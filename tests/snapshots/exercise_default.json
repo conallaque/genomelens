@@ -1,0 +1,80 @@
+{
+  "chronotype": {
+    "chronotype": "Evening",
+    "factors": [
+      "rs1801260 (CLOCK 3111) TT \u2014 strong evening chronotype"
+    ],
+    "optimal_window": "16:00 \u2013 20:00",
+    "rationale": "Late-chronotype genotype \u2014 peak strength, power, and reaction-time performance shifts later in the day. Avoid 06:00 sessions if performance matters; reserve early hours for low-intensity work."
+  },
+  "cognitive": {
+    "genotype": "Val/Val",
+    "summary": "BDNF Val/Val \u2014 efficient activity-dependent BDNF secretion. Strong cognitive-benefit response to aerobic exercise.",
+    "training_note": "Conventional aerobic training (3-4 \u00d7/week, 40-60 min Zone 2) is highly effective for mood, memory, and neuroplasticity outcomes."
+  },
+  "injury_risk": {
+    "risks": [
+      {
+        "level": "Protective",
+        "marker": "rs12722 (COL5A1) TT",
+        "mitigation": "Favourable tendon-stiffness profile \u2014 running economy advantage.",
+        "tissue": "Achilles / patellar tendon"
+      }
+    ]
+  },
+  "power_endurance": {
+    "bias": "Power-dominant",
+    "factors": [
+      "ACTN3 CT (R/X) \u2014 mixed fibre type, balanced"
+    ],
+    "ratio_pct_endurance": 0,
+    "ratio_pct_power": 100,
+    "recommendation": "Prioritise heavy strength (3-6 reps) and explosive work (jumps, sprints, Olympic lifts). 2-3 short conditioning sessions/week is sufficient. Avoid chronic high-volume aerobic which blunts your strength response."
+  },
+  "recovery": {
+    "factors": [
+      "rs1800795 (IL6 -174) GG \u2014 high baseline inflammatory tone"
+    ],
+    "inflammation_score": 2,
+    "protocol": "Expect prolonged DOMS and slower clearance of training stress. 48-72 h between hard sessions on the same muscle group. Aggressive recovery: sleep \u22658 h, omega-3, tart cherry, contrast showers.",
+    "speed": "Slow"
+  },
+  "status": "ok",
+  "weekly_template": [
+    {
+      "day": "Mon",
+      "session": "Lower body strength (squat, deadlift, jumps)",
+      "time": "16:00 \u2013 20:00"
+    },
+    {
+      "day": "Tue",
+      "session": "Conditioning \u2014 20 min Zone 2 + sprint intervals",
+      "time": "16:00 \u2013 20:00"
+    },
+    {
+      "day": "Wed",
+      "session": "Upper body strength (press, pull, accessories)",
+      "time": "16:00 \u2013 20:00"
+    },
+    {
+      "day": "Thu",
+      "session": "Full recovery day (slow inflammation profile)",
+      "time": "16:00 \u2013 20:00"
+    },
+    {
+      "day": "Fri",
+      "session": "Full-body power (cleans, push press, plyo)",
+      "time": "16:00 \u2013 20:00"
+    },
+    {
+      "day": "Sat",
+      "session": "Athletic / sport-specific play",
+      "time": "16:00 \u2013 20:00"
+    },
+    {
+      "day": "Sun",
+      "session": "Off / mobility",
+      "time": "Anytime"
+    }
+  ]
+}

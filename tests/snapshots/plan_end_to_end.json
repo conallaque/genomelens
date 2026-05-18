@@ -1,0 +1,387 @@
+{
+  "evening_actions": [
+    "Train in evening window 16:00 \u2013 20:00"
+  ],
+  "headlines": {
+    "bloodwork": "Bloodwork not supplied",
+    "exercise": "Power-dominant (100/0) \u00b7 slow recovery \u00b7 train 16:00 \u2013 20:00",
+    "nutrition": "32C/33F/35P \u00b7 caffeine slow (*1f carrier) \u00b7 alcohol standard",
+    "supplements": "1 essential supplement: Vitamin D3 + K2 (MK-7)"
+  },
+  "morning_actions": [
+    "L-Methylfolate (5-MTHF) \u2014 400 mcg (recommended)",
+    "Methyl-B-Complex (B6 P5P + Methylcobalamin) \u2014 B6 25 mg + B12 1000 mcg (recommended)",
+    "Methylcobalamin B12 \u2014 1000 mcg sublingual (recommended)",
+    "Coffee cap 200 mg/day; last cup \u2264 12:00",
+    "Breakfast: 3 eggs + saut\u00e9ed spinach + \u00bd avocado + black coffee"
+  ],
+  "pillars": {
+    "biomarkers": [],
+    "bloodwork": null,
+    "exercise": {
+      "chronotype": {
+        "chronotype": "Evening",
+        "factors": [
+          "rs1801260 (CLOCK 3111) TT \u2014 strong evening chronotype"
+        ],
+        "optimal_window": "16:00 \u2013 20:00",
+        "rationale": "Late-chronotype genotype \u2014 peak strength, power, and reaction-time performance shifts later in the day. Avoid 06:00 sessions if performance matters; reserve early hours for low-intensity work."
+      },
+      "cognitive": {
+        "genotype": "Val/Val",
+        "summary": "BDNF Val/Val \u2014 efficient activity-dependent BDNF secretion. Strong cognitive-benefit response to aerobic exercise.",
+        "training_note": "Conventional aerobic training (3-4 \u00d7/week, 40-60 min Zone 2) is highly effective for mood, memory, and neuroplasticity outcomes."
+      },
+      "injury_risk": {
+        "risks": [
+          {
+            "level": "Protective",
+            "marker": "rs12722 (COL5A1) TT",
+            "mitigation": "Favourable tendon-stiffness profile \u2014 running economy advantage.",
+            "tissue": "Achilles / patellar tendon"
+          }
+        ]
+      },
+      "power_endurance": {
+        "bias": "Power-dominant",
+        "factors": [
+          "ACTN3 CT (R/X) \u2014 mixed fibre type, balanced"
+        ],
+        "ratio_pct_endurance": 0,
+        "ratio_pct_power": 100,
+        "recommendation": "Prioritise heavy strength (3-6 reps) and explosive work (jumps, sprints, Olympic lifts). 2-3 short conditioning sessions/week is sufficient. Avoid chronic high-volume aerobic which blunts your strength response."
+      },
+      "recovery": {
+        "factors": [
+          "rs1800795 (IL6 -174) GG \u2014 high baseline inflammatory tone"
+        ],
+        "inflammation_score": 2,
+        "protocol": "Expect prolonged DOMS and slower clearance of training stress. 48-72 h between hard sessions on the same muscle group. Aggressive recovery: sleep \u22658 h, omega-3, tart cherry, contrast showers.",
+        "speed": "Slow"
+      },
+      "status": "ok",
+      "weekly_template": [
+        {
+          "day": "Mon",
+          "session": "Lower body strength (squat, deadlift, jumps)",
+          "time": "16:00 \u2013 20:00"
+        },
+        {
+          "day": "Tue",
+          "session": "Conditioning \u2014 20 min Zone 2 + sprint intervals",
+          "time": "16:00 \u2013 20:00"
+        },
+        {
+          "day": "Wed",
+          "session": "Upper body strength (press, pull, accessories)",
+          "time": "16:00 \u2013 20:00"
+        },
+        {
+          "day": "Thu",
+          "session": "Full recovery day (slow inflammation profile)",
+          "time": "16:00 \u2013 20:00"
+        },
+        {
+          "day": "Fri",
+          "session": "Full-body power (cleans, push press, plyo)",
+          "time": "16:00 \u2013 20:00"
+        },
+        {
+          "day": "Sat",
+          "session": "Athletic / sport-specific play",
+          "time": "16:00 \u2013 20:00"
+        },
+        {
+          "day": "Sun",
+          "session": "Off / mobility",
+          "time": "Anytime"
+        }
+      ]
+    },
+    "nutrition": {
+      "alcohol": {
+        "factors": [
+          "No alcohol-related SNPs typed"
+        ],
+        "guidance": "No alcohol-risk variants typed \u2014 standard moderation applies (\u22641-2 drinks/day for men, \u22641 for women).",
+        "risk": "Standard"
+      },
+      "avoid": [
+        "Sugary drinks",
+        "White bread / pastries",
+        "Sweetened breakfast cereals",
+        "Processed meats / deli",
+        "Salted snacks",
+        "High-sodium soups & sauces",
+        "Fresh milk / ice cream (lactose intolerance)"
+      ],
+      "caffeine": {
+        "cutoff_time": "12:00",
+        "factors": [
+          "rs762551 (CYP1A2) AC \u2014 slow",
+          "rs5751876 (ADORA2A) TT \u2014 anxiety-prone"
+        ],
+        "guidance": "Slow metaboliser \u2014 caffeine half-life prolonged (8+ h). Cap at 200 mg/day (\u2248 1 large coffee) and avoid after lunch. Higher dose links to elevated CV risk in slow metabolisers. L-Theanine 100-200 mg paired with caffeine smooths anxiety response.",
+        "limit_mg": 200,
+        "metabolism": "Slow (*1F carrier)"
+      },
+      "daily_template": [
+        {
+          "example": "3 eggs + saut\u00e9ed spinach + \u00bd avocado + black coffee",
+          "meal": "Breakfast"
+        },
+        {
+          "example": "Almonds + apple OR 1 boiled egg",
+          "meal": "Mid-morning"
+        },
+        {
+          "example": "Grilled salmon + large mixed-greens salad + olive oil + 1/2 sweet potato",
+          "meal": "Lunch"
+        },
+        {
+          "example": "Light snack \u2014 cheese + olives; caffeine cutoff 12:00",
+          "meal": "Afternoon"
+        },
+        {
+          "example": "Lean protein (chicken, turkey, or tofu) + cruciferous vegetables (broccoli, Brussels) + extra olive oil",
+          "meal": "Dinner"
+        },
+        {
+          "example": "Optional: small glass of red wine; finish \u22652 h before sleep.",
+          "meal": "Evening"
+        }
+      ],
+      "emphasise": [
+        "Non-starchy vegetables",
+        "Berries",
+        "Quinoa / oats (modest portions)",
+        "Fatty fish (salmon, sardines) 2-3\u00d7/week",
+        "Olive oil (extra-virgin) \u2014 primary cooking fat",
+        "Leafy greens daily (folate + nitrates)",
+        "Nuts & seeds (small handful daily)",
+        "Berries (antioxidant load)",
+        "Lactose-free dairy, aged cheeses, kefir/yoghurt"
+      ],
+      "gluten": {
+        "celiac_risk_haplotype": false,
+        "factors": [
+          "rs2187668 (HLA-DQ2 tag) CC",
+          "rs7454108 (HLA-DQ8 tag) AA"
+        ],
+        "guidance": "No DQ2/DQ8 risk haplotype typed/detected \u2014 coeliac disease is essentially ruled out. Gluten avoidance unnecessary for autoimmune reasons."
+      },
+      "lactose": {
+        "factors": [
+          "rs4988235 (LCT) GA"
+        ],
+        "guidance": "Lactase non-persistence \u2014 symptomatic lactose intolerance likely. Choose lactose-free milk, aged cheeses (parmesan, cheddar), fermented dairy (yoghurt, kefir) which are partially pre-digested. Plant milks for liquid dairy.",
+        "tolerance": "Intolerant (non-persistent)"
+      },
+      "macros": {
+        "factors": [
+          "rs9939609 (FTO) AT \u2014 better response to lower-carb diet",
+          "rs7903146 (TCF7L2) CT \u2014 reduced glucose tolerance; minimise refined carbs",
+          "APOE \u03b54 carrier \u2014 lower saturated fat, prefer mono/poly",
+          "rs174547 (FADS1) TC \u2014 favour direct EPA/DHA from fish, not ALA"
+        ],
+        "pct_carbs": 32,
+        "pct_fat": 33,
+        "pct_protein": 35,
+        "rationale": "Lower-carb skew (~30%) \u2014 your variants reduce glucose tolerance."
+      },
+      "methylation": {
+        "factors": [
+          "rs1801133 (MTHFR C677T) CT",
+          "rs1801131 (MTHFR A1298C) AC"
+        ],
+        "guidance": "Emphasise folate-rich foods: leafy greens (spinach, kale, romaine), liver, lentils, asparagus, broccoli. Avoid synthetic folic-acid fortified products (many cereals, breads) \u2014 they compete with active folate. Choose methylfolate-supplemented options if available.",
+        "needs_methylation_support": true
+      },
+      "salt": {
+        "factors": [
+          "rs699 (AGT M235T) AG \u2014 salt-sensitive hypertension allele"
+        ],
+        "guidance": "Reduce sodium to \u22642.3 g/day; emphasise potassium-rich foods (leafy greens, beans, potato). DASH-style pattern especially beneficial.",
+        "sensitive": true
+      },
+      "status": "ok",
+      "vitamin_d_food": {
+        "factors": [
+          "rs10741657 (CYP2R1) GG",
+          "rs2282679 (GC/VDBP) CC",
+          "rs2228570 (VDR FokI) TT"
+        ],
+        "guidance": "Prioritise high-D foods: wild salmon, sardines, herring, egg yolks, UV-treated mushrooms, fortified dairy. Combine with daytime sun exposure where possible (10-30 min, depending on skin tone, latitude, season).",
+        "needs_more_intake": true
+      }
+    },
+    "supplements": {
+      "avoid": [],
+      "chip_gaps": [],
+      "n_chip_gaps": 0,
+      "n_essential": 1,
+      "n_optional": 2,
+      "n_recommended": 7,
+      "n_supplements": 10,
+      "notes": "Genetic recommendations are starting points \u2014 confirm with labs and a physician. Doses are typical adult ranges; pregnant/breastfeeding/under-18 users should not self-supplement without clinical guidance.",
+      "status": "ok",
+      "tiers": {
+        "avoid": [],
+        "chip_gap": [],
+        "essential": [
+          {
+            "category": "Vitamins & Minerals",
+            "dose": "4000 IU D3 / 100-200 mcg K2",
+            "form": "Cholecalciferol (D3) with menaquinone-7",
+            "interactions": "Co-supplement magnesium (D activation requires Mg); avoid high-dose D without K2 (calcium routing).",
+            "monthly_cost_usd": 12,
+            "name": "Vitamin D3 + K2 (MK-7)",
+            "reasoning": "Multiple low-D genotypes (CYP2R1 + GC/VDBP) plus/or active VDR FokI \u2014 expect persistently low serum 25(OH)D unless dosing aggressively.",
+            "snps": [
+              "rs10741657 (CYP2R1) dose 2",
+              "rs2282679 (GC/VDBP) dose 2",
+              "rs2228570 (VDR FokI) TT"
+            ],
+            "tier": "essential",
+            "timing": "With fattiest meal of the day"
+          }
+        ],
+        "optional": [
+          {
+            "category": "Hormones & Endocrine",
+            "dose": "15 mg",
+            "form": "Picolinate or bisglycinate",
+            "interactions": "Long-term high zinc depletes copper \u2014 keep dose \u226425 mg/day.",
+            "monthly_cost_usd": 7,
+            "name": "Zinc Picolinate",
+            "reasoning": "SHBG genotype predicts higher SHBG \u2192 lower free testosterone. Zinc supports endogenous T production and aromatase modulation.",
+            "snps": [
+              "rs1799941 (SHBG) GA"
+            ],
+            "tier": "optional",
+            "timing": "Evening with food"
+          },
+          {
+            "category": "Neuro & Mood",
+            "dose": "100-200 mg with caffeine",
+            "form": "Suntheanine or generic L-theanine",
+            "interactions": "Generally well tolerated; mildly hypotensive in large doses.",
+            "monthly_cost_usd": 9,
+            "name": "L-Theanine",
+            "reasoning": "CYP1A2 slow-metaboliser genotype (rs762551 *1F) \u2014 caffeine half-life prolonged; L-theanine blunts jitteriness without reducing alertness.",
+            "snps": [
+              "rs762551 (CYP1A2) AC"
+            ],
+            "tier": "optional",
+            "timing": "Paired with morning coffee"
+          }
+        ],
+        "recommended": [
+          {
+            "category": "Detox & Antioxidants",
+            "dose": "600-1200 mg",
+            "form": "NAC capsule",
+            "interactions": "Smells of sulfur; can blunt nitroglycerin response.",
+            "monthly_cost_usd": 15,
+            "name": "N-Acetyl Cysteine (NAC)",
+            "reasoning": "Reduced glutathione-system capacity (GSTP1 / NRF2 variant). NAC is a direct cysteine donor for glutathione synthesis \u2014 supports detox and antioxidant defense.",
+            "snps": [
+              "rs1695 (GSTP1) AG",
+              "rs6721961 (NRF2) GT"
+            ],
+            "tier": "recommended",
+            "timing": "Empty stomach 1-2\u00d7 daily"
+          },
+          {
+            "category": "Inflammation & Recovery",
+            "dose": "500-1000 mg curcuminoids",
+            "form": "Meriva / Longvida / BCM-95 or curcumin + 5-10 mg piperine",
+            "interactions": "Mild antiplatelet; pause 1 week pre-surgery; can interact with tacrolimus.",
+            "monthly_cost_usd": 20,
+            "name": "Curcumin (with piperine or phytosome)",
+            "reasoning": "IL6 promoter variant and/or elevated genetic CRP prediction \u2014 chronic low-grade inflammation tendency. Curcumin inhibits NF-\u03baB and lowers CRP.",
+            "snps": [
+              "rs1800795 (IL6) GG"
+            ],
+            "tier": "recommended",
+            "timing": "With meals 1-2\u00d7 daily"
+          },
+          {
+            "category": "Inflammation & Recovery",
+            "dose": "1.5 g EPA+DHA",
+            "form": "Triglyceride-form fish oil or algal oil (vegetarian)",
+            "interactions": "Mild anticoagulant; check with physician if on warfarin/DOACs.",
+            "monthly_cost_usd": 22,
+            "name": "EPA/DHA (fish or algal oil)",
+            "reasoning": "FADS1 reduced-conversion genotype \u2014 endogenous ALA\u2192EPA/DHA pathway is impaired. Direct preformed EPA/DHA supplementation needed.",
+            "snps": [
+              "rs174547 (FADS1) TC \u2014 T-allele dose 1"
+            ],
+            "tier": "recommended",
+            "timing": "With largest meal"
+          },
+          {
+            "category": "Methylation & B-vitamins",
+            "dose": "400 mcg",
+            "form": "5-MTHF",
+            "interactions": "Replace any folic-acid containing multivitamin.",
+            "monthly_cost_usd": 12,
+            "name": "L-Methylfolate (5-MTHF)",
+            "reasoning": "Heterozygous MTHFR 677CT \u2014 ~30-40% reduction in enzyme activity. Pre-methylated folate ensures consistent methylation cycle flux.",
+            "snps": [
+              "rs1801133 (MTHFR C677T) CT"
+            ],
+            "tier": "recommended",
+            "timing": "Morning with food"
+          },
+          {
+            "category": "Methylation & B-vitamins",
+            "dose": "B6 25 mg + B12 1000 mcg",
+            "form": "Pyridoxal-5-phosphate (P5P) + methylcobalamin (not cyanocobalamin)",
+            "interactions": "Methyl-donors can over-stimulate in COMT slow homozygotes \u2014 start low.",
+            "monthly_cost_usd": 15,
+            "name": "Methyl-B-Complex (B6 P5P + Methylcobalamin)",
+            "reasoning": "MTHFR A1298C reduces BH4 regeneration, affecting neurotransmitter and methylation pathways. Active B-vitamin forms support the cycle.",
+            "snps": [
+              "rs1801131 (MTHFR A1298C)"
+            ],
+            "tier": "recommended",
+            "timing": "Morning"
+          },
+          {
+            "category": "Methylation & B-vitamins",
+            "dose": "1000 mcg sublingual",
+            "form": "Methylcobalamin (avoid cyanocobalamin)",
+            "interactions": "Vegans and PPI/metformin users need higher doses; recheck serum B12 yearly.",
+            "monthly_cost_usd": 10,
+            "name": "Methylcobalamin B12",
+            "reasoning": "Genotype predicts reduced B12 status due to absorption (FUT2) and/or transport (TCN2) variants. Sublingual methyl-form bypasses both.",
+            "snps": [
+              "rs602662 (FUT2) GA \u2192 reduced absorption",
+              "rs1801198 (TCN2) GC \u2192 reduced transport"
+            ],
+            "tier": "recommended",
+            "timing": "Morning"
+          },
+          {
+            "category": "Performance & Recovery",
+            "dose": "3-5 g daily",
+            "form": "Micronised monohydrate (skip exotic forms)",
+            "interactions": "Very safe; transient water-weight gain; hydrate well.",
+            "monthly_cost_usd": 8,
+            "name": "Creatine Monohydrate",
+            "reasoning": "ACTN3 R-allele carriers respond particularly well to creatine for power output and muscle volume. Universal cognitive benefits apply across genotypes.",
+            "snps": [
+              "rs1815739 (ACTN3) CT"
+            ],
+            "tier": "recommended",
+            "timing": "Any time, consistency > timing"
+          }
+        ]
+      },
+      "total_estimated_cost_usd_monthly": 130
+    }
+  },
+  "reconciliation": [],
+  "status": "ok"
+}
