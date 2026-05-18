@@ -1,0 +1,117 @@
+{
+  "alcohol": {
+    "factors": [
+      "No alcohol-related SNPs typed"
+    ],
+    "guidance": "No alcohol-risk variants typed \u2014 standard moderation applies (\u22641-2 drinks/day for men, \u22641 for women).",
+    "risk": "Standard"
+  },
+  "avoid": [
+    "Sugary drinks",
+    "White bread / pastries",
+    "Sweetened breakfast cereals",
+    "Processed meats / deli",
+    "Salted snacks",
+    "High-sodium soups & sauces",
+    "Fresh milk / ice cream (lactose intolerance)"
+  ],
+  "caffeine": {
+    "cutoff_time": "12:00",
+    "factors": [
+      "rs762551 (CYP1A2) AC \u2014 slow",
+      "rs5751876 (ADORA2A) TT \u2014 anxiety-prone"
+    ],
+    "guidance": "Slow metaboliser \u2014 caffeine half-life prolonged (8+ h). Cap at 200 mg/day (\u2248 1 large coffee) and avoid after lunch. Higher dose links to elevated CV risk in slow metabolisers. L-Theanine 100-200 mg paired with caffeine smooths anxiety response.",
+    "limit_mg": 200,
+    "metabolism": "Slow (*1F carrier)"
+  },
+  "daily_template": [
+    {
+      "example": "3 eggs + saut\u00e9ed spinach + \u00bd avocado + black coffee",
+      "meal": "Breakfast"
+    },
+    {
+      "example": "Almonds + apple OR 1 boiled egg",
+      "meal": "Mid-morning"
+    },
+    {
+      "example": "Grilled salmon + large mixed-greens salad + olive oil + 1/2 sweet potato",
+      "meal": "Lunch"
+    },
+    {
+      "example": "Light snack \u2014 cheese + olives; caffeine cutoff 12:00",
+      "meal": "Afternoon"
+    },
+    {
+      "example": "Lean protein (chicken, turkey, or tofu) + cruciferous vegetables (broccoli, Brussels) + extra olive oil",
+      "meal": "Dinner"
+    },
+    {
+      "example": "Optional: small glass of red wine; finish \u22652 h before sleep.",
+      "meal": "Evening"
+    }
+  ],
+  "emphasise": [
+    "Non-starchy vegetables",
+    "Berries",
+    "Quinoa / oats (modest portions)",
+    "Fatty fish (salmon, sardines) 2-3\u00d7/week",
+    "Olive oil (extra-virgin) \u2014 primary cooking fat",
+    "Leafy greens daily (folate + nitrates)",
+    "Nuts & seeds (small handful daily)",
+    "Berries (antioxidant load)",
+    "Lactose-free dairy, aged cheeses, kefir/yoghurt"
+  ],
+  "gluten": {
+    "celiac_risk_haplotype": false,
+    "factors": [
+      "rs2187668 (HLA-DQ2 tag) CC",
+      "rs7454108 (HLA-DQ8 tag) AA"
+    ],
+    "guidance": "No DQ2/DQ8 risk haplotype typed/detected \u2014 coeliac disease is essentially ruled out. Gluten avoidance unnecessary for autoimmune reasons."
+  },
+  "lactose": {
+    "factors": [
+      "rs4988235 (LCT) GA"
+    ],
+    "guidance": "Lactase non-persistence \u2014 symptomatic lactose intolerance likely. Choose lactose-free milk, aged cheeses (parmesan, cheddar), fermented dairy (yoghurt, kefir) which are partially pre-digested. Plant milks for liquid dairy.",
+    "tolerance": "Intolerant (non-persistent)"
+  },
+  "macros": {
+    "factors": [
+      "rs9939609 (FTO) AT \u2014 better response to lower-carb diet",
+      "rs7903146 (TCF7L2) CT \u2014 reduced glucose tolerance; minimise refined carbs",
+      "APOE \u03b54 carrier \u2014 lower saturated fat, prefer mono/poly",
+      "rs174547 (FADS1) TC \u2014 favour direct EPA/DHA from fish, not ALA"
+    ],
+    "pct_carbs": 32,
+    "pct_fat": 33,
+    "pct_protein": 35,
+    "rationale": "Lower-carb skew (~30%) \u2014 your variants reduce glucose tolerance."
+  },
+  "methylation": {
+    "factors": [
+      "rs1801133 (MTHFR C677T) CT",
+      "rs1801131 (MTHFR A1298C) AC"
+    ],
+    "guidance": "Emphasise folate-rich foods: leafy greens (spinach, kale, romaine), liver, lentils, asparagus, broccoli. Avoid synthetic folic-acid fortified products (many cereals, breads) \u2014 they compete with active folate. Choose methylfolate-supplemented options if available.",
+    "needs_methylation_support": true
+  },
+  "salt": {
+    "factors": [
+      "rs699 (AGT M235T) AG \u2014 salt-sensitive hypertension allele"
+    ],
+    "guidance": "Reduce sodium to \u22642.3 g/day; emphasise potassium-rich foods (leafy greens, beans, potato). DASH-style pattern especially beneficial.",
+    "sensitive": true
+  },
+  "status": "ok",
+  "vitamin_d_food": {
+    "factors": [
+      "rs10741657 (CYP2R1) GG",
+      "rs2282679 (GC/VDBP) CC",
+      "rs2228570 (VDR FokI) TT"
+    ],
+    "guidance": "Prioritise high-D foods: wild salmon, sardines, herring, egg yolks, UV-treated mushrooms, fortified dairy. Combine with daytime sun exposure where possible (10-30 min, depending on skin tone, latitude, season).",
+    "needs_more_intake": true
+  }
+}

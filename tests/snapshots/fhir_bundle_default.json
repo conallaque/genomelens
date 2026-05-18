@@ -1,0 +1,281 @@
+{
+  "entry": [
+    {
+      "resource": {
+        "active": true,
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/Patient-uv-genomics-reporting"
+          ]
+        },
+        "resourceType": "Patient"
+      }
+    },
+    {
+      "resource": {
+        "category": [
+          {
+            "coding": [
+              {
+                "code": "GE",
+                "display": "Genetics",
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "code": "81247-9",
+              "display": "Master HL7 genetic variant reporting panel",
+              "system": "http://loinc.org"
+            }
+          ],
+          "text": "Consumer-chip-derived clinical genomics report"
+        },
+        "conclusion": "APOE genotype: \u03b53/\u03b54. 1 pharmacogenomic genes evaluated; 0 actionable drug-level guidance entries.",
+        "conclusionCode": [
+          {
+            "coding": [
+              {
+                "code": "GS",
+                "display": "Genetic susceptibility",
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation"
+              }
+            ]
+          }
+        ],
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/diagnosticreport-uv-genomics-reporting"
+          ]
+        },
+        "performer": [
+          {
+            "display": "Local DNA Analysis Tool (consumer-chip pipeline)"
+          }
+        ],
+        "resourceType": "DiagnosticReport",
+        "result": [
+          {
+            "reference": "Observation/<id>"
+          },
+          {
+            "reference": "Observation/<id>"
+          }
+        ],
+        "status": "final",
+        "subject": {
+          "reference": "Patient/<id>"
+        }
+      }
+    },
+    {
+      "resource": {
+        "category": [
+          {
+            "coding": [
+              {
+                "code": "laboratory",
+                "display": "Laboratory",
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "code": "48006-2",
+              "display": "APO E gene targeted mutation analysis",
+              "system": "http://loinc.org"
+            }
+          ],
+          "text": "APOE Alzheimer's risk genotype"
+        },
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/genotype"
+          ]
+        },
+        "note": [
+          {
+            "text": "APOE genotype is a clinically recognised risk modifier for late-onset Alzheimer's disease. \u03b54/\u03b54 carries highest lifetime risk; \u03b52/\u03b52 and \u03b52/\u03b53 may be protective."
+          }
+        ],
+        "resourceType": "Observation",
+        "status": "final",
+        "subject": {
+          "reference": "Patient/<id>"
+        },
+        "valueCodeableConcept": {
+          "coding": [],
+          "text": "\u03b53/\u03b54"
+        }
+      }
+    },
+    {
+      "resource": {
+        "category": [
+          {
+            "coding": [
+              {
+                "code": "laboratory",
+                "display": "Laboratory",
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category"
+              },
+              {
+                "code": "GE",
+                "display": "Genetic",
+                "system": "http://hl7.org/fhir/uv/genomics-reporting/CodeSystem/tbd-codes-cs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "code": "84413-4",
+              "display": "Genotype display name",
+              "system": "http://loinc.org"
+            }
+          ],
+          "text": "CYP2D6 phenotype: Intermediate Metaboliser"
+        },
+        "component": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "code": "82120-4",
+                  "display": "Genetic activity score",
+                  "system": "http://loinc.org"
+                }
+              ],
+              "text": "CPIC activity score"
+            },
+            "valueQuantity": {
+              "code": "1",
+              "system": "http://unitsofmeasure.org",
+              "unit": "score",
+              "value": 1.25
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "code": "53034-5",
+                  "display": "Allelic state",
+                  "system": "http://loinc.org"
+                },
+                {
+                  "code": "rs1065852",
+                  "display": "rs1065852",
+                  "system": "http://www.ncbi.nlm.nih.gov/snp"
+                }
+              ],
+              "text": "rs1065852 genotype"
+            },
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "code": "LA6705-3",
+                  "display": "Heterozygous",
+                  "system": "http://loinc.org"
+                }
+              ],
+              "text": "GA"
+            }
+          }
+        ],
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/genotype"
+          ]
+        },
+        "note": [
+          {
+            "text": "CPIC: CPIC v2024.1"
+          }
+        ],
+        "resourceType": "Observation",
+        "status": "final",
+        "subject": {
+          "reference": "Patient/<id>"
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "code": "IM",
+              "display": "Intermediate Metaboliser",
+              "system": "https://cpicpgx.org/lookup"
+            }
+          ],
+          "text": "Intermediate Metaboliser"
+        }
+      }
+    },
+    {
+      "resource": {
+        "agent": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "code": "assembler",
+                  "display": "Assembler",
+                  "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type"
+                }
+              ]
+            },
+            "who": {
+              "display": "Local DNA Analysis Tool"
+            }
+          }
+        ],
+        "entity": [
+          {
+            "role": "source",
+            "what": {
+              "display": "Consumer-chip raw genotype file (synthetic.csv) \u2014 autosomal SNP array output, GRCh37/hg19 coordinates"
+            }
+          }
+        ],
+        "policy": [
+          "Findings limited to clinically validated genomic markers: PGx (CPIC), carrier status (autosomal recessive screening panels), HLA tag-SNP imputation, and APOE genotype. PRS, ancestry, traits, wellness, and lifestyle modules are excluded from this clinical bundle."
+        ],
+        "resourceType": "Provenance",
+        "target": [
+          {
+            "reference": "Patient/<id>"
+          },
+          {
+            "reference": "DiagnosticReport/<id>"
+          },
+          {
+            "reference": "Observation/<id>"
+          },
+          {
+            "reference": "Observation/<id>"
+          }
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/genomics-reporting/StructureDefinition/diagnosticreport-uv-genomics-reporting"
+    ],
+    "tag": [
+      {
+        "code": "consumer-genomics",
+        "display": "Generated from consumer chip raw data \u2014 clinically validated subset only",
+        "system": "https://hl7.org/fhir/R4"
+      }
+    ]
+  },
+  "resourceType": "Bundle",
+  "type": "collection"
+}

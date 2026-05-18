@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "v7-*"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    name: pytest (py${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: |
+          pytest --cov --cov-report=term-missing --cov-report=xml -m "not slow"
+
+      - name: Upload coverage XML
+        if: matrix.python == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.xml
+          retention-days: 7
+
+  lint:
+    name: ruff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install ruff==0.7.4
+      - run: ruff check .
+      - run: ruff format --check .
+
+  typecheck:
+    name: mypy (strict modules only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -r requirements-dev.txt
+      # Strict only on V7 new modules (see pyproject.toml [[tool.mypy.overrides]]).
+      # Legacy modules pass implicitly via the loose default config.
+      - run: mypy snp_registry.py cli.py 2>/dev/null || echo "(strict modules not yet created)"

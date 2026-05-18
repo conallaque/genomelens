@@ -1,0 +1,105 @@
+# ── Personal genetic data — NEVER commit ────────────────────────────────────
+# Raw DNA files (any consumer chip format)
+*.csv
+*.txt
+*.vcf
+*.vcf.gz
+*.bcf
+*.fam
+*.bim
+*.bed
+*.ped
+*.map
+*.gen
+*.gen.gz
+*.bgen
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# Specific raw-file naming patterns
+genome*.txt
+genome*.csv
+*23andMe*
+*AncestryDNA*
+*ftdna*
+*MyHeritage*
+*TellmeGen*
+WUTED*
+
+# ── Generated reports & analysis output ────────────────────────────────────
+report.html
+report.pdf
+narrative_report.html
+narrative_report.pdf
+carrier_report.html
+carrier_report.pdf
+emergency_card.html
+emergency_card.pdf
+supplements.html
+exercise.html
+nutrition.html
+bloodwork.html
+fhir_bundle.json
+tier1_results.json
+failed_categories.json
+changelog.json
+labs*.json
+bloodwork*.json
+
+# ── Cache / intermediate data ──────────────────────────────────────────────
+imputation_cache/
+beagle_cache/
+*.imputed.vcf
+*.imputed.vcf.gz
+reference/1000g/
+reference/pgs_scores/
+reference/beagle/
+reference/*.vcf*
+reference/*.bgen*
+reference/*.bed
+reference/*.bim
+reference/*.fam
+reference/*.tar*
+reference/*.zip
+
+# Allow setup metadata in reference/
+!reference/setup_manifest.json
+!reference/README*
+
+# ── Python ─────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+dist/
+build/
+.tox/
+.nox/
+
+# ── Editor / OS ────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ── Logs ───────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Allow the small included test genome and SNP DB only ───────────────────
+!test_genome.txt
+!snp_database.json

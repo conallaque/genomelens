@@ -1,0 +1,137 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dna-analysis-tool"
+version = "7.0.0-consolidation"
+description = "Local, privacy-first DNA analysis pipeline for consumer raw-chip data"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Project contributors" }]
+keywords = ["genomics", "DNA", "PGx", "PRS", "FHIR", "bioinformatics"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+# Runtime deps duplicated in requirements.txt for `pip install -r` workflows.
+# Single source of truth would be nicer; pinning them here would require
+# `pip install -e .` which not all users want.
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "scikit-learn>=1.4",
+    "snps>=2.9",
+    "requests>=2.31",
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+pdf = ["weasyprint>=60"]
+plot = ["matplotlib>=3.8"]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=5",
+    "pytest-xdist>=3",
+    "ruff>=0.7",
+    "mypy>=1.10",
+    "pre-commit>=3",
+]
+
+[project.scripts]
+dna-analyze = "cli:main"
+
+# ── pytest ─────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = [
+    "-ra",
+    "--strict-config",
+    "--strict-markers",
+    "--tb=short",
+]
+markers = [
+    "golden: snapshot regression tests — guard module output stability",
+    "slow: tests that take > 1s; deselect with `-m 'not slow'`",
+    "integration: full-pipeline tests that exercise multiple modules",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning:snps.*",
+    "ignore::PendingDeprecationWarning",
+]
+
+# ── coverage ──────────────────────────────────────────────────────────────
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "tests/*",
+    "*/__pycache__/*",
+    ".venv/*",
+    "setup.py",          # bootstrap script, not application logic
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+precision = 1
+show_missing = true
+skip_covered = true
+
+# ── ruff ──────────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = ["reference", "__pycache__", ".venv"]
+
+[tool.ruff.lint]
+# Start narrow; widen as the codebase tightens up. Adding too many rules at
+# once means a wall of warnings that nobody actions.
+select = [
+    "E",      # pycodestyle errors
+    "F",      # pyflakes (undefined names, unused imports, etc.)
+    "W",      # pycodestyle warnings
+    "I",      # isort (import ordering)
+    "UP",     # pyupgrade (modernise syntax)
+    "B",      # flake8-bugbear (common bugs)
+    "SIM",    # flake8-simplify
+    "RUF",    # ruff-specific
+]
+ignore = [
+    "E501",   # line-too-long — many migration narratives exceed; format-fix only
+    "B008",   # function-call-in-default-argument — pandas DataFrame() default ok here
+    "RUF012", # mutable-class-attribute — many dicts are intentionally module-level
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501", "B011"]   # tests favour readability over line-length / assertion strictness
+
+# ── mypy ──────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.10"
+# Strict mode is the eventual goal. Start loose so existing code compiles.
+strict = false
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true   # third-party stubs (snps, weasyprint) absent
+exclude = ["^reference/", "^\\.venv/"]
+
+# Tighter per-module checks for new V7 work — start strict on the new files
+# and grow the strict set as legacy modules are cleaned up.
+[[tool.mypy.overrides]]
+module = ["snp_registry", "cli"]
+strict = true
+disallow_untyped_defs = true

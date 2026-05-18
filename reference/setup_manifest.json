@@ -1,0 +1,14 @@
+{
+  "beagle": {
+    "jar": false,
+    "ref_panels_present": 0,
+    "maps_present": false
+  },
+  "pgs_catalog": {
+    "files_present": 15,
+    "expected": 15
+  },
+  "ancestry": {
+    "aims_panel": false
+  }
+}
