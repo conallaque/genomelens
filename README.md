@@ -1,3 +1,9 @@
+© 2026 Conall Aque. All Rights Reserved.
+
+This software is proprietary and confidential. 
+Unauthorized copying, modification, or distribution is prohibited.
+
+---
 # DNA Analysis Tool
 
 > **Local, privacy-first DNA analysis pipeline.** Turns a consumer raw-data file
