@@ -54,7 +54,11 @@ def analyze_drug_database(snps_df: pd.DataFrame) -> List[Dict]:
     if not drugs:
         return findings
 
-    snps_index = snps_df.index if snps_df is not None else []
+    if snps_df is None or snps_df.empty:
+        return findings
+    if 'rsid' in snps_df.columns and snps_df.index.name != 'rsid':
+        snps_df = snps_df.set_index('rsid')
+    snps_index = snps_df.index
 
     for entry in drugs:
         markers = entry.get("snp_markers") or []
