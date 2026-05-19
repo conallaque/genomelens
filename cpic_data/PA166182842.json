@@ -1,0 +1,151 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166182842",
+    "name" : "Annotation of DPWG Guideline for warfarin and CYP2C9",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1450415240,
+        "date" : "2019-05-27T00:00:00-07:00",
+        "description" : "Annotation current with November 2018 DPWG Guideline release",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1450820676,
+        "date" : "2019-10-03T16:23:52.557-07:00",
+        "description" : "No changes based on August 2019 guidelines",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450963944,
+        "date" : "2020-02-11T08:29:07-08:00",
+        "description" : "Fixed links to 2018 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450963980,
+        "date" : "2020-02-11T08:45:28.833-08:00",
+        "description" : "Fixed links to the algorithms.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451445822,
+        "date" : "2021-05-18T00:00:00-07:00",
+        "description" : "Added extended dosing",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451699920,
+        "date" : "2022-03-01T13:20:35.572-08:00",
+        "description" : "Updated names of IM and PM groups and added footnote and explanation.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704181,
+        "date" : "2022-03-03T16:33:22.822-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451732821,
+        "date" : "2022-03-28T09:57:36.474-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451884780,
+        "date" : "2022-09-16T14:51:20.777-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146445,
+        "date" : "2023-07-03T13:39:46.276-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452411813,
+        "date" : "2024-03-18T00:00:00-07:00",
+        "description" : "Updated links for risk analysis pdf.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452414803,
+        "date" : "2024-03-20T00:00:00-07:00",
+        "description" : "Removed broken links from within recommendations.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452414660,
+        "date" : "2024-03-20T06:05:50.625-07:00",
+        "description" : "Replaced broken links to algorithms with excel downloads.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454042221,
+        "date" : "2025-04-25T16:38:44.712-07:00",
+        "description" : "updated CYP2C9 gene information document",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15102465,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2018","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","crossReferences":[{"id":1450415575,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA451906",
+        "name" : "warfarin",
+        "version" : 21
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA126",
+        "symbol" : "CYP2C9",
+        "name" : "cytochrome P450 family 2 subfamily C member 9",
+        "version" : 7877
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1450415238,
+      "html" : "<p>Reduce warfarin dose in CYP2C9 poor and intermediate metabolizers (PM and IM) and patients with CYP2C9*1/*3, *2/*3, *2/*2 or *3/*3 genotype. The genotype-specific initial dose and maintenance dose can be calculated using an algorithm, as used in EU-PACT.</p>\n",
+      "version" : 3
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1450415239,
+      "html" : "<h3 id=\"may-2021-update\">May 2021 update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has made some minor changes to the names of some phenotype groups in this guideline. The table below has been updated to reflect this but the recommendations themselves have not changed.</p>\n<h3 id=\"november-2018-guideline\">November 2018 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for warfarin based on CYP2C9 genotype/phenotype.  They recommend reducing warfarin dose for CYP2C9 poor and intermediate metabolizers (PM and IM) and patients with CYP2C9*1/*3, *2/*3, *2/*2 or *3/*3 genotype. The genotype-specific initial dose and maintenance dose can be calculated using an algorithm, as used in EU-PACT.</p>\n<p><a download=\"DPWG_Warfarin_loading_doses_calculation_for_different_genotypes.xlsx\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_Warfarin_loading_doses_calculation_for_different_genotypes.xlsx\">Download the warfarin loading doses algorithm used in EU-PACT provided by DPWG</a> <em>this is an excel file retrieved from DPWG on 3/19/2024.</em>\n<a download=\"DPWG_Warfarin_doses_day_4_and_5_calculation_for_different_genotypes.xlsx\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_Warfarin_doses_day_4_and_5_calculation_for_different_genotypes.xlsx\">Download the warfarin day 4-5 algorithm used in EU-PACT provided by DPWG</a> <em>this is an excel file retrieved from DPWG on 3/20/2024.</em></p>\n<p><em>Wording in table taken from the <a download=\"DPWG_November_2018.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_November_2018.pdf\">Dutch guidelines November 2018 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2C9 IM other<sup>a</sup></td>\n<td>warfarin</td>\n<td>This gene variation reduces the conversion of warfarin to inactive metabolites. This can increase the risk of bleeding.</td>\n<td>1. use 65% of the standard initial dose. The genotype-specific initial dose and maintenance dose can be calculated using an algorithm. Algorithms for Caucasian patients usually contain only the *2 and *3 allele. If the activity of the reduced-activity alleles is comparable to the activity of *2 or *3, then the algorithm can be completed as if *1/*2 or *1/*3 is present. See <a href=\"/guidelineAnnotation/PA166182842#november-2018-guideline\">Excel files</a> containing calculation modules for oral and equivalent intravenous doses. From day 6 on the standard algorithm without genotype information can be used to calculate the dose. Modified dose algorithms have been developed for patients of African or (East) Asian heritage.</td>\n</tr>\n<tr>\n<td>CYP2C9 PM other<sup>a</sup></td>\n<td>warfarin</td>\n<td>This gene variation reduces the conversion of warfarin to inactive metabolites. This can increase the risk of bleeding.</td>\n<td>1. use 20% of the standard initial dose. The genotype-specific initial dose and maintenance dose can be calculated using an algorithm. Algorithms for Caucasian patients usually contain only the *2 and *3 allele. If the activity of the reduced-activity alleles is comparable to the activity of *2 or *3, then the algorithm can be completed as if *2 or *3 is present. See <a href=\"/guidelineAnnotation/PA166182842#november-2018-guideline\">Excel files</a> containing calculation modules for oral and equivalent intravenous doses. From day 6 on the standard algorithm without genotype information can be used to calculate the dose. Modified dose algorithms have been developed for patients of African or (East) Asian heritage.</td>\n</tr>\n<tr>\n<td>CYP2C9*1/*2</td>\n<td>warfarin</td>\n<td>Genetic variation may lead to a decrease in the required maintenance dose. However, there is insufficient evidence that this causes problems when therapy is initiated as usual.</td>\n<td>NO action is required for this gene-drug interaction.</td>\n</tr>\n<tr>\n<td>CYP2C9*1/*3</td>\n<td>warfarin</td>\n<td>This gene variation reduces the conversion of warfarin to inactive metabolites. This can increase the risk of bleeding.</td>\n<td>1. use 65% of the standard initial dose. The genotype-specific initial dose and maintenance dose can be calculated using an algorithm, as used in EU-PACT. From day 6 on the standard algorithm without genotype information can be used to calculate the dose.</td>\n</tr>\n<tr>\n<td>CYP2C9*2/*2</td>\n<td>warfarin</td>\n<td>This gene variation reduces the conversion of warfarin to inactive metabolites. This can increase the risk of bleeding.</td>\n<td>1. use 65% of the standard initial dose. The genotype-specific initial dose and maintenance dose can be calculated using an algorithm, as used in EU-PACT. From day 6 on the standard algorithm without genotype information can be used to calculate the dose.</td>\n</tr>\n<tr>\n<td>CYP2C9*2/*3</td>\n<td>warfarin</td>\n<td>This gene variation reduces the conversion of warfarin to inactive metabolites. This can increase the risk of bleeding.</td>\n<td>1. use 45% of the standard initial dose. The genotype-specific initial dose and maintenance dose can be calculated using an algorithm, as used in EU-PACT. From day 6 on the standard algorithm without genotype information can be used to calculate the dose.</td>\n</tr>\n<tr>\n<td>CYP2C9*3/*3</td>\n<td>warfarin</td>\n<td>This gene variation reduces the conversion of warfarin to inactive metabolites. This can increase the risk of bleeding.</td>\n<td>1. use 20% of the standard initial dose. The genotype-specific initial dose and maintenance dose can be calculated using an algorithm, as used in EU-PACT. From day 6 on the standard algorithm without genotype information can be used to calculate the dose.</td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> These groups are referred to in the DPWG recommendation PDF as 'IM ANDERS' and 'PM ANDERS', which use the Dutch word 'anders'. These have been translated to 'IM other' and PM other', respectively.</p>\n<p><a download=\"DPWG_CYP2C9_warfarin_6228-to-6234.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C9_warfarin_6228-to-6234.pdf\">Read for more information about this recommendation</a>, <a download=\"DPWG_CYP2C9_050522.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C9_050522.pdf\">Read about gene information from DPWG</a> (CYP2C9 information document updated 05/05/2022)</p>\n",
+      "version" : 9
+    },
+    "version" : 15
+  }
+}

@@ -1,0 +1,288 @@
+{
+  "citations" : [
+    {
+      "id" : 15312280,
+      "title" : "Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between TPMT/NUDT15 and thiopurines.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/41318725",
+      "authors" : [
+        "Coenen Marieke J H",
+        "Nijenhuis Marga",
+        "Soree Bianca",
+        "de Boer-Veger Nienke J",
+        "Buunk Anne Marie",
+        "Guchelaar Henk-Jan",
+        "Houwink Elisa J F",
+        "Risselada Arne",
+        "Rongen Gerard A P J M",
+        "Swen Jesse J",
+        "Touw Daan J",
+        "van Westrhenen Roos",
+        "Deneer Vera H M",
+        "van Schaik Ron H N"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 1454569125,
+          "resource" : "PubMed",
+          "resourceId" : "41318725",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/41318725",
+          "version" : 0
+        },
+        {
+          "id" : 1454569126,
+          "resource" : "DOI",
+          "resourceId" : "10.1038/s41431-025-01986-8",
+          "_url" : "http://dx.doi.org/10.1038%2Fs41431-025-01986-8",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "European journal of human genetics : EJHG",
+      "meshTerms" : [],
+      "month" : 11,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2025-11-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "The Dutch Pharmacogenetics Working Group (DPWG) describes gene-drug interactions to facilitate pharmacogenetic implementation in clinical practice. The current guideline describes the gene-drug interactions for TPMT, NUDT15 and thiopurines (azathioprine, 6-mercaptopurine and thioguanine). Evidence based recommendations were obtained via a literature review of published studies. This literature review showed that gene variants leading to a decreased activity of TPMT and/or NUDT15 result in higher risk of toxicities, especially bone-marrow depression. For intermediate metabolisers (IM) of TPMT or NUDT15, it is advised to start with 50% of the normal dose when treated with azathioprine or 6-mercaptopurine. For poor metabolisers (PM), it is advised to start with an alternative treatment or to reduce the dose to 10% of the normal dose. For thioguanine, a dose of 75% of the normal dose is advised for TPMT IM and 50% of the normal dose for NUDT15 IM. Alternative treatment or a start dose reduction is advised for PM. A start dose of 6-7% can be used for TPMT PM and of 10% for NUDT15 PM. For TPMT or NUDT15 IM treated for leukaemia, starting with the normal dose can be considered and then decrease the dose to the advised dose described above in case toxicities occur. For NUDT15 PM reduced starting dose is advised only if an alternative is not possible, due to a higher uncertainty in the calculated dose reduction for NUDT15 PM than for TPMT PM.DPWG classifies genotyping for TPMT and NUDT15 \"essential\" before thiopurine initiation.",
+      "terms" : [
+        {"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"},
+        {"id":1451577482,"resource":"PGx Paper Types","term":"Review","termId":"pgxPaperTypes:1451577482"}
+      ],
+      "type" : "Literature",
+      "version" : 3,
+      "year" : 2025
+    },
+    {
+      "id" : 7283333,
+      "title" : "Pharmacogenetics: from bench to byte--an update of guidelines.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+      "authors" : [
+        "Swen J J",
+        "Nijenhuis M",
+        "de Boer A",
+        "Grandia L",
+        "Maitland-van der Zee A H",
+        "Mulder H",
+        "Rongen G A P J M",
+        "van Schaik R H N",
+        "Schalekamp T",
+        "Touw D J",
+        "van der Weide J",
+        "Wilffert B",
+        "Deneer V H M",
+        "Guchelaar H-J"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 769250885,
+          "resource" : "PubMed",
+          "resourceId" : "21412232",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+          "version" : 0
+        },
+        {
+          "id" : 1449247827,
+          "resource" : "DOI",
+          "resourceId" : "10.1038/clpt.2011.34",
+          "_url" : "http://dx.doi.org/10.1038%2Fclpt.2011.34",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "Clinical pharmacology and therapeutics",
+      "meshTerms" : [
+        "Animals",
+        "Aryl Hydrocarbon Hydroxylases",
+        "Cytochrome P-450 CYP2C9",
+        "Drug Administration Schedule",
+        "Drug-Related Side Effects and Adverse Reactions",
+        "Humans",
+        "Pharmaceutical Preparations",
+        "Pharmacogenetics",
+        "Practice Guidelines as Topic"
+      ],
+      "month" : 5,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "page" : "662-73",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2011-05-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "Currently, there are very few guidelines linking the results of pharmacogenetic tests to specific therapeutic recommendations. Therefore, the Royal Dutch Association for the Advancement of Pharmacy established the Pharmacogenetics Working Group with the objective of developing pharmacogenetics-based therapeutic (dose) recommendations. After systematic review of the literature, recommendations were developed for 53 drugs associated with genes coding for CYP2D6, CYP2C19, CYP2C9, thiopurine-S-methyltransferase (TPMT), dihydropyrimidine dehydrogenase (DPD), vitamin K epoxide reductase (VKORC1), uridine diphosphate glucuronosyltransferase 1A1 (UGT1A1), HLA-B44, HLA-B*5701, CYP3A5, and factor V Leiden (FVL).",
+      "terms" : [],
+      "type" : "Literature",
+      "version" : 4,
+      "volume" : "89",
+      "year" : 2011
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166104960",
+    "name" : "Annotation of DPWG Guideline for thioguanine and TPMT",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1183704539,
+        "date" : "2011-08-10T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1450414873,
+        "date" : "2019-05-22T16:39:12.063-07:00",
+        "description" : "Annotation current with November 2018 DPWG Guideline release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450821361,
+        "date" : "2019-10-08T19:31:45.621-07:00",
+        "description" : "Changes based on August 2019 guidelines",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450956480,
+        "date" : "2020-01-31T14:20:15.750-08:00",
+        "description" : "Updated link to 2011 DPWG methods",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450963920,
+        "date" : "2020-02-11T08:08:44.012-08:00",
+        "description" : "Fixed links to 2018 and 2019 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451450660,
+        "date" : "2021-05-26T11:27:59.174-07:00",
+        "description" : "Tagged haplotypes.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451701171,
+        "date" : "2022-03-02T00:00:00-08:00",
+        "description" : "Added *3D allele to extended dosing guideline",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704212,
+        "date" : "2022-03-03T16:33:28.645-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451707841,
+        "date" : "2022-03-08T13:00:12.561-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732852,
+        "date" : "2022-03-28T09:57:42.392-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733464,
+        "date" : "2022-03-28T15:04:07.799-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741531,
+        "date" : "2022-04-05T11:20:58.952-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884706,
+        "date" : "2022-09-16T14:46:21.173-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146522,
+        "date" : "2023-07-03T13:40:11.125-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452410940,
+        "date" : "2024-03-18T07:53:24.634-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454613280,
+        "date" : "2025-12-18T10:58:51.875-08:00",
+        "description" : "Added new subheading for PMID: 41318725",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15312280,"title":"Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between TPMT/NUDT15 and thiopurines.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/41318725","crossReferences":[{"id":1454569125,"resource":"PubMed","resourceId":"41318725","_url":"https://www.ncbi.nlm.nih.gov/pubmed/41318725"},{"id":1454569126,"resource":"DOI","resourceId":"10.1038/s41431-025-01986-8","_url":"http://dx.doi.org/10.1038%2Fs41431-025-01986-8"}],"objCls":"Literature","pubDate":"2025-11-01T00:00:00-07:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"},{"id":1451577482,"resource":"PGx Paper Types","term":"Review","termId":"pgxPaperTypes:1451577482"}],"type":"Literature"},
+      {"id":7283333,"title":"Pharmacogenetics: from bench to byte--an update of guidelines.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/21412232","crossReferences":[{"id":769250885,"resource":"PubMed","resourceId":"21412232","_url":"https://www.ncbi.nlm.nih.gov/pubmed/21412232"},{"id":1449247827,"resource":"DOI","resourceId":"10.1038/clpt.2011.34","_url":"http://dx.doi.org/10.1038%2Fclpt.2011.34"}],"objCls":"Literature","pubDate":"2011-05-01T00:00:00-07:00","terms":[],"type":"Literature"},
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15102465,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2018","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","crossReferences":[{"id":1450415575,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA451663",
+        "name" : "thioguanine",
+        "version" : 16
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA356",
+        "symbol" : "TPMT",
+        "name" : "thiopurine S-methyltransferase",
+        "version" : 7545
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1447981928,
+      "html" : "<p>Select an alternative drug or reduce the initial dose of thioguanine for patients that are TPMT poor metabolizers and reduce initial dose for patients that are TPMT intermediate metabolizers.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1447981927,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-between-tpmt-nudt15-and-thiopurines-european-journal-of-human-genetics-2025\">Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between TPMT/NUDT15 and thiopurines. <em>European journal of human genetics</em> (2025)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper with guidelines for thioguanine and TPMT including Supplementary materials [Article:<a href=\"/pmid/41318725\">41318725</a>]. The recommendations in Table 2 are the same as shown in the table below for 2019.</p>\n<h3 id=\"august-2019-update\">August 2019 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for thioguanine based on TPMT genotype.  They recommend reducing the initial dose for patients that are intermediate metabolizers and selecting an alternative drug or reducing the initial dose for patients that are poor metabolizers. They updated the wording for the intermediate metabolizer recommendation, reflected in the table below.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_August_2019.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_August_2019.pdf\">Dutch guidelines August 2019 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>TPMT IM</td>\n<td>thioguanine</td>\n<td>Genetic variation reduces conversion of thioguanine to inactive metabolites. This increases the risk of serious adverse events such as myelosuppression.</td>\n<td>- IMMUNOSUPPRESSION: Start with 75% of the standard dose.  Adjustment of the initial dose should be guided by toxicity (monitoring of blood counts) and efficacy. The frequency of monitoring should be increased.<br/>- LEUKAEMIA: Start with 75% of the standard thioguanine dose, or start with the standard dose and reduce to 75% if side effects necessitate a dose reduction.  It is not known whether dose reduction in advance results in the same efficacy as dose reduction based on toxicity.  The initial dose should be adjusted based on toxicity (monitoring of the blood counts) and efficacy. Monitoring should be performed at an increased frequency.<br/>Note: more stringent dose reductions are necessary if the patient is also NUDT15 IM.</td>\n</tr>\n<tr>\n<td>TPMT PM</td>\n<td>thioguanine</td>\n<td>Genetic variation reduces conversion of thioguanine to inactive metabolites. This increases the risk of serious, life-threatening adverse events such as myelosuppression.</td>\n<td>1. Choose an alternative or start with 6-7% of the standard dose.  Any adjustment of the initial dose should be guided by toxicity (monitoring of blood counts) and effectiveness. The frequency of monitoring should be increased.<br/>2. If the dose is decreased: advise patients to seek medical attention when symptoms of myelosuppression (such as severe sore throat in combination with fever, regular nosebleeds and tendency to bruising) develop.</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_TPMT_thioguanine_1907-1908.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_TPMT_thioguanine_1907-1908.pdf\">Read for more information about this recommendation</a>, <a download=\"TPMT.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/TPMT.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_TPMT_thioguanine_1907-1908.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_TPMT_thioguanine_1907-1908.pdf\">DPWG risk analysis document</a> for thioguanine and TPMT:</p>\n<blockquote class=\"blockquote\">\n<p>The Dutch Pharmacogenetics Working Group considers genotyping before starting thioguanine to be essential for drug safety. Genotyping must be performed before drug therapy has been initiated to guide drug and dose selection.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n<h3 id=\"november-2018-update\">November 2018 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for thioguanine based on TPMT genotype.  They recommend reducing the initial dose for patients that are intermediate metabolizers and selecting an alternative drug or reducing the initial dose for patients that are poor metabolizers.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_November_2018.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_November_2018.pdf\">Dutch guidelines November 2018 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>TPMT IM</td>\n<td>thioguanine</td>\n<td>Genetic variation reduces conversion of thioguanine to inactive metabolites. This increases the risk of serious adverse events such as myelosuppression.</td>\n<td>Start with 75% of the standard dose.  Adjustment of the initial dose should be guided by toxicity (monitoring of blood counts) and efficacy. The frequency of monitoring should be increased.</td>\n</tr>\n<tr>\n<td>TPMT PM</td>\n<td>thioguanine</td>\n<td>Genetic variation reduces conversion of thioguanine to inactive metabolites. This increases the risk of serious adverse events such as myelosuppression.</td>\n<td>1. Choose an alternative or start with 6-7% of the standard dose.  Any adjustment of the initial dose should be guided by toxicity (monitoring of blood counts) and effectiveness. The frequency of monitoring should be increased.  2. If the dose is decreased: advise patients to seek medical attention when symptoms of myelosuppression (such as severe sore throat in combination with fever, regular nosebleeds and tendency to bruising) develop.</td>\n</tr>\n</tbody>\n</table>\n<h3 id=\"2011-guideline\">2011 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for thioguanine based on TPMT genotype [Article:<a href=\"/pmid/21412232\">21412232</a>].  They recommend selecting an alternative drug for patients carrying inactive alleles.</p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype (Genotype)</th>\n<th>Therapeutic Dose Recommendation</th>\n<th>Level of Evidence</th>\n<th>Clinical Relevance</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>IM (one inactive allele: *2, *3, *4-*18)</td>\n<td>Select alternative drug.  Insufficient data to allow calculation of dose adjustment.</td>\n<td>Published controlled studies of moderate quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints.</td>\n<td>Clinical effect (S): long-standing discomfort (&gt; 168 hr), permanent symptom or invalidating injury e.g. failure of prophylaxis of atrial fibrillation; venous thromboembolism; decreased effect of clopidogrel on inhibition of platelet aggregation; ADE resulting from increased bioavailability of phenytoin; INR &gt; 6.0; neutropenia 0.5-1.0x10<sup>9</sup>/l; leucopenia 1.0-2.0x10<sup>9</sup>/l; thrombocytopenia 25-50x10<sup>9</sup>/l; severe diarrhea.</td>\n</tr>\n<tr>\n<td>PM (two inactive alleles: *2, *3, *4-*18)</td>\n<td>Select alternative drug.  Insufficient data to allow calculation of dose adjustment.</td>\n<td>Published case reports, well documented, and having relevant pharmacokinetic or clinical endpoints. Well documented case series.</td>\n<td>Clinical effect (S): death; arrhythmia; unanticipated myelosuppression.</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li>*See <a href=\"/page/dpwg\">Methods </a> or [Article:<a href=\"/pmid/18253145\">18253145</a>] for definition of &quot;moderate&quot; quality.</li>\n<li>S: statistically significant difference.</li>\n</ul>\n",
+      "version" : 19
+    },
+    "version" : 36
+  }
+}

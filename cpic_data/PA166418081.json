@@ -1,0 +1,56 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166418081",
+    "name" : "Annotation of DPWG Guideline for mavacamten and CYP2C19",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1454254080,
+        "date" : "2025-09-08T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 0
+      }
+    ],
+    "literature" : [],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166272922",
+        "name" : "mavacamten",
+        "version" : 3
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA124",
+        "symbol" : "CYP2C19",
+        "name" : "cytochrome P450 family 2 subfamily C member 19",
+        "version" : 7210
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1454247780,
+      "html" : "<p>The Dutch Pharmacogenetics Working Group Guideline for mavacamten recommends a lower dose for CYP2C19 poor metabolizers and to avoid mavacamten in CYP2C19 poor metabolizers with strong CYP3A4 inhibitor as co-medication.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1454247781,
+      "html" : "<h3 id=\"september-2025\">September 2025</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (<a href=\"/page/dpwg\">DPWG</a>) released an updated version of the <a download=\"pharmacogenetic_recommendation_text_20240101_downloaded_090825.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/pharmacogenetic_recommendation_text_20240101_downloaded_090825.pdf\">Pharmacogenetic_recommendation_text</a> dated with 20240101. It includes CYP2C19-mavacamten guidelines which are dated within the document as 6-11-2023.</p>\n<p><em>Wording in table taken from the DPWG <a download=\"pharmacogenetic_recommendation_text_20240101_downloaded_090825.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/pharmacogenetic_recommendation_text_20240101_downloaded_090825.pdf\">Pharmacogenetic_recommendation_text</a> accessed 09082025</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2C19 UM</td>\n<td>mavacamten</td>\n<td>Although the plasma concentration of mavacamten may decrease due to increased CYP2C19 activity, this does not appear to reduce its effectiveness.</td>\n<td>NO action is required for this gene-drug interaction.</td>\n</tr>\n<tr>\n<td>CYP2C19 IM</td>\n<td>mavacamten</td>\n<td>Although the plasma concentration of mavacamten may increase due to the reduced CYP2C19 activity, this does not appear to lead to an increase in side effects.</td>\n<td>NO action is required for this gene-drug interaction.</td>\n</tr>\n<tr>\n<td>CYP2C19 PM</td>\n<td>mavacamten</td>\n<td>The risk of serious side effects, such as heart failure (decrease in left ventricular ejection fraction (LVEF)), may be increased. The gene variation can lead to a three times higher exposure to mavacamten.</td>\n<td>- NO CYP3A4 inhibitor as comedication:<br/>- start with 2.5 mg/day and give a maximum of 5 mg/day (This corresponds to half the normal starting dose and one third of the normal maximum dose.)<br/>- MODERATE or WEAK CYP3A4 inhibitor as comedication:<br/>- give a maximum of 2.5 mg/day (This corresponds to half the normal starting dose and one-sixth of the normal maximum dose when using a moderate or weak CYP3A4 inhibitor).<br/>- STRONG CYP3A4 inhibitor as comedication:<br/>Mavacamten is contraindicated. - avoid mavacamten</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_CYP2C19-mavacamten_7744-7746.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C19-mavacamten_7744-7746.pdf\">Read for more information about this recommendation</a>, <a download=\"CYP2C19.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CYP2C19.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_CYP2C19-mavacamten_7744-7746.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C19-mavacamten_7744-7746.pdf\">DPWG risk analysis document</a> for mavacamten and CYP2C19:</p>\n<blockquote class=\"blockquote\">\n<p>Due to the absence of new clinical studies or case reports with patients with a CYP2C19 genotype leading to\nreduced or increased CYP2C19 activity in medical journals, and thus the absence of evidence of an increase in\nadverse events code ≥ D (grade ≥ 3) in these patients, the clinical implication of the gene-drug interaction scores\nonly 2 out of the maximum of 10 points (with pre-emptive genotyping considered to be potentially beneficial for\nscores ranging from 0 to 2 points) (see also the Clinical Implication Score tables at the end of this risk analysis).\nHowever, there is not enough evidence to reject the warnings and recommendations in the SmPC. In addition, the\nClinical Implication Score is mainly (for 80%) based on studies published in medical journals and therefore not\nsuited to determine the clinical implication for gene-drug interactions for which data are only provided by pre-regis-\ntration studies. For these reasons, the KNMP Pharmacogenetics Working Group decided to ignore the Clinical\nImplication Score and adopt the genotyping recommendation in the SmPC. The SmPC indicates that genotyping\nmust be performed before starting mavacamten to guide dose selection. This would amount to genotyping being\nessential for drug safety according to the nomenclature of the KNMP Pharmacogenetics Working Group.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n",
+      "version" : 0
+    },
+    "version" : 2
+  }
+}

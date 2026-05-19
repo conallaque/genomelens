@@ -1,0 +1,253 @@
+{
+  "citations" : [
+    {
+      "id" : 7283333,
+      "title" : "Pharmacogenetics: from bench to byte--an update of guidelines.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+      "authors" : [
+        "Swen J J",
+        "Nijenhuis M",
+        "de Boer A",
+        "Grandia L",
+        "Maitland-van der Zee A H",
+        "Mulder H",
+        "Rongen G A P J M",
+        "van Schaik R H N",
+        "Schalekamp T",
+        "Touw D J",
+        "van der Weide J",
+        "Wilffert B",
+        "Deneer V H M",
+        "Guchelaar H-J"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 769250885,
+          "resource" : "PubMed",
+          "resourceId" : "21412232",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+          "version" : 0
+        },
+        {
+          "id" : 1449247827,
+          "resource" : "DOI",
+          "resourceId" : "10.1038/clpt.2011.34",
+          "_url" : "http://dx.doi.org/10.1038%2Fclpt.2011.34",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "Clinical pharmacology and therapeutics",
+      "meshTerms" : [
+        "Animals",
+        "Aryl Hydrocarbon Hydroxylases",
+        "Cytochrome P-450 CYP2C9",
+        "Drug Administration Schedule",
+        "Drug-Related Side Effects and Adverse Reactions",
+        "Humans",
+        "Pharmaceutical Preparations",
+        "Pharmacogenetics",
+        "Practice Guidelines as Topic"
+      ],
+      "month" : 5,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "page" : "662-73",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2011-05-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "Currently, there are very few guidelines linking the results of pharmacogenetic tests to specific therapeutic recommendations. Therefore, the Royal Dutch Association for the Advancement of Pharmacy established the Pharmacogenetics Working Group with the objective of developing pharmacogenetics-based therapeutic (dose) recommendations. After systematic review of the literature, recommendations were developed for 53 drugs associated with genes coding for CYP2D6, CYP2C19, CYP2C9, thiopurine-S-methyltransferase (TPMT), dihydropyrimidine dehydrogenase (DPD), vitamin K epoxide reductase (VKORC1), uridine diphosphate glucuronosyltransferase 1A1 (UGT1A1), HLA-B44, HLA-B*5701, CYP3A5, and factor V Leiden (FVL).",
+      "terms" : [],
+      "type" : "Literature",
+      "version" : 4,
+      "volume" : "89",
+      "year" : 2011
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166104940",
+    "name" : "Annotation of DPWG Guideline for phenprocoumon and VKORC1",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1183704517,
+        "date" : "2011-08-10T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1450415348,
+        "date" : "2019-05-28T00:00:00-07:00",
+        "description" : "Annotation current with November 2018 DPWG Guideline release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450821023,
+        "date" : "2019-10-07T18:14:28.619-07:00",
+        "description" : "No changes based on August 2019 guideline",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450956393,
+        "date" : "2020-01-31T13:44:49.466-08:00",
+        "description" : "Updated link to 2011 DPWG methods",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450964020,
+        "date" : "2020-02-11T00:00:00-08:00",
+        "description" : "Fixed link to algorithms.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450963760,
+        "date" : "2020-02-11T07:11:39.065-08:00",
+        "description" : "Fixed links to 2018 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451694843,
+        "date" : "2022-02-24T00:00:00-08:00",
+        "description" : "Added extended dosing guideline",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704192,
+        "date" : "2022-03-03T16:33:24.765-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451706323,
+        "date" : "2022-03-07T16:47:33.369-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732832,
+        "date" : "2022-03-28T09:57:38.448-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733442,
+        "date" : "2022-03-28T14:59:57.602-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741524,
+        "date" : "2022-04-05T11:17:27.127-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884502,
+        "date" : "2022-09-16T11:04:31.147-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451903881,
+        "date" : "2022-10-04T13:55:00.939-07:00",
+        "description" : "included translation to positive strand",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146506,
+        "date" : "2023-07-03T13:40:03.853-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452410942,
+        "date" : "2024-03-18T08:00:39.479-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452414601,
+        "date" : "2024-03-20T05:55:16.642-07:00",
+        "description" : "Added the link for algorithm attachment and date of retrieval.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452418720,
+        "date" : "2024-03-22T09:05:40.567-07:00",
+        "description" : "Removed broken link from within recommendation.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":7283333,"title":"Pharmacogenetics: from bench to byte--an update of guidelines.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/21412232","crossReferences":[{"id":769250885,"resource":"PubMed","resourceId":"21412232","_url":"https://www.ncbi.nlm.nih.gov/pubmed/21412232"},{"id":1449247827,"resource":"DOI","resourceId":"10.1038/clpt.2011.34","_url":"http://dx.doi.org/10.1038%2Fclpt.2011.34"}],"objCls":"Literature","pubDate":"2011-05-01T00:00:00-07:00","terms":[],"type":"Literature"},
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15102465,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2018","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","crossReferences":[{"id":1450415575,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Variant",
+        "id" : "PA166155091",
+        "symbol" : "rs9923231",
+        "name" : "rs9923231",
+        "version" : 5
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450921",
+        "name" : "phenprocoumon",
+        "version" : 8
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA133787052",
+        "symbol" : "VKORC1",
+        "name" : "vitamin K epoxide reductase complex subunit 1",
+        "version" : 16
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1447981860,
+      "html" : "<p>Patients with the VKORC1 rs9923231 TT genotype (-1639 AA genotype) is recommended to be given 50% of the standard initial dose of phenprocoumon and more frequent monitoring of INR. The genotype-specific initial dose and maintenance dose can be calculated using an algorithm. There is no recommendation for patients with the VKORC1 rs9923231 CT genotype (-1639 AG genotype).</p>\n",
+      "version" : 10
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1447981859,
+      "html" : "<h3 id=\"november-2018-update\">November 2018 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (DPWG) has evaluated therapeutic dose recommendations for phenprocoumon based on VKORC1 genotype. They recommend that patients with the VKORC1 rs9923231 TT genotype (-1639 AA genotype) receive 50% of the standard initial dose and more frequent monitoring of INR. The genotype-specific initial dose and maintenance dose can be calculated using an algorithm. There is no recommendation for patients with the VKORC1 rs9923231 CT genotype (-1639 AG genotype).</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_November_2018.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_November_2018.pdf\">Dutch guidelines November 2018 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>VKORC1 -1639 AA</td>\n<td>phenprocoumon</td>\n<td>An INR = 6, resulting in an increased risk of bleeding, occurs in 17% of these patients with standard regulation by the Anticoagulation Clinic. The genetic variation increases the sensitivity to phenprocoumon.</td>\n<td>1. Monitoring by a ANTICOAGULATION CLINIC: recommend to use 50% of the standard initial dose.<br/>2.NO monitoring by a anticoagulation clinic: recommend to use 50% of the standard initial dose, recommend more frequent monitoring of the INR.<br/>For patients younger than 75 years, the initial dose and the maintenance dose can be calculated using an algorithm as found in EUPACT. However, for patients aged 75 years and older, this algorithm increases the risk of an INR above the therapeutic range compared to an algorithm without gene variations. Therefore, use of this algorithm is not recommended for these patients.</td>\n</tr>\n<tr>\n<td>VKORC1 -1639 AG</td>\n<td>phenprocoumon</td>\n<td>The gene variation leads to a lower dose requirement, but regular monitoring of patients ensures that this does not lead to a distinct increase in the risk of bleeding.</td>\n<td>NO action is needed for this gene-drug interaction</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_VKORC1_phenprocoumon_1911-1912.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_VKORC1_phenprocoumon_1911-1912.pdf\">Read for more information about this recommendation</a>, <a download=\"VKORC1.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/VKORC1.pdf\">Read about gene information from DPWG</a></p>\n<p><a download=\"DPWG_Acenocoumarol_and_phenprocoumon_algorithm_English_2018.xlsx\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_Acenocoumarol_and_phenprocoumon_algorithm_English_2018.xlsx\">Download the algorithm used in EU-PACT provided by DPWG</a> <em>this is an excel file retrieved from DPWG on 3/19/2024.</em></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_VKORC1_phenprocoumon_1911-1912.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_VKORC1_phenprocoumon_1911-1912.pdf\">DPWG risk analysis document</a> for phenprocoumon and VKORC1:</p>\n<blockquote class=\"blockquote\">\n<p>The Dutch Pharmacogenetics Working Group considers genotyping before starting phenprocoumon to be to be beneficial for drug safety. It is advised to genotype these patients before (or directly after) drug therapy has been initiated to guide drug and dose selection.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n<h3 id=\"2011-guideline\">2011 Guideline:</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for phenprocoumon based on VKORC1 genotype [Article:<a href=\"/pmid/21412232\">21412232</a>].  They found that VKORC1 <a href=\"/variant/PA166155096\">rs9934438</a> genotype contributes to dose variability.  However, they make no dosing recommendations at this time &quot;because of strict international normalized ratio monitoring by the Dutch Thrombosis Service.&quot;</p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Genotype</th>\n<th>Therapeutic Dose Recommendation</th>\n<th>Level of Evidence</th>\n<th>Clinical Relevance</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>VKORC1 <a href=\"/variant/PA166155096\">rs9934438</a> AG</td>\n<td>None</td>\n<td>Published controlled studies of good quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints.</td>\n<td>Minor clinical effect (S): QTc prolongation (&lt;450 ms , &lt;470 ms); INR increase &lt; 4.5 Kinetic effect (S).</td>\n</tr>\n<tr>\n<td>VKORC1 <a href=\"/variant/PA166155096\">rs9934438</a> AA</td>\n<td>Check INR more frequently.</td>\n<td>Published controlled studies of good quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints.</td>\n<td>Minor clinical effect (S): QTc prolongation (&lt;450 ms , &lt;470 ms); INR increase &lt; 4.5 Kinetic effect (S).</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li>*See <a href=\"/page/dpwg\">Methods </a> or [Article:<a href=\"/pmid/18253145\">18253145</a>] for definition of &quot;good quality.&quot;</li>\n<li>S: statistically significant difference.</li>\n</ul>\n",
+      "version" : 22
+    },
+    "version" : 41
+  }
+}

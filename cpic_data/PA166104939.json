@@ -1,0 +1,211 @@
+{
+  "citations" : [
+    {
+      "id" : 7283333,
+      "title" : "Pharmacogenetics: from bench to byte--an update of guidelines.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+      "authors" : [
+        "Swen J J",
+        "Nijenhuis M",
+        "de Boer A",
+        "Grandia L",
+        "Maitland-van der Zee A H",
+        "Mulder H",
+        "Rongen G A P J M",
+        "van Schaik R H N",
+        "Schalekamp T",
+        "Touw D J",
+        "van der Weide J",
+        "Wilffert B",
+        "Deneer V H M",
+        "Guchelaar H-J"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 769250885,
+          "resource" : "PubMed",
+          "resourceId" : "21412232",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+          "version" : 0
+        },
+        {
+          "id" : 1449247827,
+          "resource" : "DOI",
+          "resourceId" : "10.1038/clpt.2011.34",
+          "_url" : "http://dx.doi.org/10.1038%2Fclpt.2011.34",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "Clinical pharmacology and therapeutics",
+      "meshTerms" : [
+        "Animals",
+        "Aryl Hydrocarbon Hydroxylases",
+        "Cytochrome P-450 CYP2C9",
+        "Drug Administration Schedule",
+        "Drug-Related Side Effects and Adverse Reactions",
+        "Humans",
+        "Pharmaceutical Preparations",
+        "Pharmacogenetics",
+        "Practice Guidelines as Topic"
+      ],
+      "month" : 5,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "page" : "662-73",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2011-05-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "Currently, there are very few guidelines linking the results of pharmacogenetic tests to specific therapeutic recommendations. Therefore, the Royal Dutch Association for the Advancement of Pharmacy established the Pharmacogenetics Working Group with the objective of developing pharmacogenetics-based therapeutic (dose) recommendations. After systematic review of the literature, recommendations were developed for 53 drugs associated with genes coding for CYP2D6, CYP2C19, CYP2C9, thiopurine-S-methyltransferase (TPMT), dihydropyrimidine dehydrogenase (DPD), vitamin K epoxide reductase (VKORC1), uridine diphosphate glucuronosyltransferase 1A1 (UGT1A1), HLA-B44, HLA-B*5701, CYP3A5, and factor V Leiden (FVL).",
+      "terms" : [],
+      "type" : "Literature",
+      "version" : 4,
+      "volume" : "89",
+      "year" : 2011
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166104939",
+    "name" : "Annotation of DPWG Guideline for fluorouracil and DPYD",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1183704473,
+        "date" : "2011-08-10T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1450414980,
+        "date" : "2019-05-23T11:23:35.569-07:00",
+        "description" : "Annotation current with November 2018 DPWG Guideline release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450820645,
+        "date" : "2019-10-03T13:13:15.174-07:00",
+        "description" : "Changes based on August 2019 guideline",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450956401,
+        "date" : "2020-01-31T13:30:28.156-08:00",
+        "description" : "Updated link to 2011 DPWG methods",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450965842,
+        "date" : "2020-02-13T09:58:53.342-08:00",
+        "description" : "Added text and links to DPYD guideline individual paper PMID: 31745289",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704191,
+        "date" : "2022-03-03T16:33:24.603-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451707000,
+        "date" : "2022-03-08T08:17:34.960-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732831,
+        "date" : "2022-03-28T09:57:38.308-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733314,
+        "date" : "2022-03-28T14:40:35.528-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741493,
+        "date" : "2022-04-05T11:13:59.303-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884241,
+        "date" : "2022-09-16T10:13:19.809-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146505,
+        "date" : "2023-07-03T13:40:03.697-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452411201,
+        "date" : "2024-03-18T09:18:45.504-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15104402,"title":"Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction of DPYD and fluoropyrimidines.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7080718","crossReferences":[{"id":1452680152,"resource":"PubMed Central","resourceId":"PMC7080718","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7080718"},{"id":1450964680,"resource":"PubMed","resourceId":"31745289","_url":"https://www.ncbi.nlm.nih.gov/pubmed/31745289"},{"id":1450964681,"resource":"DOI","resourceId":"10.1038/s41431-019-0540-0","_url":"http://dx.doi.org/10.1038%2Fs41431-019-0540-0"}],"objCls":"Literature","pubDate":"2020-04-01T00:00:00-07:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":7283333,"title":"Pharmacogenetics: from bench to byte--an update of guidelines.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/21412232","crossReferences":[{"id":769250885,"resource":"PubMed","resourceId":"21412232","_url":"https://www.ncbi.nlm.nih.gov/pubmed/21412232"},{"id":1449247827,"resource":"DOI","resourceId":"10.1038/clpt.2011.34","_url":"http://dx.doi.org/10.1038%2Fclpt.2011.34"}],"objCls":"Literature","pubDate":"2011-05-01T00:00:00-07:00","terms":[],"type":"Literature"},
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15102465,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2018","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","crossReferences":[{"id":1450415575,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA128406956",
+        "name" : "fluorouracil",
+        "version" : 19
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA145",
+        "symbol" : "DPYD",
+        "name" : "dihydropyrimidine dehydrogenase",
+        "version" : 6908
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1447981858,
+      "html" : "<p>An alternative drug to fluorouracil is recommended for patients with a DPYD activity score of 0; if an alternative drug is not possible, the DPD activity should be determined and the initial dose adjusted accordingly. For patients with a DPYD activity score of 1 or 1.5, start with 50% of the standard dose or choose an alternative drug; adjustment of subsequent doses should be guided by toxicity and effectiveness. Patients with two partially functional alleles or one non-functional and one partially functional allele or two gene variants leading to partially functional alleles or a gene variant leading to a non-functional allele and a gene variant leading to a partially functional allele should have their DPD activity determined or should avoid fluorouracil/capecitabine. Tegafur is not an alternative for fluorouracil, as it is also metabolized by DPD. The DPWG evaluated DPYD genotyping as &quot;essential&quot; and recommend DPYD testing prior to initiating fluoropyrimidines.</p>\n",
+      "version" : 5
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1447981857,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-of-dpyd-and-fluoropyrimidines-european-journal-of-human-genetics-2019\">Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction of DPYD and fluoropyrimidines. <em>European journal of human genetics (2019)</em></h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper with the guidelines as per the August 2019 update including more details and scoring the clinical implementation <a href=\"/literature/15104402\">PMID: 31745289</a>.</p>\n<h3 id=\"august-2019-update\">August 2019 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for fluorouracil and capecitabine based on DPYD genotype. An alternative drug or reduction in dose is recommended for patients with DPYD activity scores of 0, 1 and 1.5. Patients with genotypes defined by the FENO group should have their DPD activity determined or should avoid fluorouracil/capecitabine. Tegafur is not an alternative, as it is also metabolized by DPD.</p>\n<p><em>Wording in table taken from the <a rel=\"noopener noreferrer\" href=\"https://www.knmp.nl/downloads/pharmacogenetic-recommendations-august-2019.pdf\" target=\"_blank\">Dutch guidelines August 2019 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Activity Score 0</td>\n<td>fluorouracil, cutaneous</td>\n<td>The gene variation increases the risk of severe, potentially fatal toxicity. A reduced conversion of fluorouracil/capecitabine to inactive metabolites means that the normal dose is an overdose.</td>\n<td>Avoid fluorouracil.<br/><em>NOTE: If a patient has two different genetic variations that lead to a non-functional DPD enzyme (e.g. *2A and* 13), this recommendation only applies if the variations are on a different allele. If both variations are on the same allele, this patient actually has gene activity score 1, for which no increased risk of severe, potentially fatal toxicity has been found with cutaneous use. These two situations can only be distinguished by determining the enzyme activity (phenotyping). This recommendation only applies if the patient has virtually no enzyme activity</em></td>\n</tr>\n<tr>\n<td>Activity Score 0</td>\n<td>fluorouracil/capecitabine, systemic</td>\n<td>The gene variation increases the risk of severe, potentially fatal toxicity. A reduced conversion of fluorouracil/capecitabine to inactive metabolites means that the standard dose is a more than 100-fold overdose.</td>\n<td>1. Avoid fluorouracil and capecitabine. Tegafur is not an alternative, as this is also metabolised by DPD.<br/>2. If if is not possible to avoid fluorouracil and capecitabine: determine the residual DPD activity in mononuclear cells from peripheral blood and adjust the initial dose accordingly. A patient with 0.5% of the normal DPD activity tolerated 0.8% of the standard dose (150 mg capecitabine every 5 days). A patient with undetectable DPD activity tolerated 0.43% of the standard dose (150 mg capecitabine every 5 days with every third dose skipped).</td>\n</tr>\n<tr>\n<td>Activity Score 1</td>\n<td>fluorouracil/capecitabine</td>\n<td>The gene variation increases the risk of severe, potentially fatal toxicity. A reduced conversion of fluorouracil/capecitabine to inactive metabolites means that the normal dose is an overdose.</td>\n<td>Start with 50% of the standard dose or avoid fluorouracil and capecitabine. Adjustment of the subsequent dose should be guided by toxicity and effectiveness. However, in one study involving 17 patients with gene activity 1, the average dose after titration was 57% of the standard dose. Tegafur is not an alternative, as this is also metabolised by DPD.</td>\n</tr>\n<tr>\n<td>Activity Score 1.5</td>\n<td>fluorouracil/capecitabine</td>\n<td>The gene variation increases the risk of severe, potentially fatal toxicity. A reduced conversion of fluorouracil/capecitabine to inactive metabolites means that the normal dose is an overdose.</td>\n<td>Start with 50% of the standard dose or avoid fluorouracil and capecitabine. After starting treatment, the dose should be adjusted based on toxicity and effectiveness. In a study involving 17 patients with genotype <em>1/2846T</em>, the average dose after titration was 64% of the standard dose. For 51 patients with genotype <em>1/1236A</em>, the average dose after titration was 74% of the standard dose. Tegafur is not an alternative, as this is also metabolised by DPD.</td>\n</tr>\n<tr>\n<td>FENO</td>\n<td>fluorouracil/capecitabine</td>\n<td>The gene variation increases the risk of severe, potentially fatal, toxicity. A reduced conversion of fluorouracil/capecitabine to inactive metabolites means that the normal dose is an overdose.</td>\n<td>It is not possible to recommend a dose adjustment for this patient based on the genotype only.<br/>Determine the residual DPD activity in mononuclear cells from peripheral blood and adjust the initial dose based on phenotype and genotype, or avoid fluorouracil and capecitabine. Tegafur is not an alternative, as this is also metabolized by DPD.</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_DPD_5-fluorouracil_capecitabine_2551-2552-4893-4894-6192.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_DPD_5-fluorouracil_capecitabine_2551-2552-4893-4894-6192.pdf\">Read for more information about this recommendation</a>, <a download=\"DPYD.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPYD.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_DPD_5-fluorouracil_capecitabine_2551-2552-4893-4894-6192.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_DPD_5-fluorouracil_capecitabine_2551-2552-4893-4894-6192.pdf\">DPWG risk analysis document</a> for fluorouracil and DPYD:</p>\n<blockquote class=\"blockquote\">\n<p>The Dutch Pharmacogenetics Working Group considers genotyping before starting systemic fluorouracil or capecitabine to be essential for drug safety. Genotyping must be performed before drug therapy has been initiated to guide drug and dose selection.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n<h3 id=\"november-2018-update\">November 2018 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for fluorouracil and capecitabine based on DPYD genotype. An alternative drug or reduction in dose is recommended for patients with DPYD activity scores of 0, 0.5, 1 and 1.5. Tegafur is not an alternative, as it is also metabolized by DPD.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_November_2018.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_November_2018.pdf\">Dutch guidelines November 2018 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Activity Score 0</td>\n<td>fluorouracil, cutaneous</td>\n<td>Genetic variation increases the risk of severe, potentially fatal toxicity. A reduced conversion of fluorouracil/capecitabine to inactive metabolites means that the normal dose is an overdose.</td>\n<td>Choose an alternative.<br/><em>NOTE: If a patient has two different genetic variations that lead to a non-functional DPD enzyme (e.g. *2A and* 13), this recommendation only applies if the variations are on a different allele. If both variations are on the same allele, this patient has gene activity score 1, for which no increased risk of severe, potentially fatal toxicity has been found with cutaneous use. These two situations can only be distinguished by determining the enzyme activity (phenotyping).</em></td>\n</tr>\n<tr>\n<td>Activity Score 0</td>\n<td>fluorouracil/capecitabine, systemic</td>\n<td>Genetic variation increases the risk of severe, potentially fatal toxicity. A reduced conversion of fluorouracil/capecitabine to inactive metabolites means that the standard dose is a more than 100-fold overdose.</td>\n<td>1. Choose an alternative. Tegafur is not an alternative, as this is also metabolised by DPD.<br/>2. If an alternative is not possible: determine the residual DPD activity in mononuclear cells from peripheral blood and adjust the initial dose accordingly. A patient with 0.5% of the normal DPD activity tolerated 0.8% of the standard dose (150 mg capecitabine every 5 days). A patient with undetectable DPD activity tolerated 0.43% of the standard dose (150 mg capecitabine every 5 days with every third dose skipped). The average Caucasian DPD activity is 9.9 nmol/hour per mg protein. Or, adjust the initial dose based on toxicity and efficacy.<br/><em>NOTE: If a patient has two different genetic variations that lead to a non-functional DPD enzyme (e.g. *2A and *13), this recommendation only applies if the variations are on a different allele. If both variations are on the same allele, this patient has gene activity score 1 and the recommendation for that gene activity score should be followed. These two situations can only be distinguished by determining the enzyme activity (phenotyping).</em></td>\n</tr>\n<tr>\n<td>Activity Score 0.5</td>\n<td>fluorouracil/capecitabine</td>\n<td>Genetic variation increases the risk of severe, potentially fatal toxicity. A reduced conversion of fluorouracil/capecitabine to inactive metabolites means that the normal dose is an overdose.</td>\n<td>Start with 25% of the standard dose or choose an alternative. Adjustment of the initial dose should be guided by toxicity and effectiveness. Tegafur is not an alternative, as this is also metabolised by DPD.<br/><em>NOTE: This recommendation only applies if the two genetic variations are on a different allele. If both variations are on the same allele, this patient has gene activity score 1 and the recommendation for that gene activity score should be followed. These two situations can only be distinguished by determining the enzyme activity (phenotyping).</em></td>\n</tr>\n<tr>\n<td>Activity Score 1</td>\n<td>fluorouracil/capecitabine</td>\n<td>Genetic variation increases the risk of severe, potentially fatal toxicity. A reduced conversion of fluorouracil/capecitabine to inactive metabolites means that the normal dose is an overdose.</td>\n<td>Start with 50% of the standard dose or choose an alternative. Adjustment of the initial dose should be guided by toxicity and effectiveness. Tegafur is not an alternative, as this is also metabolised by DPD.<br/><em>NB1: The dose reduction described here is well substantiated for *1/*2A and 1236A/1236A. The dose reduction for patients with 2846T (2846T/2846T or 1236A/2846T) is based on, among other factors, the dose reductions identified for *1/2846T.</em><br/><em>NB2: If a patient has two different genetic variations that result in a partially functional DPD enzyme (e.g. 2846T and 1236A), this recommendation applies if the variations are on a different allele. If both variations are on the same allele, the gene activity score is between 1 and 1.5, depending on whether and how the two gene variations influence each other and on other factors that influence the DPD activity. Whether a gene activity score of 1 or 1.5 needs to be assigned in the case of two different genetic variations can only be determined by measuring the enzyme activity (phenotyping).</em></td>\n</tr>\n<tr>\n<td>Activity Score 1.5</td>\n<td>fluorouracil/capecitabine</td>\n<td>Genetic variation increases the risk of severe, potentially fatal toxicity. A reduced conversion of fluorouracil/capecitabine to inactive metabolites means that the normal dose is an overdose.</td>\n<td>Start with 75% of the standard dose or choose an alternative. Adjustment of the initial dose should be guided by toxicity and effectiveness. Tegafur is not an alternative, as this is also metabolised by DPD.</td>\n</tr>\n</tbody>\n</table>\n<h3 id=\"2011-guideline\">2011 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for fluorouracil based on DPYD genotype [Article:<a href=\"/pmid/21412232\">21412232</a>].  They recommend that an alternate drug be used for poor metabolizer patients, and a reduced dose or alternate drug for intermediate metabolizer patients.</p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype (Genotype)</th>\n<th>Therapeutic Dose Recommendation</th>\n<th>Level of Evidence</th>\n<th>Clinical Relevance</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>PM (2 inactive alleles, 2 decreased activity alleles, or one inactive and one decreased activity alleles)</td>\n<td>Select alterantive drug.  Tegafur is not a suitable alternative because this drug is also metabolized by DPD.</td>\n<td>Published controlled studies of moderate quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints.</td>\n<td>Clinical effect (S): death; arrhythmia; unanticipated myelosuppression.</td>\n</tr>\n<tr>\n<td>IM (1 active allele and 1 inactive or decreased activity allele)</td>\n<td>Reduce dose by 50% or select alternative drug.  Tegafur is not a suitable alternative because this drug is also a substrate for DPD.  Increase dose in response to toxicity and efficacy.</td>\n<td>Published controlled studies of moderate quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints.</td>\n<td>Clinical effect (S): death; arrhythmia; unanticipated myelosuppression.</td>\n</tr>\n</tbody>\n</table>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele Type</th>\n<th>Alleles</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>active</td>\n<td>*1, *4, *5, *6, *9A</td>\n</tr>\n<tr>\n<td>decreased activity</td>\n<td>*9B, *10</td>\n</tr>\n<tr>\n<td>inactive</td>\n<td>*2A, *3, *7, *8, *11, *12, *13, 496A&gt;G, IVS10-15T&gt;C, 1156G&gt;T, 1845G&gt;T</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li>*See <a href=\"/page/dpwg\">Methods </a> or [Article:<a href=\"/pmid/18253145\">18253145</a>] for definition of &quot;moderate&quot; quality.</li>\n<li>S: statistically significant difference.</li>\n</ul>\n",
+      "version" : 19
+    },
+    "version" : 36
+  }
+}

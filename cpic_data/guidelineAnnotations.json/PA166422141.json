@@ -1,0 +1,139 @@
+{
+  "citations" : [
+    {
+      "id" : 15236624,
+      "title" : "Guidelines From the French-Speaking Society for Histocompatibility and Immunogenetics (SFHI) for Harmonisation of HLA Genotyping in Autoimmune Diseases, Drug Hypersensitivity and Pharmacogenetics.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/41137743",
+      "authors" : [
+        "Renac Virginie",
+        "Moalic Virginie",
+        "Dautin Guillaume",
+        "Cherel Mathilde",
+        "Mercier Bernard",
+        "Walencik Alexandre",
+        "Cohen Jacques",
+        "Farce Fabienne",
+        "Proust Barbara",
+        "Kaveri Rangolie",
+        "Humeau Camille",
+        "Picard Christophe",
+        "Pedron Béatrice",
+        "Dubois Valérie",
+        "Taupin Jean-Luc",
+        "Elsermans Vincent",
+        "Top-Raymond Isabelle",
+        "Ferrari-Lacraz Sylvie",
+        "Barocas Antoine",
+        "Masson Dominique",
+        "Essaydi Arnaud",
+        "Guidicelli Gwendaline",
+        "Ralazamahaleo Mamy",
+        "Congy-Jolivet Nicolas"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 1454392032,
+          "resource" : "PubMed",
+          "resourceId" : "41137743",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/41137743",
+          "version" : 0
+        },
+        {
+          "id" : 1454392033,
+          "resource" : "DOI",
+          "resourceId" : "10.1111/tan.70442",
+          "_url" : "http://dx.doi.org/10.1111%2Ftan.70442",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "HLA",
+      "meshTerms" : [
+        "Alleles",
+        "Autoimmune Diseases",
+        "Drug Hypersensitivity",
+        "France",
+        "Genetic Predisposition to Disease",
+        "Genotype",
+        "HLA Antigens",
+        "Histocompatibility Testing",
+        "Humans",
+        "Immunogenetics",
+        "Pharmacogenetics"
+      ],
+      "month" : 10,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "page" : "e70442",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2025-10-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "HLA molecules play a central role in the adaptive immune response. Their high polymorphism influences individual susceptibility to various autoimmune diseases and certain drug-induced hypersensitivities. In France, HLA genotyping is classified as a medical genetics procedure and is strictly regulated. The Société Francophone d'Histocompatibilité et d'Immunogénétique (SFHI) has established national guidelines outlining clinically validated indications, required resolution levels and interpretation criteria based on robust data. These guidelines are particularly relevant for common clinical contexts, including autoimmune diseases and pharmacogenetic testing. Well-established associations include HLA-DQB1*02/DQA1*05 (DQ2) and HLA-DQB1*03:02/DQA1*05 (DQ8) with celiac disease, HLA-B*27 with spondyloarthritis, HLA-DQB1*06:02 with type 1 narcolepsy, HLA-A*29 with Birdshot chorioretinopathy and several pharmacogenetic risk alleles such as HLA-B*57:01 (abacavir), HLA-B*15:02 and HLA-A*31:01 (carbamazepine) and HLA-B*58:01 (allopurinol). In immunotherapy, the efficacy of tebentafusp has been shown to depend on HLA-A*02:01 positivity. HLA alleles must be interpreted as relative risk factors, not absolute predictors. Critical analysis of HLA-related scientific literature requires consideration of the genotyping technique, typing resolution, allele frequencies within the studied population and environmental factors. High-resolution typing is essential in pharmacogenetics and recommended in selected autoimmune disorders. Interpretation should be conducted by qualified medical biologists, integrating clinical context, allelic diversity and recent technological advances, particularly next-generation sequencing. HLA genotyping represents a valuable tool in diagnosis and risk assessment, with increasing importance in the era of personalised medicine.",
+      "terms" : [
+        {"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}
+      ],
+      "type" : "Literature",
+      "version" : 3,
+      "volume" : "106",
+      "year" : 2025
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166422141",
+    "name" : "Annotation of RNPGx Guideline for abacavir and HLA-B",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : true,
+    "history" : [],
+    "literature" : [
+      {"id":15236624,"title":"Guidelines From the French-Speaking Society for Histocompatibility and Immunogenetics (SFHI) for Harmonisation of HLA Genotyping in Autoimmune Diseases, Drug Hypersensitivity and Pharmacogenetics.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/41137743","crossReferences":[{"id":1454392032,"resource":"PubMed","resourceId":"41137743","_url":"https://www.ncbi.nlm.nih.gov/pubmed/41137743"},{"id":1454392033,"resource":"DOI","resourceId":"10.1111/tan.70442","_url":"http://dx.doi.org/10.1111%2Ftan.70442"}],"objCls":"Literature","pubDate":"2025-10-01T00:00:00-07:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165987830",
+        "symbol" : "HLA-B*57:01",
+        "name" : "*57:01",
+        "version" : 6
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA448004",
+        "name" : "abacavir",
+        "version" : 13
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA35056",
+        "symbol" : "HLA-B",
+        "name" : "major histocompatibility complex, class I, B",
+        "version" : 40
+      }
+    ],
+    "source" : "RNPGx",
+    "summaryMarkdown" : {
+      "id" : 1454392060,
+      "html" : "<p>The Société Francophone d'Histocompatibilité et d'Immunogénétique (SFHI) has established national guidelines and requires mandatory HLA testing prior to prescribing abacavir and abacavir is contraindicated in patients where the HLA-B*57:01 is present.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1454392061,
+      "html" : "<p>The Société Francophone d'Histocompatibilité et d'Immunogénétique (SFHI) has published national guidelines for HLA testing and its use in prescribing of abacavir.</p>\n<p>Excerpt from the text:</p>\n<blockquote class=\"blockquote\">\n<p>SFHI recommends:</p>\n<ul>\n<li>HLA-B*57:01 genotyping is mandatory prior to initiating abacavir treatment (as dictated by the French Health High Authority, HAS) (Grade 1A).</li>\n<li>HLA-B genotyping must be performed using a high-resolution molecular biology technique (second-field typing) without ambiguity (Grade 1A).</li>\n<li>No other HLA allele contraindicates the use of abacavir (Grade 1A)</li>\n</ul>\n</blockquote>\n<p>Excerpt from Table 2.\n(scroll right for Interpretation columns)</p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Condition of Indication</th>\n<th>Susceptibility HLA allele(s)</th>\n<th>Clinical relevance</th>\n<th>Relevance of HLA testing prior to prescription</th>\n<th>Relative risk (OR)</th>\n<th>Medical Interpretation if the allele is present</th>\n<th>Medical Interpretation if the allele is absent</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Delayed hypersensitivity to abacavir</td>\n<td>HLA-B*57:01</td>\n<td>High</td>\n<td>Mandatory before any abacavir prescription</td>\n<td>OR ~ 117</td>\n<td>Very high risk of life-threatening hypersensitivity reaction. Absolute contraindication to abacavir.</td>\n<td>Abacavir may be prescribed. Very low risk. Maintain clinical vigilance.</td>\n</tr>\n</tbody>\n</table>\n<p>Excerpts from the text</p>\n<blockquote class=\"blockquote\">\n<p>Abacavir binds within the peptide-binding cleft of HLA-B*57:01, altering the self-peptide repertoire and triggering aberrant T-cell activation. This constitutes the molecular mechanism underlying the HSR. HLA-B*57:01 screening is therefore mandatory prior to treatment initiation. If the allele is present(i.e., the test is positive), abacavir is strictly contraindicated. Re-exposure or reintroduction is strictly forbidden due to the high risk of severe recurrence, with mortality rates reported as high as 35%.</p>\n<p>HLA-B*57:03 is a closely related allele to HLA-B*57:01, both classified within the B57 serological group. Despite high sequence similarity, critical amino acid differences in the peptide-binding groove result in distinct immunological properties. Unlike HLA-B*57:01, HLA-B*57:03 is not linked to abacavir hypersensitivity due to its inability to bind abacavir within the peptide-binding cleft in the same manner.</p>\n</blockquote>\n",
+      "version" : 0
+    },
+    "version" : 0
+  }
+}

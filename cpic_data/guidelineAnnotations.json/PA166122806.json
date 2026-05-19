@@ -1,0 +1,142 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166122806",
+    "name" : "Annotation of CPIC Guideline for fosphenytoin, phenytoin and CYP2C9, HLA-B",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "cqTEmwVH2eI",
+    "dosingInformation" : true,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1184512517,
+        "date" : "2014-08-05T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1450983600,
+        "date" : "2020-03-09T13:35:29.101-07:00",
+        "description" : "Temporarily removed genotype picker and added explanatory note in summary section",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451115208,
+        "date" : "2020-04-21T14:59:38.556-07:00",
+        "description" : "Removed link to retired translation table",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235809,
+        "date" : "2020-07-30T12:13:33.649-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235964,
+        "date" : "2020-07-30T12:28:17.460-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451259040,
+        "date" : "2020-09-02T00:00:00-07:00",
+        "description" : "post 2020 guideline update",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451455140,
+        "date" : "2021-06-08T15:40:21.519-07:00",
+        "description" : "Added link to video",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451772780,
+        "date" : "2022-05-06T10:26:21.412-07:00",
+        "description" : "Corrected formatting error",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452137501,
+        "date" : "2023-06-22T18:53:41.536-07:00",
+        "description" : "Updated supplemental table links",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15113842,"title":"Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for CYP2C9 and HLA-B Genotypes and Phenytoin Dosing: 2020 Update.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7831382","crossReferences":[{"id":1451837597,"resource":"PubMed Central","resourceId":"PMC7831382","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7831382"},{"id":1451256633,"resource":"PubMed","resourceId":"32779747","_url":"https://www.ncbi.nlm.nih.gov/pubmed/32779747"},{"id":1451256634,"resource":"DOI","resourceId":"10.1002/cpt.2008","_url":"http://dx.doi.org/10.1002%2Fcpt.2008"}],"objCls":"Literature","pubDate":"2021-02-01T00:00:00-08:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":15080841,"title":"Clinical pharmacogenetics implementation consortium guidelines for CYP2C9 and HLA-B genotypes and phenytoin dosing.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4206662","crossReferences":[{"id":1449282294,"resource":"PubMed Central","resourceId":"PMC4206662","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4206662"},{"id":1449282293,"resource":"PubMed","resourceId":"25099164","_url":"https://www.ncbi.nlm.nih.gov/pubmed/25099164"},{"id":1449282295,"resource":"DOI","resourceId":"10.1038/clpt.2014.159","_url":"http://dx.doi.org/10.1038%2Fclpt.2014.159"}],"objCls":"Literature","pubDate":"2014-11-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1451263300,
+      "html" : "<p>&quot;Much of the evidence (summarized in Table S1) linking HLA-B*15:02 to phenytoin- induced SJS/TEN was generated in both children and adults. Therefore, the above recommendation is made regardless of CYP2C9 genotype, individual age, race or ancestry. For pediatric patients who are CYP2C9 IMs or PMs, dose adjustment as described in Table 3 with therapeutic drug monitoring is recommended. While limited data are available for effects of CYP2C9 alleles on phenytoin metabolism in pediatric patient populations, there is no compelling data to indicate that CYP2C9 polymorphisms will affect phenytoin metabolism differently in children compared to adults. As such, the pediatric recommendation is extrapolated using adult data. Special considerations in neonates and older pediatric patients, including a high degree of dose variability and dosage forms, and evidence from pediatric populations is included in the supplement (see Pediatrics section of the Supplement for details).&quot;</p>\n",
+      "version" : 0
+    },
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165954769",
+        "symbol" : "HLA-B*15:02",
+        "name" : "*15:02",
+        "version" : 5
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA164746820",
+        "name" : "fosphenytoin",
+        "version" : 10
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450947",
+        "name" : "phenytoin",
+        "version" : 16
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA126",
+        "symbol" : "CYP2C9",
+        "name" : "cytochrome P450 family 2 subfamily C member 9",
+        "version" : 7877
+      },
+      {
+        "objCls" : "Gene",
+        "id" : "PA35056",
+        "symbol" : "HLA-B",
+        "name" : "major histocompatibility complex, class I, B",
+        "version" : 40
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1447981650,
+      "html" : "<p>The CPIC Dosing Guideline for phenytoin/fosphenytoin recommends not using the drug in individuals with the HLA-B*15:02 allele due to significantly increased risk of phenytoin-induced cutaneous adverse reactions of Stevens-Johnson syndrome (SJS) and toxic epidermal necrolysis (TEN).  Additionally, patients with the CYP2C9 poor metabolizer phenotype (activity score of 0 or 0.5) or with a CYP2C9 activity score of 1 may require reduced doses of phenytoin/fosphenytoin.</p>\n",
+      "version" : 3
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451433687,
+      "html" : "<h3 id=\"august-2020\">August 2020</h3>\n<p><em>Advance online publication August 2020</em></p>\n<ul>\n<li>The 2020 update of the CPIC guideline for phenytoin has been <a rel=\"noopener noreferrer\" href=\"https://ascpt.onlinelibrary.wiley.com/doi/10.1002/cpt.2008\" target=\"_blank\">published in Clinical Pharmacology and Therapeutics</a>. Literature published between April 2014 and August 2019 was reviewed and the recommendations and supplemental information were updated. This includes updates to <em>CYP2C9</em> allele function assignments using the activity score system.</li>\n<li>This guideline is applicable to:\n<ul>\n<li>adult patients</li>\n<li>pediatric patients</li>\n</ul>\n</li>\n<li>Excerpt from the 2020 phenytoin/fosphenytoin dosing guideline update:\n<ul>\n<li>&quot;The <em>CYP2C9*2/*2</em> diplotype (AS=1) is now translated into the IM phenotype group (originally translated to PM). This change is based on data ... showing a similar effect of <em>CYP2C9*1/*3</em> (AS=1) and <em>CYP2C9*2/*2</em> on metabolic ratio and dose requirements. Furthermore, <em>CYP2C9*3</em> and alleles with a similar clinical effect and function are classified as ‘no function’ alleles with a value of 0 for AS calculation. This is based on <em>CYP2C9*3/*3</em>, which represents the diplotype with the lowest metabolic activity and slowest pharmacokinetic clearance. Other alleles with similarly low function have also been classified as ‘no function’.&quot;</li>\n<li>&quot;Much of the evidence (summarized in Table S1) linking HLA-B*15:02 to phenytoin- induced SJS/TEN was generated in both children and adults. Therefore, the above recommendation is made regardless of CYP2C9 genotype, individual age, race or ancestry. For pediatric patients who are CYP2C9 IMs or PMs, dose adjustment as described in Table 3 with therapeutic drug monitoring is recommended. While limited data are available for effects of CYP2C9 alleles on phenytoin metabolism in pediatric patient populations, there is no compelling data to indicate that CYP2C9 polymorphisms will affect phenytoin metabolism differently in children compared to adults. As such, the pediatric recommendation is extrapolated using adult data. Special considerations in neonates and older pediatric patients, including a high degree of dose variability and dosage forms, and evidence from pediatric populations is included in the supplement (see Pediatrics section of the Supplement for details).&quot;</li>\n</ul>\n</li>\n<li>Download and read:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/phenytoin/2020/32779747.pdf\" target=\"_blank\">Clinical Pharmacogenetics Implementation Consortium (CPIC) Guidelines for CYP2C9 and HLA-B Genotype and Phenytoin Dosing: 2020 update</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/phenytoin/2020/32779747-supplement.pdf\" target=\"_blank\">2020 supplement</a></li>\n<li><a href=\"/page/cyp2c9RefMaterials\"><em>CYP2C9</em> Gene-Specific Information Tables</a></li>\n<li><a href=\"/page/hlabRefMaterials\"><em>HLA-B</em> Gene-Specific Information Tables</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/phenytoin-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Phenytoin Drug Resource Mappings</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/fosphenytoin-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Fosphenytoin Drug Resource Mappings</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/phenytoin_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Phenytoin Pre and Post Test Alerts</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/images/flow_chart/Phenytoin_CDS_Flow_Chart.jpg\" target=\"_blank\">Phenytoin Clinical Decision Support Flow Chart</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/fosphenytoin_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Fosphenytoin Pre and Post Test Alerts</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/images/flow_chart/Fosphenytoin_CDS_Flow_Chart.jpg\" target=\"_blank\">Fosphenytoin Clinical Decision Support Flow Chart</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-phenytoin-fosphenytoin-recommendations-based-on-hla-b-15-02-and-cyp2c9\">Table 1: Phenytoin/fosphenytoin recommendations based on <em>HLA-B*15:02</em> and <em>CYP2C9</em></h3>\n<p><em>Adapted from Tables 1, 2 and 3 of the 2020 guideline update.</em></p>\n<ul>\n<li>HLA-B*15:02 &quot;positive&quot;: 1 or 2 copies of the <em>HLA-B*15:02</em> allele</li>\n<li>HLA-B*15:02 &quot;negative&quot;: No <em>HLA-B*15:02</em> alleles reported</li>\n</ul>\n<table class=\"table\">\n<thead>\n<tr>\n<th>HLA-B*15:02 Genotype</th>\n<th>CYP2C9 Phenotype</th>\n<th>CYP2C9 Activity Score</th>\n<th>CYP2C9 genotype</th>\n<th>Implication</th>\n<th>Therapeutic Recommendation</th>\n<th>Classification of Recommendation</th>\n<th>Considerations</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><strong>HLA-B*15:02 &quot;positive&quot;</strong></td>\n<td>Any CYP2C9 Phenotype</td>\n<td>Any CYP2C9 Activity Score</td>\n<td>Any CYP2C9 genotype</td>\n<td>Increased risk of phenytoin-induced SJS/TEN</td>\n<td>If patient is phenytoin-naive, do not use phenytoin/fosphenytoin. Avoid carbamazepine and oxcarbazepine.<br/><em>Optional recommendation: If the patient has previously used phenytoin continuously for longer than three months without incidence of cutaneous adverse reactions, cautiously consider use of phenytoin in the future. The latency period for drug-induced SJS/TEN is short with continuous dosing and adherence to therapy (4-28 days), and cases usually occur within three months of dosing.</em></td>\n<td>STRONG</td>\n<td>Other aromatic anticonvulsants, including eslicarbazepine, lamotrigine, and phenobarbital, have weaker evidence linking SJS/TEN with the HLA- B*15:02 allele; however, caution should still be used in choosing an alternative agent. Previous tolerance of phenytoin is not indicative of tolerance to other aromatic anticonvulsants.</td>\n</tr>\n<tr>\n<td><strong>HLA-B*15:02 “negative”</strong></td>\n<td><strong>CYP2C9 Normal Metabolizer</strong></td>\n<td>2</td>\n<td>An individual carrying two normal function alleles; Example diplotype:*1/*1</td>\n<td>Normal phenytoin metabolism</td>\n<td>No adjustments needed from typical dosing strategies. Subsequent doses should be adjusted according to therapeutic drug monitoring, response, and side effects. An HLA-B*15:02 negative test does not eliminate the risk of phenytoin-induced SJS/TEN, and patients should be carefully monitored according to standard practice.</td>\n<td>STRONG</td>\n<td></td>\n</tr>\n<tr>\n<td><strong>HLA-B*15:02 “negative”</strong></td>\n<td><strong>CYP2C9 Intermediate Metabolizer (AS 1.5)</strong></td>\n<td>1.5</td>\n<td>An individual carrying one normal function allele plus one decreased function allele; Example diplotype: *1/*2</td>\n<td>Slightly reduced phenytoin metabolism; however, this does not appear to translate into increased side effects.</td>\n<td>No adjustments needed from typical dosing strategies. Subsequent doses should be adjusted according to therapeutic drug monitoring, response and side effects. An HLA-B*15:02 negative test does not eliminate the risk of phenytoin-induced SJS/TEN, and patients should be carefully monitored according to standard practice.</td>\n<td>MODERATE</td>\n<td></td>\n</tr>\n<tr>\n<td><strong>HLA-B*15:02 “negative”</strong></td>\n<td><strong>CYP2C9 Intermediate Metabolizer (AS 1)</strong></td>\n<td>1</td>\n<td>An individual carrying one normal function allele plus one decreased function allele OR two decreased function alleles; Example diplotypes: *1/*3, *2/*2</td>\n<td>Reduced phenytoin metabolism, higher plasma concentrations will increase probability of toxicities.</td>\n<td>For first dose, use typical initial or loading dose. For subsequent doses, use approximately 25% less than typical maintenance dose. Subsequent doses should be adjusted according to therapeutic drug monitoring, response and side effects. An HLA-B*15:02 negative test does not eliminate the risk of phenytoin-induced SJS/TEN, and patients should be carefully monitored according to standard practice.</td>\n<td>MODERATE</td>\n<td></td>\n</tr>\n<tr>\n<td><strong>HLA-B*15:02 “negative”</strong></td>\n<td><strong>CYP2C9 Poor Metabolizer</strong></td>\n<td>0-0.5</td>\n<td>An individual carrying one no function allele plus one decreased function allele OR two no function alleles; Example diplotypes: *2/*3, *3/*3</td>\n<td>Reduced phenytoin metabolism, higher plasma concentrations will increase probability of toxicities.</td>\n<td>For first dose, use typical initial or loading dose. For subsequent doses use approximately 50% less than typical maintenance dose. Subsequent doses should be adjusted according to therapeutic drug monitoring, response, and side effects. An HLA-B*15:02 negative test does not eliminate the risk of phenytoin-induced SJS/TEN, and patients should be carefully monitored according to standard practice.</td>\n<td>STRONG</td>\n<td></td>\n</tr>\n<tr>\n<td><strong>HLA-B*15:02 “negative”</strong></td>\n<td><strong>Indeterminate</strong></td>\n<td>N/A</td>\n<td>An individual carrying one or two CYP2C9 unknown function or uncertain function alleles.</td>\n<td>N/A</td>\n<td>No recommendation</td>\n<td>N/A</td>\n<td></td>\n</tr>\n</tbody>\n</table>\n<h3 id=\"november-2014\">November 2014</h3>\n<p><em>Accepted article preview online August 2014; Advance online publication September 2014</em></p>\n<ul>\n<li>Guidelines regarding the use of pharmacogenomic tests in dosing for phenytoin have been published in Clinical Pharmacology and Therapeutics by the Clinical Pharmacogenetics Implementation Consortium (CPIC).</li>\n<li>Excerpt from the 2014 phenytoin dosing guidelines:\n<ul>\n<li>&quot;[A]t least a 25% reduction of the recommended starting maintenance dose may be considered for CYP2C9 intermediate metabolizers with subsequent maintenance doses adjusted based on therapeutic drug monitoring and response. For CYP2C9 poor metabolizers, consider at least a 50% reduction of starting maintenance dose with subsequent maintenance doses adjusted based on therapeutic drug monitoring or response.&quot;</li>\n<li>&quot;[R]egardless of the CYP2C9 genotype and individual's ancestry or age, if the HLA-B*15:02 test result is positive, the recommendation is to consider using an anticonvulsant other than carbamazepine and phenytoin unless the benefits of treating the underlying disease clearly outweigh the risks... Alternative medications such as oxcarbazepine, eslicarbazepine acetate, and lamotrigine have some evidence linking SJS/TEN with the HLA-B*15:02 allele and thus caution should be used in choosing alternatives to phenytoin.&quot;</li>\n</ul>\n</li>\n<li>Download and read:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/phenytoin/2014/25099164.pdf\" target=\"_blank\">Clinical Pharmacogenetics Implementation Consortium (CPIC) Guidelines for CYP2C9 and HLA-B Genotype and Phenytoin Dosing</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/phenytoin/2014/25099164-supplement.pdf\" target=\"_blank\">2014 supplement</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-2-phenytoin-fosphenytoin-therapy-recommendations-based-on-hla-b-and-cyp2c9-phenotype-genotype\">Table 2: Phenytoin/fosphenytoin therapy recommendations based on <em>HLA-B</em> and <em>CYP2C9</em> phenotype/genotype</h3>\n<p><em>Adapted from Tables 1 and 2 of the 2014 guideline manuscript.</em></p>\n<ul>\n<li>HLA-B*15:02 &quot;positive&quot;: 1 or 2 *15:02 alleles</li>\n<li>HLA-B*15:02 &quot;negative&quot;: No HLA-B*15:02 alleles reported</li>\n</ul>\n<table class=\"table\">\n<thead>\n<tr>\n<th>CYP2C9 Phenotype</th>\n<th>CYP2C9 genotype</th>\n<th>HLA-B*15:02 &quot;positive&quot; - Implications</th>\n<th>HLA-B*15:02 &quot;positive&quot; - Therapeutic recommendation</th>\n<th>HLA-B*15:02 &quot;positive&quot; - Classification of recommendation</th>\n<th>HLA-B*15:02 &quot;negative&quot;- Implications</th>\n<th>HLA-B*15:02 &quot;negative&quot;-Therapeutic recommendation</th>\n<th>HLA-B*15:02 &quot;negative&quot;-Classification of Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><strong>CYP2C9 Extensive Metabolizer</strong></td>\n<td>Normal activity ~91% of patients;  An individual carrying 2 normal activity alleles; Example diplotype:*1/*1</td>\n<td>Increased risk of phenytoin-induced SJS/TEN</td>\n<td>If patient is phenytoin-naive <sup>b</sup>, do not use phenytoin/fosphenytoin.</td>\n<td>STRONG</td>\n<td>Normal phenytoin metabolism</td>\n<td>Initiate therapy with recommended maintenance dose <sup>d</sup>.</td>\n<td>STRONG</td>\n</tr>\n<tr>\n<td><strong>CYP2C9 Intermediate Metabolizer</strong></td>\n<td>Heterozygote ~8% of patients; An individual carrying one normal activity allele plus one decreased function allele; Example diplotypes: *1/*3, *1/*2</td>\n<td>Increased risk of phenytoin-induced SJS/TEN</td>\n<td>If patient is phenytoin-naive <sup>b</sup>, do not use phenytoin/fosphenytoin.</td>\n<td>STRONG</td>\n<td>Reduced phenytoin metabolism, higher plasma concentrations will increase probability of toxicities.</td>\n<td>Consider 25% reduction of recommended starting maintenance dose <sup>d</sup>.  Subsequent doses should be adjusted according to therapeutic drug monitoring and response.</td>\n<td>MODERATE</td>\n</tr>\n<tr>\n<td><strong>CYP2C9 Poor Metabolizer</strong></td>\n<td>Homozygous variant ~1% of patients;  An individual carrying 2 decreased function alleles; Example diplotypes: *2/*2, *3/*3, *2/*3</td>\n<td>Increased risk of phenytoin-induced SJS/TEN.</td>\n<td>If patient is phenytoin-naive <sup>b</sup>, do not use phenytoin/fosphenytoin.</td>\n<td>STRONG</td>\n<td>Reduced phenytoin metabolism, higher plasma concentrations will increase probability of toxicities.</td>\n<td>Consider 50% reduction of recommended starting maintenance dose <sup>d</sup>.  Subsequent maintenance doses should be adjusted according to therapeutic drug monitoring and response.</td>\n<td>STRONG</td>\n</tr>\n</tbody>\n</table>\n<p><sup>b</sup> If the patient has previously used phenytoin for longer than 3 months without incidence of cutaneous adverse reactions, reinitiate phenytoin with caution. Adjust dose based on <em>CYP2C9</em> genotype if known.\n<sup>d</sup> Recommended maintenance dose based on patient’s clinical characteristics.</p>\n",
+      "version" : 4
+    },
+    "version" : 55
+  }
+}

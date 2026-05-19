@@ -1,0 +1,124 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166182821",
+    "name" : "Annotation of DPWG Guideline for sertraline and CYP2D6",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1450415060,
+        "date" : "2019-05-23T15:24:50.090-07:00",
+        "description" : "Annotation current with November 2018 DPWG Guideline release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450821033,
+        "date" : "2019-10-07T18:32:08.869-07:00",
+        "description" : "No changes based on August 2019 guideline",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450963900,
+        "date" : "2020-02-11T07:48:46.397-08:00",
+        "description" : "Fixed links to 2018 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451632821,
+        "date" : "2022-01-03T15:00:33.768-08:00",
+        "description" : "Added DPWG SSRI guideline publication.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704162,
+        "date" : "2022-03-03T16:33:20.148-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451732802,
+        "date" : "2022-03-28T09:57:33.945-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451884690,
+        "date" : "2022-09-16T14:38:32.988-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146459,
+        "date" : "2023-07-03T13:39:50.632-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452411540,
+        "date" : "2024-03-18T10:49:11.121-07:00",
+        "description" : "Updated links for risk analysis pdf.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452424760,
+        "date" : "2024-03-29T11:54:50.021-07:00",
+        "description" : "Removed message about gene information document availability.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15126562,"title":"Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2C19 and CYP2D6 and SSRIs.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9553948","crossReferences":[{"id":1452680280,"resource":"PubMed Central","resourceId":"PMC9553948","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9553948"},{"id":1451632760,"resource":"PubMed","resourceId":"34782755","_url":"https://www.ncbi.nlm.nih.gov/pubmed/34782755"},{"id":1451632761,"resource":"DOI","resourceId":"10.1038/s41431-021-01004-7","_url":"http://dx.doi.org/10.1038%2Fs41431-021-01004-7"}],"objCls":"Literature","pubDate":"2022-10-01T00:00:00-07:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15102465,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2018","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","crossReferences":[{"id":1450415575,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : false,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA451333",
+        "name" : "sertraline",
+        "version" : 15
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA128",
+        "symbol" : "CYP2D6",
+        "name" : "cytochrome P450 family 2 subfamily D member 6",
+        "version" : 7891
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1450415056,
+      "html" : "<p>There are currently no dosing recommendations for sertraline based on CYP2D6 genotypes.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1450415057,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-between-cyp2c19-and-cyp2d6-and-ssris-european-journal-of-human-genetics-2021\">Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2C19 and CYP2D6 and SSRIs. European journal of human genetics (2021)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper which reiterates that no action is required for the interaction between sertraline and <em>CYP2D6</em> [Article:<a href=\"/pmid/34782755\">34782755</a>].</p>\n<h3 id=\"november-2018-guideline\">November 2018 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for sertraline based on CYP2D6 genotypes. They conclude that this is not a gene-drug interaction. <em>See the <a download=\"DPWG_November_2018.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_November_2018.pdf\">Dutch guidelines November 2018 update</a>.</em></p>\n<p><a download=\"DPWG_CYP2D6_sertraline_3512-to-3514.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2D6_sertraline_3512-to-3514.pdf\">Read for more information about this recommendation</a>, <a download=\"CYP2D6.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CYP2D6.pdf\">Read about gene information from DPWG</a></p>\n",
+      "version" : 8
+    },
+    "version" : 11
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166119846",
+    "name" : "Annotation of CPIC Guideline for dapsone, methylene blue, pegloticase, rasburicase, tafenoquine, toluidine blue and G6PD",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "AMnnwcsOpXI",
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1184175211,
+        "date" : "2014-05-04T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1184233830,
+        "date" : "2014-05-09T00:00:00-07:00",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450042027,
+        "date" : "2018-11-13T15:55:54.755-08:00",
+        "description" : "Added text regarding September 2018 update to the guideline and added the G6PD A allele to the extended dosing guideline",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450043031,
+        "date" : "2018-11-20T09:54:16.026-08:00",
+        "description" : "Added link to guideline video",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451446500,
+        "date" : "2021-05-19T13:17:14.874-07:00",
+        "description" : "added pediatric tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451886060,
+        "date" : "2022-09-19T09:16:35.548-07:00",
+        "description" : "Removed link to old video",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451901140,
+        "date" : "2022-09-30T10:31:19.043-07:00",
+        "description" : "Added September 2022 guideline update",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452137720,
+        "date" : "2023-06-22T21:26:58.656-07:00",
+        "description" : "Added drug flow chart",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452198860,
+        "date" : "2023-08-03T12:25:14.058-07:00",
+        "description" : "Removed broken link from 2018 update",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452474660,
+        "date" : "2024-05-15T09:41:39.548-07:00",
+        "description" : "Added link to CPIC video",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15135762,"title":"Expanded Clinical Pharmacogenetics Implementation Consortium Guideline for Medication Use in the Context of G6PD Genotype.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10281211","crossReferences":[{"id":1452680347,"resource":"PubMed Central","resourceId":"PMC10281211","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10281211"},{"id":1451882620,"resource":"PubMed","resourceId":"36049896","_url":"https://www.ncbi.nlm.nih.gov/pubmed/36049896"},{"id":1451882621,"resource":"DOI","resourceId":"10.1002/cpt.2735","_url":"http://dx.doi.org/10.1002%2Fcpt.2735"}],"objCls":"Literature","pubDate":"2023-05-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":15074661,"title":"Clinical Pharmacogenetics Implementation Consortium (CPIC) guidelines for rasburicase therapy in the context of G6PD deficiency genotype.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4111801","crossReferences":[{"id":1449280689,"resource":"PubMed Central","resourceId":"PMC4111801","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4111801"},{"id":1449280688,"resource":"PubMed","resourceId":"24787449","_url":"https://www.ncbi.nlm.nih.gov/pubmed/24787449"},{"id":1449280690,"resource":"DOI","resourceId":"10.1038/clpt.2014.97","_url":"http://dx.doi.org/10.1038%2Fclpt.2014.97"}],"objCls":"Literature","pubDate":"2014-08-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1451994740,
+      "html" : "<p>Guideline excerpt: &quot;There are data supporting or refuting certain drugs associated with increased risk of AHA in the setting of G6PD deficiency reported in pediatric patients (Table S1). There is no reason to think that genetically-based recommendations in this guideline should differ for children versus adults.&quot;</p>\n",
+      "version" : 0
+    },
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA449211",
+        "name" : "dapsone",
+        "version" : 9
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450457",
+        "name" : "methylene blue",
+        "version" : 8
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA165963961",
+        "name" : "pegloticase",
+        "version" : 6
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA10176",
+        "name" : "rasburicase",
+        "version" : 9
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166115580",
+        "name" : "tafenoquine",
+        "version" : 6
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166268821",
+        "name" : "toluidine blue",
+        "version" : 3
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA28469",
+        "symbol" : "G6PD",
+        "name" : "glucose-6-phosphate dehydrogenase",
+        "version" : 136
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1447982051,
+      "html" : "<p>The CPIC dosing guideline recommends that high risk drugs should be avoided in G6PD deficient patients with or without chronic non-spherocytic hemolytic anemia (CNSHA). In patients with a G6PD variable or indeterminate phenotype, an enzyme activity test should be carried out before initiating drug therapy. The G6PD gene is located on the X chromosome. Therefore, some patients will only have one copy, whereas others will have two copies. See full guideline for disclaimers, further details and supporting evidence.</p>\n",
+      "version" : 3
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451433652,
+      "html" : "<h3 id=\"september-2022\">September 2022</h3>\n<ul>\n<li>\n<p>The <a rel=\"noopener noreferrer\" href=\"https://ascpt.onlinelibrary.wiley.com/doi/full/10.1002/cpt.2735\" target=\"_blank\">Expanded CPIC&reg; Guideline for Medication Use in the Context of <em>G6PD</em> Genotype</a> has been published in Clinical Pharmacology and Therapeutics. As part of this guideline, the authors classified drugs by their risk of causing acute hemolytic anemia (AHA) in patients with G6PD deficiency. Dapsone, methylene blue, pegloticase, rasburicase, tafenoquine and toluidine blue have been classified as <strong>high risk drugs</strong>, as shown in Table 2 of the guideline publication. This guideline replaces the original 2014 guideline for G6PD and rasburicase.</p>\n</li>\n<li>\n<p>These guidelines are applicable to:</p>\n<ul>\n<li>adult patients</li>\n<li>pediatric patients</li>\n</ul>\n</li>\n<li>\n<p>Excerpts from the guideline:</p>\n<ul>\n<li>&quot;An additional step was added to this CPIC guideline to assign drugs into three groups: those that can be considered high risk for AHA in the presence of G6PD deficiency (and thus should generally be avoided), those that are considered medium risk in G6PD deficiency (and thus should be used with caution), and those that can be considered low-to-no risk (with no added risk of AHA in those that are deficient for G6PD versus those with normal G6PD status).&quot;</li>\n<li>&quot;In order to assign drugs into risk groups, the authors considered not only the strength of the evidence in the primary peer-reviewed literature, but also the frequency of drug use, the presence of regulatory agency warnings, and the presence or absence of a mechanism by which\nreactive oxygen species might be generated and contribute to hemolysis in G6PD deficiency (Supplement, Assigning Risk Level)&quot;</li>\n<li>&quot;<strong>Rasburicase and pegloticase (high risk drugs)</strong>\n<em><strong>Risk category for rasburicase and pegloticase in G6PD deficiency</strong></em> Based on literature strength (high level of evidence) linking AHA and methemoglobinemia to use of the drugs in the setting of G6PD deficiency (Table S1), the mechanism of action of urate oxidase (generation of\nhydrogen peroxide) (31), and strong, consistent regulatory warnings (Table S3), rasburicase and pegloticase are considered to be in the high risk category.&quot;</li>\n<li>&quot;<em><strong>Therapeutic recommendations.</strong></em>_ As high risk drugs, rasburicase and pegloticase should be avoided in patients with G6PD deficiency (Table 3). However, as for any drug, the risk of the adverse effects (AHA and/or methemoglobinemia) must be weighed against the risk of\nhyperuricemia, particularly in patients with newly diagnosed malignancies in whom tumor lysis is anticipated. Tumor lysis syndrome itself can be life-threatening, and alternative uric acid lowering therapy, such as allopurinol, may not be as efficacious as rasburicase at lowering uric acid levels, and has other potential adverse effects.&quot;</li>\n</ul>\n</li>\n<li>\n<p>Download and read:</p>\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/G6PD/2022/36049896.pdf\" target=\"_blank\">Expanded Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for Medication Use in the Context of <em>G6PD</em> Genotype</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/G6PD/2022/36049896-supplement.pdf\" target=\"_blank\">2022 supplement</a></li>\n<li><a href=\"/page/g6pdRefMaterials\">G6PD Gene-Specific Information Tables</a></li>\n<li>Drug Resource Mappings\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/dapsone-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Dapsone</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/methylene%20blue-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Methylene blue</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/pegloticase-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Pegloticase</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/rasburicase-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Rasburicase</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/tafenoquine-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Tafenoquine</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/toluidine%20blue-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Toluidine blue</a></li>\n</ul>\n</li>\n<li>Pre and Post Test Alerts\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/dapsone_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Dapsone</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/methylene%20blue_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Methylene blue</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/pegloticase_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Pegloticase</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/rasburicase_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Rasburicase</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/tafenoquine_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Tafenoquine</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/toluidine%20blue_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Toluidine blue</a></li>\n</ul>\n</li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/images/flow_chart/G6PD_High_Risk_Drug_CDS_Flow_Chart.jpg\" target=\"_blank\">High Risk Drug Flow Chart</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-recommended-therapeutic-use-of-high-risk-drugs-in-relation-to-g6pd-phenotype\">Table 1: Recommended therapeutic use of high risk drugs in relation to <em>G6PD</em> phenotype</h3>\n<p><em>Adapted from Tables 1, 2 and 3 of the guideline</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Predicted Phenotype</th>\n<th>Genotype<sup>a</sup></th>\n<th>Example genotypes<sup>b</sup></th>\n<th>Implications</th>\n<th>Therapeutic Recommendations</th>\n<th>Classification of recommendations<sup>c</sup></th>\n<th>Considerations</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Normal</td>\n<td>A person with one X chromosome carrying a non-deficient (class IV) allele<br/>OR<br/>A person carrying two non-deficient (class IV) alleles</td>\n<td>B, Sao Boria, IV<br/>&nbsp;<br/>B/B, B/Sao Boria, B/A, IV/IV</td>\n<td>Low risk of acute hemolytic anemia</td>\n<td>No reason to avoid high risk drugs based on G6PD status</td>\n<td>Strong</td>\n<td>Tafenoquine’s safety has been established for a G6PD enzyme activity ≥70% of normal.</td>\n</tr>\n<tr>\n<td>Deficient</td>\n<td>A person with one X chromosome carrying a deficient (class II-III) allele<br/>OR<br/>A person carrying two deficient (class II-III) alleles OR one class I allele and one class II or III allele</td>\n<td>A-, Orissa, Kalyan-Kerala, Mediterranean, Canton, Chatham, II, III<br/>&nbsp;<br/>A-/A-, A-/Orissa, Orissa/ Kalyan-Kerala, Mediterranean/ Mediterranean, Chatham /Mediterranean, Canton/ Viangchan, II/II, II/III, III/III, I/II, I/III</td>\n<td>High risk of acute hemolytic anemia</td>\n<td>Avoid use of high risk drugs</td>\n<td><strong>Methylene blue and toluidine blue<sup>f</sup>:</strong> Moderate.<br/>&nbsp;<br/><strong>All other high risk drugs:</strong> Strong</td>\n<td></td>\n</tr>\n<tr>\n<td>Deficient with CNSHA</td>\n<td>A person with one X chromosome carrying a deficient (class I) allele<br/>OR<br/>A person carrying two deficient (class I) alleles<sup>d</sup></td>\n<td>Bangkok, Villeurbanne, I<br/>&nbsp;<br/>Bangkok/Bangkok, Bangkok/Villeurbanne, I/I</td>\n<td>High risk of acute exacerbation of chronic hemolysis</td>\n<td>Avoid use of high risk drugs</td>\n<td>Strong</td>\n<td>Although there are no published data in individuals with the G6PD Deficient with CNSHA phenotype, there is a strong rationale to avoid these drugs based on evidence in G6PD Deficient individuals.</td>\n</tr>\n<tr>\n<td>Variable<sup>e</sup></td>\n<td>A person carrying one non-deficient (class IV) allele and one deficient (class I-III) allele</td>\n<td>B /Bangkok, B/Mediterranean, B/A-, IV/I, IV/II, IV/III</td>\n<td>Variable risk of acute hemolytic anemia</td>\n<td>No reason to avoid low-to-no risk drugs based on G6PD status at standard doses</td>\n<td>Moderate</td>\n<td>Due to X-linked mosaicism, individuals with more than one X chromosome (e.g., females, individuals with Klinefelter syndrome) and heterozygous for one non-deficient (class IV) and one deficient (class I–III) allele may display a normal or a deficient phenotype; an enzyme activity test is needed to assign G6PD phenotype in such cases.<br/>&nbsp;<br/>Tafenoquine’s safety has been established for a G6PD enzyme activity ≥70% of normal.</td>\n</tr>\n<tr>\n<td>Indeterminate</td>\n<td>A person carrying at least one allele with uncertain function</td>\n<td>Dagua<br/>&nbsp;<br/>B/Dagua</td>\n<td>Unknown risk of acute hemolytic anemia</td>\n<td>To ascertain G6PD status, enzyme activity must be measured. Drug use should be guided per the recommendations based on the activity-based phenotype.</td>\n<td>Moderate</td>\n<td></td>\n</tr>\n</tbody>\n</table>\n<p>CNSHA: chronic non-spherocytic hemolytic anemia<br />\n<sup>a</sup> WHO classifications from [Article:<a href=\"/pmid/22293322\">22293322</a>], other details from [Article:<a href=\"/pmid/4963040\">4963040</a>]. Class I alleles are extremely rare; the distinction between Class II and III alleles is not clear. Almost all patients will carry class II, III, or IV alleles.<br />\n<sup>b</sup> Due to the large number of G6PD alleles, other genotypes may be possible besides those given as examples here; see the <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/allele_definition/G6PD_allele_definition_table.xlsx\" target=\"_blank\">G6PD Allele Definition Table</a> for a more comprehensive list of alleles and <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/allele_function_reference/G6PD_allele_functionality_reference.xlsx\" target=\"_blank\">G6PD Allele Functionality Table</a> for their assigned function (WHO class). Note that some labs use the designation “B allele” to indicate an allele carrying no known class I-III variants. The <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/frequency/G6PD_frequency_table.xlsx\" target=\"_blank\">G6PD Frequency Table</a> can be referenced for the frequency of G6PD alleles across major biogeographical groups.<br />\n<sup>c</sup> Rating scheme described in the Strength of Recommendations section in the <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/G6PD/2022/36049896-supplement.pdf\" target=\"_blank\">guideline supplement</a>.<br />\n<sup>d</sup> Such genotypes have never been seen and are presumably exceedingly rare.<br />\n<sup>e</sup> Due to X-linked mosaicism, persons heterozygous (generally females) for one non-deficient (class IV) and one deficient (class I-III alleles) allele may display a normal or a deficient phenotype. It is therefore difficult to predict the phenotype of these individuals (see Supplement, G6PD Heterozygotes).\n<sup>f</sup> Strength of evidence for toluidine blue recommendation is based on extrapolation from methylene blue data.</p>\n<h3 id=\"september-2018-update\">September 2018 Update</h3>\n<p>The CPIC authors recommend that the <em>G6PD A</em> variant be categorized as IV/normal function (previously II-IV/Deficient-Normal function) based on new evidence supporting function [Article:<a href=\"/pmid/27040960\">27040960</a>] and [Article:<a href=\"/pmid/30206300\">30206300</a>]. This change has been incorporated into the G6PD allele definition table.</p>\n<h3 id=\"august-2014\">August 2014</h3>\n<p><em>Accepted article preview online May 2014, advance online publication 11 June 2014</em></p>\n<ul>\n<li>Guidelines regarding the use of pharmacogenomic tests in determining whether rasburicase treatment should be undertaken have been published in Clinical Pharmacology and Therapeutics by the Clinical Pharmacogenetics Implementation Consortium (CPIC).</li>\n<li>Excerpt from the 2014 rasburicase guideline:\n<ul>\n<li>&quot;As stated above, rasburicase is contraindicated by the FDA, the EMA, and PMDA in those with G6PD deficiency (32-34) (see Table 2). If, on the basis of genotyping, a deficient status can be unambiguously assigned to a patient, that would be a sufficient contraindication to the use of rasburicase. However, due to the limitations of genetic testing (discussed above), in most cases it is necessary to perform G6PD enzyme testing to assign G6PD status.&quot;</li>\n</ul>\n</li>\n<li>These guidelines are applicable to\n<ul>\n<li>neonates</li>\n<li>pediatrics</li>\n<li>adults</li>\n</ul>\n</li>\n<li>Download and read:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/rasburicase/2014/24787449.pdf\" target=\"_blank\">Clinical Pharmacogenetics Implementation Consortium (CPIC) Guidelines for Rasburicase Therapy in the context of G6PD Deficiency Genotype.</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/rasburicase/2014/24787449-supplement.pdf\" target=\"_blank\">2014 supplement</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-recommended-dosing-of-rasburicase-by-g6pd-phenotype\">Table 1: Recommended dosing of rasburicase by G6PD phenotype</h3>\n<p><em>Adapted from Table 1 and Table 2 of the 2014 guideline manuscript.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype (Genotype) <sup>a</sup></th>\n<th>Examples of diplotypes <sup>b</sup></th>\n<th>Implications for phenotypic measures</th>\n<th>Dosing recommendations for rasburicase</th>\n<th>Classification of recommendations <sup>c</sup></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Normal <sup>d</sup>. A male carrying a non-deficient (class IV) allele or a female carrying two non-deficient (class IV) alleles.</td>\n<td>Male: B, Sao Boria. Female: B/B, B/ Sao Boria.</td>\n<td>Low or reduced risk of hemolytic anemia.</td>\n<td>No reason to withhold rasburicase based on G6PD status <sup>d</sup>.</td>\n<td>Strong</td>\n</tr>\n<tr>\n<td>Deficient or Deficient with CNSHA. A male carrying a class I, II or III allele, a female carrying two deficient class I-III alleles.</td>\n<td>Male: A-, Orissa, Kalyan-Kerala, Mediterranean, Canton, Chatham, Bangkok, Villeurbanne. Female: A-/A-, A-/ Orissa, Orissa/ Kalyan-Kerala, Mediterranean/ Mediterranean, Chatham/Mediterranean, Canton/ Viangchan, Bangkok/ Bangkok, Bangkok/ Villeurbanne.</td>\n<td>At risk of acute hemolytic anemia.</td>\n<td>Rasburicase is contraindicated; alternatives include allopurinol <sup>e</sup>.</td>\n<td>Strong</td>\n</tr>\n<tr>\n<td>Variable <sup>d,f</sup>. A female carrying one non-deficient (class IV) and one deficient (class I-III variants) allele.</td>\n<td>B/A-, B/Mediterranean, B/Bangkok.</td>\n<td>Unknown risk of hemolytic anemia.</td>\n<td>To ascertain that G6PD status is normal, enzyme activity must be measured; alternatives include allopurinol <sup>e</sup>.</td>\n<td>Moderate</td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> &quot;Class&quot; refers to the WHO classifications from [Article:<a href=\"/pmid/22293322\">22293322</a>], other details from [Article:<a href=\"/pmid/4963040\">4963040</a>]. Class I variants are extremely rare; the distinction between class II and III variants is not clear; and the &quot;class V&quot; very high activity variant has only been reported in a single case [Article:<a href=\"/pmid/4963040\">4963040</a>]. Therefore, almost all patients will carry class II, III, or IV alleles. It should be noted that the class of a variant may have been assigned only by the clinical manifestations of a patient in which the variant was subsequently identified.</p>\n<p>(*) Luzzatto, L. &amp; Poggi, V. Glucose-6-Phosphate Dehydrogenase Deficiency In: Nathan and Oski's Hematology of Infancy and Childhood, 7th Edition  (ed. Meloni, D., Anderson, A. Authors of the book: Orkin, S.H., Fisher, D.E., Look, A.T., Lux IV, S.E., Ginsburg, D., Nathan, D.G. ) (Saunders, Elsevier., 2009).</p>\n<p><sup>b</sup> Due to the large number of G6PD variants, many other diplotypes may be possible besides those given as examples here; see Supplemental Table S1 for a more comprehensive list of variant alleles with their assigned WHO class.</p>\n<p><sup>c</sup> Rating scheme described in Supplement (See Strength of Recommendations material).</p>\n<p><sup>d</sup> A negative or inconclusive genetic test cannot be assumed to indicate normal G6PD phenotype; an enzyme activity test is needed to assign G6PD phenotype in such cases.</p>\n<p><sup>e</sup> Allopurinol is associated with severe cutaneous reactions in the rare carriers of the HLA-B*58:01 allele [Article:<a href=\"/pmid/23232549\">23232549</a>].</p>\n<p><sup>f</sup> Due to X-linked mosaicism, females heterozygous for one non-deficient (class IV) and one deficient (class I-III variants) allele may display a normal or a deficient phenotype. It is therefore difficult to predict the phenotype of these individuals (Supplement, G6PD heterozygotes).</p>\n<h3 id=\"figure-1-workflow-for-interpreting-g6pd-genotype-and-for-assessing-need-for-an-enzyme-activity-test\">Figure 1: Workflow for interpreting G6PD genotype and for assessing need for an enzyme activity test.</h3>\n<p><em>Figure 1 from the guideline manuscript.</em></p>\n<p><img src=\"https://s3.pgkb.org/attachment/CPIC_G6PD_rasburicase_guideline_Figure_1.png\" alt=\"CPIC G6PD rasburicase guideline\" /></p>\n<p>*It should be noted that the class of a variant may have been assigned only by the clinical manifestations of a patient in which the variant was subsequently identified [Article:<a href=\"/pmid/22293322\">22293322</a>].</p>\n",
+      "version" : 4
+    },
+    "version" : 50
+  }
+}

@@ -1,0 +1,309 @@
+{
+  "citations" : [
+    {
+      "id" : 15329722,
+      "title" : "Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6 and CYP2C19 and tricyclic antidepressants.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/41526670",
+      "authors" : [
+        "Kleine Schaars Kristian",
+        "Nijenhuis Marga",
+        "Soree Bianca",
+        "de Boer-Veger Nienke J",
+        "Buunk Anne-Marie",
+        "Guchelaar Henk-Jan",
+        "Houwink Elisa J F",
+        "Risselada Arne",
+        "Rongen Gerard A P J M",
+        "van Schaik Ron H N",
+        "Swen Jesse J",
+        "Touw Daan",
+        "Deneer Vera H M",
+        "van Westrhenen Roos"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 1454631360,
+          "resource" : "PubMed",
+          "resourceId" : "41526670",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/41526670",
+          "version" : 0
+        },
+        {
+          "id" : 1454631361,
+          "resource" : "DOI",
+          "resourceId" : "10.1038/s41431-025-02008-3",
+          "_url" : "http://dx.doi.org/10.1038%2Fs41431-025-02008-3",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "European journal of human genetics : EJHG",
+      "meshTerms" : [],
+      "month" : 1,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2026-01-01T00:00:00-08:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "The Dutch Pharmacogenetic Working Group (DPWG) aims to integrate pharmacogenetics into clinical practice by creating evidence-based guidelines to optimize pharmacotherapy based on genetic tests. The current guideline describes the gene-drug interactions between CYP2D6 and CYP2C19 and various tricyclic antidepressants (TCAs). For CYP2D6 poor metabolisers (PM), dose reductions are advised for amitriptyline (reduction to 60% of the normal dose), clomipramine (reduction to 50% of the normal dose for the indication depression or in case of side effects at the normal dose for the other indications), doxepin (reduction to 40% of normal dose), imipramine (30% of the normal dose), and nortriptyline (40%). For CYP2D6 intermediate metabolisers (IM) reduced dose is also recommended for amitriptyline (75%), clomipramine (70%), doxepin (80%), imipramine (70%), and nortriptyline (60%). Also, CYP2D6 ultra-rapid metabolisers (UM) require tailored dose adjustments: amitriptyline (1.6 times the normal dose), clomipramine (1.5 times), doxepin (2 times), imipramine (1.7 times), and nortriptyline (1.7 times). Additionally, alternative drugs may be needed for CYP2D6 UM due to potential safety concerns. For CYP2C19 PM, a 70% dose reduction is advised for imipramine. For CYP2C19 IM, no action is required for TCAs. For CYP2C19 UM, an alternative medication is recommended for clomipramine prescribed for anxiety and obsessive-compulsive disorder (OCD). The DPWG classifies CYP2D6 genotyping for all five TCAs and CYP2C19 genotyping for clomipramine in patients with anxiety disorders or OCD, and for imipramine as being \"potentially beneficial\". Genotyping prior to treatment can be considered on an individual patient basis.",
+      "terms" : [
+        {"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}
+      ],
+      "type" : "Literature",
+      "version" : 2,
+      "year" : 2026
+    },
+    {
+      "id" : 7283333,
+      "title" : "Pharmacogenetics: from bench to byte--an update of guidelines.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+      "authors" : [
+        "Swen J J",
+        "Nijenhuis M",
+        "de Boer A",
+        "Grandia L",
+        "Maitland-van der Zee A H",
+        "Mulder H",
+        "Rongen G A P J M",
+        "van Schaik R H N",
+        "Schalekamp T",
+        "Touw D J",
+        "van der Weide J",
+        "Wilffert B",
+        "Deneer V H M",
+        "Guchelaar H-J"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 769250885,
+          "resource" : "PubMed",
+          "resourceId" : "21412232",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+          "version" : 0
+        },
+        {
+          "id" : 1449247827,
+          "resource" : "DOI",
+          "resourceId" : "10.1038/clpt.2011.34",
+          "_url" : "http://dx.doi.org/10.1038%2Fclpt.2011.34",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "Clinical pharmacology and therapeutics",
+      "meshTerms" : [
+        "Animals",
+        "Aryl Hydrocarbon Hydroxylases",
+        "Cytochrome P-450 CYP2C9",
+        "Drug Administration Schedule",
+        "Drug-Related Side Effects and Adverse Reactions",
+        "Humans",
+        "Pharmaceutical Preparations",
+        "Pharmacogenetics",
+        "Practice Guidelines as Topic"
+      ],
+      "month" : 5,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "page" : "662-73",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2011-05-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "Currently, there are very few guidelines linking the results of pharmacogenetic tests to specific therapeutic recommendations. Therefore, the Royal Dutch Association for the Advancement of Pharmacy established the Pharmacogenetics Working Group with the objective of developing pharmacogenetics-based therapeutic (dose) recommendations. After systematic review of the literature, recommendations were developed for 53 drugs associated with genes coding for CYP2D6, CYP2C19, CYP2C9, thiopurine-S-methyltransferase (TPMT), dihydropyrimidine dehydrogenase (DPD), vitamin K epoxide reductase (VKORC1), uridine diphosphate glucuronosyltransferase 1A1 (UGT1A1), HLA-B44, HLA-B*5701, CYP3A5, and factor V Leiden (FVL).",
+      "terms" : [],
+      "type" : "Literature",
+      "version" : 4,
+      "volume" : "89",
+      "year" : 2011
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166104994",
+    "name" : "Annotation of DPWG Guideline for doxepin and CYP2D6",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1183704462,
+        "date" : "2011-08-10T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1450415095,
+        "date" : "2019-05-23T20:53:50.845-07:00",
+        "description" : "Annotation current with November 2018 DPWG Guideline release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450820793,
+        "date" : "2019-10-06T23:19:47.375-07:00",
+        "description" : "No changes based on August 2019 guideline",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450956361,
+        "date" : "2020-01-31T13:27:11.803-08:00",
+        "description" : "Updated link to 2011 DPWG methods",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450962860,
+        "date" : "2020-02-10T11:22:54.014-08:00",
+        "description" : "Fixed links to 2018 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451431284,
+        "date" : "2021-05-04T00:00:00-07:00",
+        "description" : "Added extended dosing",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704238,
+        "date" : "2022-03-03T16:33:33.057-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451706302,
+        "date" : "2022-03-07T16:20:20.871-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732878,
+        "date" : "2022-03-28T09:57:46.929-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733308,
+        "date" : "2022-03-28T14:38:44.519-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741447,
+        "date" : "2022-04-05T11:12:47.424-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884224,
+        "date" : "2022-09-16T10:06:00.751-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084388,
+        "date" : "2023-04-28T18:51:44.355-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084451,
+        "date" : "2023-04-28T18:52:19.799-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084608,
+        "date" : "2023-04-28T19:05:03.346-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146542,
+        "date" : "2023-07-03T13:40:15.688-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452411022,
+        "date" : "2024-03-18T08:17:16.195-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454439840,
+        "date" : "2025-11-11T14:00:27.829-08:00",
+        "description" : "updated recommendations based on the file accessed 111125",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454632460,
+        "date" : "2026-01-20T08:56:43.257-08:00",
+        "description" : "Added section for new publication and linked PMID 41526670",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15329722,"title":"Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6 and CYP2C19 and tricyclic antidepressants.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/41526670","crossReferences":[{"id":1454631360,"resource":"PubMed","resourceId":"41526670","_url":"https://www.ncbi.nlm.nih.gov/pubmed/41526670"},{"id":1454631361,"resource":"DOI","resourceId":"10.1038/s41431-025-02008-3","_url":"http://dx.doi.org/10.1038%2Fs41431-025-02008-3"}],"objCls":"Literature","pubDate":"2026-01-01T00:00:00-08:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":7283333,"title":"Pharmacogenetics: from bench to byte--an update of guidelines.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/21412232","crossReferences":[{"id":769250885,"resource":"PubMed","resourceId":"21412232","_url":"https://www.ncbi.nlm.nih.gov/pubmed/21412232"},{"id":1449247827,"resource":"DOI","resourceId":"10.1038/clpt.2011.34","_url":"http://dx.doi.org/10.1038%2Fclpt.2011.34"}],"objCls":"Literature","pubDate":"2011-05-01T00:00:00-07:00","terms":[],"type":"Literature"},
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15102465,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2018","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","crossReferences":[{"id":1450415575,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15256422,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2025","_sameAs":"https://api.clinpgx.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf","crossReferences":[{"id":1454439720,"resource":"URL","resourceId":"https://api.clinpgx.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf","_url":"https://api.clinpgx.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf"}],"objCls":"Literature","terms":[{"id":1452267780,"resource":"ClinPGx Tags","term":"Has PGx","termId":"pgkbTags:1452267780"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA449409",
+        "name" : "doxepin",
+        "version" : 11
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA128",
+        "symbol" : "CYP2D6",
+        "name" : "cytochrome P450 family 2 subfamily D member 6",
+        "version" : 7891
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1447982020,
+      "html" : "<p>The Dutch Pharmacogenetics Working Group Guideline for doxepin recommends dose changes and to monitor the effect and side effects or the plasma concentrations to set the maintenance dose for CYP2D6 poor (PM), intermediate (IM), and ultrarapid (UM) metabolizer or to avoid doxepin in UM.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1447982019,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-between-cyp2d6-and-cyp2c19-and-tricyclic-antidepressants-european-journal-of-human-genetics-2026\">Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6 and CYP2C19 and tricyclic antidepressants. <em>European journal of human genetics</em> (2026)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper with guidelines for doxepin and CYP2D6 including Supplementary materials [Article:<a href=\"/pmid/41526670\">41526670</a>]. The recommendations in Table 2 are the same as shown in the table below for November 2025.</p>\n<h3 id=\"november-2025-update\">November 2025 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (<a href=\"/page/dpwg\">DPWG</a>) released an updated version of the <a download=\"pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf\">Pharmacogenetic_recommendation_text</a> dated with 20240501. It includes changes to the wording for the CYP2D6-doxepin guidelines which are dated within the document as 08-02-2024.</p>\n<p><em>Wording in table taken from the DPWG <a download=\"pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf\">Pharmacogenetic_recommendation_text</a> accessed 11112025</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2D6 UM</td>\n<td>doxepin</td>\n<td>The risk of ineffectiveness and cardiotoxic side effects may be increased. The gene variation leads to reduced plasma concentrations of doxepin and the active metabolite nordoxepin and an increase in the plasma concentrations of the potentially cardiotoxic hydroxy metabolites.</td>\n<td>Double the standard dose and monitor the effect and side effects or the plasma concentrations of doxepin and nordoxepin in order to set the maintenance dose. If a dose increase is not wanted due to the potentially cardiotoxic hydroxy metabolites: avoid doxepin. Antidepressants that are not metabolised by CYP2D6, or to a lesser extent, include citalopram and sertraline.</td>\n</tr>\n<tr>\n<td>CYP2D6 IM</td>\n<td>doxepin</td>\n<td>The risk of side effects may be increased, because the gene variation leads to increased plasma concentrations of doxepin and the active metabolite nordoxepin.</td>\n<td>Use 80% of the standard dose and monitor the effect and side effects or the plasma concentrations of doxepin and nordoxepin in order to set the maintenance dose.</td>\n</tr>\n<tr>\n<td>CYP2D6 PM</td>\n<td>doxepin</td>\n<td>The risk of side effects may be increased, because the gene variation leads to increased plasma concentrations of doxepin and the active metabolite nordoxepin.</td>\n<td>Use 40% of the standard dose and monitor the effect and side effects or the plasma concentrations of doxepin and nordoxepin in order to set the maintenance dose.</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_CYP2D6_doxepin_2596-2598_downloaded_111125.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2D6_doxepin_2596-2598_downloaded_111125.pdf\">Read for more information about this recommendation</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_CYP2D6_doxepin_2596-2598_downloaded_111125.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2D6_doxepin_2596-2598_downloaded_111125.pdf\">DPWG risk analysis document</a> for doxepin and CYP2D6:</p>\n<blockquote class=\"blockquote\">\n<p>The Dutch Pharmacogenetics Working Group considers genotyping before starting doxepin to be potentially beneficial for the prevention of side effects. Genotyping can be considered on an individual patient basis. If, however, the genotype is available, the Dutch Pharmacogenetics Working Group recommends adhering to the gene-drug guideline.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n<h3 id=\"november-2018-update\">November 2018 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for doxepin based on CYP2D6 genotype. They recommend dose changes and to monitor the effect and side effects or the plasma concentrations to set the maintenance dose for CYP2D6 poor (PM), intermediate (IM), and ultrarapid (UM) metabolizer or to avoid doxepin in UM.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_November_2018.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_November_2018.pdf\">Dutch guidelines November 2018 update</a></em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2D6 UM</td>\n<td>doxepin</td>\n<td>The risk of ineffectiveness and cardiotoxic side effects may be increased. The gene variation leads to reduced plasma concentrations of doxepin and the active metabolite nordoxepin and an increase in the plasma concentrations of the potentially cardiotoxic hydroxy metabolites.</td>\n<td>Double the standard dose and monitor the effect and side effects or the plasma concentrations of doxepin and nordoxepin in order to set the maintenance dose. The therapeutic range is 100-250 ng/mL for the sum of doxepin and nordoxepin plasma concentrations. Values higher than 400 ng/mL are considered toxic. If a dose increase is not wanted due to the potentially cardiotoxic hydroxy metabolites: avoid doxepin. Antidepressants that are not metabolised by CYP2D6, or to a lesser extent, include citalopram and sertraline.</td>\n</tr>\n<tr>\n<td>CYP2D6 IM</td>\n<td>doxepin</td>\n<td>The risk of side effects may be increased, because the gene variation leads to increased plasma concentrations of doxepin and the active metabolite nordoxepin.</td>\n<td>Use 80% of the standard dose and monitor the effect and side effects or the plasma concentrations of doxepin and nordoxepin in order to set the maintenance dose. The therapeutic range is 100-250 ng/mL for the sum of doxepin and nordoxepin plasma concentrations. Values higher than 400 ng/mL are considered toxic.</td>\n</tr>\n<tr>\n<td>CYP2D6 PM</td>\n<td>doxepin</td>\n<td>The risk of side effects may be increased, because the gene variation leads to increased plasma concentrations of doxepin and the active metabolite nordoxepin.</td>\n<td>Use 40% of the standard dose and monitor the effect and side effects or the plasma concentrations of doxepin and nordoxepin in order to set the maintenance dose. The therapeutic range is 100-250 ng/mL for the sum of doxepin and nordoxepin plasma concentrations. Values higher than 400 ng/mL are considered toxic.</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_CYP2D6_doxepin_2015-2016-2017.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2D6_doxepin_2015-2016-2017.pdf\">Read for more information about this recommendation</a>, <a download=\"CYP2D6.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CYP2D6.pdf\">Read about gene information from DPWG</a></p>\n<h3 id=\"2011-guideline\">2011 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for doxepin based on CYP2D6 genotypes [Article:<a href=\"/pmid/21412232\">21412232</a>].  They recommend lower dose for patients carrying the poor metabolizer (PM) alleles and intermediate metabolizer alleles and alternative drug for patients carrying the ultrarapid metabolizer (UM) allleles.</p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype (Genotype)</th>\n<th>Therapeutic Dose Recommendation</th>\n<th>Level of Evidence</th>\n<th>Clinical Relevance</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>PM (two inactive (*3-*8, *11-*16, *19-*21, *38, *40, *42) alleles)</td>\n<td>Reduce dose by 60%. Adjust maintenance dose in response to (nor)doxepin plasma concentration</td>\n<td>Published controlled studies of moderate quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints.</td>\n<td>Clinical effect (S): death; arrhythmia; unanticipated myelosuppression.</td>\n</tr>\n<tr>\n<td>IM (two decreased-activity (*9, *10, *17, *29, *36, *41) alleles or carrying one active (*1, *2, *33, *35) and one inactive (*3-*8, *11-*16, *19-*21, *38, *40, *42) allele, or carrying one decreased-activity (*9, *10, *17, *29, *36, *41) allele and one inactive (*3-*8, *11-*16, *19-*21, *38, *40, *42) allele)</td>\n<td>Reduce dose by 20%. Adjust maintenance dose in response to (nor)doxepin plasma concentration.</td>\n<td>Published controlled studies of moderate quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints.</td>\n<td>Minor clinical effect (S): QTc prolongation (&lt;450 ms female, &lt;470 ms male); INR increase &lt; 4.5 Kinetic effect (S)</td>\n</tr>\n<tr>\n<td>UM (a gene duplication in absence of inactive (*3-*8, *11-*16, *19-*21, *38, *40, *42) or decreased-activity (*9, *10, *17, *29, *36, *41) alleles)</td>\n<td>Select alternative drug (citalopram, sertraline) or increase dose by 100%. Adjust maintenance dose in response to (nor)doxepin plasma concentration.</td>\n<td>Published controlled studies of moderate quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints.</td>\n<td>Minor clinical effect (S): QTc prolongation (&lt;450 ms female, &lt;470 ms male); INR increase &lt; 4.5 Kinetic effect (S).</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li>*See <a href=\"/page/dpwg\">Methods</a> or [Article:<a href=\"/pmid/18253145\">18253145</a>] for definition of &quot;good&quot; and &quot;moderate&quot; quality.</li>\n<li>S: statistically significant difference.</li>\n</ul>\n",
+      "version" : 19
+    },
+    "version" : 35
+  }
+}

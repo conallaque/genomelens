@@ -1,0 +1,124 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166182810",
+    "name" : "Annotation of DPWG Guideline for flucloxacillin and HLA-B",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1450414938,
+        "date" : "2019-05-23T00:00:00-07:00",
+        "description" : "Annotation current with November 2018 DPWG Guideline release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450820629,
+        "date" : "2019-10-03T10:21:52.121-07:00",
+        "description" : "No changes based on August 2019 guideline",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1450962961,
+        "date" : "2020-02-10T11:49:27.957-08:00",
+        "description" : "Fixed links to 2018 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704174,
+        "date" : "2022-03-03T16:33:21.894-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451732814,
+        "date" : "2022-03-28T09:57:35.500-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451884239,
+        "date" : "2022-09-16T10:11:45.754-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146463,
+        "date" : "2023-07-03T13:39:51.904-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452411660,
+        "date" : "2024-03-18T11:40:21.961-07:00",
+        "description" : "Updated links for risk analysis pdf and added preemptive testing.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452411721,
+        "date" : "2024-03-18T12:01:36.522-07:00",
+        "description" : "Checked testing box",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15102465,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2018","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","crossReferences":[{"id":1450415575,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165987830",
+        "symbol" : "HLA-B*57:01",
+        "name" : "*57:01",
+        "version" : 6
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA164781042",
+        "name" : "flucloxacillin",
+        "version" : 7
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA35056",
+        "symbol" : "HLA-B",
+        "name" : "major histocompatibility complex, class I, B",
+        "version" : 40
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1450414935,
+      "html" : "<p>Monitor for liver function and select an alternative drug instead of flucloxacillin if liver enzymes or bilirubin is elevated, for patients that are HLA-B*57:01.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1450414936,
+      "html" : "<h3 id=\"november-2018-guideline\">November 2018 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for flucloxacillin and HLA-B*57:01.</p>\n<p><em>Wording in table taken from <a download=\"DPWG_November_2018.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_November_2018.pdf\">the Dutch guidelines November 2018 update</a></em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>ALLELE/GENOTYPE/PHENOTYPE</th>\n<th>DRUG</th>\n<th>DESCRIPTION</th>\n<th>RECOMMENDATION</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>HLA-B*5701</td>\n<td>flucloxacillin</td>\n<td>HLA-B*5701-positive patients have an 80-fold elevated risk of flucloxacillin-induced liver injury. However, the incidence is low (1-2 per 1000 individuals).</td>\n<td>1. Regularly monitor the patient’s liver function<br/>2. Choose an alternative if liver enzymes and/or bilirubin levels are elevated</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_HLA_flucloxacillin_4652.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_HLA_flucloxacillin_4652.pdf\">Read for more information about this recommendation</a>, <a download=\"HLAs.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/HLAs.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_HLA_flucloxacillin_4652.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_HLA_flucloxacillin_4652.pdf\">DPWG risk analysis document</a> for flucloxacillin and HLA-B:</p>\n<blockquote class=\"blockquote\">\n<p>The KNMP Pharmacogenetics Working Group considers genotyping before starting flucloxacillin to be beneficial for\ndrug safety. It is advised to consider genotyping these patients before (or directly after) drug therapy has been initiated\nto guide drug selection.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n",
+      "version" : 7
+    },
+    "version" : 16
+  }
+}

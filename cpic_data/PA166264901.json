@@ -1,0 +1,101 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166264901",
+    "name" : "Annotation of DPWG Guideline for methylphenidate and COMT",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1451695822,
+        "date" : "2022-02-25T00:00:00-08:00",
+        "type" : "Create",
+        "version" : 1
+      },
+      {
+        "id" : 1451704257,
+        "date" : "2022-03-03T16:33:35.787-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451732897,
+        "date" : "2022-03-28T09:57:49.725-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451968223,
+        "date" : "2022-12-19T08:26:41.150-08:00",
+        "description" : "Added 2022 guideline paper.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146469,
+        "date" : "2023-07-03T13:39:53.776-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452412501,
+        "date" : "2024-03-19T05:42:03.901-07:00",
+        "description" : "Updated links for risk analysis pdf.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15139382,"title":"Dutch pharmacogenetics working group (DPWG) guideline for the gene-drug interaction of CYP2D6 and COMT with atomoxetine and methylphenidate.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10689464","crossReferences":[{"id":1452323500,"resource":"PubMed Central","resourceId":"PMC10689464","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10689464"},{"id":1451967460,"resource":"PubMed","resourceId":"36509836","_url":"https://www.ncbi.nlm.nih.gov/pubmed/36509836"},{"id":1451967461,"resource":"DOI","resourceId":"10.1038/s41431-022-01262-z","_url":"http://dx.doi.org/10.1038%2Fs41431-022-01262-z"}],"objCls":"Literature","pubDate":"2023-12-01T00:00:00-08:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : false,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Variant",
+        "id" : "PA166156024",
+        "symbol" : "rs4680",
+        "name" : "rs4680",
+        "version" : 5
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450464",
+        "name" : "methylphenidate",
+        "version" : 10
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA117",
+        "symbol" : "COMT",
+        "name" : "catechol-O-methyltransferase",
+        "version" : 5126
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1451695820,
+      "html" : "<p>There are currently no dosing recommendations for methylphenidate based on COMT genotype.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451695821,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-of-cyp2d6-and-comt-with-atomoxetine-and-methylphenidate\">Dutch pharmacogenetics working group (DPWG) guideline for the gene-drug interaction of CYP2D6 and COMT with atomoxetine and methylphenidate</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper concluding after systematic literature review that &quot;No interaction was found between the CYP2D6 and COMT genes and methylphenidate&quot; <a href=\"/literature/15139382\">PMID: 36509836</a>.</p>\n<h3 id=\"may-2021-guideline\">May 2021 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for methylphenidate based on COMT Val/Met genotypes (<a href=\"/variant/PA166156024\">rs4680</a>). They conclude that this is NOT a gene-drug interaction (see <a download=\"DPWG_May_2021.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_May_2021.pdf\">Dutch guidelines May 2021 update</a>).</p>\n<p><a download=\"DPWG_COMT_methylphenidate_6432-6433.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_COMT_methylphenidate_6432-6433.pdf\">Read for more information about this recommendation</a></p>\n",
+      "version" : 4
+    },
+    "version" : 8
+  }
+}

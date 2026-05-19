@@ -1,0 +1,282 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166192301",
+    "name" : "Annotation of CPIC Guideline for meloxicam and CYP2C9",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "a_Kd5s-u1h4",
+    "dosingInformation" : true,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1451095140,
+        "date" : "2020-03-19T00:00:00-07:00",
+        "description" : "Guideline published",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451235761,
+        "date" : "2020-07-30T12:07:10.337-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235766,
+        "date" : "2020-07-30T12:11:49.564-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235781,
+        "date" : "2020-07-30T12:12:00.779-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235771,
+        "date" : "2020-07-30T12:12:26.689-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235776,
+        "date" : "2020-07-30T12:12:35.476-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235786,
+        "date" : "2020-07-30T12:12:45.951-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235791,
+        "date" : "2020-07-30T12:12:56.030-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235801,
+        "date" : "2020-07-30T12:13:12.515-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235806,
+        "date" : "2020-07-30T12:13:33.642-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235796,
+        "date" : "2020-07-30T12:13:44.800-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235821,
+        "date" : "2020-07-30T12:13:56.783-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235826,
+        "date" : "2020-07-30T12:14:22.670-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235811,
+        "date" : "2020-07-30T12:14:38.710-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235816,
+        "date" : "2020-07-30T12:14:52.094-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235841,
+        "date" : "2020-07-30T12:15:02.129-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235831,
+        "date" : "2020-07-30T12:20:46.956-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235836,
+        "date" : "2020-07-30T12:20:57.964-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235861,
+        "date" : "2020-07-30T12:21:09.183-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235866,
+        "date" : "2020-07-30T12:25:42.375-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235881,
+        "date" : "2020-07-30T12:25:53.732-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235901,
+        "date" : "2020-07-30T12:26:11.495-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235906,
+        "date" : "2020-07-30T12:26:25.249-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235921,
+        "date" : "2020-07-30T12:26:44.620-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235941,
+        "date" : "2020-07-30T12:27:00.023-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235946,
+        "date" : "2020-07-30T12:27:19.428-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235951,
+        "date" : "2020-07-30T12:27:35.003-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235956,
+        "date" : "2020-07-30T12:27:51.811-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451235961,
+        "date" : "2020-07-30T12:28:17.452-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451446461,
+        "date" : "2021-05-19T13:03:05.249-07:00",
+        "description" : "added pediatric tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451613181,
+        "date" : "2021-12-10T11:12:44.631-08:00",
+        "description" : "Added video",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452137561,
+        "date" : "2023-06-22T19:22:31.178-07:00",
+        "description" : "Updated supplemental table links",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15105062,"title":"Clinical Pharmacogenetics Implementation Consortium Guideline (CPIC) for CYP2C9 and Nonsteroidal Anti-Inflammatory Drugs.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8080882","crossReferences":[{"id":1451837598,"resource":"PubMed Central","resourceId":"PMC8080882","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8080882"},{"id":1451090662,"resource":"PubMed","resourceId":"32189324","_url":"https://www.ncbi.nlm.nih.gov/pubmed/32189324"},{"id":1451090663,"resource":"DOI","resourceId":"10.1002/cpt.1830","_url":"http://dx.doi.org/10.1002%2Fcpt.1830"}],"objCls":"Literature","pubDate":"2020-08-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1451446460,
+      "html" : "<p><em><strong>Pediatrics</strong></em>: Because CYP2C9 activity is fully mature by early childhood, it may be appropriate to extrapolate these recommendations to adolescents or possibly younger children with close monitoring. Ultimately, additional research and clinical trials in pediatric patients investigating the association between CYP2C9 genotype and NSAID systemic exposure and treatment outcomes are needed.</p>\n",
+      "version" : 0
+    },
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450353",
+        "name" : "meloxicam",
+        "version" : 16
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA126",
+        "symbol" : "CYP2C9",
+        "name" : "cytochrome P450 family 2 subfamily C member 9",
+        "version" : 7877
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1450986480,
+      "html" : "<p>The CPIC Dosing Guideline for meloxicam recommends alternative therapy for CYP2C9 poor metabolizers due to markedly prolonged half-life, and initiating therapy with 50% of the lowest recommended starting dose or choose an alternative therapy for CYP2C9 intermediate metabolizers with activity score of 1. See full guideline for further details and supporting evidence.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451433675,
+      "html" : "<h3 id=\"march-2020\">March 2020</h3>\n<p><em>Advance online publication March 2020.</em></p>\n<ul>\n<li>\n<p>The <a rel=\"noopener noreferrer\" href=\"https://ascpt.onlinelibrary.wiley.com/doi/abs/10.1002/cpt.1830\" target=\"_blank\">CPIC guideline regarding for <em>CYP2C9</em> and Nonsteroidal Anti-inflammatory Drugs</a> is published in Clinical Pharmacology and Therapeutics.</p>\n</li>\n<li>\n<p>These guidelines are applicable to:</p>\n<ul>\n<li>\n<p>pediatric patients</p>\n</li>\n<li>\n<p>adult patients</p>\n</li>\n</ul>\n</li>\n<li>\n<p>Excerpts from the 2020 Nonsteroidal Anti-inflammatory Drugs dosing guideline:</p>\n<ul>\n<li>\n<p>&quot;Substantial evidence links CYP2C9 genotypes with phenotypic variability in CYP2C9 metabolism and plasma NSAID concentrations, with the majority of studies conducted in healthy volunteers.&quot;</p>\n</li>\n<li>\n<p>&quot;Although clinical evidence linking genetic variation in CYP2C9 to an increased rate of adverse events with NSAIDs use is scarce, several studies have established an association between CYP2C9 decreased function and no function alleles and elevated NSAID exposure (Figure 1 and Figure S2). Because most NSAID adverse events are dose-dependent, on-target adverse events involving COX inhibition (19-23) it is reasonable to assume that elevated exposure increases the risk of adverse events.&quot;</p>\n</li>\n<li>\n<p>&quot;CYP2C9 IM and PM phenotypes affect systemic plasma concentrations of NSAIDs by decreasing metabolic clearance and consequently prolonging plasma elimination half-life. Therefore, therapeutic recommendations are broadly organized according to the NSAID plasma elimination half-life in NMs. Where more than two studies reported plasma concentration areaunder-the-curve (AUC), a meta-analysis was conducted to estimate the average impact of CYP2C9 genotype on drug exposure (Figure 1 and Figures S2 to S4).&quot;</p>\n</li>\n<li>\n<p>&quot; <em><strong>Meloxicam</strong></em>. Meloxicam has a longer half-life (15-20 hours, Table S12) than celecoxib and ibuprofen; thus, impaired meloxicam metabolism is expected to cause sustained elevations in drug exposure. Recommendations for CYP2C9 NMs and IMs with an AS of 1.5 are similar to the short half-life NSAIDs and include initiation of therapy with the standard dose while using the lowest effective dosage for shortest duration capable to achieve treatment goals. For IMs with an AS of 1, reduced metabolism and increased plasma concentrations are expected that may increase probability of toxicities...The recommendations are to either initiate therapy with 50% of the lowest recommended starting dose or choose an alternative therapy, consistent with the recommendations in PMs for short half-life NSAIDs (Table 2). Upward dose titration should not occur until after steady-state is reached (at least seven days), and careful monitoring is recommended. CYP2C9 PMs should be prescribed an alternative therapy because markedly prolonged half-life is expected (i.e., &gt;100 hours)&quot;.</p>\n</li>\n<li>\n<p>&quot;<em><strong>Celecoxib, flurbiprofen, ibuprofen, lornoxicam</strong></em>: Based on current evidence, NMs and IMs with an AS of 1.5 are recommended to initiate therapy with the approved starting dose. Despitehaving mildly reduced metabolism, IMs with an AS of 1.5 do not exhibit significant increases in drug exposure relative to NMs... CYP2C9 IMs with an AS of 1 have reduced metabolism and are expected to exhibit a prolonged drug half-life and higher plasma concentrations compared to NMs, which may increase probability of toxicities.For IMs with an AS of 1, it is recommended to initiate NSAID therapy with the lowest recommended starting dose and titrate to clinical effect with close monitoring for adverse events such as elevated blood pressure and kidney dysfunction during course of therapy. Regarding ibuprofen use, it should be taken into consideration that while the CYP2C9*2 allele alone might not cause a clinically relevant reduction in clearance, its strong linkage with the\ndecreased function CYP2C8*3 allele may result in impaired R (-) ibuprofen hydroxylation and increased exposure to the parent drug...Individuals with a CYP2C9 PM phenotype (AS of 0) are expected to have markedly reduced metabolism and are expected to exhibit a pronounced prolongation of drug half-life and increase in plasma concentrations, which may increase the probability and/or severity of toxicities...It is recommended to initiate therapy with 25-50% of the lowest recommended starting dose (i.e. 50-75% dose reduction), and careful dose titration to clinical effect. Because drug half-life is significantly prolonged in these patients, upward dose titration should not occur until after steady-state is reached, taking into consideration the PM half-life for each drug; of course, dosing may be stopped or decreased due to toxicity at any time. Treatment with an alternative therapy could also be considered. This could include NSAIDs not primarily metabolized by CYP2C9 (such as aspirin, ketorolac (approved for short term use only), metamizole, naproxen, sulindac, etoricoxib, parecoxib, or valdecoxib), or with pharmacokinetic parameters apparently not impacted by CYP2C9 genetic variants in vivo despite CYP2C9 metabolism in vitro&quot;.</p>\n</li>\n<li>\n<p>&quot; <em><strong>Piroxicam and tenoxicam</strong></em>. These drugs have extremely long half-lives (30-86 and 60 hours, respectively), thus\namplifying the potential risks in individuals with reduced CYP2C9 metabolism and hampering dose titration strategies due to lack of data. Accordingly, rather than use of a lower starting dose, IMs with an AS of 1 and PMs are recommended to receive an alternative therapy. This includes drugs that are not metabolized by CYP2C9 or significantly affected by CYP2C9 genetic variants in vivo. Selection of a NSAID with a short half-life (Table 2) could also be considered.&quot;</p>\n</li>\n<li>\n<p>&quot; <em><strong>Aceclofenac, aspirin, diclofenac, indomethacin, lumiracoxib, metamizole, nabumetone and naproxen</strong></em>. The pharmacokinetics of these drugs are not significantly impacted by CYP2C9 genetic variants in vivo and/or there is insufficient evidence to provide a recommendation to guide clinical practice at this time (CPIC classification of recommendation “no recommendation”; CPIC level C&quot;.</p>\n</li>\n<li>\n<p>&quot;<em><strong>Pediatrics</strong></em>: Because CYP2C9 activity is fully mature by early childhood, it may be appropriate to extrapolate these recommendations to adolescents or possibly younger children with close monitoring. Ultimately, additional research\nand clinical trials in pediatric patients investigating the association between CYP2C9 genotype and NSAID systemic exposure and treatment outcomes are needed.&quot;</p>\n</li>\n</ul>\n</li>\n<li>\n<p>Download and read:</p>\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/NSAID/2020/32189324.pdf\" target=\"_blank\">Clinical Pharmacogenetics Implementation Consortium (CPIC) guideline for <em>CYP2C9</em> and NSAIDs Therapy</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/NSAID/2020/32189324-supplement.pdf\" target=\"_blank\">2020 supplement</a></li>\n<li><a href=\"/page/cyp2c9RefMaterials\">CYP2C9 Gene-Specific Information Tables</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/meloxicam-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Meloxicam Drug Resource Mappings</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/meloxicam_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Meloxicam Pre and Post Test Alerts</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/images/flow_chart/Meloxicam_CDS_Flow_Chart.jpg\" target=\"_blank\">Meloxicam Clinical Decision Support Flow Chart</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-recommended-dosing-of-meloxicam-by-cyp2c9-phenotype\">Table 1: Recommended dosing of <em><strong>meloxicam</strong></em> by CYP2C9 phenotype</h3>\n<p><em>Adapted from Tables 1 and 3 of the 2020 guideline.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype<sup>a</sup></th>\n<th>Activity Score</th>\n<th>Genotype</th>\n<th>Examples of genotypes<sup>b</sup></th>\n<th>Implications</th>\n<th>Therapeutic recommendations<sup>c</sup></th>\n<th>Classification of recommendations<sup>d</sup></th>\n<th>Other considerations</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><em>CYP2C9</em> Normal metabolizer</td>\n<td>2<sup>c</sup></td>\n<td>An individual carrying two normal function alleles</td>\n<td>*1/*1</td>\n<td>Normal metabolism</td>\n<td>Initiate therapy with recommended starting dose. In accordance with the prescribing information, use the lowest effective dosage for shortest duration consistent with individual patient treatment goals.</td>\n<td>Strong</td>\n<td></td>\n</tr>\n<tr>\n<td><em>CYP2C9</em> Intermediate metabolizer<sup>f</sup></td>\n<td>1.5<sup>c</sup></td>\n<td>An individual carrying one normal function and one decreased function allele.</td>\n<td>*1/*2</td>\n<td>Mildly reduced metabolism</td>\n<td>Initiate therapy with recommended starting dose. In accordance with the prescribing information, use the lowest effective dosage for shortest duration consistent with individual patient treatment goals.</td>\n<td>Moderate</td>\n<td>IMs might have a higher than normal risk of adverse events especially in individuals with other factors affecting clearance of these drugs such as hepatic impairment or advanced age.</td>\n</tr>\n<tr>\n<td><em>CYP2C9</em> Intermediate metabolizer<sup>f</sup></td>\n<td>1<sup>c</sup></td>\n<td>An individual carrying one normal function allele plus one no function allele OR two decreased function alleles.</td>\n<td>*1/*3, *2/*2</td>\n<td>Moderately reduced metabolism; higher plasma concentrations may increase probability of toxicities</td>\n<td>Initiate therapy with 50% of the lowest recommended starting dose. Titrate dose upward to clinical effect or 50% of the maximum recommended dose with caution. In accordance with the meloxicam prescribing information, use the lowest effective dosage for shortest duration consistent with individual patient treatment goals. Upward dose titration should not occur until after steady state is reached (at least 7 days). Carefully monitor adverse events such as blood pressure and kidney function during course of therapy. Alternatively, consider alternative therapy. Choose an alternative therapy not metabolized by CYP2C9 or not significantly impacted by CYP2C9 genetic variants in vivo or choose an NSAID metabolized by CYP2C9 but with a shorter half-life (Table 2).</td>\n<td>Moderate</td>\n<td>IMs might have a higher than normal risk of adverse events especially in individuals with other factors affecting clearance of these drugs such as hepatic impairment or advanced age. Alternative therapies not primarily metabolized by CYP2C9 include aspirin, ketorolac, naproxen and sulindac. Selection of therapy will depend on individual patient treatment goals and risks for toxicity.</td>\n</tr>\n<tr>\n<td><em>CYP2C9</em> Poor metabolizer</td>\n<td>0 or 0.5<sup>c</sup></td>\n<td>An individual carrying one no function allele plus one decreased function allele; OR two no function alleles</td>\n<td>*2/*3, *3/*3</td>\n<td>Significantly reduced metabolism and prolonged half life; higher plasma concentrations may increase probability and/or severity of toxicities</td>\n<td>Choose an alternative therapy not metabolized by CYP2C9 or not significantly impacted by CYP2C9 genetic variants in vivo or choose an NSAID metabolized by CYP2C9 but with a shorter half-life (Table 2).</td>\n<td>Moderate</td>\n<td></td>\n</tr>\n<tr>\n<td>Indeterminate</td>\n<td>n/a<sup>c</sup></td>\n<td>An individual carrying allele combinations with uncertain and/or unknown function alleles</td>\n<td>*1/*7, *1/*10, *7/*10, *1/*57</td>\n<td>n/a</td>\n<td>No recommendation.</td>\n<td>n/a</td>\n<td></td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> See the <a href=\"/page/cyp2c9RefMaterials\">CYP2C9 frequency table</a> for race-specific allele and phenotype frequencies.<br />\n<sup>b</sup> For a complete list of CYP2C9 diplotypes and resulting phenotypes, see the <a href=\"/page/cyp2c9RefMaterials\">CYP2C9 genotype to phenotype table</a>.</p>\n<p><sup>c</sup> CPIC assigned each allele functional status an activity value ranging from 0 to 1 (e.g., 0 for no function, 0.5 for decreased, and 1.0 for normal function), which are summed to calculate the activity score (AS) for each diplotype. The CYP2C9 AS has been translated into the phenotype classification system as follows: individuals with an AS of 0 or 0.5 are poor\nmetabolizers (PMs), those with a score of 1 or 1.5 are intermediate metabolizers (IMs), and those with a score of 2 are normal metabolizers (NMs).<br />\n<sup>d</sup> Rating scheme described in Supplement.</p>\n",
+      "version" : 3
+    },
+    "version" : 11
+  }
+}

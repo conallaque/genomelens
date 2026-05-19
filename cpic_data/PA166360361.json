@@ -1,0 +1,182 @@
+{
+  "citations" : [
+    {
+      "id" : 15171228,
+      "title" : "French-Speaking Network of Pharmacogenetics (RNPGx) Recommendations for Clinical Use of Mavacamten.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/39584620",
+      "authors" : [
+        "Lebreton Louis",
+        "Boyer Jean-Christophe",
+        "Lafay-Chebassier Claire",
+        "Hennart Benjamin",
+        "Baklouti Sarah",
+        "Cunat Séverine",
+        "Vilquin Paul",
+        "Medard Yves",
+        "Gautier-Veyret Elodie",
+        "Laffitte-Redondo Clara",
+        "Verstuyft Céline",
+        "Ait Tayeb Abd El Kader",
+        "Haufroid Vincent",
+        "Wils Julien",
+        "Lamoureux Fabien",
+        "Evrard Alexandre",
+        "Davaze-Schneider Julie",
+        "Ben-Sassi Mouna",
+        "Picard Nicolas",
+        "Quaranta Sylvie",
+        "Ayme-Dietrich Estelle",
+        "French‐Speaking Network of Pharmacogenetics (RNPGx)"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 1452720759,
+          "resource" : "PubMed",
+          "resourceId" : "39584620",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/39584620",
+          "version" : 0
+        },
+        {
+          "id" : 1452720760,
+          "resource" : "DOI",
+          "resourceId" : "10.1002/cpt.3502",
+          "_url" : "http://dx.doi.org/10.1002%2Fcpt.3502",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "Clinical pharmacology and therapeutics",
+      "meshTerms" : [],
+      "month" : 11,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2024-11-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "Mavacamten, the first drug in the class of beta-cardiac myosin modulator, is used for the treatment of patients with hypertrophic cardiomyopathy. This orally administered drug demonstrates wide interpatient variability in pharmacokinetics parameters, due in part to variant CYP2C19 alleles. Individuals who are CYP2C19 poor metabolizers have increased exposure and are at increased risk of reduced cardiac hypercontractility. To ensure the safety of all patients, European Medicines Agency recommends CYP2C19 preemptive genotyping, and consecutively, to adapt maintenance and initial mavacamten doses, and to manage drug-drug interactions, according to CYP2C19 phenotype. In this article, we summarize evidence from the literature supporting the association between CYP2C19 phenotype and pharmacological features of mavacamten and provide, beyond biologic guidelines, therapeutic recommendations for the use of mavacamten based on CYP2C19 and CYP3A4/CYP3A5 genotype.",
+      "terms" : [
+        {"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"},
+        {"id":1451577482,"resource":"PGx Paper Types","term":"Review","termId":"pgxPaperTypes:1451577482"},
+        {"id":1451978620,"resource":"PGx Paper Types","term":"Phenoconversion","termId":"pgxPaperTypes:1451978620"}
+      ],
+      "type" : "Literature",
+      "version" : 9,
+      "year" : 2024
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166360361",
+    "name" : "Annotation of RNPGx Guideline for mavacamten and CYP2C19",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1452725000,
+        "date" : "2024-12-04T00:00:00-08:00",
+        "description" : "Annotation based on preprint version of the paper (Online ahead of print).",
+        "type" : "Note",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15171228,"title":"French-Speaking Network of Pharmacogenetics (RNPGx) Recommendations for Clinical Use of Mavacamten.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/39584620","crossReferences":[{"id":1452720759,"resource":"PubMed","resourceId":"39584620","_url":"https://www.ncbi.nlm.nih.gov/pubmed/39584620"},{"id":1452720760,"resource":"DOI","resourceId":"10.1002/cpt.3502","_url":"http://dx.doi.org/10.1002%2Fcpt.3502"}],"objCls":"Literature","pubDate":"2024-11-01T00:00:00-07:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"},{"id":1451577482,"resource":"PGx Paper Types","term":"Review","termId":"pgxPaperTypes:1451577482"},{"id":1451978620,"resource":"PGx Paper Types","term":"Phenoconversion","termId":"pgxPaperTypes:1451978620"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165816533",
+        "symbol" : "CYP2C19*17",
+        "name" : "*17",
+        "version" : 31
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165980635",
+        "symbol" : "CYP2C19*2",
+        "name" : "*2",
+        "version" : 27
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165980636",
+        "symbol" : "CYP2C19*3",
+        "name" : "*3",
+        "version" : 27
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819244",
+        "symbol" : "CYP3A4*20",
+        "name" : "*20",
+        "version" : 21
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA166048680",
+        "symbol" : "CYP3A4*22",
+        "name" : "*22",
+        "version" : 17
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA166128219",
+        "symbol" : "CYP3A5*3",
+        "name" : "*3",
+        "version" : 13
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA166128233",
+        "symbol" : "CYP3A5*6",
+        "name" : "*6",
+        "version" : 12
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA166128234",
+        "symbol" : "CYP3A5*7",
+        "name" : "*7",
+        "version" : 13
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166272922",
+        "name" : "mavacamten",
+        "version" : 3
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA124",
+        "symbol" : "CYP2C19",
+        "name" : "cytochrome P450 family 2 subfamily C member 19",
+        "version" : 7210
+      }
+    ],
+    "source" : "RNPGx",
+    "summaryMarkdown" : {
+      "id" : 1452723260,
+      "html" : "<p>The French National Network of Pharmacogenetics (Réseau national de pharmacogénétique (RNPGx)) considers the genotyping of CYP2C19*2 and *3 as essential for mavacamten, which is in line with the EMA label testing recommendation and dosing adjustments of mavacamten for poor metabolizers. There is also a review of CYP2C19*17 and other CYP2C variants and CYP3A4*20 and *22 and CYP3A5*3, *6 and *7.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1452723220,
+      "html" : "<p>The French National Network of Pharmacogenetics (Réseau national de pharmacogénétique (RNPGx)) discusses the <a href=\"/labelAnnotation/PA166317641\">EMA recommendations for CYP2C19 poor metabolizers (PM) and mavacamten</a> and includes further information about testing and drug-drug interactions in the context of CYP2C19 PM.</p>\n<blockquote class=\"blockquote\">\n<p>The French-­ speaking Network of Pharmacogenetic (RNPGx) is\nproposing guidelines to (i) precisely outline the dose adjustment of\nmavacamten and its pharmacogenetic relevance; (ii) identify the\npharmacogenetic variant of interest with three levels of recommendations: essential, advisable, and possibly helpful. This work is\nbased on a scientific review of literature on mavacamten clinical\ntrials, pharmacological, and genetic studies, and on the Clinical\nPharmacogenetics Implementation Consortium (CPIC) data for\nCYP2C19, CYP3A4, and CYP3A5 haplotypes definitions, alleles\nfrequencies and functional impact.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p>After analyzing the available data, RNPGx recommends genotyping for clinical use both null alleles CYP2C19*2 and CYP2C19*3\nbefore initiating mavacamten treatment, for every ethnicities.\nThese alleles are associated with poor metabolizer status for the\nCYP2C19, in order to limit mavacamten overexposure and ensure\npatient safety (Figure 3 and Table 5). These two-­ star alleles are\nthe own with enough level of evidence: functional, clinical, and\nare recommended by the EMA.\nThe “advisable” and “possibly helpful” tests cannot currently be used\nto guide mavacamten treatment due to the lack of clinical evidence.\nHowever, further studies are needed, as some functional or pharmacokinetic data suggest a potential impact in certain situations.</p>\n</blockquote>\n<p>Tables 1-4 give drug-drug interaction adjustments based on metabolizer status (not reproduced here). Table 5 (reproduced below with details included from S2) gives testing and variant information:</p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Level</th>\n<th>Pharmacogenomic test</th>\n<th>Details</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Essential</td>\n<td>CYP2C19 *2 (rs4244285) and *3 alleles (rs4986893)</td>\n<td>Stratification for starting and maximum dose prescription, as well as dose adjustment based on drug–drug interactions</td>\n</tr>\n<tr>\n<td>Advisable</td>\n<td>CYP2C19 *17 alleles (rs12248560)</td>\n<td>Dose adjustment (efficiency)</td>\n</tr>\n<tr>\n<td>Possibly helpful</td>\n<td>CYP2C19 rs12769205 (*35), rs28399504 (*4), rs56337013 (*5), rs3758581 (*6), rs72558186 (*7), rs41291556 (*8), rs17884712 (*9), rs140278421 (*22), rs118203757 (*24), Deletions (*36 et *37)</td>\n<td>Adverse drug reaction associated with overexposure after genotyping CYP2C19 *2 and *3 alleles</td>\n</tr>\n<tr>\n<td>Possibly helpful (CYP2C19 poor metabolizers)</td>\n<td>CYP3A5 alleles*3, *6 and *7</td>\n<td>Dose adjustment (efficiency)</td>\n</tr>\n<tr>\n<td>Possibly helpful (CYP2C19 poor metabolizers)</td>\n<td>CYP3A4 alleles*22 and *20</td>\n<td>Adverse drug reaction after dose adjustment in CYP2C19 poor metabolizers</td>\n</tr>\n</tbody>\n</table>\n<p>For CPIC allele definitions see the Gene-specific Information Tables for <a href=\"/page/cyp2c19RefMaterials\">CYP2C19</a> and <a href=\"/page/cyp3a5RefMaterials\">CYP3A5</a>. CPIC does not currently have tables for CYP3A4 but allele definitions are from <a rel=\"noopener noreferrer\" href=\"https://www.pharmvar.org/gene/CYP3A4\" target=\"_blank\">PharmVar</a>.</p>\n",
+      "version" : 0
+    },
+    "version" : 0
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166265141",
+    "name" : "Annotation of DPWG Guideline for allopurinol and HLA-B",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1451704262,
+        "date" : "2022-03-03T16:33:36.508-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451706061,
+        "date" : "2022-03-07T12:02:05.697-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732901,
+        "date" : "2022-03-28T09:57:50.185-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733282,
+        "date" : "2022-03-28T14:29:39.020-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741481,
+        "date" : "2022-04-05T11:09:16.243-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884000,
+        "date" : "2022-09-16T09:21:39.533-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451889554,
+        "date" : "2022-09-22T15:00:14.771-07:00",
+        "description" : "Added guideline publication",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146479,
+        "date" : "2023-07-03T13:39:56.139-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452412500,
+        "date" : "2024-03-19T05:40:15.354-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15136122,"title":"Dutch pharmacogenetics working group guideline for the gene-drug interaction of ABCG2, HLA-B and Allopurinol, and MTHFR, folic acid and methotrexate.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10853275","crossReferences":[{"id":1452379680,"resource":"PubMed Central","resourceId":"PMC10853275","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10853275"},{"id":1451889545,"resource":"PubMed","resourceId":"36056234","_url":"https://www.ncbi.nlm.nih.gov/pubmed/36056234"},{"id":1451889546,"resource":"DOI","resourceId":"10.1038/s41431-022-01180-0","_url":"http://dx.doi.org/10.1038%2Fs41431-022-01180-0"}],"objCls":"Literature","pubDate":"2024-02-01T00:00:00-08:00","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165987831",
+        "symbol" : "HLA-B*58:01",
+        "name" : "*58:01",
+        "version" : 4
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA448320",
+        "name" : "allopurinol",
+        "version" : 11
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA35056",
+        "symbol" : "HLA-B",
+        "name" : "major histocompatibility complex, class I, B",
+        "version" : 40
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1451697660,
+      "html" : "<p>Individuals with the HLA-B*58:01 allele should be given an alternative drug or undergo induction of allopurinol tolerance.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451697661,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-of-abcg2-hla-b-and-allopurinol-and-mthfr-folic-acid-and-methotrexate-european-journal-of-human-genetics-2022\">Dutch pharmacogenetics working group (DPWG) guideline for the gene-drug interaction of ABCG2, HLA-B and Allopurinol, and MTHFR, folic acid and methotrexate. European journal of human genetics (2022)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper with the guidelines as per the May 2021 guideline including more details and scoring the clinical implementation [Article:<a href=\"/pmid/36056234\">36056234</a>]</p>\n<h3 id=\"may-2021-guideline\">May 2021 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (DPWG) has evaluated therapeutic dose recommendations for allopurinol based on presence of the HLA-B*58:01 allele.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_May_2021.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_May_2021.pdf\">Dutch guidelines May 2021 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>HLA-B*5801</td>\n<td>allopurinol</td>\n<td>A strongly increased risk of developing the life-threatening cutaneous side effects Stevens-Johnson syndrome/toxic epidermal necrolysis (SJS/TEN) and DRESS is present in patients with this genetic variation. The risk of an allopurinol-induced life-threatening cutaneous side effect (mortality 11%) in these patients is 1.6-2.0% for the entire group and 8-18% for the group with chronic renal insufficiency.</td>\n<td>1. Choose an alternative, such as febuxostat 2. Another option is to induce allopurinol tolerance first: To induce allopurinol tolerance, the allopurinol dose is increased every 3 days until a dose of 100 mg/day has been achieved on Day 28. The consecutive daily doses in the induction protocol are 50 µg, 100 µg, 200 µg, 500 µg, 1 mg, 5 mg, 10 mg, 25 mg, 50 mg and 100 mg.</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_HLA_allopurinol_6391_03072024.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_HLA_allopurinol_6391_03072024.pdf\">Read for more information about this recommendation</a>, <a download=\"HLAs.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/HLAs.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_HLA_allopurinol_6391_03072024.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_HLA_allopurinol_6391_03072024.pdf\">DPWG risk analysis document</a> for allopurinol and HLA-B:</p>\n<blockquote class=\"blockquote\">\n<p>The KNMP Pharmacogenetics Working Group considers genotyping of patients before starting allopurinol to be beneficial for drug safety. It is advised to consider genotyping the patient before (or directly after) drug therapy has been initiated to guide drug and dose selection.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n",
+      "version" : 6
+    },
+    "version" : 9
+  }
+}

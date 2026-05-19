@@ -1,0 +1,774 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166114461",
+    "name" : "Annotation of CPIC Guideline for ivacaftor and CFTR",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "Ru50LgwdTPw",
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1183848388,
+        "date" : "2014-03-05T00:00:00-08:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1183960130,
+        "date" : "2014-03-17T00:00:00-07:00",
+        "description" : "Addition of other variants.",
+        "type" : "Update",
+        "version" : 1
+      },
+      {
+        "id" : 1184214951,
+        "date" : "2014-05-06T00:00:00-07:00",
+        "description" : "Formatting and content changes",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1447986336,
+        "date" : "2016-05-10T14:57:16.865-07:00",
+        "description" : "Guideline on PharmGKB updated due to changes to the FDA-approved label for ivacaftor",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1448624943,
+        "date" : "2017-06-02T11:19:44.411-07:00",
+        "description" : "FDA expanded approved use of ivacaftor to treat an additional 23 CFTR mutations.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1449564550,
+        "date" : "2018-06-14T00:00:00-07:00",
+        "description" : "Added guideline video.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1449717117,
+        "date" : "2018-08-23T16:13:37.866-07:00",
+        "description" : "Updated video link",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450824213,
+        "date" : "2019-10-21T10:33:27.258-07:00",
+        "description" : "Added new variants based on ivacaftor drug label and approved by CPIC authors in May 2019",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451274760,
+        "date" : "2020-10-07T11:54:51.791-07:00",
+        "description" : "Tagging variants.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454183160,
+        "date" : "2025-07-17T15:16:35.223-07:00",
+        "description" : "fixed link",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454231400,
+        "date" : "2025-08-25T17:44:02.838-07:00",
+        "description" : "added further variants included for the ivacaftor label",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454690620,
+        "date" : "2026-03-11T13:33:40.931-07:00",
+        "description" : "Fixed variant typo S997F to S977F.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15071319,"title":"Clinical Pharmacogenetics Implementation Consortium (CPIC) guidelines for ivacaftor therapy in the context of CFTR genotype.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4026598","crossReferences":[{"id":1449279797,"resource":"PubMed Central","resourceId":"PMC4026598","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4026598"},{"id":1449279796,"resource":"PubMed","resourceId":"24598717","_url":"https://www.ncbi.nlm.nih.gov/pubmed/24598717"},{"id":1449279798,"resource":"DOI","resourceId":"10.1038/clpt.2014.54","_url":"http://dx.doi.org/10.1038%2Fclpt.2014.54"}],"objCls":"Literature","pubDate":"2014-06-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : true,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164943",
+        "symbol" : "rs113993958",
+        "name" : "rs113993958",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164941",
+        "symbol" : "rs115545701",
+        "name" : "rs115545701",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164959",
+        "symbol" : "rs11971167",
+        "name" : "rs11971167",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164946",
+        "symbol" : "rs121908752",
+        "name" : "rs121908752",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164947",
+        "symbol" : "rs121908753",
+        "name" : "rs121908753",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166157529",
+        "symbol" : "rs121908755",
+        "name" : "rs121908755",
+        "version" : 5
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166157530",
+        "symbol" : "rs121908757",
+        "name" : "rs121908757",
+        "version" : 5
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166157531",
+        "symbol" : "rs121909005",
+        "name" : "rs121909005",
+        "version" : 5
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166157532",
+        "symbol" : "rs121909013",
+        "name" : "rs121909013",
+        "version" : 5
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164953",
+        "symbol" : "rs121909020",
+        "name" : "rs121909020",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394761",
+        "symbol" : "rs121909021",
+        "name" : "rs121909021",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166157533",
+        "symbol" : "rs121909041",
+        "name" : "rs121909041",
+        "version" : 5
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394862",
+        "symbol" : "rs121909044",
+        "name" : "rs121909044",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394861",
+        "symbol" : "rs140883683",
+        "name" : "rs140883683",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164950",
+        "symbol" : "rs141033578",
+        "name" : "rs141033578",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166395021",
+        "symbol" : "rs142773283",
+        "name" : "rs142773283",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166395121",
+        "symbol" : "rs144055758",
+        "name" : "rs144055758",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394801",
+        "symbol" : "rs144476686",
+        "name" : "rs144476686",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394981",
+        "symbol" : "rs145449046",
+        "name" : "rs145449046",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166395081",
+        "symbol" : "rs149279509",
+        "name" : "rs149279509",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394982",
+        "symbol" : "rs150157202",
+        "name" : "rs150157202",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164951",
+        "symbol" : "rs150212784",
+        "name" : "rs150212784",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394961",
+        "symbol" : "rs151048781",
+        "name" : "rs151048781",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394661",
+        "symbol" : "rs1800076",
+        "name" : "rs1800076",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394781",
+        "symbol" : "rs1800079",
+        "name" : "rs1800079",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394921",
+        "symbol" : "rs1800097",
+        "name" : "rs1800097",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394941",
+        "symbol" : "rs1800098",
+        "name" : "rs1800098",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166178025",
+        "symbol" : "rs1800100",
+        "name" : "rs1800100",
+        "version" : 4
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394701",
+        "symbol" : "rs1800103",
+        "name" : "rs1800103",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394821",
+        "symbol" : "rs1800110",
+        "name" : "rs1800110",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166178032",
+        "symbol" : "rs1800111",
+        "name" : "rs1800111",
+        "version" : 4
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166395301",
+        "symbol" : "rs1800112",
+        "name" : "rs1800112",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166395102",
+        "symbol" : "rs1800120",
+        "name" : "rs1800120",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164957",
+        "symbol" : "rs186045772",
+        "name" : "rs186045772",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166299361",
+        "symbol" : "rs186089140",
+        "name" : "rs186089140",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166157534",
+        "symbol" : "rs193922525",
+        "name" : "rs193922525",
+        "version" : 5
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164954",
+        "symbol" : "rs200321110",
+        "name" : "rs200321110",
+        "version" : 5
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394983",
+        "symbol" : "rs201759207",
+        "name" : "rs201759207",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394721",
+        "symbol" : "rs201958172",
+        "name" : "rs201958172",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164956",
+        "symbol" : "rs202179988",
+        "name" : "rs202179988",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394421",
+        "symbol" : "rs2116683801",
+        "name" : "rs2116683801",
+        "version" : 2
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166157537",
+        "symbol" : "rs267606723",
+        "name" : "rs267606723",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166365261",
+        "symbol" : "rs35516286",
+        "name" : "rs35516286",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164940",
+        "symbol" : "rs368505753",
+        "name" : "rs368505753",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394802",
+        "symbol" : "rs376008630",
+        "name" : "rs376008630",
+        "version" : 2
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166395001",
+        "symbol" : "rs386134230",
+        "name" : "rs386134230",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166395141",
+        "symbol" : "rs397508153",
+        "name" : "rs397508153",
+        "version" : 2
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164939",
+        "symbol" : "rs397508256",
+        "name" : "rs397508256",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164948",
+        "symbol" : "rs397508288",
+        "name" : "rs397508288",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394662",
+        "symbol" : "rs397508300",
+        "name" : "rs397508300",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166395162",
+        "symbol" : "rs397508378",
+        "name" : "rs397508378",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166196982",
+        "symbol" : "rs397508387",
+        "name" : "rs397508387",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166395041",
+        "symbol" : "rs397508436",
+        "name" : "rs397508436",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166395163",
+        "symbol" : "rs397508440",
+        "name" : "rs397508440",
+        "version" : 2
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164949",
+        "symbol" : "rs397508442",
+        "name" : "rs397508442",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164952",
+        "symbol" : "rs397508513",
+        "name" : "rs397508513",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164942",
+        "symbol" : "rs397508537",
+        "name" : "rs397508537",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394341",
+        "symbol" : "rs397508556",
+        "name" : "rs397508556",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394581",
+        "symbol" : "rs397508572",
+        "name" : "rs397508572",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394541",
+        "symbol" : "rs397508573",
+        "name" : "rs397508573",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166178193",
+        "symbol" : "rs397508602",
+        "name" : "rs397508602",
+        "version" : 4
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166395061",
+        "symbol" : "rs397508616",
+        "name" : "rs397508616",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394521",
+        "symbol" : "rs397508621",
+        "name" : "rs397508621",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166395181",
+        "symbol" : "rs397508678",
+        "name" : "rs397508678",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394901",
+        "symbol" : "rs397508721",
+        "name" : "rs397508721",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394681",
+        "symbol" : "rs397508744",
+        "name" : "rs397508744",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394762",
+        "symbol" : "rs397508748",
+        "name" : "rs397508748",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394881",
+        "symbol" : "rs397508758",
+        "name" : "rs397508758",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164945",
+        "symbol" : "rs397508759",
+        "name" : "rs397508759",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166196981",
+        "symbol" : "rs397508761",
+        "name" : "rs397508761",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394302",
+        "symbol" : "rs397508783",
+        "name" : "rs397508783",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394641",
+        "symbol" : "rs397508784",
+        "name" : "rs397508784",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166395101",
+        "symbol" : "rs397508785",
+        "name" : "rs397508785",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166157511",
+        "symbol" : "rs74503330",
+        "name" : "rs74503330",
+        "version" : 5
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166162705",
+        "symbol" : "rs74551128",
+        "name" : "rs74551128",
+        "version" : 5
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394481",
+        "symbol" : "rs74571530",
+        "name" : "rs74571530",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166157514",
+        "symbol" : "rs75039782",
+        "name" : "rs75039782",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166157516",
+        "symbol" : "rs75527207",
+        "name" : "rs75527207",
+        "version" : 5
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164958",
+        "symbol" : "rs75541969",
+        "name" : "rs75541969",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394841",
+        "symbol" : "rs75763344",
+        "name" : "rs75763344",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394842",
+        "symbol" : "rs758818611",
+        "name" : "rs758818611",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166184909",
+        "symbol" : "rs76151804",
+        "name" : "rs76151804",
+        "version" : 4
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166394741",
+        "symbol" : "rs769016520",
+        "name" : "rs769016520",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166178052",
+        "symbol" : "rs77409459",
+        "name" : "rs77409459",
+        "version" : 4
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164944",
+        "symbol" : "rs77834169",
+        "name" : "rs77834169",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166395161",
+        "symbol" : "rs77902683",
+        "name" : "rs77902683",
+        "version" : 3
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166161186",
+        "symbol" : "rs77932196",
+        "name" : "rs77932196",
+        "version" : 5
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166157519",
+        "symbol" : "rs78655421",
+        "name" : "rs78655421",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166164955",
+        "symbol" : "rs78769542",
+        "name" : "rs78769542",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166162698",
+        "symbol" : "rs80224560",
+        "name" : "rs80224560",
+        "version" : 4
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166157521",
+        "symbol" : "rs80282562",
+        "name" : "rs80282562",
+        "version" : 5
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA165950341",
+        "name" : "ivacaftor",
+        "version" : 7
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA109",
+        "symbol" : "CFTR",
+        "name" : "CF transmembrane conductance regulator",
+        "version" : 19
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1447981606,
+      "html" : "<p>Ivacaftor treatment is recommended only in cystic fibrosis (CF) patients that have certain <em>CFTR</em> variants.  See full guideline for disclaimers, further details and supporting evidence. The guideline has been updated since its original publication with more variants listed on the website based on FDA label updates.</p>\n",
+      "version" : 2
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451433622,
+      "html" : "<h3 id=\"august-2025-update\">August 2025 Update</h3>\n<ul>\n<li>The <a href=\"/labelAnnotation/PA166104890\">FDA-approved drug label</a> for ivacaftor has been updated to include 58 additional variants, bringing the total number of indicated variants to 96: A120T, A234D, A349V, D192G, D924N, E822K, F311del, F311L, F508C, G1249R, G178E, G194R, G314E, G576A, G970D, H1375P, H939R, I1027T, I1139V, I148T, I175V, I807M, L1480P, L320V, L967S, L997F, M152V, M952I, M952T, Q1291R, Q237E, Q237H, Q359R, R1162L, R117G, R117L, R117P, R1283M, R170H, R347L, R553Q, R668C, R75Q, R792G, R933G, S1159F, S1159P, S589N, T1053I, T338I, V1293G, V232D, V562I, V754M, W1282R, Y1014C, Y1032C. Table 1, below, has been updated. However, the specific variants listed above were not discussed in the 2014 guideline publication.</li>\n</ul>\n<h3 id=\"may-2019-update\">May 2019 Update</h3>\n<ul>\n<li>Since the most recent update to the CPIC ivacaftor dosing guideline in April 2014, and the most recent update online in June 2017, the <a href=\"/labelAnnotation/PA166104890\">FDA-approved drug label</a> has been updated again to include 5 additional CFTR variants that are approved for KALYDECO use, bringing the total number of indicated variants to 38: 2789+5G-&gt;A (<a href=\"/variant/PA166162698\">rs80224560</a>), 3272-26A-&gt;G (<a href=\"/variant/PA166184909\">rs76151804</a>), 3849+10kbC-&gt;T (<a href=\"/variant/PA166157514\">rs75039782</a>), 711+1G-&gt;T (<a href=\"/variant/PA166162707\">rs77188391</a>) and E831X (<a href=\"/variant/PA166157519\">rs78655421</a>). Table 1, below, has been updated.</li>\n</ul>\n<h3 id=\"june-2017-update\">June 2017 Update</h3>\n<ul>\n<li>Since the most recent update to the CPIC ivacaftor dosing guideline in April 2014, and the most recent update online in May 2016, the <a href=\"/label/PA166104890\">FDA-approved drug label</a> has been updated again to include 23 additional CFTR variants that are approved for KALYDECO use, bringing the total number of indicated variants to 33. Please see the <a rel=\"noopener noreferrer\" href=\"https://www.fda.gov/NewsEvents/Newsroom/PressAnnouncements/ucm559212.htm\" target=\"_blank\">FDA News Release</a> from May 17th, 2017 for more information. In light of this change, the CPIC guideline annotation on this webpage has been update to include these additional CFTR variants (see Table 1, below). These variants were not discussed in the 2014 guideline publication. These variants are as follows: E56K (<a href=\"/variant/PA166164939\">rs397508256</a>), P67L (<a href=\"/variant/PA166164940\">rs368505753</a>), R74W (<a href=\"/variant/PA166164941\">rs115545701</a>), D110E (<a href=\"/variant/PA166164942\">rs397508537</a>), D110H (<a href=\"/variant/PA166164943\">rs113993958</a>), R117C (<a href=\"/variant/PA166164944\">rs77834169</a>), E193K (<a href=\"/variant/PA166164945\">rs397508759</a>), L206W (<a href=\"/variant/PA166164946\">rs121908752</a>), R347H (<a href=\"/variant/PA166161186\">rs77932196</a>), R352Q (<a href=\"/variant/PA166164947\">rs121908753</a>), A455E (<a href=\"/variant/PA166162705\">rs74551128</a>), D579G (<a href=\"/variant/PA166164948\">rs397508288</a>), S945L (<a href=\"/variant/PA166164949\">rs397508442</a>), S977F (<a href=\"/variant/PA166164950\">rs141033578</a>), F1052V (<a href=\"/variant/PA166164951\">rs150212784</a>), K1060T (<a href=\"/variant/PA166164952\">rs397508513</a>), A1067T (<a href=\"/variant/PA166164953\">rs121909020</a>), G1069R (<a href=\"/variant/PA166164954\">rs200321110</a>), R1070Q (<a href=\"/variant/PA166164955\">rs78769542</a>), R1070W (<a href=\"/variant/PA166164956\">rs202179988</a>), F1074L (<a href=\"/variant/PA166164957\">rs186045772</a>), D1152H (<a href=\"/variant/PA166164958\">rs75541969</a>), D1270N (<a href=\"/variant/PA166164959\">rs11971167</a>).</li>\n</ul>\n<h3 id=\"may-2016-update\">May 2016 Update</h3>\n<ul>\n<li>Since the most recent update to the CPIC ivacaftor dosing guideline in April 2014, the <a href=\"/label/PA166104890\">FDA-approved drug label</a> has been updated again to include the variant R117H (<a href=\"/variant/PA166157519\">rs78655421</a>). In light of this change, the CPIC guideline annotation on this webpage has been updated to include this additional <em>CFTR</em> variant (see Table 1, below). This variant is not discussed in the 2014 guideline publication. Additionally, the updated drug label indicates ivacaftor use for patients 2 years and older; previously it was indicated only for patients 6 years and older.</li>\n</ul>\n<h3 id=\"april-2014-update\">April 2014 Update</h3>\n<ul>\n<li>After the submission and review of the CPIC guideline manuscript, the <a href=\"/label/PA166104890\">FDA-approved drug label</a> for ivacaftor was updated to include additional variants. In light of these changes, the CPIC guideline annotation on this webpage has been updated to include additional <em>CFTR</em> variants, specifically G1244E (<a href=\"/variant/PA166157537\">rs267606723</a>), G1349D (<a href=\"/variant/PA166157534\">rs193922525</a>), G178R (<a href=\"/variant/PA166157521\">rs80282562</a>), G551S (<a href=\"/variant/PA166157532\">rs121909013</a>), S1251N (<a href=\"/variant/PA166157511\">rs74503330</a>), S1255P (<a href=\"/variant/PA166157533\">rs121909041</a>), S549N (<a href=\"/variant/PA166157529\">rs121908755</a>) and S549R (<a href=\"/variant/PA166157530\">rs121908757</a> and <a href=\"/variant/PA166157531\">rs121909005</a>) (see Table 1, below).  These variants are not discussed in the 2014 guideline publication.</li>\n</ul>\n<h3 id=\"march-2014\">March 2014</h3>\n<p><em>Accepted article preview online March 2014; Advance online publication March 2014.</em></p>\n<ul>\n<li>Guidelines regarding the use of pharmacogenomic tests in determining whether ivacaftor treatment should be undertaken have been published in Clinical Pharmacology and Therapeutics by the Clinical Pharmacogenetics Implementation Consortium (CPIC).</li>\n<li>These guidelines are applicable to\n<ul>\n<li>cystic fibrosis patients</li>\n<li>pediatrics, 6 years and older</li>\n<li>adults</li>\n</ul>\n</li>\n<li>Download and read:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/ivacaftor/2014/24598717.pdf\" target=\"_blank\">Clinical Pharmacogenetics Implementation Consortium (CPIC) Guidelines for Ivacaftor Therapy in the Context of CFTR Genotype</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/ivacaftor/2014/24598717-supplement.pdf\" target=\"_blank\">2014 supplement</a> (2025 update)</li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-recommended-therapeutic-use-of-ivacaftor-based-on-cftr-genotype\">Table 1: Recommended therapeutic use of ivacaftor based on <em>CFTR</em> genotype</h3>\n<p>_Adapted from Table 2 of the 2014 guideline manuscript and online updates.  <em>Variants have been added to the table below that are not in the published 2014 guideline or supplement; specifically, variants other than G551D and F508del.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>CFTR Genotype</th>\n<th>Examples of diplotypes</th>\n<th>Implications for ivacaftor effects</th>\n<th>Recommendations for ivacaftor therapy</th>\n<th>Classification of recommendation for ivacaftor therapy<sup>c</sup></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Homozygous or Heterozygous G551D-CFTR, <a href=\"/variant/PA166157516\">rs75527207</a> genotype AA or AG</td>\n<td>G551D/ F508del, G551D/ G551D</td>\n<td>Significant improvement in lung function, weight, risk of pulmonary exacerbation, patient reported outcomes, and reduction in sweat chloride concentrations through enhanced CFTR channel activity (increase probability of open channel).</td>\n<td>Use ivacaftor according to the product label</td>\n<td>Strong</td>\n</tr>\n<tr>\n<td>Homozygous for F508del-CFTR, <a href=\"/variant/PA166157525\">rs113993960</a> or <a href=\"/variant/PA166157536\">rs199826652</a> genotype del/del</td>\n<td>F508del/F508del</td>\n<td>No significant reduction in sweat chloride concentrations; no changes in other clinical measurements including spirometric measurements, pulmonary exacerbations, or body weight<sup>b</sup>. Unlikely to respond to treatment.</td>\n<td>Ivacaftor is not recommended<sup>a</sup></td>\n<td>Moderate<sup>b</sup></td>\n</tr>\n<tr>\n<td>Homozygous or heterozygous for one of the following CFTR variants: E56K, P67L, R74W, D110E, D110H, R117C, R117H, G178R, E193K, L206W, R347H, R352Q, A455E, S549N, S549R, G551D, G551S, D579G, S945L, S977F, F1052V, K1060T, A1067T, G1069R, R1070Q, R1070W, F1074L, D1152H, G1244E, S1251N, S1255P, D1270N, G1349D, 2789+5G-&gt;A, 3272-26A-&gt;G, 3849+10kbC-&gt;T, 711+1G-&gt;T and E831X, A120T, A234D, A349V, D192G, D924N, E822K, F311del, F311L, F508C, G1249R, G178E, G194R, G314E, G576A, G970D, H1375P, H939R, I1027T, I1139V, I148T, I175V, I807M, L1480P, L320V, L967S, L997F, M152V, M952I, M952T, Q1291R, Q237E, Q237H, Q359R, R1162L, R117G, R117L, R117P, R1283M, R170H, R347L, R553Q, R668C, R75Q, R792G, R933G, S1159F, S1159P, S589N, T1053I, T338I, V1293G, V232D, V562I, V754M, W1282R, Y1014C, Y1032C<sup>d</sup></td>\n<td>F508del/S549N</td>\n<td>Significantly enhanced channel open probability <em>in vitro</em> [Article:<a href=\"/pmid/22293084\">22293084</a>]. <em>In vitro</em> assays with CFBEo- cells expressing S549N-CFTR showed ivacaftor potentiated chloride channel function [Article:<a href=\"/pmid/23027855\">23027855</a>], and a case study showed improved lung function after ivacaftor treatment in a 12-year-old girl with CF with a copy of the S549N variant [Article:<a href=\"/pmid/24081349\">24081349</a>]. Improvement in sweat chloride and CFQ-R respiratory domain scores in patients with the R117H variant [Article:<a href=\"/pmid/26070913\">26070913</a>]. Or, variant was listed in the <a href=\"/label/PA166104890\">FDA-approved drug label</a> as being responsive to ivacaftor.</td>\n<td>Use ivacaftor according to the product label</td>\n<td>Moderate</td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> These recommendations are based on treatment of CF patients with ivacaftor alone and current evidence. Clinical trials are currently underway to investigate ivacaftor alone or in combination with other drugs to treat CF patients with CFTR variants other than G551D, therefore there is potential that ivacaftor may be effective in these patients. See the 2014 guidelines for further details.</p>\n<p><sup>b</sup> The recommendation for patients with the F508del/F508del genotype is based on ivacaftor mechanism of action and clinical observational data. The clinical study however was a safety study and was not powered to detect a difference in efficacy [Article:<a href=\"/pmid/22383668\">22383668</a>].</p>\n<p><sup>c</sup> Rating scheme described in the 2014 supplement.</p>\n<p><sup>d</sup> Variants listed in this table include those added to the updated <a href=\"/label/PA166104890\">drug label for ivacaftor</a>. The modifications to this table were made after the acceptance of publication of the 2014 CPIC Ivacaftor-CFTR guideline [Article:<a href=\"/pmid/24598717\">24598717</a>] and are not reflected in the PDFs of the CPIC guideline main manuscript or supplement.</p>\n<p><sup>e</sup> Ivacaftor is not recommended for CF patients with other CFTR variants or in patients homozygous for the F508del variant (see 2014 guideline for further details, supporting evidence and disclaimers). Future clinical trials for other CFTR variants are ongoing.</p>\n",
+      "version" : 5
+    },
+    "version" : 67
+  }
+}

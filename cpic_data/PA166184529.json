@@ -1,0 +1,172 @@
+{
+  "citations" : [
+    {
+      "id" : 15329722,
+      "title" : "Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6 and CYP2C19 and tricyclic antidepressants.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/41526670",
+      "authors" : [
+        "Kleine Schaars Kristian",
+        "Nijenhuis Marga",
+        "Soree Bianca",
+        "de Boer-Veger Nienke J",
+        "Buunk Anne-Marie",
+        "Guchelaar Henk-Jan",
+        "Houwink Elisa J F",
+        "Risselada Arne",
+        "Rongen Gerard A P J M",
+        "van Schaik Ron H N",
+        "Swen Jesse J",
+        "Touw Daan",
+        "Deneer Vera H M",
+        "van Westrhenen Roos"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 1454631360,
+          "resource" : "PubMed",
+          "resourceId" : "41526670",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/41526670",
+          "version" : 0
+        },
+        {
+          "id" : 1454631361,
+          "resource" : "DOI",
+          "resourceId" : "10.1038/s41431-025-02008-3",
+          "_url" : "http://dx.doi.org/10.1038%2Fs41431-025-02008-3",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "European journal of human genetics : EJHG",
+      "meshTerms" : [],
+      "month" : 1,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2026-01-01T00:00:00-08:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "The Dutch Pharmacogenetic Working Group (DPWG) aims to integrate pharmacogenetics into clinical practice by creating evidence-based guidelines to optimize pharmacotherapy based on genetic tests. The current guideline describes the gene-drug interactions between CYP2D6 and CYP2C19 and various tricyclic antidepressants (TCAs). For CYP2D6 poor metabolisers (PM), dose reductions are advised for amitriptyline (reduction to 60% of the normal dose), clomipramine (reduction to 50% of the normal dose for the indication depression or in case of side effects at the normal dose for the other indications), doxepin (reduction to 40% of normal dose), imipramine (30% of the normal dose), and nortriptyline (40%). For CYP2D6 intermediate metabolisers (IM) reduced dose is also recommended for amitriptyline (75%), clomipramine (70%), doxepin (80%), imipramine (70%), and nortriptyline (60%). Also, CYP2D6 ultra-rapid metabolisers (UM) require tailored dose adjustments: amitriptyline (1.6 times the normal dose), clomipramine (1.5 times), doxepin (2 times), imipramine (1.7 times), and nortriptyline (1.7 times). Additionally, alternative drugs may be needed for CYP2D6 UM due to potential safety concerns. For CYP2C19 PM, a 70% dose reduction is advised for imipramine. For CYP2C19 IM, no action is required for TCAs. For CYP2C19 UM, an alternative medication is recommended for clomipramine prescribed for anxiety and obsessive-compulsive disorder (OCD). The DPWG classifies CYP2D6 genotyping for all five TCAs and CYP2C19 genotyping for clomipramine in patients with anxiety disorders or OCD, and for imipramine as being \"potentially beneficial\". Genotyping prior to treatment can be considered on an individual patient basis.",
+      "terms" : [
+        {"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}
+      ],
+      "type" : "Literature",
+      "version" : 2,
+      "year" : 2026
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166184529",
+    "name" : "Annotation of DPWG Guideline for doxepin and CYP2C19",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1450820797,
+        "date" : "2019-10-06T23:33:44.655-07:00",
+        "description" : "August 2019 Guidelines",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450962840,
+        "date" : "2020-02-10T11:21:04.576-08:00",
+        "description" : "Fixed links to 2019 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704250,
+        "date" : "2022-03-03T16:33:34.798-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451732890,
+        "date" : "2022-03-28T09:57:48.936-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451884226,
+        "date" : "2022-09-16T10:06:33.588-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146546,
+        "date" : "2023-07-03T13:40:16.935-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452412600,
+        "date" : "2024-03-19T05:56:06.987-07:00",
+        "description" : "Updated links for risk analysis pdf.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452424555,
+        "date" : "2024-03-29T11:39:06.452-07:00",
+        "description" : "Removed message about gene information document availability.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454632480,
+        "date" : "2026-01-20T08:59:37.645-08:00",
+        "description" : "Added section for new publication and linked PMID 41526670",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15329722,"title":"Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6 and CYP2C19 and tricyclic antidepressants.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/41526670","crossReferences":[{"id":1454631360,"resource":"PubMed","resourceId":"41526670","_url":"https://www.ncbi.nlm.nih.gov/pubmed/41526670"},{"id":1454631361,"resource":"DOI","resourceId":"10.1038/s41431-025-02008-3","_url":"http://dx.doi.org/10.1038%2Fs41431-025-02008-3"}],"objCls":"Literature","pubDate":"2026-01-01T00:00:00-08:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : false,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA449409",
+        "name" : "doxepin",
+        "version" : 11
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA124",
+        "symbol" : "CYP2C19",
+        "name" : "cytochrome P450 family 2 subfamily C member 19",
+        "version" : 7210
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1450820794,
+      "html" : "<p>There are currently no dosing recommendations for doxepin based on CYP2C19 genotype.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1450820795,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-between-cyp2d6-and-cyp2c19-and-tricyclic-antidepressants-european-journal-of-human-genetics-2026\">Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6 and CYP2C19 and tricyclic antidepressants. <em>European journal of human genetics</em> (2026)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper with guidelines for doxepin and CYP2D19 including Supplementary materials [Article:<a href=\"/pmid/41526670\">41526670</a>].  The DPWG concluded that adjustment of therapy is not required for doxepin and CYP2D19.</p>\n<h3 id=\"august-2019-guideline\">August 2019 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for doxepin based on CYP2C19 metabolizer (UM, IM, PM). They conclude that NO action is required for this gene-drug interaction, (see the <a download=\"DPWG_August_2019.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_August_2019.pdf\">Dutch guidelines August 2019 update</a>).</p>\n<p>For CYP2C19 UM, IM and PM, the gene variations have an effect on the exposure to doxepin, but not on the exposure to doxepin + the active metabolite nordoxepin, which determines the effect and side effects.</p>\n<p><a download=\"DPWG_CYP2C19_doxepine_7021-to-7023.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C19_doxepine_7021-to-7023.pdf\">Read for more information about this recommendation</a>, <a download=\"CYP2C19.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CYP2C19.pdf\">Read about gene information from DPWG</a></p>\n",
+      "version" : 6
+    },
+    "version" : 8
+  }
+}

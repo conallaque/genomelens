@@ -1,0 +1,65 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166341321",
+    "name" : "Annotation of CPIC Guideline for metoprolol and CYP2D6",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "SlqsW32LhLg",
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1452553340,
+        "date" : "2024-08-12T04:33:37.897-07:00",
+        "description" : "Added video",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15160274,"title":"Clinical Pharmacogenetics Implementation Consortium Guideline (CPIC) for CYP2D6, ADRB1, ADRB2, ADRA2C, GRK4, and GRK5 Genotypes and Beta-Blocker Therapy.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11502236","crossReferences":[{"id":1452681441,"resource":"PubMed Central","resourceId":"PMC11502236","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11502236"},{"id":1452517521,"resource":"PubMed","resourceId":"38951961","_url":"https://www.ncbi.nlm.nih.gov/pubmed/38951961"},{"id":1452517522,"resource":"DOI","resourceId":"10.1002/cpt.3351","_url":"http://dx.doi.org/10.1002%2Fcpt.3351"}],"objCls":"Literature","pubDate":"2024-10-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"},{"id":1451978620,"resource":"PGx Paper Types","term":"Phenoconversion","termId":"pgxPaperTypes:1451978620"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1452498460,
+      "html" : "<p>Excerpt from the guideline:</p>\n<blockquote class=\"blockquote\">\n<p><em><strong>Pediatrics.</strong></em> Beta-blockers are used to treat a variety of indications in children, such as heart failure, hemangiomas, migraine, aggression, and anxiety. However, only two pediatric pharmacogenetic studies of beta-blockers were identified. Therefore, more evidence is needed before clinical recommendations can be specifically made for pediatric patients. It may be appropriate, with caution, to extrapolate the recommendations for CYP2D6 and metoprolol to most children because CYP2D6 genotype appears to correlate with CYP2D6 activity as early as two weeks of age.</p>\n</blockquote>\n",
+      "version" : 0
+    },
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450480",
+        "name" : "metoprolol",
+        "version" : 17
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA128",
+        "symbol" : "CYP2D6",
+        "name" : "cytochrome P450 family 2 subfamily D member 6",
+        "version" : 7891
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1452497740,
+      "html" : "<p>The CPIC Dosing Guideline for metoprolol recommends that patients who are CYP2D6 poor metabolizers initiate therapy at the lowest recommended starting dose and carefully titrate upwards to clinical effect or guideline-recommended dose. Alternatively, a different beta-blocker may be selected. There is no recommendation for CYP2D6 ultrarapid metabolizers.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1452497741,
+      "html" : "<h3 id=\"july-2024\">July 2024</h3>\n<p>The authors of the CPIC&reg; guideline for beta-blocker therapy and CYP2D6, ADRB1, ADRB2, ADRA2C, GRK4 and GRK5 evaluated the available evidence for the use of metoprolol in patients carrying CYP2D6 variants.</p>\n<p>These guidelines are applicable to:</p>\n<ul>\n<li>adult patients</li>\n<li>pediatric patients</li>\n</ul>\n<p>Excerpts from the guideline:</p>\n<blockquote class=\"blockquote\">\n<p>The evidence supporting the association of CYP2D6 genotype with metoprolol exposure and response included participants with a variety of health statuses (e.g., healthy, hypertension, heart failure, etc.). Therefore, it may be reasonable to assume that the pharmacokinetic effects of CYP2D6 variation would affect clinical metoprolol response similarly across a variety of indications, and the dosing recommendations provided could be utilized for most cardiovascular indications.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p>Recommendations primarily focus on minimizing the risk of adverse effects in CYP2D6 poor metabolizers related to the greater observed reductions in heart rate and blood pressure stemming from increased metoprolol systemic exposure. In addition, the maximally tolerated metoprolol dose may be lower in poor metabolizers compared to normal metabolizers due to these pharmacokinetic differences.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p>While the evidence suggests metoprolol plasma concentrations are also increased in CYP2D6 intermediate metabolizers compared with normal metabolizers, these effects appear smaller in magnitude than those observed with poor metabolizers, and there was insufficient evidence to clarify whether these smaller pharmacokinetic differences significantly affect clinical response.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p>There was insufficient evidence to determine whether CYP2D6 ultrarapid metabolizers experience clinically significant differences in metoprolol exposure or response.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p>Importantly, none of the recommendations provided in this guideline should be interpreted in a way that would prevent or impede the up-titration of beta-blocker doses to maximally tolerated or guideline-recommended levels, such as in heart failure with reduced ejection fraction and in the post-myocardial infarction setting.</p>\n</blockquote>\n<p>Download and read:</p>\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/beta_blockers/2024/38951961.pdf\" target=\"_blank\">Guideline publication</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/beta_blockers/2024/38951961-supplement.pdf\" target=\"_blank\">Guideline supplement</a></li>\n<li><a href=\"/page/cyp2d6RefMaterials\">Gene-Specific Information Tables</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/metoprolol-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Drug Resource Mappings</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/metoprolol_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Pre and Post Test Alerts</a></li>\n</ul>\n<h3 id=\"table-1-recommended-therapeutic-use-of-metoprolol-in-relation-to-cyp2d6-phenotype\">Table 1: Recommended therapeutic use of metoprolol in relation to CYP2D6 phenotype</h3>\n<p><em>Adapted from Tables 1 and 2 of the guideline</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype<sup>a</sup></th>\n<th>Activity score range</th>\n<th>Activity score<sup>b</sup></th>\n<th>Examples of CYP2D6 diplotypes<sup>c</sup></th>\n<th>Implications<sup>d</sup></th>\n<th>Recommendations</th>\n<th>Classification of recommendations<sup>e</sup></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Ultrarapid metabolizer</td>\n<td>&gt;2.25</td>\n<td>&gt;2.25</td>\n<td>*1/*1xN, *1/*2xN, *2/*2xN</td>\n<td>Increased metabolism of metoprolol leading to decreased drug concentrations; however, it is unclear whether this results in clinically significant changes in heart rate, blood pressure, or clinical outcomes.</td>\n<td>No recommendation for metoprolol therapy due to insufficient evidence regarding diminished metoprolol effectiveness clinically</td>\n<td>No recommendation</td>\n</tr>\n<tr>\n<td>Normal metabolizer</td>\n<td>1.25 ≤ x ≤ 2.25</td>\n<td>2.25<br/>2<br/>1.75<br/>1.5<br/>1.25</td>\n<td>*2x2*10<br/>*1/*1, *1/*2<br/>*1/*10x3<br/>*1/*17, *2/*29<br/>*1/*10, *1/*41, *1/*9</td>\n<td>Normal metabolism of metoprolol</td>\n<td>Initiate standard dosing</td>\n<td>Strong</td>\n</tr>\n<tr>\n<td>Intermediate metabolizer</td>\n<td>0 &lt; x &lt; 1.25</td>\n<td>1<br/>0.75<br/>0.5<br/>0.25</td>\n<td>*1/*5<br/>*10/*17, *29/*41<br/>*10/*10, *41/*41, *10/*41<br/>*4/*10, *4/*41</td>\n<td>Decreased metabolism of metoprolol leading to increased drug concentrations; however, this does not appear to translate into clinically significant changes in heart rate, blood pressure, or clinical outcomes</td>\n<td>Initiate standard dosing</td>\n<td>Moderate</td>\n</tr>\n<tr>\n<td>Poor metabolizer</td>\n<td>0</td>\n<td>0</td>\n<td>*3/*4, *4/*4, *5/*5, *5/*6</td>\n<td>Decreased metabolism of metoprolol leading to markedly increased drug concentrations; this leads to greater heart rate and blood pressure reductions, but the effect on clinical outcomes is unclear</td>\n<td>Initiate therapy with lowest recommended starting dose. Carefully titrate dose upward to clinical effect or guideline-recommended dose; monitor more closely for bradycardia.  Alternatively, consider selecting another beta-blocker.</td>\n<td>Moderate</td>\n</tr>\n<tr>\n<td>Indeterminate</td>\n<td>n/a</td>\n<td>An individual carrying one or two uncertain function alleles</td>\n<td>*1/*22, *1/*25, *22/*25</td>\n<td>n/a</td>\n<td>No recommendation</td>\n<td>No recommendation</td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> See the CYP2D6 Allele Frequency Table on the <a href=\"/page/cyp2d6RefMaterials\">CYP2D6 Gene-Specific Information Tables page</a> for ancestry-specific allele and phenotype frequencies.<br />\n<sup>b</sup> Assignment of allele function and allele activity values, including citations for allele function, can be found in the CYP2D6 Allele Definition Table and the CYP2D6 Allele Functionality Table on the <a href=\"/page/cyp2d6RefMaterials\">CYP2D6 Gene-Specific Information Tables page</a>. For a complete list of CYP2D6 diplotypes and predicted phenotypes, see the CYP2D6 Diplotype to Phenotype Table on the <a href=\"/page/cyp2d6RefMaterials\">CYP2D6 Gene-Specific Information Tables page</a>.<br />\n<sup>c</sup> Where xN represents the number of CYP2D6 gene copies.<br />\n<sup>d</sup> Metoprolol has no known active metabolites via CYP2D6.<br />\n<sup>e</sup> Rating scheme described in the Strength of Recommendations section in the <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/beta_blockers/2024/38951961-supplement.pdf\" target=\"_blank\">guideline supplement</a>.</p>\n",
+      "version" : 2
+    },
+    "version" : 2
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166222801",
+    "name" : "Annotation of DPWG Guideline for flucytosine and DPYD",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1451257822,
+        "date" : "2020-08-31T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1451698047,
+        "date" : "2022-02-28T14:49:52.771-08:00",
+        "description" : "no change to recommendation text, updated the linked to the DPD:flucytosine pdf",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704253,
+        "date" : "2022-03-03T16:33:35.188-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451706940,
+        "date" : "2022-03-08T08:12:06.503-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732892,
+        "date" : "2022-03-28T09:57:49.105-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733312,
+        "date" : "2022-03-28T14:40:11.286-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741474,
+        "date" : "2022-04-05T11:13:46.099-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884261,
+        "date" : "2022-09-16T10:12:26.421-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146500,
+        "date" : "2023-07-03T13:40:02.033-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452412680,
+        "date" : "2024-03-19T06:17:20.512-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15113882,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2020","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2020.pdf","crossReferences":[{"id":1451257580,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2020.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2020.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA449654",
+        "name" : "flucytosine",
+        "version" : 8
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA145",
+        "symbol" : "DPYD",
+        "name" : "dihydropyrimidine dehydrogenase",
+        "version" : 6908
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1451257820,
+      "html" : "<p>The Dutch Pharmacogenetics Working Group Guideline for flucytosine states that patients with a DPYD activity score of 0 should avoid flucytosine. Patients with a DPYD activity score of 1 or 1.5 should be alert to the occurrence of severe side effects and flucytosine should be stopped if severe side effects occur.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451257821,
+      "html" : "<h3 id=\"august-2020\">August 2020</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for flucytosine based on DPYD activity score.</p>\n<p><em>Wording in table taken from <a download=\"DPWG_August_2020.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_August_2020.pdf\">Dutch guidelines August 2020 update</a></em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>DPD AS 0</td>\n<td>flucytosine</td>\n<td>A risk of life-threatening toxicity is increased by gene variation. A small proportion of flucytosine is converted to fluorouracil and patients with this gene variation are intolerant even to small quantities of fluorouracil.</td>\n<td>Avoid flucytosine</td>\n</tr>\n<tr>\n<td>DPD AS 1</td>\n<td>flucytosine</td>\n<td>A very low risk of severe toxicity is increased by gene variation. A small proportion of flucytosine is converted to fluorouracil. Patients with this gene variation are more likely to react to fluorouracil, but generally tolerate low doses (approximately 50% of the standard fluorouracil dose).</td>\n<td>Be alert to the occurrence of severe side effects, such as leukopaenia, neutropaenia, thrombocytopaenia and diarrhoea. In the majority of cases, side effects of flucytosine occur in the first two to three weeks of the treatment. Flucytosine should be stopped if severe side effects occur.</td>\n</tr>\n<tr>\n<td>DPD AS 1.5</td>\n<td>flucytosine</td>\n<td>A very low risk of severe toxicity is increased by gene variation. A small proportion of flucytosine is converted to fluorouracil. Patients with this gene variation are more likely to have a reaction to fluorouracil, but generally tolerate low doses (50-75% of the standard fluorouracil dose).</td>\n<td>Be alert to the occurrence of severe side effects, such as leukopaenia, neutropaenia, thrombocytopaenia and diarrhoea. In the majority of cases, side effects of flucytosine occur in the first two to three weeks of the treatment. Flucytosine should be stopped if severe side effects occur.</td>\n</tr>\n<tr>\n<td>DPD FENO</td>\n<td>flucytosine</td>\n<td>A very low risk of severe toxicity is increased by gene variation. A small proportion of flucytosine is converted to fluorouracil. Patients with this gene variation are more likely to have a reaction to fluorouracil, but generally tolerate low doses (15-50% of the standard fluorouracil dose).</td>\n<td>Be alert to the occurrence of severe side effects, such as leukopaenia, neutropaenia, thrombocytopaenia and diarrhoea. In the majority of cases, side effects of flucytosine occur in the first two to three weeks of the treatment. Flucytosine should be stopped if severe side effects occur.</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_DPD_flucytosine_7208-7209-7210-7211.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_DPD_flucytosine_7208-7209-7210-7211.pdf\">Read for more information about this recommendation</a>, <a download=\"DPYD.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPYD.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_DPD_flucytosine_7208-7209-7210-7211.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_DPD_flucytosine_7208-7209-7210-7211.pdf\">DPWG risk analysis document</a> for flucytosine and DPYD:</p>\n<blockquote class=\"blockquote\">\n<p>The KNMP Pharmacogenetics Working Group considers genotyping before starting flucytosine to be beneficial for drug safety. It is advised to genotype these patients before (or directly after) drug therapy has been initiated to guide drug selection.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n",
+      "version" : 6
+    },
+    "version" : 13
+  }
+}

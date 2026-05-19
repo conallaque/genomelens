@@ -1,0 +1,65 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166279561",
+    "name" : "Annotation of CPIC Guideline for aspirin and G6PD",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "AMnnwcsOpXI",
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1452474680,
+        "date" : "2024-05-15T09:43:43.726-07:00",
+        "description" : "Added link to CPIC video",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15135762,"title":"Expanded Clinical Pharmacogenetics Implementation Consortium Guideline for Medication Use in the Context of G6PD Genotype.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10281211","crossReferences":[{"id":1452680347,"resource":"PubMed Central","resourceId":"PMC10281211","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10281211"},{"id":1451882620,"resource":"PubMed","resourceId":"36049896","_url":"https://www.ncbi.nlm.nih.gov/pubmed/36049896"},{"id":1451882621,"resource":"DOI","resourceId":"10.1002/cpt.2735","_url":"http://dx.doi.org/10.1002%2Fcpt.2735"}],"objCls":"Literature","pubDate":"2023-05-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1451994560,
+      "html" : "<p>Guideline excerpt: &quot;There are data supporting or refuting certain drugs associated with increased risk of AHA in the setting of G6PD deficiency reported in pediatric patients (Table S1). There is no reason to think that genetically-based recommendations in this guideline should differ for children versus adults.&quot;</p>\n",
+      "version" : 0
+    },
+    "recommendation" : false,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA448497",
+        "name" : "aspirin",
+        "version" : 18
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA28469",
+        "symbol" : "G6PD",
+        "name" : "glucose-6-phosphate dehydrogenase",
+        "version" : 136
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1451897700,
+      "html" : "<p>The CPIC dosing guideline does not provide or recommend changing prescribing actions based on G6PD genotype for aspirin at any dose. There is no reason to avoid aspirin at doses of ≤1g/day in patients with the G6PD deficient or G6PD variable phenotypes. In patients who are G6PD deficient with chronic non-spherocytic hemolytic anemia (CNSHA), aspirin ≤1g/day should be used with caution and close monitoring for acute exacerbation of chronic hemolysis is recommended. CPIC gives a 'no recommendation' for the use of G6PD genotype for prescribing aspirin at doses &gt;1g/day.</p>\n",
+      "version" : 2
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451897701,
+      "html" : "<h3 id=\"september-2022\">September 2022</h3>\n<h4 id=\"recommendation-for-aspirin-at-doses-≤1g-day\">Recommendation for aspirin at doses ≤1g/day</h4>\n<ul>\n<li>\n<p>The <a rel=\"noopener noreferrer\" href=\"https://ascpt.onlinelibrary.wiley.com/doi/full/10.1002/cpt.2735\" target=\"_blank\">Expanded CPIC&reg; Guideline for Medication Use in the Context of <em>G6PD</em> Genotype</a> has been published in Clinical Pharmacology and Therapeutics. As part of this guideline, the authors classified drugs by their risk of causing acute hemolytic anemia (AHA) in patients with G6PD deficiency. Aspirin at doses of ≤1g/day has been classified as a <strong>low-to-no risk drug</strong>, as shown in Table 2 of the guideline publication. CPIC gives a 'no recommendation' for the use of G6PD genotype for prescribing aspirin at doses &gt;1g/day. In summary, CPIC does not recommend or provide prescribing actions based on genotype for aspirin at any dose and the <em>G6PD</em>/aspirin gene/drug pair is assigned a final status of level C by CPIC.</p>\n</li>\n<li>\n<p>These guidelines are applicable to:</p>\n<ul>\n<li>adult patients</li>\n<li>pediatric patients</li>\n</ul>\n</li>\n<li>\n<p>Excerpts from the guideline:</p>\n<ul>\n<li>&quot;An additional step was added to this CPIC guideline to assign drugs into three groups: those that can be considered high risk for AHA in the presence of G6PD deficiency (and thus should generally be avoided), those that are considered medium risk in G6PD deficiency (and thus should be used with caution), and those that can be considered low-to-no risk (with no added risk of AHA in those that are deficient for G6PD versus those with normal G6PD status).&quot;</li>\n<li>&quot;In order to assign drugs into risk groups, the authors considered not only the strength of\nthe evidence in the primary peer-reviewed literature, but also the frequency of drug use, the\npresence of regulatory agency warnings, and the presence or absence of a mechanism by which\nreactive oxygen species might be generated and contribute to hemolysis in G6PD deficiency (Supplement, Assigning Risk Level)&quot;</li>\n<li>&quot;The paucity of reports of AHA for extremely widely used drugs, such as [...] low-dose aspirin, coupled with the lack of any positive studies, strongly suggests that such drugs are not associated with AHA in G6PD deficiency.&quot;</li>\n</ul>\n</li>\n<li>\n<p>Download and read:</p>\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/G6PD/2022/36049896.pdf\" target=\"_blank\">Expanded Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for Medication Use in the Context of <em>G6PD</em> Genotype</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/G6PD/2022/36049896-supplement.pdf\" target=\"_blank\">2022 supplement</a></li>\n<li><a href=\"/page/g6pdRefMaterials\">G6PD Gene-Specific Information Tables</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/aspirin-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Aspirin drug resource mapping</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/aspirin_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Aspirin Pre- and Post-Test Alerts</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-recommended-therapeutic-use-of-aspirin-at-doses-of-≤1g-day-in-relation-to-g6pd-phenotype\">Table 1: Recommended therapeutic use of aspirin at doses of ≤1g/day in relation to <em>G6PD</em> phenotype</h3>\n<p><em>Adapted from Tables 1, 2 and 6 of the guideline</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Predicted Phenotype</th>\n<th>Genotype<sup>a</sup></th>\n<th>Example genotypes<sup>b</sup></th>\n<th>Implications</th>\n<th>Therapeutic Recommendations</th>\n<th>Classification of recommendations<sup>c</sup></th>\n<th>Considerations</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Normal</td>\n<td>A person with one X chromosome carrying a non-deficient (class IV) allele<br/>OR<br/>A person carrying two non-deficient (class IV) alleles</td>\n<td>B, Sao Boria, IV<br/>&nbsp;<br/>B/B, B/Sao Boria, B/A, IV/IV</td>\n<td>Low-to-no risk of acute hemolytic anemia</td>\n<td>No reason to avoid low-to-no risk drugs based on G6PD status</td>\n<td>Strong</td>\n<td></td>\n</tr>\n<tr>\n<td>Deficient</td>\n<td>A person with one X chromosome carrying a deficient (class II-III) allele<br/>OR<br/>A person carrying two deficient (class II-III) alleles OR one class I allele and one class II or III allele</td>\n<td>A-, Orissa, Kalyan-Kerala, Mediterranean, Canton, Chatham, II, III<br/>&nbsp;<br/>A-/A-, A-/Orissa, Orissa/ Kalyan-Kerala, Mediterranean/ Mediterranean, Chatham /Mediterranean, Canton/ Viangchan, II/II, II/III, III/III, I/II, I/III</td>\n<td>Low-to-no risk of acute hemolytic anemia</td>\n<td>No reason to avoid a low-to-no risk drug based on G6PD status at standard doses</td>\n<td>Moderate</td>\n<td>Closer monitoring may be indicated for higher-than-normal dosages, and in the setting of infection or other oxidative stress, including concomitant use of multiple medium and low-to-no risk drugs.</td>\n</tr>\n<tr>\n<td>Deficient with CNSHA</td>\n<td>A person with one X chromosome carrying a deficient (class I) allele<br/>OR<br/>A person carrying two deficient (class I) alleles<sup>d</sup></td>\n<td>Bangkok, Villeurbanne, I<br/>&nbsp;<br/>Bangkok/Bangkok, Bangkok/Villeurbanne, I/I</td>\n<td>High risk of acute exacerbation of chronic hemolysis</td>\n<td>Use drug cautiously; if used, close monitoring for acute exacerbation of chronic hemolysis is recommended.</td>\n<td>Optional</td>\n<td>There are insufficient data in patients with the G6PD Deficient with CNSHA phenotype, but the risk of using any drug should be weighed carefully against the benefits in these rare patients due to the underlying pathophysiology that confers high risk for acute exacerbation of chronic hemolysis.</td>\n</tr>\n<tr>\n<td>Variable<sup>e</sup></td>\n<td>A person carrying one non-deficient (class IV) allele and one deficient (class I-III) allele</td>\n<td>B /Bangkok, B/Mediterranean, B/A-, IV/I, IV/II, IV/III</td>\n<td>Low-to-no risk of acute hemolytic anemia</td>\n<td>No reason to avoid low-to-no risk drugs based on G6PD status at standard doses</td>\n<td>Moderate</td>\n<td>Due to X-linked mosaicism, individuals with more than one X chromosome (e.g., females, individuals with Klinefelter syndrome) and heterozygous for one non-deficient (class IV) and one deficient (class I–III) allele may display a normal or a deficient phenotype.</td>\n</tr>\n<tr>\n<td>Indeterminate</td>\n<td>A person carrying at least one allele with uncertain function</td>\n<td>Dagua<br/>&nbsp;<br/>B/Dagua</td>\n<td>Unknown risk of acute hemolytic anemia</td>\n<td>To ascertain G6PD status, enzyme activity must be measured. Drug use should be guided per the recommendations based on the activity-based phenotype.</td>\n<td>Moderate</td>\n<td></td>\n</tr>\n</tbody>\n</table>\n<p>CNSHA: chronic non-spherocytic hemolytic anemia<br />\n<sup>a</sup> WHO classifications from [Article:<a href=\"/pmid/22293322\">22293322</a>], other details from [Article:<a href=\"/pmid/4963040\">4963040</a>]. Class I alleles are extremely rare; the distinction between Class II and III alleles is not clear. Almost all patients will carry class II, III, or IV alleles.<br />\n<sup>b</sup> Due to the large number of G6PD alleles, other genotypes may be possible besides those given as examples here; see the <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/allele_definition/G6PD_allele_definition_table.xlsx\" target=\"_blank\">G6PD Allele Definition Table</a> for a more comprehensive list of alleles and <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/allele_function_reference/G6PD_allele_functionality_reference.xlsx\" target=\"_blank\">G6PD Allele Functionality Table</a> for their assigned function (WHO class). Note that some labs use the designation “B allele” to indicate an allele carrying no known class I-III variants. The <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/frequency/G6PD_frequency_table.xlsx\" target=\"_blank\">G6PD Frequency Table</a> can be referenced for the frequency of G6PD alleles across major biogeographical groups.<br />\n<sup>c</sup> Rating scheme described in the Strength of Recommendations section in the <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/G6PD/2022/36049896-supplement.pdf\" target=\"_blank\">guideline supplement</a>.<br />\n<sup>d</sup> Such genotypes have never been seen and are presumably exceedingly rare.<br />\n<sup>e</sup> Due to X-linked mosaicism, persons heterozygous (generally females) for one non-deficient (class IV) and one deficient (class I-III alleles) allele may display a normal or a deficient phenotype. It is therefore difficult to predict the phenotype of these individuals (see Supplement, G6PD Heterozygotes).</p>\n<h4 id=\"no-recommendation-for-aspirin-at-doses-1g-day\">No recommendation for aspirin at doses &gt;1g/day</h4>\n<p>The guideline authors also evaluated the available evidence for the use of aspirin at doses of &gt;1g/day in patients carrying <em>G6PD</em> variants. They conclude that there is insufficient evidence to guide clinical practice at this time.</p>\n<p>Excerpt from the guideline:</p>\n<blockquote class=\"blockquote\">\n<p>For drugs with no relevant published articles linking that drug to an increased risk of AHA in the setting of G6PD deficiency, there is no recommendation (CPIC Level C)</p>\n</blockquote>\n",
+      "version" : 1
+    },
+    "version" : 3
+  }
+}

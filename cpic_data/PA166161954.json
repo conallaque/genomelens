@@ -1,0 +1,108 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166161954",
+    "name" : "Annotation of CPIC Guideline for ondansetron and CYP2D6",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "OHD9LFRlJ4g",
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1448526496,
+        "date" : "2016-12-23T16:12:51.760-08:00",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1449717054,
+        "date" : "2018-08-23T09:21:51.656-07:00",
+        "description" : "Added link to YouTube video for this guideline",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450042759,
+        "date" : "2018-11-15T18:55:13.118-08:00",
+        "description" : "updated *14B to *14 and *14A to *114 based on the Nov 2018 PharmVar release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450824544,
+        "date" : "2019-10-24T20:12:43.110-07:00",
+        "description" : "online October 2019 guideline update (G2P project)",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451223820,
+        "date" : "2020-07-08T00:00:00-07:00",
+        "description" : "added CYP2D6*115-*139 to allele picker; changed function for *60, *72, *84",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451309746,
+        "date" : "2021-01-12T13:37:37.045-08:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451461900,
+        "date" : "2021-06-16T18:24:21.767-07:00",
+        "description" : "Added text from guideline regarding pediatrics",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452137940,
+        "date" : "2023-06-22T22:35:48.579-07:00",
+        "description" : "Updated supplemental table links",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15098241,"title":"Clinical Pharmacogenetics Implementation Consortium (CPIC) guideline for CYP2D6 genotype and use of ondansetron and tropisetron.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5479760","crossReferences":[{"id":1449293318,"resource":"PubMed Central","resourceId":"PMC5479760","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5479760"},{"id":1449293317,"resource":"PubMed","resourceId":"28002639","_url":"https://www.ncbi.nlm.nih.gov/pubmed/28002639"},{"id":1449293319,"resource":"DOI","resourceId":"10.1002/cpt.598","_url":"http://dx.doi.org/10.1002%2Fcpt.598"}],"objCls":"Literature","pubDate":"2017-08-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : true,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450705",
+        "name" : "ondansetron",
+        "version" : 11
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA128",
+        "symbol" : "CYP2D6",
+        "name" : "cytochrome P450 family 2 subfamily D member 6",
+        "version" : 7891
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1448526106,
+      "html" : "<p>The CPIC dosing guideline for ondansetron recommends selecting an alternate drug for CYP2D6 ultrarapid metabolizers.  It is recommended that the alternate drug not be predominantly metabolized by CYP2D6 (eg. granisetron). CPIC has updated the CYP2D6 genotype-phenotype translation in all supplemental files since the guideline was published.</p>\n",
+      "version" : 2
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451433671,
+      "html" : "<h3 id=\"october-2019-update\">October 2019 Update</h3>\n<p><a rel=\"noopener noreferrer\" href=\"https://ascpt.onlinelibrary.wiley.com/doi/full/10.1111/cts.12692\" target=\"_blank\">CYP2D6 genotype to phenotype translation changes</a>: Up until August 2019, there were a few inconsistencies in the translation of CYP2D6 genotype to phenotype translation across guidelines (i.e. CPIC and DPWG) and between clinical genetic testing laboratories. CPIC recently conducted a modified-Delphi project to obtain consensus for a uniform system for translating CYP2D6 genotype to phenotype among a panel of international CYP2D6 experts <a href=\"/page/cpicCyp2d6Standardization\">more information</a>. Modifications to CPIC’s prior system include downgrading the value assigned to the CYP2D6*10 allele for activity score calculation from 0.5 to 0.25 and changing the phenotype assignment for an activity score of 1 from normal metabolizer to intermediate metabolizer (<a rel=\"noopener noreferrer\" href=\"http://files.cpicpgx.org/data/gene/CYP2D6/Inferred_CYP2D6_Phenotype10242019.docx\" target=\"_blank\">table of all previous and new phenotype groupings</a>).</p>\n<p>As a result, the following changes have been made in the CYP2D6 allele functionality table, CYP2D6 genotype to phenotype table (access tables below):</p>\n<ul>\n<li>Diplotypes giving rise to activity scores of 1 changed from CYP2D6 normal metabolizer to CYP2D6 intermediate metabolizer assignments.\n<ul>\n<li><strong>Impact on the recommendations in this guideline:</strong> Because the recommendations in this guideline do not differ between a CYP2D6 normal and intermediate metabolizer, the current published recommendations for normal and intermediate metabolizers will remain unchanged.</li>\n</ul>\n</li>\n<li>All activity scores for diplotypes containing a CYP2D6*10 allele have been updated accordingly (activity scores changed to reflect the lower value of 0.25 for *10). Prior to the consensus projects, the combination of a duplicated normal function allele with a *10 allele resulted in an activity score of 2.5 which translates to an ultrarapid metabolizer. The lower value of 0.25 for CYP2D6*10 results in an activity score of 2.25 for these allele combinations, which based on the consensus project translates to a normal metabolizer.  See <a rel=\"noopener noreferrer\" href=\"http://files.cpicpgx.org/data/gene/CYP2D6/Inferred_CYP2D6_Phenotype10242019.docx\" target=\"_blank\">table of all previous and new phenotype groupings</a>.\n<ul>\n<li><strong>Impact on the recommendations in this guideline:</strong> The authors of this guideline are currently reviewing evidence for the affected activity score (AS of 2.25) and will update this webpage and relevant tables accordingly.</li>\n</ul>\n</li>\n</ul>\n<h3 id=\"december-2016\">December 2016</h3>\n<ul>\n<li>Guidelines regarding the use of pharmacogenomic tests in dosing for ondansetron were published in Clinical Pharmacology and Therapeutics by the Clinical Pharmacogenetics Implementation Consortium (CPIC).</li>\n<li>Excerpts from the 2016 ondansetron dosing guidelines:\n<ul>\n<li>&quot;Gene duplication has been shown to be associated with higher metabolism and clearance of ondansetron resulting in lower area under the plasma concentration-time curve. This translates clinically into a decreased response to ondansetron and tropisetron, specifically increased risk of vomiting in CYP2D6 ultrarapid metabolizers. If CYP2D6 genotype is known, alternative 5-HT3 receptor antagonist antiemetics not metabolized by CYP2D6 (e.g., granisetron) should be considered in CYP2D6 ultrarapid metabolizers. &quot;</li>\n<li>&quot;At the time of this writing, there are no data available on CYP2D6 genotype's effect on ondansetron or tropisetron response in the pediatric populations, although there is no reason to suspect that <em>CYP2D6</em> genetic variation will affect this drug's metabolism differently in children compared with adults. Because CYP2D6 catalytic activity in neonates (&lt;1 month old) depends strongly on developmental aspects, the impact of CYP2D6 in this patient population might be different than adults or older children.&quot;</li>\n</ul>\n</li>\n<li>Download and read:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/ondansetron/2016/28002639.pdf\" target=\"_blank\">Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for CYP2D6 Genotype and Use of Ondansetron and Tropisetron</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/ondansetron/2016/28002639-supplement.pdf\" target=\"_blank\">2016 supplement</a></li>\n<li><a href=\"/page/cyp2d6RefMaterials\">Gene-specific Information Tables for CYP2D6</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/ondansetron-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Ondansetron Drug Resource Mappings</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/ondansetron_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Ondansetron Pre and Post Test Alerts</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/images/flow_chart/Ondansetron_CDS_Flow_Chart.jpg\" target=\"_blank\">Ondansetron Clinical Decision Support Flow Chart</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-dosing-recommendations-for-ondansetron-based-on-cyp2d6-phenotype-genotype\">Table 1: Dosing recommendations for ondansetron based on CYP2D6 phenotype/genotype</h3>\n<p><em>Adapted from Tables 1 and 2 of the 2016 guideline manuscript.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>CYP2D6 Phenotype</th>\n<th>Activity score</th>\n<th>CYP2D6 Genotypes<sup>a</sup></th>\n<th>Examples of diplotypes</th>\n<th>Implications</th>\n<th>Therapeutic recommendations</th>\n<th>Classification of Recommendations<sup>b</sup></th>\n<th>Consideration for alternative 5-HT<sub>3</sub> receptor antagonists antiemetics<sup>c</sup></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Ultrarapid metabolizer</td>\n<td>&gt;2.0</td>\n<td>An individual carrying duplications of function alleles</td>\n<td><em>*1/*1xN, *1/*2xN, *2/*2xN</em><sup>d</sup></td>\n<td>Increased metabolism to less active compounds when compared to normal metabolizers and is associated with decreased response to ondansetron and tropisetron (i.e. vomiting).</td>\n<td>Select and alternative drug not predominantly metabolized by CYP2D6 (i.e. granisetron).<sup>e</sup></td>\n<td>Moderate</td>\n<td>Dolasetron, palonosetron, and ramosetron are also metabolized by CYP2D6.  Limited evidence is available regarding the utilization of <em>CYP2D6</em> genetic variation to guide use of these drugs.</td>\n</tr>\n<tr>\n<td>Normal metabolizer</td>\n<td>2.0-1.0<sup>f</sup></td>\n<td>An individual carrying two normal function alleles, or two decreased function alleles, or one normal function and one no function allele, or one normal function and one decreased function allele, or combinations of duplicated alleles that result in an activity score of 1.0-2.0</td>\n<td><em>*1/*1, *1/*2, *1/*4, *1/*5, *1/*9, *1/*41, *2/*2,*41/*41</em></td>\n<td>Normal metabolism</td>\n<td>Initiate therapy with recommended starting dose.</td>\n<td>Strong</td>\n<td></td>\n</tr>\n<tr>\n<td>Intermediate metabolizer</td>\n<td>0.5</td>\n<td>An individual carrying one decreased function and one no function allele</td>\n<td><em>*4/*10,*4/*41, *5/*9</em></td>\n<td>Very limited data available for CYP2D6 intermediate metabolizers</td>\n<td>Insufficient evidence demonstrating clinical impact based on <em>CYP2D6</em> genotype.  Initiate therapy with recommended starting dose.</td>\n<td>No recommendation</td>\n<td></td>\n</tr>\n<tr>\n<td>Poor metabolizer</td>\n<td>0</td>\n<td>An individual carrying no functional alleles</td>\n<td><em>*3/*4,*4/*4, *5/*5, *5/*6</em></td>\n<td>Very limited data available for CYP2D6 poor metabolizers</td>\n<td>Insufficient evidence demonstrating clinical impact based on <em>CYP2D6</em> genotype.  Initiate therapy with recommended starting dose.</td>\n<td>No recommendation</td>\n<td></td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> Assignment of allele function and citations for allele function, see <a href=\"/page/cyp2d6RefMaterials\">CYP2D6 Allele Definition Table and CYP2D6 Allele Functionality Table</a>.</p>\n<p><sup>b</sup> Rating scheme is described in the 2016 Supplement</p>\n<p><sup>c</sup> CPIC strength of recommendation: No Recommendation. See rating scheme described in the Supplement.</p>\n<p><sup>d</sup> Where <em>xN</em> represents the number of <em>CYP2D6</em> gene copies.  For individuals with <em>CYP2D6</em> duplications or multiplications, see supplemental data for additional information on how to translate diplotypes into phenotypes.</p>\n<p><sup>e</sup> Drug-drug interactions and other patient characteristics (e.g., age, renal function, and liver function) should be considered when selecting alternative therapy.</p>\n<p><sup>f</sup> Patients with an activity score of 1.0 may be classified as intermediate metabolizers by some reference laboratories.</p>\n",
+      "version" : 3
+    },
+    "version" : 37
+  }
+}

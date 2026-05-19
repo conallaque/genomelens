@@ -1,0 +1,218 @@
+{
+  "citations" : [
+    {
+      "id" : 7283333,
+      "title" : "Pharmacogenetics: from bench to byte--an update of guidelines.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+      "authors" : [
+        "Swen J J",
+        "Nijenhuis M",
+        "de Boer A",
+        "Grandia L",
+        "Maitland-van der Zee A H",
+        "Mulder H",
+        "Rongen G A P J M",
+        "van Schaik R H N",
+        "Schalekamp T",
+        "Touw D J",
+        "van der Weide J",
+        "Wilffert B",
+        "Deneer V H M",
+        "Guchelaar H-J"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 769250885,
+          "resource" : "PubMed",
+          "resourceId" : "21412232",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+          "version" : 0
+        },
+        {
+          "id" : 1449247827,
+          "resource" : "DOI",
+          "resourceId" : "10.1038/clpt.2011.34",
+          "_url" : "http://dx.doi.org/10.1038%2Fclpt.2011.34",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "Clinical pharmacology and therapeutics",
+      "meshTerms" : [
+        "Animals",
+        "Aryl Hydrocarbon Hydroxylases",
+        "Cytochrome P-450 CYP2C9",
+        "Drug Administration Schedule",
+        "Drug-Related Side Effects and Adverse Reactions",
+        "Humans",
+        "Pharmaceutical Preparations",
+        "Pharmacogenetics",
+        "Practice Guidelines as Topic"
+      ],
+      "month" : 5,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "page" : "662-73",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2011-05-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "Currently, there are very few guidelines linking the results of pharmacogenetic tests to specific therapeutic recommendations. Therefore, the Royal Dutch Association for the Advancement of Pharmacy established the Pharmacogenetics Working Group with the objective of developing pharmacogenetics-based therapeutic (dose) recommendations. After systematic review of the literature, recommendations were developed for 53 drugs associated with genes coding for CYP2D6, CYP2C19, CYP2C9, thiopurine-S-methyltransferase (TPMT), dihydropyrimidine dehydrogenase (DPD), vitamin K epoxide reductase (VKORC1), uridine diphosphate glucuronosyltransferase 1A1 (UGT1A1), HLA-B44, HLA-B*5701, CYP3A5, and factor V Leiden (FVL).",
+      "terms" : [],
+      "type" : "Literature",
+      "version" : 4,
+      "volume" : "89",
+      "year" : 2011
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166104958",
+    "name" : "Annotation of DPWG Guideline for pantoprazole and CYP2C19",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1183704511,
+        "date" : "2011-08-10T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1450415041,
+        "date" : "2019-05-23T15:05:19.630-07:00",
+        "description" : "Annotation current with November 2018 DPWG Guideline release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450821020,
+        "date" : "2019-10-07T18:02:32.357-07:00",
+        "description" : "No changes based on August 2019 guideline",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450956351,
+        "date" : "2020-01-31T13:44:00.384-08:00",
+        "description" : "Updated link to 2011 DPWG methods",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450963722,
+        "date" : "2020-02-11T07:06:07.421-08:00",
+        "description" : "Fixed links to 2018 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704207,
+        "date" : "2022-03-03T16:33:27.649-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451707353,
+        "date" : "2022-03-08T10:09:21.014-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732847,
+        "date" : "2022-03-28T09:57:41.308-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733425,
+        "date" : "2022-03-28T14:50:54.989-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741523,
+        "date" : "2022-04-05T11:16:58.822-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884486,
+        "date" : "2022-09-16T11:02:19.313-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146517,
+        "date" : "2023-07-03T13:40:08.339-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452410801,
+        "date" : "2024-03-18T07:27:32.229-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454662260,
+        "date" : "2026-02-09T12:46:41.451-08:00",
+        "description" : "minor wording update",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":7283333,"title":"Pharmacogenetics: from bench to byte--an update of guidelines.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/21412232","crossReferences":[{"id":769250885,"resource":"PubMed","resourceId":"21412232","_url":"https://www.ncbi.nlm.nih.gov/pubmed/21412232"},{"id":1449247827,"resource":"DOI","resourceId":"10.1038/clpt.2011.34","_url":"http://dx.doi.org/10.1038%2Fclpt.2011.34"}],"objCls":"Literature","pubDate":"2011-05-01T00:00:00-07:00","terms":[],"type":"Literature"},
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15330502,"title":"Dutch Pharmacogenetics Working Group Guidelines February 2026","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20241201_downloaded_010926.pdf","crossReferences":[{"id":1454661860,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20241201_downloaded_010926.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20241201_downloaded_010926.pdf"}],"objCls":"Literature","terms":[{"id":1452267780,"resource":"ClinPGx Tags","term":"Has PGx","termId":"pgkbTags:1452267780"}],"type":"Literature"},
+      {"id":15102465,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2018","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","crossReferences":[{"id":1450415575,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450774",
+        "name" : "pantoprazole",
+        "version" : 17
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA124",
+        "symbol" : "CYP2C19",
+        "name" : "cytochrome P450 family 2 subfamily C member 19",
+        "version" : 7210
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1447981904,
+      "html" : "<p>For CYP2C19 ultrarapid metabolizers who are undergoing <em>H. pylori</em> eradication therapy, use a 5-fold higher dose. For CYP2C19 ultrarapid metabolizers with other indications, be alert to reduced effectiveness and, if necessary, use a 5-fold higher dose.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1447981903,
+      "html" : "<h3 id=\"february-2026-update\">February 2026 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (<a href=\"/page/dpwg\">DPWG</a>) released an updated version of the <a download=\"pharmacogenetic_recommendation_text_20241201_downloaded_010926.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/pharmacogenetic_recommendation_text_20241201_downloaded_010926.pdf\">Pharmacogenetic_recommendation_text</a> dated with 20241201. It includes changes to the wording for the CYP2C19-lansoprazole guidelines which are dated within the document as 10-9-2024. There are minor wording updates for CYP2C19 UM, which are updated accordantly in the table below.</p>\n<h3 id=\"november-2018-update\">November 2018 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for pantoprazole based on CYP2C19 genotype. Patients who are CYP2C19 ultrarapid metabolizers who are undergoing <em>H. pylori</em> eradication therapy should receive a 5-fold higher dose. In CYP2C19 ultrarapid metabolizer patients with other indications, be alert to reduced effectiveness, and, if necessary, use a 5-fold higher dose. Patients should be advised to report persisting symptoms of dyspepsia.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_November_2018.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_November_2018.pdf\">Dutch guidelines November 2018 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2C19 PM</td>\n<td>pantoprazole</td>\n<td>NO action is required for this gene-drug interaction.</td>\n<td>The higher plasma concentration of pantoprazole results in an increase in the therapeutic effectiveness, without an increase in the side effects.</td>\n</tr>\n<tr>\n<td>CYP2C19 IM</td>\n<td>pantoprazole</td>\n<td>NO action is required for this gene-drug interaction.</td>\n<td>The higher plasma concentration of pantoprazole results in an increase in the therapeutic effectiveness, without an increase in the side effects.</td>\n</tr>\n<tr>\n<td>CYP2C19 UM</td>\n<td>pantoprazole</td>\n<td>The genetic variation may lead to a reduced pantoprazole plasma concentration and therefore reduced pantoprazole effectiveness.</td>\n<td><strong>For Helicobacter pylori ERADICATION THERAPY:</strong> 1. use a 5-fold higher dose or choose another PPI. Other PPIs are metabolized to a lesser extent by CYP2C19. 2. advise the patient to report persisting symptoms of dyspepsia.<br/><strong>OTHER INDICATIONS:</strong> 1. be alert to reduced effectiveness. 2. if necessary, use a 5-fold higher dose or choose another PPI. Other PPIs are metabolised to a lesser extent by CYP2C19. 3. advise the patient to report persisting symptoms of dyspepsia.</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_CYP2C19_pantoprazole_2508-2510_downloaded_020926.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C19_pantoprazole_2508-2510_downloaded_020926.pdf\">Read for more information about this recommendation</a>, <a download=\"CYP2C19.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CYP2C19.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_CYP2C19_pantoprazole_2508-2510_downloaded_020926.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C19_pantoprazole_2508-2510_downloaded_020926.pdf\">DPWG risk analysis document</a> for pantoprazole and CYP2C19:</p>\n<blockquote class=\"blockquote\">\n<p>The Dutch Pharmacogenetics Working Group considers genotyping before starting pantoprazole to be potentially beneficial for drug efficacy. Genotyping can be considered on an individual patient basis. If, however, the genotype is available, the Dutch Pharmacogenetics Working Group recommends adhering to the gene-drug guideline.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n<h3 id=\"2011-guideline\">2011 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for pantoprazole based on <em>CYP2C19</em> genotype [Article:<a href=\"/pmid/21412232\">21412232</a>].  For the <em>CYP2C19</em> UM phenotype, they conclude to be extra alert to insufficient response and recommend to consider dose increase by 400%.</p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype (Genotype)</th>\n<th>Therapeutic Dose Recommendation</th>\n<th>Level of Evidence</th>\n<th>Clinical Relevance</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><em>CYP2C19</em> PM (*2/*2, *2/*3, *3/*3)</td>\n<td>None</td>\n<td>Published controlled studies of moderate quality# relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints</td>\n<td>Positive clinical effects</td>\n</tr>\n<tr>\n<td><em>CYP2C19</em> IM (*1/*2, *1/*3, *17/*2, *17/*3)</td>\n<td>None</td>\n<td>Published controlled studies of moderate quality# relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints</td>\n<td>Positive clinical effects</td>\n</tr>\n<tr>\n<td><em>CYP2C19</em> UM (*17/*17)</td>\n<td>Helicobacter pylori eradication: increase dose by 400%. Be extra alert to insufficient response. Other: be extra alert to insufficient response. Consider dose increase by 400%</td>\n<td>Published controlled studies of moderate quality# relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints</td>\n<td>Clinical effect (not statistically significant difference); Kinetic effect (not statistically significant difference)</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li>#See <a href=\"/page/dpwg\">Methods </a> or [Article:<a href=\"/pmid/18253145\">18253145</a>] for definition of &quot;moderate&quot; quality.</li>\n</ul>\n",
+      "version" : 19
+    },
+    "version" : 37
+  }
+}

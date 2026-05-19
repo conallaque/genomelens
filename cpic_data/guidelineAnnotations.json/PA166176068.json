@@ -1,0 +1,101 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166176068",
+    "name" : "Annotation of CPIC Guideline for tamoxifen and CYP2D6",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "0sb9J4GziyE",
+    "dosingInformation" : true,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1449161729,
+        "date" : "2018-01-11T00:00:00-08:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1450042768,
+        "date" : "2018-11-15T19:05:53.046-08:00",
+        "description" : "updated *14B to *14 and *14A to *114 based on the Nov 2018 PharmVar release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450824540,
+        "date" : "2019-10-24T19:41:04.335-07:00",
+        "description" : "online October 2019 guideline update (G2P project)",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451223821,
+        "date" : "2020-07-08T00:00:00-07:00",
+        "description" : "added CYP2D6*115-*139 to allele picker; changed function for *60, *72, *84",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451309741,
+        "date" : "2021-01-12T13:37:37-08:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451456400,
+        "date" : "2021-06-10T15:20:03.352-07:00",
+        "description" : "Added link to video",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452137821,
+        "date" : "2023-06-22T22:10:21.794-07:00",
+        "description" : "Updated supplemental table links",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15100237,"title":"Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for CYP2D6 and Tamoxifen Therapy.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5931215","crossReferences":[{"id":1451837603,"resource":"PubMed Central","resourceId":"PMC5931215","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5931215"},{"id":1449291806,"resource":"PubMed","resourceId":"29385237","_url":"https://www.ncbi.nlm.nih.gov/pubmed/29385237"},{"id":1449291807,"resource":"DOI","resourceId":"10.1002/cpt.1007","_url":"http://dx.doi.org/10.1002%2Fcpt.1007"}],"objCls":"Literature","pubDate":"2018-05-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA451581",
+        "name" : "tamoxifen",
+        "version" : 25
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA128",
+        "symbol" : "CYP2D6",
+        "name" : "cytochrome P450 family 2 subfamily D member 6",
+        "version" : 7891
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1449157620,
+      "html" : "<p>The CPIC Dosing Guideline for tamoxifen recommends the use of alternative hormonal therapy such as an aromatase inhibitor for postmenopausal women or aromatase inhibitor along with ovarian function suppression in premenopausal women for CYP2D6 poor metabolizer, if aromatase inhibitor use is not contraindicated. For CYP2D6 intermediate metabolizers the recommendation is to consider the recommendations stated for the CYP2D6 poor metabolizer. If aromatase inhibitor use is contraindicated, consideration should be given to use a higher but FDA approved tamoxifen dose for CYP2D6 intermediate metabolizers. For poor metabolizer, higher dose tamoxifen (40 mg/day) increases but does not normalize endoxifen concentrations and can be considered if there are contraindications to aromatase inhibitor therapy. CPIC has updated the CYP2D6 genotype-phenotype translation in all supplemental files since the guideline was published.</p>\n",
+      "version" : 2
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451433667,
+      "html" : "<h3 id=\"october-2019-update\">October 2019 Update</h3>\n<p><a rel=\"noopener noreferrer\" href=\"https://ascpt.onlinelibrary.wiley.com/doi/full/10.1111/cts.12692\" target=\"_blank\">CYP2D6 genotype to phenotype translation changes</a>: Up until August 2019, there were a few inconsistencies in the translation of CYP2D6 genotype to phenotype translation across guidelines (i.e. CPIC and DPWG) and between clinical genetic testing laboratories. CPIC recently conducted a modified-Delphi project to obtain consensus for a uniform system for translating CYP2D6 genotype to phenotype among a panel of international CYP2D6 experts <a href=\"/page/cpicCyp2d6Standardization\">more information</a>. Modifications to CPIC’s prior system include downgrading the value assigned to the CYP2D6*10 allele for activity score calculation from 0.5 to 0.25 and changing the phenotype assignment for an activity score of 1 from normal metabolizer to intermediate metabolizer (<a rel=\"noopener noreferrer\" href=\"http://files.cpicpgx.org/data/gene/CYP2D6/Inferred_CYP2D6_Phenotype10242019.docx\" target=\"_blank\">table of all previous and new phenotype groupings</a>).</p>\n<p>As a result, the following changes have been made in the CYP2D6 allele functionality table, CYP2D6 genotype to phenotype table, Tamoxifen pre- and post-test alerts and flow chart (access tables below):</p>\n<ul>\n<li>Activity scores of 1 changed from CYP2D6 normal metabolizer to CYP2D6 intermediate metabolizer.\n<ul>\n<li><strong>Impact on the recommendations in this guideline:</strong> The current guideline has a specific recommendation for AS of 1 (no CYP2D6*10 allele present); thus, the current published recommendations for normal and intermediate metabolizer will remain unchanged.</li>\n</ul>\n</li>\n<li>All activity scores for diplotypes containing a CYP2D6*10 allele have been updated accordingly (activity scores changed to reflect the lower activity value of 0.25 for CYP2D6*10). See <a rel=\"noopener noreferrer\" href=\"http://files.cpicpgx.org/data/gene/CYP2D6/Inferred_CYP2D6_Phenotype10242019.docx\" target=\"_blank\">table of all previous and new phenotype groupings</a>.\n<ul>\n<li><strong>Impact on the recommendations in this guideline:</strong> The recommendations for ultrarapid and normal metabolizers are the same so this change does not impact the recommended prescribing recommendations. The recommendations for the activity score of 1 (with a CYP2D6*10 allele present) and 0.5 are the same so the current published recommendations for this diplotype will remain unchanged.</li>\n</ul>\n</li>\n</ul>\n<h3 id=\"may-2018\">May 2018</h3>\n<p><em>Accepted article preview online January 2018; Advance online publication January 2018</em></p>\n<ul>\n<li>The CPIC guidelines regarding the use of pharmacogenomic tests in dosing of tamoxifen is accepted by <em>Clinical Pharmacology and Therapeutics</em>.</li>\n<li>Excerpts from the 2018 dosing guideline:\n<ul>\n<li>&quot;There is substantial evidence linking CYP2D6 genotype with phenotypic variability in endoxifen concentrations. The evidence was considered uniformly strong that CYP2D6 PMs (AS=0) have lower plasma endoxifen concentrations among patients taking adjuvant tamoxifen compared to CYP2D6 NMs, and that reduced CYP2D6 activity (AS=0 to 1) is associated with lower plasma endoxifen concentrations among patients taking adjuvant tamoxifen compared to normal CYP2D6 activity.&quot;</li>\n<li>&quot;Because of the extensive biological variability across the various clinical settings where tamoxifen is administered  (prevention, ductal carcinoma in situ, premenopausal and postmenopausal adjuvant setting, and metastatic), the current CPIC guidelines focuses only on the role of CYP2D6 genotype in the adjuvant treatment of ER+  breast cancer, using the endpoints of recurrence, recurrence-free survival, disease-free survival, distant relapse-free survival, breast cancer specific survival, and overall survival.&quot;</li>\n<li>&quot;CYP2D6 UMs and NMs are expected to achieve therapeutic endoxifen concentrations after administration of tamoxifen and should receive the recommended standard of care doses of tamoxifen. CYP2D6 PMs and IMs (including patients with an activity score of 1.0, see below) are expected to have lower endoxifen concentrations compared to NMs and have a higher risk of breast cancer recurrence, and worse event-free survival compared to NMs.&quot;</li>\n<li>&quot;For CYP2D6 PMs, a “strong” therapeutic recommendation was provided to recommend alternative hormonal therapy such as an aromatase inhibitor (AI) for postmenopausal women or aromatase inhibitor along with ovarian function suppression in premenopausal women given that these approaches are superior to tamoxifen regardless of CYP2D6 genotype [Articles:<a href=\"/pmid/26211827\">26211827</a>, <a href=\"/pmid/24881463\">24881463</a>] and based on knowledge that CYP2D6 PMs patients who switch from tamoxifen to anastrozole do not exhibit an increased risk of recurrence [Article:<a href=\"/pmid/23213055\">23213055</a>]. Given that escalation of tamoxifen dose from 20-40 mg/day in CYP2D6 PM significantly increases endoxifen concentrations (but not to concentrations achieved in CYP2D6 NMs [Article:<a href=\"/pmid/27226358\">27226358</a>]), the use of an aromatase inhibitor (+/- ovarian function suppression) is recommended in this setting. Tamoxifen 40 mg/day can be considered for CYP2D6 PM if there are contraindications to AI use.</li>\n<li>&quot;For CYP2D6 IMs and CYP2D6*10/*10 or CYP2D6*10/decreased function allele, a “moderate” recommendation was made to consider use of an alternative hormonal therapy (i.e. aromatase inhibitor) for postmenopausal women or aromatase inhibitor plus ovarian function suppression in premenopausal women is recommended. In CYP2D6 IMs, if aromatase inhibitors are contraindicated, consideration can be given for the use of a higher FDA-approved dose of tamoxifen (40 mg/day), which is known to result in significantly higher endoxifen concentrations without an increase in toxicity [Article:<a href=\"/pmid/27226358\">27226358</a>]. Based on extrapolation from evidence in *10 individuals, a similar recommendation applies to individuals who carry other decreased function alleles resulting in an activity score of 1.0 but with an “optional” recommendation, given the paucity of data for this group.&quot;</li>\n</ul>\n</li>\n<li>Download and read:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/tamoxifen/2017/29385237.pdf\" target=\"_blank\">Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for CYP2D6 and Tamoxifen Therapy</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/tamoxifen/2017/29385237-supplement.pdf\" target=\"_blank\">2018 supplement</a></li>\n<li><a href=\"/page/cyp2d6RefMaterials\">Gene-specific Information Tables for CYP2D6</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/tamoxifen-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Tamoxifen Drug Resource Mapping</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/tamoxifen_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Tamoxifen Pre and Post Test Alerts</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/images/flow_chart/Tamoxifen_CDS_Flow_Chart.jpg\" target=\"_blank\">Tamoxifen Clinical Decision Support Flow Chart</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-recommended-dosing-of-tamoxifen-by-cyp2d6-genotype-phenotype\">Table 1: Recommended dosing of tamoxifen by CYP2D6 genotype/phenotype.</h3>\n<p><em>Adapted from Tables 1 and 2 of the 2017 guideline manuscript.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype<sup>a</sup></th>\n<th>Activity Score</th>\n<th>Genotype</th>\n<th>Examples of genotypes<sup>b</sup></th>\n<th>Implications</th>\n<th>Therapeutic recommendations<sup>c</sup></th>\n<th>Classification of recommendations<sup>d</sup></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><em>CYP2D6</em> Ultrarapid Metabolizer</td>\n<td>&gt;2</td>\n<td>An individual carrying duplications of functional alleles</td>\n<td>*1/*1xN, *1/*2xN, *2/*2xN<sup>e</sup></td>\n<td>Therapeutic endoxifen concentrations</td>\n<td>Avoid moderate and strong CYP2D6 inhibitors. Initiate therapy with recommended standard of care dosing (tamoxifen 20 mg/day).</td>\n<td>Strong</td>\n</tr>\n<tr>\n<td><em>CYP2D6</em> Normal metabolizer</td>\n<td>1.5 and 2</td>\n<td>An individual carrying two normal function alleles or one  normal function and one decreased function allele</td>\n<td>*1/*1, *1/*2, *1/*9, *1/*41, *2/*2</td>\n<td>Therapeutic endoxifen concentrations</td>\n<td>Avoid moderate and strong CYP2D6 inhibitors. Initiate therapy with recommended standard of care dosing (tamoxifen 20 mg/day).</td>\n<td>Strong</td>\n</tr>\n<tr>\n<td><em>CYP2D6</em> Normal metabolizer or Intermediate metabolizer (controversy remains)<sup>f</sup></td>\n<td>1 (no *10 allele present)<sup>c</sup></td>\n<td>An individual carrying two decreased function alleles or one normal function and one no function allele. An activity score (AS) of 1.0 is associated with decreased tamoxifen metabolism to endoxifen compared to those with an AS of 1.5 or 2.</td>\n<td>*1/*4, *1/*5, *41/*41</td>\n<td>Lower endoxifen concentrations compared to normal metabolizers; higher risk of breast cancer recurrence, event-free and recurrence-free survival compared to normal metabolizers.</td>\n<td>Consider hormonal therapy such as an aromatase inhibitor for postmenopausal women or aromatase inhibitor along with ovarian function suppression in premenopausal women, given that these approaches are superior to tamoxifen regardless of CYP2D6 genotype [Articles:<a href=\"/pmid/26211827\">26211827</a>, <a href=\"/pmid/24881463\">24881463</a>]. If aromatase inhibitor use is contraindicated, consideration should be given to use a higher but FDA approved tamoxifen dose (40 mg/day) [Article:<a href=\"/pmid/27226358\">27226358</a>]. Avoid CYP2D6 strong to weak inhibitors.</td>\n<td>Optional<sup>c</sup></td>\n</tr>\n<tr>\n<td><em>CYP2D6</em> Normal metabolizer or Intermediate metabolizer (controversy remains)<sup>f</sup></td>\n<td>1 (*10 allele present)<sup>c</sup></td>\n<td>An individual carrying two decreased function alleles with the *10 allele present. An activity score (AS) of 1.0 is associated with decreased tamoxifen metabolism to endoxifen compared to those with an AS of 1.5 or 2.</td>\n<td>*10/*10, *10/*41</td>\n<td>Lower endoxifen concentrations compared to normal metabolizers; higher risk of breast cancer recurrence, event-free and recurrence-free survival compared to normal metabolizers.</td>\n<td>Consider hormonal therapy such as an aromatase inhibitor for postmenopausal women or aromatase inhibitor along with ovarian function suppression in premenopausal women, given that these approaches are superior to tamoxifen regardless of CYP2D6 genotype [Articles:<a href=\"/pmid/26211827\">26211827</a>, <a href=\"/pmid/24881463\">24881463</a>]. If aromatase inhibitor use is contraindicated, consideration should be given to use a higher but FDA approved tamoxifen dose (40 mg/day) [Article:<a href=\"/pmid/27226358\">27226358</a>]. Avoid CYP2D6 strong to weak inhibitors.</td>\n<td>Moderate<sup>c</sup></td>\n</tr>\n<tr>\n<td><em>CYP2D6</em> Intermediate metabolizer</td>\n<td>0.5</td>\n<td>An individual carrying one decreased function and one no function allele</td>\n<td>*4/*10,*4/*41, *5/*9</td>\n<td>Lower endoxifen concentrations compared to normal metabolizers; higher risk of breast cancer recurrence, event-free and recurrence-free survival compared to normal metabolizers.</td>\n<td>Consider hormonal therapy such as an aromatase inhibitor for postmenopausal women or aromatase inhibitor along with ovarian function suppression in premenopausal women, given that these approaches are superior to tamoxifen regardless of CYP2D6 genotype [Articles:<a href=\"/pmid/26211827\">26211827</a>, <a href=\"/pmid/24881463\">24881463</a>]. If aromatase inhibitor use is contraindicated, consideration should be given to use a higher but FDA approved tamoxifen dose (40 mg/day) [Article:<a href=\"/pmid/27226358\">27226358</a>]. Avoid CYP2D6 strong to weak inhibitors.</td>\n<td>Moderate</td>\n</tr>\n<tr>\n<td><em>CYP2D6</em> Poor metabolizer</td>\n<td>0</td>\n<td>An individual carrying only no functional alleles</td>\n<td>*3/*4,*4/*4, *5/*5, *5/*6</td>\n<td>Lower endoxifen concentrations compared to normal metabolizers; higher risk of breast cancer recurrence, event-free and recurrence-free survival compared to normal metabolizers.</td>\n<td>Recommend alternative hormonal therapy such as an aromatase inhibitor for postmenopausal women or aromatase inhibitor along with ovarian function suppression in premenopausal women given that these approaches are superior to tamoxifen regardless of CYP2D6 genotype [Articles:<a href=\"/pmid/26211827\">26211827</a>, <a href=\"/pmid/24881463\">24881463</a>] and based on knowledge that CYP2D6 poor metabolizers switched from tamoxifen to anastrozole do not have an increased risk of recurrence [Article:<a href=\"/pmid/23213055\">23213055</a>]. Note, higher dose tamoxifen (40 mg/day) increases but does not normalize endoxifen concentrations and can be considered if there are contraindications to aromatase inhibitor therapy [Articles:<a href=\"/pmid/27226358\">27226358</a>, <a href=\"/pmid/21768473\">21768473</a>].</td>\n<td>Strong</td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> See the <a href=\"/page/cyp2d6RefMaterials\">CYP2D6 frequency table</a> for population-specific allele and phenotype frequencies.<br />\n<sup>b</sup> For a complete list of CYP2D6 diplotypes and resulting phenotypes, see the CYP2D6 genotype to phenotype table . Note that genotypes with an activity score of 1 are classified as NMs in the online CYP2D6 genotype to phenotype table.<br />\n<sup>c</sup> CPIC has generally classified patients with an activity score of 1 as a “normal metabolizer”.  However, in the case of tamoxifen, prescribing recommendations for those with an AS of 1.0 are allele dependent, based on the presence of the *10 allele.  Those patients with an AS of 1.0 on the basis a *10 allele are provided a “moderate,” recommendation.  In contrast, prescribing recommendations for those with an activity score of 1 based on the presence of CYP2D6 alleles other than *10 are graded as “optional” because the recommendations are primarily extrapolated from evidence generated from *10 individuals (i.e. limited data for clinical outcomes and pharmacokinetics for this group).<br />\n<sup>d</sup> Rating scheme described in Supplement.<br />\n<sup>e</sup> Where xN represents the number of CYP2D6 gene copies. For individuals with CYP2D6 duplications or multiplications, see supplemental data for additional information on how to translate diplotypes into phenotypes.<br />\n<sup>f</sup> Patients with an activity score of 1.0 may be classified as intermediate metabolizers by some reference laboratories.  A group of CYP2D6 experts are currently working to standardize the CYP2D6 genotype to phenotype translation system. CPIC will update the CPIC website accordingly <a href=\"/page/cyp2d6RefMaterials\">CYP2D6 genotype to phenotype table</a>.</p>\n",
+      "version" : 3
+    },
+    "version" : 15
+  }
+}

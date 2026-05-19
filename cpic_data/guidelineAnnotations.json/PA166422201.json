@@ -1,0 +1,159 @@
+{
+  "citations" : [
+    {
+      "id" : 15236624,
+      "title" : "Guidelines From the French-Speaking Society for Histocompatibility and Immunogenetics (SFHI) for Harmonisation of HLA Genotyping in Autoimmune Diseases, Drug Hypersensitivity and Pharmacogenetics.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/41137743",
+      "authors" : [
+        "Renac Virginie",
+        "Moalic Virginie",
+        "Dautin Guillaume",
+        "Cherel Mathilde",
+        "Mercier Bernard",
+        "Walencik Alexandre",
+        "Cohen Jacques",
+        "Farce Fabienne",
+        "Proust Barbara",
+        "Kaveri Rangolie",
+        "Humeau Camille",
+        "Picard Christophe",
+        "Pedron Béatrice",
+        "Dubois Valérie",
+        "Taupin Jean-Luc",
+        "Elsermans Vincent",
+        "Top-Raymond Isabelle",
+        "Ferrari-Lacraz Sylvie",
+        "Barocas Antoine",
+        "Masson Dominique",
+        "Essaydi Arnaud",
+        "Guidicelli Gwendaline",
+        "Ralazamahaleo Mamy",
+        "Congy-Jolivet Nicolas"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 1454392032,
+          "resource" : "PubMed",
+          "resourceId" : "41137743",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/41137743",
+          "version" : 0
+        },
+        {
+          "id" : 1454392033,
+          "resource" : "DOI",
+          "resourceId" : "10.1111/tan.70442",
+          "_url" : "http://dx.doi.org/10.1111%2Ftan.70442",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "HLA",
+      "meshTerms" : [
+        "Alleles",
+        "Autoimmune Diseases",
+        "Drug Hypersensitivity",
+        "France",
+        "Genetic Predisposition to Disease",
+        "Genotype",
+        "HLA Antigens",
+        "Histocompatibility Testing",
+        "Humans",
+        "Immunogenetics",
+        "Pharmacogenetics"
+      ],
+      "month" : 10,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "page" : "e70442",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2025-10-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "HLA molecules play a central role in the adaptive immune response. Their high polymorphism influences individual susceptibility to various autoimmune diseases and certain drug-induced hypersensitivities. In France, HLA genotyping is classified as a medical genetics procedure and is strictly regulated. The Société Francophone d'Histocompatibilité et d'Immunogénétique (SFHI) has established national guidelines outlining clinically validated indications, required resolution levels and interpretation criteria based on robust data. These guidelines are particularly relevant for common clinical contexts, including autoimmune diseases and pharmacogenetic testing. Well-established associations include HLA-DQB1*02/DQA1*05 (DQ2) and HLA-DQB1*03:02/DQA1*05 (DQ8) with celiac disease, HLA-B*27 with spondyloarthritis, HLA-DQB1*06:02 with type 1 narcolepsy, HLA-A*29 with Birdshot chorioretinopathy and several pharmacogenetic risk alleles such as HLA-B*57:01 (abacavir), HLA-B*15:02 and HLA-A*31:01 (carbamazepine) and HLA-B*58:01 (allopurinol). In immunotherapy, the efficacy of tebentafusp has been shown to depend on HLA-A*02:01 positivity. HLA alleles must be interpreted as relative risk factors, not absolute predictors. Critical analysis of HLA-related scientific literature requires consideration of the genotyping technique, typing resolution, allele frequencies within the studied population and environmental factors. High-resolution typing is essential in pharmacogenetics and recommended in selected autoimmune disorders. Interpretation should be conducted by qualified medical biologists, integrating clinical context, allelic diversity and recent technological advances, particularly next-generation sequencing. HLA genotyping represents a valuable tool in diagnosis and risk assessment, with increasing importance in the era of personalised medicine.",
+      "terms" : [
+        {"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}
+      ],
+      "type" : "Literature",
+      "version" : 3,
+      "volume" : "106",
+      "year" : 2025
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166422201",
+    "name" : "Annotation of RNPGx Guideline for carbamazepine, oxcarbazepine and HLA-A, HLA-B",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [],
+    "literature" : [
+      {"id":15236624,"title":"Guidelines From the French-Speaking Society for Histocompatibility and Immunogenetics (SFHI) for Harmonisation of HLA Genotyping in Autoimmune Diseases, Drug Hypersensitivity and Pharmacogenetics.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/41137743","crossReferences":[{"id":1454392032,"resource":"PubMed","resourceId":"41137743","_url":"https://www.ncbi.nlm.nih.gov/pubmed/41137743"},{"id":1454392033,"resource":"DOI","resourceId":"10.1111/tan.70442","_url":"http://dx.doi.org/10.1111%2Ftan.70442"}],"objCls":"Literature","pubDate":"2025-10-01T00:00:00-07:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165954030",
+        "symbol" : "HLA-A*31:01",
+        "name" : "*31:01",
+        "version" : 5
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165954769",
+        "symbol" : "HLA-B*15:02",
+        "name" : "*15:02",
+        "version" : 5
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA448785",
+        "name" : "carbamazepine",
+        "version" : 16
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450732",
+        "name" : "oxcarbazepine",
+        "version" : 11
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA35055",
+        "symbol" : "HLA-A",
+        "name" : "major histocompatibility complex, class I, A",
+        "version" : 42
+      },
+      {
+        "objCls" : "Gene",
+        "id" : "PA35056",
+        "symbol" : "HLA-B",
+        "name" : "major histocompatibility complex, class I, B",
+        "version" : 40
+      }
+    ],
+    "source" : "RNPGx",
+    "summaryMarkdown" : {
+      "id" : 1454392180,
+      "html" : "<p>The Société Francophone d'Histocompatibilité et d'Immunogénétique (SFHI) has guidance about carbamazepine and oxcarbazepine toxicity and HLA-B*15:02 and HLA-A*31:01.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1454392181,
+      "html" : "<p>Excerpts from the text:</p>\n<blockquote class=\"blockquote\">\n<p><strong>Carbamazepine- and Oxcarbazepine-Related Toxidermia, HLA-B*15:02 and HLA-A*31:01</strong>. Carbamazepine (Tegretol) and oxcarbazepine (Trileptal) are antiepileptic drugs used for trigeminal neuralgia, epilepsy, bi-polar disorder and neuropathic pain.\nCarbamazepine induces cutaneous adverse reactions, including severe hypersensitivity syndromes such as Drug Reaction with Eosinophilia and Systemic Symptoms (DRESS), Stevens–Johnson syndrome (SJS)and toxic epidermal necrolysis (TEN), which can be fatal. These reactions are strongly associated with the HLA-B*15:02 allele,which mediates T-cell activation and toxic epidermal necrolysis.</p>\n<p>The HLA-A*31:01 allele is also linked to an increased risk of carbamazepine-induced skin reactions, ranging from mild eruptions to severe SJS and DRESS.</p>\n</blockquote>\n<p>HLA-B*15:11 and HLA-B*15:21 are shown in the table but no guidance is listed or further discussion. Oxcarbazepine is listed in the section header but no specific guidance is given.</p>\n<blockquote class=\"blockquote\">\n<p>SFHI recommends:</p>\n<ul>\n<li>Testing for the HLA-B*15:02 allele should be performed upon request. It is particularly recommended for patients of Asian descent before starting a treatment (Grade 1A).</li>\n<li>Testing for the HLA-A*31:01 allele should be performed upon request. It is not routinely recommended before initiating treatment (Grade 1A).</li>\n<li>HLA-A or HLA-B genotyping should be conducted using high-resolution molecular biology techniques, second-field typing with no ambiguity (Grade 1A).</li>\n</ul>\n</blockquote>\n<p>Excerpt from Table 2.\n(scroll right for Interpretation columns)</p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Condition of Indication</th>\n<th>Susceptibility HLA allele(s)</th>\n<th>Clinical relevance</th>\n<th>Relevance of HLA testing prior to prescription</th>\n<th>Relative risk (OR)</th>\n<th>Medical Interpretation if the allele is present</th>\n<th>Medical Interpretation if the allele is absent</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Severe cutaneous adverse reactions (SCARs) to carbamazepine</td>\n<td>HLA-B*15:02(main),<br/>HLA-B*15:11,<br/>HLA-B*15:21,<br/>HLA-A*31:01</td>\n<td>High</td>\n<td>HLA-B*15:02:  Recommended in patients of Southeast Asian or Chinese ancestry.<br/>HLA-A*31:01: Consider based on clinical context.</td>\n<td>HLA-B*15:02:OR ~ 14.63<br/>HLA-A*31:01: OR ~ 5.37 depending on study and population</td>\n<td>HLA-B*15:02: Very high risk of severe cutaneous reaction. Contraindicated unless no alternative is available; strict clinical monitoring required.<br/>HLA-A*31:01: Increased risk. Re-evaluate risk–benefit ratio.</td>\n<td>HLA-B*15:02: No increased risk identified. Standard prescription according to label.<br/>HLA-A*31:01: No demonstrated risk increase. Treat according to label.</td>\n</tr>\n</tbody>\n</table>\n",
+      "version" : 0
+    },
+    "version" : 0
+  }
+}

@@ -1,0 +1,239 @@
+{
+  "citations" : [
+    {
+      "id" : 7283333,
+      "title" : "Pharmacogenetics: from bench to byte--an update of guidelines.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+      "authors" : [
+        "Swen J J",
+        "Nijenhuis M",
+        "de Boer A",
+        "Grandia L",
+        "Maitland-van der Zee A H",
+        "Mulder H",
+        "Rongen G A P J M",
+        "van Schaik R H N",
+        "Schalekamp T",
+        "Touw D J",
+        "van der Weide J",
+        "Wilffert B",
+        "Deneer V H M",
+        "Guchelaar H-J"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 769250885,
+          "resource" : "PubMed",
+          "resourceId" : "21412232",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+          "version" : 0
+        },
+        {
+          "id" : 1449247827,
+          "resource" : "DOI",
+          "resourceId" : "10.1038/clpt.2011.34",
+          "_url" : "http://dx.doi.org/10.1038%2Fclpt.2011.34",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "Clinical pharmacology and therapeutics",
+      "meshTerms" : [
+        "Animals",
+        "Aryl Hydrocarbon Hydroxylases",
+        "Cytochrome P-450 CYP2C9",
+        "Drug Administration Schedule",
+        "Drug-Related Side Effects and Adverse Reactions",
+        "Humans",
+        "Pharmaceutical Preparations",
+        "Pharmacogenetics",
+        "Practice Guidelines as Topic"
+      ],
+      "month" : 5,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "page" : "662-73",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2011-05-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "Currently, there are very few guidelines linking the results of pharmacogenetic tests to specific therapeutic recommendations. Therefore, the Royal Dutch Association for the Advancement of Pharmacy established the Pharmacogenetics Working Group with the objective of developing pharmacogenetics-based therapeutic (dose) recommendations. After systematic review of the literature, recommendations were developed for 53 drugs associated with genes coding for CYP2D6, CYP2C19, CYP2C9, thiopurine-S-methyltransferase (TPMT), dihydropyrimidine dehydrogenase (DPD), vitamin K epoxide reductase (VKORC1), uridine diphosphate glucuronosyltransferase 1A1 (UGT1A1), HLA-B44, HLA-B*5701, CYP3A5, and factor V Leiden (FVL).",
+      "terms" : [],
+      "type" : "Literature",
+      "version" : 4,
+      "volume" : "89",
+      "year" : 2011
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166104975",
+    "name" : "Annotation of DPWG Guideline for escitalopram and CYP2C19",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1183704467,
+        "date" : "2011-08-10T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1450415089,
+        "date" : "2019-05-23T19:29:31.216-07:00",
+        "description" : "Annotation current with November 2018 DPWG Guideline release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450820625,
+        "date" : "2019-10-03T09:38:55.481-07:00",
+        "description" : "No changes based on August 2019 guideline",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1450956400,
+        "date" : "2020-01-31T13:28:48.137-08:00",
+        "description" : "Updated link to 2011 DPWG methods",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450962902,
+        "date" : "2020-02-10T11:41:41.194-08:00",
+        "description" : "Fixed links to 2018 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451417531,
+        "date" : "2021-04-22T00:00:00-07:00",
+        "description" : "Added extended dosing",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451632900,
+        "date" : "2022-01-03T15:12:31.670-08:00",
+        "description" : "Added DPWG SSRI guideline publication.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451695560,
+        "date" : "2022-02-25T09:01:45.864-08:00",
+        "description" : "Updated annotation to reflect wording changes in May 2021 update.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704239,
+        "date" : "2022-03-03T16:33:33.147-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451706320,
+        "date" : "2022-03-07T16:41:59.781-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451723016,
+        "date" : "2022-03-17T20:16:35.799-07:00",
+        "description" : "Corrected typo",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732879,
+        "date" : "2022-03-28T09:57:47.090-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733310,
+        "date" : "2022-03-28T14:39:23.189-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741448,
+        "date" : "2022-04-05T11:13:19.482-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884233,
+        "date" : "2022-09-16T10:09:20.383-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146492,
+        "date" : "2023-07-03T13:39:59.833-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452410780,
+        "date" : "2024-03-18T07:12:58.044-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15126562,"title":"Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2C19 and CYP2D6 and SSRIs.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9553948","crossReferences":[{"id":1452680280,"resource":"PubMed Central","resourceId":"PMC9553948","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9553948"},{"id":1451632760,"resource":"PubMed","resourceId":"34782755","_url":"https://www.ncbi.nlm.nih.gov/pubmed/34782755"},{"id":1451632761,"resource":"DOI","resourceId":"10.1038/s41431-021-01004-7","_url":"http://dx.doi.org/10.1038%2Fs41431-021-01004-7"}],"objCls":"Literature","pubDate":"2022-10-01T00:00:00-07:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":7283333,"title":"Pharmacogenetics: from bench to byte--an update of guidelines.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/21412232","crossReferences":[{"id":769250885,"resource":"PubMed","resourceId":"21412232","_url":"https://www.ncbi.nlm.nih.gov/pubmed/21412232"},{"id":1449247827,"resource":"DOI","resourceId":"10.1038/clpt.2011.34","_url":"http://dx.doi.org/10.1038%2Fclpt.2011.34"}],"objCls":"Literature","pubDate":"2011-05-01T00:00:00-07:00","terms":[],"type":"Literature"},
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15102465,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2018","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","crossReferences":[{"id":1450415575,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA10074",
+        "name" : "escitalopram",
+        "version" : 13
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA124",
+        "symbol" : "CYP2C19",
+        "name" : "cytochrome P450 family 2 subfamily C member 19",
+        "version" : 7210
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1447982026,
+      "html" : "<p>The Dutch Pharmacogenetics Working Group Guideline for escitalopram recommends for intermediate and poor metabolizers of CYP2C19 to not exceed the in the DPWG document specified doses and for CYP2C19 ultrarapid metabolizer to avoid escitalopram.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1447982025,
+      "html" : "<h3 id=\"may-2021-update\">May 2021 update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has made some minor changes to the text of the CYP2C19-escitalopram guideline. The table below has been updated to reflect this but the recommendations themselves have not changed.</p>\n<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-between-cyp2c19-and-cyp2d6-and-ssris-european-journal-of-human-genetics-2021\">Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2C19 and CYP2D6 and SSRIs. European journal of human genetics (2021)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper with the guidelines as per the November 2018 update and further details on the assessed literature [Article:<a href=\"/pmid/34782755\">34782755</a>].</p>\n<h3 id=\"november-2018-update\">November 2018 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for escitalopram based on CYP2C19 genotype. They recommend to not exceed the below mentioned doses for intermediate metabolizer (for IM = 75% of the standard maximum dose) and poor metabolizer (for PM = 50% of the standard maximum dose). For CYP2C19 ultrarapid metabolizer, the recommendation is to avoid escitalopram.</p>\n<p><em>Wording in table taken from <a download=\"DPWG_November_2018.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_November_2018.pdf\">the Dutch guidelines November 2018 update</a> and incorporating text changes from the <a download=\"DPWG_May_2021.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_May_2021.pdf\">May 2021 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2C19 UM</td>\n<td>escitalopram</td>\n<td>The risk of switching to another antidepressant is increased as the gene variation leads to a reduction in the escitalopram plasma concentration.</td>\n<td>Avoid escitalopram. Antidepressants that are not metabolised or that are metabolised to a lesser extent by CYP2C19 are, for example, paroxetine or fluvoxamine.</td>\n</tr>\n<tr>\n<td>CYP2C19 IM</td>\n<td>escitalopram</td>\n<td>The risk of QT prolongation and torsades de pointes is theoretically increased because the gene variation leads to an increased escitalopram plasma concentration. If you follow the dose recommendation below, the increased plasma concentration and the theoretically increased risk of QT prolongation will be offset.</td>\n<td>Do not exceed the following doses (75% of the standard maximum dose): adults &lt; 65 years: 15 mg/day, adults 65 years or older: 7.5 mg/day</td>\n</tr>\n<tr>\n<td>CYP2C19 PM</td>\n<td>escitalopram</td>\n<td>The risk of switching to another antidepressant is increased. In addition, the risk of QT prolongation and torsades de pointes is theoretically increased because the gene variation leads to an increased escitalopram plasma concentration. If you follow the dose recommendation below, the increased plasma concentration, the theoretically increased risk of QT prolongation and the increased risk of switching to another antidepressant will be offset.</td>\n<td>Do not exceed the following doses (50% of the standard maximum dose): adults &lt; 65 years: 10 mg/day, adults 65 years or older: 5 mg/day</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_CYP2C19_escitalopram_1820-to-1822.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C19_escitalopram_1820-to-1822.pdf\">Read for more information about this recommendation</a>, <a download=\"CYP2C19.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CYP2C19.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_CYP2C19_escitalopram_1820-to-1822.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C19_escitalopram_1820-to-1822.pdf\">DPWG risk analysis document</a> for escitalopram and CYP2C19:</p>\n<blockquote class=\"blockquote\">\n<p>The Dutch Pharmacogenetics Working Group considers genotyping before starting escitalopram to be potentially beneficial. Genotyping can be considered on an individual patient basis. If, however, the genotype is available, the Dutch Pharmacogenetics Working Group recommends adhering to the gene-drug guideline.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n<h3 id=\"2011-guideline\">2011 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for escitalopram based on the <em>CYP2C19</em> genotype [Article:<a href=\"/pmid/21412232\">21412232</a>].  They conclude to monitor plasma concentration and titrate dose to a maximum of 150% in response to efficacy and adverse drug event or select alternative drug (e.g. fluoxetine, paroxetine) for the <em>CYP2C19</em> UM phenotype.</p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype (Genotype)</th>\n<th>Therapeutic Dose Recommendation</th>\n<th>Level of Evidence</th>\n<th>Clinical Relevance</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><em>CYP2C19</em> PM (*2/*2, *2/*3, *3/*3)</td>\n<td>None</td>\n<td>Published controlled studies of good quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints</td>\n<td>Minor clinical effect (statistically significant difference): QTc prolongation (&lt;450 ms female, &lt;470 ms male); international normalized ratio (INR) increase &lt; 4.5. Kinetic effect (statistically significant difference)</td>\n</tr>\n<tr>\n<td><em>CYP2C19</em> IM (*1/*2, *1/*3, *17/*2, *17/*3)</td>\n<td>None</td>\n<td>Published controlled studies of good quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints</td>\n<td>Minor clinical effect (statistically significant difference): QTc prolongation (&lt;450 ms female, &lt;470 ms male); INR increase &lt; 4.5. Kinetic effect (statistically significant difference)</td>\n</tr>\n<tr>\n<td><em>CYP2C19</em> UM (*17/*17)</td>\n<td>Monitor plasma concentration and titrate dose to a maximum of 150% in response to efficacy and adverse drug event or select alternative drug (e.g. fluoxetine, paroxetine)</td>\n<td>Published controlled studies of good quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints</td>\n<td>Minor clinical effect (statistically significant difference): QTc prolongation (&lt;450 ms female, &lt;470 ms male); INR increase &lt; 4.5. Kinetic effect (statistically significant difference)</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li>*See <a href=\"/page/dpwg\">Methods </a> or [Article:<a href=\"/pmid/18253145\">18253145</a>] for definition of &quot;good quality.&quot;</li>\n<li>Please see attached PDF for detailed information about the evaluated studies: <a download=\"es_citalopram_CYP2C19_271111.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/es_citalopram_CYP2C19_271111.pdf\">Escitalopram CYP2C19</a></li>\n</ul>\n",
+      "version" : 21
+    },
+    "version" : 36
+  }
+}

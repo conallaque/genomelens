@@ -1,0 +1,372 @@
+{
+  "citations" : [
+    {
+      "id" : 15329722,
+      "title" : "Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6 and CYP2C19 and tricyclic antidepressants.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/41526670",
+      "authors" : [
+        "Kleine Schaars Kristian",
+        "Nijenhuis Marga",
+        "Soree Bianca",
+        "de Boer-Veger Nienke J",
+        "Buunk Anne-Marie",
+        "Guchelaar Henk-Jan",
+        "Houwink Elisa J F",
+        "Risselada Arne",
+        "Rongen Gerard A P J M",
+        "van Schaik Ron H N",
+        "Swen Jesse J",
+        "Touw Daan",
+        "Deneer Vera H M",
+        "van Westrhenen Roos"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 1454631360,
+          "resource" : "PubMed",
+          "resourceId" : "41526670",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/41526670",
+          "version" : 0
+        },
+        {
+          "id" : 1454631361,
+          "resource" : "DOI",
+          "resourceId" : "10.1038/s41431-025-02008-3",
+          "_url" : "http://dx.doi.org/10.1038%2Fs41431-025-02008-3",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "European journal of human genetics : EJHG",
+      "meshTerms" : [],
+      "month" : 1,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2026-01-01T00:00:00-08:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "The Dutch Pharmacogenetic Working Group (DPWG) aims to integrate pharmacogenetics into clinical practice by creating evidence-based guidelines to optimize pharmacotherapy based on genetic tests. The current guideline describes the gene-drug interactions between CYP2D6 and CYP2C19 and various tricyclic antidepressants (TCAs). For CYP2D6 poor metabolisers (PM), dose reductions are advised for amitriptyline (reduction to 60% of the normal dose), clomipramine (reduction to 50% of the normal dose for the indication depression or in case of side effects at the normal dose for the other indications), doxepin (reduction to 40% of normal dose), imipramine (30% of the normal dose), and nortriptyline (40%). For CYP2D6 intermediate metabolisers (IM) reduced dose is also recommended for amitriptyline (75%), clomipramine (70%), doxepin (80%), imipramine (70%), and nortriptyline (60%). Also, CYP2D6 ultra-rapid metabolisers (UM) require tailored dose adjustments: amitriptyline (1.6 times the normal dose), clomipramine (1.5 times), doxepin (2 times), imipramine (1.7 times), and nortriptyline (1.7 times). Additionally, alternative drugs may be needed for CYP2D6 UM due to potential safety concerns. For CYP2C19 PM, a 70% dose reduction is advised for imipramine. For CYP2C19 IM, no action is required for TCAs. For CYP2C19 UM, an alternative medication is recommended for clomipramine prescribed for anxiety and obsessive-compulsive disorder (OCD). The DPWG classifies CYP2D6 genotyping for all five TCAs and CYP2C19 genotyping for clomipramine in patients with anxiety disorders or OCD, and for imipramine as being \"potentially beneficial\". Genotyping prior to treatment can be considered on an individual patient basis.",
+      "terms" : [
+        {"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}
+      ],
+      "type" : "Literature",
+      "version" : 2,
+      "year" : 2026
+    },
+    {
+      "id" : 7283333,
+      "title" : "Pharmacogenetics: from bench to byte--an update of guidelines.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+      "authors" : [
+        "Swen J J",
+        "Nijenhuis M",
+        "de Boer A",
+        "Grandia L",
+        "Maitland-van der Zee A H",
+        "Mulder H",
+        "Rongen G A P J M",
+        "van Schaik R H N",
+        "Schalekamp T",
+        "Touw D J",
+        "van der Weide J",
+        "Wilffert B",
+        "Deneer V H M",
+        "Guchelaar H-J"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 769250885,
+          "resource" : "PubMed",
+          "resourceId" : "21412232",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+          "version" : 0
+        },
+        {
+          "id" : 1449247827,
+          "resource" : "DOI",
+          "resourceId" : "10.1038/clpt.2011.34",
+          "_url" : "http://dx.doi.org/10.1038%2Fclpt.2011.34",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "Clinical pharmacology and therapeutics",
+      "meshTerms" : [
+        "Animals",
+        "Aryl Hydrocarbon Hydroxylases",
+        "Cytochrome P-450 CYP2C9",
+        "Drug Administration Schedule",
+        "Drug-Related Side Effects and Adverse Reactions",
+        "Humans",
+        "Pharmaceutical Preparations",
+        "Pharmacogenetics",
+        "Practice Guidelines as Topic"
+      ],
+      "month" : 5,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "page" : "662-73",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2011-05-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "Currently, there are very few guidelines linking the results of pharmacogenetic tests to specific therapeutic recommendations. Therefore, the Royal Dutch Association for the Advancement of Pharmacy established the Pharmacogenetics Working Group with the objective of developing pharmacogenetics-based therapeutic (dose) recommendations. After systematic review of the literature, recommendations were developed for 53 drugs associated with genes coding for CYP2D6, CYP2C19, CYP2C9, thiopurine-S-methyltransferase (TPMT), dihydropyrimidine dehydrogenase (DPD), vitamin K epoxide reductase (VKORC1), uridine diphosphate glucuronosyltransferase 1A1 (UGT1A1), HLA-B44, HLA-B*5701, CYP3A5, and factor V Leiden (FVL).",
+      "terms" : [],
+      "type" : "Literature",
+      "version" : 4,
+      "volume" : "89",
+      "year" : 2011
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166104982",
+    "name" : "Annotation of DPWG Guideline for amitriptyline and CYP2D6",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1183704441,
+        "date" : "2011-08-10T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1450415075,
+        "date" : "2019-05-23T16:42:29.319-07:00",
+        "description" : "Annotation current with November 2018 DPWG Guideline release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450815701,
+        "date" : "2019-09-25T14:28:22.748-07:00",
+        "description" : "Changes based on August 2019 guidelines",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450956262,
+        "date" : "2020-01-31T13:16:57.212-08:00",
+        "description" : "Updated link to 2011 DPWG methods",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450962540,
+        "date" : "2020-02-10T08:52:24.501-08:00",
+        "description" : "Fixed links to 2018 and 2019 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451417709,
+        "date" : "2021-04-22T12:11:24.393-07:00",
+        "description" : "Corrected typo",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451431280,
+        "date" : "2021-05-04T00:00:00-07:00",
+        "description" : "Added extended dosing",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704222,
+        "date" : "2022-03-03T16:33:30.323-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451706100,
+        "date" : "2022-03-07T13:08:43.524-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732862,
+        "date" : "2022-03-28T09:57:44.104-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733284,
+        "date" : "2022-03-28T14:31:49.316-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741443,
+        "date" : "2022-04-05T11:09:31.397-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884080,
+        "date" : "2022-09-16T09:37:20.068-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084391,
+        "date" : "2023-04-28T18:51:44.377-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084412,
+        "date" : "2023-04-28T18:51:57.813-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084433,
+        "date" : "2023-04-28T18:52:08.020-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084454,
+        "date" : "2023-04-28T18:52:19.809-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084475,
+        "date" : "2023-04-28T18:52:49.164-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084496,
+        "date" : "2023-04-28T18:53:07.343-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084517,
+        "date" : "2023-04-28T18:53:23.396-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084538,
+        "date" : "2023-04-28T18:53:41.012-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084559,
+        "date" : "2023-04-28T18:54:03.565-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084580,
+        "date" : "2023-04-28T18:56:19.985-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084611,
+        "date" : "2023-04-28T19:05:03.369-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146501,
+        "date" : "2023-07-03T13:40:02.185-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452410980,
+        "date" : "2024-03-18T08:07:08.810-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454439940,
+        "date" : "2025-11-11T14:50:21.505-08:00",
+        "description" : "updated based on recommendation file accessed 111125",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454632060,
+        "date" : "2026-01-20T05:48:18.313-08:00",
+        "description" : "Added section for new publication and linked  PMID 41526670",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15329722,"title":"Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6 and CYP2C19 and tricyclic antidepressants.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/41526670","crossReferences":[{"id":1454631360,"resource":"PubMed","resourceId":"41526670","_url":"https://www.ncbi.nlm.nih.gov/pubmed/41526670"},{"id":1454631361,"resource":"DOI","resourceId":"10.1038/s41431-025-02008-3","_url":"http://dx.doi.org/10.1038%2Fs41431-025-02008-3"}],"objCls":"Literature","pubDate":"2026-01-01T00:00:00-08:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":7283333,"title":"Pharmacogenetics: from bench to byte--an update of guidelines.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/21412232","crossReferences":[{"id":769250885,"resource":"PubMed","resourceId":"21412232","_url":"https://www.ncbi.nlm.nih.gov/pubmed/21412232"},{"id":1449247827,"resource":"DOI","resourceId":"10.1038/clpt.2011.34","_url":"http://dx.doi.org/10.1038%2Fclpt.2011.34"}],"objCls":"Literature","pubDate":"2011-05-01T00:00:00-07:00","terms":[],"type":"Literature"},
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15102465,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2018","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","crossReferences":[{"id":1450415575,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15256422,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2025","_sameAs":"https://api.clinpgx.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf","crossReferences":[{"id":1454439720,"resource":"URL","resourceId":"https://api.clinpgx.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf","_url":"https://api.clinpgx.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf"}],"objCls":"Literature","terms":[{"id":1452267780,"resource":"ClinPGx Tags","term":"Has PGx","termId":"pgkbTags:1452267780"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA448385",
+        "name" : "amitriptyline",
+        "version" : 10
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA128",
+        "symbol" : "CYP2D6",
+        "name" : "cytochrome P450 family 2 subfamily D member 6",
+        "version" : 7891
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1447981960,
+      "html" : "<p>The Dutch Pharmacogenetics Working Group Guideline for amitriptyline recommends decreasing the dose for CYP2D6 intermediate and CYP2D6 poor metabolizers and increasing the dose or using an alternative drug for CYP2D6 ultra-rapid metabolizers.</p>\n",
+      "version" : 2
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1447981959,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-between-cyp2d6-and-cyp2c19-and-tricyclic-antidepressants-european-journal-of-human-genetics-2026\">Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6 and CYP2C19 and tricyclic antidepressants. <em>European journal of human genetics</em> (2026)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper with guidelines for amitriptyline and CYP2D6 including Supplementary materials [Article:<a href=\"/pmid/41526670\">41526670</a>]. The recommendations in Table 2 are the same as shown in the table below for November 2025.</p>\n<h3 id=\"november-2025-update\">November 2025 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (<a href=\"/page/dpwg\">DPWG</a>) released an updated version of the <a download=\"pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf\">Pharmacogenetic_recommendation_text</a> dated with 20240501. It includes changes to the wording for the CYP2D6-amitriptyline guidelines which are dated within the document as 08-02-2024.</p>\n<p><em>Wording in table taken from the DPWG <a download=\"pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf\">Pharmacogenetic_recommendation_text</a> accessed 11112025</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2D6 UM</td>\n<td>amitriptyline</td>\n<td>The risk of ineffectiveness is increased and the risk of cardiotoxic side effects may be increased.  The gene variation leads to increased conversion of amitriptyline and the active metabolite nortriptyline to less active and inactive metabolites.</td>\n<td>- Increase the dose to 1.6 times the normal dose, monitor the effect and side effects or the plasma concentrations and be alert to increased plasma concentrations of the cardiotoxic Z-10-hydroxy metabolites. Plasma concentrations of Z-hydroxy nortriptyline or Z-hydroxy amitriptyline higher than 40 ng/mL are considered toxic.<br/>- if a dose increase is not desirable due to the cardiotoxic hydroxy metabolite: avoid amitriptyline Antidepressants that are not metabolised by CYP2D6, or to a lesser extent, include citalopram and sertraline.</td>\n</tr>\n<tr>\n<td>CYP2D6 IM</td>\n<td>amitriptyline</td>\n<td>The risk of side effects is increased, because the gene variation leads to higher plasma concentrations of the active metabolite nortriptyline and to a lesser extent of amitriptyline.</td>\n<td>Use 75% of the standard dose and monitor the efficacy and side effects or the plasma concentrations of amitriptyline and nortriptyline in order to set the maintenance dose</td>\n</tr>\n<tr>\n<td>CYP2D6 PM</td>\n<td>amitriptyline</td>\n<td>In theory risk of side effects is increased, because the genetic variation results in higher plasma concentrations of the active metabolite nortriptyline and to a lesser extent of amitriptyline.</td>\n<td>Use 60% of the standard dose and monitor the effect and side effects or the plasma concentrations of amitriptyline and nortriptyline in order to set the maintenance dose</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_CYP2D6_amitriptyline_2569-2571_downloaded_111125.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2D6_amitriptyline_2569-2571_downloaded_111125.pdf\">Read for more information about this recommendation</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_CYP2D6_amitriptyline_2569-2571_downloaded_111125.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2D6_amitriptyline_2569-2571_downloaded_111125.pdf\">DPWG risk analysis document</a> for amitriptyline and CYP2D6:</p>\n<blockquote class=\"blockquote\">\n<p>The Dutch Pharmacogenetics Working Group considers genotyping before starting amitriptyline to be potentially beneficial for the prevention of side effects and for drug efficacy. Genotyping can be considered on an individual patient basis. If, however, the genotype is available, the Dutch Pharmacogenetics Working Group recommends adhering to the gene-drug guideline.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n<h3 id=\"august-2019-update\">August 2019 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (DPWG) has evaluated therapeutic dose recommendations for amitriptyline based on CYP2D6 genotypes. They recommend decreasing the dose for CYP2D6 intermediate and CYP2D6 poor metabolizers with plasma concentration monitoring, and increasing the dose or using an alternative drug for CYP2D6 ultra-rapid metabolizers.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_August_2019.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_August_2019.pdf\">Dutch guidelines August 2019 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2D6 UM</td>\n<td>amitriptyline</td>\n<td>The risk of ineffectiveness is increased and the risk of cardiotoxic side effects may be increased.  The gene variation leads to increased conversion of amitriptyline and the active metabolite nortriptyline to less active and inactive metabolites.</td>\n<td>1. increase the dose to 1.4 times the standard dose, monitor the effect and side effects or the plasma concentrations and be alert to increased plasma concentrations of the cardiotoxic Z-10-hydroxy metabolites.  Plasma concentrations of Z-hydroxy nortriptyine or Z-hydroxy amitriptyline higher than 40 ng/mL are considered toxic.<br/>2. if a dose increase is not desirable due to the cardiotoxic hydroxy metabolite: avoid amitriptyline. Anti-depressants that are not metabolised by CYP2D6, or to a lesser extent, include citalopram and sertraline.</td>\n</tr>\n<tr>\n<td>CYP2D6 IM</td>\n<td>amitriptyline</td>\n<td>The risk of side effects is increased, because the gene variation leads to higher plasma concentrations of the active metabolite nortriptyline and to a lesser extent of amitriptyline.</td>\n<td>Use 75% of the standard dose and monitor the efficacy and side effects or the plasma concentrations of amitriptyline and nortriptyline to adjust the maintenance dose</td>\n</tr>\n<tr>\n<td>CYP2D6 PM</td>\n<td>amitriptyline</td>\n<td>In theory risk of side effects is increased, because the genetic variation results in higher plasma concentrations of the active metabolite nortriptyline and to a lesser extent of amitriptyline.</td>\n<td>Use 70% of the standard dose and monitor the effect and side effects or the plasma concentrations of amitriptyline and nortriptyline to adjust the maintenance dose</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_CYP2D6_amitriptyline_1920-1921-1922.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2D6_amitriptyline_1920-1921-1922.pdf\">Read for more information about this recommendation</a>, <a download=\"CYP2D6.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CYP2D6.pdf\">Read about gene information from DPWG</a></p>\n<h3 id=\"november-2018-update\">November 2018 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for amitriptyline based on CYP2D6 genotype. They recommend to choose an alternative antidepressant if possible and in case an alternative is not an option to increase the dose for UM and decreased the dose for IM and PM together with plasma concentrations monitoring.</p>\n<p><em>Wording in table taken from <a download=\"DPWG_November_2018.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_November_2018.pdf\">Dutch guidelines 2018 November 2018 update</a></em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2D6 UM</td>\n<td>amitriptyline</td>\n<td>The genetic polymorphism leads to increased metabolic capacity of CYP2D6, which may cause a decrease in the plasma concentrations of amitriptyline and its active metabolite nortriptyline and increased plasma concentrations of the active metabolites E-10-OH- amitriptyline and E-10-OH-nortriptyline.</td>\n<td>1. Choose an alternative if possible. Antidepressants that are not metabolised via CYP2D6 - or to a lesser extent - include, for example, citalopram and sertraline.<br/>2. If an alternative is not an option: increase the dose to 1.25 times the standard dose, monitor the plasma concentrations and be alert to potential therapy failure due to decreased amitriptyline plus nortriptyline plasma concentrations and to increased plasma concentrations of the potentially cardiotoxic, active hydroxy metabolites.</td>\n</tr>\n<tr>\n<td>CYP2D6 IM</td>\n<td>amitriptyline</td>\n<td>The genetic polymorphism leads to decreased metabolic capacity of CYP2D6, which may cause an increase in the plasma concentrations of amitriptyline and its active metabolite nortriptyline and decreased plasma concentrations of the active metabolites E-10-OH- amitriptyline and E-10-OH-nortriptyline.</td>\n<td>1. Choose an alternative if possible. Antidepressants that are not metabolised via CYP2D6 - or to a lesser extent - include, for example, citalopram and sertraline.<br/>2. If an alternative is not an option: use 60% of the standard dose and monitor the plasma concentrations of amitriptyline and nortriptyline. As side effects are related to nortriptyline plasma concentrations and the efficacy to amitriptyline plus nortriptyline plasma concentrations, which are influenced to a lesser extent by CYP2D6, it is not known whether it is possible to reduce the dose to such an extent that the side effects disappear, but the efficacy is maintained.</td>\n</tr>\n<tr>\n<td>CYP2D6 PM</td>\n<td>amitriptyline</td>\n<td>The genetic polymorphism leads to decreased metabolic capacity of CYP2D6, which may cause an increase in the plasma concentrations of amitriptyline and its active metabolite nortriptyline and decreased plasma concentrations of the active metabolites E-10-OH- amitriptyline and E-10-OH-nortriptyline.</td>\n<td>1. Choose an alternative if possible. Antidepressants that are not metabolised via CYP2D6 - or to a lesser extent - include, for example, citalopram and sertraline.<br/>2. If an alternative is not an option: use 50% of the standard dose and monitor the plasma concentrations of amitriptyline and nortriptyline. As side effects are related to nortriptyline plasma concentrations and the efficacy to amitriptyline plus nortriptyline plasma concentrations, which are influenced to a lesser extent by CYP2D6, it is not known whether it is possible to reduce the dose to such an extent that the side effects disappear, but the efficacy is maintained.</td>\n</tr>\n</tbody>\n</table>\n<h3 id=\"2011-guideline\">2011 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for amitriptyline based on CYP2D6 genotypes [Article:<a href=\"/pmid/21412232\">21412232</a>].  They recommend selecting an alternative drug or reducing the initial dose for patients carrying intermediate metabolizer alleles and selecting alternative drugs or monitor amitypityline and nortriptyline plasma concentration for patients carrying the poor metabolizer or ultrarapid metabolizer alleles.</p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype (Genotype)</th>\n<th>Therapeutic Dose Recommendation</th>\n<th>Level of Evidence</th>\n<th>Clinical Relevance</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>PM (two inactive (*3-*8, *11-*16, *19-*21, *38, *40, *42) alleles)</td>\n<td>Insufficient data to allow calculation of dose adjustment. Select alternative drug (e.g., citalopram, sertraline) or monitor amitriptyline and nortriptyline plasma concentration.</td>\n<td>Published controlled studies of moderate quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints.</td>\n<td>Minor clinical effect (S): QTc prolongation (&lt;450 ms female, &lt;470 ms male); INR increase &lt; 4.5; Kinetic effect (S)</td>\n</tr>\n<tr>\n<td>IM (two decreased-activity (*9, *10, *17, *29, *36, *41) alleles or carrying one active (*1, *2, *33, *35) and one inactive (*3-*8, *11-*16, *19-*21, *38, *40, *42) allele, or carrying one decreased-activity (*9, *10, *17, *29, *36, *41) allele and one inactive (*3-*8, *11-*16, *19-*21, *38, *40, *42) allele)</td>\n<td>Reduce dose by 25% and monitor plasma concentration or select alternative drug (e.g., citalopram, sertraline).</td>\n<td>Published controlled studies of good quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints.</td>\n<td>Clinical effect (S): long-standing discomfort (48-168 hr) without permanent injury e.g. failure of therapy with tricyclic antidepressants, atypical antipsychotic drugs; extrapyramidal side effects; parkinsonism; ADE resulting from increased bioavailability of tricyclic antidepressants, metoprolol, propafenone (central effects e.g. dizziness); INR 4.5-6.0; neutropenia 1.0-1.5x109/l; leucopenia 2.0-3.0x109/l; thrombocytopenia 50-75x109/l</td>\n</tr>\n<tr>\n<td>UM (a gene duplication in absence of inactive (*3-*8, *11-*16, *19-*21, *38, *40, *42) or decreased-activity (*9, *10, *17, *29, *36, *41) alleles)</td>\n<td>Insufficient data to allow calculation of dose adjustment. Select alternative drug (e.g., citalopram,sertraline) or monitor (E-10-hydroxy)amitriptyline plasma concentration.</td>\n<td>Published controlled studies of moderate quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints.</td>\n<td>Clinical effect (S): long-standing discomfort (48-168 hr) without permanent injury e.g. failure of therapy with tricyclic antidepressants, atypical antipsychotic drugs; extrapyramidal side effects; parkinsonism; ADE resulting from increased bioavailability of tricyclic antidepressants, metoprolol, propafenone (central effects e.g. dizziness); INR 4.5-6.0; neutropenia 1.0-1.5x109/l; leucopenia 2.0-3.0x109/l; thrombocytopenia 50-75x109/l.</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li>*See <a href=\"/page/dpwg\">Methods </a> or [Article:<a href=\"/pmid/18253145\">18253145</a>] for definition of &quot;good&quot; and &quot;moderate&quot; quality.</li>\n<li>S: statistically significant difference.</li>\n<li>Please see attached PDF for detailed information about the evaluated studies: <a download=\"Amitriptyline_CYP2D6.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/Amitriptyline_CYP2D6.pdf\">Amitriptyline CYP2D6 </a></li>\n</ul>\n",
+      "version" : 21
+    },
+    "version" : 37
+  }
+}

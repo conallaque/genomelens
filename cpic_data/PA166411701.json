@@ -1,0 +1,56 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166411701",
+    "name" : "Annotation of DPWG Guideline for atazanavir and UGT1A1",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1454163562,
+        "date" : "2025-06-27T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 1
+      }
+    ],
+    "literature" : [],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA10251",
+        "name" : "atazanavir",
+        "version" : 8
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA420",
+        "symbol" : "UGT1A1",
+        "name" : "UDP glucuronosyltransferase 1 family, polypeptide A1",
+        "version" : 6110
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1454163560,
+      "html" : "<p>For patients who are UGT1A1 *28/*28, avoidance of atazanavir is recommended if there is a suitable alternative.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1454163561,
+      "html" : "<h3 id=\"june-2025\"><em><strong>June 2025</strong></em></h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (DPWG) has evaluated therapeutic dose recommendations for atazanavir based on UGT1A1 genotype. They recommend that for patients who are UGT1A1 *28/*28 to avoid atazanavir if there is a suitable alternative.</p>\n<p><em>Wording in table taken from the <a download=\"pharmacogenetic_recommendation_text_20230801_downloaded_062425.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/pharmacogenetic_recommendation_text_20230801_downloaded_062425.pdf\">Dutch guidelines pdf</a>. Please note the pdf is dated 20230801 and the atazanavir content has Date 16-5-2023, however the content was newly added to the recommendation pdf available from the <a rel=\"noopener noreferrer\" href=\"https://www.knmp.nl/dossiers/farmacogenetica\" target=\"_blank\">KNMP website</a> in 2025.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>UGT1A1*28/*28</td>\n<td>atazanavir</td>\n<td>The risk of atazanavir discontinuation is increased in patients with this gene variation. In two studies, discontinuation rates of 60% and 63% were observed (compared with discontinuation rates of 5% and 19% for patients without this gene variation). The gene variation potentiates the atazanavir-induced reduction in bilirubin conversion, leading to a higher risk of the benign side effects jaundice and hyperbilirubinemia.</td>\n<td>- avoid atazanavir if there is a suitable alternative<br/>- if there is no suitable alternative:<br/>- tell the patient that jaundice and hyperbilirubinemia are benign, i.e. not indicative of liver damage, and that they are reversible even after long-term use of atazanavir<br/>- tell the patient what the disadvantages of the possible alternatives are</td>\n</tr>\n<tr>\n<td>UGT1A1*1/*28</td>\n<td>atazanavir</td>\n<td>This gene variation (*1/*28) is more common in Western populations than the so-called wild type (*1/*1). This means that treatment choice is largely tailored to patients with this gene variation. Adjusting treatment choice is therefore not useful.</td>\n<td>NO action is needed for this gene-drug interaction.</td>\n</tr>\n<tr>\n<td>UGT1A1 IM OTHER</td>\n<td>atazanavir</td>\n<td>This gene variation (IM) is more common in Western populations than the so-called wild type (*1/*1). This means that treatment choice is largely tailored to patients with this gene variation. Adjusting treatment choice is therefore not useful.</td>\n<td>NO action is needed for this gene-drug interaction.</td>\n</tr>\n<tr>\n<td>UGT1A1 PM OTHER</td>\n<td>atazanavir</td>\n<td>This gene variation (PM) is more common in Western populations than the so-called wild type (*1/*1). This means that treatment choice is largely tailored to patients with this gene variation. Adjusting treatment choice is therefore not useful.</td>\n<td>NO action is needed for this gene-drug interaction.</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_UGT1A1_atazanavir_06272025.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_UGT1A1_atazanavir_06272025.pdf\">Read for more information about this guideline</a>, <a download=\"UGT1A1.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/UGT1A1.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_UGT1A1_atazanavir_06272025.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_UGT1A1_atazanavir_06272025.pdf\">DPWG risk analysis document</a> for atazanavir and UGT1A1:</p>\n<blockquote class=\"blockquote\">\n<p>...the KNMP Pharmacogenetics Working Group decided to downgrade this score to <strong>potentially beneficial</strong>, because the actual clinical impact of discontinuation of therapy will be small in the Netherlands ....</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n",
+      "version" : 1
+    },
+    "version" : 3
+  }
+}

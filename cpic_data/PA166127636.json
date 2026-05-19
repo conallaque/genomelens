@@ -1,0 +1,122 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166127636",
+    "name" : "Annotation of CPIC Guideline for paroxetine and CYP2D6",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "nAyXCBn3ZHI",
+    "dosingInformation" : true,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1444708092,
+        "date" : "2015-05-08T00:00:00-07:00",
+        "description" : "initial save",
+        "type" : "Create",
+        "version" : 1
+      },
+      {
+        "id" : 1450042747,
+        "date" : "2018-11-15T14:33:04.863-08:00",
+        "description" : "updated *14B to *14 and *14A to *114 based on Nov 2018 PharmVar release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450043042,
+        "date" : "2018-11-20T17:45:17.764-08:00",
+        "description" : "Added link to guideline video",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450824546,
+        "date" : "2019-10-24T20:18:25.780-07:00",
+        "description" : "online October 2019 guideline update (G2P project)",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451115162,
+        "date" : "2020-04-21T14:57:43.198-07:00",
+        "description" : "Updated links to CYP2D6 gene information tables, drug resource mappings and pre and post test alerts",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451223802,
+        "date" : "2020-07-08T00:00:00-07:00",
+        "description" : "added CYP2D6*115-*139 to allele picker; changed function for *60, *72, *84",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451309744,
+        "date" : "2021-01-12T13:37:37.033-08:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452064980,
+        "date" : "2023-04-10T14:12:30.436-07:00",
+        "description" : "added CPIC guideline publication",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452508440,
+        "date" : "2024-06-26T03:38:00.482-07:00",
+        "description" : "Added video",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15143242,"title":"Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for CYP2D6, CYP2C19, CYP2B6, SLC6A4, and HTR2A Genotypes and Serotonin Reuptake Inhibitor Antidepressants.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10564324","crossReferences":[{"id":1452680439,"resource":"PubMed Central","resourceId":"PMC10564324","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10564324"},{"id":1452064840,"resource":"PubMed","resourceId":"37032427","_url":"https://www.ncbi.nlm.nih.gov/pubmed/37032427"},{"id":1452064841,"resource":"DOI","resourceId":"10.1002/cpt.2903","_url":"http://dx.doi.org/10.1002%2Fcpt.2903"}],"objCls":"Literature","pubDate":"2023-07-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":15089021,"title":"Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for CYP2D6 and CYP2C19 Genotypes and Dosing of Selective Serotonin Reuptake Inhibitors.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4512908","crossReferences":[{"id":1449285932,"resource":"PubMed Central","resourceId":"PMC4512908","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4512908"},{"id":1449285931,"resource":"PubMed","resourceId":"25974703","_url":"https://www.ncbi.nlm.nih.gov/pubmed/25974703"},{"id":1449285933,"resource":"DOI","resourceId":"10.1002/cpt.147","_url":"http://dx.doi.org/10.1002%2Fcpt.147"}],"objCls":"Literature","pubDate":"2015-08-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1451266624,
+      "html" : "<p>Guideline excerpt: &quot;Therefore, the generalizability of other recommendations to pediatric patients needs to be established. As such, clinicians treating children and adolescents should determine their applicability to younger patients while considering the unique and more limited evidence base for these medications in youth, as well as pediatric-specific differences in tolerability (e.g., activation)and disorder-specific response trajectory. Because CYP2D6, CYP2C19, and CYP2B6 activity reach adult levels by early childhood, it may be appropriate to extrapolate genotype-guided recommendations for antidepressants related to CYP2D6, CYP2C19 and CYP2B6 to adolescents or possibly younger children with close monitoring.&quot;</p>\n",
+      "version" : 1
+    },
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450801",
+        "name" : "paroxetine",
+        "version" : 17
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA128",
+        "symbol" : "CYP2D6",
+        "name" : "cytochrome P450 family 2 subfamily D member 6",
+        "version" : 7891
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1447982281,
+      "html" : "<p>The CPIC Dosing Guideline for the selective serotonin reuptake inhibitor paroxetine recommends an alternative drug not predominantly metabolized by CYP2D6 for CYP2D6 ultrarapid metabolizers. For CYP2D6 poor metabolizers, consider a 50% reduction in recommended starting dose, slower titration schedule, and a 50% lower maintenance dose.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451433659,
+      "html" : "<h3 id=\"february-2023\">February 2023</h3>\n<ul>\n<li>\n<p>The 2015 CPIC&reg; guideline for for Selective Serotonin Reuptake Inhibitors and CYP2D6 and CYP2C19 has been updated to include additional genes and drugs. It is now known as the CPIC&reg; guideline for CYP2D6, CYP2C19, CYP2B6, SLC6A4, and HTR2A Genotypes and Serotonin Reuptake Inhibitor Antidepressants. Literature pertaining to paroxetine and CYP2D6 published between January 2015 to June 2022 was reviewed and the recommendations and supplemental information were updated.</p>\n</li>\n<li>\n<p>Excerpts from the guideline:</p>\n<ul>\n<li>&quot;In multiple studies, CYP2D6 UMs had low or undetectable plasma concentrations of paroxetine (31-34) and vortioxetine (35) when compared to NMs (31-34). Those with undetectable or low plasma concentrations had a lower probability of clinical benefit, although the minimal effective paroxetine therapeutic concentration is not well-defined (36).&quot;</li>\n<li>&quot;When administered similar doses, CYP2D6 PMs had significantly greater drug exposure or parent to metabolite ratios for paroxetine, fluvoxamine, venlafaxine, and vortioxetine when compared to NMs (Table S1). Increased drug exposure increases the risk for dose/concentration-dependent side effects (37). To potentially prevent  adverse effects, dose extrapolations based on differences in pharmacokinetic parameters between phenotype groups suggest a 50% dose reduction of paroxetine.&quot;</li>\n</ul>\n</li>\n<li>\n<p>These guidelines are applicable to:</p>\n<ul>\n<li>adult patients</li>\n<li>pediatric consideration: &quot;Citalopram, escitalopram, and sertraline had the most pharmacogenetic data supporting potential genotype-guided prescribing changes in children. Based on this evidence, the recommendations for these drugs are relevant to pediatric patients and are consistent with smaller pharmacokinetic studies available for this population.&quot; ..... &quot;The generalizability of other recommendations to pediatric patients needs to be established. As such, clinicians treating children and adolescents should determine their applicability to younger patients while considering the unique and more limited evidence base for these medications in youth, as well as pediatric-specific differences in tolerability (e.g., activation)and disorder-specific response trajectory. Because CYP2D6, CYP2C19, and CYP2B6 activity reach adult levels by early childhood, it may be appropriate to extrapolate genotype-guided recommendations for antidepressants related to CYP2D6, CYP2C19 and CYP2B6 to adolescents or possibly younger children with close monitoring.&quot;</li>\n</ul>\n</li>\n<li>\n<p>Download and read:</p>\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/serotonin_reuptake_inhibitor_antidepressants/2023/37032427.pdf\" target=\"_blank\">CPIC&reg; Guideline for for <em>CYP2D6</em>, <em>CYP2C19</em>, <em>CYP2B6</em>, <em>SLC6A4</em>, and <em>HTR2A</em> Genotypes and Serotonin Reuptake Inhibitor Antidepressants</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/serotonin_reuptake_inhibitor_antidepressants/2023/37032427-supplement.pdf\" target=\"_blank\">2023 supplement</a></li>\n<li><a href=\"/page/cyp2d6RefMaterials\">CYP2D6 Gene-Specific Information Tables</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/paroxetine-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Paroxetine Drug Resource Mappings</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/paroxetine_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Paroxetine Pre and Post Test Alerts</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/images/flow_chart/Paroxetine_CDS_Flow_Chart.jpg\" target=\"_blank\">Paroxetine CDS Flow Chart</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-dosing-recommendations-for-paroxetine-based-on-cyp2d6-phenotype\">Table 1: Dosing recommendations for paroxetine based on CYP2D6 phenotype</h3>\n<p><em>Adapted from Tables 1 and 2a of the guideline.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype</th>\n<th>Activity score<br/>range</th>\n<th>Activity score</th>\n<th>Examples</th>\n<th>Implications</th>\n<th>Therapeutic<br/>Recommendations</th>\n<th>Classification of<br/>recommendation<sup>a</sup></th>\n<th>Considerations</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2D6 ultrarapid metabolizer</td>\n<td>&gt;2.25</td>\n<td>&gt;2.25</td>\n<td><em>*1/*1xN, *1/*2xN, *2/*2xN<sup>c</sup></em></td>\n<td>Increased metabolism of paroxetine to less active compounds when compared to CYP2D6 normal metabolizers. Lower plasma concentrations decrease the probability of clinical benefit. The extent to which ultrarapid metabolizers phenoconvert to normal, intermediate, or poor metabolizers due to paroxetine autoinhibition of CYP2D6 is unclear.</td>\n<td>Select alternative drug not predominantly metabolized by CYP2D6.</td>\n<td>Moderate</td>\n<td>Drug-drug interactions and other patient characteristics (e.g., age, renal function, liver function) should be considered when selecting an alternative therapy.</td>\n</tr>\n<tr>\n<td>CYP2D6 normal metabolizer</td>\n<td>1.25 &lt;= x &lt;= 2.25</td>\n<td>1.25<br/>1.5<br/>1.75<br/>2.0<br/>2.25</td>\n<td><em>*1/*10<br/>*1/*41, *1/*9<br/>*10/*41x3<br/>*1/*1, *1/*2<br/>*2x2/*10</em></td>\n<td>Normal metabolism of paroxetine to less active compounds. Paroxetine-associated phenoconversion of normal metabolizers to intermediate or poor metabolizers due to CYP2D6 autoinhibition may occur and is dose-dependent and greater at steady state concentrations.</td>\n<td>Initiate therapy with recommended starting dose.</td>\n<td>Strong</td>\n<td></td>\n</tr>\n<tr>\n<td>CYP2D6 intermediate metabolizer</td>\n<td>0 &lt; x &lt; 1.25</td>\n<td>0.25<br/>0.5<br/>0.75<br/>1.0</td>\n<td>*4/*10<br/>*4/*41, *10/*10<br/>*10/*41<br/>*41/*41, *1/*5</td>\n<td>Reduced metabolism of paroxetine to less active compounds when compared to CYP2D6 normal metabolizers when starting treatment or at lower doses. Higher plasma concentrations may increase the probability of side effects. Paroxetine-associated phenoconversion of intermediate metabolizers to poor metabolizers due to CYP2D6 autoinhibition may occur and is dose-dependent and greater at steady state concentrations.</td>\n<td>Consider a lower starting dose and slower titration schedule as compared to normal metabolizers.</td>\n<td>Optional</td>\n<td>Drug-drug interactions and other patient characteristics (e.g., age, renal function, liver function) should be considered when adjusting dose or selecting an alternative therapy.</td>\n</tr>\n<tr>\n<td>CYP2D6 poor metabolizer</td>\n<td>0</td>\n<td>0</td>\n<td><em>*3/*4, *4/*4, *5/*5, *5/*6</em></td>\n<td>Greatly reduced metabolism when compared to CYP2D6 normal metabolizers. Higher plasma concentrations may increase the probability of side effects. The impact of paroxetine-associated autoinhibition of CYP2D6 is minimal in poor metabolizers.</td>\n<td>Consider a 50% reduction in recommended starting dose, slower titration schedule, and a 50% lower maintenance dose as compared to normal metabolizers.</td>\n<td>Moderate</td>\n<td>Drug-drug interactions and other patient characteristics (e.g., age, renal function, liver function) should be considered when adjusting dose or selecting an alternative therapy.</td>\n</tr>\n<tr>\n<td>CYP2D6 Indeterminate</td>\n<td>n/a</td>\n<td>An individual carrying one or two unknown or uncertain function alleles</td>\n<td><em>*1/*22, *1/*25, *22/*25</em></td>\n<td></td>\n<td>No recommendation</td>\n<td>No recommendation</td>\n<td></td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> Rating scheme described in Supplemental Materials.</p>\n<h3 id=\"october-2019-update\">October 2019 Update</h3>\n<p><a rel=\"noopener noreferrer\" href=\"https://ascpt.onlinelibrary.wiley.com/doi/full/10.1111/cts.12692\" target=\"_blank\">CYP2D6 genotype to phenotype translation changes</a>: Up until August 2019, there were a few inconsistencies in the translation of CYP2D6 genotype to phenotype translation across guidelines (i.e. CPIC and DPWG) and between clinical genetic testing laboratories. CPIC recently conducted a modified-Delphi project to obtain consensus for a uniform system for translating CYP2D6 genotype to phenotype among a panel of international CYP2D6 experts <a href=\"/page/cpicCyp2d6Standardization\">more information</a>. Modifications to CPIC’s prior system include downgrading the value assigned to the CYP2D6*10 allele for activity score calculation from 0.5 to 0.25 and changing the phenotype assignment for an activity score of 1 from normal metabolizer to intermediate metabolizer (<a rel=\"noopener noreferrer\" href=\"http://files.cpicpgx.org/data/gene/CYP2D6/Inferred_CYP2D6_Phenotype10242019.docx\" target=\"_blank\">table of all previous and new phenotype groupings</a>).</p>\n<p>As a result, the following changes have been made in the CYP2D6 allele functionality table, CYP2D6 genotype to phenotype table (access tables below):</p>\n<ul>\n<li>Diplotypes giving rise to activity scores of 1 changed from CYP2D6 normal metabolizer to CYP2D6 intermediate metabolizer assignments.\n<ul>\n<li><strong>Impact on the recommendations in this guideline:</strong> Because the recommendations in this guideline do not differ between a CYP2D6 normal and intermediate metabolizer, the current published recommendations for normal and intermediate metabolizers will remain unchanged.</li>\n</ul>\n</li>\n<li>All activity scores for diplotypes containing a CYP2D6*10 allele have been updated accordingly (activity scores changed to reflect the lower value of 0.25 for *10). Prior to the consensus projects, the combination of a duplicated normal function allele with a *10 allele resulted in an activity score of 2.5 which translates to an ultrarapid metabolizer. The lower value of 0.25 for CYP2D6*10 results in an activity score of 2.25 for these allele combinations, which based on the consensus project translates to a normal metabolizer.  See <a rel=\"noopener noreferrer\" href=\"http://files.cpicpgx.org/data/gene/CYP2D6/Inferred_CYP2D6_Phenotype10242019.docx\" target=\"_blank\">table of all previous and new phenotype groupings</a>.\n<ul>\n<li><strong>Impact on the recommendations in this guideline:</strong> The authors of this guideline are currently reviewing evidence for the affected activity score (AS of 2.25) and will update this webpage and relevant tables accordingly.</li>\n</ul>\n</li>\n</ul>\n<h3 id=\"august-2015\">August 2015</h3>\n<p><em>Advanced online publication May 2015</em></p>\n<ul>\n<li>Guidelines regarding the use of pharmacogenomic tests in dosing of selective serotonin reuptake inhibitors have been published in Clinical Pharmacology and Therapeutics by the Clinical Pharmacogenetics Implementation Consortium (CPIC).</li>\n<li>Excerpts from the 2015 selective serotonin reuptake inhibitors dosing guidelines (for paroxetine and CYP2D6):\n<ul>\n<li>&quot;Multiple studies have demonstrated that CYP2D6 ultrarapid metabolizers have low or undetectable paroxetine plasma concentrations...Because of the risk for therapy failure due to lower drug exposure, an alternative SSRI not extensively metabolized by CYP2D6 should be considered for CYP2D6.&quot;</li>\n<li>&quot;When administered similar doses, CYP2D6 poor metabolizers have significantly greater drug exposure to paroxetine when compared to extensive metabolizers...To potentially prevent an adverse effect, an alternative SSRI not extensively metabolized by CYP2D6 should be considered for poor metabolizers.&quot;</li>\n<li>&quot;The recommendations in the guideline and below apply primarily to actions based on genetic tests only; drug interactions and other clinical factors can have a major influence for prescribing decisions for SSRIs and should be taken into consideration before initiating drug therapy.&quot;</li>\n<li>&quot; Data describing the relationship between CYP2D6 or CYP2C19 genotype and SSRI systemic exposure or steady state plasma concentrations in pediatric patients are scarce. Because CYP2D6 activity is fully mature by early childhood, it may be appropriate to extrapolate these recommendations to adolescents or possibly younger children with close monitoring.&quot;</li>\n</ul>\n</li>\n<li>Download and read:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/SSRI/2015/25974703.pdf\" target=\"_blank\">Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for CYP2D6 and CYP2C19 Genotypes and Dosing of Selective Serotonin Reuptake Inhibitors</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/SSRI/2015/25974703-supplement.pdf\" target=\"_blank\">2015 Supplement</a></li>\n<li><a href=\"/page/cyp2d6RefMaterials\">CYP2D6 Gene-Specific Information Tables</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/SSRI/2015/Paroxetine_Drug_Resource_Mappings.xlsx\" target=\"_blank\">Paroxetine Drug Resource Mappings</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/SSRI/2015/Paroxetine_Pre_and_Post_Test_Alerts_and_Flow_Chart.xlsx\" target=\"_blank\">Paroxetine Pre and Post Test Alerts</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-dosing-recommendations-for-paroxetine-based-on-cyp2d6-phenotype-1\">Table 1: Dosing recommendations for paroxetine based on CYP2D6 phenotype:</h3>\n<p><em>Adapted from Tables 1 and 2a of the 2015 guideline manuscript.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Likely phenotype</th>\n<th>Activity Score</th>\n<th>Genotypes</th>\n<th>Examples of CYP2D6 diplotypes</th>\n<th>Implications for paroxetine metabolism</th>\n<th>Therapeutic Recommendations</th>\n<th>Classification of recommendations <sup>a</sup></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Ultrarapid metabolizer (~1-2% of patients)<sup>b</sup></td>\n<td>&gt; 2.0</td>\n<td>An individual carrying duplications of functional alleles</td>\n<td>*1/*1xN, *1/*2xN, *2/*2xN <sup>c</sup></td>\n<td>Increased metabolism to less active compounds when compared to extensive metabolizers. Lower/undetectable plasma concentrations may increase probability of pharmacotherapy failure.</td>\n<td>Select alternative drug not predominantly metabolized by CYP2D6.<sup>d</sup></td>\n<td>Strong</td>\n</tr>\n<tr>\n<td>Extensive metabolizer (~77-92% of patients)</td>\n<td>2.0-1.0 <sup>e</sup></td>\n<td>An individual carrying two normal function alleles or two decreased function alleles or one normal function and one no function allele or one  normal function and one decreased function allele</td>\n<td>*1/*1, *1/*2, *1/*4, *1/*5, *1/*9, *1/*41, *2/*2,*41/*41</td>\n<td>Normal metabolism</td>\n<td>Initiate therapy with recommended starting dose.</td>\n<td>Strong</td>\n</tr>\n<tr>\n<td>Intermediate metabolizer (~2-11% of patients)</td>\n<td>0.5</td>\n<td>An individual carrying one decreased function and one no function allele</td>\n<td>*4/*10,*4/*41, *5/*9</td>\n<td>Reduced metabolism when compared to extensive metabolizers. Higher plasma concentrations may increase the probability of side effects.</td>\n<td>Initiate therapy with recommended starting dose.</td>\n<td>Moderate</td>\n</tr>\n<tr>\n<td>Poor metabolizers (~5-10% of patients)</td>\n<td>0</td>\n<td>An individual carrying only no functional alleles</td>\n<td>*3/*4,*4/*4, *5/*5, *5/*6</td>\n<td>Greatly reduced metabolism when compared to extensive metabolizers. Higher plasma concentrations may increase the probability of side effects.</td>\n<td>Select alternative drug not predominantly metabolized by CYP2D6 <sup>d</sup> or if paroxetine use warranted, consider a 50% reduction of recommended starting dose and titrate to response.</td>\n<td>Optional</td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> Rating scheme described in Supplement.</p>\n<p><sup>b</sup> CYP2D6 metabolizer status frequencies are based on data from Caucasians and may differ from other ethnicities. See Supplemental note for information on the chances of observing specific diplotypes in different major race/ethnic groups.</p>\n<p><sup>c</sup> Where xN represents the number of CYP2D6 gene copies. For individuals with CYP2D6 duplications or multiplications, see supplemental data for additional information on how to translate diplotypes into phenotypes.</p>\n<p><sup>d</sup> Drug-drug interactions and other patient characteristics (e.g., age, renal function, liver function) should be considered when selecting an alternative therapy.</p>\n<p><sup>e</sup> Patients with an activity score of 1.0 may be classified as intermediate metabolizers by some reference laboratories.</p>\n",
+      "version" : 3
+    },
+    "version" : 53
+  }
+}

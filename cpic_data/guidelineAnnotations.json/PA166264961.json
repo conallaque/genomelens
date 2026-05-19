@@ -1,0 +1,143 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166264961",
+    "name" : "Annotation of DPWG Guideline for allopurinol and ABCG2",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1451695864,
+        "date" : "2022-02-25T00:00:00-08:00",
+        "type" : "Create",
+        "version" : 1
+      },
+      {
+        "id" : 1451699240,
+        "date" : "2022-03-01T10:01:58.531-08:00",
+        "description" : "Complemented genotypes to positive strand.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704259,
+        "date" : "2022-03-03T16:33:36.080-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451706060,
+        "date" : "2022-03-07T11:59:46.353-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732898,
+        "date" : "2022-03-28T09:57:49.814-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733280,
+        "date" : "2022-03-28T14:29:15.310-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741461,
+        "date" : "2022-04-05T11:08:42.289-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451883981,
+        "date" : "2022-09-16T09:20:22.978-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451889552,
+        "date" : "2022-09-22T14:59:22.227-07:00",
+        "description" : "Added guideline publication",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451903460,
+        "date" : "2022-10-04T10:40:09.044-07:00",
+        "description" : "included variant mapping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146478,
+        "date" : "2023-07-03T13:39:55.930-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452409360,
+        "date" : "2024-03-15T12:03:52.548-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15136122,"title":"Dutch pharmacogenetics working group guideline for the gene-drug interaction of ABCG2, HLA-B and Allopurinol, and MTHFR, folic acid and methotrexate.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10853275","crossReferences":[{"id":1452379680,"resource":"PubMed Central","resourceId":"PMC10853275","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10853275"},{"id":1451889545,"resource":"PubMed","resourceId":"36056234","_url":"https://www.ncbi.nlm.nih.gov/pubmed/36056234"},{"id":1451889546,"resource":"DOI","resourceId":"10.1038/s41431-022-01180-0","_url":"http://dx.doi.org/10.1038%2Fs41431-022-01180-0"}],"objCls":"Literature","pubDate":"2024-02-01T00:00:00-08:00","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Variant",
+        "id" : "PA166156544",
+        "symbol" : "rs2231142",
+        "name" : "rs2231142",
+        "version" : 4
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA448320",
+        "name" : "allopurinol",
+        "version" : 11
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA390",
+        "symbol" : "ABCG2",
+        "name" : "ATP binding cassette subfamily G member 2 (JR blood group)",
+        "version" : 3597
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1451695862,
+      "html" : "<p>Patients with the GT or TT genotypes at <a href=\"/variant/PA166156544\">rs2231142</a> should be given an increased dose of allopurinol.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451695863,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-of-abcg2-hla-b-and-allopurinol-and-mthfr-folic-acid-and-methotrexate-european-journal-of-human-genetics-2022\">Dutch pharmacogenetics working group (DPWG) guideline for the gene-drug interaction of ABCG2, HLA-B and Allopurinol, and MTHFR, folic acid and methotrexate. European journal of human genetics (2022)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper with the guidelines as per the May 2021 guideline including more details and scoring the clinical implementation [Article:<a href=\"/pmid/36056234\">36056234</a>]. The article includes the following mapping for the variant ABCG2 p.(Gln141Lys): rs-number: 2231142; NM_001257386.1:c.421 C &gt; A; NP_001244315.1:p.Gln141Lys; NG_032067.2:g.105152 C &gt; A.</p>\n<h3 id=\"may-2021-guideline\">May 2021 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (DPWG) has evaluated therapeutic dose recommendations for allopurinol based on ABCG2 genotype. They recommend a dose increase for patients with the GT or TT genotypes (described in the document as their equivalent amino acids GK and KK, respectively).</p>\n<p><em><strong>Note:</strong></em> The DPWG allopurinol guideline publication [Article:<a href=\"/pmid/36056234\">36056234</a>] includes the following mapping for the variant ABCG2 p.(Gln141Lys): rs-number: 2231142; NM_001257386.1:c.421 C &gt; A; NP_001244315.1:p.Gln141Lys; NG_032067.2:g.105152 C &gt; A. <em>ABCG2</em> is found on the negative strand. All genotypes displayed in this annotation have been complemented to the positive strand.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_May_2021.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_May_2021.pdf\">Dutch guidelines May 2021 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>141KK (TT genotype)<sup>a</sup></td>\n<td>allopurinol</td>\n<td>The effectiveness of allopurinol is reduced, meaning that a higher dose is required. The gene variation reduces the excretion of uric acid by kidneys and intestines, meaning that a stronger inhibition of the uric acid production by allopurinol is required to achieve the desired uric acid concentration.</td>\n<td>Use 1.4 times the standard dose. This equates to a dose titration schedule of 100, 300, 400, 600 and 700 mg/day instead of the usual schedule of 100, 200, 300, 400 and 500 mg/day.</td>\n</tr>\n<tr>\n<td>141QK (GT genotype)<sup>a</sup></td>\n<td>allopurinol</td>\n<td>The effectiveness of allopurinol is reduced, meaning that a higher dose is required. The gene variation reduces the excretion of uric acid by kidneys and intestines, meaning that a stronger inhibition of the uric acid production by allopurinol is required to achieve the desired uric acid concentration.</td>\n<td>Use 1.25 times the standard dose. This equates to a dose titration schedule of 100, 200, 400 and 500 mg/day instead of the usual schedule of 100, 200, 300 and 400 mg/day.</td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> These genotypes have been complemented to the positive strand.</p>\n<p><a download=\"DPWG_ABCG2_allopurinol_7255-7256_03072024.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_ABCG2_allopurinol_7255-7256_03072024.pdf\">Read for more information about this recommendation</a>, <a download=\"ABCG2.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/ABCG2.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_ABCG2_allopurinol_7255-7256_03072024.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_ABCG2_allopurinol_7255-7256_03072024.pdf\">DPWG risk analysis document</a> for allopurinol and ABCG2:</p>\n<blockquote class=\"blockquote\">\n<p>The KNMP Pharmacogenetics Working Group considers genotyping of ABCG2 before starting allopurinol to be potentially beneficial for drug effectiveness. Genotyping can be considered on an individual patient basis. If, however, the genotype is available, the Dutch Pharmacogenetics Working Group recommends adhering to the gene-drug guideline.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n",
+      "version" : 9
+    },
+    "version" : 17
+  }
+}

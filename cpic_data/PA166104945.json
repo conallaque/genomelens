@@ -1,0 +1,176 @@
+{
+  "citations" : [
+    {
+      "id" : 15330382,
+      "title" : "Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for Thiopurine Dosing Based on TPMT and NUDT15 Genotypes: 2025 Update.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/41618934",
+      "authors" : [
+        "Maillard Maud",
+        "Schwab Matthias",
+        "Whirl-Carrillo Michelle",
+        "Moyer Ann M",
+        "Suarez-Kurtz Guilherme",
+        "Pui Ching-Hon",
+        "Stein C Michael",
+        "Klein Teri E",
+        "Spahn Claire",
+        "Kwon Sooyeon",
+        "Hartono Juanda Leo",
+        "de Boer Nanne K",
+        "Ahmad Tariq",
+        "Antillon-Klussmann Federico Guillermo",
+        "Caudle Kelly E",
+        "Kato Motohiro",
+        "Yeoh Allen E J",
+        "Schmiegelow Kjeld",
+        "Yang Jun J"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 1454649660,
+          "resource" : "PubMed",
+          "resourceId" : "41618934",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/41618934",
+          "version" : 0
+        },
+        {
+          "id" : 1454649661,
+          "resource" : "DOI",
+          "resourceId" : "10.1002/cpt.70209",
+          "_url" : "http://dx.doi.org/10.1002%2Fcpt.70209",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "Clinical pharmacology and therapeutics",
+      "meshTerms" : [],
+      "month" : 1,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "pediatric" : true,
+      "pgkbPublication" : false,
+      "pubDate" : "2026-01-01T00:00:00-08:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "Thiopurine methyltransferase (TPMT) and Nudix hydrolase 15 (NUDT15) are key enzymes that catabolize thiopurines. Decreased or no-function alleles in TPMT and NUDT15 are associated with reduced or no enzyme activity and predictive of pronounced adverse effects, including severe myelosuppression, that may occur among individuals treated with standard doses of thiopurines. Genetic variants in these genes are present in all world populations; however, their frequency varies by ancestry. In this updated guideline, we provide recommendations for adjusting starting doses of mercaptopurine, thioguanine, and azathioprine based on TPMT and NUDT15 genotypes, including for individuals with variants in both genes (updates on www.clinpgx.org).",
+      "terms" : [
+        {"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},
+        {"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}
+      ],
+      "type" : "Literature",
+      "version" : 4,
+      "year" : 2026
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166104945",
+    "name" : "Annotation of CPIC Guideline for mercaptopurine and NUDT15, TPMT",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1183699774,
+        "date" : "2011-01-26T00:00:00-08:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1183699775,
+        "date" : "2013-01-17T00:00:00-08:00",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1447986819,
+        "date" : "2016-05-10T21:44:54.940-07:00",
+        "description" : "Update guideline with information regarding the NUDT15 gene.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451463580,
+        "date" : "2021-06-22T11:08:50.259-07:00",
+        "description" : "Added link to video",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452138000,
+        "date" : "2023-06-22T23:01:13.753-07:00",
+        "description" : "Updated supplemental table links",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452417940,
+        "date" : "2024-03-21T13:22:12.602-07:00",
+        "description" : "Updated recommendations for the following phenotypes: TPMT Intermediate Metabolizer/NUDT15 Intermediate Metabolizer, TPMT Intermediate Metabolizer/Possible NUDT15 Intermediate Metabolizer, Possible TPMT Intermediate Metabolizer/NUDT15 Intermediate Metabolizer, Possible TPMT Intermediate Metabolizer/Possible NUDT15 Intermediate Metabolizer",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454649781,
+        "date" : "2026-02-04T01:52:40.830-08:00",
+        "description" : "Guideline update",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15330382,"title":"Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for Thiopurine Dosing Based on TPMT and NUDT15 Genotypes: 2025 Update.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/41618934","crossReferences":[{"id":1454649660,"resource":"PubMed","resourceId":"41618934","_url":"https://www.ncbi.nlm.nih.gov/pubmed/41618934"},{"id":1454649661,"resource":"DOI","resourceId":"10.1002/cpt.70209","_url":"http://dx.doi.org/10.1002%2Fcpt.70209"}],"objCls":"Literature","pubDate":"2026-01-01T00:00:00-08:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":15101542,"title":"Clinical Pharmacogenetics Implementation Consortium Guideline for Thiopurine Dosing Based on TPMT and NUDT15 Genotypes: 2018 Update.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6576267","crossReferences":[{"id":1451837563,"resource":"PubMed Central","resourceId":"PMC6576267","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6576267"},{"id":1450043138,"resource":"PubMed","resourceId":"30447069","_url":"https://www.ncbi.nlm.nih.gov/pubmed/30447069"},{"id":1450043139,"resource":"DOI","resourceId":"10.1002/cpt.1304","_url":"http://dx.doi.org/10.1002%2Fcpt.1304"}],"objCls":"Literature","pubDate":"2019-05-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":15051187,"title":"Clinical pharmacogenetics implementation consortium guidelines for thiopurine methyltransferase genotype and thiopurine dosing: 2013 update.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3604643","crossReferences":[{"id":1449275272,"resource":"PubMed Central","resourceId":"PMC3604643","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3604643"},{"id":1449275271,"resource":"PubMed","resourceId":"23422873","_url":"https://www.ncbi.nlm.nih.gov/pubmed/23422873"},{"id":1449275273,"resource":"DOI","resourceId":"10.1038/clpt.2013.4","_url":"http://dx.doi.org/10.1038%2Fclpt.2013.4"}],"objCls":"Literature","pubDate":"2013-04-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":6690400,"title":"Clinical Pharmacogenetics Implementation Consortium guidelines for thiopurine methyltransferase genotype and thiopurine dosing.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3098761","crossReferences":[{"id":1449245874,"resource":"PubMed Central","resourceId":"PMC3098761","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3098761"},{"id":769164748,"resource":"PubMed","resourceId":"21270794","_url":"https://www.ncbi.nlm.nih.gov/pubmed/21270794"},{"id":1449245875,"resource":"DOI","resourceId":"10.1038/clpt.2010.320","_url":"http://dx.doi.org/10.1038%2Fclpt.2010.320"}],"objCls":"Literature","pubDate":"2011-03-01T00:00:00-08:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1454649780,
+      "html" : "<p>From the guideline: &quot;Because thiopurines are essential for the treatment of both childhood malignancies (e.g., ALL) and immune suppressive disorders (e.g., IBD, mostly diagnosed in adults), much of the evidence supporting the original dosing recommendations (summarized in Tables S1 and S2) was derived from studies including pediatric and adult patients. Thus, the guideline dosing recommendations are intended for use in both age groups.&quot;</p>\n",
+      "version" : 0
+    },
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450379",
+        "name" : "mercaptopurine",
+        "version" : 33
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA134963132",
+        "symbol" : "NUDT15",
+        "name" : "nudix hydrolase 15",
+        "version" : 12
+      },
+      {
+        "objCls" : "Gene",
+        "id" : "PA356",
+        "symbol" : "TPMT",
+        "name" : "thiopurine S-methyltransferase",
+        "version" : 7545
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1450044160,
+      "html" : "<p>The CPIC dosing guideline recommends a lower than standard starting dose of mercaptopurine should be considered if the starting dose is high for TPMT or NUDT15 intermediate metabolizers. For TPMT and/or NUDT15 poor metabolizers, markedly reduced doses should be used.</p>\n",
+      "version" : 4
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451433695,
+      "html" : "<h3 id=\"february-2026-update\">February 2026 Update</h3>\n<ul>\n<li>The <a rel=\"noopener noreferrer\" href=\"https://ascpt.onlinelibrary.wiley.com/doi/10.1002/cpt.70209\" target=\"_blank\">2025 update of CPIC guidelines regarding azathioprine, thioguanine and mercaptopurine</a>, have been published in Clinical Pharmacology and Therapeutics.  A systematic literature review focused on <em>TPMT</em> and <em>NUDT15</em> genotypes and thiopurine use was conducted, recommendations and supplemental information was updated.</li>\n<li>These guidelines are applicable to:\n<ul>\n<li>pediatric patients</li>\n<li>adult patients</li>\n</ul>\n</li>\n<li>Excerpts from the 2026 thiopurine dosing guideline update:\n<ul>\n<li>&quot;Three thiopurines are used clinically: azathioprine, mercaptopurine, and thioguanine. Although all three medications share many of the same pharmacologic effects, mercaptopurine and azathioprine are generally used for nonmalignant immunologic disorders, and mercaptopurine and thioguanine are used for hematological malignancies. Because azathioprine is converted to mercaptopurine in cells, the two drugs can be considered to have identical interactions with TPMT and NUDT15. &quot;</li>\n<li>&quot;TPMT catabolizes mercaptopurine to an inactive methylmercaptopurine base, leaving less parent drug available for potential anabolism to pharmacologically active thioguanine nucleotides.&quot;</li>\n<li>&quot;Through agnostic genome-­wide association studies, variants in NUDT15 were identified that strongly influence thiopurine tolerance in patients with ALL and IBD.&quot;</li>\n<li>&quot;There is substantial evidence linking TPMT and NUDT15 genotypes with phenotypic variability in thiopurine response\n(see Tables S1 and S2). Pre-­emptive dose adjustments based on TPMT genotype have reduced thiopurine-­induced adverse\neffects without compromising desired antitumor and immunosuppressive therapeutic effects in several clinical settings.&quot;</li>\n<li>&quot;[T]he guideline dosing recommendations are intended for use in both age groups [pediatric and adult patients]&quot;.</li>\n</ul>\n</li>\n<li>Download and read:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/thiopurines/2026/41618934.pdf\" target=\"_blank\">Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for Thiopurine Dosing Based on <em>TPMT</em> and <em>NUDT15</em> genotypes: 2025 Update</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/thiopurines/2026/41618934-supplement.pdf\" target=\"_blank\">2025 supplement</a></li>\n<li><a href=\"/page/tpmtRefMaterials\">TPMT Gene-Specific Information Tables</a></li>\n<li><a href=\"/page/nudt15RefMaterials\">NUDT15 Gene-Specific Information Tables</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/azathioprine-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Azathioprine Drug Resource Mappings</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/azathioprine_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Azathioprine Pre and Post Test Alerts</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/images/flow_chart/Azathioprine_CDS_Flow_Chart.jpg\" target=\"_blank\">Azathioprine Clinical Decision Support Flow Chart</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"february-2024-update\">February 2024 Update</h3>\n<p>CPIC have updated the recommendations for patients who are intermediate metabolizers of both <em>TPMT</em> and <em>NUDT15</em>. Patients who are intermediate metabolizers or possible intermediate metabolizers for both genes are recommended to begin with a starting dose of 20-50% of the normal dosage. The recommendations in the genotype picker tool and on this annotation page have been updated accordingly.</p>\n<h3 id=\"october-2018-update\">October 2018 Update</h3>\n<p><em>Advance online publication November 2018.</em></p>\n<ul>\n<li>The <a rel=\"noopener noreferrer\" href=\"https://ascpt.onlinelibrary.wiley.com/doi/abs/10.1002/cpt.1304?af=R\" target=\"_blank\">2018 update of CPIC guidelines regarding azathioprine, thioguanine and mercaptopurine</a>, have been published in Clinical Pharmacology and Therapeutics.  Literature published between October 2012 to June 2017 was reviewed, recommendations and supplemental information was updated.</li>\n<li>These guidelines are applicable to:\n<ul>\n<li>pediatric patients</li>\n<li>adult patients</li>\n</ul>\n</li>\n<li>Excerpt from the 2018 thiopurine dosing guideline update:\n<ul>\n<li>&quot;TPMT activity exhibits a monogenic co-dominant inheritance and catabolizes\nthiopurines. TPMT variant alleles are associated with low enzyme activity and pronounced pharmacologic effects of thiopurines.&quot;</li>\n<li>&quot;Loss-of-function alleles in the NUDT15 gene are common in Asians and Hispanics and reduces the degradation of active thiopurine nucleotide metabolites, also predisposing to myelosuppression.&quot;</li>\n</ul>\n</li>\n<li>Download and read:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/thiopurines/2018/30447069.pdf\" target=\"_blank\">Clinical Pharmacogenetics Implementation Consortium (CPIC) guideline for thiopurine dosing based on <em>TPMT</em> and <em>NUDT15</em> genotypes: 2018 Update</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/thiopurines/2018/CPIC_TPMT_NUDT15_Thiopurine_Supplemental_Material.pdf\" target=\"_blank\">2018 supplement</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"may-2016-update\">May 2016 Update</h3>\n<p>Several studies have reported that individuals who carry low-function alleles for NUDT15 are unable to tolerate usual doses of thiopurines. [Articles:<a href=\"/pmid/25108385\">25108385</a>, <a href=\"/pmid/25624441\">25624441</a>, <a href=\"/pmid/26033531\">26033531</a>, <a href=\"/pmid/26076924\">26076924</a>, <a href=\"/pmid/26405151\">26405151</a>, <a href=\"/pmid/26503813\">26503813</a>, <a href=\"/pmid/26590936\">26590936</a>, <a href=\"/pmid/26735160\">26735160</a>, <a href=\"/pmid/26878724\">26878724</a>] These alleles are more common among those of Asian ancestry and Hispanic ethnicity than others. [Articles:<a href=\"/pmid/25624441\">25624441</a>, <a href=\"/pmid/26878724\">26878724</a>] The dose tolerated by those with two low-function alleles is only ~ 10% that tolerated by those with no low-function NUDT15 or TPMT alleles. [Articles:<a href=\"/pmid/25624441\">25624441</a>, <a href=\"/pmid/26878724\">26878724</a>] CPIC is planning a guideline to address NUDT15 variants and possible dosing recommendations for thiopurines.</p>\n<h3 id=\"april-2013-update\">April 2013 Update</h3>\n<p><em>Advance online publication January 2013</em></p>\n<ul>\n<li>The <a rel=\"noopener noreferrer\" href=\"http://www.nature.com/clpt/journal/vaop/naam/index.html#17012013\" target=\"_blank\">2013 update of CPIC guidelines regarding azathioprine, thioguanine and mercaptopurine</a>, have been published in Clinical Pharmacology and Therapeutics.  Literature published between June 2010-November 2012 was reviewed and there is <strong>no new evidence that would change the original guidelines. Therefore, the dosing recommendations in the original publication remain clinically current.</strong></li>\n<li>These guidelines are applicable to:\n<ul>\n<li>pediatric patients</li>\n<li>adult patients</li>\n</ul>\n</li>\n<li>Download and read:\n<ul>\n<li><a download=\"CPIC_TPMT_update.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CPIC_TPMT_update.pdf\">Clinical Pharmacogenetics Implementation Consortium Guidelines for Thiopurine Methyltransferase Genotype and Thiopurine Dosing: 2013 Update</a></li>\n<li><a download=\"CPIC_TPMT_update_supp.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CPIC_TPMT_update_supp.pdf\">2013 supplement</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"march-2011\">March 2011</h3>\n<p><em>Advance online publication January 2011.</em></p>\n<ul>\n<li>Guidelines regarding the use of pharmacogenomic tests in dosing for azathioprine, thioguanine and mercaptopurine were published in Clinical Pharmacology and Therapeutics by the Clinical Pharmacogenetics Implementation Consortium (CPIC).</li>\n<li>Excerpt from the 2011 thiopurine dosing guidelines:\n<ul>\n<li>&quot;Thiopurines are most commonly used to treat nonmalignant conditions but are also critical anticancer agents. The approach to dosing adjustments based on TPMT status may differ depending on the clinical indication and the propensity to initiate therapy at higher vs. lower starting doses. We and others advocate testing for TPMT status prior to initiating thiopurine therapy, so that starting dosages can be adjusted accordingly.&quot;</li>\n</ul>\n</li>\n<li>Download and read:\n<ul>\n<li><a download=\"cpic-tpmt-article.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/cpic-tpmt-article.pdf\">Clinical Pharmacogenetics Implementation Consortium Guidelines for Thiopurine Methyltransferase Genotype and Thiopurine Dosing</a></li>\n<li><a download=\"cpic-tpmt-supplement.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/cpic-tpmt-supplement.pdf\">2011 supplement</a></li>\n</ul>\n</li>\n</ul>\n",
+      "version" : 6
+    },
+    "version" : 52
+  }
+}

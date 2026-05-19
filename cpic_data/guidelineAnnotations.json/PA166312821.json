@@ -1,0 +1,60 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166312821",
+    "name" : "Annotation of AIOM Guideline for irinotecan and UGT1A1",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [],
+    "literature" : [
+      {"id":15147132,"title":"Pharmacogenetic Practice of Anticancer Drugs: Multiple Approaches for an Accurate and Comprehensive Genotyping.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10390719","crossReferences":[{"id":1452200138,"resource":"PubMed Central","resourceId":"PMC10390719","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10390719"},{"id":1452200137,"resource":"PubMed","resourceId":"37534027","_url":"https://www.ncbi.nlm.nih.gov/pubmed/37534027"},{"id":1452200139,"resource":"DOI","resourceId":"10.2147/PGPM.S412430","_url":"http://dx.doi.org/10.2147%2FPGPM.S412430"}],"objCls":"Literature","pubDate":"2022-12-01T00:00:00-08:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"},{"id":1451577486,"resource":"PGx Paper Types","term":"Methods","termId":"pgxPaperTypes:1451577486"},{"id":1452054440,"resource":"PGx Paper Types","term":"Uses PharmGKB","termId":"pgxPaperTypes:1452054440"}],"type":"Literature"},
+      {"id":15147302,"title":"Pharmacogenetic guidelines of The ITALIAN ASSOCIATION of Medical Oncology ASSOCIAZIONE ITALIANA di Oncologia Medica, AIOM","_sameAs":"https://www.aiom.it/wp-content/uploads/2019/10/2019_Racc-analisi-farmacogenetiche_v26.3.2020.pdf","crossReferences":[{"id":1452202360,"resource":"URL","resourceId":"https://www.aiom.it/wp-content/uploads/2019/10/2019_Racc-analisi-farmacogenetiche_v26.3.2020.pdf","_url":"https://www.aiom.it/wp-content/uploads/2019/10/2019_Racc-analisi-farmacogenetiche_v26.3.2020.pdf"}],"objCls":"Literature","pubDate":"2020-01-01T00:00:00-08:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"},{"id":1452054440,"resource":"PGx Paper Types","term":"Uses PharmGKB","termId":"pgxPaperTypes:1452054440"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA166115842",
+        "symbol" : "UGT1A1*28",
+        "name" : "*28",
+        "version" : 16
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450085",
+        "name" : "irinotecan",
+        "version" : 19
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA420",
+        "symbol" : "UGT1A1",
+        "name" : "UDP glucuronosyltransferase 1 family, polypeptide A1",
+        "version" : 6110
+      }
+    ],
+    "source" : "AIOM",
+    "summaryMarkdown" : {
+      "id" : 1452221140,
+      "html" : "<p>An Italian working group comprising the Italian Association of Medical Oncology (AIOM) and the Italian Society of Pharmacology (SIF) has published recommendations for the use of UGT1A1*28 (TA7 repeats) genotype when prescribing irinotecan.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1452221141,
+      "html" : "<p>An Italian working group comprising the Italian Association of Medical Oncology (AIOM) and the Italian Society of Pharmacology (SIF) has published recommendations for the use of UGT1A1*28 (TA7 repeats) genotype when prescribing irinotecan.\nIn particular, the analysis of the UGT1A1 (TA)n polymorphism <a href=\"/variant/PA166192561\">rs3064744</a>, in the promoter region, is advisable:</p>\n<ul>\n<li>BEFORE treatment to prevent severe adverse reactions, if the medical oncologist consider it appropriate on the basis of the clinical condition of the patient (comorbidity, performance status PS and tumor stage) and of the benefit-risk ratio;</li>\n<li>DURING treatment, in case of grade ≥3 gastrointestinal toxicities and/or grade 4 (NCI-CTCAE v.4.0) hematologic toxicities, and anyway in all cases of severe unexpected toxicities.</li>\n</ul>\n<p>Download the full <a download=\"2019_Racc-analisi-farmacogenetiche_v26.3.2020.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/2019_Racc-analisi-farmacogenetiche_v26.3.2020.pdf\">Guidelines of The Italian Association of Medical Oncology, AIOM</a></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>UGT1A1 genotype</th>\n<th>Dose</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>6/6</td>\n<td>100%</td>\n</tr>\n<tr>\n<td>6/7</td>\n<td>100%</td>\n</tr>\n<tr>\n<td>7/7</td>\n<td>70%</td>\n</tr>\n</tbody>\n</table>\n<p>Translation kindly provided by Dr Cristina Montrasio, Ospedale L. Sacco, Polo Universitario.</p>\n",
+      "version" : 1
+    },
+    "version" : 0
+  }
+}

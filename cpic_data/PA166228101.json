@@ -1,0 +1,92 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166228101",
+    "name" : "Annotation of CPIC Guideline for tramadol and CYP2D6",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "dVatX-mxv_8",
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1451309823,
+        "date" : "2021-01-12T00:00:00-08:00",
+        "type" : "Create",
+        "version" : 1
+      },
+      {
+        "id" : 1451471003,
+        "date" : "2021-07-14T10:15:47.483-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451598144,
+        "date" : "2021-11-29T15:41:56.575-08:00",
+        "description" : "Added video",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452137861,
+        "date" : "2023-06-22T22:23:58.596-07:00",
+        "description" : "Updated supplemental table links",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452465740,
+        "date" : "2024-05-07T13:02:12.122-07:00",
+        "description" : "Added link to tramadol CDS flowchart",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15115982,"title":"Clinical Pharmacogenetics Implementation Consortium Guideline for CYP2D6, OPRM1, and COMT Genotypes and Select Opioid Therapy.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8249478","crossReferences":[{"id":1451837577,"resource":"PubMed Central","resourceId":"PMC8249478","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8249478"},{"id":1451307240,"resource":"PubMed","resourceId":"33387367","_url":"https://www.ncbi.nlm.nih.gov/pubmed/33387367"},{"id":1451307241,"resource":"DOI","resourceId":"10.1002/cpt.2149","_url":"http://dx.doi.org/10.1002%2Fcpt.2149"}],"objCls":"Literature","pubDate":"2021-10-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1451309822,
+      "html" : "<p>Excerpts from the guideline:</p>\n<ul>\n<li>&quot;Several regulatory agencies worldwide advise against the use of codeine and tramadol in children\nyounger than 12 years of age, and in children younger than 18 years of age after tonsillectomy and/or\nadenoidectomy (43-46). Due to these guidances, use of these drugs in children has decreased\nsignificantly in the US and some other countries, but continues in some clinical settings.&quot;</li>\n<li>&quot;The US FDA label includes a warning to mothers that breastfeeding is not recommended when taking (...) tramadol. (...) the warning for tramadol was extrapolated from presence of tramadol and its active metabolite in breast milk and the evidence for adverse events in adults who are CYP2D6 ultrarapid metabolizers (...). Our evidence review did not identify any published cases or studies related to adverse events due to infant exposure to tramadol in breast milk. The American College of Obstetrics and Gynecology provides clinical guidance for postpartum pain management as untreated or inadequately treated pain in lactating women also has adverse consequences for the postpartum mother and her breastfed infant.&quot;</li>\n</ul>\n",
+      "version" : 0
+    },
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA451735",
+        "name" : "tramadol",
+        "version" : 14
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA128",
+        "symbol" : "CYP2D6",
+        "name" : "cytochrome P450 family 2 subfamily D member 6",
+        "version" : 7891
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1451309820,
+      "html" : "<p>In the CPIC Dosing Guideline, alternate non-codeine analgesics are recommended for CYP2D6 ultrarapid and poor metabolizers. A label recommended age- or weight-specific dose of tramadol is warranted for CYP2D6 normal and intermediate metabolizers.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451433717,
+      "html" : "<h3 id=\"december-2020\">December 2020</h3>\n<p>The authors of the CPIC&reg; guideline for opioids and CYP2D6, OPRM1 and COMT evaluated the available evidence for therapeutic dose recommendations for tramadol and CYP2D6 metabolizer phenotypes.</p>\n<ul>\n<li>\n<p>These guidelines are applicable to:</p>\n<ul>\n<li>adult patients</li>\n<li>pediatric patients</li>\n</ul>\n</li>\n<li>\n<p>Excerpts from the guideline:</p>\n<ul>\n<li>&quot;For CYP2D6 normal metabolizers, a label recommended age- or weight-specific starting dose of (...) tramadol, as recommended in the product label, is warranted. A label recommended starting dosing is also recommended for intermediate metabolizers; these patients should be monitored closely for less than optimal response and should be offered an alternative analgesic if warranted.&quot;</li>\n<li>&quot;For CYP2D6 poor metabolizers, current evidence supports the avoidance of (...) tramadol and the use of an alternative analgesics due to the likelihood of suboptimal or lack of effect. There is insufficient evidence in the literature to recommend a higher dose of (...) tramadol in poor metabolizers, especially considering the evidence that some adverse events do not differ between poor and normal metabolizers.&quot;</li>\n<li>&quot;For CYP2D6 ultrarapid metabolizers, (...) tramadol should not be used, in order to avoid the risk of severe toxicity with label-recommended dosing. Non-opioid analgesics and if needed, other opioids that are not affected by CYP2D6 phenotype, are potential alternatives for use in CYP2D6 poor and ultrarapid metabolizers based on the type, severity and chronicity of the pain being treated.&quot;</li>\n</ul>\n</li>\n<li>\n<p>Download and read:</p>\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/opioids/2020/33387367.pdf\" target=\"_blank\">CPIC&reg; Guideline for Opioids and <em>CYP2D6</em>, <em>OPRM1</em> and <em>COMT</em></a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/opioids/2020/33387367-supplement.pdf\" target=\"_blank\">2020 supplement</a></li>\n<li><a href=\"/page/cyp2d6RefMaterials\">CYP2D6 Gene-Specific Information Tables</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/tramadol-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Tramadol Drug Resource Mappings</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/tramadol_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Tramadol Pre and Post Test Alerts</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/images/flow_chart/Tramadol_CDS_Flow_Chart.jpg\" target=\"_blank\">Tramadol Clinical Decision Support Flow Chart</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-tramadol-therapy-recommendations-based-on-cyp2d6-phenotype\">Table 1: Tramadol therapy recommendations based on CYP2D6 phenotype</h3>\n<p><em>Adapted from Tables 1 and 3 of the guideline.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype<sup>a</sup></th>\n<th>Activity score<br/>range</th>\n<th>Activity score<sup>b</sup></th>\n<th>Examples of<br/><em>CYP2D6</em> diplotypes<sup>b</sup></th>\n<th>Implications</th>\n<th>Recommendations</th>\n<th>Classification of<br/>recommendation<sup>d</sup></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2D6 ultrarapid metabolizer</td>\n<td>&gt;2.25</td>\n<td>&gt;2.25</td>\n<td><em>*1/*1xN, *1/*2xN, *2/*2xN<sup>c</sup></em></td>\n<td>Increased formation of O-desmethyltramadol (active metabolite) leading to higher risk of toxicity.</td>\n<td>Avoid tramadol use because of potential for toxicity. If opioid use is warranted, consider a non-codeine opioid.</td>\n<td>Strong</td>\n</tr>\n<tr>\n<td>CYP2D6 normal metabolizer</td>\n<td>1.25 &lt;= x &lt;= 2.25</td>\n<td>1.25<br/>1.5<br/>1.75<br/>2.0<br/>2.25</td>\n<td><em>*1/*10<br/>*1/*41, *1/*9<br/>*10/*41x3<br/>*1/*1, *1/*2<br/>*2x2/*10</em></td>\n<td>Expected O-desmethyltramadol (active metabolite) formation</td>\n<td>Use tramadol label recommended age- or weight-specific dosing</td>\n<td>Strong</td>\n</tr>\n<tr>\n<td>CYP2D6 intermediate metabolizer</td>\n<td>0 &lt; x &lt; 1.25</td>\n<td>0.25<br/>0.5<br/>0.75<br/>1.0</td>\n<td>*4/*10<br/>*4/*41, *10/*10<br/>*10/*41<br/>*41/*41, *1/*5</td>\n<td>Reduced O-desmethyltramadol (active metabolite) formation.</td>\n<td>Use tramadol label recommended age- or weight-specific dosing. If no response and opioid use is warranted, consider a non-codeine opioid</td>\n<td>Optional</td>\n</tr>\n<tr>\n<td>CYP2D6 poor metabolizer</td>\n<td>0</td>\n<td>0</td>\n<td><em>*3/*4, *4/*4, *5/*5, *5/*6</em></td>\n<td>Greatly reduced O-desmethyltramadol (active metabolite) formation leading to diminished analgesia</td>\n<td>Avoid tramadol use because of possibility of diminished analgesia. If opioid use is warranted, consider a non-codeine opioid.</td>\n<td>Strong</td>\n</tr>\n<tr>\n<td>CYP2D6 Indeterminate</td>\n<td>n/a</td>\n<td>An individual carrying one or two unknown or uncertain function alleles</td>\n<td><em>*1/*22, *1/*25, *22/*25</em></td>\n<td>n/a</td>\n<td>No recommendation</td>\n<td>No recommendation</td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> See the <strong>CYP2D6 Frequency Table</strong> on the <a href=\"/page/cyp2d6RefMaterials\">CYP2D6 Gene-Specific Information Tables page</a> for biogeographical group-specific allele and phenotype frequencies.\n<sup>b</sup> Assignment of allele function and allele activity values including citations for allele function can be found in the <strong>CYP2D6 Allele Definition Table</strong> and <strong>CYP2D6 Allele Functionality Table</strong>. For a complete list of CYP2D6 diplotypes and resulting phenotypes, see the <strong>CYP2D6 Genotype to Phenotype Table</strong>. All of these tables can be accessed on the <a href=\"/page/cyp2d6RefMaterials\">CYP2D6 Gene-Specific Information Tables page</a>.<br />\n<sup>c</sup> Where xN represents the number of CYP2D6 gene copies. For individuals with CYP2D6 duplications or multiplications, see supplemental\ndata for additional information on how to translate diplotypes into phenotypes.<br />\n<sup>d</sup> Rating scheme described in the Strength of Recommendations section in the <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/opioids/2020/33387367-supplement.pdf\" target=\"_blank\">guideline supplement</a>.</p>\n",
+      "version" : 3
+    },
+    "version" : 9
+  }
+}

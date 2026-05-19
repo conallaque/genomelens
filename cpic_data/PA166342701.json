@@ -1,0 +1,123 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166342701",
+    "name" : "Annotation of AHA Guideline for clopidogrel and CYP2C19",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1454282720,
+        "date" : "2025-10-03T10:48:01.754-07:00",
+        "description" : "Updated to label as AHA",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454283680,
+        "date" : "2025-10-06T05:38:24.130-07:00",
+        "description" : "Added information about variants",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15159764,"title":"CYP2C19 Genetic Testing for Oral P2Y12 Inhibitor Therapy: A Scientific Statement From the American Heart Association.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11300169","crossReferences":[{"id":1452681344,"resource":"PubMed Central","resourceId":"PMC11300169","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11300169"},{"id":1452506126,"resource":"PubMed","resourceId":"38899464","_url":"https://www.ncbi.nlm.nih.gov/pubmed/38899464"},{"id":1452506127,"resource":"DOI","resourceId":"10.1161/CIR.0000000000001257","_url":"http://dx.doi.org/10.1161%2FCIR.0000000000001257"}],"objCls":"Literature","pubDate":"2024-08-01T00:00:00-07:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"},{"id":1451577482,"resource":"PGx Paper Types","term":"Review","termId":"pgxPaperTypes:1451577482"},{"id":1451577485,"resource":"PGx Paper Types","term":"Pharmacoeconomics","termId":"pgxPaperTypes:1451577485"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165816533",
+        "symbol" : "CYP2C19*17",
+        "name" : "*17",
+        "version" : 31
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165980635",
+        "symbol" : "CYP2C19*2",
+        "name" : "*2",
+        "version" : 27
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165980636",
+        "symbol" : "CYP2C19*3",
+        "name" : "*3",
+        "version" : 27
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165980637",
+        "symbol" : "CYP2C19*4",
+        "name" : "*4",
+        "version" : 27
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165980638",
+        "symbol" : "CYP2C19*5",
+        "name" : "*5",
+        "version" : 27
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165816522",
+        "symbol" : "CYP2C19*6",
+        "name" : "*6",
+        "version" : 29
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165816523",
+        "symbol" : "CYP2C19*7",
+        "name" : "*7",
+        "version" : 29
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165816524",
+        "symbol" : "CYP2C19*8",
+        "name" : "*8",
+        "version" : 29
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA449053",
+        "name" : "clopidogrel",
+        "version" : 22
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA124",
+        "symbol" : "CYP2C19",
+        "name" : "cytochrome P450 family 2 subfamily C member 19",
+        "version" : 7210
+      }
+    ],
+    "source" : "AHA",
+    "summaryMarkdown" : {
+      "id" : 1452511060,
+      "html" : "<p>The American Heart Association has a statement of CYP2C19 and clopidogrel and testing before oral P2Y12 inhibitors are prescribed in patients with acute coronary syndromes or percutaneous coronary intervention.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1452511061,
+      "html" : "<h3 id=\"2024-guideline\">2024 Guideline</h3>\n<p>The American Heart Association has evaluated therapeutic dose recommendations for clopidogrel based on CYP2C19 [Article:<a href=\"/pmid/38899464\">38899464</a>]. They recommend:</p>\n<blockquote class=\"blockquote\">\n<p>Treating CYP2C19 LOF carriers with an alternative oral P2Y12 inhibitor such as ticagrelor or prasugrel (drugs that are not dependent on CYP2C19 for activation) results in improving high on-treatment platelet reactivity and decreasing ischemic events. However, these more potent oral P2Y12 inhibitors compared with clopidogrel can result in increased bleeding complications when used universally. A precision medicine approach based on CYP2C19 genetic testing results in which LOF carriers are prescribed ticagrelor or prasugrel and noncarriers are prescribed clopidogrel decreases the risk of ischemic events compared with universal clopidogrel and decreases the risk of bleeding compared with universal ticagrelor or prasugrel and thus may offer a more balanced therapeutic approach. Given the totality of pharmacokinetic, pharmacodynamic, and recent clinical trial data with recent meta-analyses findings, CYP2C19 genetic testing before prescription of clopidogrel or ticagrelor/prasugrel in patients with ACS or PCI can be beneficial. The implementation of CYP2C19 genetic testing for individualizing oral P2Y12 inhibitor therapy depends on clinician and patient perceptions, recommendations provided by clinical guidelines that incorporate recently published clinical evidence, adoption by health care organizations by providing seamless integration in the EHR with supportive tools to understand results, reimbursement by insurance companies, and easy and timely availability of genetic testing.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p>For the purposes of this document, the term carrier indicates subjects who are homozygous or heterozygous for the allele that is being referenced. The most common LOF alleles include CYP2C19*2 (rs4244285, c.681G&gt;A) and CYP2C19*3 (rs4986893, c.636G&gt;A), which result in degraded or metabolically inactive protein. Less common LOF alleles include CYP2C19 *4, *5, *6, *7, and *8. In addition, hundreds of rarer missense variants have been reported to the Genome Aggregation Database, but their functional significance is undefined, although recent high-throughput approaches may change this situation. CYP2C19*17 (rs12248560, c.-806 C&gt;T) is considered a gain-of-function allele that increases transcription and enzyme expression.</p>\n</blockquote>\n",
+      "version" : 0
+    },
+    "version" : 0
+  }
+}

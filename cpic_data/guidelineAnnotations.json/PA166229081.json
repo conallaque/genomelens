@@ -1,0 +1,168 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166229081",
+    "name" : "Annotation of CPIC Guideline for amikacin, dibekacin, gentamicin, kanamycin, neomycin, netilmicin, paromomycin, plazomicin, ribostamycin, streptomycin, tobramycin and MT-RNR1",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "IE5sfgWBIAE",
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1451554700,
+        "date" : "2021-08-11T00:00:00-07:00",
+        "description" : "Approved",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1451564460,
+        "date" : "2021-10-27T10:16:54.534-07:00",
+        "description" : "Added link to guideline video",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452530643,
+        "date" : "2024-07-18T11:56:35.668-07:00",
+        "description" : "Added new drugs and excerpts from March 2023 update",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454386720,
+        "date" : "2025-10-27T00:00:00-07:00",
+        "description" : "changed m.930A>G to m.930G>A in Supplemental material and added update text",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15120862,"title":"Clinical Pharmacogenetics Implementation Consortium Guideline for the Use of Aminoglycosides Based on MT-RNR1 Genotype.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8613315","crossReferences":[{"id":1451837575,"resource":"PubMed Central","resourceId":"PMC8613315","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8613315"},{"id":1451457520,"resource":"PubMed","resourceId":"34032273","_url":"https://www.ncbi.nlm.nih.gov/pubmed/34032273"},{"id":1451457521,"resource":"DOI","resourceId":"10.1002/cpt.2309","_url":"http://dx.doi.org/10.1002%2Fcpt.2309"}],"objCls":"Literature","pubDate":"2022-02-01T00:00:00-08:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1451440641,
+      "html" : "<p>Excerpt from the guideline:\n&quot;These recommendations are not age-based and should apply to any individual with a MT-RNR1 AIHL-associated genotype where administration of an aminoglycoside is being considered. As hearing, listening and spoken language skills continue to develop in infants and children the impact of aminoglycoside administration in children with an actionable MT-RNR1 variant is likely to be greater than in the adult population</p>\n",
+      "version" : 0
+    },
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Variant",
+        "id" : "PA166159181",
+        "symbol" : "rs267606617",
+        "name" : "rs267606617",
+        "version" : 5
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166158908",
+        "symbol" : "rs267606618",
+        "name" : "rs267606618",
+        "version" : 6
+      },
+      {
+        "objCls" : "Variant",
+        "id" : "PA166158909",
+        "symbol" : "rs267606619",
+        "name" : "rs267606619",
+        "version" : 6
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA164744372",
+        "name" : "amikacin",
+        "version" : 9
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166292901",
+        "name" : "dibekacin",
+        "version" : 3
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA449753",
+        "name" : "gentamicin",
+        "version" : 10
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450137",
+        "name" : "kanamycin",
+        "version" : 7
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450608",
+        "name" : "neomycin",
+        "version" : 9
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA164754913",
+        "name" : "netilmicin",
+        "version" : 7
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA164784023",
+        "name" : "paromomycin",
+        "version" : 7
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166228921",
+        "name" : "plazomicin",
+        "version" : 3
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166292902",
+        "name" : "ribostamycin",
+        "version" : 3
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA451512",
+        "name" : "streptomycin",
+        "version" : 9
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA451704",
+        "name" : "tobramycin",
+        "version" : 10
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA31274",
+        "symbol" : "MT-RNR1",
+        "name" : "mitochondrially encoded 12S RNA",
+        "version" : 8
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1451330800,
+      "html" : "<p>The CPIC dosing guideline recommends that administration of aminoglycoside antibiotics should be avoided in patients carrying certain MT-RNR1 variants due to the increased risk of developing aminoglycoside-induced hearing loss (AIHL). The guideline has been updated online since the publication to correct a variant allele, add several more drugs and to clarify that vaccine schedules should still be followed.</p>\n",
+      "version" : 2
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451330801,
+      "html" : "<h3 id=\"october-2025\">October 2025</h3>\n<p>The MT-RNR1 variant at position 930 was originally included as m.930A&gt;G. The guideline authors have reviewed institutional sample data and confirmed that the G allele is the reference allele. Therefore the variant is now represented as m.930G&gt;A. The MT-RNR1 allele definition table, MT-RNR1 allele functionality reference, and the MT-RNR1 frequency table are updated to reflect the variant as m.930G&gt;A. The Supplement pdf and Table1 below are also updated.</p>\n<h3 id=\"march-2023\">March 2023</h3>\n<p>Following queries from prescribing clinicians, the guideline authors issued an update to clarify the use of vaccines in patients with certain <em>MT-RNR1</em> variants.</p>\n<p>Excerpts from the update text:</p>\n<blockquote class=\"blockquote\">\n<p>Aminoglycoside antibiotics are commonly used during the manufacture of vaccines to prevent bacterial contamination. Many of these agents are removed during the purification process, but some can remain as trace excipients.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p>This writing group agreed that individuals with MT-RNR1 variants associated with an increased risk of aminoglycoside-induced hearing loss (AIHL) should receive their vaccine schedule as normal. The rationale for this decision is threefold:</p>\n<ol>\n<li>The antibiotic content in vaccines is extremely low and well below the therapeutic doses associated with AIHL.1-3 For example, an influenza vaccine contains no more than 0.00015mg per dose. Although prescribing regimens vary depending on the clinical context and local guidance, a typical dose of gentamicin in neonatal sepsis is 5mg/kg every 24-36 hours.4-7 Therefore, a 3kg newborn might receive a 15mg daily dose of gentamicin intravenously; a 100,000 order of magnitude greater quantity than found in the vaccine. As such, the possibility that such small quantities of aminoglycosides contained in vaccines could cause AIHL is extremely low and, at best, theoretical.</li>\n<li>The CPIC guidelines for the use of aminoglycosides for individuals with the MT-RNR1 genotype state that, in individuals with risk-conferring MT-RNR1 variants, aminoglycoside antibiotics should be avoided unless the risk of AIHL is outweighed by the risk of not providing that antibiotic therapy, without safe or effective alternative therapies. In this clinical scenario, the guideline writing group agree that the extremely low theoretical risk of AIHL from vaccines is greatly outweighed by the benefits of vaccination.</li>\n<li>The frequency of the most common risk-conferring MT-RNR1 variant, m.1555A&gt;G, is sufficiently high that is reasonably likely that if there was a signal to be observed, this would have been identified given the almost ubiquitous nature of this intervention.</li>\n</ol>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p>In conclusion, the CPIC MT-RNR1 writing group agree that presence of MT-RNR1 variants associated with an increased risk of AIHL should not impact routine vaccination schedules.</p>\n</blockquote>\n<p>Download and read <a rel=\"noopener noreferrer\" href=\"https://cpicpgx.org/wp-content/uploads/2023/03/CPIC_Update_Final_V3.0.docx\" target=\"_blank\">the full update text</a></p>\n<p>In addition, the guideline recommendations were extended to cover dibekacin, neomycin, netilmicin and ribostamycin. Links to drug resource mapping files and to pre- and post-test alerts for these new drugs have been added below.</p>\n<h3 id=\"june-2021\">June 2021</h3>\n<p>The <a rel=\"noopener noreferrer\" href=\"https://ascpt.onlinelibrary.wiley.com/doi/10.1002/cpt.2309\" target=\"_blank\">CPIC&reg; guideline for aminoglycosides and MT-RNR1</a> has been published in <em>Clinical Pharmacology and Therapeutics</em>. The authors of the guideline evaluated the available evidence for the use of aminoglycoside antibiotics in patients carrying certain <em>MT-RNR1</em> variants.</p>\n<ul>\n<li>\n<p>These guidelines are applicable to:</p>\n<ul>\n<li>adult patients</li>\n<li>pediatric patients</li>\n</ul>\n</li>\n<li>\n<p>Excerpts from the guideline:</p>\n<ul>\n<li>&quot;The critical pharmacogenetics recommendation for a person with an <em>MT-RNR1</em> variant which predisposes to AIHL is that aminoglycoside antibiotics are relatively contraindicated, meaning that aminoglycosides should be avoided unless the increased risk of hearing loss is outweighed by the severity of infection and lack of safe or effective alternative therapies&quot;</li>\n<li>&quot;There is insufficient evidence to suggest that the adverse drug reaction may be more profound with some members of the aminoglycoside class than others. As such, this guidance covers all aminoglycoside antibiotics irrespective of class. We provide a strong recommendation that carriers of MT-RNR1 variants that predispose to AIHL should avoid aminoglycosides unless the increased risk of permanent hearing loss is outweighed by the risk of infection without safe or effective alternative therapies&quot;</li>\n<li>&quot;If no effective alternative to an aminoglycoside is thought to be available, we advise use for the shortest possible time, consultation with an infectious disease expert for alternative approaches, therapeutic drug monitoring and frequent assessment for hearing loss, both during and after therapy, in consultation with an audiovestibular physician.&quot;</li>\n<li>&quot;An individual with no detectable MT-RNR1 variant or carrying MT-RNR1 variants not considered to be predisposing to AIHL (normal risk), including the m.827A&gt;G variant, should still be considered at risk of AIHL.&quot;</li>\n</ul>\n</li>\n<li>\n<p>Download and read:</p>\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/aminoglycosides/2021/34032273.pdf\" target=\"_blank\">CPIC&reg; Guideline for Aminoglycosides and <em>MT-RNR1</em></a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/aminoglycosides/2021/34032273-supplement.pdf\" target=\"_blank\">Guideline supplement</a></li>\n<li><a href=\"/page/mtrnr1RefMaterials\">MT-RNR1 Gene-Specific Information Tables</a></li>\n<li>Drug Resource Mappings:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/amikacin-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Amikacin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/dibekacin-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Dibekacin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/gentamicin-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Gentamicin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/kanamycin-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Kanamycin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/neomycin-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Neomycin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/netilmicin-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Netilmicin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/paromomycin-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Paromomycin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/plazomicin-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Plazomicin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/ribostamycin-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Ribostamycin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/streptomycin-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Streptomycin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/tobramycin-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Tobramycin</a></li>\n</ul>\n</li>\n<li>Pre and Post Test Alerts and Flow Charts:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/amikacin_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Amikacin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/dibekacin_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Dibekacin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/gentamicin_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Gentamicin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/kanamycin_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Kanamycin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/neomycin_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Neomycin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/netilmicin_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Netilmicin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/paromomycin_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Paromomycin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/plazomicin_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Plazomicin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/ribostamycin_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Ribostamycin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/streptomycin_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Streptomycin</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/tobramycin_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Tobramycin</a></li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-recommended-therapeutic-use-of-aminoglycosides-in-relation-to-mt-rnr1-phenotype\">Table 1: Recommended therapeutic use of aminoglycosides in relation to <em>MT-RNR1</em> phenotype</h3>\n<p><em>Adapted from Tables 1 and 2 of the guideline.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype</th>\n<th>Genotype</th>\n<th>Example genotypes</th>\n<th>Implications</th>\n<th>Recommendations</th>\n<th>Classification of<br/>recommendation<sup>a</sup></th>\n<th>Considerations</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>MT-RNR1 increased risk of aminoglycoside-induced hearing loss</td>\n<td>Individuals with an <em>MT-RNR1</em> variant with an increased risk of aminoglycoside-induced hearing loss</td>\n<td>m.1095T&gt;C<br/>m.1494C&gt;T<br/>m.1555A&gt;G</td>\n<td>Very high risk of developing hearing loss if administered an aminoglycoside antibiotic</td>\n<td>Avoid aminoglycoside antibiotics unless the high risk of permanent hearing loss is outweighed by the severity of infection and lack of safe or effective alternative therapies.</td>\n<td>Strong</td>\n<td>If no effective alternative to an aminoglycoside antibiotic is available, evaluate for hearing loss frequently during therapy and ensure that all appropriate precautions are utilized (e.g., lowest possible dose and duration, utilization of therapeutic drug monitoring, hydration, renal function monitoring).</td>\n</tr>\n<tr>\n<td>MT-RNR1 normal risk of aminoglycoside-induced hearing loss</td>\n<td>Individuals with no detectable MT-RNR1 increased risk variant or a MT-RNR1 variant associated with normal risk of aminoglycoside-induced hearing loss</td>\n<td>m.827A&gt;G</td>\n<td>Normal risk of developing hearing loss if administered an aminoglycoside antibiotic.</td>\n<td>Use aminoglycoside antibiotics at standard doses for the shortest feasible course with therapeutic dose monitoring. Evaluate regularly for hearing loss in line with local guidance.</td>\n<td>Strong</td>\n<td>Individuals without MT-RNR1 aminoglycoside-induced hearing loss increased risk variants are still at risk of aminoglycoside-associated hearing loss, especially with high drug levels or prolonged courses.</td>\n</tr>\n<tr>\n<td>MT-RNR1 uncertain risk of aminoglycoside-induced hearing loss</td>\n<td>Individuals with a MT-RNR1 variant associated with an uncertain risk of aminoglycoside-induced hearing loss</td>\n<td>m.663A&gt;G<br/>m.669T&gt;C<br/>m.747A&gt;G<br/>m.786G&gt;A<br/>m.807A&gt;G<br/>m.807A&gt;C<br/>m.839A&gt;G<br/>m.896A&gt;G<br/>m.930G&gt;A<br/>m.951G&gt;A<br/>m.960C&gt;del<br/>m.961T&gt;G<br/>m.961T&gt;del<br/>m.961T&gt;del+Cn<br/>m.988G&gt;A<br/>m.1189T&gt;C<br/>m.1243T&gt;C<br/>m.1520T&gt;C<br/>m.1537C&gt;T<br/>m.1556C&gt;T</td>\n<td>Weak or no evidence for an increased risk of MT-RNR1-associated hearing loss if administered an aminoglycoside antibiotic.</td>\n<td>Use aminoglycoside antibiotics at standard doses for the shortest feasible course with therapeutic drug monitoring. Evaluate regularly for hearing loss in line with local guidance.</td>\n<td>Optional</td>\n<td>Individuals without MT-RNR1 aminoglycoside-induced hearing loss increased risk variants are still at risk of aminoglycoside-associated hearing loss, especially with high drug levels or prolonged courses.</td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup>  Rating scheme described in the Strength of Recommendations section in the <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/aminoglycosides/2021/34032273-supplement.pdf\" target=\"_blank\">guideline supplement</a>.</p>\n",
+      "version" : 5
+    },
+    "version" : 11
+  }
+}
