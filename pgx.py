@@ -22,8 +22,68 @@ Caveats (called out in the report):
     but is not guaranteed.
 """
 
+from pathlib import Path
 from typing import Dict, List, Optional
+import json
 import pandas as pd
+
+_DRUG_DB_PATH = Path(__file__).resolve().parent / "drug_database.json"
+_DRUG_DB_CACHE: Optional[List[Dict]] = None
+
+
+def _load_drug_database() -> List[Dict]:
+    global _DRUG_DB_CACHE
+    if _DRUG_DB_CACHE is None:
+        try:
+            with open(_DRUG_DB_PATH) as fh:
+                data = json.load(fh)
+            _DRUG_DB_CACHE = data.get("drugs", []) if isinstance(data, dict) else list(data)
+        except Exception:
+            _DRUG_DB_CACHE = []
+    return _DRUG_DB_CACHE
+
+
+def analyze_drug_database(snps_df: pd.DataFrame) -> List[Dict]:
+    """For every drug entry in drug_database.json, report a finding if the
+    user has a called genotype for any of the drug's snp_markers.
+
+    Returns one finding per drug entry that has at least one matched SNP.
+    """
+    findings: List[Dict] = []
+    drugs = _load_drug_database()
+    if not drugs:
+        return findings
+
+    snps_index = snps_df.index if snps_df is not None else []
+
+    for entry in drugs:
+        markers = entry.get("snp_markers") or []
+        matched: List[Dict] = []
+        for rsid in markers:
+            if rsid not in snps_index:
+                continue
+            gt = snps_df.loc[rsid].get("genotype")
+            gt_str = str(gt).upper() if gt is not None else ""
+            gt_clean = gt_str.replace(" ", "").replace("-", "")
+            if gt_clean in ("", "NAN", "--"):
+                continue
+            matched.append({"rsid": rsid, "genotype": gt_str})
+
+        if not matched:
+            continue
+
+        findings.append({
+            "drug": entry.get("drug_name", ""),
+            "genes": entry.get("genes", []) or [],
+            "snp_markers": markers,
+            "matched_snps": matched,
+            "n_matched": len(matched),
+            "n_markers": len(markers),
+            "phenotypes": entry.get("phenotypes", []) or [],
+            "recommendation": entry.get("dosing_recommendation", ""),
+        })
+
+    return findings
 
 
 # ─── Helper ───────────────────────────────────────────────────────────────────
@@ -498,14 +558,42 @@ NOVELTY_PANELS: List[Dict] = [
         "section": "Electro-Biological Sensitivity",
         "description": "Genetic factors affecting electrical/neurological sensitivity.",
         "genes": [
-            # Fictional / non-HGNC symbols — kept as supplied, never callable.
-            {"gene": "CRF2",  "rsid": None, "note": "Symbol not in HGNC — not assayable."},
             {"gene": "ASMT",  "rsid": "rs4446909",
              "note": "Melatonin biosynthesis; promoter variation has been studied in circadian phenotypes."},
             {"gene": "NOS3",  "rsid": "rs1799983",
              "note": "Endothelial nitric oxide synthase; G894T (Glu298Asp) tweaks NO signaling."},
-            {"gene": "ISCAI", "rsid": None, "note": "Symbol not in HGNC — not assayable."},
-            {"gene": "TRRL",  "rsid": None, "note": "Symbol not in HGNC — not assayable."},
+            {"gene": "COMT",  "rsid": "rs4680",
+             "note": "Val158Met; intermediate dopamine clearance in heterozygotes (one Val158 \"warrior\" copy, one Met158 \"worrier\" copy)."},
+            {"gene": "BDNF",  "rsid": "rs6265",
+             "note": "Val66Met; major-allele homozygotes show standard activity-dependent BDNF secretion and neuroplasticity."},
+            {"gene": "CACNA1C", "rsid": "rs1006737",
+             "note": "Voltage-gated L-type calcium channel (Cav1.2); most-studied neuropsychiatric variant."},
+            {"gene": "HTR2A", "rsid": "rs6313",
+             "note": "Serotonin 2A receptor; T102C variant, major-allele homozygotes have baseline signaling."},
+            {"gene": "CRHR2", "rsid": None,
+             "note": "Corticotropin-releasing hormone receptor 2; stress-axis receptor involved in HPA-axis regulation and autonomic response. Not tested on this chip."},
+            {"gene": "ISCA1", "rsid": None,
+             "note": "Iron-sulfur cluster assembly 1; mitochondrial Fe-S cluster biogenesis and electron transport chain function. Not tested on this chip."},
+        ],
+    },
+    {
+        "section": "Photic / Circadian Sensitivity",
+        "description": "Serotonin-melatonin biosynthesis and retinal transcription factors influencing light/circadian response.",
+        "genes": [
+            {"gene": "AANAT", "rsid": None,
+             "note": "Aralkylamine N-acetyltransferase; rate-limiting enzyme in melatonin biosynthesis. Not tested on this chip."},
+            {"gene": "ASMT",  "rsid": None,
+             "note": "Acetylserotonin O-methyltransferase; final step of melatonin biosynthesis. Not tested on this chip."},
+            {"gene": "TPH1",  "rsid": "rs1800532",
+             "note": "Tryptophan hydroxylase 1; rate-limiting enzyme for peripheral serotonin synthesis. Major-allele homozygotes have baseline activity."},
+            {"gene": "DDC",   "rsid": "rs921451",
+             "note": "DOPA decarboxylase (AADC); catalyzes 5-HTP→serotonin and L-DOPA→dopamine."},
+            {"gene": "CRX",   "rsid": None,
+             "note": "Cone-rod homeobox transcription factor; photoreceptor differentiation and maintenance. Not tested on this chip."},
+            {"gene": "OTX2",  "rsid": None,
+             "note": "Orthodenticle homeobox 2; transcription factor required for retinal and brain development. Not tested on this chip."},
+            {"gene": "PAX6",  "rsid": None,
+             "note": "Paired box 6; master regulator transcription factor for eye and neural development. Not tested on this chip."},
         ],
     },
     {
@@ -514,11 +602,6 @@ NOVELTY_PANELS: List[Dict] = [
         "genes": [
             {"gene": "MTHFR",  "rsid": "rs1801133",
              "note": "C677T; T allele reduces enzyme activity → mild homocysteine elevation."},
-            {"gene": "AGE",    "rsid": None,
-             "note": '"AGE" is not a gene symbol (advanced glycation end-products) — not assayable.'},
-            {"gene": "PRKA11", "rsid": None, "note": "Symbol not in HGNC — not assayable."},
-            {"gene": "EFAS1",  "rsid": None, "note": "Symbol not in HGNC — not assayable."},
-            {"gene": "EGLNA",  "rsid": None, "note": "Symbol not in HGNC — not assayable."},
             {"gene": "PPARA",  "rsid": "rs1800206",
              "note": "L162V; V allele linked to altered lipid handling and vascular response."},
         ],
@@ -589,10 +672,17 @@ def analyze_pgx(snps_df: pd.DataFrame) -> Dict:
     except Exception:
         novelty_panels = []
 
+    try:
+        database_findings = analyze_drug_database(snps_df)
+    except Exception:
+        database_findings = []
+
     return {
         "per_gene": per_gene,
         "actionable_findings": actionable,
         "n_genes_tested": len(per_gene),
         "n_actionable_findings": len(actionable),
         "novelty_panels": novelty_panels,
+        "database_findings": database_findings,
+        "n_database_findings": len(database_findings),
     }
