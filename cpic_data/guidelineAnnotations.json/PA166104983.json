@@ -1,0 +1,232 @@
+{
+  "citations" : [
+    {
+      "id" : 7283333,
+      "title" : "Pharmacogenetics: from bench to byte--an update of guidelines.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+      "authors" : [
+        "Swen J J",
+        "Nijenhuis M",
+        "de Boer A",
+        "Grandia L",
+        "Maitland-van der Zee A H",
+        "Mulder H",
+        "Rongen G A P J M",
+        "van Schaik R H N",
+        "Schalekamp T",
+        "Touw D J",
+        "van der Weide J",
+        "Wilffert B",
+        "Deneer V H M",
+        "Guchelaar H-J"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 769250885,
+          "resource" : "PubMed",
+          "resourceId" : "21412232",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/21412232",
+          "version" : 0
+        },
+        {
+          "id" : 1449247827,
+          "resource" : "DOI",
+          "resourceId" : "10.1038/clpt.2011.34",
+          "_url" : "http://dx.doi.org/10.1038%2Fclpt.2011.34",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "Clinical pharmacology and therapeutics",
+      "meshTerms" : [
+        "Animals",
+        "Aryl Hydrocarbon Hydroxylases",
+        "Cytochrome P-450 CYP2C9",
+        "Drug Administration Schedule",
+        "Drug-Related Side Effects and Adverse Reactions",
+        "Humans",
+        "Pharmaceutical Preparations",
+        "Pharmacogenetics",
+        "Practice Guidelines as Topic"
+      ],
+      "month" : 5,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "page" : "662-73",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2011-05-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "Currently, there are very few guidelines linking the results of pharmacogenetic tests to specific therapeutic recommendations. Therefore, the Royal Dutch Association for the Advancement of Pharmacy established the Pharmacogenetics Working Group with the objective of developing pharmacogenetics-based therapeutic (dose) recommendations. After systematic review of the literature, recommendations were developed for 53 drugs associated with genes coding for CYP2D6, CYP2C19, CYP2C9, thiopurine-S-methyltransferase (TPMT), dihydropyrimidine dehydrogenase (DPD), vitamin K epoxide reductase (VKORC1), uridine diphosphate glucuronosyltransferase 1A1 (UGT1A1), HLA-B44, HLA-B*5701, CYP3A5, and factor V Leiden (FVL).",
+      "terms" : [],
+      "type" : "Literature",
+      "version" : 4,
+      "volume" : "89",
+      "year" : 2011
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166104983",
+    "name" : "Annotation of DPWG Guideline for tacrolimus and CYP3A5",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1183704531,
+        "date" : "2011-08-10T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1450414922,
+        "date" : "2019-05-23T08:19:51.154-07:00",
+        "description" : "Annotation current with November 2018 DPWG Guideline release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450820682,
+        "date" : "2019-10-03T16:38:07.181-07:00",
+        "description" : "No changes based on August 2019 guidelines",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450956420,
+        "date" : "2020-01-31T14:18:56.499-08:00",
+        "description" : "Updated link to 2011 DPWG methods",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450963904,
+        "date" : "2020-02-11T07:58:37.393-08:00",
+        "description" : "Fixed links to 2018 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451153180,
+        "date" : "2020-06-01T14:05:01.035-07:00",
+        "description" : "Changes based on May 2020 guidelines",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451701140,
+        "date" : "2022-03-02T15:16:35.153-08:00",
+        "description" : "Updated annotation to reflect wording changes in May 2021 update.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704220,
+        "date" : "2022-03-03T16:33:30.066-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451707503,
+        "date" : "2022-03-08T10:53:46.179-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732860,
+        "date" : "2022-03-28T09:57:43.885-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733458,
+        "date" : "2022-03-28T15:03:08.142-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741529,
+        "date" : "2022-04-05T11:19:54.451-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884700,
+        "date" : "2022-09-16T14:44:02.111-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452083480,
+        "date" : "2023-04-27T18:15:15.352-07:00",
+        "description" : "added note about CYP3A5*2, *4, *5",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452146528,
+        "date" : "2023-07-03T13:40:12.195-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452411043,
+        "date" : "2024-03-18T08:53:00.875-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":7283333,"title":"Pharmacogenetics: from bench to byte--an update of guidelines.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/21412232","crossReferences":[{"id":769250885,"resource":"PubMed","resourceId":"21412232","_url":"https://www.ncbi.nlm.nih.gov/pubmed/21412232"},{"id":1449247827,"resource":"DOI","resourceId":"10.1038/clpt.2011.34","_url":"http://dx.doi.org/10.1038%2Fclpt.2011.34"}],"objCls":"Literature","pubDate":"2011-05-01T00:00:00-07:00","terms":[],"type":"Literature"},
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15111722,"title":"Dutch Pharmacogenetics Working Group Guidelines May 2020","_sameAs":"https://www.knmp.nl/downloads/pharmacogenetic-recommendations-may-2020.pdf","crossReferences":[{"id":1451152900,"resource":"URL","resourceId":"https://www.knmp.nl/downloads/pharmacogenetic-recommendations-may-2020.pdf","_url":"https://www.knmp.nl/downloads/pharmacogenetic-recommendations-may-2020.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15102465,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2018","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","crossReferences":[{"id":1450415575,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA451578",
+        "name" : "tacrolimus",
+        "version" : 27
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA131",
+        "symbol" : "CYP3A5",
+        "name" : "cytochrome P450 family 3 subfamily A member 5",
+        "version" : 7962
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1447981954,
+      "html" : "<p>Increased doses of tacrolimus are recommended for CYP3A5 heterozygous and homozygous expressors and adjusted as needed. Instructions for liver transplantation patients include genotypes of both patient and donor.</p>\n",
+      "version" : 2
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1447981953,
+      "html" : "<p>The CYP3A5 gene information document from DPWG includes CYP3A5*2, *4, and *5, but these alleles are not included in the genotype selection picker above. CYP3A5*2, *4 and *5 have been retired by PharmVar in February 2022 after their core SNVs have been found to be in complete linkage equilibrium with the CYP3A5*3-defining intronic variant c.219-237. See <a rel=\"noopener noreferrer\" href=\"https://a.storyblok.com/f/70677/x/4ef856ccd0/gene-info_cyp3a5_v1-5.pdf\" target=\"_blank\">Read me document</a> and the PharmVar CYP3A5 GeneFocus [Article:<a href=\"/pmid/35202484\">35202484</a>] for additional details.</p>\n<h3 id=\"may-2021-update\">May 2021 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has made some minor changes to the text of the CYP3A5-tacrolimus guideline. The table below has been updated to reflect this but the recommendations themselves have not changed</p>\n<h3 id=\"may-2020-update\">May 2020 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for tacrolimus based on CYP3A5 status and includes recommendations for liver transplantations and other transplantations. They recommend increasing the initial dose followed by adjustment based on therapeutic drug monitoring in both heterozygous and homozygous CYP3A5 expressor.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_May_2020.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_May_2020.pdf\">Dutch guidelines May 2020 update</a> and incorporating text changes from the <a download=\"DPWG_May_2021.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_May_2021.pdf\">May 2021 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation Indications OTHER than liver transplantation</th>\n<th>Recommendation LIVER transplantation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP3A5 heterozygote expressor</td>\n<td>tacrolimus</td>\n<td>An increase of the initial dose can result in an increased chance of reaching a tacrolimus concentration within the target range before the start of therapeutic drug monitoring. However, there is no direct evidence that this results in improved clinical results. The genetic variation results in increased conversion of tacrolimus to inactive metabolites and therefore in a higher required dose.</td>\n<td>Use 1.5 times the initial dose that would yield the desired result in non-expressers. Adjustment of the dose should then be based on therapeutic drug monitoring.<br/>For example: A Dutch study found a median trough concentration for tacrolimus of 14.7 ng/mL after 3 days at an initial dose of 0.15 mg/kg twice daily for 29 kidney transplant patients who were heterozygous expressers. Their target value was 10 - 15 ng/mL.</td>\n<td>In addition to the patient’s genotype, the metabolism of tacrolimus is also determined by the genotype of the transplanted liver.<br/>LIVER is also of the genotype HETEROZYGOUS EXPRESSOR: Use 1.5 times the normal initial dose. Adjustment of the dose should then be based on therapeutic drug monitoring.<br/>If LIVER has a DIFFERENT genotype: There is insufficient evidence in the literature to support a dose recommendation.</td>\n</tr>\n<tr>\n<td>CYP3A5 homozygous expressor</td>\n<td>tacrolimus</td>\n<td>An increase of the initial dose can result in an increased chance of reaching a tacrolimus concentration within the target range before the start of therapeutic drug monitoring. However, there is no direct evidence that this results in improved clinical results. The genetic variation results in an increased conversion of tacrolimus to inactive metabolites and therefore a higher required dose.</td>\n<td>Use 2.5 times the initial dose that would yield the desired result in non-expressers. Adjustment of the dose should then be based on therapeutic drug monitoring.<br/>For example: One Dutch study found a median trough concentration for tacrolimus after three days of 9.4 ng/mL at an initial dose of 0.15 mg/kg twice daily for 5 homozygous kidney transplant patients. Their target value was 10 - 15 ng/mL.</td>\n<td>In addition to the patient’s genotype, the metabolism of tacrolimus is also determined by the genotype of the transplanted liver.<br/>LIVER is also of the genotype HOMOZYGOUS EXPRESSOR: Use 2.5 times the normal initial dose. Adjustment of the dose should then be based on therapeutic drug monitoring.<br/>LIVER has a DIFFERENT genotype: There is insufficient evidence in the literature to support a dose recommendation.</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_CYP3A5_tacrolimus_2357-2358.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP3A5_tacrolimus_2357-2358.pdf\">Read for more information about this recommendation</a>, <a download=\"CYP3A5.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CYP3A5.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_CYP3A5_tacrolimus_2357-2358.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP3A5_tacrolimus_2357-2358.pdf\">DPWG risk analysis document</a> for tacrolimus and CYP3A5:</p>\n<blockquote class=\"blockquote\">\n<p>The KNMP Pharmacogenetics Working Group decided not to give a genotyping recommendation for tacrolimus, because evidence of a clinical effect of CYP3A5 expresser phenotypes in standard clinical practice is lacking. Because of this, indications for a positive effect of determining CYP3A5 phenotype and adjusting therapy according to this phenotype are lacking.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n<h3 id=\"november-2018-update\">November 2018 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for tacrolimus based on CYP3A5 status and includes recommendations for liver transplantations and other transplantations. Genetic variation results in an increased conversion of tacrolimus to inactive metabolites and as a result a higher dose is required. Adjustment of the initial dose results in an increased chance of reaching a tacrolimus concentration within the target range before the start of therapeutic drug monitoring on day three. However, there is no direct evidence that this results in improved clinical results.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_November_2018.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_November_2018.pdf\">Dutch guidelines November 2018 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Recommendation Indications OTHER than liver transplantation</th>\n<th>Recommendation LIVER transplantation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP3A5 heterozygote expressor</td>\n<td>tacrolimus</td>\n<td>Start with 1.75 times of the standard initial dose that would yield the desired result in non-expressors. Adjustment of the dose should then be based on therapeutic drug monitoring.</td>\n<td>In addition to the patient’s genotype, the metabolism of tacrolimus is also determined by the genotype of the transplanted liver.<br/>LIVER is also of the genotype HETEROZYGOUS EXPRESSOR: Start with 1.75 times the standard initial dose Adjustment of the dose should then be based on therapeutic drug monitoring.<br/>If LIVER has a DIFFERENT genotype: There is insufficient evidence in the literature to support a dose recommendation.</td>\n</tr>\n<tr>\n<td>CYP3A5 homozygous expressor</td>\n<td>tacrolimus</td>\n<td>Start with 2.5 times the standard initial dose that would yield the desired result in non-expressors Adjustment of the dose should then be based on therapeutic drug monitoring.</td>\n<td>In addition to the patient’s genotype, the metabolism of tacrolimus is also determined by the genotype of the transplanted liver.<br/>LIVER is also of the genotype HOMOZYGOUS EXPRESSOR: Start with 2.5 times the standard initial dose Adjustment of the dose should then be based on therapeutic drug monitoring.<br/>LIVER has a DIFFERENT genotype: There is insufficient evidence in the literature to support a dose recommendation.</td>\n</tr>\n</tbody>\n</table>\n<h3 id=\"2011-guideline\">2011 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for tacrolimus based on CYP3A5 genotype [Article:<a href=\"/pmid/21412232\">21412232</a>].  They found evidence to support an interaction between tacrolimus and CYP3A5.  However, they make no dosing recommendations at this time, due to fact that &quot;in Dutch transplantation hospitals the tacrolimus dose is titrated in response to therapeutic drug monitoring.&quot;</p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Genotype</th>\n<th>Therapeutic Dose Recommendation</th>\n<th>Level of Evidence</th>\n<th>Clinical Relevance</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP3A5 *1/*1</td>\n<td>None</td>\n<td>Published controlled studies of good quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints.</td>\n<td>Clinical effect (S): short-lived discomfort (&lt; 48 hr) without permanent injury: e.g. reduced decrease in resting heart rate; reduction in exercise tachycardia; decreased pain relief from oxycodone; ADE resulting from increased bioavailability of atomoxetine (decreased appetite, insomnia, sleep disturbance etc); neutropenia &gt; 1.5x109/l; leucopenia &gt; 3.0x109/l; thrombocytopenia  &gt; 75x109/l; moderate diarrhea not affecting daily activities; reduced glucose increase following oral glucose tolerance test.</td>\n</tr>\n<tr>\n<td>CYP3A5 *1/*3</td>\n<td>None</td>\n<td>Published controlled studies of good quality* relating to phenotyped and/or genotyped patients or healthy volunteers, and having relevant pharmacokinetic or clinical endpoints.</td>\n<td>Clinical effect (S): long-standing discomfort (&gt; 168 hr), permanent symptom or invalidating injury e.g. failure of prophylaxis of atrial fibrillation; venous thromboembolism; decreased effect of clopidogrel on inhibition of platelet aggregation; ADE resulting from increased bioavailability of phenytoin; INR &gt; 6.0; neutropenia 0.5-1.0x109/l; leucopenia 1.0-2.0x109/l; thrombocytopenia 25-50x109/l; severe diarrhea.</td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li>*See <a href=\"/page/dpwg\">Methods </a> or [Article:<a href=\"/pmid/18253145\">18253145</a>] for definition of &quot;good quality.&quot;</li>\n<li>S: statistically significant difference.</li>\n</ul>\n",
+      "version" : 21
+    },
+    "version" : 36
+  }
+}

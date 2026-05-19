@@ -1,0 +1,131 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166182841",
+    "name" : "Annotation of DPWG Guideline for warfarin and VKORC1",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1450415237,
+        "date" : "2019-05-27T00:00:00-07:00",
+        "description" : "Annotation current with November 2018 DPWG Guideline release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450820675,
+        "date" : "2019-10-03T16:20:39.794-07:00",
+        "description" : "No changes based on August 2019 guidelines",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450963981,
+        "date" : "2020-02-11T08:50:11.941-08:00",
+        "description" : "Fixed links to 2018 guideline pdfs and links to algorithms",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704179,
+        "date" : "2022-03-03T16:33:22.608-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451732819,
+        "date" : "2022-03-28T09:57:36.283-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451884782,
+        "date" : "2022-09-16T14:51:58.837-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451903941,
+        "date" : "2022-10-04T14:47:14.968-07:00",
+        "description" : "included translation to positive strand",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146449,
+        "date" : "2023-07-03T13:39:47.648-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452411925,
+        "date" : "2024-03-18T12:40:45.847-07:00",
+        "description" : "Updated links for risk analysis pdf.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452414661,
+        "date" : "2024-03-20T06:08:05.526-07:00",
+        "description" : "Added the link for algorithm attachment and date of retrieval.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15102465,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2018","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","crossReferences":[{"id":1450415575,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Variant",
+        "id" : "PA166155091",
+        "symbol" : "rs9923231",
+        "name" : "rs9923231",
+        "version" : 5
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA451906",
+        "name" : "warfarin",
+        "version" : 21
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA133787052",
+        "symbol" : "VKORC1",
+        "name" : "vitamin K epoxide reductase complex subunit 1",
+        "version" : 16
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1450415234,
+      "html" : "<p>Patients with the VKORC1 rs9923231 TT genotype (-1639 AA genotype) should be given 60% of the standard initial dose of warfarin. The genotype-specific initial dose and maintenance dose can be calculated using an algorithm. There are no recommendation for patients with the VKORC1 rs9923231 CT genotype (-1639 AG genotype).</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1450415235,
+      "html" : "<h3 id=\"november-2018-guideline\">November 2018 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (DPWG) has evaluated therapeutic dose recommendations for warfarin based on VKORC1 genotype. They recommend that patients with the VKORC1 <a href=\"/variant/PA166155091\">rs9923231</a> TT genotype (-1639 AA genotype)  receive 60% of the standard initial dose.The genotype-specific initial dose and maintenance dose can be calculated using an algorithm. No action is needed for patients with the VKORC1 rs9923231 CT genotype (-1639 AG genotype).</p>\n<p><a download=\"DPWG_Warfarin_loading_doses_calculation_for_different_genotypes.xlsx\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_Warfarin_loading_doses_calculation_for_different_genotypes.xlsx\">Download the warfarin loading doses algorithm used in EU-PACT provided by DPWG</a> <em>this is an excel file retrieved from DPWG on 3/19/2024.</em>\n<a download=\"DPWG_Warfarin_doses_day_4_and_5_calculation_for_different_genotypes.xlsx\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_Warfarin_doses_day_4_and_5_calculation_for_different_genotypes.xlsx\">Download the warfarin day 4-5 algorithm used in EU-PACT provided by DPWG</a> <em>this is an excel file retrieved from DPWG on 3/20/2024.</em></p>\n<p><em>Wording in table taken from the <a download=\"DPWG_November_2018.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_November_2018.pdf\">Dutch guidelines November 2018 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>VKORC1 -1639 AA</td>\n<td>warfarin</td>\n<td>The genetic variation results in increased sensitivity to warfarin. This results in an increase in the risk of excessively severe inhibition of blood clotting (INR &gt; 4) during the first month of the treatment.</td>\n<td>1. use 60% of the standard initial dose. The genotype-specific initial dose and maintenance dose can be calculated using an algorithm, as used in EU-PACT. From day 6 on the standard algorithm without genotype information can be used to calculate the dose.</td>\n</tr>\n<tr>\n<td>VKORC1 -1639 AG</td>\n<td>warfarin</td>\n<td>The genetic variation results in a reduction in the required dose and an increase in the risk of excessively severe inhibition of blood clotting during the first month of the treatment. However, the effect is small and GA is also the most common genotype, meaning that the standard treatment will primarily be based on patients with this genotype.</td>\n<td>NO action is needed for this gene-drug interaction</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_VKORC1_warfarin_6235-6236.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_VKORC1_warfarin_6235-6236.pdf\">Read for more information about this recommendation</a>, <a download=\"VKORC1.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/VKORC1.pdf\">Read about gene information from DPWG</a></p>\n",
+      "version" : 7
+    },
+    "version" : 14
+  }
+}

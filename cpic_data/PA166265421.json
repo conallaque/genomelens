@@ -1,0 +1,221 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166265421",
+    "name" : "Annotation of DPWG Guideline for quetiapine and CYP3A4",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1451704255,
+        "date" : "2022-03-03T16:33:35.459-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451723440,
+        "date" : "2022-03-18T11:39:36.747-07:00",
+        "description" : "Updated annotation based on February 2022 release and added extended dosing guideline",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451733448,
+        "date" : "2022-03-28T00:00:00-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732895,
+        "date" : "2022-03-28T09:57:49.445-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451741505,
+        "date" : "2022-04-05T11:18:17.661-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451778540,
+        "date" : "2022-05-13T12:20:17.413-07:00",
+        "description" : "Updated CYP3A4 alleles to match PharmVar",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884680,
+        "date" : "2022-09-16T14:34:19.426-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451984860,
+        "date" : "2023-01-17T10:55:33.540-08:00",
+        "description" : "Removed CYP3A4*36 due to *36 being retired by PharmVar",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452057820,
+        "date" : "2023-04-03T16:16:48.142-07:00",
+        "description" : "added DPWG publication",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452083520,
+        "date" : "2023-04-27T18:26:21.401-07:00",
+        "description" : "added note about *1A, *1B, *1G",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452146484,
+        "date" : "2023-07-03T13:39:57.505-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452411664,
+        "date" : "2024-03-18T11:55:26.206-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15142974,"title":"Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6, CYP3A4 and CYP1A2 and antipsychotics.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10923774","crossReferences":[{"id":1452412000,"resource":"PubMed Central","resourceId":"PMC10923774","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10923774"},{"id":1452056756,"resource":"PubMed","resourceId":"37002327","_url":"https://www.ncbi.nlm.nih.gov/pubmed/37002327"},{"id":1452056757,"resource":"DOI","resourceId":"10.1038/s41431-023-01347-3","_url":"http://dx.doi.org/10.1038%2Fs41431-023-01347-3"}],"objCls":"Literature","pubDate":"2024-03-01T00:00:00-08:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819201",
+        "symbol" : "CYP3A4*1",
+        "name" : "*1",
+        "version" : 20
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819229",
+        "symbol" : "CYP3A4*11",
+        "name" : "*11",
+        "version" : 20
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819230",
+        "symbol" : "CYP3A4*12",
+        "name" : "*12",
+        "version" : 20
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819231",
+        "symbol" : "CYP3A4*13",
+        "name" : "*13",
+        "version" : 20
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819236",
+        "symbol" : "CYP3A4*16",
+        "name" : "*16",
+        "version" : 19
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819239",
+        "symbol" : "CYP3A4*17",
+        "name" : "*17",
+        "version" : 20
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819240",
+        "symbol" : "CYP3A4*18",
+        "name" : "*18",
+        "version" : 19
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819244",
+        "symbol" : "CYP3A4*20",
+        "name" : "*20",
+        "version" : 21
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA166048680",
+        "symbol" : "CYP3A4*22",
+        "name" : "*22",
+        "version" : 17
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA166245583",
+        "symbol" : "CYP3A4*26",
+        "name" : "*26",
+        "version" : 10
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819224",
+        "symbol" : "CYP3A4*6",
+        "name" : "*6",
+        "version" : 20
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819226",
+        "symbol" : "CYP3A4*8",
+        "name" : "*8",
+        "version" : 20
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA451201",
+        "name" : "quetiapine",
+        "version" : 8
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA130",
+        "symbol" : "CYP3A4",
+        "name" : "cytochrome P450 family 3 subfamily A member 4",
+        "version" : 8039
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1451698940,
+      "html" : "<p>Patients who are CYP3A4 poor metabolizers and being treated for depression should be given an alternative drug. Patients being treated for other indications and who are CYP3A4 poor metabolizers should be given a reduced dose of quetiapine. No action is needed for patients who are CYP3A4 intermediate metabolizers.</p>\n<p><em><strong>ClinPGx uses CYP3A4 allele nomenclature as defined by <a rel=\"noopener noreferrer\" href=\"https://www.pharmvar.org/\" target=\"_blank\">PharmVar</a>, while the current version of this guideline issued by the DPWG uses retired allele names. Further details are given on the <a href=\"/page/dpwgMapping\">DPWG curation page</a>.</strong></em></p>\n",
+      "version" : 3
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451698941,
+      "html" : "<p>The CYP3A4 gene information document from DPWG includes CYP3A4*1A, *1B, and *1G, but these alleles are not included in the genotype selection picker above. CYP3A4*1A and *1B have assigned as sub alleles under the CYP3A4*1  core allele by PharmVar. CYP3A4*1G has been retired by <a rel=\"noopener noreferrer\" href=\"https://www.pharmvar.org/gene/CYP3A4\" target=\"_blank\">PharmVar</a>. See the <a rel=\"noopener noreferrer\" href=\"https://a.storyblok.com/f/70677/x/737f8eee89/gene-info_cyp3a4_v2-0.pdf\" target=\"_blank\">CYP3A4 Read me</a> document for details.</p>\n<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-between-cyp2d6-cyp3a4-and-cyp1a2-and-antipsychotics-european-journal-of-human-genetics-2023\">Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6, CYP3A4 and CYP1A2 and antipsychotics.  European journal of human genetics (2023)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper with the guidelines for quetiapine and CYP3A4 as per the February 2022 guidelines and further details on the assessed literature [Article:<a href=\"/pmid/37002327\">37002327</a>]. Wording in the poor metabolizer recommendation changed from &quot;standard&quot; to &quot;normal&quot; and is reflected in the table below.</p>\n<h3 id=\"february-2022-update\">February 2022 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has updated their therapeutic dose recommendations for quetiapine based on CYP3A4 genotypes. They now recommend an alternative drug for patients who are CYP3A4 poor metabolizers (PMs) who are being treated for depression. A dose reduction is recommended for patients who are CYP3A4 PMs and being treated for other indications.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_February_2022_guidelines.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_February_2022_guidelines.pdf\">Dutch guidelines February 2022 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP3A4 IM</td>\n<td>quetiapine</td>\n<td>This gene variation reduces the conversion of quetiapine to inactive metabolites and a metabolite with anti-depressant effect. However, the effect on the plasma concentration of quetiapine is limited (20% increase) and it is not known whether this has any clinical consequences. The relationship between the plasma concentration and clinical effect is weak for quetiapine.</td>\n<td>NO action is needed for this gene-drug interaction.</td>\n</tr>\n<tr>\n<td>CYP3A4 PM</td>\n<td>quetiapine</td>\n<td>The plasma concentration of quetiapine is 3.2-fold higher in these patients. In addition, the formation of the active metabolite N-desalkylquetiapine, which is probably responsible for the antidepressant effect, should be reduced. The gene variation results in reduced activity of the enzyme CYP3A4, which converts quetiapine to N-desalkylquetiapine and an inactive metabolite.</td>\n<td>Indication DEPRESSION: choose an alternative.<br/>Aripiprazole appears to be less dependent on CYP3A4 for metabolism. Olanzapine is not metabolised by CYP3A4.<br/>OTHER INDICATIONS: use 30% of the normal dose.</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_CYP3A4_quetiapine_5991-5992.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP3A4_quetiapine_5991-5992.pdf\">Read for more information about this recommendation</a>, <a download=\"CYP3A4.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CYP3A4.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_CYP3A4_quetiapine_5991-5992.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP3A4_quetiapine_5991-5992.pdf\">DPWG risk analysis document</a> for quetiapine and CYP3A4:</p>\n<blockquote class=\"blockquote\">\n<p>The KNMP Pharmacogenetics Working Group considers genotyping before starting quetiapine to be potentially beneficial for prevention of adverse events and for effectiveness. Genotyping can be considered on an individual patient basis. If, however, the genotype is available, the KNMP Pharmacogenetics Working Group recommends adhering to the gene-drug guideline.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n<h3 id=\"may-2021-guideline\">May 2021 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for quetiapine based on CYP3A4 genotypes. They conclude that this is not a gene-drug interaction (see <a download=\"DPWG_May_2021.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_May_2021.pdf\">Dutch guidelines May 2021 update</a>).</p>\n",
+      "version" : 8
+    },
+    "version" : 16
+  }
+}

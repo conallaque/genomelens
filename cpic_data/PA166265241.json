@@ -1,0 +1,150 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166265241",
+    "name" : "Annotation of DPWG Guideline for clozapine and CYP1A2",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1451697963,
+        "date" : "2022-02-28T00:00:00-08:00",
+        "type" : "Create",
+        "version" : 1
+      },
+      {
+        "id" : 1451704268,
+        "date" : "2022-03-03T16:33:37.390-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451723360,
+        "date" : "2022-03-18T10:09:47.049-07:00",
+        "description" : "Updated text based on February 2022 release. Removed extended dosing guideline due to lack of recommendations.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732907,
+        "date" : "2022-03-28T09:57:51.050-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451884203,
+        "date" : "2022-09-16T10:02:28.845-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452063340,
+        "date" : "2023-04-07T15:15:04.529-07:00",
+        "description" : "added DPWG guideline",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146477,
+        "date" : "2023-07-03T13:39:55.732-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452411602,
+        "date" : "2024-03-18T11:25:50.114-07:00",
+        "description" : "Updated links for risk analysis pdf.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452424553,
+        "date" : "2024-03-29T11:38:18.437-07:00",
+        "description" : "Removed message about gene information document availability.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15142974,"title":"Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6, CYP3A4 and CYP1A2 and antipsychotics.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10923774","crossReferences":[{"id":1452412000,"resource":"PubMed Central","resourceId":"PMC10923774","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10923774"},{"id":1452056756,"resource":"PubMed","resourceId":"37002327","_url":"https://www.ncbi.nlm.nih.gov/pubmed/37002327"},{"id":1452056757,"resource":"DOI","resourceId":"10.1038/s41431-023-01347-3","_url":"http://dx.doi.org/10.1038%2Fs41431-023-01347-3"}],"objCls":"Literature","pubDate":"2024-03-01T00:00:00-08:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : false,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819181",
+        "symbol" : "CYP1A2*3",
+        "name" : "*3",
+        "version" : 9
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA166363474",
+        "symbol" : "CYP1A2*30",
+        "name" : "*30",
+        "version" : 3
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819182",
+        "symbol" : "CYP1A2*4",
+        "name" : "*4",
+        "version" : 9
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819183",
+        "symbol" : "CYP1A2*6",
+        "name" : "*6",
+        "version" : 9
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165819184",
+        "symbol" : "CYP1A2*7",
+        "name" : "*7",
+        "version" : 9
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA449061",
+        "name" : "clozapine",
+        "version" : 11
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA27093",
+        "symbol" : "CYP1A2",
+        "name" : "cytochrome P450 family 1 subfamily A member 2",
+        "version" : 6459
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1451697966,
+      "html" : "<p>There is no gene-drug interaction between CYP1A2 and clozapine.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451697962,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-between-cyp2d6-cyp3a4-and-cyp1a2-and-antipsychotics-european-journal-of-human-genetics-2023\">Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6, CYP3A4 and CYP1A2 and antipsychotics.  European journal of human genetics (2023)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper with the guidelines for clozapine and CYP1A2 as per the February 2022 guidelines and further details on the assessed literature [Article:<a href=\"/pmid/37002327\">37002327</a>]. Supplementary Table 12A: &quot;Suggested clinical decision support texts for health care professionals for CYP1A2-clozapine&quot; states for CYP1A2 genotype or phenotype - clozapine pairs &quot;This is NOT a gene-drug interaction.&quot;.</p>\n<h3 id=\"february-2022-update\">February 2022 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (DPWG) has updated their recommendations for clozapine based on CYP1A2 genotype. They now conclude there is no gene-drug interaction between any CYP1A2 alleles and clozapine. As a result, all recommendation have been removed. <a download=\"DPWG_February_2022_guidelines.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_February_2022_guidelines.pdf\">See the DPWG February 2022 update</a>.</p>\n<h3 id=\"may-2021-guideline\">May 2021 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (DPWG) has evaluated therapeutic dose recommendations for clozapine based on CYP1A2 genotype. They recommend adjusting clozapine dose as a function of clozapine plasma concentrations in patients with one or two copies of the CYP1A2*1C allele.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_August_2019.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_August_2019.pdf\">Dutch guidelines August 2019 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP1A2 NM</td>\n<td>clozapine</td>\n<td>This is NOT a gene-drug interaction</td>\n<td>N/A</td>\n</tr>\n<tr>\n<td>CYP1A2 IM</td>\n<td>clozapine</td>\n<td>This is NOT a gene-drug interaction</td>\n<td>N/A</td>\n</tr>\n<tr>\n<td>CYP1A2 PM</td>\n<td>clozapine</td>\n<td>This is NOT a gene-drug interaction</td>\n<td>N/A</td>\n</tr>\n<tr>\n<td>CYP1A2*1A/*1F</td>\n<td>clozapine</td>\n<td>This is NOT a gene-drug interaction</td>\n<td>N/A</td>\n</tr>\n<tr>\n<td>CYP1A2*1C-heterozygote</td>\n<td>clozapine</td>\n<td>The genetic polymorphism can result in a reduced metabolism of clozapine. This can result in an increase in the plasma concentration of clozapine and thereby the risk of adverse events.</td>\n<td>It is not possible to offer substantiated advice for dose reduction based on the literature.<br/>1. Adjust the dose as a function of the plasma concentration of clozapine. A therapeutic range of 200-600 ng/mL has been proposed for clozapine.</td>\n</tr>\n<tr>\n<td>CYP1A2*1C/*1C</td>\n<td>clozapine</td>\n<td>The genetic polymorphism can result in a reduced metabolism of clozapine. This can result in an increase in the plasma concentration of clozapine and thereby the risk of adverse events.</td>\n<td>It is not possible to offer substantiated advice for dose reduction based on the literature.<br/>1. Adjust the dose as a function of the plasma concentration of clozapine. A therapeutic range of 200-600 ng/mL has been proposed for clozapine.</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_CYP1A2_clozapine_4640-to-4645.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP1A2_clozapine_4640-to-4645.pdf\">Read for more information about this recommendation</a>, <a download=\"CYP1A2.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CYP1A2.pdf\">Read about gene information from DPWG</a></p>\n",
+      "version" : 6
+    },
+    "version" : 12
+  }
+}

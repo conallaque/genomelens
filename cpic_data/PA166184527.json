@@ -1,0 +1,151 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166184527",
+    "name" : "Annotation of DPWG Guideline for brexpiprazole and CYP2D6",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1450820775,
+        "date" : "2019-10-06T21:57:30.452-07:00",
+        "description" : "august 2019 guidelines",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450962720,
+        "date" : "2020-02-10T10:10:07.760-08:00",
+        "description" : "Fixed links to 2019 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451431282,
+        "date" : "2021-05-04T00:00:00-07:00",
+        "description" : "Added extended dosing",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704180,
+        "date" : "2022-03-03T16:33:22.738-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451706221,
+        "date" : "2022-03-07T15:33:37.889-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732820,
+        "date" : "2022-03-28T09:57:36.379-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733294,
+        "date" : "2022-03-28T14:34:07.040-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741467,
+        "date" : "2022-04-05T11:10:49.690-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884099,
+        "date" : "2022-09-16T09:49:15.276-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452057540,
+        "date" : "2023-04-03T14:36:48.024-07:00",
+        "description" : "added DPWG article",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084600,
+        "date" : "2023-04-28T19:05:03.277-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146483,
+        "date" : "2023-07-03T13:39:57.303-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452412605,
+        "date" : "2024-03-19T06:11:19.033-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452423096,
+        "date" : "2024-03-28T00:00:00-07:00",
+        "description" : "Tags updated: [Alt Drug removed]",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15142974,"title":"Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6, CYP3A4 and CYP1A2 and antipsychotics.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10923774","crossReferences":[{"id":1452412000,"resource":"PubMed Central","resourceId":"PMC10923774","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10923774"},{"id":1452056756,"resource":"PubMed","resourceId":"37002327","_url":"https://www.ncbi.nlm.nih.gov/pubmed/37002327"},{"id":1452056757,"resource":"DOI","resourceId":"10.1038/s41431-023-01347-3","_url":"http://dx.doi.org/10.1038%2Fs41431-023-01347-3"}],"objCls":"Literature","pubDate":"2024-03-01T00:00:00-08:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166160053",
+        "name" : "brexpiprazole",
+        "version" : 5
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA128",
+        "symbol" : "CYP2D6",
+        "name" : "cytochrome P450 family 2 subfamily D member 6",
+        "version" : 7891
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1450820772,
+      "html" : "<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (DPWG) recommends to use half of the normal dose of brexpiprazole for poor metabolizers of CYP2D6.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1450820773,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-between-cyp2d6-cyp3a4-and-cyp1a2-and-antipsychotics-european-journal-of-human-genetics-2023\">Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6, CYP3A4 and CYP1A2 and antipsychotics.  European journal of human genetics (2023)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper with the guidelines for brexpiprazole and CYP2D6 as per the August 2019 guidelines and further details on the assessed literature [Article:<a href=\"/pmid/37002327\">37002327</a>]. Wording in the poor metabolizer recommendation changed from &quot;standard&quot; to &quot;normal&quot; and is reflected in the table below.</p>\n<h3 id=\"august-2019-guideline\">August 2019 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for brexpiprazole based on CYP2D6 genotype. They recommend to use half of the standard dose of brexpiprazole for CYP2D6 poor metabolizer (PM).</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_August_2019.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_August_2019.pdf\">Dutch guidelines August 2019 update</a></em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2D6 UM</td>\n<td>brexpiprazole</td>\n<td>-</td>\n<td>NO action is required for this gene-drug interaction. The gene variation results in a reduction of the exposure to brexpiprazole, but there are no indications supporting a decrease in efficacy.</td>\n</tr>\n<tr>\n<td>CYP2D6 IM</td>\n<td>brexpiprazole</td>\n<td>-</td>\n<td>NO action is required for this gene-drug interaction. There are indications supporting an increase in the exposure to brexpiprazole, but no indications supporting an increase in side effects in patients with this gene variation.</td>\n</tr>\n<tr>\n<td>CYP2D6 PM</td>\n<td>brexpiprazole</td>\n<td>The risk of side effects is theoretically increased, because the gene variation reduces the metabolism of brexpiprazole.</td>\n<td>Use half of the normal dose.</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_CYP2D6_brexpiprazole_7046-7047-7048.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2D6_brexpiprazole_7046-7047-7048.pdf\">Read for more information about this recommendation</a>, <a download=\"CYP2D6.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CYP2D6.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_CYP2D6_brexpiprazole_7046-7047-7048.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2D6_brexpiprazole_7046-7047-7048.pdf\">DPWG risk analysis document</a> for brexpiprazole and CYP2D6:</p>\n<blockquote class=\"blockquote\">\n<p>The Dutch Pharmacogenetics Working Group considers genotyping before starting brexpiprazole to be potentially beneficial for prevention of adverse events. Genotyping can be considered on an individual patient basis. If, however, the genotype is available, the Dutch Pharmacogenetics Working Group recommends adhering to the gene-drug guideline.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n",
+      "version" : 6
+    },
+    "version" : 15
+  }
+}

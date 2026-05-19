@@ -1,0 +1,139 @@
+{
+  "citations" : [
+    {
+      "id" : 15236624,
+      "title" : "Guidelines From the French-Speaking Society for Histocompatibility and Immunogenetics (SFHI) for Harmonisation of HLA Genotyping in Autoimmune Diseases, Drug Hypersensitivity and Pharmacogenetics.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/41137743",
+      "authors" : [
+        "Renac Virginie",
+        "Moalic Virginie",
+        "Dautin Guillaume",
+        "Cherel Mathilde",
+        "Mercier Bernard",
+        "Walencik Alexandre",
+        "Cohen Jacques",
+        "Farce Fabienne",
+        "Proust Barbara",
+        "Kaveri Rangolie",
+        "Humeau Camille",
+        "Picard Christophe",
+        "Pedron Béatrice",
+        "Dubois Valérie",
+        "Taupin Jean-Luc",
+        "Elsermans Vincent",
+        "Top-Raymond Isabelle",
+        "Ferrari-Lacraz Sylvie",
+        "Barocas Antoine",
+        "Masson Dominique",
+        "Essaydi Arnaud",
+        "Guidicelli Gwendaline",
+        "Ralazamahaleo Mamy",
+        "Congy-Jolivet Nicolas"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 1454392032,
+          "resource" : "PubMed",
+          "resourceId" : "41137743",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/41137743",
+          "version" : 0
+        },
+        {
+          "id" : 1454392033,
+          "resource" : "DOI",
+          "resourceId" : "10.1111/tan.70442",
+          "_url" : "http://dx.doi.org/10.1111%2Ftan.70442",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "HLA",
+      "meshTerms" : [
+        "Alleles",
+        "Autoimmune Diseases",
+        "Drug Hypersensitivity",
+        "France",
+        "Genetic Predisposition to Disease",
+        "Genotype",
+        "HLA Antigens",
+        "Histocompatibility Testing",
+        "Humans",
+        "Immunogenetics",
+        "Pharmacogenetics"
+      ],
+      "month" : 10,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "page" : "e70442",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2025-10-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "HLA molecules play a central role in the adaptive immune response. Their high polymorphism influences individual susceptibility to various autoimmune diseases and certain drug-induced hypersensitivities. In France, HLA genotyping is classified as a medical genetics procedure and is strictly regulated. The Société Francophone d'Histocompatibilité et d'Immunogénétique (SFHI) has established national guidelines outlining clinically validated indications, required resolution levels and interpretation criteria based on robust data. These guidelines are particularly relevant for common clinical contexts, including autoimmune diseases and pharmacogenetic testing. Well-established associations include HLA-DQB1*02/DQA1*05 (DQ2) and HLA-DQB1*03:02/DQA1*05 (DQ8) with celiac disease, HLA-B*27 with spondyloarthritis, HLA-DQB1*06:02 with type 1 narcolepsy, HLA-A*29 with Birdshot chorioretinopathy and several pharmacogenetic risk alleles such as HLA-B*57:01 (abacavir), HLA-B*15:02 and HLA-A*31:01 (carbamazepine) and HLA-B*58:01 (allopurinol). In immunotherapy, the efficacy of tebentafusp has been shown to depend on HLA-A*02:01 positivity. HLA alleles must be interpreted as relative risk factors, not absolute predictors. Critical analysis of HLA-related scientific literature requires consideration of the genotyping technique, typing resolution, allele frequencies within the studied population and environmental factors. High-resolution typing is essential in pharmacogenetics and recommended in selected autoimmune disorders. Interpretation should be conducted by qualified medical biologists, integrating clinical context, allelic diversity and recent technological advances, particularly next-generation sequencing. HLA genotyping represents a valuable tool in diagnosis and risk assessment, with increasing importance in the era of personalised medicine.",
+      "terms" : [
+        {"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}
+      ],
+      "type" : "Literature",
+      "version" : 3,
+      "volume" : "106",
+      "year" : 2025
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166422181",
+    "name" : "Annotation of RNPGx Guideline for tebentafusp and HLA-A",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : true,
+    "history" : [],
+    "literature" : [
+      {"id":15236624,"title":"Guidelines From the French-Speaking Society for Histocompatibility and Immunogenetics (SFHI) for Harmonisation of HLA Genotyping in Autoimmune Diseases, Drug Hypersensitivity and Pharmacogenetics.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/41137743","crossReferences":[{"id":1454392032,"resource":"PubMed","resourceId":"41137743","_url":"https://www.ncbi.nlm.nih.gov/pubmed/41137743"},{"id":1454392033,"resource":"DOI","resourceId":"10.1111/tan.70442","_url":"http://dx.doi.org/10.1111%2Ftan.70442"}],"objCls":"Literature","pubDate":"2025-10-01T00:00:00-07:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA166123427",
+        "symbol" : "HLA-A*02:01",
+        "name" : "*02:01",
+        "version" : 2
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166277741",
+        "name" : "tebentafusp",
+        "version" : 3
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA35055",
+        "symbol" : "HLA-A",
+        "name" : "major histocompatibility complex, class I, A",
+        "version" : 42
+      }
+    ],
+    "source" : "RNPGx",
+    "summaryMarkdown" : {
+      "id" : 1454392140,
+      "html" : "<p>The Société Francophone d'Histocompatibilité et d'Immunogénétique (SFHI) requires testing for HLA-A*02:01 to select patients with metastatic uveal melanoma suitable for treatment with tebentafusp.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1454392141,
+      "html" : "<p>Excerpts from the text:</p>\n<blockquote class=\"blockquote\">\n<p>Tebentafusp belongs to the class of immune mobilising monoclonal T-cell receptors against cancer (ImmTACs). It is a bi-specific fusion protein produced by recombinant DNA technology in E. coli. This molecule specifically targets the melanoma-associated antigen gp100, comprising a high-affinity T-cell receptor (TCR) recognising the gp100 280–288 peptide presented by HLA-A*02:01, fused to an anti-CD3 single-chain variable fragment (ScFv). HLA-A*02:01 was selected as the presenting allele due to its high prevalence in European populations, where it is expressed in approximately 50% of individuals.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p>SFHI recommends:</p>\n<ul>\n<li>HLA-A typing is mandatory before initiating treatment (Grade A1).</li>\n<li>HLA-A genotyping must be performed using a high-resolution molecular biology technique (second-field) without ambiguity (Grade A1).</li>\n</ul>\n</blockquote>\n<p>Excerpt from Table 2.\n(scroll right for Interpretation columns)</p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Condition of Indication</th>\n<th>Susceptibility HLA allele(s)</th>\n<th>Clinical relevance</th>\n<th>Relevance of HLA testing prior to prescription</th>\n<th>Relative risk (OR)</th>\n<th>Medical Interpretation if the allele is present</th>\n<th>Medical Interpretation if the allele is absent</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Tebentafusp eligibility</td>\n<td>HLA-A*02:01</td>\n<td>High</td>\n<td>Mandatory for indication (metastatic uveal melanoma)</td>\n<td>No OR: pharmacological eligibility criterion</td>\n<td>Patient is eligible for Tebentafusp treatment.</td>\n<td>Patient is not eligible. Treatment not indicated</td>\n</tr>\n</tbody>\n</table>\n",
+      "version" : 0
+    },
+    "version" : 0
+  }
+}

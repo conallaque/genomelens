@@ -1,0 +1,90 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166341524",
+    "name" : "Annotation of CPIC Guideline for carvedilol, labetalol, nadolol, pindolol, propranolol, sotalol and ADRB2",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "4pjYtVaHStI",
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1452553440,
+        "date" : "2024-08-12T04:47:34.482-07:00",
+        "description" : "Added video",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15160274,"title":"Clinical Pharmacogenetics Implementation Consortium Guideline (CPIC) for CYP2D6, ADRB1, ADRB2, ADRA2C, GRK4, and GRK5 Genotypes and Beta-Blocker Therapy.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11502236","crossReferences":[{"id":1452681441,"resource":"PubMed Central","resourceId":"PMC11502236","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11502236"},{"id":1452517521,"resource":"PubMed","resourceId":"38951961","_url":"https://www.ncbi.nlm.nih.gov/pubmed/38951961"},{"id":1452517522,"resource":"DOI","resourceId":"10.1002/cpt.3351","_url":"http://dx.doi.org/10.1002%2Fcpt.3351"}],"objCls":"Literature","pubDate":"2024-10-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"},{"id":1451978620,"resource":"PGx Paper Types","term":"Phenoconversion","termId":"pgxPaperTypes:1451978620"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : false,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA448817",
+        "name" : "carvedilol",
+        "version" : 12
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA164743150",
+        "name" : "labetalol",
+        "version" : 9
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450573",
+        "name" : "nadolol",
+        "version" : 12
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450966",
+        "name" : "pindolol",
+        "version" : 10
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA451145",
+        "name" : "propranolol",
+        "version" : 16
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA451457",
+        "name" : "sotalol",
+        "version" : 13
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA39",
+        "symbol" : "ADRB2",
+        "name" : "adrenoceptor beta 2",
+        "version" : 7936
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1452498501,
+      "html" : "<p>There are currently no recommendations for dosing of carvedilol, labetalol, nadolol, pindolol, propranolol or sotalol based on ADRB2 genotypes.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1452498502,
+      "html" : "<h3 id=\"july-2024\">July 2024</h3>\n<p>The authors of the CPIC&reg; guideline for beta-blocker therapy and CYP2D6, ADRB1, ADRB2, ADRA2C, GRK4 and GRK5 evaluated the available evidence for the use of carvedilol, labetalol, nadolol, pindolol, propranolol or sotalol in patients carrying ADRB2 variants. They conclude that there is insufficient evidence to guide clinical practice at this time.</p>\n<p>These guidelines are applicable to:</p>\n<ul>\n<li>adult patients</li>\n<li>pediatric patients</li>\n</ul>\n<p>Excerpts from the guideline:</p>\n<blockquote class=\"blockquote\">\n<p>ADRB2 encodes the beta-2 adrenoreceptor [...]. The beta-2 receptor is antagonized at clinically used doses by “non-selective” beta-blockers, such as carvedilol, labetalol, and propranolol.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p>[Few] studies were available related to individual variants in ADRA2C, GRK4 and GRK5 and their associations with beta-blocker response. Thus, no clinical recommendations were provided for individual variants in ADRB2, ADRA2C, GRK4, or GRK5 (CPIC level C-no recommendation).</p>\n</blockquote>\n<p>Download and read:</p>\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/beta_blockers/2024/38951961.pdf\" target=\"_blank\">Guideline publication</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/beta_blockers/2024/38951961-supplement.pdf\" target=\"_blank\">Guideline supplement</a></li>\n</ul>\n",
+      "version" : 1
+    },
+    "version" : 2
+  }
+}

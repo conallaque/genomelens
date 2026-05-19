@@ -1,0 +1,215 @@
+{
+  "citations" : [
+    {
+      "id" : 15329722,
+      "title" : "Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6 and CYP2C19 and tricyclic antidepressants.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/41526670",
+      "authors" : [
+        "Kleine Schaars Kristian",
+        "Nijenhuis Marga",
+        "Soree Bianca",
+        "de Boer-Veger Nienke J",
+        "Buunk Anne-Marie",
+        "Guchelaar Henk-Jan",
+        "Houwink Elisa J F",
+        "Risselada Arne",
+        "Rongen Gerard A P J M",
+        "van Schaik Ron H N",
+        "Swen Jesse J",
+        "Touw Daan",
+        "Deneer Vera H M",
+        "van Westrhenen Roos"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 1454631360,
+          "resource" : "PubMed",
+          "resourceId" : "41526670",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/41526670",
+          "version" : 0
+        },
+        {
+          "id" : 1454631361,
+          "resource" : "DOI",
+          "resourceId" : "10.1038/s41431-025-02008-3",
+          "_url" : "http://dx.doi.org/10.1038%2Fs41431-025-02008-3",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "European journal of human genetics : EJHG",
+      "meshTerms" : [],
+      "month" : 1,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2026-01-01T00:00:00-08:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "The Dutch Pharmacogenetic Working Group (DPWG) aims to integrate pharmacogenetics into clinical practice by creating evidence-based guidelines to optimize pharmacotherapy based on genetic tests. The current guideline describes the gene-drug interactions between CYP2D6 and CYP2C19 and various tricyclic antidepressants (TCAs). For CYP2D6 poor metabolisers (PM), dose reductions are advised for amitriptyline (reduction to 60% of the normal dose), clomipramine (reduction to 50% of the normal dose for the indication depression or in case of side effects at the normal dose for the other indications), doxepin (reduction to 40% of normal dose), imipramine (30% of the normal dose), and nortriptyline (40%). For CYP2D6 intermediate metabolisers (IM) reduced dose is also recommended for amitriptyline (75%), clomipramine (70%), doxepin (80%), imipramine (70%), and nortriptyline (60%). Also, CYP2D6 ultra-rapid metabolisers (UM) require tailored dose adjustments: amitriptyline (1.6 times the normal dose), clomipramine (1.5 times), doxepin (2 times), imipramine (1.7 times), and nortriptyline (1.7 times). Additionally, alternative drugs may be needed for CYP2D6 UM due to potential safety concerns. For CYP2C19 PM, a 70% dose reduction is advised for imipramine. For CYP2C19 IM, no action is required for TCAs. For CYP2C19 UM, an alternative medication is recommended for clomipramine prescribed for anxiety and obsessive-compulsive disorder (OCD). The DPWG classifies CYP2D6 genotyping for all five TCAs and CYP2C19 genotyping for clomipramine in patients with anxiety disorders or OCD, and for imipramine as being \"potentially beneficial\". Genotyping prior to treatment can be considered on an individual patient basis.",
+      "terms" : [
+        {"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}
+      ],
+      "type" : "Literature",
+      "version" : 2,
+      "year" : 2026
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166184528",
+    "name" : "Annotation of DPWG Guideline for clomipramine and CYP2C19",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1450820783,
+        "date" : "2019-10-06T22:47:26.963-07:00",
+        "description" : "August 2019 Guidelines",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450962783,
+        "date" : "2020-02-10T10:46:35.951-08:00",
+        "description" : "Fixed links to 2019 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451109100,
+        "date" : "2020-04-14T09:23:29.135-07:00",
+        "description" : "Corrected mentions of CYP2D6 in summary and annotation text to CYP2C19.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451417283,
+        "date" : "2021-04-22T00:00:00-07:00",
+        "description" : "Added extended dosing",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704244,
+        "date" : "2022-03-03T16:33:33.946-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451706240,
+        "date" : "2022-03-07T15:53:18.463-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732884,
+        "date" : "2022-03-28T09:57:48.009-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733300,
+        "date" : "2022-03-28T14:35:25.666-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741489,
+        "date" : "2022-04-05T11:11:50.685-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884184,
+        "date" : "2022-09-16T09:59:37.576-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146489,
+        "date" : "2023-07-03T13:39:59.188-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452412602,
+        "date" : "2024-03-19T06:02:30.715-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452423054,
+        "date" : "2024-03-28T00:00:00-07:00",
+        "description" : "Tags updated: [Alt Drug added]",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454439721,
+        "date" : "2025-11-11T12:25:15.973-08:00",
+        "description" : "updated wording for CYP2C19UM",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454632600,
+        "date" : "2026-01-20T09:56:19.222-08:00",
+        "description" : "Added section for new publication and linked PMID 41526670",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15329722,"title":"Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6 and CYP2C19 and tricyclic antidepressants.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/41526670","crossReferences":[{"id":1454631360,"resource":"PubMed","resourceId":"41526670","_url":"https://www.ncbi.nlm.nih.gov/pubmed/41526670"},{"id":1454631361,"resource":"DOI","resourceId":"10.1038/s41431-025-02008-3","_url":"http://dx.doi.org/10.1038%2Fs41431-025-02008-3"}],"objCls":"Literature","pubDate":"2026-01-01T00:00:00-08:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15256422,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2025","_sameAs":"https://api.clinpgx.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf","crossReferences":[{"id":1454439720,"resource":"URL","resourceId":"https://api.clinpgx.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf","_url":"https://api.clinpgx.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf"}],"objCls":"Literature","terms":[{"id":1452267780,"resource":"ClinPGx Tags","term":"Has PGx","termId":"pgkbTags:1452267780"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA449048",
+        "name" : "clomipramine",
+        "version" : 9
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA124",
+        "symbol" : "CYP2C19",
+        "name" : "cytochrome P450 family 2 subfamily C member 19",
+        "version" : 7210
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1450820780,
+      "html" : "<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (DPWG) recommends to avoid clomipramine in CYP2C19 ultrarapid metabolizer (UM) for Indication OBSESSIVE COMPULSIVE DISORDER or ANXIETY DISORDERS.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1450820781,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-between-cyp2d6-and-cyp2c19-and-tricyclic-antidepressants-european-journal-of-human-genetics-2026\">Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6 and CYP2C19 and tricyclic antidepressants. <em>European journal of human genetics</em> (2026)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper with guidelines for clomipramine and CYP2C19 including Supplementary materials [Article:<a href=\"/pmid/41526670\">41526670</a>]. The recommendations in Table 2 are the same as shown in the table below.</p>\n<h3 id=\"november-2025-update\">November 2025 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (<a href=\"/page/dpwg\">DPWG</a>) released an updated version of the <a download=\"pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf\">Pharmacogenetic_recommendation_text</a> dated with 20240501. It includes changes to the wording for the CYP2C19 UM-clomipramine guideline which is dated within the document as 08-02-2024.</p>\n<p><em>Wording in table taken from the DPWG <a download=\"pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/pharmacogenetic_recommendation_text_20240501_downloaded_111125.pdf\">Pharmacogenetic_recommendation_text</a> accessed 11112025</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2C19 UM</td>\n<td>clomipramine</td>\n<td>The gene variation increases the risk of ineffectiveness for obsessive compulsive disorder and anxiety disorders by reducing the plasma concentration of clomipramine. The gene variation has little to no effect on the plasma concentration of clomipramine+desmethylclomipramine, which determines the efficacy for depression and side effects.</td>\n<td>- Indication OBSESSIVE COMPULSIVE DISORDER or ANXIETY DISORDERS:<br/>- avoid clomipramine<br/>Antidepressants that are not metabolised by CYP2C19 - or to a lesser extent - include, for example, fluoxetine, fluvoxamine and paroxetine.<br/>- if it is not possible to avoid clomipramine:<br/>- monitor the effect and side effects or the plasma concentrations of clomipramine and desmethylclomipramine<br/>- add a low dose of fluvoxamine if necessary, to inhibit CYP2C19 and CYP1A2 and thereby inhibit the conversion of clomipramine to desmethylclomipramine.<br/>- Indication DEPRESSION: no action required</td>\n</tr>\n<tr>\n<td>CYP2C19 IM</td>\n<td>clomipramine</td>\n<td>-</td>\n<td>NO action is required for this gene-drug interaction. The gene variation does increase clomipramine plasma concentrations, but not clomipramine+desmethylclomipramine plasma concentrations, which determines side effects and efficacy in depression. The increase in the plasma concentration of clomipramine is favourable for the efficacy in anxiety and obsessive compulsive disorder.</td>\n</tr>\n<tr>\n<td>CYP2C19 PM</td>\n<td>clomipramine</td>\n<td>-</td>\n<td>NO action is required for this gene-drug interaction. The gene variation increases the plasma concentration of clomipramine. However, there is insufficient evidence to substantiate an increase of the plasma concentration of clomipramine+desmethylclomipramine to such an extent that it increases the risk of side effects. The increase in the plasma concentration of clomipramine is favourable for the efficacy in anxiety and obsessive compulsive disorder.</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_CYP2C19_clomipramine_7027-to-7029_downloaded_111125.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C19_clomipramine_7027-to-7029_downloaded_111125.pdf\">Read for more information about this recommendation</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_CYP2C19_clomipramine_7027-to-7029_downloaded_111125.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C19_clomipramine_7027-to-7029_downloaded_111125.pdf\">DPWG risk analysis document</a> for clomipramine and CYP2C19:</p>\n<blockquote class=\"blockquote\">\n<p>The KNMP Pharmacogenetics Working Group considers genotyping before starting clomipramine to be potentially beneficial in patients with anxiety disorders and obsessive compulsive disorder. Genotyping can be considered on an individual patient basis. If, however, the genotype is available, the KNMP Pharmacogenetics Working Group recommends adhering to the gene-drug guideline.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n<h3 id=\"august-2019-guideline\">August 2019 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for clomipramine based on CYP2C19 genotype. They recommend to avoid clomipramine for CYP2C19 ultrarapid metabolizer (UM) with regards to Indication OBSESSIVE COMPULSIVE DISORDER or ANXIETY DISORDERS.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_August_2019.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_August_2019.pdf\">Dutch guidelines August 2019 update</a></em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2C19 UM</td>\n<td>clomipramine</td>\n<td>The gene variation increases the risk of ineffectiveness for obsessive compulsive disorder and anxiety disorders by reducing the plasma concentration of clomipramine. The gene variation has little to no effect on the plasma concentration of clomipramine+desmethylclomipramine, which determines the efficacy for depression and side effects.</td>\n<td>Indication OBSESSIVE COMPULSIVE DISORDER or ANXIETY DISORDERS: avoid clomipramine. Antidepressants that are not metabolised by CYP2C19 - or to a lesser extent - include, for example, fluoxetine, fluvoxamine and paroxetine. If it is not possible to avoid clomipramine: monitor the effect and side effects or the plasma concentrations of clomipramine and desmethylclomipramine. For obsessive compulsive disorder, the therapeutic plasma concentration of clomipramine is greater than 200 ng/mL in combination with a plasma concentration of desmethylclomipramine that is as low as possible. For anxiety disorders, the therapeutic plasma concentration of clomipramine is approximately 100 ng/mL in combination with a plasma concentration of desmethylclomipramine lower than 200 ng/mL. A sum of the plasma concentrations of clomipramine and desmethylclomipramine exceeding 600 ng/mL is considered toxic. Add a low dose of fluvoxamine if necessary, to inhibit CYP2C19 and CYP1A2 and thereby inhibit the conversion of clomipramine to desmethylclomipramine. Indication DEPRESSION: no action required</td>\n</tr>\n</tbody>\n</table>\n",
+      "version" : 9
+    },
+    "version" : 15
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166219301",
+    "name" : "Annotation of CPIC Guideline for dexlansoprazole and CYP2C19",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "KgRrti8dIRs",
+    "dosingInformation" : true,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1451243880,
+        "date" : "2020-08-11T13:50:56.664-07:00",
+        "description" : "posted",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451612280,
+        "date" : "2021-12-09T14:02:38.765-08:00",
+        "description" : "Added video",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452137800,
+        "date" : "2023-06-22T21:54:00.746-07:00",
+        "description" : "Updated supplemental table links",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454720460,
+        "date" : "2026-03-27T00:00:00-07:00",
+        "description" : "changed summary text for RM and NM",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15113542,"title":"Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for CYP2C19 and Proton Pump Inhibitor Dosing.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7868475","crossReferences":[{"id":1451837569,"resource":"PubMed Central","resourceId":"PMC7868475","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7868475"},{"id":1451242280,"resource":"PubMed","resourceId":"32770672","_url":"https://www.ncbi.nlm.nih.gov/pubmed/32770672"},{"id":1451242281,"resource":"DOI","resourceId":"10.1002/cpt.2015","_url":"http://dx.doi.org/10.1002%2Fcpt.2015"}],"objCls":"Literature","pubDate":"2021-06-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1451266740,
+      "html" : "<p>Guideline excerpt: &quot;The CYP2C19-guided PPI recommendations presented in Table 2 also apply to pediatric patients. ..... A recent pilot study of CYP2C19-genotype-guided dosing of PPIs in children has been promising, and additional studies are ongoing [Articles:<a href=\"/pmid/30341969\">30341969</a>, <a href=\"/pmid/30659924\">30659924</a>]. These reports support genotype-based optimization of PPI therapy for children. However, very low clearance in pre-term infants and infants less than 2-3 months of age [Article:<a href=\"/pmid/20484619\">20484619</a>] makes recommendations in the neonatal population difficult to support.&quot;</p>\n",
+      "version" : 0
+    },
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166110257",
+        "name" : "dexlansoprazole",
+        "version" : 6
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA124",
+        "symbol" : "CYP2C19",
+        "name" : "cytochrome P450 family 2 subfamily C member 19",
+        "version" : 7210
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1451226480,
+      "html" : "<p>The CPIC Dosing Guideline recommendations for dexlansoprazole are based on the similarity in its metabolism and lansoprazole and extrapolated from the first-generation PPIs. The guideline recommends to increase the starting daily dose and to monitor efficacy in CYP2C19 ultrarapid metabolizer. For CYP2C19 rapid and normal metabolizers, a dose increase might be considered for the treatment of H. pylori infection and erosive esophagitis. The recommendations for intermediate and poor metabolizers for chronic therapy (&gt;12 weeks) and efficacy achieved is to consider 50% reduction in daily dose. See full guideline for further details and supporting evidence.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451433689,
+      "html" : "<h3 id=\"august-2020\">August 2020</h3>\n<p><em>Advance online publication August 2020.</em></p>\n<ul>\n<li>\n<p>The <a rel=\"noopener noreferrer\" href=\"https://ascpt.onlinelibrary.wiley.com/doi/abs/10.1002/cpt.2015\" target=\"_blank\">CPIC Guideline for CYP2C19 and Proton Pump Inhibitor Dosing</a> is published in <em>Clinical Pharmacology and Therapeutics</em>.</p>\n</li>\n<li>\n<p>These guidelines are applicable to:</p>\n<ul>\n<li>pediatric patients</li>\n<li>adult patients</li>\n</ul>\n</li>\n<li>\n<p>Excerpts from the 2020 Proton Pump Inhibitor Dosing dosing guideline:</p>\n<ul>\n<li>\n<p>&quot;<em>CYP2C19</em> genotypes have been linked to PPI exposure, with lower exposure associated with treatment failure and higher exposure associated with improved efficacy. Higher exposure of PPIs has also been associated with adverse effects, as has long-term use.&quot;</p>\n</li>\n<li>\n<p><em>Second Generation PPI dexlansoprazole:</em> &quot;There is less evidence linking CYP2C19 genotype with variability in plasma concentrations and effectiveness of second-generation PPIs (esomeprazole, rabeprazole, and dexlansoprazole), both in terms of number of studies and strength of the association. ..... Given the similarity in metabolism between lansoprazole and dexlansoprazole, it is reasonable to extrapolate the recommendations from the first-generation PPIs (Table 2). These recommendations are considered “optional” due to the limited data with dexlansoprazole and CYP2C19.&quot;</p>\n</li>\n<li>\n<p>&quot;The RM and UM phenotypes are driven by the presence of the increased function CYP2C19*17 allele. Due to the relatively recent discovery of this variant and because the majority of studies describing associations between CYP2C19 genotype, pharmacokinetics, and pharmacodynamics of PPIs were conducted in Asian populations in whom the CYP2C19*17 allele occurs less frequently, there are limited data on the relationship between CYP2C19*17, pharmacokinetic parameters, acid secretion indices and therapeutic outcomes in CYP2C19 RMs and UMs.&quot;</p>\n</li>\n<li>\n<p>&quot;Nevertheless, the low PPI exposure documented in patients who are CYP2C19 UMs compared to NMs, IMs, and PMs suggests that these individuals may benefit from higher than standard daily doses of PPIs (Tables S1-S3).&quot;</p>\n</li>\n<li>\n<p>&quot; While CYP2C19 NMs are expected to have normal PPI metabolism and clearance, a large body of literature from studies in Asian populations reported an association between CYP2C19 NMs and decreased therapeutic effectiveness with these PPIs (e.g., failure to eradicate H. pylori infection and lower healing rates of erosive esophagitis) compared to CYP2C19 IMs and PMs (Tables S1-S4). Therefore, for CYP2C19 NMs, initiating these PPIs at standard daily doses (e.g., label recommended doses) is generally recommended; however, for H. pylori infection or erosive esophagitis, clinicians may consider increasing the recommended dose for these indications by 50-100% to optimize therapeutic efficacy.&quot;</p>\n</li>\n<li>\n<p>&quot;CYP2C19 IMs and PMs are considered to be “therapeutically advantaged” compared to NMs in terms of efficacy. However, it has been suggested that continued inhibition of acid secretion in individuals taking PPIs chronically who are genotyped as CYP2C19 IMs or PMs may have a higher risk of PPI-related adverse events compared to NM, RM, or UM phenotypes. While the current data are insufficient to make strong dosing recommendations, potential associations of CYP2C19 phenotype and incidence of adverse events (e.g., infections) are emerging.&quot;</p>\n</li>\n<li>\n<p><em>Second Generation PPIs esomeprazole and rabeprazole:</em> &quot;Inconsistent findings regarding the effect of CYP2C19 genotype on the pharmacokinetics and therapeutic response to esomeprazole and rabeprazole preclude making recommendations for these second-generation PPIs (i.e., CPIC level C; no recommendation).&quot;</p>\n</li>\n<li>\n<p>&quot;<em><strong>Pediatrics</strong></em>: The CYP2C19-guided PPI recommendations presented in Table 2 also apply to pediatric patients. ...... A recent pilot study of CYP2C19-genotype-guided dosing of PPIs in children has been promising, and additional studies are ongoing. These reports support genotype-based optimization of PPI therapy for children. However, very low clearance in pre-term infants and infants less than 2-3 months of age makes recommendations in the neonatal population difficult to support. Additional pediatric considerations are discussed in the Supplemental Material.&quot;</p>\n</li>\n</ul>\n</li>\n<li>\n<p>Download and read:</p>\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/PPI/2020/CYP2C19_proton_pump_inhibitors_guideline_revised.pdf\" target=\"_blank\">Clinical Pharmacogenetics Implementation Consortium guideline for <em>CYP2C19</em> and Proton Pump Inhibitors</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/PPI/2020/CYP2C19_proton_pump_inhibitors_guideline_supp_revised.pdf\" target=\"_blank\">2020 supplement</a></li>\n<li><a href=\"/page/cyp2c19RefMaterials\">CYP2C19 Gene-Specific Information Tables</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/dexlansoprazole-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Dexlansoprazole Drug Resource Mappings</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/dexlansoprazole_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Dexlansoprazole Pre and Post Test Alerts</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/images/flow_chart/Dexlansoprazole_CDS_Flow_Chart.jpg\" target=\"_blank\">Dexlansoprazole Clinical Decision Support Flow Chart</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-recommended-dosing-of-dexlansoprazole-by-cyp2c19-phenotype\">Table 1: Recommended dosing of dexlansoprazole by CYP2C19 phenotype</h3>\n<p><em>Adapted from Tables 1 and 2 of the 2020 guideline.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype<sup>a</sup></th>\n<th>Genotype</th>\n<th>Examples of genotypes<sup>b</sup></th>\n<th>Implications</th>\n<th>Therapeutic recommendations</th>\n<th>Classification of recommendations<sup>c</sup></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2C19 Ultrarapid metabolizer</td>\n<td>An individual carrying two increased function alleles</td>\n<td><em>*17/*17</em></td>\n<td>Decreased plasma concentrations of PPIs compared to CYP2C19 NMs; increased risk of therapeutic failure</td>\n<td>Increase starting daily dose by 100%. Daily dose may be given in divided doses. Monitor for efficacy.</td>\n<td>Optional</td>\n</tr>\n<tr>\n<td>CYP2C19 Rapid metabolizer</td>\n<td>An individual carrying one normal function allele and one increased function allele</td>\n<td><em>*1/*17</em></td>\n<td>Decreased plasma concentrations of PPIs compared to CYP2C19 NMs; increased risk of therapeutic failure</td>\n<td>Initiate standard starting daily dose. Consider increasing dose by 50-100% for the treatment of <em>H. pylori</em> infection and erosive esophagitis. Daily dose may be given in divided doses. Monitor for efficacy.</td>\n<td>Optional</td>\n</tr>\n<tr>\n<td>CYP2C19 Normal metabolizer</td>\n<td>An individual carrying two normal function alleles</td>\n<td><em>*1/*1</em></td>\n<td>Normal PPI metabolism; may be at increased risk of therapeutic failure compared to CYP2C19 IMs and PMs</td>\n<td>Initiate standard starting daily dose. Consider increasing dose by 50-100% for the treatment of <em>H. pylori</em> infection and erosive esophagitis. Daily dose may be given in divided doses. Monitor for efficacy.</td>\n<td>Optional</td>\n</tr>\n<tr>\n<td>CYP2C19 likely intermediate metabolizer <sup>d</sup></td>\n<td>An individual carrying one normal function allele and one decreased function allele or one increased function allele and one decreased function allele or two decreased function alleles</td>\n<td><em>*1/*9, *9/*17, *9/*9</em></td>\n<td>Likely increased plasma concentration of PPI compared to CYP2C19 NMs; likely increased chance of efficacy and potentially toxicity</td>\n<td>Initiate standard starting daily dose. For chronic therapy (&gt;12 weeks) and efficacy achieved, consider 50% reduction in daily dose and monitor for continued efficacy.</td>\n<td>Optional<sup>e</sup></td>\n</tr>\n<tr>\n<td>CYP2C19 intermediate metabolizer</td>\n<td>An individual carrying one normal function allele and one no function allele or one increased function allele and one no function allele</td>\n<td><em>*1/*2, *1/*3, *2/*17, *3/*17</em></td>\n<td>Increased plasma concentration of PPI compared to CYP2C19 NMs; increased chance of efficacy and potentially toxicity</td>\n<td>Initiate standard starting daily dose. For chronic therapy (&gt;12 weeks) and efficacy achieved, consider 50% reduction in daily dose and monitor for continued efficacy.</td>\n<td>Optional</td>\n</tr>\n<tr>\n<td>CYP2C19 likely poor metabolizer <sup>d</sup></td>\n<td>An individual carrying one decreased function allele and one no function allele</td>\n<td><em>*2/*9, *3/*9</em></td>\n<td>Likely increased plasma concentration of PPI compared to CYP2C19 NMs; likely increased chance of efficacy and potentially toxicity</td>\n<td>Initiate standard starting daily dose. For chronic therapy (&gt;12 weeks) and efficacy achieved, consider 50% reduction in daily dose and monitor for continued efficacy.</td>\n<td>Optional<sup>e</sup></td>\n</tr>\n<tr>\n<td>CYP2C19 poor metabolizer</td>\n<td>An individual carrying two no function alleles</td>\n<td><em>*2/*2, *3/*3, *2/*3</em></td>\n<td>Increased plasma concentration of PPI compared to CYP2C19 NMs; increased chance of efficacy and potentially toxicity</td>\n<td>Initiate standard starting daily dose. For chronic therapy (&gt;12 weeks) and efficacy achieved, consider 50% reduction in daily dose and monitor for continued efficacy.</td>\n<td>Optional</td>\n</tr>\n<tr>\n<td>Indeterminate</td>\n<td>An individual carrying one or two uncertain function alleles</td>\n<td><em>*1/*12, *2/*12, *12/*14</em></td>\n<td>N/A</td>\n<td>No recommendation</td>\n<td>No recommendation</td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> The online <a href=\"/page/cyp2c19RefMaterials\">CYP2C19 Frequency Table</a> provides phenotype frequencies for major race/ethnic groups, and the online <a href=\"/page/cyp2c19RefMaterials\">CYP2C19 Diplotype-Phenotype Table</a> provides a complete list of possible diplotypes and phenotype assignments .<br />\n<sup>b</sup> For a complete list of CYP2C19 diplotypes and resulting phenotypes, see the <a href=\"/page/cyp2c19RefMaterials\">CYP2C19 genotype to phenotype table</a>.<br />\n<sup>c</sup> Rating scheme described in Supplement.<br />\n<sup>d</sup> There are limited data to characterize the function of decreased function alleles.<br />\n<sup>e</sup> The strength of recommendation for “likely” phenotypes are the same as their respective confirmed phenotypes. “Likely” indicates the uncertainty in the phenotype assignment, but it is reasonable to apply the recommendation for the confirmed phenotype to the corresponding “likely” phenotype.</p>\n",
+      "version" : 4
+    },
+    "version" : 10
+  }
+}

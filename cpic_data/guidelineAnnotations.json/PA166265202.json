@@ -1,0 +1,98 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166265202",
+    "name" : "Annotation of DPWG Guideline for paclitaxel and CYP3A4",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1451697948,
+        "date" : "2022-02-28T00:00:00-08:00",
+        "type" : "Create",
+        "version" : 1
+      },
+      {
+        "id" : 1451704266,
+        "date" : "2022-03-03T16:33:37.121-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451732905,
+        "date" : "2022-03-28T09:57:50.762-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451884484,
+        "date" : "2022-09-16T11:01:43.148-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146475,
+        "date" : "2023-07-03T13:39:55.306-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452412641,
+        "date" : "2024-03-19T06:12:45.489-07:00",
+        "description" : "Updated links for risk analysis pdf.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452424665,
+        "date" : "2024-03-29T11:51:28.256-07:00",
+        "description" : "Removed message about gene information document availability.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : false,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450761",
+        "name" : "paclitaxel",
+        "version" : 22
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA130",
+        "symbol" : "CYP3A4",
+        "name" : "cytochrome P450 family 3 subfamily A member 4",
+        "version" : 8039
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1451697946,
+      "html" : "<p>There are currently no recommendations for paclitaxel dosing based on CYP3A4 genotypes.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451697947,
+      "html" : "<h3 id=\"may-2021-guideline\">May 2021 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for paclitaxel based on CYP3A4 genotypes. They conclude that no action is needed for this gene-drug interaction, (see <a download=\"DPWG_May_2021.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_May_2021.pdf\">Dutch guidelines May 2021 update</a>).</p>\n<p><a download=\"DPWG_CYP3A4_paclitaxel_7107-7113.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP3A4_paclitaxel_7107-7113.pdf\">Read for more information about this recommendation</a>, <a download=\"CYP3A4.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CYP3A4.pdf\">Read about gene information from DPWG</a></p>\n",
+      "version" : 4
+    },
+    "version" : 7
+  }
+}

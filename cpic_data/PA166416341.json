@@ -1,0 +1,124 @@
+{
+  "citations" : [
+    {
+      "id" : 15185332,
+      "title" : "Clinical Pharmacogenetics Implementation Consortium Guideline for NAT2 Genotype and Hydralazine Therapy.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/40974042",
+      "authors" : [
+        "Eadon Michael T",
+        "Hein David W",
+        "Andersen Michael A",
+        "Chapman Arlene B",
+        "Cooper-DeHoff Rhonda M",
+        "Desta Zeruesenay",
+        "Duarte Julio D",
+        "Elchynski Amanda L",
+        "Gaedigk Andrea",
+        "Karol Seth E",
+        "Limdi Nita A",
+        "Lteif Christelle",
+        "Sosinski Laura",
+        "Zubiaur Pablo",
+        "Whirl-Carrillo Michelle",
+        "Klein Teri E",
+        "Caudle Kelly E",
+        "Donnelly Roseann S",
+        "Agúndez José A G"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 1454269817,
+          "resource" : "PubMed",
+          "resourceId" : "40974042",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/40974042",
+          "version" : 0
+        },
+        {
+          "id" : 1454269818,
+          "resource" : "DOI",
+          "resourceId" : "10.1002/cpt.70071",
+          "_url" : "http://dx.doi.org/10.1002%2Fcpt.70071",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "Clinical pharmacology and therapeutics",
+      "meshTerms" : [],
+      "month" : 9,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "pediatric" : false,
+      "pgkbPublication" : true,
+      "pubDate" : "2025-09-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "Hydralazine is a vasodilator typically used in the treatment of resistant hypertension and heart failure. N-acetyltransferase 2 (NAT2) catalyzes the metabolism of hydralazine into inactive metabolites. NAT2 poor metabolizers (historically referred to as \"slow acetylators\") are predicted to have increased plasma hydralazine concentrations compared with NAT2 rapid and intermediate metabolizers (historically referred to as \"rapid acetylators\" and \"intermediate acetylators,\" respectively), which may lead to both increased clinical efficacy and adverse effects, including drug-induced systemic lupus erythematosus. This guideline summarizes the evidence from the literature relevant to NAT2/hydralazine and provides recommendations for hydralazine prescribing based on NAT2 genotype-predicted acetylator phenotype (updates at www.cpicpgx.org).",
+      "terms" : [
+        {"id":1454360100,"resource":"PGx Paper Types","term":"CPIC Guideline Evidence","termId":"pgxPaperTypes:1454360100"}
+      ],
+      "type" : "Literature",
+      "version" : 3,
+      "year" : 2025
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166416341",
+    "name" : "Annotation of CPIC Guideline for hydralazine and NAT2",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1454273702,
+        "date" : "2025-09-24T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15185332,"title":"Clinical Pharmacogenetics Implementation Consortium Guideline for NAT2 Genotype and Hydralazine Therapy.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/40974042","crossReferences":[{"id":1454269817,"resource":"PubMed","resourceId":"40974042","_url":"https://www.ncbi.nlm.nih.gov/pubmed/40974042"},{"id":1454269818,"resource":"DOI","resourceId":"10.1002/cpt.70071","_url":"http://dx.doi.org/10.1002%2Fcpt.70071"}],"objCls":"Literature","pubDate":"2025-09-01T00:00:00-07:00","terms":[{"id":1454360100,"resource":"PGx Paper Types","term":"CPIC Guideline Evidence","termId":"pgxPaperTypes:1454360100"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1454272641,
+      "html" : "<p>Excerpts from the guideline:</p>\n<p>&quot;Hydralazine is not commonly used in the pediatric patient population. The clinical data upon which this guideline is based were obtained from studies in adults. Given the well-characterized pharmacokinetic basis for this gene-drug interaction and the presence of 90% of mature NAT2 enzyme activity after 4-5 months of age (46, 47), it is reasonable to extrapolate the recommendations presented in this guideline to pediatric patients prescribed oral hydralazine if needed.&quot;</p>\n",
+      "version" : 0
+    },
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA449894",
+        "name" : "hydralazine",
+        "version" : 13
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA18",
+        "symbol" : "NAT2",
+        "name" : "N-acetyltransferase 2",
+        "version" : 150
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1454273060,
+      "html" : "<p>The CPIC dosing guideline recommends consideration of a starting total daily dose of hydralazine of at least 75 mg for patients who are NAT2 rapid metabolizers and NAT2 intermediate metabolizers. titrating up to 300 mg as tolerated. For patients who are NAT2 poor metabolizers, initiate therapy at a total daily dose of hydralazine of 40 to 75 mg and carefully titrate upwards; use caution with total daily hydralazine doses of 200 mg or more.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1454228060,
+      "html" : "<h3 id=\"september-2025\">September 2025</h3>\n<ul>\n<li>The <a rel=\"noopener noreferrer\" href=\"https://ascpt.onlinelibrary.wiley.com/doi/epdf/10.1002/cpt.70071\" target=\"_blank\">CPIC&reg; Guideline for NAT2 Genotype and Hydralazine Therapy</a> has been published in <em>Clinical Pharmacology and Therapeutics</em>. CPIC authors evaluated the available literature evidence for the use of hydralazine in patients carrying <em>NAT2</em> variants.</li>\n<li>These guidelines are applicable to:\n<ul>\n<li>adult patients</li>\n<li>pediatric patients</li>\n</ul>\n</li>\n<li>Excerpts from the guideline:\n<ul>\n<li>&quot;Hydralazine is metabolized into inactive metabolites by NAT2...NAT2 polymorphic acetylation affects the pharmacokinetics of oral administration of hydralazine, not intravenous administration, because no first-pass effect occurs after intravenous administration of hydralazine.&quot;</li>\n<li>&quot;NAT2 metabolizer status is divided evenly between rapid/intermediate metabolism and poor metabolism across the global population, yet it is tightly tied to genetic ancestry. Consequently, the writing committee, with input from the broader CPIC membership, ultimately resolved that neither metabolizer phenotype would be classified as normal due to the even global split and extensive use of the historical terms that do not include the term “normal.” In addition, because all phenotypes are actionable for hydralazine prescribing, future clinical decision support may alert providers for rapid or intermediate metabolizers prescribed low doses and for slow metabolizers prescribed high doses.&quot;</li>\n<li>&quot;Most studies exploring the relationship between NAT2 genetic variation and oral hydralazine involve phenotyping, as they were conducted before genotyping technologies were readily available for scientific research. The overall concordance of NAT2 genotype to NAT2 enzymatic activity phenotype is greater than 90%.&quot;</li>\n</ul>\n</li>\n<li>Download and read:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/hydralazine/2025/40974042.pdf\" target=\"_blank\">Clinical Pharmacogenetics Implementation Consortium Guideline for <em>NAT2</em> Genotype and Hydralazine Therapy</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/hydralazine/2025/40974042-supplement.pdf\" target=\"_blank\">2025 supplement</a></li>\n<li><a href=\"/page/nat2RefMaterials\">NAT2 information tables</a>:\n<ul>\n<li>Allele definitions</li>\n<li>Allele functionality</li>\n<li>Phenotype definitions</li>\n<li>Diplotype to phenotype mappings</li>\n<li>Example clinical decision support language and workflow diagram</li>\n<li>Gene resource mapping table</li>\n</ul>\n</li>\n<li>Hydralazine information tables:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/hydralazine-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Drug resource mapping table</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/hydralazine_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Pre and post test alerts</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/images/flow_chart/Hydralazine_CDS_Flow_Chart.jpg\" target=\"_blank\">Clinical decision support flow chart</a></li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-recommended-dosing-of-hydralazine-in-relation-based-on-nat2-phenotype\">Table 1: Recommended dosing of hydralazine in relation based on NAT2 phenotype</h3>\n<p><em>Adapted from Tables 1 and 2 of the guideline manuscript.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>NAT2 Phenotype<sup>a</sup></th>\n<th>Genotype</th>\n<th>Example diplotypes</th>\n<th>Implications</th>\n<th>Recommendations</th>\n<th>Classification of recommendations<sup>b</sup></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>NAT2 Rapid Metabolizer</td>\n<td>An individual carrying two increased function alleles.</td>\n<td>*1/*1, *1/*4, *4/*4</td>\n<td>Predicted to have reduced plasma concentrations and efficacy of hydralazine compared to NAT2 poor metabolizers.</td>\n<td>Consider a starting total daily dose of at least 75 mg. Titrate up to 300 mg total daily hydralazine dose as tolerated. NAT2 rapid metabolizers typically require a 50–100% higher maintenance dose compared to poor metabolizers.</td>\n<td>Moderate</td>\n</tr>\n<tr>\n<td>NAT2 Intermediate Metabolizer</td>\n<td>An individual carrying one increased function allele and one decreased function allele.</td>\n<td>*1/*5, *4/*6, *1/*7, *1/*14</td>\n<td>Predicted to have reduced plasma concentrations and efficacy of hydralazine compared to NAT2 poor metabolizers</td>\n<td>Consider a starting total daily dose of at least 75 mg. Titrate up to 300 mg total daily hydralazine dose as tolerated. NAT2 intermediate metabolizers typically require a 50–100% higher maintenance dose compared to poor metabolizers</td>\n<td>Moderate</td>\n</tr>\n<tr>\n<td>NAT2 Poor Metabolizer</td>\n<td>An individual carrying two decreased function allelels.</td>\n<td>*5/*5, *5/*6, *7/*7, *6/*14</td>\n<td>Predicted to have increased hydralazine plasma concentrations compared to NAT2 rapid and intermediate metabolizers, which may lead to both increased efficacy and adverse effects, including drug-induced systemic lupus erythematosus</td>\n<td>Initiate therapy at a total daily dose of 40–75 mg. Carefully titrate dose upward to clinical effect or guideline-recommended dose; use caution with total daily hydralazine doses of 200 mg or more</td>\n<td>Moderate</td>\n</tr>\n<tr>\n<td>NAT2 Indeterminate</td>\n<td>An individual carrying one or two uncertain or unknown function alleles.</td>\n<td>*10/*27, *5/*51, *7/*44</td>\n<td>.n/a</td>\n<td>No recommendation.</td>\n<td>No recommendation.</td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> The <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/diplotype_phenotype/NAT2_Diplotype_Phenotype_Table.xlsx\" target=\"_blank\"><em>NAT2</em> Diplotype-Phenotype Table</a> provides a complete list of possible diplotypes and phenotype assignments.</p>\n<p><sup>b</sup> Rating scheme described in the <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/hydralazine/2025/40974042-supplement.pdf\" target=\"_blank\">guideline supplement</a>.</p>\n",
+      "version" : 3
+    },
+    "version" : 5
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "citations" : [
+    {
+      "id" : 15159502,
+      "title" : "Clinical Pharmacogenetics Implementation Consortium Guideline for CYP2B6 Genotype and Methadone Therapy.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/38863207",
+      "authors" : [
+        "Robinson Katherine M",
+        "Eum Seenae",
+        "Desta Zeruesenay",
+        "Tyndale Rachel F",
+        "Gaedigk Andrea",
+        "Crist Richard C",
+        "Haidar Cyrine E",
+        "Myers Alan L",
+        "Samer Caroline F",
+        "Somogyi Andrew A",
+        "Zubiaur Pablo",
+        "Iwuchukwu Otito F",
+        "Whirl-Carrillo Michelle",
+        "Klein Teri E",
+        "Caudle Kelly E",
+        "Donnelly Roseann S",
+        "Kharasch Evan D"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 1452502075,
+          "resource" : "PubMed",
+          "resourceId" : "38863207",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/38863207",
+          "version" : 0
+        },
+        {
+          "id" : 1452502076,
+          "resource" : "DOI",
+          "resourceId" : "10.1002/cpt.3338",
+          "_url" : "http://dx.doi.org/10.1002%2Fcpt.3338",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "Clinical pharmacology and therapeutics",
+      "meshTerms" : [
+        "Analgesics, Opioid",
+        "Cytochrome P-450 CYP2B6",
+        "Genotype",
+        "Humans",
+        "Methadone",
+        "Opiate Substitution Treatment",
+        "Opioid-Related Disorders",
+        "Pharmacogenetics",
+        "Pharmacogenomic Variants"
+      ],
+      "month" : 10,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "page" : "932-938",
+      "pediatric" : false,
+      "pgkbPublication" : true,
+      "pubDate" : "2024-10-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "Methadone is a mu (μ) opioid receptor agonist used clinically in adults and children to manage opioid use disorder, neonatal abstinence syndrome, and acute and chronic pain. It is typically marketed as a racemic mixture of R- and S-enantiomers. R-methadone has 30-to 50-fold higher analgesic potency than S-methadone, and S-methadone has a greater adverse effect (prolongation) on the cardiac QTc interval. Methadone undergoes stereoselective metabolism. CYP2B6 is the primary enzyme responsible for catalyzing the metabolism of both enantiomers to the inactive metabolites, S- and R-2-ethylidene-1,5-dimethyl-3,3-diphenylpyrrolidine (S- and R-EDDP). Genetic variation in the CYP2B6 gene has been investigated in the context of implications for methadone pharmacokinetics, dose, and clinical outcomes. Most CYP2B6 variants result in diminished or loss of CYP2B6 enzyme activity, which can lead to higher plasma methadone concentrations (affecting S- more than R-methadone). However, the data do not consistently indicate that CYP2B6-based metabolic variability has a clinically significant effect on methadone dose, efficacy, or QTc prolongation. Expert analysis of the published literature does not support a change from standard methadone prescribing based on CYP2B6 genotype (updates at www.cpicpgx.org).",
+      "terms" : [
+        {"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},
+        {"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}
+      ],
+      "type" : "Literature",
+      "version" : 9,
+      "volume" : "116",
+      "year" : 2024
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166345801",
+    "name" : "Annotation of CPIC Guideline for methadone and CYP2B6",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "7yXh6pHJPMU",
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1452565900,
+        "date" : "2024-08-26T12:19:29.198-07:00",
+        "description" : "Added video",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15159502,"title":"Clinical Pharmacogenetics Implementation Consortium Guideline for CYP2B6 Genotype and Methadone Therapy.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/38863207","crossReferences":[{"id":1452502075,"resource":"PubMed","resourceId":"38863207","_url":"https://www.ncbi.nlm.nih.gov/pubmed/38863207"},{"id":1452502076,"resource":"DOI","resourceId":"10.1002/cpt.3338","_url":"http://dx.doi.org/10.1002%2Fcpt.3338"}],"objCls":"Literature","pubDate":"2024-10-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1452555181,
+      "html" : "<blockquote class=\"blockquote\">\n<p>Methadone is also used in the pediatric setting for the treatment of neonatal abstinence syndrome, iatrogenic\nopioid withdrawal, chronic pain, and perioperative pain. With regard to CYP2B6 ontogeny, CYP2B6 mRNA expression levels reach adult levels by 1 year of age. The impact of CYP2B6 phenotypes on the pharmacokinetics of methadone is similar in children and adolescents as compared with adults. A population pharmacokinetic model extrapolated adult pharmacokinetic parameters to a pediatric population and predicted increased exposure to methadone in CYP2B6 PMs. Clinical outcome data associated with CYP2B6 phenotypes in pediatrics are limited to one study in which infants exposed to methadone in utero were less likely to require treatment for neonatal abstinence syndrome if they carried a CYP2B6 decreased function allele and to one fatal case report of an infant who was a CYP2B6 PM and breastfeeding from a mother receiving methadone. Therefore, there is not enough data to support changes in prescribing based on CYP2B6 phenotype in children at this time, which is consistent with our adult recommendations.</p>\n</blockquote>\n",
+      "version" : 0
+    },
+    "recommendation" : false,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450401",
+        "name" : "methadone",
+        "version" : 19
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA123",
+        "symbol" : "CYP2B6",
+        "name" : "cytochrome P450 family 2 subfamily B member 6",
+        "version" : 6788
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1452539060,
+      "html" : "<p>CPIC does not currently provide CYP2B6 genotype-based prescribing recommendations for methadone.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1452539061,
+      "html" : "<h3 id=\"july-2024\">July 2024</h3>\n<p>The authors of theCPIC&reg; guideline for methadone and CYP2B6 evaluated the available evidence for the use of methadone in patients carrying CYP2B6 variants. They conclude that the current evidence base does not support making changes to standard methadone prescribing based on CYP2B6 diplotype.</p>\n<p>These guidelines are applicable to:</p>\n<ul>\n<li>adult patients</li>\n<li>pediatric patients</li>\n</ul>\n<p>Excerpts from the guideline:</p>\n<blockquote class=\"blockquote\">\n<p><strong>Therapeutic recommendations</strong> The current evidence does not support changing standard prescribing for methadone (both acute and chronic dosing) based on CYP2B6 genotype.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p>There is limited literature exploring the impact of CYP2B6 genetic variation on clinical outcomes during methadone treatment, including dose requirements, efficacy, and adverse events. [...] The clinical implications of changes in methadone disposition are less understood due to the titratability of methadone dose and the weak pharmacokinetic–pharmacodynamic relationship between methadone concentrations and QTc prolongation.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p><strong>CYP2B6 variants and methadone plasma concentrations</strong> [...] Steady-state trough S-methadone plasma concentrations are almost two times higher in CYP2B6 PMs than in CYP2B6 NMs. Few studies specifically compare CYP2B6 IMs with NMs and PMs. [...] In most studies, decreased or no function CYP2B6 alleles were not associated with significantly greater mean plasma R-methadone concentrations.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p><strong>CYP2B6 variants and methadone pharmacokinetics</strong> CYP2B6 decreased or no function alleles were associated with decreased clearance and/or increased area-under-the-curve (AUC) for S-methadone. [...] As with plasma methadone concentrations, the influence of CYP2B6 genotype on methadone clearance is less with R-than S-methadone clearance.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p><strong>CYP2B6 variants and methadone dose in opioid use disorder</strong> In 321 Han Chinese patients, CYP2B6*6 carriers were more likely to be stably maintained on a lower methadone maintenance dose (&lt; 55 mg vs &gt; 100 mg). The mean methadone maintenance dose for CYP2B6 c.516G&gt;T Israeli homozygotes (96 mg) was significantly lower than for CYP2B6 c.516G&gt;T heterozygotes (129 mg) and noncarriers (150 mg), and in 100 Taiwanese patients (44 mg vs. 52 mg vs. 68 mg, respectively). However, the majority of studies fail to replicate these findings, with no significant association found between CYP2B6 genotype and methadone dose in opioid use disorder.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p><strong>CYP2B6 variants and methadone treatment response in opioid use disorder</strong> Studies have not found a significant effect of CYP2B6 genetics on methadone response in the treatment of opioid use disorder.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p><strong>CYP2B6 variants and methadone QTc interval</strong> The main adverse effect studied in the context of CYP2B6 genotype is QTc prolongation. However, there is only one study directly evaluating CYP2B6 variants and the QTc interval. In that study of 179 patients, CYP2B6 PMs had increased plasma S-methadone concentrations and had a mean QTc interval on methadone treatment 18 ms greater than other phenotype groups. CYP2B6 PMs had a higher frequency of a long-QTc interval (i.e., &gt; 450 ms for males and &gt; 470 ms for females) than other phenotype groups. Although the CYP2B6 PMs had decreased metabolism of S-methadone, the clinical importance of this genetic effect is unknown since no patient developed a QTc &gt; 500 ms during the study period, and there were no episodes of torsade de pointes during the study period.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p><strong>Therapeutic recommendations</strong> [...] Because the relationship between methadone concentrations and QTc is weak with a low magnitude of effect, the relationship between CYP2B6 genotype and methadone pharmacokinetics cannot be extrapolated to CYP2B6 genotype and risk of QTc prolongation and thus can not support using CYP2B6 genotype to guide dosing. Clinical guidelines for ECG monitoring in the context of methadone therapy, including risk assessment of other clinical factors, should be followed. None of the pharmacogenetic information in this guideline should be interpreted to influence the use of ECG monitoring guidelines.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p><strong>Other considerations</strong> Although methadone is metabolized to a minor extent by CYP2D6, the <a href=\"/guidelineAnnotation/PA166228022\">CPIC guideline for opioids</a> concludes that CYP2D6 genotype does not appear to affect methadone adverse events, dose requirements, or analgesia (CPIC Level C – no recommendation).</p>\n</blockquote>\n<p>Download and read:</p>\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/methadone/2024/38863207.pdf\" target=\"_blank\">Guideline publication</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/methadone/2024/38863207-supplement.pdf\" target=\"_blank\">Guideline supplement</a></li>\n</ul>\n<h3 id=\"table-1-methadone-dosing-recommendations-based-on-cyp2b6-phenotype\">Table 1: Methadone dosing recommendations based on CYP2B6 phenotype</h3>\n<p><em>Adapted from Tables 1 &amp; 2 of the guideline</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Predicted phenotype</th>\n<th>Genotypes</th>\n<th>Examples of CYP2B6 diplotypes<sup>a</sup></th>\n<th>Implications for phenotypic measures</th>\n<th>Therapeutic recommendation<sup>b</sup></th>\n<th>Classification of recommendations</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2B6 ultrarapid metabolizer (UM)</td>\n<td>An individual carrying two increased function alleles</td>\n<td>*4/*4</td>\n<td>No data</td>\n<td>No recommendation</td>\n<td>No recommendation</td>\n</tr>\n<tr>\n<td>CYP2B6 rapid metabolizer (RM)</td>\n<td>An individual carrying one normal function allele and one increased function allele</td>\n<td>*1/*4</td>\n<td>Limited evidence for decreased R-and S-methadone plasma concentrations</td>\n<td>Standard dosing, titration, and monitoring of methadone</td>\n<td>Moderate</td>\n</tr>\n<tr>\n<td>CYP2B6 normal metabolizer (NM)</td>\n<td>An individual carrying two normal function alleles</td>\n<td>*1/*1, *1/*2, *2/*2</td>\n<td>Normal metabolism and plasma concentrations of R-and S-methadone</td>\n<td>Standard dosing, titration, and monitoring of methadone</td>\n<td>Strong</td>\n</tr>\n<tr>\n<td>CYP2B6 intermediate metabolizer (IM)</td>\n<td>An individual carrying one normal function allele and one decreased function allele OR one normal function allele and one no-function allele OR one increased function allele and one decreased function allele OR one increased function allele and one no-function allele<sup>c</sup></td>\n<td>*1/*6, *1/*18</td>\n<td>Increased S-methadone plasma concentrations; unknown clinical implications. No difference in steady-state R-methadone plasma concentrations</td>\n<td>Standard dosing, titration, and monitoring of methadone</td>\n<td>Moderate</td>\n</tr>\n<tr>\n<td>CYP2B6 poor metabolizer (PM)</td>\n<td>An individual carrying two decreased function alleles OR two no-function alleles OR one decreased function allele and one no-function allele</td>\n<td>*6/*6, *18/*18, *6/*18</td>\n<td>Increased S-methadone plasma concentrations; unknown clinical implications. No difference in steady-state R-methadone plasma concentrations</td>\n<td>Standard dosing, titration, and monitoring of methadone</td>\n<td>Moderate</td>\n</tr>\n<tr>\n<td>Indeterminate</td>\n<td>An individual carrying one or two uncertain function alleles</td>\n<td>*1/*3, *3/*3</td>\n<td>n/a</td>\n<td>No recommendation</td>\n<td>No recommendation</td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> Please refer to the <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/diplotype_phenotype/CYP2B6_Diplotype_Phenotype_Table.xlsx\" target=\"_blank\">CYP2B6 Diplotype-Phenotype Table</a> online for a complete list. For allele function and population-specific allele and phenotype frequencies, please refer to the <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/allele_function_reference/CYP2B6_allele_functionality_reference.xlsx\" target=\"_blank\">CYP2B6 Allele Functionality Table</a> and the <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/frequency/CYP2B6_frequency_table.xlsx\" target=\"_blank\">CYP2B6 Allele Frequency Table</a> online.<br />\n<sup>b</sup> Clinical guidelines for ECG monitoring in the context of methadone therapy, including risk assessment of other clinical factors, should be followed.<br />\n<sup>c</sup> There is a paucity of clinical data for diplotypes containing one increased function allele and one decreased/no-function allele, and the data varies based on substrate. For methadone, there is limited data that\nsuggest that*4/*6 may have increased activity compared with CYP2B6 normal metabolizers</p>\n",
+      "version" : 1
+    },
+    "version" : 3
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166182814",
+    "name" : "Annotation of DPWG Guideline for fluvoxamine and CYP2C19",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1450414989,
+        "date" : "2019-05-23T00:00:00-07:00",
+        "description" : "Annotation current with November 2018 DPWG Guideline release",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1450820662,
+        "date" : "2019-10-03T14:31:47.823-07:00",
+        "description" : "No changes based on August 2019 guideline",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1450963505,
+        "date" : "2020-02-11T05:59:24.702-08:00",
+        "description" : "Fixed links to 2018 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451632843,
+        "date" : "2022-01-03T15:04:24.008-08:00",
+        "description" : "Added DPWG SSRI guideline publication.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704175,
+        "date" : "2022-03-03T16:33:22.019-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451732815,
+        "date" : "2022-03-28T09:57:35.635-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451884245,
+        "date" : "2022-09-16T10:19:28.701-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146464,
+        "date" : "2023-07-03T13:39:52.170-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452411300,
+        "date" : "2024-03-18T09:44:07.455-07:00",
+        "description" : "Updated links for risk analysis pdf.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452424586,
+        "date" : "2024-03-29T11:43:05.531-07:00",
+        "description" : "Removed message about gene information document availability.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15126562,"title":"Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2C19 and CYP2D6 and SSRIs.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9553948","crossReferences":[{"id":1452680280,"resource":"PubMed Central","resourceId":"PMC9553948","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9553948"},{"id":1451632760,"resource":"PubMed","resourceId":"34782755","_url":"https://www.ncbi.nlm.nih.gov/pubmed/34782755"},{"id":1451632761,"resource":"DOI","resourceId":"10.1038/s41431-021-01004-7","_url":"http://dx.doi.org/10.1038%2Fs41431-021-01004-7"}],"objCls":"Literature","pubDate":"2022-10-01T00:00:00-07:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15102465,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2018","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","crossReferences":[{"id":1450415575,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : false,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA449690",
+        "name" : "fluvoxamine",
+        "version" : 10
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA124",
+        "symbol" : "CYP2C19",
+        "name" : "cytochrome P450 family 2 subfamily C member 19",
+        "version" : 7210
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1450414987,
+      "html" : "<p>There are currently no dosing recommendations for fluvoxamine based on CYP2C19 genotypes.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1450414988,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-between-cyp2c19-and-cyp2d6-and-ssris-european-journal-of-human-genetics-2021\">Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2C19 and CYP2D6 and SSRIs. European journal of human genetics (2021)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper reiterates that there is no interaction between fluvoxamine and CYP2C19 [Article:<a href=\"/pmid/34782755\">34782755</a>].</p>\n<h3 id=\"november-2018-guideline\">November 2018 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for fluvoxamine based on CYP2C19 genotypes. They conclude that there is not a gene-drug interaction (see the <a download=\"DPWG_November_2018.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_November_2018.pdf\">Dutch guidelines November 2018 update</a>).</p>\n<p><a download=\"DPWG_CYP2C19_fluvoxamine_3509-to-3511.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C19_fluvoxamine_3509-to-3511.pdf\">Read for more information about this recommendation</a>, <a download=\"CYP2C19.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CYP2C19.pdf\">Read about gene information from DPWG</a></p>\n",
+      "version" : 7
+    },
+    "version" : 9
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "citations" : [
+    {
+      "id" : 15236624,
+      "title" : "Guidelines From the French-Speaking Society for Histocompatibility and Immunogenetics (SFHI) for Harmonisation of HLA Genotyping in Autoimmune Diseases, Drug Hypersensitivity and Pharmacogenetics.",
+      "_sameAs" : "https://www.ncbi.nlm.nih.gov/pubmed/41137743",
+      "authors" : [
+        "Renac Virginie",
+        "Moalic Virginie",
+        "Dautin Guillaume",
+        "Cherel Mathilde",
+        "Mercier Bernard",
+        "Walencik Alexandre",
+        "Cohen Jacques",
+        "Farce Fabienne",
+        "Proust Barbara",
+        "Kaveri Rangolie",
+        "Humeau Camille",
+        "Picard Christophe",
+        "Pedron Béatrice",
+        "Dubois Valérie",
+        "Taupin Jean-Luc",
+        "Elsermans Vincent",
+        "Top-Raymond Isabelle",
+        "Ferrari-Lacraz Sylvie",
+        "Barocas Antoine",
+        "Masson Dominique",
+        "Essaydi Arnaud",
+        "Guidicelli Gwendaline",
+        "Ralazamahaleo Mamy",
+        "Congy-Jolivet Nicolas"
+      ],
+      "crossReferences" : [
+        {
+          "id" : 1454392032,
+          "resource" : "PubMed",
+          "resourceId" : "41137743",
+          "_url" : "https://www.ncbi.nlm.nih.gov/pubmed/41137743",
+          "version" : 0
+        },
+        {
+          "id" : 1454392033,
+          "resource" : "DOI",
+          "resourceId" : "10.1111/tan.70442",
+          "_url" : "http://dx.doi.org/10.1111%2Ftan.70442",
+          "version" : 0
+        }
+      ],
+      "day" : -1,
+      "hasKeyword" : true,
+      "journal" : "HLA",
+      "meshTerms" : [
+        "Alleles",
+        "Autoimmune Diseases",
+        "Drug Hypersensitivity",
+        "France",
+        "Genetic Predisposition to Disease",
+        "Genotype",
+        "HLA Antigens",
+        "Histocompatibility Testing",
+        "Humans",
+        "Immunogenetics",
+        "Pharmacogenetics"
+      ],
+      "month" : 10,
+      "nonHuman" : false,
+      "objCls" : "Literature",
+      "page" : "e70442",
+      "pediatric" : false,
+      "pgkbPublication" : false,
+      "pubDate" : "2025-10-01T00:00:00-07:00",
+      "pubmedMeshTerms" : [],
+      "summary" : "HLA molecules play a central role in the adaptive immune response. Their high polymorphism influences individual susceptibility to various autoimmune diseases and certain drug-induced hypersensitivities. In France, HLA genotyping is classified as a medical genetics procedure and is strictly regulated. The Société Francophone d'Histocompatibilité et d'Immunogénétique (SFHI) has established national guidelines outlining clinically validated indications, required resolution levels and interpretation criteria based on robust data. These guidelines are particularly relevant for common clinical contexts, including autoimmune diseases and pharmacogenetic testing. Well-established associations include HLA-DQB1*02/DQA1*05 (DQ2) and HLA-DQB1*03:02/DQA1*05 (DQ8) with celiac disease, HLA-B*27 with spondyloarthritis, HLA-DQB1*06:02 with type 1 narcolepsy, HLA-A*29 with Birdshot chorioretinopathy and several pharmacogenetic risk alleles such as HLA-B*57:01 (abacavir), HLA-B*15:02 and HLA-A*31:01 (carbamazepine) and HLA-B*58:01 (allopurinol). In immunotherapy, the efficacy of tebentafusp has been shown to depend on HLA-A*02:01 positivity. HLA alleles must be interpreted as relative risk factors, not absolute predictors. Critical analysis of HLA-related scientific literature requires consideration of the genotyping technique, typing resolution, allele frequencies within the studied population and environmental factors. High-resolution typing is essential in pharmacogenetics and recommended in selected autoimmune disorders. Interpretation should be conducted by qualified medical biologists, integrating clinical context, allelic diversity and recent technological advances, particularly next-generation sequencing. HLA genotyping represents a valuable tool in diagnosis and risk assessment, with increasing importance in the era of personalised medicine.",
+      "terms" : [
+        {"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}
+      ],
+      "type" : "Literature",
+      "version" : 3,
+      "volume" : "106",
+      "year" : 2025
+    }
+  ],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166422161",
+    "name" : "Annotation of RNPGx Guideline for allopurinol and HLA-B",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : true,
+    "history" : [],
+    "literature" : [
+      {"id":15236624,"title":"Guidelines From the French-Speaking Society for Histocompatibility and Immunogenetics (SFHI) for Harmonisation of HLA Genotyping in Autoimmune Diseases, Drug Hypersensitivity and Pharmacogenetics.","_sameAs":"https://www.ncbi.nlm.nih.gov/pubmed/41137743","crossReferences":[{"id":1454392032,"resource":"PubMed","resourceId":"41137743","_url":"https://www.ncbi.nlm.nih.gov/pubmed/41137743"},{"id":1454392033,"resource":"DOI","resourceId":"10.1111/tan.70442","_url":"http://dx.doi.org/10.1111%2Ftan.70442"}],"objCls":"Literature","pubDate":"2025-10-01T00:00:00-07:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165987831",
+        "symbol" : "HLA-B*58:01",
+        "name" : "*58:01",
+        "version" : 4
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA448320",
+        "name" : "allopurinol",
+        "version" : 11
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA35056",
+        "symbol" : "HLA-B",
+        "name" : "major histocompatibility complex, class I, B",
+        "version" : 40
+      }
+    ],
+    "source" : "RNPGx",
+    "summaryMarkdown" : {
+      "id" : 1454392080,
+      "html" : "<p>The Société Francophone d'Histocompatibilité et d'Immunogénétique (SFHI) has established national guidelines around testing for HLA-B*58:01 prior to prescription of allopurinol to avoid severe cutaneous adverse reactions (SCARs).</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1454392081,
+      "html" : "<p>Excerpts from the text:</p>\n<blockquote class=\"blockquote\">\n<p>Severe adverse events range from 1.6% to 2% of patients and up to 8%–18% in patients with chronic kidney insufficiency. Mortality rates reported in patients developing SCAR may be as high as 10%–30% .\nThe symptoms were observed mostly in Asian populations, where the prevalence of HLA-B*58:01 is higher (mainly in Han Chinese, Thai or Korean populations). Chronic kidney insufficiency is a major risk factor in patients treated with allopurinol. To generate an immune response, only very small amounts of HLA are required, predicting the absence of a gene-dose effect. There is no difference between heterozygous and homozygous carriers.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p>SFHI recommends:</p>\n<ul>\n<li>Testing for the HLA-B*58:01 allele should be performed upon request before prescribing allopurinol. It is particularly recommended for patients of Asian descent before starting treatment (Grade 1A).</li>\n<li>HLA-B genotyping must be performed using a high-resolution molecular biology technique, second-field typing with no ambiguity (Grade 1A).</li>\n</ul>\n</blockquote>\n<p>Excerpt from Table 2.\n(scroll right for Interpretation columns)</p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Condition of Indication</th>\n<th>Susceptibility HLA allele(s)</th>\n<th>Clinical relevance</th>\n<th>Relevance of HLA testing prior to prescription</th>\n<th>Relative risk (OR)</th>\n<th>Medical Interpretation if the allele is present</th>\n<th>Medical Interpretation if the allele is absent</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>SCARs to allopurinol</td>\n<td>HLA-B*58:01</td>\n<td>High</td>\n<td>Recommended in patients of Asian ancestry, those with chronic kidney disease, or taking thiazide diuretics/antibiotics</td>\n<td>OR ~ 80–580 depending on studies and population (Korea ~ 100,Taiwan ~ 580,Japan ~ 80)</td>\n<td>High risk of SCARs (SJS/TEN, DRESS). Contraindicated.</td>\n<td>Allopurinol may be prescribed. Enhanced monitoring if clinical risk factors are present.</td>\n</tr>\n</tbody>\n</table>\n",
+      "version" : 0
+    },
+    "version" : 0
+  }
+}

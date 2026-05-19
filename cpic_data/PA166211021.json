@@ -1,0 +1,151 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166211021",
+    "name" : "Annotation of DPWG Guideline for siponimod and CYP2C9",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1451153240,
+        "date" : "2020-06-01T14:23:38.807-07:00",
+        "description" : "Changes based on May 2020 guidelines",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451445823,
+        "date" : "2021-05-18T00:00:00-07:00",
+        "description" : "Added extended dosing",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451699880,
+        "date" : "2022-03-01T13:14:17.229-08:00",
+        "description" : "Updated names of IM and PM groups and added footnote and explanation.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704251,
+        "date" : "2022-03-03T16:33:34.933-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451707502,
+        "date" : "2022-03-08T10:46:23.221-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732891,
+        "date" : "2022-03-28T09:57:49.022-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733456,
+        "date" : "2022-03-28T15:02:46.750-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741543,
+        "date" : "2022-04-05T11:19:29.185-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884696,
+        "date" : "2022-09-16T14:42:46.409-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146499,
+        "date" : "2023-07-03T13:40:01.857-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452412660,
+        "date" : "2024-03-19T06:14:32.604-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454042180,
+        "date" : "2025-04-25T15:25:22.157-07:00",
+        "description" : "updated CYP2C9 gene information document",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454247820,
+        "date" : "2025-09-08T16:17:11.771-07:00",
+        "description" : "updated based on version 20240101",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454270880,
+        "date" : "2025-09-22T00:00:00-07:00",
+        "description" : "exchanged Sep 2025 pdf to version that includes also *2/*3 updates",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15111722,"title":"Dutch Pharmacogenetics Working Group Guidelines May 2020","_sameAs":"https://www.knmp.nl/downloads/pharmacogenetic-recommendations-may-2020.pdf","crossReferences":[{"id":1451152900,"resource":"URL","resourceId":"https://www.knmp.nl/downloads/pharmacogenetic-recommendations-may-2020.pdf","_url":"https://www.knmp.nl/downloads/pharmacogenetic-recommendations-may-2020.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15184982,"title":"Dutch Pharmacogenetics Working Group Guidelines September 2025","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20240101_downloaded_090825.pdf","crossReferences":[{"id":1454247640,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20240101_downloaded_090825.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/pharmacogenetic_recommendation_text_20240101_downloaded_090825.pdf"}],"objCls":"Literature","terms":[{"id":1452267780,"resource":"ClinPGx Tags","term":"Has PGx","termId":"pgkbTags:1452267780"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166182736",
+        "name" : "siponimod",
+        "version" : 7
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA126",
+        "symbol" : "CYP2C9",
+        "name" : "cytochrome P450 family 2 subfamily C member 9",
+        "version" : 7877
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1451153220,
+      "html" : "<p>The Dutch Pharmacogenetics Working Group Guideline for siponimod recommends decreasing the dose for <em>CYP2C9</em> *1/*3, *2/*3 genotypes or CYP2C9 intermediate metabolizer (not including *2 and *3) and to avoid siponimod for the <em>CYP2C9</em> *3/*3 genotype or CYP2C9 poor metabolizer (two alleles with no/decreased enzyme activity, of which at least one other than *2 or *3).</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451153221,
+      "html" : "<h3 id=\"september-2025-update\">September 2025 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group (<a href=\"/page/dpwg\">DPWG</a>) released an updated version of the <a download=\"pharmacogenetic_recommendation_text_20240101_versie2_downloaded092225.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/pharmacogenetic_recommendation_text_20240101_versie2_downloaded092225.pdf\">Pharmacogenetic_recommendation_text</a> dated with 20240101 version 2. It includes changes to the wording for the CYP2C9-siponimod guidelines which are dated within the document as 6-11-2023. The word &quot;genetic&quot; is replaced with &quot;gene&quot; and &quot;effects&quot; with &quot;reactions&quot;. For IM other, *1/*3, and *2/*3 &quot;moderate CYP3A4 inducer&quot; are extended to &quot;moderate or strong CYP3A4 inducer&quot;. The table below has been updated to reflect the wording changes.</p>\n<h3 id=\"may-2021-update\">May 2021 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has made some minor changes to the names of some phenotype groups in this guideline. The table below has been updated to reflect this but the recommendations themselves have not changed.</p>\n<h3 id=\"may-2020-update\">May 2020 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for siponimod based on CYP2C9 genotype. They recommend decreasing the dose for <em>CYP2C9</em> <em>*1/*3</em>, <em>*2/*3</em> genotypes and to avoid siponimod for the <em>CYP2C9</em> <em>*3/*3</em> genotype.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_May_2020.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_May_2020.pdf\">Dutch guidelines May 2020 update</a> with <a download=\"pharmacogenetic_recommendation_text_20240101_versie2_downloaded092225.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/pharmacogenetic_recommendation_text_20240101_versie2_downloaded092225.pdf\">updates</a> from 2025.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><em>CYP2C9*1/*2</em></td>\n<td>siponimod</td>\n<td>The gene variation can slightly increase the exposure to siponimod. However, the effect is too small to expect any impact on efficacy or adverse reactions.</td>\n<td>NO action is required for this gene-drug interaction.</td>\n</tr>\n<tr>\n<td><em>CYP2C9*1/*3</em></td>\n<td>siponimod</td>\n<td>Theoretically, the risk of adverse reactions is increased, as the gene variation results in higher plasma concentrations of siponimod.</td>\n<td>Use 50% of the normal maintenance dose. Reconsider the choice and the potential benefit of siponimod if the patient is also using a moderate CYP3A4 inducer, such as modafinil, or a strong CYP3A4 inducer. For this gene variation, a moderate or strong CYP3A4 inducer results in a reduction in the exposure of siponimod by 49%, according to a pharmacokinetic model.</td>\n</tr>\n<tr>\n<td><em>CYP2C9*2/*2</em></td>\n<td>siponimod</td>\n<td>The gene variation can slightly increase the exposure to siponimod. However, the effect is too small to expect any impact on efficacy or adverse reactions.</td>\n<td>NO action is required for this gene-drug interaction.</td>\n</tr>\n<tr>\n<td><em>CYP2C9*2/*3</em></td>\n<td>siponimod</td>\n<td>Theoretically, the risk of adverse reactions is increased, as the gene variation results in higher plasma concentrations of siponimod.</td>\n<td>Use 50% of the normal maintenance dose. Reconsider the choice and the potential benefit of siponimod if the patient is also using a moderate CYP3A4 inducer, such as modafinil, or a strong CYP3A4 inducer. For this genetic variation, a moderate or strong CYP3A4 inducer results in a reduction in the exposure of siponimod by 49%, according to a pharmacokinetic model.</td>\n</tr>\n<tr>\n<td><em>CYP2C9*3/*3</em></td>\n<td>siponimod</td>\n<td>Siponimod is contraindicated in patients with this gene variation. Theoretically, the risk of adverse reactions is greatly increased, as the gene variation results in much higher plasma concentrations of siponimod.</td>\n<td>Avoid siponimod.</td>\n</tr>\n<tr>\n<td>CYP2C9 IM other<sup>a</sup></td>\n<td>siponimod</td>\n<td>Theoretically, the risk of adverse reactions is increased, as the gene variation results in higher plasma concentrations of siponimod.</td>\n<td>Use 50% of the normal maintenance dose. Reconsider the choice and the potential benefit of siponimod if the patient is also using a moderate CYP3A4 inducer, such as modafinil, or a strong CYP3A4 inducer. For the comparable gene variation *1/*3, the moderate or strong CYP3A4 inducer results in a reduction in the exposure of siponimod by 49%, according to a pharmacokinetic model.</td>\n</tr>\n<tr>\n<td>CYP2C9 PM other <sup>a</sup></td>\n<td>siponimod</td>\n<td>Siponimod is contraindicated in patients with the comparable gene variation *3/*3. Theoretically, the risk of adverse reactions is greatly increased, as the gene variation results in much higher plasma concentrations of siponimod.</td>\n<td>Avoid siponimod.</td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> These groups are referred to in the DPWG recommendation PDF as 'IM ANDERS' and 'PM ANDERS', which use the Dutch word 'anders'. These has been translated as 'IM other' and PM other', respectively.</p>\n<p><a download=\"DPWG_CYP2C9_siponimod_7160-to-7166.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C9_siponimod_7160-to-7166.pdf\">Read for more information about this recommendation</a>, <a download=\"DPWG_CYP2C9_050522.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C9_050522.pdf\">Read about gene information from DPWG</a> <em>(CYP2C9 information document updated 05/05/2022)</em></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_CYP2C9_siponimod_7160-to-7166.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2C9_siponimod_7160-to-7166.pdf\">DPWG risk analysis document</a> for siponimod and CYP2C9:</p>\n<blockquote class=\"blockquote\">\n<p>Due to the absence of clinical studies with patients with a CYP2C9 genotype leading to reduced CYP2C9 activity, and thus the absence of evidence of an increase in adverse events code ≥ D (grade ≥ 3) in these patients, the clinical implication of the gene-drug interaction scores only 2 out of the maximum of 10 points (with pre-emptive genotyping considered to be potentially beneficial for scores ranging from 0 to 2 points) [...]. However, because there is not enough evidence to reject the warnings and recommendations in the SmPC either, the KNMP decided to adopt the genotyping recommendation in the SmPC. The SmPC indicates that genotyping must be performed before starting siponimod to guide drug and dose selection. This would amount to genotyping being essential for drug safety according to the nomenclature of the KNMP Pharmacogenetics Working Group.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n",
+      "version" : 10
+    },
+    "version" : 16
+  }
+}

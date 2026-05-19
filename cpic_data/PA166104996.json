@@ -1,0 +1,163 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166104996",
+    "name" : "Annotation of CPIC Guideline for codeine and CYP2D6",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "pfovk7flpoM",
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1183699759,
+        "date" : "2011-12-28T00:00:00-08:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1183703037,
+        "date" : "2014-01-24T00:00:00-08:00",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1447983994,
+        "date" : "2016-05-05T12:28:51.930-07:00",
+        "description" : "corrected error in guideline link",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1448616255,
+        "date" : "2017-05-02T00:00:00-07:00",
+        "description" : "added note about FDA safety announcement",
+        "type" : "Update",
+        "version" : 1
+      },
+      {
+        "id" : 1449715166,
+        "date" : "2018-08-10T17:04:07.839-07:00",
+        "description" : "Updated link to new guideline video",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1449717118,
+        "date" : "2018-08-23T16:37:53.481-07:00",
+        "description" : "Updated video link",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450042765,
+        "date" : "2018-11-15T19:02:16.487-08:00",
+        "description" : "updated *14B to *14 and *14A to *114 based on the Nov 2018 PharmVar release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450824543,
+        "date" : "2019-10-24T20:01:25.514-07:00",
+        "description" : "online October 2019 guideline update (G2P project)",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451115160,
+        "date" : "2020-04-21T14:51:09.639-07:00",
+        "description" : "Removed links to retired allele frequency tables and added link to CYP2D6 gene information tables page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451223761,
+        "date" : "2020-07-08T00:00:00-07:00",
+        "description" : "added CYP2D6*115-*139 to allele picker; changed function for *60, *72, *84",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451309602,
+        "date" : "2021-01-12T12:28:27.164-08:00",
+        "description" : "Updated annotation to include information from 2020 guideline update and added pediatric section. Added 2020 guideline as a literature object. Removed link to old guideline video.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451309743,
+        "date" : "2021-01-12T13:37:37.029-08:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451471002,
+        "date" : "2021-07-14T10:15:47.451-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451598140,
+        "date" : "2021-11-29T15:40:47.281-08:00",
+        "description" : "Added video",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452137860,
+        "date" : "2023-06-22T22:14:07.590-07:00",
+        "description" : "Updated supplemental table links",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15115982,"title":"Clinical Pharmacogenetics Implementation Consortium Guideline for CYP2D6, OPRM1, and COMT Genotypes and Select Opioid Therapy.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8249478","crossReferences":[{"id":1451837577,"resource":"PubMed Central","resourceId":"PMC8249478","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8249478"},{"id":1451307240,"resource":"PubMed","resourceId":"33387367","_url":"https://www.ncbi.nlm.nih.gov/pubmed/33387367"},{"id":1451307241,"resource":"DOI","resourceId":"10.1002/cpt.2149","_url":"http://dx.doi.org/10.1002%2Fcpt.2149"}],"objCls":"Literature","pubDate":"2021-10-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":15069654,"title":"Clinical Pharmacogenetics Implementation Consortium guidelines for cytochrome P450 2D6 genotype and codeine therapy: 2014 update.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3975212","crossReferences":[{"id":1449279351,"resource":"PubMed Central","resourceId":"PMC3975212","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3975212"},{"id":1449279350,"resource":"PubMed","resourceId":"24458010","_url":"https://www.ncbi.nlm.nih.gov/pubmed/24458010"},{"id":1449279352,"resource":"DOI","resourceId":"10.1038/clpt.2013.254","_url":"http://dx.doi.org/10.1038%2Fclpt.2013.254"}],"objCls":"Literature","pubDate":"2014-04-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":14821790,"title":"Clinical Pharmacogenetics Implementation Consortium (CPIC) guidelines for codeine therapy in the context of cytochrome P450 2D6 (CYP2D6) genotype.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3289963","crossReferences":[{"id":1449266728,"resource":"PubMed Central","resourceId":"PMC3289963","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3289963"},{"id":827815491,"resource":"PubMed","resourceId":"22205192","_url":"https://www.ncbi.nlm.nih.gov/pubmed/22205192"},{"id":1449266729,"resource":"DOI","resourceId":"10.1038/clpt.2011.287","_url":"http://dx.doi.org/10.1038%2Fclpt.2011.287"}],"objCls":"Literature","pubDate":"2012-02-01T00:00:00-08:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1451309601,
+      "html" : "<p>Excerpts from the guideline:</p>\n<ul>\n<li>&quot;Several regulatory agencies worldwide advise against the use of codeine (...) in children younger than 12 years of age, and in children younger than 18 years of age after tonsillectomy and/or adenoidectomy. Due to these guidances, use of these drugs in children has decreased significantly in the US and some other countries, but continues in some clinical settings. Some advocate for careful genotype-guided use of codeine in specific pediatric patient populations.&quot;</li>\n<li>&quot;The US FDA label includes a warning to mothers that breastfeeding is not recommended when taking codeine (...). Codeine and its metabolites, including morphine, are secreted into human breast milk. The amount is typically low and dose-dependent, but breastfeeding women with a CYP2D6 ultrarapid metabolizer phenotype may achieve high serum concentrations of morphine on standard codeine therapy. This may lead to high levels of morphine in breast milk and dangerously high morphine exposure in their breastfed infants. A fatal opioid poisoning in a breastfed neonate from an ultrarapid metabolizer mother receiving codeine has been described; however a more recent review of this case calls into question the plausibility of neonatal opioid toxicity from breastfeeding. The American College of Obstetrics and Gynecology provides clinical guidance for postpartum pain management as untreated or inadequately treated pain in lactating women also has adverse consequences for the postpartum mother and her breastfed infant.</li>\n</ul>\n",
+      "version" : 0
+    },
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA449088",
+        "name" : "codeine",
+        "version" : 15
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA128",
+        "symbol" : "CYP2D6",
+        "name" : "cytochrome P450 family 2 subfamily D member 6",
+        "version" : 7891
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1447982022,
+      "html" : "<p>In the CPIC Dosing Guideline, alternate non-tramadol analgesics are recommended for CYP2D6 ultrarapid and poor metabolizers. A label recommended age- or weight-specific dose of codeine is warranted for CYP2D6 normal and intermediate metabolizers.</p>\n",
+      "version" : 2
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451433648,
+      "html" : "<p><em><strong>Note that the FDA released a <a rel=\"noopener noreferrer\" href=\"https://www.fda.gov/Drugs/DrugSafety/ucm549679.htm?source=govdelivery&amp;utm_medium=email&amp;utm_source=govdelivery\" target=\"_blank\">safety announcement</a> on 4/20/2017 stating that codeine and tramadol should not be used in children under 12 years.</strong></em></p>\n<h3 id=\"december-2020\">December 2020</h3>\n<ul>\n<li>\n<p>The 2014 CPIC&reg; guideline for codeine and CYP2D6 has been updated to include additional genes and drugs. It is now known as the CPIC&reg; guideline for opioids and CYP2D6, OPRM1 and COMT.</p>\n</li>\n<li>\n<p>Literature pertaining to codeine and CYP2D6 published between September 2013 and July 2020 was reviewed and the recommendations and supplemental information were updated.</p>\n</li>\n<li>\n<p>This guideline is applicable to:</p>\n<ul>\n<li>adult patients</li>\n<li>pediatric patients</li>\n</ul>\n</li>\n<li>\n<p>Download and read:</p>\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/opioids/2020/33387367.pdf\" target=\"_blank\">CPIC&reg; Guideline for Opioids and <em>CYP2D6</em>, <em>OPRM1</em> and <em>COMT</em></a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/opioids/2020/33387367-supplement.pdf\" target=\"_blank\">2020 supplement</a></li>\n<li><a href=\"/page/cyp2d6RefMaterials\">CYP2D6 Gene-Specific Information Tables</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/drug_resource/codeine-Drug_Resource_Mappings.xlsx\" target=\"_blank\">Codeine Drug Resource Mappings</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/report/current/test_alert/codeine_Pre_and_Post_Test_Alerts.xlsx\" target=\"_blank\">Codeine Pre and Post Test Alerts</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/images/flow_chart/Codeine_CDS_Flow_Chart.jpg\" target=\"_blank\">Codeine Clinical Decision Support Flow Chart</a></li>\n</ul>\n</li>\n</ul>\n<h3 id=\"table-1-codeine-therapy-recommendations-based-on-cyp2d6-phenotype\">Table 1: Codeine therapy recommendations based on CYP2D6 phenotype</h3>\n<p><em>Adapted from Tables 1 and 2 of the guideline.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Phenotype<sup>a</sup></th>\n<th>Activity score<br/>range</th>\n<th>Activity score<sup>b</sup></th>\n<th>Examples of<br/><em>CYP2D6</em> diplotypes<sup>b</sup></th>\n<th>Implications</th>\n<th>Recommendations</th>\n<th>Classification of<br/>recommendation<sup>d</sup></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2D6 ultrarapid metabolizer</td>\n<td>&gt;2.25</td>\n<td>&gt;2.25</td>\n<td><em>*1/*1xN, *1/*2xN, *2/*2xN<sup>c</sup></em></td>\n<td>Increased formation of morphine leading to higher risk of toxicity.</td>\n<td>Avoid codeine use because of potential for serious toxicity. If opioid use is warranted, consider a non-tramadol opioid.</td>\n<td>Strong</td>\n</tr>\n<tr>\n<td>CYP2D6 normal metabolizer</td>\n<td>1.25 &lt;= x &lt;= 2.25</td>\n<td>1.25<br/>1.5<br/>1.75<br/>2.0<br/>2.25</td>\n<td><em>*1/*10<br/>*1/*41, *1/*9<br/>*10/*41x3<br/>*1/*1, *1/*2<br/>*2x2/*10</em></td>\n<td>Expected morphine formation</td>\n<td>Use codeine label recommended age- or weight-specific dosing</td>\n<td>Strong</td>\n</tr>\n<tr>\n<td>CYP2D6 intermediate metabolizer</td>\n<td>0 &lt; x &lt; 1.25</td>\n<td>0.25<br/>0.5<br/>0.75<br/>1.0</td>\n<td>*4/*10<br/>*4/*41, *10/*10<br/>*10/*41<br/>*41/*41, *1/*5</td>\n<td>Reduced morphine formation.</td>\n<td>Use codeine label recommended age- or weight-specific dosing. If no response and opioid use is warranted, consider a non-tramadol opioid</td>\n<td>Moderate</td>\n</tr>\n<tr>\n<td>CYP2D6 poor metabolizer</td>\n<td>0</td>\n<td>0</td>\n<td><em>*3/*4, *4/*4, *5/*5, *5/*6</em></td>\n<td>Greatly reduced morphine formation leading to diminished analgesia</td>\n<td>Avoid codeine use because of possibility of diminished analgesia. If opioid use is warranted, consider a non-tramadol opioid.</td>\n<td>Strong</td>\n</tr>\n<tr>\n<td>CYP2D6 Indeterminate</td>\n<td>n/a</td>\n<td>An individual carrying one or two unknown or uncertain function alleles</td>\n<td><em>*1/*22, *1/*25, *22/*25</em></td>\n<td>n/a</td>\n<td>No recommendation</td>\n<td>No recommendation</td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> See the <strong>CYP2D6 Frequency Table</strong> on the <a href=\"/page/cyp2d6RefMaterials\">CYP2D6 Gene-Specific Information Tables page</a> for biogeographical group-specific allele and phenotype frequencies.\n<sup>b</sup> Assignment of allele function and allele activity values including citations for allele function can be found in the <strong>CYP2D6 Allele Definition Table</strong> and <strong>CYP2D6 Allele Functionality Table</strong>. For a complete list of CYP2D6 diplotypes and resulting phenotypes, see the <strong>CYP2D6 Genotype to Phenotype Table</strong>. All of these tables can be accessed on the <a href=\"/page/cyp2d6RefMaterials\">CYP2D6 Gene-Specific Information Tables page</a>.<br />\n<sup>c</sup> Where xN represents the number of CYP2D6 gene copies. For individuals with CYP2D6 duplications or multiplications, see supplemental\ndata for additional information on how to translate diplotypes into phenotypes.<br />\n<sup>d</sup> Rating scheme described in the Strength of Recommendations section in the <a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/opioids/2020/33387367-supplement.pdf\" target=\"_blank\">guideline supplement</a></p>\n<h3 id=\"october-2019-update\">October 2019 Update</h3>\n<p><a rel=\"noopener noreferrer\" href=\"https://ascpt.onlinelibrary.wiley.com/doi/full/10.1111/cts.12692\" target=\"_blank\">CYP2D6 genotype to phenotype translation changes</a>: Up until August 2019, there were a few inconsistencies in the translation of CYP2D6 genotype to phenotype translation across guidelines (i.e. CPIC and DPWG) and between clinical genetic testing laboratories. CPIC recently conducted a modified-Delphi project to obtain consensus for a uniform system for translating CYP2D6 genotype to phenotype among a panel of international CYP2D6 experts <a href=\"/page/cpicCyp2d6Standardization\">more information</a>. Modifications to CPIC’s prior system include downgrading the value assigned to the CYP2D6*10 allele for activity score calculation from 0.5 to 0.25 and changing the phenotype assignment for an activity score of 1 from normal metabolizer to intermediate metabolizer (<a rel=\"noopener noreferrer\" href=\"http://files.cpicpgx.org/data/gene/CYP2D6/Inferred_CYP2D6_Phenotype10242019.docx\" target=\"_blank\">table of all previous and new phenotype groupings</a>).</p>\n<p>As a result, the following changes have been made in the CYP2D6 allele functionality table, CYP2D6 genotype to phenotype table (access tables below):</p>\n<ul>\n<li>Diplotypes giving rise to activity scores of 1 changed from CYP2D6 normal metabolizer to CYP2D6 intermediate metabolizer assignments.\n<ul>\n<li><strong>Impact on the recommendations in this guideline:</strong> Because the recommendations in this guideline do not differ between a CYP2D6 normal and intermediate metabolizer, the current published recommendations for normal and intermediate metabolizers will remain unchanged.</li>\n</ul>\n</li>\n<li>All activity scores for diplotypes containing a CYP2D6*10 allele have been updated accordingly (activity scores changed to reflect the lower value of 0.25 for *10). Prior to the consensus projects, the combination of a duplicated normal function allele with a *10 allele resulted in an activity score of 2.5 which translates to an ultrarapid metabolizer. The lower value of 0.25 for CYP2D6*10 results in an activity score of 2.25 for these allele combinations, which based on the consensus project translates to a normal metabolizer.  See <a rel=\"noopener noreferrer\" href=\"http://files.cpicpgx.org/data/gene/CYP2D6/Inferred_CYP2D6_Phenotype10242019.docx\" target=\"_blank\">table of all previous and new phenotype groupings</a>.\n<ul>\n<li><strong>Impact on the recommendations in this guideline:</strong> The authors of this guideline are currently reviewing evidence for the affected activity score (AS of 2.25) and will update this webpage and relevant tables accordingly.</li>\n</ul>\n</li>\n</ul>\n<h3 id=\"august-2015-update\">August 2015 Update</h3>\n<ul>\n<li>Supplemental table S3 (Association between allelic variants and CYP2D6 enzyme activity) was updated with Supplemental table S2 from the Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for CYP2D6 and CYP2C19 Genotypes and Dosing of Selective Serotonin Reuptake Inhibitors (2015 Supplement) PMID: 25974703. The table is an updated version including additions to functional status and additional alleles.</li>\n</ul>\n<h3 id=\"april-2014-update\">April 2014 Update</h3>\n<p><em>Advance online publication January 2014.</em></p>\n<ul>\n<li>The 2014 update of CPIC guidelines regarding CYP2D6 and codeine have been published in Clinical Pharmacology and Therapeutics. Literature up to August 2013 was reviewed. <strong>The update addresses the FDA warning regarding codeine use in children following tonsillectomy with or without adenoidectomy, pediatric considerations, and additional considerations for use of alternative opioids metabolized by CYP2D6</strong>. In addition, supplemental information was updated.</li>\n<li>Excerpts from the 2014 guideline update:\n<ul>\n<li>&quot;<em>CYP2D6</em> genotype is expected to be equally reliable for inferring phenotype from genotype in children as in adults. Codeine is not recommended in children less than 2 years of age but presumably would carry additional dangers in neonates and young children who are ultrarapid metabolizers.&quot;</li>\n<li>&quot;Caution should be used when prescribing codeine to a breastfeeding woman with an ultrarapid metabolizer status.&quot;</li>\n<li>&quot;In February 2013, the FDA announced its strongest and new black box warning against codeine use to manage postoperative pain in children following tonsillectomy with or without adenoidectomy. This warning was in response to further FDA review of the codeine-related deaths and serious adverse drug reactions. The FDA warning is applicable to all children undergoing tonsillectomy with or without adenoidectomy irrespective of their obstructive sleep apnea status or CYP2D6 genotype/phenotype.&quot;</li>\n</ul>\n</li>\n<li>These guidelines are applicable to:\n<ul>\n<li>pediatric patients</li>\n<li>adult patients</li>\n</ul>\n</li>\n<li>Download and read:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/codeine/2014/24458010.pdf\" target=\"_blank\">Clinical Pharmacogenetics Implementation Consortium (CPIC) guidelines for cytochrome P450 2D6 (CYP2D6) genotype and codeine therapy: 2014 Update </a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/codeine/2014/24458010-supplement.pdf\" target=\"_blank\">2014 supplement</a></li>\n<li><a href=\"/page/cyp2d6RefMaterials\">Gene-Specific Information Tables for CYP2D6</a></li>\n</ul>\n</li>\n</ul>\n<h4 id=\"table-1-recommended-dosing-of-codeine-by-cyp2d6-phenotype\">Table 1: Recommended dosing of codeine by CYP2D6 Phenotype</h4>\n<p><em>Adapted from Tables 1 and 2 of the 2014 guideline update manuscript.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Likely phenotype.<sup>a</sup></th>\n<th>Activity score</th>\n<th>Genotypes</th>\n<th>Examples of diplotypes</th>\n<th>Implications for codeine metabolism</th>\n<th>Recommendations for codeine therapy.<sup>b</sup></th>\n<th>Classification of recommendation for codeine therapy</th>\n<th>Considerations for alternative opioids</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Ultrarapid metabolizer (~1-2% of patients)</td>\n<td>&gt;2.0</td>\n<td>An individual carrying more than two copies of functional alleles</td>\n<td>*1/*1xN, *1/*2xN</td>\n<td>Increased formation of morphine following codeine administration, leading to higher risk of toxicity</td>\n<td>Avoid codeine use due to potential for toxicity.</td>\n<td>Strong</td>\n<td>Alternatives that are not affected by this CYP2D6 phenotype include morphine and non-opioid analgesics. Tramadol, and to a lesser extent hydrocodone and oxycodone, are not good alternatives because their metabolism is affected by CYP2D6 activity.<sup>d,e</sup></td>\n</tr>\n<tr>\n<td>Extensive metabolizer (~77-92% of patients)</td>\n<td>1.0-2.0.<sup>c</sup></td>\n<td>An individual carrying two alleles encoding full or reduced function or one full function allele together with either one nonfunctional or one reduced-function allele</td>\n<td>*1/*1, *1/*2, *2/*2, *1/*41, *1/*4, *2/*5, *10/*10</td>\n<td>Normal morphine formation</td>\n<td>Use label recommended age- or weight-specific dosing.</td>\n<td>Strong</td>\n<td></td>\n</tr>\n<tr>\n<td>Intermediate metabolizer (~2-11% of patients)</td>\n<td>0.5.<sup>c</sup></td>\n<td>An individual carrying one reduced and one nonfunctional allele</td>\n<td>*4/*10, *5/*41</td>\n<td>Reduced morphine formation</td>\n<td>Use label recommended age- or weight-specific dosing. If no response, consider alternative analgesics such as morphine or a non-opioid.</td>\n<td>Moderate</td>\n<td>Monitor tramadol use for response.</td>\n</tr>\n<tr>\n<td>Poor metabolizer (~5-10% of patients)</td>\n<td>0</td>\n<td>An individual carrying no functional alleles</td>\n<td>*4/*4, *4/*5, *5/*5, *4/*6</td>\n<td>Greatly reduced morphine formation following codeine administration, leading to insufficient pain relief</td>\n<td>Avoid codeine use due to lack of efficacy.</td>\n<td>Strong</td>\n<td>Alternatives that are not affected by this CYP2D6 phenotype include morphine and non-opioid analgesics. Tramadol, and to a lesser extent hydrocodone and oxycodone, are not good alternatives because their metabolism is affected by CYP2D6 activity; these agents should be avoided.<sup>d,e</sup></td>\n</tr>\n</tbody>\n</table>\n<p><sup>a</sup> Frequency estimates are based on data from Caucasians and may differ substantially for other ethnicities. See 2014 supplement above for estimates of phenotype frequencies among different ethnic/geographic groups.</p>\n<p><sup>b</sup> Rating scheme is described in supplemental material - see 2014 update above.</p>\n<p><sup>c</sup> Note that some investigators define patients with an activity score of 0.5 and 1.0 as intermediate metabolizers and define patients with an activity score of 1.5 and 2.0 as extensive metabolizers.  Classifying patients with an activity score of 1.0 as extensive metabolizers in this guideline is based on data specific for formation of morphine from codeine in these patients [Article:<a href=\"/pmid/19395173\">19395173</a>].</p>\n<p><sup>d</sup> There is substantial evidence for decreased efficacy of tramadol in poor metabolizers and a single case report of toxicity in an ultrarapid metabolizer with renal impairment following tramadol post-surgery.  Use of other analgesics in CYP2D6 poor and ultrarapid metabolizers may therefore be preferable (see 2014 update above).</p>\n<p><sup>e</sup> Some other opioid analgesics are metabolized by CYP2D6, such as hydrocodone and oxycodone. To avoid treatment complications, opioids that are not metabolized by CYP2D6, including morphine, oxymorphone, buprenorphine, fentanyl, methadone and hydromorphone, along with non-opioid analgesics, may be considered as alternatives for use in CYP2D6 poor and ultrarapid metabolizers.</p>\n<h3 id=\"february-2012\">February 2012</h3>\n<p><em>Advance online publication Dec 2011.</em></p>\n<ul>\n<li>Guidelines regarding the use of pharmacogenomic tests in dosing for codeine were published in Clinical Pharmacology and Therapeutics by the Clinical Pharmacogenetics Implementation Consortium (CPIC).</li>\n<li>These guidelines are applicable to:\n<ul>\n<li>pediatric patients</li>\n<li>adult patients</li>\n</ul>\n</li>\n<li>Download and read:\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/codeine/2012/22205192.pdf\" target=\"_blank\">Clinical Pharmacogenetics Implementation Consortium (CPIC) Guidelines for Codeine Therapy in the Context of Cytochrome P450 2D6 (CYP2D6) Genotype</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/codeine/2012/22205192-supplement.pdf\" target=\"_blank\">2012 supplement</a></li>\n</ul>\n</li>\n</ul>\n",
+      "version" : 3
+    },
+    "version" : 69
+  }
+}

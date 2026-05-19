@@ -1,0 +1,247 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166182819",
+    "name" : "Annotation of DPWG Guideline for pimozide and CYP2D6",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1450415022,
+        "date" : "2019-05-23T00:00:00-07:00",
+        "type" : "Create",
+        "version" : 0
+      },
+      {
+        "id" : 1450821025,
+        "date" : "2019-10-07T18:19:00.092-07:00",
+        "description" : "No changes based on August 2019 guideline",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1450963782,
+        "date" : "2020-02-11T07:34:57.514-08:00",
+        "description" : "Fixed links to 2018 guideline pdfs.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451431286,
+        "date" : "2021-05-04T00:00:00-07:00",
+        "description" : "Added extended dosing",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451704252,
+        "date" : "2022-03-03T16:33:35.051-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451707420,
+        "date" : "2022-03-08T10:12:40.971-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451723380,
+        "date" : "2022-03-18T11:08:34.396-07:00",
+        "description" : "Updated annotation based on February 2022 release",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451731081,
+        "date" : "2022-03-25T09:51:43.056-07:00",
+        "description" : "Added pediatric information",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732894,
+        "date" : "2022-03-28T09:57:49.322-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733446,
+        "date" : "2022-03-28T15:00:47.147-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741504,
+        "date" : "2022-04-05T11:17:59.661-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451818340,
+        "date" : "2022-07-05T13:45:33.145-07:00",
+        "description" : "Edited pediatric information",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884520,
+        "date" : "2022-09-16T12:07:24.724-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452057740,
+        "date" : "2023-04-03T15:47:46.965-07:00",
+        "description" : "added DPWG publication",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084393,
+        "date" : "2023-04-28T18:51:44.384-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084414,
+        "date" : "2023-04-28T18:51:57.819-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084435,
+        "date" : "2023-04-28T18:52:08.026-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084456,
+        "date" : "2023-04-28T18:52:19.816-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084477,
+        "date" : "2023-04-28T18:52:49.171-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084498,
+        "date" : "2023-04-28T18:53:07.349-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084519,
+        "date" : "2023-04-28T18:53:23.404-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084540,
+        "date" : "2023-04-28T18:53:41.020-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084561,
+        "date" : "2023-04-28T18:54:03.572-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084582,
+        "date" : "2023-04-28T18:56:19.992-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452084613,
+        "date" : "2023-04-28T19:05:03.376-07:00",
+        "description" : "Updated allele function assignment",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146539,
+        "date" : "2023-07-03T13:40:15.187-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452411044,
+        "date" : "2024-03-18T08:59:00.899-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15142974,"title":"Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6, CYP3A4 and CYP1A2 and antipsychotics.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10923774","crossReferences":[{"id":1452412000,"resource":"PubMed Central","resourceId":"PMC10923774","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10923774"},{"id":1452056756,"resource":"PubMed","resourceId":"37002327","_url":"https://www.ncbi.nlm.nih.gov/pubmed/37002327"},{"id":1452056757,"resource":"DOI","resourceId":"10.1038/s41431-023-01347-3","_url":"http://dx.doi.org/10.1038%2Fs41431-023-01347-3"}],"objCls":"Literature","pubDate":"2024-03-01T00:00:00-08:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"},
+      {"id":15103288,"title":"Dutch Pharmacogenetics Working Group Guidelines August 2019","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","crossReferences":[{"id":1450815695,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_August_2019.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"},
+      {"id":15102465,"title":"Dutch Pharmacogenetics Working Group Guidelines November 2018","_sameAs":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","crossReferences":[{"id":1450415575,"resource":"URL","resourceId":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf","_url":"https://api.pharmgkb.org/v1/preview/download/file/attachment/DPWG_November_2018.pdf"}],"objCls":"Literature","terms":[],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1451731080,
+      "html" : "<p>Excerpts from the DPWG guideline recommendations:</p>\n<blockquote class=\"blockquote\">\n<p>CYP2D6 IM [...] Use no more than the following doses (80% of the standard maximum dose): 12 years and older: 16 mg/day. Younger than 12 years: 0.08 mg/kg per day to a maximum of 3 mg/day.</p>\n</blockquote>\n<blockquote class=\"blockquote\">\n<p>CYP2D6 PM [...] Use no more than the following doses (50% of the standard maximum dose): 12 years and older: 10 mg/day. Younger than 12 years: 0.05 mg/kg per day to a maximum of 2 mg/day.</p>\n</blockquote>\n",
+      "version" : 1
+    },
+    "recommendation" : true,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450965",
+        "name" : "pimozide",
+        "version" : 13
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA128",
+        "symbol" : "CYP2D6",
+        "name" : "cytochrome P450 family 2 subfamily D member 6",
+        "version" : 7891
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1450415020,
+      "html" : "<p>Patients who are CYP2D6 intermediate metabolizers should be given no more than 80% of the standard maximum dose of pimozide while patients who are CYP2D6 poor metabolizers should be given no more than 50% of the standard maximum dose.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1450415021,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-between-cyp2d6-cyp3a4-and-cyp1a2-and-antipsychotics-european-journal-of-human-genetics-2023\">Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction between CYP2D6, CYP3A4 and CYP1A2 and antipsychotics.  European journal of human genetics (2023)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper with the guidelines for pimozide and CYP2D6 as per the February 2022 guidelines and further details on the assessed literature [Article:<a href=\"/pmid/37002327\">37002327</a>]. Wording in the poor and intermediate metabolizer recommendation changed from &quot;standard&quot; to &quot;normal&quot; and is reflected in the table below.</p>\n<h3 id=\"february-2022-update\">February 2022 Update</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has updated their therapeutic dose recommendations for pimozide based on CYP2D6 genotype. They now give more detailed dosing instructions by age.</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_February_2022_guidelines.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_February_2022_guidelines.pdf\">Dutch guidelines February 2022 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2D6 UM</td>\n<td>pimozide</td>\n<td>This gene variation can result in lower pimozide concentrations. However, there is no evidence of reduced effectiveness.</td>\n<td>NO action is required for this gene-drug interaction.</td>\n</tr>\n<tr>\n<td>CYP2D6 IM</td>\n<td>pimozide</td>\n<td>The risk of QT-prolongation – and thereby also the risk of torsade de points – is theoretically increased, because the genetic variation results in an increase in the plasma concentration of pimozide. The elevated plasma concentration and associated theoretical increased risk of QT elongation can be negated by following the dose recommendations provided below.</td>\n<td>Use no more than the following doses (80% of the normal maximum dose):<br/>12 years and older: 16 mg/day<br/>younger than 12 years: 0.08 mg/kg per day to a maximum of 3 mg/day</td>\n</tr>\n<tr>\n<td>CYP2D6 PM</td>\n<td>pimozide</td>\n<td>The risk of QT-prolongation – and thereby also the risk of torsade de points – is theoretically increased, because the genetic variation results in an increase in the plasma concentration of pimozide. The elevated plasma concentration and associated theoretical increased risk of QT elongation can be negated by following the dose recommendations provided below.</td>\n<td>Use no more than the following doses (50% of the normal maximum dose):<br/>12 years and older: 10 mg/day<br/>younger than 12 years: 0.05 mg/kg per day to a maximum of 2 mg/day</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_CYP2D6_pimozide_2447-2448-2449.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2D6_pimozide_2447-2448-2449.pdf\">Read for more information about this recommendation</a>, <a download=\"CYP2D6.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/CYP2D6.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_CYP2D6_pimozide_2447-2448-2449.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_CYP2D6_pimozide_2447-2448-2449.pdf\">DPWG risk analysis document</a> for pimozide and CYP2D6:</p>\n<blockquote class=\"blockquote\">\n<p>The Dutch Pharmacogenetics Working Group considers genotyping before starting pimozide to be potentially beneficial for the prevention of adverse events. Genotyping can be considered on an individual patient basis. If, however, the genotype is available, the Dutch Pharmacogenetics Working Group recommends adhering to the gene-drug guideline</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n<h3 id=\"november-2018-guideline\">November 2018 Guideline</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for pimozide based on CYP2D6 genotype. They recommend a dose reduction for patients who are CYP2D6 intermediate metabolizers (IMs) or poor metabolizers (PMs). There are no recommendations for patients who are CYP2D6 ultrarapid metabolizers (UMs).</p>\n<p><em>Wording in table taken from the <a download=\"DPWG_November_2018.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_November_2018.pdf\">Dutch guidelines November 2018 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>CYP2D6 UM</td>\n<td>pimozide</td>\n<td>This gene variation can result in lower pimozide concentrations. However, there is no evidence of reduced effectiveness.</td>\n<td>NO action is required for this gene-drug interaction.</td>\n</tr>\n<tr>\n<td>CYP2D6 IM</td>\n<td>pimozide</td>\n<td>The risk of QT-prolongation – and thereby also the risk of torsade de points – is theoretically increased, because the genetic variation results in an increase in the plasma concentration of pimozide. The risk of an excessively high plasma concentration can be negated by following the dose recommendations provided.</td>\n<td>Use no more than the following doses (80% of the standard maximum dose):<br/>adults 16 mg/day<br/>children 0.08 mg/kg per day to a maximum of 3 mg/day</td>\n</tr>\n<tr>\n<td>CYP2D6 PM</td>\n<td>pimozide</td>\n<td>The risk of QT-prolongation – and thereby also the risk of torsade de points – is theoretically increased, because the genetic variation results in an increase in the plasma concentration of pimozide. The risk of an excessively high plasma concentration can be negated by following the dose recommendations provided.</td>\n<td>Use no more than the following doses (50% of the standard maximum dose):<br/>adults 10 mg/day<br/>children 0.05 mg/kg per day to a maximum of 2 mg/day</td>\n</tr>\n</tbody>\n</table>\n",
+      "version" : 8
+    },
+    "version" : 21
+  }
+}

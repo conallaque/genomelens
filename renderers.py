@@ -689,6 +689,57 @@ factors; not diagnostic.
 """
 
 
+def _build_novelty_panels_html(panels: List[Dict]) -> str:
+    if not panels:
+        return ""
+    section_blocks = ""
+    for panel in panels:
+        rows = ""
+        for g in panel["genes"]:
+            if g["tested"]:
+                status = (
+                    f'<span class="pgx-pheno pheno-nm">{_esc(g["genotype"])}</span>'
+                )
+            else:
+                status = '<span class="pgx-na">Not tested on this chip</span>'
+            rsid_cell = _esc(g["rsid"]) if g.get("rsid") else "—"
+            rows += (
+                f'<tr>'
+                f'<td><strong>{_esc(g["gene"])}</strong></td>'
+                f'<td class="rsid-cell">{rsid_cell}</td>'
+                f'<td>{status}</td>'
+                f'<td>{_esc(g["note"])}</td>'
+                f'</tr>'
+            )
+        section_blocks += f"""
+<div class="pgx-card">
+  <div class="pgx-card-head">
+    <div class="pgx-gene-name">{_esc(panel["section"])}</div>
+    <div class="pgx-gene-long">{_esc(panel["description"])}</div>
+  </div>
+  <div class="tbl-wrap" style="margin-top:8px">
+    <table class="pgx-tbl">
+      <thead><tr><th>Gene</th><th>rsID</th><th>Genotype</th><th>Note</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+  </div>
+</div>
+"""
+    return f"""
+<div class="pgx-novelty" style="margin-top:24px">
+  <h3>Exploratory Gene Panels <span style="font-size:0.75em;opacity:0.7">(for fun — non-clinical)</span></h3>
+  <div class="pgx-caveat">
+    <strong>Not a clinical finding.</strong> These panels were added for
+    curiosity. Several listed symbols are not HGNC-approved genes and have
+    no validated assay; the real genes (e.g. MTHFR, NOS3, PPARA, ASMT) are
+    shown without effect-size interpretation. Do not use for medical
+    decisions.
+  </div>
+  <div class="pgx-grid">{section_blocks}</div>
+</div>
+"""
+
+
 def build_pgx_html(pgx: Optional[Dict]) -> str:
     if not pgx:
         return ""
@@ -836,6 +887,7 @@ judgment.
 </div>
 {actionable}
 <div class="pgx-grid">{gene_cards}</div>
+{_build_novelty_panels_html(pgx.get("novelty_panels") or [])}
 </section>
 """
 

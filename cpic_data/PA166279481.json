@@ -1,0 +1,149 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166279481",
+    "name" : "Annotation of CPIC Guideline for chlorpropamide, dabrafenib, gliclazide, glimepiride, glipizide, mesalazine, moxifloxacin, nicorandil, nitrofurazone, probenecid, quinacrine, sodium nitrate, sulfacetamide, tolazamide, trametinib and G6PD",
+    "alternateDrugAvailable" : false,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "descriptiveVideoId" : "AMnnwcsOpXI",
+    "dosingInformation" : false,
+    "hasTestingInfo" : false,
+    "history" : [
+      {
+        "id" : 1452474669,
+        "date" : "2024-05-15T09:44:05.862-07:00",
+        "description" : "Added link to CPIC video",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15135762,"title":"Expanded Clinical Pharmacogenetics Implementation Consortium Guideline for Medication Use in the Context of G6PD Genotype.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10281211","crossReferences":[{"id":1452680347,"resource":"PubMed Central","resourceId":"PMC10281211","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10281211"},{"id":1451882620,"resource":"PubMed","resourceId":"36049896","_url":"https://www.ncbi.nlm.nih.gov/pubmed/36049896"},{"id":1451882621,"resource":"DOI","resourceId":"10.1002/cpt.2735","_url":"http://dx.doi.org/10.1002%2Fcpt.2735"}],"objCls":"Literature","pubDate":"2023-05-01T00:00:00-07:00","terms":[{"id":1454108620,"resource":"ClinPGx Tags","term":"CPIC","termId":"pgkbTags:1454108620"},{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : true,
+    "pediatricMarkdown" : {
+      "id" : 1451994540,
+      "html" : "<p>Guideline excerpt: &quot;There are data supporting or refuting certain drugs associated with increased risk of AHA in the setting of G6PD deficiency reported in pediatric patients (Table S1). There is no reason to think that genetically-based recommendations in this guideline should differ for children versus adults.&quot;</p>\n",
+      "version" : 0
+    },
+    "recommendation" : false,
+    "relatedAlleles" : [],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA448966",
+        "name" : "chlorpropamide",
+        "version" : 12
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166114911",
+        "name" : "dabrafenib",
+        "version" : 7
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA10892",
+        "name" : "gliclazide",
+        "version" : 11
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA449761",
+        "name" : "glimepiride",
+        "version" : 12
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA449762",
+        "name" : "glipizide",
+        "version" : 12
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450384",
+        "name" : "mesalazine",
+        "version" : 9
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450555",
+        "name" : "moxifloxacin",
+        "version" : 7
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166184081",
+        "name" : "nicorandil",
+        "version" : 3
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA164754877",
+        "name" : "nitrofurazone",
+        "version" : 7
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA451106",
+        "name" : "probenecid",
+        "version" : 8
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA164745551",
+        "name" : "quinacrine",
+        "version" : 7
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166279461",
+        "name" : "sodium nitrate",
+        "version" : 3
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA451536",
+        "name" : "sulfacetamide",
+        "version" : 7
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA164774902",
+        "name" : "tolazamide",
+        "version" : 8
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA166115364",
+        "name" : "trametinib",
+        "version" : 8
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA28469",
+        "symbol" : "G6PD",
+        "name" : "glucose-6-phosphate dehydrogenase",
+        "version" : 136
+      }
+    ],
+    "source" : "CPIC",
+    "summaryMarkdown" : {
+      "id" : 1451897020,
+      "html" : "<p>The CPIC dosing guideline does not provide recommendations for dosing of chlorpropamide, dabrafenib, gliclazide, glimepiride, glipizide, mepacrine (aka quinacrine), mesalazine, moxifloxacin, nicorandil, nitrofural (aka nitrofurazone), probenecid, sodium nitrate, sulfacetamide, tolazamide or trametinib based on G6PD genotype.</p>\n",
+      "version" : 1
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451896980,
+      "html" : "<h3 id=\"september-2022\">September 2022</h3>\n<ul>\n<li>\n<p>The <a rel=\"noopener noreferrer\" href=\"https://ascpt.onlinelibrary.wiley.com/doi/full/10.1002/cpt.2735\" target=\"_blank\">Expanded CPIC&reg; Guideline for Medication Use in the Context of <em>G6PD</em> Genotype</a> has been published in Clinical Pharmacology and Therapeutics.</p>\n</li>\n<li>\n<p>These guidelines are applicable to:</p>\n<ul>\n<li>adult patients</li>\n<li>pediatric patients</li>\n</ul>\n</li>\n<li>\n<p>Excerpt from the guideline:</p>\n<ul>\n<li>&quot;For drugs with no relevant published articles linking that drug to an increased risk of [acute hemolytic anemia] in the setting of G6PD deficiency, there is no recommendation (CPIC Level C).&quot;</li>\n</ul>\n</li>\n<li>\n<p>Download and read:</p>\n<ul>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/G6PD/2022/36049896.pdf\" target=\"_blank\">Expanded Clinical Pharmacogenetics Implementation Consortium (CPIC) Guideline for Medication Use in the Context of <em>G6PD</em> Genotype</a></li>\n<li><a rel=\"noopener noreferrer\" href=\"https://files.cpicpgx.org/data/guideline/publication/G6PD/2022/36049896-supplement.pdf\" target=\"_blank\">2022 supplement</a></li>\n</ul>\n</li>\n</ul>\n",
+      "version" : 1
+    },
+    "version" : 2
+  }
+}

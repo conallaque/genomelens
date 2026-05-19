@@ -1,0 +1,100 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166312801",
+    "name" : "Annotation of AIOM Guideline for capecitabine, fluorouracil, tegafur and DPYD",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : true,
+    "hasTestingInfo" : true,
+    "history" : [],
+    "literature" : [
+      {"id":15147132,"title":"Pharmacogenetic Practice of Anticancer Drugs: Multiple Approaches for an Accurate and Comprehensive Genotyping.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10390719","crossReferences":[{"id":1452200138,"resource":"PubMed Central","resourceId":"PMC10390719","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10390719"},{"id":1452200137,"resource":"PubMed","resourceId":"37534027","_url":"https://www.ncbi.nlm.nih.gov/pubmed/37534027"},{"id":1452200139,"resource":"DOI","resourceId":"10.2147/PGPM.S412430","_url":"http://dx.doi.org/10.2147%2FPGPM.S412430"}],"objCls":"Literature","pubDate":"2022-12-01T00:00:00-08:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"},{"id":1451577486,"resource":"PGx Paper Types","term":"Methods","termId":"pgxPaperTypes:1451577486"},{"id":1452054440,"resource":"PGx Paper Types","term":"Uses PharmGKB","termId":"pgxPaperTypes:1452054440"}],"type":"Literature"},
+      {"id":15147302,"title":"Pharmacogenetic guidelines of The ITALIAN ASSOCIATION of Medical Oncology ASSOCIAZIONE ITALIANA di Oncologia Medica, AIOM","_sameAs":"https://www.aiom.it/wp-content/uploads/2019/10/2019_Racc-analisi-farmacogenetiche_v26.3.2020.pdf","crossReferences":[{"id":1452202360,"resource":"URL","resourceId":"https://www.aiom.it/wp-content/uploads/2019/10/2019_Racc-analisi-farmacogenetiche_v26.3.2020.pdf","_url":"https://www.aiom.it/wp-content/uploads/2019/10/2019_Racc-analisi-farmacogenetiche_v26.3.2020.pdf"}],"objCls":"Literature","pubDate":"2020-01-01T00:00:00-08:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"},{"id":1452054440,"resource":"PGx Paper Types","term":"Uses PharmGKB","termId":"pgxPaperTypes:1452054440"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : false,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA166171120",
+        "symbol" : "DPYD c.1129-5923C>G, c.1236G>A (HapB3)",
+        "name" : "c.1129-5923C>G, c.1236G>A (HapB3)",
+        "version" : 17
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA166171118",
+        "symbol" : "DPYD c.1679T>G (*13)",
+        "name" : "c.1679T>G (*13)",
+        "version" : 17
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA166171117",
+        "symbol" : "DPYD c.1905+1G>A (*2A)",
+        "name" : "c.1905+1G>A (*2A)",
+        "version" : 17
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA166194413",
+        "symbol" : "DPYD c.2194G>A (*6)",
+        "name" : "c.2194G>A (*6)",
+        "version" : 10
+      },
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA166171119",
+        "symbol" : "DPYD c.2846A>T",
+        "name" : "c.2846A>T",
+        "version" : 16
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA448771",
+        "name" : "capecitabine",
+        "version" : 23
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA128406956",
+        "name" : "fluorouracil",
+        "version" : 19
+      },
+      {
+        "objCls" : "Chemical",
+        "id" : "PA452620",
+        "name" : "tegafur",
+        "version" : 26
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA145",
+        "symbol" : "DPYD",
+        "name" : "dihydropyrimidine dehydrogenase",
+        "version" : 6908
+      }
+    ],
+    "source" : "AIOM",
+    "summaryMarkdown" : {
+      "id" : 1452221080,
+      "html" : "<p>An Italian working group comprising the Italian Association of Medical Oncology (AIOM) and the Italian Society of Pharmacology (SIF) has published recommendations for the use of DPYD genotype when prescribing fluoropyrimidines (5-fluorouracil, capecitabine and tegafur).</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1452221081,
+      "html" : "<p>An Italian working group comprising the Italian Association of Medical Oncology (AIOM) and the Italian Society of Pharmacology (SIF) has published recommendations for the use of DPYD genotype when prescribing fluoropyrimidines (5-fluorouracil, capecitabine and tegafur).\nIn order to prevent severe, life-threatening adverse events, EMA Pharmacovigilance Risk Assessment Committee, in a communication to healthcare professionals dated 13 March 2020 (EMA/125891/2020), recommended DPYD pre-treatment testing. The DPYD variants that should be investigated are: c.1236G&gt;A <a href=\"/variant/PA166153889\">rs56038477</a> or, as an alternative, c.1129–5923C&gt;G <a href=\"/variant/PA166153906\">rs75017182</a>; c.1679T&gt;G <a href=\"/variant/PA166153888\">rs55886062</a>; c.1905+1G&gt;A <a href=\"/variant/PA166153760\">rs3918290</a> and c.2846A&gt;T <a href=\"/variant/PA166153895\">rs67376798</a> (Lancet Oncol 2018;19:1459-67).\nIn case of toxicity during treatment, it might be useful to add the c.2194G&gt;A variant <a href=\"/variant/PA166153647\">rs1801160</a> (JAMA Oncol 2016;2:655-62; Br J Cancer 2017;117:1269-77; Lancet Oncol 2018;19:1459-67; Pharmacogenomics J 2019;19:556-63; Br J Cancer 2019;120:834-9). Other genes/variants that may be included in the test panel have no clinical utility.</p>\n<p>Download the full <a download=\"2019_Racc-analisi-farmacogenetiche_v26.3.2020.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/2019_Racc-analisi-farmacogenetiche_v26.3.2020.pdf\">Guidelines of The Italian Association of Medical Oncology, AIOM</a></p>\n<p>Recommended doses in case of heterozygous/homozygous genotype are listed below:</p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>DPYD genotype</th>\n<th>Dose of fluoropyrimidine</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>c.1236GG</td>\n<td>100% of the normal dose</td>\n</tr>\n<tr>\n<td>c.1679TT</td>\n<td>100% of the normal dose</td>\n</tr>\n<tr>\n<td>c.1905+1GG</td>\n<td>100% of the normal dose</td>\n</tr>\n<tr>\n<td>c.2846AA</td>\n<td>100% of the normal dose</td>\n</tr>\n<tr>\n<td>c.2194GG</td>\n<td>100% of the normal dose</td>\n</tr>\n<tr>\n<td>c.1236GA</td>\n<td>75% of the normal dose</td>\n</tr>\n<tr>\n<td>c.1679TG</td>\n<td>50% of the normal dose</td>\n</tr>\n<tr>\n<td>c.1905+1GA</td>\n<td>50% of the normal dose</td>\n</tr>\n<tr>\n<td>c.2846AT</td>\n<td>50% of the normal dose</td>\n</tr>\n<tr>\n<td>c.2194GA</td>\n<td>85% of the normal dose</td>\n</tr>\n<tr>\n<td>c.1236AA</td>\n<td>50% of the normal dose</td>\n</tr>\n<tr>\n<td>c.1679GG</td>\n<td>avoid fluoropyrimidines</td>\n</tr>\n<tr>\n<td>c.1905+1AA</td>\n<td>avoid fluoropyrimidines</td>\n</tr>\n<tr>\n<td>c.2846TT</td>\n<td>avoid fluoropyrimidines</td>\n</tr>\n<tr>\n<td>c.2194AA</td>\n<td>70% of the normal dose</td>\n</tr>\n</tbody>\n</table>\n<p>Translation provided by Dr Cristina Montrasio, Ospedale L. Sacco, Polo Universitario</p>\n",
+      "version" : 1
+    },
+    "version" : 0
+  }
+}

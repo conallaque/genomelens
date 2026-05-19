@@ -1,0 +1,136 @@
+{
+  "citations" : [],
+  "guideline" : {
+    "objCls" : "Guideline Annotation",
+    "id" : "PA166264881",
+    "name" : "Annotation of DPWG Guideline for phenytoin and HLA-B",
+    "alternateDrugAvailable" : true,
+    "cancerGenome" : false,
+    "crossReferences" : [],
+    "dosingInformation" : false,
+    "hasTestingInfo" : true,
+    "history" : [
+      {
+        "id" : 1451695782,
+        "date" : "2022-02-25T00:00:00-08:00",
+        "type" : "Create",
+        "version" : 1
+      },
+      {
+        "id" : 1451704256,
+        "date" : "2022-03-03T16:33:35.593-08:00",
+        "description" : "Annotation current with May 2021 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451706360,
+        "date" : "2022-03-07T16:57:41.122-08:00",
+        "description" : "Added information about preemptive genotyping",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451732896,
+        "date" : "2022-03-28T09:57:49.538-07:00",
+        "description" : "Annotation current with February 2022 DPWG guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1451733444,
+        "date" : "2022-03-28T15:00:28.025-07:00",
+        "description" : "Updated link to testing guidance page",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451741459,
+        "date" : "2022-04-05T11:17:45.353-07:00",
+        "description" : "Added testing guidance tag",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1451884506,
+        "date" : "2022-09-16T11:06:42.137-07:00",
+        "description" : "Fixed link to gene information document and added explanatory note",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452146468,
+        "date" : "2023-07-03T13:39:53.585-07:00",
+        "description" : "Annotation current with May 2023 DPWG Guideline release",
+        "type" : "Note",
+        "version" : 0
+      },
+      {
+        "id" : 1452412520,
+        "date" : "2024-03-19T05:44:00.190-07:00",
+        "description" : "Updated links for risk analysis pdf and preemptive testing page.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1452439762,
+        "date" : "2024-04-11T06:32:53.872-07:00",
+        "description" : "Added 2024 publication.",
+        "type" : "Update",
+        "version" : 0
+      },
+      {
+        "id" : 1454042240,
+        "date" : "2025-04-25T17:42:48.122-07:00",
+        "description" : "added text for the 38570725 article to the page",
+        "type" : "Update",
+        "version" : 0
+      }
+    ],
+    "literature" : [
+      {"id":15156470,"title":"Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction of CYP2C9, HLA-A and HLA-B with anti-epileptic drugs.","_sameAs":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11291682","crossReferences":[{"id":1452680901,"resource":"PubMed Central","resourceId":"PMC11291682","_url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11291682"},{"id":1452435716,"resource":"PubMed","resourceId":"38570725","_url":"https://www.ncbi.nlm.nih.gov/pubmed/38570725"},{"id":1452435717,"resource":"DOI","resourceId":"10.1038/s41431-024-01572-4","_url":"http://dx.doi.org/10.1038%2Fs41431-024-01572-4"}],"objCls":"Literature","pubDate":"2024-08-01T00:00:00-07:00","terms":[{"id":1451577480,"resource":"PGx Paper Types","term":"Implementation","termId":"pgxPaperTypes:1451577480"}],"type":"Literature"}
+    ],
+    "otherPrescribingGuidance" : true,
+    "pediatric" : false,
+    "recommendation" : true,
+    "relatedAlleles" : [
+      {
+        "objCls" : "Haplotype",
+        "id" : "PA165954769",
+        "symbol" : "HLA-B*15:02",
+        "name" : "*15:02",
+        "version" : 5
+      }
+    ],
+    "relatedChemicals" : [
+      {
+        "objCls" : "Chemical",
+        "id" : "PA450947",
+        "name" : "phenytoin",
+        "version" : 16
+      }
+    ],
+    "relatedGenes" : [
+      {
+        "objCls" : "Gene",
+        "id" : "PA35056",
+        "symbol" : "HLA-B",
+        "name" : "major histocompatibility complex, class I, B",
+        "version" : 40
+      }
+    ],
+    "source" : "DPWG",
+    "summaryMarkdown" : {
+      "id" : 1451695780,
+      "html" : "<p>Phenytoin should be avoided if possible in patients with the HLA-B*15:02 allele.</p>\n",
+      "version" : 0
+    },
+    "terms" : [],
+    "textMarkdown" : {
+      "id" : 1451695781,
+      "html" : "<h3 id=\"dutch-pharmacogenetics-working-group-dpwg-guideline-for-the-gene-drug-interaction-of-cyp2c9-hla-a-and-hla-b-with-anti-epileptic-drugs-european-journal-of-human-genetics-2024\">Dutch Pharmacogenetics Working Group (DPWG) guideline for the gene-drug interaction of CYP2C9, HLA-A and HLA-B with anti-epileptic drugs. <em>European journal of human genetics</em> (2024)</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group published a paper with the guidelines as per the May 2021 guidelines including more details and scoring the clinical implementation [Article:<a href=\"/pmid/39676086\">39676086</a>].</p>\n<p>The phenotype name was changed from HLA-B*1502 to HLA-B*1502 positive, which is reflected in the table below.  The &quot;Description&quot; section in the table below was updated with &quot;in the first three months &quot; based on content from Supplementary table 16.</p>\n<p>The Clinical Implication Score for HLA-B*15:02-phenytoin, in patients of Asian descent other than Japanese descent, is “beneficial”, based on the criteria and corresponding scores given by the DPWG. For detailed information, see Supplementary table 20b.</p>\n<h3 id=\"may-2021\">May 2021</h3>\n<p>The Royal Dutch Pharmacists Association - Pharmacogenetics Working Group has evaluated therapeutic dose recommendations for phenytoin based on HLA-B*15:02.</p>\n<p>The annotation of the DPWG guideline for phenytoin and CYP2C9 can be found <a href=\"/guidelineAnnotation/PA166104984\">here</a></p>\n<p><em>Wording in table taken from the <a download=\"DPWG_May_2021.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_May_2021.pdf\">Dutch guidelines May 2021 update</a>.</em></p>\n<table class=\"table\">\n<thead>\n<tr>\n<th>Allele/Genotype/Phenotype</th>\n<th>Drug</th>\n<th>Description</th>\n<th>Recommendation</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>HLA-B*1502 positive</td>\n<td>phenytoin</td>\n<td>The life-threatening cutaneous side effect Stevens-Johnson syndrome/toxic epidermal necrolysis (SJS/TEN) in the first three months occurs more frequently in patients with this genetic variation. The calculated risk of phenytoin-induced SJS/TEN in patients with HLA-B*1502 is 0.65%.</td>\n<td>Carefully weigh the risk of SJS/TEN against the benefits.<br/>Avoid phenytoin if an alternative is possible. Carbamazepine carries a 10-fold higher risk of SJS/TEN for these patients and is therefore not an alternative. A comparable risk has been reported for lamotrigine as for phenytoin. The same applies for oxcarbazepine, but the most severe forms (SJS/TEN overlap and TEN) are not observed with oxcarbazepine.<br/>If it is not possible to avoid phenytoin, then advise the patient to report any skin rash immediately.</td>\n</tr>\n</tbody>\n</table>\n<p><a download=\"DPWG_HLA_phenytoin_6927.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_HLA_phenytoin_6927.pdf\">Read for more information about this recommendation</a>, <a download=\"HLAs.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/HLAs.pdf\">Read about gene information from DPWG</a></p>\n<h4 id=\"preemptive-genotyping\">Preemptive genotyping</h4>\n<p>Excerpts from the <a download=\"DPWG_HLA_phenytoin_6927.pdf\" href=\"https://api.clinpgx.org/v1/download/file/attachment/DPWG_HLA_phenytoin_6927.pdf\">DPWG risk analysis document</a> for phenytoin and HLA:</p>\n<blockquote class=\"blockquote\">\n<p>HLA-B*1502 has not been detected in a sample of 1350 Dutch persons (Allele Frequency Net Database: http://www.allelefrequencies.net). For this reason, the Dutch Pharmacogenetics Working Group does not consider genotyping of Dutch patients in general before starting phenytoin to be useful.\nHowever, the HLA-B*1502 frequency is high in Asians, except for Japanese and Koreans. The Dutch Pharmacogenetics Working Group considers genotyping of patients of Asian descent other than Japanese or Korean descent before starting phenytoin to be beneficial for drug safety. It is advised to genotype these patients before (or directly after) drug therapy has been initiated to guide drug and dose selection.</p>\n</blockquote>\n<p><a href=\"/page/dpwgPreemptiveGenotyping\">Read more about how DPWG assigns their recommendations for preemptive genotyping.</a></p>\n",
+      "version" : 8
+    },
+    "version" : 13
+  }
+}

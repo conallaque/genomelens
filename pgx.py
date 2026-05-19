@@ -485,6 +485,79 @@ def _analyze_gene(gene_name: str, gene_def: Dict, snps_df: pd.DataFrame) -> Dict
     }
 
 
+# ─── Novelty / exploratory gene panels (non-clinical) ────────────────────────
+#
+# These panels are presented in the report for curiosity only. They mix
+# real HGNC-approved genes with informal/non-standard symbols that do not
+# correspond to validated clinical findings. They MUST be rendered with a
+# clear "non-clinical / for fun" disclaimer and never feed into actionable
+# recommendations.
+#
+NOVELTY_PANELS: List[Dict] = [
+    {
+        "section": "Electro-Biological Sensitivity",
+        "description": "Genetic factors affecting electrical/neurological sensitivity.",
+        "genes": [
+            # Fictional / non-HGNC symbols — kept as supplied, never callable.
+            {"gene": "CRF2",  "rsid": None, "note": "Symbol not in HGNC — not assayable."},
+            {"gene": "ASMT",  "rsid": "rs4446909",
+             "note": "Melatonin biosynthesis; promoter variation has been studied in circadian phenotypes."},
+            {"gene": "NOS3",  "rsid": "rs1799983",
+             "note": "Endothelial nitric oxide synthase; G894T (Glu298Asp) tweaks NO signaling."},
+            {"gene": "ISCAI", "rsid": None, "note": "Symbol not in HGNC — not assayable."},
+            {"gene": "TRRL",  "rsid": None, "note": "Symbol not in HGNC — not assayable."},
+        ],
+    },
+    {
+        "section": "Pressure Sensitivity",
+        "description": "Genetic factors affecting blood pressure and vascular response.",
+        "genes": [
+            {"gene": "MTHFR",  "rsid": "rs1801133",
+             "note": "C677T; T allele reduces enzyme activity → mild homocysteine elevation."},
+            {"gene": "AGE",    "rsid": None,
+             "note": '"AGE" is not a gene symbol (advanced glycation end-products) — not assayable.'},
+            {"gene": "PRKA11", "rsid": None, "note": "Symbol not in HGNC — not assayable."},
+            {"gene": "EFAS1",  "rsid": None, "note": "Symbol not in HGNC — not assayable."},
+            {"gene": "EGLNA",  "rsid": None, "note": "Symbol not in HGNC — not assayable."},
+            {"gene": "PPARA",  "rsid": "rs1800206",
+             "note": "L162V; V allele linked to altered lipid handling and vascular response."},
+        ],
+    },
+]
+
+
+def analyze_novelty_panels(snps_df: pd.DataFrame) -> List[Dict]:
+    """Light-touch lookup for novelty panels. Returns one dict per section
+    with per-gene genotype calls (or 'Not tested on this chip')."""
+    sections = []
+    for panel in NOVELTY_PANELS:
+        gene_results = []
+        any_called = False
+        for g in panel["genes"]:
+            rsid = g.get("rsid")
+            if rsid and rsid in snps_df.index:
+                gt = snps_df.loc[rsid].get("genotype")
+                gt_str = str(gt).upper() if gt is not None and str(gt).strip() not in ("", "nan", "--") else None
+                if gt_str:
+                    any_called = True
+                    gene_results.append({
+                        "gene": g["gene"], "rsid": rsid, "tested": True,
+                        "genotype": gt_str, "note": g["note"],
+                    })
+                    continue
+            gene_results.append({
+                "gene": g["gene"], "rsid": rsid, "tested": False,
+                "genotype": None, "note": g["note"],
+            })
+        sections.append({
+            "section": panel["section"],
+            "description": panel["description"],
+            "any_called": any_called,
+            "genes": gene_results,
+        })
+    return sections
+
+
 def analyze_pgx(snps_df: pd.DataFrame) -> Dict:
     """Run all PGx genes. Returns a dict with per-gene phenotypes and a
     consolidated list of clinically-actionable drug findings."""
@@ -511,9 +584,15 @@ def analyze_pgx(snps_df: pd.DataFrame) -> Dict:
                 "guideline": result["cpic_guideline"],
             })
 
+    try:
+        novelty_panels = analyze_novelty_panels(snps_df)
+    except Exception:
+        novelty_panels = []
+
     return {
         "per_gene": per_gene,
         "actionable_findings": actionable,
         "n_genes_tested": len(per_gene),
         "n_actionable_findings": len(actionable),
+        "novelty_panels": novelty_panels,
     }
