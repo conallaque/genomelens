@@ -219,7 +219,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
         try:
             pgx_result = analyze_pgx(snps_df)
             log(f"  PGx: {pgx_result['n_genes_tested']} genes, "
-                f"{pgx_result['n_actionable_findings']} actionable drug findings")
+                f"{pgx_result['n_actionable_findings']} actionable drug findings, "
+                f"{pgx_result.get('n_database_findings', 0)} drug-database matches")
         except Exception as e:
             log(f"  WARNING: PGx failed: {e}")
         try:

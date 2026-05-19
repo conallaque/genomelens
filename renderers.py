@@ -729,11 +729,12 @@ def _build_novelty_panels_html(panels: List[Dict]) -> str:
 <div class="pgx-novelty" style="margin-top:24px">
   <h3>Exploratory Gene Panels <span style="font-size:0.75em;opacity:0.7">(for fun — non-clinical)</span></h3>
   <div class="pgx-caveat">
-    <strong>Not a clinical finding.</strong> These panels were added for
-    curiosity. Several listed symbols are not HGNC-approved genes and have
-    no validated assay; the real genes (e.g. MTHFR, NOS3, PPARA, ASMT) are
-    shown without effect-size interpretation. Do not use for medical
-    decisions.
+    <strong>Not a clinical finding.</strong> These panels are exploratory.
+    Tested genotypes are shown without effect-size interpretation; rows
+    marked "Not tested on this chip" lack a probe in the source data.
+    Some symbols submitted to earlier versions of these panels were dropped
+    because they were not HGNC-approved and had no validated assay.
+    Do not use for medical decisions.
   </div>
   <div class="pgx-grid">{section_blocks}</div>
 </div>
@@ -887,9 +888,43 @@ judgment.
 </div>
 {actionable}
 <div class="pgx-grid">{gene_cards}</div>
+{_build_drug_database_html(pgx.get("database_findings") or [])}
 {_build_novelty_panels_html(pgx.get("novelty_panels") or [])}
 </section>
 """
+
+
+def _build_drug_database_html(findings: List[Dict]) -> str:
+    if not findings:
+        return ""
+    rows = ""
+    for f in findings:
+        snp_bits = ", ".join(
+            f'{_esc(m["rsid"])}={_esc(m["genotype"])}' for m in f.get("matched_snps", [])
+        )
+        genes = ", ".join(_esc(g) for g in f.get("genes", []))
+        phenos = ", ".join(_esc(p) for p in f.get("phenotypes", []))
+        pheno_html = f'<div class="db-drug-phenos"><em>Relevant phenotypes:</em> {phenos}</div>' if phenos else ""
+        rows += (
+            f'<li class="db-drug-item">'
+            f'<div class="db-drug-head">'
+            f'<span class="db-drug-name">{_esc(f["drug"])}</span> '
+            f'<span class="db-drug-gene">{genes}</span> '
+            f'<span class="db-drug-match">{f["n_matched"]}/{f["n_markers"]} markers</span>'
+            f'</div>'
+            f'<div class="db-drug-snps">{snp_bits}</div>'
+            f'{pheno_html}'
+            f'<div class="db-drug-rec">{_esc(f.get("recommendation", ""))}</div>'
+            f'</li>'
+        )
+    return (
+        f'<div class="pgx-drug-database">'
+        f'<h3>Drug-Database Matches ({len(findings)})</h3>'
+        f'<p class="db-intro">Drugs in the curated database where your genotype '
+        f'overlaps the listed pharmacogenomic SNP markers.</p>'
+        f'<ul class="db-drug-list">{rows}</ul>'
+        f'</div>'
+    )
 
 
 def build_interactions_html(inter: Optional[Dict]) -> str:
