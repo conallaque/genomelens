@@ -1220,6 +1220,24 @@ def analyze_y_haplogroup(snps_df: pd.DataFrame) -> Dict:
             ),
         }
 
+    if y_count < 10:
+        return {
+            "status": "insufficient_y_data",
+            "y_snp_count": y_count,
+            "haplogroup_path": "Insufficient Y-chromosome SNPs",
+            "terminal_haplogroup": "Insufficient Y-chromosome SNPs",
+            "terminal_description": "",
+            "terminal_migration": None,
+            "path": [],
+            "chip_gaps": [],
+            "not_tested_branches": [],
+            "further_testing": "",
+            "message": (
+                f"Insufficient Y-chromosome SNPs ({y_count} found, minimum 10 required) "
+                "to make a reliable haplogroup call."
+            ),
+        }
+
     walked_path, walk_status, chip_gaps = _walk(
         HAPLOGROUP_TREE, rsid_map, pos_map, [], 0
     )
