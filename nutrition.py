@@ -31,6 +31,11 @@ from __future__ import annotations
 from typing import Dict, List, Optional
 import pandas as pd
 
+try:
+    from nutrition_advanced import analyze_advanced_nutrition
+except ImportError:
+    analyze_advanced_nutrition = None
+
 
 def _gt(snps_df: Optional[pd.DataFrame], rsid: str) -> Optional[str]:
     if snps_df is None or rsid not in snps_df.index:
@@ -948,7 +953,7 @@ def analyze_nutrition(snps_df: Optional[pd.DataFrame]) -> Dict:
         foods["emphasise"].append("Roasted/glazed cruciferous veg (super-taster mitigation)")
     template = _build_daily_template(macros, caffeine, alcohol)
 
-    return {
+    result = {
         "status": "ok",
         "macros": macros,
         "caffeine": caffeine,
@@ -977,6 +982,15 @@ def analyze_nutrition(snps_df: Optional[pd.DataFrame]) -> Dict:
         "avoid": foods["avoid"],
         "daily_template": template,
     }
+
+    if analyze_advanced_nutrition is not None:
+        try:
+            advanced = analyze_advanced_nutrition(snps_df, result)
+            result.update(advanced)
+        except Exception as exc:  # noqa: BLE001
+            result["advanced_error"] = str(exc)
+
+    return result
 
 
 # ── HTML rendering ──────────────────────────────────────────────────────────
@@ -1010,8 +1024,190 @@ ul.nu-list { margin: 4px 0 0 18px; padding: 0; }
 table.nu { width:100%; border-collapse: collapse; }
 table.nu th, table.nu td { padding:8px 10px; border-bottom:1px solid #eee; text-align:left; }
 table.nu th { background:#f9f9f9; }
+.pgs-bar { background:#eee; border-radius:6px; height:14px; position:relative; overflow:hidden; }
+.pgs-bar > div { height:100%; background:linear-gradient(90deg,#3a5a8f,#a32a2a); }
+.pgs-row { display:grid; grid-template-columns: 200px 80px 1fr; gap:8px; align-items:center;
+           padding:4px 0; border-bottom:1px solid #f0f0f0; font-size:0.9em; }
+.dash-axis { display:grid; grid-template-columns: 240px 90px 1fr; gap:10px; align-items:start;
+             padding:8px 0; border-bottom:1px solid #f0f0f0; }
+.dash-tier { font-weight:600; }
+.recipe-card { background:#fdfcf7; border:1px solid #e9e3c8; border-radius:10px;
+               padding:14px 16px; margin:10px 0; }
+.recipe-card h3 { margin: 0 0 4px; font-size: 1.05em; }
+.matrix-table td:last-child { text-align:right; font-variant-numeric: tabular-nums; }
 </style>
 """
+
+
+def _render_advanced_sections(result: Dict) -> str:
+    pgs = result.get("polygenic_scores")
+    dash = result.get("cardiometabolic_dashboard")
+    inflam = result.get("inflammation")
+    histamine = result.get("histamine")
+    detox = result.get("detoxification")
+    glycemic = result.get("glycemic_threshold")
+    period = result.get("macro_periodisation")
+    matrix = result.get("weekly_food_matrix")
+    shop = result.get("shopping_list")
+    recipes = result.get("recipes")
+
+    if not pgs:
+        return ""
+
+    # Polygenic scores table
+    pgs_rows = []
+    for trait, s in pgs.items():
+        pct = s.get("percentile")
+        bar_width = pct if pct is not None else 0
+        pct_text = f"{pct}%" if pct is not None else "—"
+        cov_text = f"<small style='color:#888'>coverage {s.get('coverage','—')}%</small>"
+        pgs_rows.append(
+            f'<div class="pgs-row">'
+            f'<div>{_esc(trait.replace("_"," "))} <br>{cov_text}</div>'
+            f'<div><strong>{pct_text}</strong><br><small>{_esc(s.get("tier",""))}</small></div>'
+            f'<div><div class="pgs-bar"><div style="width:{bar_width}%"></div></div></div>'
+            f'</div>'
+        )
+    pgs_html = f"""
+<h2>Polygenic Scores (percentile vs general population)</h2>
+<div class="nu-card">
+  <p style="font-size:0.88em;color:#666">Composite gene scores from GWAS-weighted SNPs.
+  Higher percentile = stronger genetic predisposition (good or bad depending on trait).
+  Confidence depends on coverage — most full-genome panels cover &gt;80%.</p>
+  {"".join(pgs_rows)}
+</div>
+"""
+
+    # Cardiometabolic dashboard
+    dash_html = ""
+    if dash:
+        rows = "".join(
+            f'<div class="dash-axis">'
+            f'<div><strong>{_esc(a["axis"])}</strong></div>'
+            f'<div class="dash-tier">{_esc(a.get("tier",""))}<br><small>{a.get("percentile","—")}%</small></div>'
+            f'<div>{_esc(a.get("leverage",""))}</div>'
+            f'</div>'
+            for a in dash["axes"]
+        )
+        dash_html = f"""
+<h2>Cardiometabolic Dashboard</h2>
+<div class="nu-card">{rows}</div>
+"""
+
+    # Inflammation
+    inflam_html = ""
+    if inflam:
+        f = "".join(f'<div class="nu-factors">{_esc(x)}</div>' for x in inflam.get("factors", []))
+        inflam_html = f"""
+<h2>Inflammation Index</h2>
+<div class="nu-card">
+  <div><strong>{_esc(inflam.get("tier",""))}</strong> (score {inflam.get("score",0)})</div>
+  {f}
+  <p>{_esc(inflam.get("guidance",""))}</p>
+</div>
+"""
+
+    # Histamine
+    hist_html = ""
+    if histamine:
+        f = "".join(f'<div class="nu-factors">{_esc(x)}</div>' for x in histamine.get("factors", []))
+        hist_html = f"""
+<h2>Histamine Tolerance</h2>
+<div class="nu-card">
+  <div><strong>{"Elevated risk" if histamine.get("elevated_risk") else "Normal clearance"}</strong></div>
+  {f}<p>{_esc(histamine.get("guidance",""))}</p>
+</div>
+"""
+
+    # Detox
+    detox_html = ""
+    if detox:
+        p1 = "".join(f'<div class="nu-factors">{_esc(x)}</div>' for x in detox.get("phase1_typed", []))
+        p2 = "".join(f'<div class="nu-factors">{_esc(x)}</div>' for x in detox.get("phase2_typed", []))
+        detox_html = f"""
+<h2>Detoxification (Phase I / II)</h2>
+<div class="nu-card">
+  <strong>Phase I (CYP enzymes)</strong>{p1}
+  <strong>Phase II (conjugation)</strong>{p2}
+  <p>Cruciferous target: <strong>{detox.get("cruciferous_target_servings_per_week","—")} servings/week</strong></p>
+  <p>{_esc(detox.get("guidance",""))}</p>
+</div>
+"""
+
+    # Glycemic threshold
+    gly_html = ""
+    if glycemic:
+        f = "".join(f'<div class="nu-factors">{_esc(x)}</div>' for x in glycemic.get("factors", []))
+        gly_html = f"""
+<h2>Personal Glycemic Threshold</h2>
+<div class="nu-card">
+  <div>Carb ceiling per meal: <strong>{glycemic.get("max_carbs_per_meal_g","—")} g</strong>
+       (dinner: <strong>{glycemic.get("max_carbs_dinner_g","—")} g</strong>)</div>
+  {f}<p>{_esc(glycemic.get("guidance",""))}</p>
+</div>
+"""
+
+    # Macro periodisation
+    period_html = ""
+    if period:
+        td = period["training_day"]
+        rd = period["rest_day"]
+        period_html = f"""
+<h2>Macro Periodisation (Training vs Rest Day)</h2>
+<div class="nu-card">
+  <table class="nu">
+    <tr><th>Day type</th><th>Carbs</th><th>Fat</th><th>Protein</th><th>Carb timing</th></tr>
+    <tr><td>Training</td><td>{td['pct_carbs']}%</td><td>{td['pct_fat']}%</td>
+        <td>{td['pct_protein']}%</td><td>{_esc(td['carb_timing'])}</td></tr>
+    <tr><td>Rest</td><td>{rd['pct_carbs']}%</td><td>{rd['pct_fat']}%</td>
+        <td>{rd['pct_protein']}%</td><td>{_esc(rd['carb_timing'])}</td></tr>
+  </table>
+  <p>{_esc(period.get("guidance",""))}</p>
+</div>
+"""
+
+    # Weekly food matrix
+    matrix_html = ""
+    if matrix:
+        sv = matrix["servings_per_week"]
+        rows = "".join(f"<tr><td>{_esc(k)}</td><td>{v}</td></tr>" for k, v in sv.items())
+        matrix_html = f"""
+<h2>Quantitative Weekly Food Matrix (servings per week)</h2>
+<div class="nu-card">
+  <table class="nu matrix-table"><tr><th>Food group</th><th>Servings/wk</th></tr>{rows}</table>
+</div>
+"""
+
+    # Shopping list
+    shop_html = ""
+    if shop:
+        groups = "".join(
+            f"<div class='nu-card'><strong>{_esc(g['category'])}</strong><ul class='nu-list'>"
+            + "".join(f"<li>{_esc(i)}</li>" for i in g['items'] if i and i != "—")
+            + "</ul></div>"
+            for g in shop
+        )
+        shop_html = f"<h2>Weekly Shopping List (1 person)</h2>{groups}"
+
+    # Recipes
+    recipes_html = ""
+    if recipes:
+        cards = ""
+        for r in recipes:
+            ing = "".join(f"<li>{_esc(x)}</li>" for x in r["ingredients"])
+            why = "".join(f"<li>{_esc(x)}</li>" for x in r["why_for_you"])
+            cards += f"""
+<div class="recipe-card">
+  <h3>{_esc(r["name"])}</h3>
+  <div style="color:#666;font-size:0.88em">{_esc(r["macros_est"])}</div>
+  <strong>Ingredients</strong><ul>{ing}</ul>
+  <strong>Why this matches your genotype</strong><ul>{why}</ul>
+  <strong>Method</strong><p>{_esc(r["method"])}</p>
+</div>"""
+        recipes_html = f"<h2>Generated Recipes Tailored to Your Genotype</h2>{cards}"
+
+    return (pgs_html + dash_html + inflam_html + hist_html + detox_html
+            + gly_html + period_html + matrix_html + shop_html + recipes_html)
 
 
 def render_nutrition_html(result: Dict, file_label: str = "") -> str:
@@ -1181,6 +1377,8 @@ def render_nutrition_html(result: Dict, file_label: str = "") -> str:
   {template_rows}
 </table>
 </div>
+
+{_render_advanced_sections(result)}
 
 <p style="margin-top:30px;color:#888;font-size:0.85em">
 Not medical advice. These are evidence-aligned starting points; refine with a

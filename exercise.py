@@ -22,6 +22,11 @@ from __future__ import annotations
 from typing import Dict, List, Optional, Tuple
 import pandas as pd
 
+try:
+    from exercise_advanced import analyze_advanced_exercise
+except ImportError:
+    analyze_advanced_exercise = None
+
 
 def _gt(snps_df: Optional[pd.DataFrame], rsid: str) -> Optional[str]:
     if snps_df is None or rsid not in snps_df.index:
@@ -823,7 +828,7 @@ def analyze_exercise(snps_df: Optional[pd.DataFrame]) -> Dict:
     periodisation = _periodisation(pe)
     warmup = _warmup(injury, pe)
 
-    return {
+    result = {
         "status": "ok",
         "power_endurance": pe,
         "injury_risk": injury,
@@ -845,6 +850,15 @@ def analyze_exercise(snps_df: Optional[pd.DataFrame]) -> Dict:
         "warmup": warmup,
         "weekly_template": weekly,
     }
+
+    if analyze_advanced_exercise is not None:
+        try:
+            advanced = analyze_advanced_exercise(snps_df, result)
+            result.update(advanced)
+        except Exception as exc:  # noqa: BLE001
+            result["advanced_error"] = str(exc)
+
+    return result
 
 
 # ── HTML rendering ──────────────────────────────────────────────────────────
@@ -876,6 +890,19 @@ _EX_CSS = """
 table.ex { width:100%; border-collapse: collapse; margin-top:10px; }
 table.ex th, table.ex td { padding:8px 10px; border-bottom:1px solid #eee; text-align:left; }
 table.ex th { background:#f9f9f9; }
+.attr-bar { background:#eee; border-radius:6px; height:14px; overflow:hidden; }
+.attr-bar > div { height:100%; background:linear-gradient(90deg,#1e6091,#a32a2a); }
+.attr-row { display:grid; grid-template-columns: 160px 60px 1fr; gap:8px; align-items:center;
+            padding:4px 0; font-size:0.92em; }
+.sport-rank { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f0f0; }
+.workout-card { background:#fdfcf7; border:1px solid #e9e3c8; border-radius:10px;
+                padding:14px 16px; margin:10px 0; }
+.workout-card h3 { margin: 0 0 4px; font-size: 1.05em; }
+.region-risk { display:grid; grid-template-columns: 180px 60px 1fr; gap:8px; padding:6px 0;
+               border-bottom:1px solid #f0f0f0; align-items:center; }
+.region-risk .bar { background:#eee; border-radius:4px; height:10px; overflow:hidden; }
+.region-risk .bar > div { height:100%; background:linear-gradient(90deg,#2c7a30,#c08327,#a32a2a); }
+.readiness-table td { font-size:0.92em; }
 </style>
 """
 
@@ -886,6 +913,224 @@ def _risk_class(level: str) -> str:
     if "prot" in level.lower():
         return "ex-risk-prot"
     return "ex-risk-base"
+
+
+def _render_advanced_exercise(result: Dict) -> str:
+    profile = result.get("composite_profile")
+    injury_map = result.get("injury_risk_map")
+    readiness = result.get("daily_readiness")
+    workouts = result.get("sample_workouts")
+    concurrent = result.get("concurrent_training")
+    aerobic = result.get("aerobic_estimates")
+    taper = result.get("tapering")
+    deload = result.get("deload")
+    mental = result.get("mental_skills")
+    thermal = result.get("thermal_adaptation")
+    mobility = result.get("mobility")
+    plyo = result.get("plyometric_progression")
+
+    if not profile:
+        return ""
+
+    # Composite + sport ranking
+    attr_rows = "".join(
+        f'<div class="attr-row"><div>{_esc(k.replace("_"," ").title())}</div>'
+        f'<div><strong>{v:.0f}</strong></div>'
+        f'<div><div class="attr-bar"><div style="width:{v:.0f}%"></div></div></div></div>'
+        for k, v in profile["attributes"].items()
+    )
+    sport_rows = "".join(
+        f'<div class="sport-rank"><span>{i+1}. {_esc(s["sport"])}</span>'
+        f'<span><strong>{s["fit_score"]:.1f}</strong></span></div>'
+        for i, s in enumerate(profile["ranked_sports"])
+    )
+    profile_html = f"""
+<h2>Composite Athletic Profile</h2>
+<div class="ex-card">
+  <p><strong>Overall index: {profile['overall_score']:.1f}/100</strong></p>
+  <p>{_esc(profile['summary'])}</p>
+  <h3 style="font-size:1em;margin-top:14px">Attribute scores</h3>
+  {attr_rows}
+  <h3 style="font-size:1em;margin-top:14px">Top sport matches</h3>
+  {sport_rows}
+</div>
+"""
+
+    # Injury map
+    injury_html = ""
+    if injury_map:
+        rows = "".join(
+            f'<div class="region-risk">'
+            f'<div>{_esc(r["region"])}</div>'
+            f'<div><strong>{r["risk_pct"]}%</strong></div>'
+            f'<div><div class="bar"><div style="width:{r["risk_pct"]}%"></div></div>'
+            f'<small>{_esc(r["interventions"])}</small></div>'
+            f'</div>'
+            for r in injury_map["regions"]
+        )
+        injury_html = f"""
+<h2>Body-Region Injury Risk Map</h2>
+<div class="ex-card">
+  <p>Composite index: <strong>{injury_map['overall_index']}</strong> · per-region quantitative scoring + mitigations</p>
+  {rows}
+</div>
+"""
+
+    # Readiness
+    readiness_html = ""
+    if readiness:
+        rows = "".join(
+            f'<tr><td><strong>{_esc(t["range"])}</strong></td><td>{_esc(t["action"])}</td></tr>'
+            for t in readiness["thresholds"]
+        )
+        readiness_html = f"""
+<h2>Daily Readiness Formula</h2>
+<div class="ex-card">
+  <p><em>{_esc(readiness["formula"])}</em></p>
+  <table class="ex readiness-table">
+    <tr><th>Score</th><th>Action</th></tr>
+    {rows}
+  </table>
+  <p>{_esc(readiness.get("tracking",""))}</p>
+  <p><strong>For you:</strong> {_esc(readiness.get("personal_note",""))}</p>
+</div>
+"""
+
+    # Sample workouts
+    workouts_html = ""
+    if workouts:
+        cards = ""
+        for w in workouts:
+            blocks = "".join(f"<li>{_esc(b)}</li>" for b in w["blocks"])
+            cards += f"""
+<div class="workout-card">
+  <h3>{_esc(w["name"])}</h3>
+  <div style="color:#666;font-size:0.88em">{_esc(w["duration"])} · best at {_esc(w["best_window"])}</div>
+  <ul>{blocks}</ul>
+  <p><strong>Target intensity:</strong> {_esc(w["rpe_target"])}</p>
+</div>"""
+        workouts_html = f"<h2>Fully Spelled-Out Sample Workouts</h2>{cards}"
+
+    # Concurrent
+    concur_html = ""
+    if concurrent:
+        concur_html = f"""
+<h2>Concurrent Training Interference</h2>
+<div class="ex-card">
+  <div><strong>Interference level: {_esc(concurrent['interference_level'])}</strong></div>
+  <p>{_esc(concurrent['rule'])}</p>
+</div>
+"""
+
+    # Aerobic estimates
+    aero_html = ""
+    if aerobic:
+        tests = "".join(f"<li>{_esc(t)}</li>" for t in aerobic.get("test_protocols", []))
+        aero_html = f"""
+<h2>Aerobic Capacity Projections</h2>
+<div class="ex-card">
+  <p><strong>VO2max:</strong> {_esc(aerobic.get('vo2max_estimate',''))}</p>
+  <p><strong>Lactate threshold:</strong> {_esc(aerobic.get('lactate_threshold_estimate',''))}</p>
+  <strong>Self-test protocols:</strong><ul>{tests}</ul>
+</div>
+"""
+
+    # Taper
+    taper_html = ""
+    if taper:
+        s = "".join(f"<li>{_esc(x)}</li>" for x in taper.get("structure", []))
+        taper_html = f"""
+<h2>Competition Taper Protocol</h2>
+<div class="ex-card">
+  <p><strong>{taper['duration_days']} days · {_esc(taper['volume_change'])}</strong></p>
+  <ol>{s}</ol>
+</div>
+"""
+
+    # Deload
+    deload_html = ""
+    if deload:
+        s = "".join(f"<li>{_esc(x)}</li>" for x in deload.get("structure", []))
+        deload_html = f"""
+<h2>Deload Protocol</h2>
+<div class="ex-card">
+  <p><strong>Frequency:</strong> {_esc(deload['frequency'])}</p>
+  <ul>{s}</ul>
+  <p><strong>Unscheduled-deload triggers:</strong> {_esc(deload.get('trigger_signals',''))}</p>
+</div>
+"""
+
+    # Mental skills
+    mental_html = ""
+    if mental:
+        f = "".join(f'<div class="ex-factors">{_esc(x)}</div>' for x in mental.get("factors", []))
+        s = "".join(f"<li>{_esc(x)}</li>" for x in mental.get("strategies", []))
+        mental_html = f"""
+<h2>Mental Skills Profile</h2>
+<div class="ex-card">
+  <div><strong>{_esc(mental.get('profile',''))}</strong></div>
+  {f}
+  <ul>{s}</ul>
+</div>
+"""
+
+    # Thermal
+    thermal_html = ""
+    if thermal:
+        f = "".join(f'<div class="ex-factors">{_esc(x)}</div>' for x in thermal.get("factors", []))
+        thermal_html = f"""
+<h2>Cold &amp; Heat Adaptation Protocols</h2>
+<div class="ex-card">
+  <div><strong>{_esc(thermal.get('cold_tolerance',''))}</strong></div>
+  {f}
+  <p><strong>Cold protocol:</strong> {_esc(thermal.get('cold_protocol',''))}</p>
+  <p><strong>Heat (sauna) protocol:</strong> {_esc(thermal.get('heat_protocol',''))}</p>
+</div>
+"""
+
+    # Mobility
+    mobility_html = ""
+    if mobility:
+        items = "".join(f"<li>{_esc(x)}</li>" for x in mobility.get("items", []))
+        mobility_html = f"""
+<h2>Mobility / Flexibility Prescription</h2>
+<div class="ex-card">
+  <p><strong>{mobility.get('daily_minutes','—')} min daily</strong></p>
+  <ul>{items}</ul>
+  <p><em>{_esc(mobility.get('guidance',''))}</em></p>
+</div>
+"""
+
+    # Plyometric
+    plyo_html = ""
+    if plyo:
+        if not plyo.get("ready", True):
+            phases_str = "".join(f"<li>{_esc(p)}</li>" for p in plyo.get("phases", []))
+            plyo_html = f"""
+<h2>Plyometric Progression (Preparation Required)</h2>
+<div class="ex-card">
+  <p><strong>Not yet ready for full plyometrics</strong> — elevated joint/tendon risk.</p>
+  <p>{_esc(plyo.get('preparation_weeks',''))}</p>
+  <ol>{phases_str}</ol>
+</div>
+"""
+        else:
+            rows = "".join(
+                f'<tr><td>{_esc(p["weeks"])}</td><td>{_esc(p["level"])}</td><td>{_esc(p["drills"])}</td></tr>'
+                for p in plyo.get("phases", [])
+            )
+            rules = "".join(f"<li>{_esc(r)}</li>" for r in plyo.get("rules", []))
+            plyo_html = f"""
+<h2>12-Week Plyometric Progression</h2>
+<div class="ex-card">
+  <table class="ex"><tr><th>Weeks</th><th>Level</th><th>Drills</th></tr>{rows}</table>
+  <ul>{rules}</ul>
+</div>
+"""
+
+    return (profile_html + injury_html + readiness_html + workouts_html
+            + concur_html + aero_html + taper_html + deload_html
+            + mental_html + thermal_html + mobility_html + plyo_html)
 
 
 def render_exercise_html(result: Dict, file_label: str = "") -> str:
@@ -1066,6 +1311,8 @@ def render_exercise_html(result: Dict, file_label: str = "") -> str:
   {week_rows}
 </table>
 </div>
+
+{_render_advanced_exercise(result)}
 
 <p style="margin-top:30px;color:#888;font-size:0.85em">
 Not medical advice. Recommendations are starting points derived from published
