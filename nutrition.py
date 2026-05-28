@@ -35,6 +35,10 @@ try:
     from nutrition_advanced import analyze_advanced_nutrition
 except ImportError:
     analyze_advanced_nutrition = None
+try:
+    from nutrition_protocols import analyze_nutrition_protocols
+except ImportError:
+    analyze_nutrition_protocols = None
 
 
 def _gt(snps_df: Optional[pd.DataFrame], rsid: str) -> Optional[str]:
@@ -990,6 +994,13 @@ def analyze_nutrition(snps_df: Optional[pd.DataFrame]) -> Dict:
         except Exception as exc:  # noqa: BLE001
             result["advanced_error"] = str(exc)
 
+    if analyze_nutrition_protocols is not None:
+        try:
+            protocols = analyze_nutrition_protocols(result)
+            result["protocols"] = protocols
+        except Exception as exc:  # noqa: BLE001
+            result["protocols_error"] = str(exc)
+
     return result
 
 
@@ -1206,8 +1217,204 @@ def _render_advanced_sections(result: Dict) -> str:
 </div>"""
         recipes_html = f"<h2>Generated Recipes Tailored to Your Genotype</h2>{cards}"
 
-    return (pgs_html + dash_html + inflam_html + hist_html + detox_html
-            + gly_html + period_html + matrix_html + shop_html + recipes_html)
+    advanced_blob = (pgs_html + dash_html + inflam_html + hist_html + detox_html
+                     + gly_html + period_html + matrix_html + shop_html + recipes_html)
+    advanced_blob += _render_protocols(result)
+    return advanced_blob
+
+
+def _render_protocols(result: Dict) -> str:
+    p = result.get("protocols")
+    if not p:
+        return ""
+    out = ""
+
+    # Glucose simulator table
+    gs = p.get("glucose_simulator")
+    if gs:
+        rows = "".join(
+            f"<tr><td>{_esc(m['meal'])}</td><td>{m['available_carbs_g']} g</td>"
+            f"<td>{m['estimated_peak_mg_dL']}</td><td>{m['estimated_iAUC']}</td>"
+            f"<td>{_esc(m['verdict'])}</td></tr>" for m in gs
+        )
+        out += f"""
+<h2>Postprandial Glucose Simulator</h2>
+<div class="nu-card">
+<p style="color:#666;font-size:0.88em">Estimated glucose response to common meals at your personal threshold.
+Peak ≥140 mg/dL = caution; ≥180 = restructure.</p>
+<table class="nu"><tr><th>Meal</th><th>Avail. carbs</th><th>Est. peak</th><th>iAUC</th><th>Verdict</th></tr>{rows}</table>
+</div>
+"""
+
+    # 30-day meal plan
+    mp = p.get("meal_plan_30d")
+    if mp:
+        rows = "".join(
+            f"<tr><td>{d['day']}</td><td>{_esc(d['breakfast'])}</td>"
+            f"<td>{_esc(d['snack_am'])}</td><td>{_esc(d['lunch'])}</td>"
+            f"<td>{_esc(d['snack_pm'])}</td><td>{_esc(d['dinner'])}</td></tr>"
+            for d in mp
+        )
+        out += f"""
+<h2>30-Day Meal Plan</h2>
+<div class="nu-card">
+<table class="nu" style="font-size:0.85em">
+<tr><th>Day</th><th>Breakfast</th><th>AM snack</th><th>Lunch</th><th>PM snack</th><th>Dinner</th></tr>
+{rows}
+</table>
+</div>
+"""
+
+    # Cooking
+    ck = p.get("cooking_methods")
+    if ck:
+        rule_rows = "".join(
+            f"<tr><td>{_esc(r['method'])}</td><td><strong>{_esc(r['AGE_load'])}</strong></td>"
+            f"<td>{_esc(r['use_for'])}</td></tr>" for r in ck["rules"]
+        )
+        oils = "".join(f"<li>{_esc(k)}: {v} °C</li>" for k, v in ck["oil_smoke_points_C"].items())
+        practical = "".join(f"<li>{_esc(x)}</li>" for x in ck["practical"])
+        out += f"""
+<h2>Cooking-Method Optimiser (AGE minimisation)</h2>
+<div class="nu-card">
+<p>{_esc(ck['rationale'])}</p>
+<table class="nu"><tr><th>Method</th><th>AGE load</th><th>Use for</th></tr>{rule_rows}</table>
+<strong>Oil smoke points</strong><ul>{oils}</ul>
+<strong>Practical</strong><ul>{practical}</ul>
+</div>
+"""
+
+    # Restaurant guides
+    rg = p.get("restaurant_guides")
+    if rg:
+        cards = ""
+        for g in rg:
+            orders = "".join(f"<li>{_esc(o)}</li>" for o in g["order"])
+            cards += (f'<div class="nu-card"><strong>{_esc(g["cuisine"])}</strong>'
+                      f'<ul>{orders}</ul><p><em>Your tweak: {_esc(g["your_tweak"])}</em></p></div>')
+        out += f"<h2>Restaurant Ordering Guides</h2>{cards}"
+
+    # Fasting
+    fast = p.get("fasting")
+    if fast:
+        caut = "".join(f"<li>{_esc(c)}</li>" for c in fast["cautions"])
+        out += f"""
+<h2>Intermittent-Fasting Matchmaker</h2>
+<div class="nu-card">
+<p><strong>Recommended:</strong> {_esc(fast['recommended_protocol'])}</p>
+<p>{_esc(fast['rationale'])}</p>
+<strong>Cautions</strong><ul>{caut}</ul>
+<p>{_esc(fast['break_fast_meal'])}</p>
+</div>
+"""
+
+    # Polyphenols
+    pp = p.get("polyphenols")
+    if pp:
+        food_rows = "".join(
+            f"<tr><td>{_esc(f['food'])}</td><td>{f['mg']}</td>"
+            f"<td>{_esc(f['key_polyphenols'])}</td></tr>" for f in pp["foods"]
+        )
+        out += f"""
+<h2>Polyphenol Prescription</h2>
+<div class="nu-card">
+<p>Target: <strong>{pp['target_mg_per_day']} mg/day</strong></p>
+<table class="nu"><tr><th>Food</th><th>mg per serving</th><th>Key polyphenols</th></tr>{food_rows}</table>
+<p>{_esc(pp['guidance'])}</p>
+</div>
+"""
+
+    # Minerals
+    mn = p.get("minerals")
+    if mn:
+        rows = "".join(
+            f"<tr><td>{_esc(m['mineral'])}</td>"
+            f"<td>{m.get('rda_mg', m.get('rda_mcg','—'))} {'mg' if 'rda_mg' in m else 'µg'}</td>"
+            f"<td>{_esc(m['sources'])}</td><td>{_esc(m['note'])}</td></tr>"
+            for m in mn
+        )
+        out += f"""
+<h2>Mineral Panel (quantitative)</h2>
+<div class="nu-card">
+<table class="nu"><tr><th>Mineral</th><th>Target</th><th>Sources (mg/serving)</th><th>Note</th></tr>{rows}</table>
+</div>
+"""
+
+    # MIND
+    md = p.get("mind_diet")
+    if md and md.get("applicable"):
+        inc = "".join(
+            f"<tr><td>{_esc(i['food'])}</td><td>{_esc(i['servings'])}</td><td>{_esc(i['why'])}</td></tr>"
+            for i in md["include_weekly"]
+        )
+        lim = "".join(
+            f"<tr><td>{_esc(l['food'])}</td><td>{_esc(l['limit'])}</td></tr>"
+            for l in md["limit_strictly"]
+        )
+        leverage = "".join(f"<li>{_esc(x)}</li>" for x in md["high_leverage_actions"])
+        e4spec = "".join(f"<li>{_esc(x)}</li>" for x in md.get("additional_ε4_specific", []))
+        out += f"""
+<h2>MIND Diet Protocol (APOE ε4 cognitive nutrition)</h2>
+<div class="nu-card">
+<p>{_esc(md['header'])}</p>
+<strong>Include weekly</strong>
+<table class="nu"><tr><th>Food</th><th>Servings</th><th>Why</th></tr>{inc}</table>
+<strong>Limit</strong>
+<table class="nu"><tr><th>Food</th><th>Limit</th></tr>{lim}</table>
+<strong>Highest-leverage daily actions</strong><ul>{leverage}</ul>
+<strong>ε4-specific additions</strong><ul>{e4spec}</ul>
+</div>
+"""
+
+    # Cycle phase
+    cp = p.get("cycle_phase")
+    if cp:
+        out += f"""
+<h2>Female Cycle-Phase Nutrition (reference)</h2>
+<div class="nu-card">
+<p><em>{_esc(cp.get('note',''))}</em></p>
+<ul>
+  <li><strong>Follicular (d1-14):</strong> {_esc(cp['follicular_d1_14']['macro_emphasis'])}; training: {_esc(cp['follicular_d1_14']['training'])}</li>
+  <li><strong>Ovulation (d14-16):</strong> {_esc(cp['ovulation_d14_16']['macro_emphasis'])}; training: {_esc(cp['ovulation_d14_16']['training'])}</li>
+  <li><strong>Luteal (d17-28):</strong> {_esc(cp['luteal_d17_28']['macro_emphasis'])}; training: {_esc(cp['luteal_d17_28']['training'])}</li>
+  <li><strong>Menstrual (d1-5):</strong> {_esc(cp['menstrual_d1_5']['macro_emphasis'])}; training: {_esc(cp['menstrual_d1_5']['training'])}</li>
+</ul>
+<p><strong>RED-S:</strong> {_esc(cp['RED_S_screening'])}</p>
+</div>
+"""
+
+    # Travel
+    tj = p.get("travel_jetlag")
+    if tj:
+        steps = "".join(
+            f"<li><strong>{_esc(s['step'])}:</strong> {_esc(s['action'])}</li>"
+            for s in tj["steps"]
+        )
+        sup = "".join(f"<li>{_esc(x)}</li>" for x in tj["supplements_considered"])
+        out += f"""
+<h2>Travel / Jet-Lag Nutrition Protocol</h2>
+<div class="nu-card">
+<p>{_esc(tj['header'])}</p>
+<ol>{steps}</ol>
+<strong>Supplements considered</strong><ul>{sup}</ul>
+</div>
+"""
+
+    # Pre-bed
+    pb = p.get("pre_bed_mps")
+    if pb:
+        opts = "".join(f"<li>{_esc(x)}</li>" for x in pb["options"])
+        avoid = "".join(f"<li>{_esc(x)}</li>" for x in pb["avoid_pre_bed"])
+        out += f"""
+<h2>Pre-Bed Muscle Protein Synthesis</h2>
+<div class="nu-card">
+<p>{_esc(pb['rationale'])}</p>
+<strong>Options</strong><ul>{opts}</ul>
+<strong>Avoid pre-bed</strong><ul>{avoid}</ul>
+</div>
+"""
+
+    return out
 
 
 def render_nutrition_html(result: Dict, file_label: str = "") -> str:

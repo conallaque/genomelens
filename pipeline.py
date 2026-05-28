@@ -98,6 +98,101 @@ except ImportError:
     _MODULE_LOAD_ERROR = ""
 
 
+def _render_longevity_html(integrated: dict, file_label: str = "") -> str:
+    import html as _h
+    esc = lambda s: _h.escape(str(s) if s is not None else "")
+    summary = integrated["executive_summary"]
+    lon = integrated["longevity_composite"]
+    plan = integrated["year_long_plan"]
+
+    facts = "".join(f"<li>{esc(f)}</li>" for f in summary["key_facts"])
+    actions = "".join(f"<li>{esc(a)}</li>" for a in summary["top_three_actions_this_week"])
+    daily = "".join(f"<li>{esc(d)}</li>" for d in summary["non_negotiable_daily"])
+    weekly = "".join(f"<li>{esc(d)}</li>" for d in summary["weekly_floors"])
+
+    comp_rows = "".join(
+        f"<tr><td>{esc(c['component'])}</td>"
+        f"<td><strong>{c['score']}</strong></td>"
+        f"<td>{int(c['weight']*100)}%</td></tr>"
+        for c in lon["components"]
+    )
+
+    lever_rows = "".join(
+        f"<tr><td><strong>{esc(l['lever'])}</strong></td>"
+        f"<td>{l['current_score']}</td>"
+        f"<td>{esc(l['improvement_action'])}</td></tr>"
+        for l in lon["biggest_levers"]
+    )
+
+    plan_rows = "".join(
+        f"<tr><td>{esc(b['mesocycle'])}</td><td>{esc(b['weeks'])}</td>"
+        f"<td>{esc(b['exercise_focus'])}</td>"
+        f"<td>{esc(b['nutrition_focus'])}</td>"
+        f"<td>{esc('; '.join(b['labs_to_recheck']))}</td>"
+        f"<td>{esc(b['goal_milestone'])}</td></tr>"
+        for b in plan
+    )
+
+    return f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Longevity Composite{(' — ' + esc(file_label)) if file_label else ''}</title>
+<style>
+body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color:#222; max-width:1100px; margin:24px auto; padding:0 16px; }}
+h1 {{ font-size:1.6em; border-bottom:2px solid #333; padding-bottom:6px; }}
+h2 {{ font-size:1.2em; margin-top:28px; padding-bottom:4px; border-bottom:1px solid #eee; }}
+.card {{ background:#fcfcfd; border:1px solid #e2e2e6; border-radius:10px; padding:14px 16px; margin:10px 0; }}
+.score-hero {{ font-size:3em; color:#1e6091; font-weight:600; }}
+table {{ width:100%; border-collapse:collapse; }}
+th,td {{ padding:8px 10px; border-bottom:1px solid #eee; text-align:left; vertical-align:top; }}
+th {{ background:#f9f9f9; }}
+</style></head><body>
+<h1>Longevity Composite &amp; Integrated Plan</h1>
+
+<h2>Executive Summary</h2>
+<div class="card">
+  <div class="score-hero">{lon['composite_score']}/100</div>
+  <p><strong>{esc(lon['tier'])}</strong></p>
+  <p>{esc(lon['interpretation'])}</p>
+</div>
+
+<h2>Key Facts</h2>
+<div class="card"><ul>{facts}</ul></div>
+
+<h2>Top 3 Actions This Week</h2>
+<div class="card"><ol>{actions}</ol></div>
+
+<h2>Non-Negotiable Daily / Weekly</h2>
+<div class="card">
+  <strong>Daily</strong><ul>{daily}</ul>
+  <strong>Weekly floors</strong><ul>{weekly}</ul>
+</div>
+
+<h2>Component Breakdown</h2>
+<div class="card">
+  <table><tr><th>Component</th><th>Score</th><th>Weight</th></tr>{comp_rows}</table>
+</div>
+
+<h2>Biggest Improvable Levers</h2>
+<div class="card">
+  <table><tr><th>Lever</th><th>Current</th><th>Improvement Action</th></tr>{lever_rows}</table>
+</div>
+
+<h2>Year-Long Integrated Plan</h2>
+<div class="card">
+  <table style="font-size:0.88em">
+    <tr><th>Mesocycle</th><th>Weeks</th><th>Exercise focus</th><th>Nutrition focus</th><th>Labs to recheck</th><th>Milestone</th></tr>
+    {plan_rows}
+  </table>
+</div>
+
+<p style="margin-top:30px;color:#888;font-size:0.85em">
+Not medical advice. The composite score integrates genetic and capacity inputs only;
+actual longevity outcomes are dominated by behaviour. Use this as a strategic map for
+where to spend your effort over the next year.
+</p>
+</body></html>"""
+
+
 def run_pipeline(args: argparse.Namespace) -> int:
     """Execute the analysis pipeline against parsed CLI args.
 
@@ -747,6 +842,19 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  Master plan dashboard saved: {plan_path}")
         except Exception as e:
             log(f"  WARNING: Personalized plan failed: {e}")
+
+    # ── Longevity composite & year-long integrated plan ──
+    try:
+        from longevity import integrated_longevity_plan
+        if nutrition_result and nutrition_result.get("status") == "ok" \
+                and exercise_result and exercise_result.get("status") == "ok":
+            integrated = integrated_longevity_plan(nutrition_result, exercise_result)
+            long_path = output_path.parent / "longevity.html"
+            long_path.write_text(_render_longevity_html(integrated, file_label),
+                                  encoding="utf-8")
+            log(f"  Longevity composite + year-long plan saved: {long_path}")
+    except Exception as e:  # noqa: BLE001
+        log(f"  WARNING: Longevity composite failed: {e}")
 
     # ── V6: FHIR clinical export ──
     if args.fhir:
