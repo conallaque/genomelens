@@ -407,6 +407,500 @@ def _build_daily_template(macros: Dict, caffeine: Dict, alcohol: Dict) -> List[D
     ]
 
 
+# ── Omega-3 (FADS1/FADS2 ALA→EPA/DHA conversion) ────────────────────────────
+
+def _analyze_omega3(snps_df) -> Dict:
+    fads1 = _gt(snps_df, "rs174547")
+    fads2 = _gt(snps_df, "rs174537") or _gt(snps_df, "rs174575")
+    elovl2 = _gt(snps_df, "rs953413")
+    factors: List[str] = []
+    poor = False
+    if fads1:
+        factors.append(f"rs174547 (FADS1) {fads1}")
+        if "T" in fads1:
+            poor = True
+    if fads2:
+        factors.append(f"rs174537/rs174575 (FADS2) {fads2}")
+        if "T" in fads2 or "G" in fads2:
+            poor = True
+    if elovl2:
+        factors.append(f"rs953413 (ELOVL2) {elovl2}")
+        if "G" in elovl2:
+            poor = True
+    if poor:
+        return {
+            "ala_conversion": "Poor",
+            "epa_dha_target_mg": 1500,
+            "factors": factors,
+            "guidance": (
+                "Reduced-activity FADS desaturase variant — ALA from flax/chia/walnut "
+                "converts inefficiently (<5%) to EPA/DHA. Hit 1.5–2 g combined EPA+DHA "
+                "daily from oily fish (salmon, sardines, mackerel, herring) 3–4×/week, "
+                "or algal-/fish-oil supplementation. Vegetarians: algae-oil 500–1000 mg "
+                "EPA+DHA daily."
+            ),
+        }
+    return {
+        "ala_conversion": "Normal" if factors else "Unknown",
+        "epa_dha_target_mg": 1000,
+        "factors": factors or ["FADS SNPs not typed"],
+        "guidance": (
+            "Normal desaturase activity — plant ALA sources (flax, chia, walnut) "
+            "contribute meaningfully. Still aim for ~1 g EPA+DHA from fish 2×/week."
+        ),
+    }
+
+
+# ── Iron overload risk (hemochromatosis) ────────────────────────────────────
+
+def _analyze_iron(snps_df) -> Dict:
+    c282y = _gt(snps_df, "rs1800562")
+    h63d = _gt(snps_df, "rs1799945")
+    tmprss6 = _gt(snps_df, "rs855791")
+    factors: List[str] = []
+    overload = "Low"
+    if c282y:
+        factors.append(f"rs1800562 (HFE C282Y) {c282y}")
+        if "A" in c282y and c282y.count("A") == 2:
+            overload = "High (homozygous)"
+        elif "A" in c282y:
+            overload = "Moderate (heterozygous)"
+    if h63d:
+        factors.append(f"rs1799945 (HFE H63D) {h63d}")
+        if "G" in h63d:
+            if overload == "Low":
+                overload = "Mild"
+            elif "Moderate" in overload:
+                overload = "Compound heterozygous"
+    if tmprss6:
+        factors.append(f"rs855791 (TMPRSS6) {tmprss6}")
+    if overload.startswith("High"):
+        guidance = (
+            "HFE C282Y homozygous — hereditary hemochromatosis genotype. ~28% penetrance "
+            "for iron overload in men, lower in women. Action: ask physician for serum "
+            "ferritin + transferrin saturation. Limit red meat to 1×/week, avoid iron-"
+            "fortified cereals, do NOT take iron-containing multivitamins, avoid "
+            "vitamin-C megadoses with meals (enhances iron absorption), moderate alcohol. "
+            "Tea/coffee with meals reduces iron absorption — useful."
+        )
+    elif "Moderate" in overload or "Compound" in overload:
+        guidance = (
+            "Heterozygous/compound HFE — modest overload risk. Avoid iron-fortified "
+            "supplements unless ferritin documented low. Monitor ferritin every 2–3 yr."
+        )
+    elif "Mild" in overload:
+        guidance = "Single H63D copy — minimal clinical risk; no action needed."
+    else:
+        guidance = (
+            "No hemochromatosis risk variants typed/detected. Standard iron intake; "
+            "vegetarians should pair plant iron with vitamin C; menstruating women "
+            "may need extra (18 mg/day RDA)."
+        )
+    return {"overload_risk": overload, "factors": factors or ["HFE not typed"],
+            "guidance": guidance}
+
+
+# ── Choline (PEMT) ──────────────────────────────────────────────────────────
+
+def _analyze_choline(snps_df) -> Dict:
+    pemt = _gt(snps_df, "rs7946")
+    mthfd1 = _gt(snps_df, "rs2236225")
+    factors: List[str] = []
+    needs = False
+    if pemt:
+        factors.append(f"rs7946 (PEMT) {pemt}")
+        if "T" in pemt:
+            needs = True
+    if mthfd1:
+        factors.append(f"rs2236225 (MTHFD1) {mthfd1}")
+        if "A" in mthfd1:
+            needs = True
+    return {
+        "increased_need": needs,
+        "target_mg": 550 if needs else 425,
+        "factors": factors or ["PEMT/MTHFD1 not typed"],
+        "guidance": (
+            "Reduced endogenous phosphatidylcholine synthesis — dietary choline becomes "
+            "essential. Target 550 mg/day from: 2 whole eggs (≈250 mg), beef liver (1 oz "
+            "≈100 mg), soybeans, salmon, chicken, cruciferous veg. Inadequate choline "
+            "→ NAFLD risk."
+            if needs else
+            "Adequate intake target 425 mg/day (women) / 550 mg/day (men). 1–2 whole "
+            "eggs daily covers most."
+        ),
+    }
+
+
+# ── Vitamin B12 (FUT2 secretor status, TCN2) ────────────────────────────────
+
+def _analyze_b12(snps_df) -> Dict:
+    fut2 = _gt(snps_df, "rs601338")
+    tcn2 = _gt(snps_df, "rs1801198")
+    factors: List[str] = []
+    lower_status = False
+    if fut2:
+        factors.append(f"rs601338 (FUT2 secretor) {fut2}")
+        # AA = non-secretor — higher serum B12 paradoxically but altered gut absorption
+        if "A" in fut2 and fut2.count("A") == 2:
+            lower_status = True
+    if tcn2:
+        factors.append(f"rs1801198 (TCN2) {tcn2}")
+        if "G" in tcn2:
+            lower_status = True
+    return {
+        "lower_functional_b12": lower_status,
+        "factors": factors or ["B12 transport SNPs not typed"],
+        "guidance": (
+            "Variants in B12 transport/secretor status — prioritise high-bioavailable "
+            "B12 sources: clams, beef liver, sardines, eggs, dairy. Consider 500 µg "
+            "methylcobalamin sublingual 2–3×/week if vegetarian/vegan."
+            if lower_status else
+            "Standard B12 intake from animal foods (meat, fish, dairy, eggs) suffices. "
+            "Strict vegans should supplement 250–500 µg cyanocobalamin daily."
+        ),
+    }
+
+
+# ── Vitamin A conversion (BCO1) ─────────────────────────────────────────────
+
+def _analyze_vitamin_a(snps_df) -> Dict:
+    bco1a = _gt(snps_df, "rs7501331")
+    bco1b = _gt(snps_df, "rs12934922")
+    factors: List[str] = []
+    poor = False
+    if bco1a:
+        factors.append(f"rs7501331 (BCO1) {bco1a}")
+        if "T" in bco1a:
+            poor = True
+    if bco1b:
+        factors.append(f"rs12934922 (BCO1) {bco1b}")
+        if "A" in bco1b:
+            poor = True
+    return {
+        "beta_carotene_converter": "Poor" if poor else "Normal",
+        "factors": factors or ["BCO1 not typed"],
+        "guidance": (
+            "BCO1 reduced-activity — β-carotene from carrots/sweet potato converts "
+            "poorly to retinol (~30% of normal). Include preformed retinol weekly: "
+            "egg yolks, dairy, liver (1 oz/week), oily fish. Cooking + fat with "
+            "carotenoid veg improves absorption."
+            if poor else
+            "Normal β-carotene conversion — colourful plant sources (sweet potato, "
+            "carrot, kale, pumpkin) cover retinol needs."
+        ),
+    }
+
+
+# ── Vitamin C, E ────────────────────────────────────────────────────────────
+
+def _analyze_vitamin_c(snps_df) -> Dict:
+    slc = _gt(snps_df, "rs33972313") or _gt(snps_df, "rs6596473")
+    haptoglobin = _gt(snps_df, "rs72294371")
+    factors: List[str] = []
+    higher_need = False
+    if slc:
+        factors.append(f"SLC23A1/A2 {slc}")
+        if "A" in slc or "T" in slc:
+            higher_need = True
+    return {
+        "higher_need": higher_need,
+        "target_mg": 200 if higher_need else 90,
+        "factors": factors or ["SLC23A SNPs not typed"],
+        "guidance": (
+            "Higher vitamin-C requirement — aim 200 mg/day from food: 1 red bell "
+            "pepper (~150 mg), kiwi (~70 mg), broccoli, citrus, strawberries. Split "
+            "across the day (absorption saturates ~200 mg per dose)."
+            if higher_need else
+            "Standard 90 mg/day (men)/75 mg (women) from varied produce."
+        ),
+    }
+
+
+def _analyze_vitamin_e(snps_df) -> Dict:
+    cyp4f2 = _gt(snps_df, "rs2108622")
+    factors: List[str] = []
+    higher = False
+    if cyp4f2:
+        factors.append(f"rs2108622 (CYP4F2) {cyp4f2}")
+        if "T" in cyp4f2:
+            higher = True
+    return {
+        "higher_retention": higher,
+        "factors": factors or ["CYP4F2 not typed"],
+        "guidance": (
+            "CYP4F2 reduced metabolism — vitamin E (α-tocopherol) accumulates more. "
+            "AVOID high-dose vitamin-E supplements (>200 IU/day). Get from food: "
+            "almonds, sunflower seeds, avocado, olive oil."
+            if higher else
+            "Standard vitamin-E from nuts/seeds/oils. Supplementation usually unnecessary."
+        ),
+    }
+
+
+# ── Taste perception (TAS2R38 bitter, CD36 fat, sweet preference) ───────────
+
+def _analyze_taste(snps_df) -> Dict:
+    tas2r38 = _gt(snps_df, "rs713598")          # G = PAV taster, C = AVI non-taster
+    cd36 = _gt(snps_df, "rs1761667")            # A = poor fat-taste sensitivity
+    sweet = _gt(snps_df, "rs35874116")          # TAS1R2
+    factors: List[str] = []
+    bitter = "Unknown"
+    fat_taste = "Unknown"
+    if tas2r38:
+        factors.append(f"rs713598 (TAS2R38) {tas2r38}")
+        if "G" in tas2r38 and tas2r38.count("G") == 2:
+            bitter = "Super-taster"
+        elif "G" in tas2r38:
+            bitter = "Taster"
+        else:
+            bitter = "Non-taster"
+    if cd36:
+        factors.append(f"rs1761667 (CD36) {cd36}")
+        if "A" in cd36 and cd36.count("A") == 2:
+            fat_taste = "Reduced fat perception (overconsumption risk)"
+        else:
+            fat_taste = "Normal fat perception"
+    bitter_advice = {
+        "Super-taster": (
+            "PAV/PAV super-taster — cruciferous veg (Brussels, kale, broccoli) and "
+            "coffee taste markedly bitter. Mitigate with: roasting (caramelises), "
+            "olive-oil/lemon dressings, blanching, adding modest sweetness (balsamic, "
+            "honey-glaze). Don't skip these vegetables — they remain critical for "
+            "phytonutrient intake."
+        ),
+        "Taster": "Mild bitter sensitivity — most vegetables palatable with light seasoning.",
+        "Non-taster": "Bitter compounds barely register — bonus: black coffee, dark chocolate, kale taste fine.",
+        "Unknown": "Bitter-taste variant not typed.",
+    }
+    fat_advice = (
+        "Reduced fatty-acid oral detection — risk of unconsciously overeating high-fat "
+        "foods. Pre-portion calorie-dense items (nuts, oils, cheese) by weight instead "
+        "of estimating."
+        if "Reduced" in fat_taste else
+        "Normal fat-taste — internal satiety cues for high-fat foods are reliable."
+    )
+    return {
+        "bitter": bitter, "fat_taste": fat_taste,
+        "factors": factors or ["Taste-perception SNPs not typed"],
+        "bitter_guidance": bitter_advice[bitter],
+        "fat_guidance": fat_advice,
+    }
+
+
+# ── Satiety / appetite (FTO, MC4R, LEPR) ────────────────────────────────────
+
+def _analyze_satiety(snps_df) -> Dict:
+    fto = _gt(snps_df, "rs9939609")
+    mc4r = _gt(snps_df, "rs17782313")
+    lepr = _gt(snps_df, "rs1137101")
+    factors: List[str] = []
+    appetite = "Standard"
+    score = 0
+    if fto:
+        factors.append(f"rs9939609 (FTO) {fto}")
+        if "A" in fto:
+            score += fto.count("A")
+    if mc4r:
+        factors.append(f"rs17782313 (MC4R) {mc4r}")
+        if "C" in mc4r:
+            score += mc4r.count("C")
+    if lepr:
+        factors.append(f"rs1137101 (LEPR) {lepr}")
+        if "G" in lepr:
+            score += 1
+    if score >= 3:
+        appetite = "Elevated hunger drive"
+    elif score >= 1:
+        appetite = "Mildly elevated hunger"
+    strategies = (
+        "High-satiety eating pattern is critical. Anchor every meal with: (1) 30–40 g "
+        "protein (eggs, Greek yoghurt, fish, lean meat, tofu), (2) 8–10 g fibre "
+        "(legumes, berries, vegetables), (3) volume from non-starchy veg. Front-load "
+        "calories to breakfast/lunch; keep dinner lighter. Avoid liquid calories "
+        "(juice, smoothies as meals — they bypass satiety). Pre-meal water 500 mL + "
+        "salad reduces total intake. 12-hour overnight fast helps; longer (16:8) only "
+        "if it doesn't trigger evening binges."
+        if appetite != "Standard" else
+        "Normal appetite regulation — hunger/fullness cues are reliable. Standard "
+        "guidelines apply."
+    )
+    return {
+        "appetite_phenotype": appetite,
+        "satiety_score": score,
+        "factors": factors or ["Appetite SNPs not typed"],
+        "guidance": strategies,
+    }
+
+
+# ── Saturated-fat sub-typing (APOE detailed + APOA2) ────────────────────────
+
+def _analyze_saturated_fat(snps_df) -> Dict:
+    apoe1 = _gt(snps_df, "rs429358")
+    apoe2 = _gt(snps_df, "rs7412")
+    apoa2 = _gt(snps_df, "rs5082")
+    factors: List[str] = []
+    apoe_geno = "Unknown"
+    if apoe1 and apoe2:
+        # ε2: rs429358 T + rs7412 T; ε3: T+C; ε4: C+C
+        e4 = "C" in apoe1
+        e2 = "T" in apoe2
+        if e4 and not e2:
+            apoe_geno = "ε4 carrier" if apoe1.count("C") == 1 else "ε4/ε4"
+        elif e2 and not e4:
+            apoe_geno = "ε2 carrier"
+        else:
+            apoe_geno = "ε3/ε3 (typical)"
+        factors.append(f"APOE: rs429358={apoe1}, rs7412={apoe2} ({apoe_geno})")
+    high_sat_risk = "C" in (apoe1 or "") and not ("T" in (apoe2 or ""))
+    if apoa2:
+        factors.append(f"rs5082 (APOA2) {apoa2}")
+    sat_cap_g = 15 if high_sat_risk else 22  # ~7% vs ~10% of 2000 kcal
+    if high_sat_risk:
+        guidance = (
+            f"APOE ε4 carrier — markedly elevated LDL response to saturated fat. Cap "
+            f"saturated fat at ≤{sat_cap_g} g/day (~7% of calories). Replace butter/"
+            f"coconut oil with extra-virgin olive oil and avocado; limit red meat to "
+            f"1–2×/week, choose poultry/fish. Prioritise MUFA (olive, avocado, almonds) "
+            f"and PUFA (walnuts, fatty fish). Mediterranean pattern is best-evidence."
+        )
+    else:
+        guidance = (
+            f"Standard saturated-fat handling — keep ≤{sat_cap_g} g/day (~10% of "
+            f"calories). Full-fat dairy and moderate red meat acceptable; emphasise "
+            f"MUFA/PUFA still."
+        )
+    return {
+        "apoe_genotype": apoe_geno,
+        "saturated_fat_cap_g": sat_cap_g,
+        "factors": factors or ["APOE/APOA2 not typed"],
+        "guidance": guidance,
+    }
+
+
+# ── Meal-timing / chrononutrition ───────────────────────────────────────────
+
+def _analyze_meal_timing(snps_df) -> Dict:
+    clock = _gt(snps_df, "rs1801260")
+    melatonin = _gt(snps_df, "rs10830963")  # MTNR1B G allele = impaired glucose tolerance evening
+    factors: List[str] = []
+    eating_window = "08:00–20:00"
+    note = ""
+    if clock:
+        factors.append(f"rs1801260 (CLOCK) {clock}")
+        if "T" in clock:  # evening chronotype
+            eating_window = "10:00–20:00"
+            note += "Evening chronotype — push first meal later, but cap last meal ≤20:00 to preserve overnight fast. "
+    if melatonin:
+        factors.append(f"rs10830963 (MTNR1B) {melatonin}")
+        if "G" in melatonin:
+            note += (
+                "MTNR1B G-allele — glucose tolerance drops sharply in evening. Eat largest "
+                "carb load at breakfast/lunch; keep dinner protein+veg-heavy with minimal "
+                "starch after 19:00. "
+            )
+    if not note:
+        note = "Standard 10–12 h eating window; finish dinner ≥2 h before sleep."
+    return {
+        "eating_window": eating_window,
+        "factors": factors or ["Chrono-nutrition SNPs not typed"],
+        "guidance": note.strip(),
+    }
+
+
+# ── Antioxidant capacity ────────────────────────────────────────────────────
+
+def _analyze_antioxidants(snps_df) -> Dict:
+    sod2 = _gt(snps_df, "rs4880")
+    gpx1 = _gt(snps_df, "rs1050450")
+    nqo1 = _gt(snps_df, "rs1800566")
+    factors: List[str] = []
+    low = 0
+    if sod2:
+        factors.append(f"rs4880 (SOD2 Ala16Val) {sod2}")
+        if "G" in sod2:
+            low += sod2.count("G") * 0.5
+    if gpx1:
+        factors.append(f"rs1050450 (GPX1) {gpx1}")
+        if "T" in gpx1:
+            low += 1
+    if nqo1:
+        factors.append(f"rs1800566 (NQO1) {nqo1}")
+        if "T" in nqo1:
+            low += 1
+    needs = low >= 1.5
+    return {
+        "reduced_capacity": needs,
+        "factors": factors or ["Antioxidant SNPs not typed"],
+        "guidance": (
+            "Reduced endogenous antioxidant enzymes — supply abundant dietary "
+            "antioxidants. Daily targets: 2 cups dark leafy greens, 1 cup berries, "
+            "cruciferous veg 3–4×/week (sulforaphane induces Nrf2), green tea 2–3 "
+            "cups, herbs/spices generously (turmeric, rosemary, oregano). Selenium: "
+            "2 Brazil nuts/week. Glutathione precursors: whey, eggs, alliums. Avoid "
+            "antioxidant megadose pills — paradoxically blunt training adaptations."
+            if needs else
+            "Standard endogenous antioxidant capacity — a normal varied diet suffices. "
+            "Aim for diverse plant colours weekly."
+        ),
+    }
+
+
+# ── Fiber target ────────────────────────────────────────────────────────────
+
+def _analyze_fiber(snps_df, macros: Dict, satiety: Dict, salt: Dict) -> Dict:
+    base = 38  # men default
+    extra: List[str] = []
+    if macros["pct_carbs"] >= 50:
+        base = 45
+        extra.append("Higher-carb prescription — push fibre to anchor glycemic response.")
+    if satiety["appetite_phenotype"] != "Standard":
+        base = max(base, 40)
+        extra.append("Elevated appetite — fibre is the most powerful free satiety lever.")
+    if salt["sensitive"]:
+        extra.append("Salt-sensitive — potassium-rich high-fibre foods (legumes, potato) double-up benefit.")
+    return {
+        "target_g": base,
+        "factors": extra or ["Standard fibre target"],
+        "guidance": (
+            f"Target {base} g fibre/day — most adults eat 15. Practical: 1 cup oats "
+            "(8 g), 1 cup berries (8 g), 1 cup beans/lentils (15 g), 2 cups veg (10 g), "
+            "1 oz chia/flax (10 g). Ramp up 5 g/week to avoid GI distress; pair with "
+            "water increase."
+        ),
+    }
+
+
+# ── Hydration ───────────────────────────────────────────────────────────────
+
+def _analyze_hydration(snps_df, salt: Dict) -> Dict:
+    avp = _gt(snps_df, "rs1042615")
+    note = "Baseline: 30–35 mL/kg body weight daily, +500–750 mL per hour exercise."
+    if salt["sensitive"]:
+        note += " Salt-sensitive: pre-load 500 mL water on waking; emphasise potassium-rich fluids (coconut water, broth) over electrolyte powders."
+    return {
+        "target_ml_per_kg": 33,
+        "guidance": note,
+        "factors": ([f"rs1042615 (AVPR1A) {avp}"] if avp else ["Hydration SNPs not typed"]),
+    }
+
+
+# ── Caloric framework (no body data, give worksheet) ────────────────────────
+
+def _caloric_framework(macros: Dict, satiety: Dict) -> Dict:
+    return {
+        "tdee_formula": "Mifflin-St Jeor: BMR(♂) = 10·kg + 6.25·cm − 5·age + 5; (♀) −161. TDEE = BMR × activity (1.4 sedentary, 1.55 moderate, 1.75 active, 1.9 athlete).",
+        "loss_deficit_kcal": 400 if satiety["appetite_phenotype"] != "Standard" else 500,
+        "gain_surplus_kcal": 250,
+        "protein_g_per_kg": 1.8 if macros["pct_carbs"] <= 35 else 1.6,
+        "guidance": (
+            "Compute TDEE from formula. For fat loss: subtract 400–500 kcal (smaller "
+            "deficit if appetite-elevated genotype — sustainability beats speed). For "
+            "lean gain: +250 kcal with strength training. Protein floor regardless of "
+            "goal: 1.6–2.0 g/kg body weight, distributed across 3–4 meals."
+        ),
+    }
+
+
 # ── Public API ──────────────────────────────────────────────────────────────
 
 def analyze_nutrition(snps_df: Optional[pd.DataFrame]) -> Dict:
@@ -421,7 +915,37 @@ def analyze_nutrition(snps_df: Optional[pd.DataFrame]) -> Dict:
     gluten = _analyze_gluten(snps_df)
     methyl = _analyze_methylation_diet(snps_df)
     vit_d = _analyze_vitamin_d_food(snps_df)
+    omega3 = _analyze_omega3(snps_df)
+    iron = _analyze_iron(snps_df)
+    choline = _analyze_choline(snps_df)
+    b12 = _analyze_b12(snps_df)
+    vit_a = _analyze_vitamin_a(snps_df)
+    vit_c = _analyze_vitamin_c(snps_df)
+    vit_e = _analyze_vitamin_e(snps_df)
+    taste = _analyze_taste(snps_df)
+    satiety = _analyze_satiety(snps_df)
+    sat_fat = _analyze_saturated_fat(snps_df)
+    meal_timing = _analyze_meal_timing(snps_df)
+    antiox = _analyze_antioxidants(snps_df)
+    fiber = _analyze_fiber(snps_df, macros, satiety, salt)
+    hydration = _analyze_hydration(snps_df, salt)
+    caloric = _caloric_framework(macros, satiety)
     foods = _build_food_lists(macros, alcohol, lactose, salt, gluten)
+    # Augment food lists with new insights
+    if iron["overload_risk"].startswith("High") or "Moderate" in iron["overload_risk"]:
+        foods["avoid"].extend(["Iron-fortified cereals/breads", "Red meat >1×/week",
+                               "Iron-containing multivitamins"])
+    if omega3["ala_conversion"] == "Poor":
+        foods["emphasise"].append("Oily fish 3–4×/week (salmon, sardines, mackerel) — FADS poor converter")
+    if sat_fat["apoe_genotype"].startswith("ε4"):
+        foods["avoid"].extend(["Butter/coconut oil as primary fats", "Processed red meat"])
+        foods["emphasise"].append("Extra-virgin olive oil (primary fat), Mediterranean pattern")
+    if choline["increased_need"]:
+        foods["emphasise"].append("Whole eggs 1–2/day, liver 1 oz weekly (PEMT choline need)")
+    if antiox["reduced_capacity"]:
+        foods["emphasise"].append("Cruciferous vegetables 3–4×/week (sulforaphane → Nrf2)")
+    if taste["bitter"] == "Super-taster":
+        foods["emphasise"].append("Roasted/glazed cruciferous veg (super-taster mitigation)")
     template = _build_daily_template(macros, caffeine, alcohol)
 
     return {
@@ -434,6 +958,21 @@ def analyze_nutrition(snps_df: Optional[pd.DataFrame]) -> Dict:
         "gluten": gluten,
         "methylation": methyl,
         "vitamin_d_food": vit_d,
+        "omega3": omega3,
+        "iron": iron,
+        "choline": choline,
+        "b12": b12,
+        "vitamin_a": vit_a,
+        "vitamin_c": vit_c,
+        "vitamin_e": vit_e,
+        "taste": taste,
+        "satiety": satiety,
+        "saturated_fat": sat_fat,
+        "meal_timing": meal_timing,
+        "antioxidants": antiox,
+        "fiber": fiber,
+        "hydration": hydration,
+        "caloric": caloric,
         "emphasise": foods["emphasise"],
         "avoid": foods["avoid"],
         "daily_template": template,
@@ -509,9 +1048,86 @@ def render_nutrition_html(result: Dict, file_label: str = "") -> str:
         section("🧂 Salt sensitivity", result["salt"]),
         section("🥛 Lactose", result["lactose"]),
         section("🌾 Gluten / coeliac risk", result["gluten"]),
-        section("🧬 Methylation", result["methylation"]),
+        section("🧬 Methylation (folate)", result["methylation"]),
         section("☀ Vitamin D from food", result["vitamin_d_food"]),
+        section("🐟 Omega-3 (FADS conversion)", result.get("omega3", {})),
+        section("🩸 Iron / hemochromatosis risk", result.get("iron", {})),
+        section("🥚 Choline (PEMT)", result.get("choline", {})),
+        section("💊 Vitamin B12", result.get("b12", {})),
+        section("🥕 Vitamin A (β-carotene conversion)", result.get("vitamin_a", {})),
+        section("🍊 Vitamin C", result.get("vitamin_c", {})),
+        section("🌰 Vitamin E", result.get("vitamin_e", {})),
+        section("🥦 Antioxidant capacity", result.get("antioxidants", {})),
     ]
+
+    # Build extended cards
+    sat = result.get("saturated_fat", {})
+    sat_card = ""
+    if sat:
+        sf_factors = "".join(f'<div class="nu-factors">{_esc(f)}</div>' for f in sat.get("factors", []))
+        sat_card = f"""
+<div class="nu-card">
+  <strong>🥩 Saturated-fat handling (APOE)</strong>
+  <div>Genotype: <strong>{_esc(sat.get('apoe_genotype','—'))}</strong> ·
+       cap: <strong>≤ {sat.get('saturated_fat_cap_g','—')} g/day</strong></div>
+  {sf_factors}
+  <p>{_esc(sat.get('guidance',''))}</p>
+</div>"""
+
+    tas = result.get("taste", {})
+    taste_card = ""
+    if tas:
+        t_factors = "".join(f'<div class="nu-factors">{_esc(f)}</div>' for f in tas.get("factors", []))
+        taste_card = f"""
+<div class="nu-card">
+  <strong>👅 Taste perception</strong>
+  <div>Bitter: <strong>{_esc(tas.get('bitter','—'))}</strong> ·
+       Fat-taste: <strong>{_esc(tas.get('fat_taste','—'))}</strong></div>
+  {t_factors}
+  <p>{_esc(tas.get('bitter_guidance',''))}</p>
+  <p>{_esc(tas.get('fat_guidance',''))}</p>
+</div>"""
+
+    sat_y = result.get("satiety", {})
+    satiety_card = ""
+    if sat_y:
+        f = "".join(f'<div class="nu-factors">{_esc(x)}</div>' for x in sat_y.get("factors", []))
+        satiety_card = f"""
+<div class="nu-card">
+  <strong>🍽 Appetite & satiety (FTO / MC4R / LEPR)</strong>
+  <div>Phenotype: <strong>{_esc(sat_y.get('appetite_phenotype','—'))}</strong>
+       (score {sat_y.get('satiety_score','—')})</div>
+  {f}
+  <p>{_esc(sat_y.get('guidance',''))}</p>
+</div>"""
+
+    mt = result.get("meal_timing", {})
+    timing_card = ""
+    if mt:
+        f = "".join(f'<div class="nu-factors">{_esc(x)}</div>' for x in mt.get("factors", []))
+        timing_card = f"""
+<div class="nu-card">
+  <strong>🕒 Meal timing / chrononutrition</strong>
+  <div>Eating window: <strong>{_esc(mt.get('eating_window','—'))}</strong></div>
+  {f}
+  <p>{_esc(mt.get('guidance',''))}</p>
+</div>"""
+
+    fib = result.get("fiber", {})
+    hyd = result.get("hydration", {})
+    cal = result.get("caloric", {})
+    targets_card = f"""
+<div class="nu-card">
+  <strong>📏 Daily targets</strong>
+  <ul class="nu-list">
+    <li>Fibre target: <strong>{fib.get('target_g','—')} g/day</strong> — {_esc(fib.get('guidance',''))}</li>
+    <li>Hydration: ~{hyd.get('target_ml_per_kg','—')} mL/kg/day — {_esc(hyd.get('guidance',''))}</li>
+    <li>Protein floor: <strong>{cal.get('protein_g_per_kg','—')} g/kg body weight</strong></li>
+    <li>Saturated fat cap: <strong>≤ {sat.get('saturated_fat_cap_g','—')} g/day</strong></li>
+  </ul>
+  <p><em>Calorie framework:</em> {_esc(cal.get('tdee_formula',''))}</p>
+  <p>{_esc(cal.get('guidance',''))}</p>
+</div>"""
 
     template_rows = "".join(
         f"<tr><td>{_esc(d['meal'])}</td><td>{_esc(d['example'])}</td></tr>"
@@ -542,7 +1158,20 @@ def render_nutrition_html(result: Dict, file_label: str = "") -> str:
   </div>
 </div>
 
-<h2>Stimulants, Sensitivities & Special Considerations</h2>
+<h2>Daily Targets & Caloric Framework</h2>
+{targets_card}
+
+<h2>Saturated Fat & Cardiovascular Lipid Response</h2>
+{sat_card}
+
+<h2>Appetite, Satiety & Meal Timing</h2>
+{satiety_card}
+{timing_card}
+
+<h2>Taste Perception & Adherence Strategy</h2>
+{taste_card}
+
+<h2>Stimulants, Sensitivities & Micronutrients</h2>
 {"".join(cells)}
 
 <h2>Example Daily Pattern</h2>
