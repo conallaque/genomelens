@@ -402,6 +402,401 @@ def _build_weekly_template(power_endurance: Dict, recovery: Dict, chronotype: Di
     return days
 
 
+# ── VO2max trainability ─────────────────────────────────────────────────────
+
+def _analyze_vo2max_trainability(snps_df) -> Dict:
+    vegfa = _gt(snps_df, "rs2010963")
+    hif1a = _gt(snps_df, "rs11549465")
+    adrb2 = _gt(snps_df, "rs1042713")
+    nrf2 = _gt(snps_df, "rs7181866")
+    factors: List[str] = []
+    score = 0
+    if vegfa:
+        factors.append(f"rs2010963 (VEGFA) {vegfa}")
+        if "G" in vegfa:
+            score += vegfa.count("G")
+    if hif1a:
+        factors.append(f"rs11549465 (HIF1A) {hif1a}")
+        if "T" in hif1a:
+            score += 1
+    if adrb2:
+        factors.append(f"rs1042713 (ADRB2) {adrb2}")
+        if "A" in adrb2:
+            score += 1
+    if nrf2:
+        factors.append(f"rs7181866 (NRF2) {nrf2}")
+        if "G" in nrf2:
+            score += 1
+    if score >= 3:
+        tier = "High responder"
+        guidance = (
+            "Strong VO2max trainability — expect +15–20% with 8 weeks of polarised "
+            "training. Push interval volume: 4×4 min @ 90–95% HRmax, 1–2×/week."
+        )
+    elif score >= 1:
+        tier = "Average responder"
+        guidance = (
+            "Typical VO2max response (~+10%) with structured aerobic+interval work. "
+            "Combine 2 Zone-2 + 1 VO2max + 1 threshold session/week."
+        )
+    elif factors:
+        tier = "Low responder"
+        guidance = (
+            "Genetic VO2max-response cluster on the low end. Don't be discouraged — "
+            "shift focus to lactate-threshold/economy gains (which improve regardless "
+            "of VO2max) and strength-based aerobic transfer (heavy carries, hill work)."
+        )
+    else:
+        tier = "Unknown"
+        guidance = "Trainability SNPs not typed — assume average response."
+    return {"tier": tier, "score": score, "factors": factors or ["VO2max SNPs not typed"],
+            "guidance": guidance}
+
+
+# ── Strength trainability (MSTN / IGF1 / ACVR1B) ────────────────────────────
+
+def _analyze_strength_trainability(snps_df) -> Dict:
+    mstn = _gt(snps_df, "rs1805086")
+    igf1 = _gt(snps_df, "rs35767")
+    actn3 = _gt(snps_df, "rs1815739")
+    factors: List[str] = []
+    score = 0
+    if mstn:
+        factors.append(f"rs1805086 (MSTN) {mstn}")
+        if "A" in mstn:
+            score += 2
+    if igf1:
+        factors.append(f"rs35767 (IGF1) {igf1}")
+        if "A" in igf1:
+            score += 1
+    if actn3:
+        if "C" in actn3:
+            score += actn3.count("C") * 0.5
+    if score >= 2:
+        tier = "High hypertrophy responder"
+        rec = (
+            "Strong genetic hypertrophy response — push moderate-rep volume (8–12 reps, "
+            "12–20 sets/muscle group/week). Expect visible gains within 8–12 weeks."
+        )
+    elif score >= 1:
+        tier = "Average responder"
+        rec = (
+            "Typical hypertrophy response — 10–15 sets/muscle/week at 6–12 reps, "
+            "progressive overload weekly."
+        )
+    else:
+        tier = "Low hypertrophy / strength-leaning responder"
+        rec = (
+            "Hypertrophy genes lean low — focus on strength (3–6 reps, heavy) where "
+            "neural adaptations drive bigger early gains, plus high-volume blocks "
+            "(8–12 weeks) for body composition. Consistency beats genes."
+        )
+    return {"tier": tier, "score": score, "factors": factors or ["Strength SNPs not typed"],
+            "recommendation": rec}
+
+
+# ── Fat-loss response to exercise (FTO + ADRB2/ADRB3) ───────────────────────
+
+def _analyze_fat_loss_response(snps_df) -> Dict:
+    fto = _gt(snps_df, "rs9939609")
+    adrb2_27 = _gt(snps_df, "rs1042714")
+    adrb3 = _gt(snps_df, "rs4994")
+    factors: List[str] = []
+    fto_risk = False
+    if fto:
+        factors.append(f"rs9939609 (FTO) {fto}")
+        if "A" in fto:
+            fto_risk = True
+    if adrb2_27:
+        factors.append(f"rs1042714 (ADRB2 Q27E) {adrb2_27}")
+    if adrb3:
+        factors.append(f"rs4994 (ADRB3 Trp64Arg) {adrb3}")
+    if fto_risk:
+        guidance = (
+            "FTO obesity-risk allele — GOOD NEWS: large studies show ≥150 min/week of "
+            "moderate aerobic exercise NEUTRALISES the FTO weight-gain effect. Aerobic "
+            "exercise is non-negotiable. Strength training adds compounding benefit by "
+            "raising RMR. Combine with high-protein/high-fibre eating for best fat-loss "
+            "outcomes."
+        )
+    else:
+        guidance = (
+            "No FTO risk allele — standard exercise dose for fat loss applies "
+            "(150–300 min/week moderate aerobic + 2× strength)."
+        )
+    return {"fto_risk_allele": fto_risk, "factors": factors or ["Fat-loss SNPs not typed"],
+            "guidance": guidance}
+
+
+# ── Pain tolerance (COMT, OPRM1) ────────────────────────────────────────────
+
+def _analyze_pain_tolerance(snps_df) -> Dict:
+    comt = _gt(snps_df, "rs4680")
+    oprm1 = _gt(snps_df, "rs1799971")
+    factors: List[str] = []
+    tolerance = "Average"
+    if comt:
+        factors.append(f"rs4680 (COMT Val158Met) {comt}")
+        if "A" in comt and comt.count("A") == 2:
+            tolerance = "Lower (Met/Met — 'worrier')"
+        elif "G" in comt and comt.count("G") == 2:
+            tolerance = "Higher (Val/Val — 'warrior')"
+    if oprm1:
+        factors.append(f"rs1799971 (OPRM1) {oprm1}")
+        if "G" in oprm1:
+            tolerance += " · OPRM1 G — higher pain sensitivity"
+    if "Lower" in tolerance:
+        guidance = (
+            "Lower pain threshold — RPE will feel harder than HR/power data suggests. "
+            "Use objective metrics (HR, pace, bar speed) not 'how hard it feels'. Build "
+            "RPE tolerance gradually with shorter intervals; mental-skill work "
+            "(breathing, self-talk) yields disproportionate gains."
+        )
+    elif "Higher" in tolerance:
+        guidance = (
+            "Higher pain tolerance — risk of overtraining because you can push through "
+            "warning signs. USE objective recovery metrics (HRV, resting HR, sleep) and "
+            "schedule mandatory deload weeks."
+        )
+    else:
+        guidance = "Typical pain perception — RPE scales reliably."
+    return {"tolerance": tolerance, "factors": factors or ["Pain SNPs not typed"],
+            "guidance": guidance}
+
+
+# ── Motivation / adherence (DRD2, COMT, dopamine) ───────────────────────────
+
+def _analyze_motivation(snps_df) -> Dict:
+    drd2 = _gt(snps_df, "rs1800497")  # A1 allele = lower D2 receptor density
+    comt = _gt(snps_df, "rs4680")
+    factors: List[str] = []
+    low_drive = False
+    if drd2:
+        factors.append(f"rs1800497 (DRD2 Taq1A) {drd2}")
+        if "A" in drd2:
+            low_drive = True
+    if comt and "G" in comt and comt.count("G") == 2:
+        factors.append(f"rs4680 (COMT Val/Val) — fast dopamine clearance")
+    if low_drive:
+        guidance = (
+            "Reduced D2 receptor density — exercise-induced 'reward' feels muted and "
+            "habit formation takes longer. Strategies: (1) train at fixed time/cue daily "
+            "(habit stack), (2) use external accountability (training partner, coach, "
+            "public log), (3) chase variety (novel sports/classes hit dopamine harder "
+            "than steady-state cardio), (4) explicit short-term rewards post-session "
+            "(post-workout coffee, podcast). Expect 90+ days to lock in vs 60 for "
+            "average."
+        )
+    else:
+        guidance = (
+            "Typical dopaminergic reward — exercise habit usually forms within 6–8 "
+            "weeks of consistency. Use that 'runner's high' window."
+        )
+    return {"low_dopamine_reward": low_drive, "factors": factors or ["DRD2/COMT not typed"],
+            "guidance": guidance}
+
+
+# ── Caffeine ergogenic response (CYP1A2 for performance) ────────────────────
+
+def _analyze_caffeine_ergogenic(snps_df) -> Dict:
+    cyp1a2 = _gt(snps_df, "rs762551")
+    factors: List[str] = []
+    if not cyp1a2:
+        return {"responder": "Unknown",
+                "factors": ["CYP1A2 not typed"],
+                "guidance": "Trial 3 mg/kg 45 min pre-exercise to test response."}
+    factors.append(f"rs762551 (CYP1A2) {cyp1a2}")
+    if "A" in cyp1a2 and cyp1a2.count("A") == 2:
+        return {
+            "responder": "Strong ergogenic responder",
+            "factors": factors,
+            "guidance": (
+                "Fast metaboliser — caffeine reliably improves endurance/power. "
+                "Pre-event: 3–6 mg/kg body weight 45–60 min before competition. "
+                "Cycle caffeine off 5–7 days before key events to restore sensitivity."
+            ),
+        }
+    if "C" in cyp1a2:
+        return {
+            "responder": "Null / negative responder",
+            "factors": factors,
+            "guidance": (
+                "Slow metaboliser — high-dose pre-workout caffeine likely impairs "
+                "rather than enhances endurance and elevates BP. Stick to ≤1 mg/kg "
+                "if any; consider beta-alanine, beetroot juice, or no stimulant."
+            ),
+        }
+    return {"responder": "Intermediate", "factors": factors,
+            "guidance": "Modest pre-exercise dose (2–3 mg/kg) — test individual response."}
+
+
+# ── Sleep need / recovery quality ───────────────────────────────────────────
+
+def _analyze_sleep(snps_df) -> Dict:
+    ada = _gt(snps_df, "rs73598374")
+    per3_vntr = _gt(snps_df, "rs57875989")
+    factors: List[str] = []
+    deep_sleep = "Average"
+    if ada:
+        factors.append(f"rs73598374 (ADA) {ada}")
+        if "T" in ada:
+            deep_sleep = "Deeper slow-wave sleep (efficient recoverer)"
+    if per3_vntr:
+        factors.append(f"rs57875989 (PER3 VNTR) {per3_vntr}")
+    guidance = (
+        "Standard 7.5–9 h target. Sleep-extension protocol on hard training weeks: "
+        "+30–60 min vs baseline. Track HRV trend; <baseline 3 days = mandatory deload."
+    )
+    if "Deeper" in deep_sleep:
+        guidance += " ADA T allele — slow-wave sleep is unusually efficient; 7 h may feel adequate but still target 8 h for athletic recovery."
+    return {"sleep_phenotype": deep_sleep, "factors": factors or ["Sleep SNPs not typed"],
+            "guidance": guidance}
+
+
+# ── Iron-endurance interaction (HFE) ────────────────────────────────────────
+
+def _analyze_iron_endurance(snps_df) -> Dict:
+    c282y = _gt(snps_df, "rs1800562")
+    h63d = _gt(snps_df, "rs1799945")
+    factors: List[str] = []
+    risk = False
+    if c282y and "A" in c282y:
+        factors.append(f"rs1800562 (HFE C282Y) {c282y}")
+        risk = True
+    if h63d and "G" in h63d:
+        factors.append(f"rs1799945 (HFE H63D) {h63d}")
+        risk = True
+    if risk:
+        guidance = (
+            "Endurance athletes with HFE variants have higher iron stores than peers "
+            "— DO NOT supplement iron without lab confirmation. Annual ferritin + "
+            "transferrin saturation check. Excess iron blunts mitochondrial function "
+            "and increases oxidative damage in athletes."
+        )
+    else:
+        guidance = (
+            "Endurance athletes commonly run low ferritin (foot-strike haemolysis, "
+            "sweat losses). Check ferritin annually if you do >5 h/week endurance. "
+            "Target ferritin >40 ng/mL for performance."
+        )
+    return {"hfe_carrier": risk, "factors": factors or ["HFE not typed"],
+            "guidance": guidance}
+
+
+# ── Stress fracture / bone health ───────────────────────────────────────────
+
+def _analyze_stress_fracture(snps_df) -> Dict:
+    vdr_fok = _gt(snps_df, "rs2228570")
+    col1a1 = _gt(snps_df, "rs1800012")
+    factors: List[str] = []
+    risk = False
+    if vdr_fok:
+        factors.append(f"rs2228570 (VDR FokI) {vdr_fok}")
+        if "T" in vdr_fok:
+            risk = True
+    if col1a1:
+        factors.append(f"rs1800012 (COL1A1) {col1a1}")
+        if "T" in col1a1:
+            risk = True
+    if risk:
+        guidance = (
+            "Elevated stress-fracture risk markers — for runners/jumpers: ramp running "
+            "mileage ≤10%/week, alternate impact days with cycling/swim, prioritise "
+            "vitamin D ≥40 ng/mL, calcium 1000 mg/day, and bone-loading strength work "
+            "(heavy squats, jumps) 2×/week — these strengthen bone more than running."
+        )
+    else:
+        guidance = "No stress-fracture risk variants typed — standard load progression."
+    return {"elevated_risk": risk, "factors": factors or ["Bone SNPs not typed"],
+            "guidance": guidance}
+
+
+# ── HR zones (formula-based since age not provided) ─────────────────────────
+
+def _hr_zones() -> Dict:
+    return {
+        "formula": "HRmax ≈ 208 − 0.7 × age (Tanaka). Zones as % HRmax:",
+        "zones": [
+            {"zone": "Z1 Recovery", "pct": "50–60%", "use": "Active recovery, warm-up/cool-down"},
+            {"zone": "Z2 Aerobic base", "pct": "60–70%", "use": "Mitochondrial / fat oxidation — most weekly volume"},
+            {"zone": "Z3 Tempo", "pct": "70–80%", "use": "Lactate-clearance work, 'comfortably hard'"},
+            {"zone": "Z4 Threshold", "pct": "80–90%", "use": "Lactate threshold intervals (8–20 min)"},
+            {"zone": "Z5 VO2max", "pct": "90–100%", "use": "3–5 min hard intervals — high-leverage capacity work"},
+        ],
+        "polarised": "80/20 rule: 80% of weekly training in Z1–Z2, 20% in Z3–Z5. Avoid the 'grey zone' (Z3 every day) — neither builds base nor builds peak.",
+    }
+
+
+# ── Training nutrition (pre/intra/post) ─────────────────────────────────────
+
+def _training_nutrition(power_endurance: Dict, caffeine_erg: Dict) -> Dict:
+    is_endurance = power_endurance["bias"].startswith("Endurance") or "endurance-leaning" in power_endurance["bias"]
+    return {
+        "pre_workout": (
+            "60–90 min before: 0.5–1 g/kg carbs + 20 g protein (e.g. oats+whey, "
+            "rice cake+jam+yoghurt). " +
+            (caffeine_erg.get("guidance", "") if caffeine_erg.get("responder", "").startswith("Strong") else "")
+        ),
+        "intra_workout": (
+            "Sessions <60 min: water only. 60–90 min: 30 g carbs/h (sports drink or gel). "
+            "90+ min: 60–90 g carbs/h + 500–750 mL fluid + 300–500 mg sodium."
+            if is_endurance else
+            "Strength sessions: water only is fine. >90 min lift: 20 g intra-EAAs or carbs optional."
+        ),
+        "post_workout": (
+            "Within 1–2 h: 0.3 g/kg protein (20–40 g) + carbs (1 g/kg if depleted). "
+            "Examples: Greek yoghurt + berries + granola; chicken + rice + veg. Hydrate "
+            "to 150% of fluid lost (weigh in/out)."
+        ),
+    }
+
+
+# ── Periodisation overview ──────────────────────────────────────────────────
+
+def _periodisation(power_endurance: Dict) -> List[Dict]:
+    if power_endurance["bias"].startswith("Power"):
+        return [
+            {"phase": "Weeks 1–4 — Hypertrophy", "focus": "8–12 reps, 12–16 sets/muscle/wk, RPE 7–8"},
+            {"phase": "Weeks 5–8 — Strength", "focus": "3–6 reps, heavy compounds, RPE 7–9"},
+            {"phase": "Weeks 9–11 — Power/peak", "focus": "1–3 reps + plyometrics + Olympic lifts"},
+            {"phase": "Week 12 — Deload", "focus": "−40% volume, technique focus"},
+        ]
+    if power_endurance["bias"].startswith("Endurance"):
+        return [
+            {"phase": "Weeks 1–6 — Base", "focus": "Zone 2 volume +10%/wk, 1 tempo session"},
+            {"phase": "Weeks 7–9 — Build", "focus": "Threshold intervals 2×/wk + long Z2"},
+            {"phase": "Weeks 10–11 — Peak", "focus": "VO2max work (4×4 min), race-pace efforts"},
+            {"phase": "Week 12 — Taper/deload", "focus": "−50% volume, maintain intensity"},
+        ]
+    return [
+        {"phase": "Weeks 1–4 — General prep", "focus": "Balanced strength + Z2 aerobic base"},
+        {"phase": "Weeks 5–8 — Specific build", "focus": "Strength bias OR endurance bias chosen by goal"},
+        {"phase": "Weeks 9–11 — Intensity", "focus": "HIIT + heavy strength, sport-specific"},
+        {"phase": "Week 12 — Deload", "focus": "Mobility, lighter loads, recover for next block"},
+    ]
+
+
+# ── Warm-up / mobility prescription ─────────────────────────────────────────
+
+def _warmup(injury_risk: Dict, power_endurance: Dict) -> Dict:
+    elevated = any("elev" in r["level"].lower() for r in injury_risk["risks"])
+    base = [
+        "5 min easy cardio (bike/row/jog) — raise core temp",
+        "Dynamic mobility: leg swings, hip openers, T-spine rotations — 3 min",
+        "Activation: glute bridges 2×10, band pull-aparts 2×15, scap pushups 2×10",
+    ]
+    if power_endurance["bias"].startswith("Power"):
+        base.append("Specific ramp: 3 ascending sets to working weight (50/70/90%)")
+    if elevated:
+        base.insert(0, "EXTRA collagen + vit C 60 min pre-session (15 g + 50 mg) — tendon synthesis")
+        base.append("Eccentric prep: Nordics 1×5 (ham) / decline squat 1×10 (patellar) / heel drops (Achilles)")
+    return {
+        "duration_min": 15 if elevated else 10,
+        "protocol": base,
+        "cooldown": "5 min easy cardio + 5 min static stretching (focus on tight areas — hips, calves, T-spine).",
+    }
+
+
 # ── Public API ──────────────────────────────────────────────────────────────
 
 def analyze_exercise(snps_df: Optional[pd.DataFrame]) -> Dict:
@@ -413,7 +808,20 @@ def analyze_exercise(snps_df: Optional[pd.DataFrame]) -> Dict:
     recovery = _analyze_recovery(snps_df)
     chronotype = _analyze_chronotype(snps_df)
     cognitive = _analyze_cognitive_exercise(snps_df)
+    vo2 = _analyze_vo2max_trainability(snps_df)
+    strength = _analyze_strength_trainability(snps_df)
+    fat_loss = _analyze_fat_loss_response(snps_df)
+    pain = _analyze_pain_tolerance(snps_df)
+    motivation = _analyze_motivation(snps_df)
+    caff_erg = _analyze_caffeine_ergogenic(snps_df)
+    sleep = _analyze_sleep(snps_df)
+    iron_end = _analyze_iron_endurance(snps_df)
+    stress_fx = _analyze_stress_fracture(snps_df)
     weekly = _build_weekly_template(pe, recovery, chronotype)
+    hr_zones = _hr_zones()
+    nutrition_timing = _training_nutrition(pe, caff_erg)
+    periodisation = _periodisation(pe)
+    warmup = _warmup(injury, pe)
 
     return {
         "status": "ok",
@@ -422,6 +830,19 @@ def analyze_exercise(snps_df: Optional[pd.DataFrame]) -> Dict:
         "recovery": recovery,
         "chronotype": chronotype,
         "cognitive": cognitive,
+        "vo2max": vo2,
+        "strength_trainability": strength,
+        "fat_loss": fat_loss,
+        "pain_tolerance": pain,
+        "motivation": motivation,
+        "caffeine_ergogenic": caff_erg,
+        "sleep": sleep,
+        "iron_endurance": iron_end,
+        "stress_fracture": stress_fx,
+        "hr_zones": hr_zones,
+        "training_nutrition": nutrition_timing,
+        "periodisation": periodisation,
+        "warmup": warmup,
         "weekly_template": weekly,
     }
 
@@ -545,6 +966,97 @@ def render_exercise_html(result: Dict, file_label: str = "") -> str:
   <div><strong>{_esc(cog.get('genotype') or 'Not tested')}</strong></div>
   <p>{_esc(cog['summary'])}</p>
   <p><em>{_esc(cog['training_note'])}</em></p>
+</div>
+
+<h2>VO2max Trainability</h2>
+<div class="ex-card">
+  <div><strong>{_esc(result.get('vo2max',{}).get('tier','—'))}</strong>
+       (score {result.get('vo2max',{}).get('score','—')})</div>
+  {"".join(f'<div class="ex-factors">{_esc(f)}</div>' for f in result.get('vo2max',{}).get('factors',[]))}
+  <p>{_esc(result.get('vo2max',{}).get('guidance',''))}</p>
+</div>
+
+<h2>Strength / Hypertrophy Trainability</h2>
+<div class="ex-card">
+  <div><strong>{_esc(result.get('strength_trainability',{}).get('tier','—'))}</strong></div>
+  {"".join(f'<div class="ex-factors">{_esc(f)}</div>' for f in result.get('strength_trainability',{}).get('factors',[]))}
+  <p>{_esc(result.get('strength_trainability',{}).get('recommendation',''))}</p>
+</div>
+
+<h2>Fat-Loss Response to Exercise</h2>
+<div class="ex-card">
+  {"".join(f'<div class="ex-factors">{_esc(f)}</div>' for f in result.get('fat_loss',{}).get('factors',[]))}
+  <p>{_esc(result.get('fat_loss',{}).get('guidance',''))}</p>
+</div>
+
+<h2>Pain Tolerance & RPE Calibration</h2>
+<div class="ex-card">
+  <div><strong>{_esc(result.get('pain_tolerance',{}).get('tolerance','—'))}</strong></div>
+  {"".join(f'<div class="ex-factors">{_esc(f)}</div>' for f in result.get('pain_tolerance',{}).get('factors',[]))}
+  <p>{_esc(result.get('pain_tolerance',{}).get('guidance',''))}</p>
+</div>
+
+<h2>Motivation & Habit Formation (Dopamine)</h2>
+<div class="ex-card">
+  {"".join(f'<div class="ex-factors">{_esc(f)}</div>' for f in result.get('motivation',{}).get('factors',[]))}
+  <p>{_esc(result.get('motivation',{}).get('guidance',''))}</p>
+</div>
+
+<h2>Caffeine as Ergogenic Aid</h2>
+<div class="ex-card">
+  <div><strong>{_esc(result.get('caffeine_ergogenic',{}).get('responder','—'))}</strong></div>
+  {"".join(f'<div class="ex-factors">{_esc(f)}</div>' for f in result.get('caffeine_ergogenic',{}).get('factors',[]))}
+  <p>{_esc(result.get('caffeine_ergogenic',{}).get('guidance',''))}</p>
+</div>
+
+<h2>Sleep & Recovery</h2>
+<div class="ex-card">
+  <div><strong>{_esc(result.get('sleep',{}).get('sleep_phenotype','—'))}</strong></div>
+  {"".join(f'<div class="ex-factors">{_esc(f)}</div>' for f in result.get('sleep',{}).get('factors',[]))}
+  <p>{_esc(result.get('sleep',{}).get('guidance',''))}</p>
+</div>
+
+<h2>Iron & Endurance Athletes</h2>
+<div class="ex-card">
+  {"".join(f'<div class="ex-factors">{_esc(f)}</div>' for f in result.get('iron_endurance',{}).get('factors',[]))}
+  <p>{_esc(result.get('iron_endurance',{}).get('guidance',''))}</p>
+</div>
+
+<h2>Stress-Fracture / Bone Health</h2>
+<div class="ex-card">
+  {"".join(f'<div class="ex-factors">{_esc(f)}</div>' for f in result.get('stress_fracture',{}).get('factors',[]))}
+  <p>{_esc(result.get('stress_fracture',{}).get('guidance',''))}</p>
+</div>
+
+<h2>Heart-Rate Zones</h2>
+<div class="ex-card">
+  <p><em>{_esc(result.get('hr_zones',{}).get('formula',''))}</em></p>
+  <table class="ex">
+    <tr><th>Zone</th><th>% HRmax</th><th>Use</th></tr>
+    {"".join(f'<tr><td>{_esc(z["zone"])}</td><td>{_esc(z["pct"])}</td><td>{_esc(z["use"])}</td></tr>' for z in result.get('hr_zones',{}).get('zones',[]))}
+  </table>
+  <p>{_esc(result.get('hr_zones',{}).get('polarised',''))}</p>
+</div>
+
+<h2>Warm-Up Prescription ({result.get('warmup',{}).get('duration_min','—')} min)</h2>
+<div class="ex-card">
+  <ul>{"".join(f"<li>{_esc(x)}</li>" for x in result.get('warmup',{}).get('protocol',[]))}</ul>
+  <p><strong>Cool-down:</strong> {_esc(result.get('warmup',{}).get('cooldown',''))}</p>
+</div>
+
+<h2>Training Nutrition (Pre / Intra / Post)</h2>
+<div class="ex-card">
+  <p><strong>Pre-workout:</strong> {_esc(result.get('training_nutrition',{}).get('pre_workout',''))}</p>
+  <p><strong>Intra-workout:</strong> {_esc(result.get('training_nutrition',{}).get('intra_workout',''))}</p>
+  <p><strong>Post-workout:</strong> {_esc(result.get('training_nutrition',{}).get('post_workout',''))}</p>
+</div>
+
+<h2>12-Week Periodisation</h2>
+<div class="ex-card">
+  <table class="ex">
+    <tr><th>Phase</th><th>Focus</th></tr>
+    {"".join(f'<tr><td>{_esc(p["phase"])}</td><td>{_esc(p["focus"])}</td></tr>' for p in result.get('periodisation',[]))}
+  </table>
 </div>
 
 <h2>Example 7-Day Template</h2>
