@@ -26,6 +26,10 @@ try:
     from exercise_advanced import analyze_advanced_exercise
 except ImportError:
     analyze_advanced_exercise = None
+try:
+    from exercise_protocols import analyze_exercise_protocols
+except ImportError:
+    analyze_exercise_protocols = None
 
 
 def _gt(snps_df: Optional[pd.DataFrame], rsid: str) -> Optional[str]:
@@ -858,6 +862,13 @@ def analyze_exercise(snps_df: Optional[pd.DataFrame]) -> Dict:
         except Exception as exc:  # noqa: BLE001
             result["advanced_error"] = str(exc)
 
+    if analyze_exercise_protocols is not None:
+        try:
+            protocols = analyze_exercise_protocols(result)
+            result["protocols"] = protocols
+        except Exception as exc:  # noqa: BLE001
+            result["protocols_error"] = str(exc)
+
     return result
 
 
@@ -1128,9 +1139,220 @@ def _render_advanced_exercise(result: Dict) -> str:
 </div>
 """
 
-    return (profile_html + injury_html + readiness_html + workouts_html
+    blob = (profile_html + injury_html + readiness_html + workouts_html
             + concur_html + aero_html + taper_html + deload_html
             + mental_html + thermal_html + mobility_html + plyo_html)
+    blob += _render_exercise_protocols(result)
+    return blob
+
+
+def _render_exercise_protocols(result: Dict) -> str:
+    p = result.get("protocols")
+    if not p:
+        return ""
+    out = ""
+
+    # Fitness tests
+    ft = p.get("fitness_tests")
+    if ft:
+        cards = ""
+        for name, test in ft.items():
+            cards += f"<div class='ex-card'><strong>{_esc(name.replace('_',' ').title())}</strong>"
+            for k, v in test.items():
+                if isinstance(v, dict):
+                    sub = "".join(f"<li>{_esc(kk)}: {_esc(vv)}</li>" for kk, vv in v.items())
+                    cards += f"<p><em>{_esc(k.replace('_',' '))}:</em><ul>{sub}</ul></p>"
+                else:
+                    cards += f"<p><em>{_esc(k.replace('_',' '))}:</em> {_esc(v)}</p>"
+            cards += "</div>"
+        out += f"<h2>Fitness-Test Calculators</h2>{cards}"
+
+    # HR zones for age 35 demo
+    hz = p.get("hr_zone_demo_age_35")
+    if hz:
+        rows = "".join(
+            f"<tr><td>{_esc(z['zone'])}</td><td>{_esc(z['pct_hrmax'])}</td>"
+            f"<td>{_esc(z['bpm_range_karvonen'])} bpm</td></tr>" for z in hz["zones"]
+        )
+        out += f"""
+<h2>HR Zones (example: age {hz['age']}, RHR {hz['resting_hr']})</h2>
+<div class="ex-card">
+<p>HRmax (Tanaka): <strong>{hz['HRmax_tanaka']} bpm</strong> · HR reserve: {hz['HR_reserve']}</p>
+<table class="ex"><tr><th>Zone</th><th>% HRmax</th><th>BPM (Karvonen)</th></tr>{rows}</table>
+<p><em>{_esc(hz['note'])}</em></p>
+</div>
+"""
+
+    # Running paces
+    rp = p.get("running_pace_demo_threshold_5min_km")
+    if rp:
+        rows = "".join(
+            f"<tr><td>{_esc(z['zone'])}</td><td>{_esc(z['pace_min_km'])} min/km</td></tr>"
+            for z in rp["zones"]
+        )
+        out += f"""
+<h2>Running Pace Zones (example: 5:00 min/km threshold)</h2>
+<div class="ex-card">
+<table class="ex"><tr><th>Zone</th><th>Pace</th></tr>{rows}</table>
+</div>
+"""
+
+    # FTP
+    ftp = p.get("cycling_ftp_demo")
+    if ftp:
+        rows = "".join(
+            f"<tr><td>{_esc(z['zone'])}</td><td>{_esc(z['watts'])}</td></tr>"
+            for z in ftp["zones"]
+        )
+        tests = "".join(f"<li>{_esc(t)}</li>" for t in ftp["ftp_test_protocols"])
+        out += f"""
+<h2>Cycling FTP Zones (example: FTP {ftp['ftp_watts']} W)</h2>
+<div class="ex-card">
+<table class="ex"><tr><th>Zone</th><th>Watts</th></tr>{rows}</table>
+<strong>FTP test protocols</strong><ul>{tests}</ul>
+</div>
+"""
+
+    # Race time predictor
+    rt = p.get("race_time_demo")
+    if rt:
+        out += f"""
+<h2>Race-Time Predictor (Riegel)</h2>
+<div class="ex-card">
+<p>Known: {_esc(rt['known'])}</p>
+<p><strong>Predicted:</strong> {_esc(rt['predicted_target'])}</p>
+<p><em>{_esc(rt['caveat'])}</em></p>
+</div>
+"""
+
+    # Sport-specific 12-wk plans
+    plans = p.get("sport_specific_plans")
+    if plans:
+        cards = ""
+        for pl in plans:
+            weeks = "".join(
+                f"<li><strong>{_esc(w.get('phase',''))}:</strong> "
+                f"{_esc(w.get('schedule', w.get('weekly_template', w.get('focus',''))))}</li>"
+                for w in pl["weeks"]
+            )
+            extra = ""
+            if "meet_day" in pl:
+                extra = f"<p><strong>Meet day:</strong> {_esc(pl['meet_day'])}</p>"
+            if "race_day_fueling" in pl:
+                extra = f"<p><strong>Race-day fueling:</strong> {_esc(pl['race_day_fueling'])}</p>"
+            cards += (f"<div class='ex-card'><strong>{_esc(pl['sport'])} — 12-week plan</strong>"
+                      f"<ul>{weeks}</ul>{extra}</div>")
+        out += f"<h2>Sport-Specific 12-Week Plans (top matches)</h2>{cards}"
+
+    # Lifting cues
+    lc = p.get("lifting_cues")
+    if lc:
+        cards = ""
+        for l in lc:
+            cues = "".join(f"<li>{_esc(c)}</li>" for c in l["cues"])
+            faults = "".join(f"<li>{_esc(c)}</li>" for c in l["common_faults"])
+            cards += (f"<div class='ex-card'><strong>{_esc(l['lift'])}</strong>"
+                      f"<p><em>Setup:</em> {_esc(l['setup'])}</p>"
+                      f"<strong>Cues</strong><ul>{cues}</ul>"
+                      f"<strong>Common faults</strong><ul>{faults}</ul></div>")
+        out += f"<h2>Lifting Cue Library</h2>{cards}"
+
+    # Recovery modality matrix
+    rm = p.get("recovery_matrix")
+    if rm:
+        rows = "".join(
+            f"<tr><td>{_esc(m['modality'])}</td><td>{_esc(m['effect_size'])}</td>"
+            f"<td>{_esc(m['evidence'])}</td><td>{_esc(m['protocol'])}</td></tr>"
+            for m in rm
+        )
+        out += f"""
+<h2>Recovery Modality Matrix</h2>
+<div class="ex-card">
+<table class="ex"><tr><th>Modality</th><th>Effect</th><th>Evidence</th><th>Protocol</th></tr>{rows}</table>
+</div>
+"""
+
+    # Master athlete
+    ma = p.get("master_athlete")
+    if ma:
+        cards = ""
+        for d in ma:
+            adj = "".join(f"<li>{_esc(x)}</li>" for x in d["adjustments"])
+            cards += (f"<div class='ex-card'><strong>{_esc(d['decade'])}</strong>"
+                      f"<p><em>{_esc(d['key_changes'])}</em></p><ul>{adj}</ul></div>")
+        out += f"<h2>Master Athlete Adjustments by Decade</h2>{cards}"
+
+    # Supplement stacks
+    ss = p.get("supplement_stacks")
+    if ss:
+        pre = "".join(f"<li>{_esc(x)}</li>" for x in ss["pre_workout"])
+        intra = "".join(f"<li>{_esc(x)}</li>" for x in ss["intra_workout"])
+        post = "".join(f"<li>{_esc(x)}</li>" for x in ss["post_workout"])
+        ev = ss["evidence_tiers"]
+        a = "".join(f"<li>{_esc(x)}</li>" for x in ev["A_proven"])
+        b = "".join(f"<li>{_esc(x)}</li>" for x in ev["B_some_evidence"])
+        c = "".join(f"<li>{_esc(x)}</li>" for x in ev["C_avoid_or_unproven"])
+        out += f"""
+<h2>Workout Supplement Stacks</h2>
+<div class="ex-card">
+  <strong>Pre-workout</strong><ul>{pre}</ul>
+  <strong>Intra-workout</strong><ul>{intra}</ul>
+  <strong>Post-workout</strong><ul>{post}</ul>
+  <strong>Tier A — proven</strong><ul>{a}</ul>
+  <strong>Tier B — some evidence</strong><ul>{b}</ul>
+  <strong>Tier C — avoid / unproven</strong><ul>{c}</ul>
+  <p><em>{_esc(ss['personalised_priority'])}</em></p>
+</div>
+"""
+
+    # Movement screen
+    ms = p.get("movement_screen")
+    if ms:
+        rows = "".join(
+            f"<tr><td>{_esc(t['test'])}</td><td>{_esc(t['checks'])}</td>"
+            f"<td>{_esc(t['common_fail'])}</td><td>{_esc(t['remedy'])}</td></tr>"
+            for t in ms
+        )
+        out += f"""
+<h2>Movement Screen (self-test)</h2>
+<div class="ex-card">
+<table class="ex"><tr><th>Test</th><th>Pass criteria</th><th>Common fail</th><th>Remedy</th></tr>{rows}</table>
+</div>
+"""
+
+    # Detraining timeline
+    dt = p.get("detraining_timeline")
+    if dt:
+        rows = "".join(
+            f"<tr><td>{_esc(d['period'])}</td><td>{_esc(d['what_happens'])}</td></tr>"
+            for d in dt
+        )
+        out += f"""
+<h2>Detraining / Retraining Timeline</h2>
+<div class="ex-card">
+<table class="ex"><tr><th>Period</th><th>Physiology</th></tr>{rows}</table>
+</div>
+"""
+
+    # HRV-guided week
+    hg = p.get("hrv_guided_week")
+    if hg:
+        rules = "".join(
+            f"<tr><td>{_esc(r['signal'])}</td><td>{_esc(r['action'])}</td></tr>"
+            for r in hg["decision_rules"]
+        )
+        ctx = "".join(f"<li>{_esc(x)}</li>" for x in hg["context_modifiers"])
+        out += f"""
+<h2>HRV-Guided Week Structure</h2>
+<div class="ex-card">
+<p>{_esc(hg['tracking'])}</p>
+<table class="ex"><tr><th>Signal</th><th>Action</th></tr>{rules}</table>
+<strong>Context modifiers</strong><ul>{ctx}</ul>
+<p><em>{_esc(hg['implementation'])}</em></p>
+</div>
+"""
+
+    return out
 
 
 def render_exercise_html(result: Dict, file_label: str = "") -> str:
