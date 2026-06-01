@@ -209,6 +209,36 @@ def _dosage(genotype: object, effect_allele: str) -> Optional[int]:
     return gt.count(effect_allele)
 
 
+# Coverage thresholds for genome-wide PGS (often 10^2-10^6 variants). These are
+# larger panels than the curated PRS, so a smaller *fraction* can still be
+# usable, but very low coverage badly biases the percentile.
+PGS_HIGH_COVERAGE_PCT = 80
+PGS_MODERATE_COVERAGE_PCT = 40
+PGS_MIN_COVERAGE_PCT = 10   # below this the percentile is not interpretable
+
+
+def _pgs_confidence(n_used: int, total: int, n_low_r2: int) -> tuple:
+    """Map PGS coverage (and imputation quality) to an explicit confidence."""
+    pct = 100.0 * n_used / max(total, 1)
+    base = f"{n_used:,} of {total:,} scoring-file variants used ({pct:.0f}%)"
+    low_r2_note = ""
+    if n_used and n_low_r2 / n_used > 0.25:
+        low_r2_note = (
+            f" {n_low_r2:,} used variants are low-confidence imputed (r²<0.5), "
+            "adding noise."
+        )
+    if pct < PGS_MIN_COVERAGE_PCT:
+        return "low", (
+            f"{base} — far too few for a reliable percentile; shown for "
+            "transparency only." + low_r2_note
+        )
+    if pct < PGS_MODERATE_COVERAGE_PCT:
+        return "low", f"{base}. Low coverage materially biases the percentile." + low_r2_note
+    if pct < PGS_HIGH_COVERAGE_PCT:
+        return "moderate", f"{base}. Partial coverage adds uncertainty." + low_r2_note
+    return "high", f"{base}." + low_r2_note
+
+
 # ── PGS calculation ───────────────────────────────────────────────────────────
 def calculate_pgs(snps_df: pd.DataFrame, variants: List[Dict],
                   default_af: float = 0.30) -> Dict:
@@ -266,12 +296,15 @@ def calculate_pgs(snps_df: pd.DataFrame, variants: List[Dict],
         return {
             "status": "insufficient_data",
             "reason": f"None of the {total} scoring-file variants found on chip or in imputed data.",
+            "confidence": "none",
             "coverage": {
                 "total": total, "chip": 0, "imputed": 0,
                 "missing": n_missing, "low_r2": n_low_r2,
                 "pct_callable": 0.0,
             },
         }
+
+    confidence, confidence_note = _pgs_confidence(n_used, total, n_low_r2)
 
     z = (raw_score - expected_mean) / sqrt(expected_var)
     pct = _norm_cdf(z) * 100.0
@@ -294,6 +327,8 @@ def calculate_pgs(snps_df: pd.DataFrame, variants: List[Dict],
         "percentile": round(pct, 1),
         "tier": tier,
         "tier_class": cls,
+        "confidence": confidence,
+        "confidence_note": confidence_note,
         "coverage": {
             "total": total,
             "chip": n_chip,
@@ -327,14 +362,14 @@ def analyze_expanded_pgs(snps_df: pd.DataFrame, sex: Optional[str] = None) -> Di
         if applies_to == "female" and sex == "male":
             panels[slug] = {
                 **info,
-                "result": {"status": "not_applicable",
+                "result": {"status": "not_applicable", "confidence": "n/a",
                            "reason": "Female-specific score; not applicable."},
             }
             continue
         if applies_to == "male" and sex == "female":
             panels[slug] = {
                 **info,
-                "result": {"status": "not_applicable",
+                "result": {"status": "not_applicable", "confidence": "n/a",
                            "reason": "Male-specific score; not applicable."},
             }
             continue

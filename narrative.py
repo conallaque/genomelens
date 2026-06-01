@@ -192,10 +192,19 @@ def _build_context(
         out.append(f"\nROH burden: F_ROH = {roh_result['f_roh']:.4f} "
                    f"({roh_result.get('context_tier','')})")
 
-    # Ancestry
-    if ancestry_result and ancestry_result.get("proportions"):
-        top = sorted(ancestry_result["proportions"].items(), key=lambda x: -x[1])[:3]
-        out.append(f"\nEstimated ancestry: {', '.join(f'{p} {q*100:.0f}%' for p,q in top)}")
+    # Ancestry — these are relative single-population affinities, NOT admixture
+    # proportions, and the heuristic is low/moderate confidence. Frame it so the
+    # AI does not narrate it as "X% of your DNA".
+    if ancestry_result and ancestry_result.get("primary_population"):
+        conf = ancestry_result.get("confidence", "low")
+        amb = " (ambiguous — cannot be reliably distinguished from the runner-up)" \
+            if ancestry_result.get("ambiguous") else ""
+        out.append(
+            f"\nAncestry best single-population match: "
+            f"{ancestry_result['primary_population']} "
+            f"({conf} confidence{amb}). Note: rough affinity from a small marker "
+            "panel, not admixture percentages."
+        )
 
     # Counseling triggers
     if counseling_result and counseling_result.get("triggers"):

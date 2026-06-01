@@ -471,6 +471,37 @@ GENES: Dict[str, Dict] = {
 
 
 # ─── Core analysis ────────────────────────────────────────────────────────────
+def _pgx_confidence(callable_variants: int, total_variants: int) -> tuple:
+    """Map defining-variant coverage to an explicit confidence level.
+
+    PGx phenotyping from a SNP array is inherently approximate (it cannot see
+    gene duplications/deletions or rare alleles), so coverage maps to at most
+    "high" only when every defining variant for the gene was typed.
+    Returns (confidence, note).
+    """
+    if callable_variants == 0:
+        return "none", (
+            f"0 of {total_variants} defining variant(s) typed — phenotype cannot "
+            "be determined and is reported as indeterminate."
+        )
+    pct = 100 * callable_variants / max(total_variants, 1)
+    base = f"{callable_variants} of {total_variants} defining variant(s) typed"
+    if pct < 50:
+        return "low", (
+            f"{base} (<50%). Untyped variants may carry star alleles that would "
+            "change this call; treat as provisional."
+        )
+    if pct < 100:
+        return "moderate", (
+            f"{base}. Some defining variants were not typed; rare alleles on "
+            "untyped sites cannot be excluded."
+        )
+    return "high", (
+        f"{base} (full panel). Note: SNP arrays still cannot resolve gene "
+        "duplications/deletions or rare alleles."
+    )
+
+
 def _classify(activity: float, bins: List) -> tuple:
     for max_act, label, code, cls in bins:
         if activity <= max_act:
@@ -508,16 +539,43 @@ def _analyze_gene(gene_name: str, gene_def: Dict, snps_df: pd.DataFrame) -> Dict
         })
 
     activity = max(activity, 0.0)
+    callability_pct = round(100 * callable_variants / max(total_variants, 1), 1)
+    confidence, conf_note = _pgx_confidence(callable_variants, total_variants)
 
-    # Binary tests (HLA-B*57:01) use a different classification
+    # Binary tests (HLA-B*57:01) use a different classification.
     if gene_def.get("binary_test"):
+        # A negative call requires the proxy SNP to actually be typed — absence
+        # of data is NOT a negative result and must never be reported as one.
+        if callable_variants == 0:
+            return {
+                "gene": gene_name,
+                "long_name": gene_def["long_name"],
+                "callable_variants": 0,
+                "total_variants": total_variants,
+                "callability_pct": 0.0,
+                "confidence": "none",
+                "confidence_note": conf_note,
+                "indeterminate": True,
+                "binary_result": "Indeterminate (proxy SNP not typed)",
+                "phenotype": "Indeterminate — tag SNP not on this chip",
+                "phenotype_code": "IND",
+                "phenotype_class": "pheno-indeterminate",
+                "activity_score": None,
+                "variant_calls": variant_calls,
+                "drug_recs": gene_def["drug_recs"],
+                "cpic_guideline": gene_def["cpic_guideline"],
+                "is_binary": True,
+            }
         positive = any(c.get("dosage", 0) and c["dosage"] > 0 for c in variant_calls)
         return {
             "gene": gene_name,
             "long_name": gene_def["long_name"],
             "callable_variants": callable_variants,
             "total_variants": total_variants,
-            "callability_pct": round(100 * callable_variants / max(total_variants, 1), 1),
+            "callability_pct": callability_pct,
+            "confidence": confidence,
+            "confidence_note": conf_note,
+            "indeterminate": False,
             "binary_result": "POSITIVE (proxy)" if positive else "Negative (proxy)",
             "phenotype": "POSITIVE for HLA-B*57:01 tag" if positive else "Negative for HLA-B*57:01 tag",
             "phenotype_code": "POS" if positive else "NEG",
@@ -529,13 +587,41 @@ def _analyze_gene(gene_name: str, gene_def: Dict, snps_df: pd.DataFrame) -> Dict
             "is_binary": True,
         }
 
+    # Activity-score genes: with NO defining variant typed the activity is just
+    # the untouched baseline, which would masquerade as a confident "Normal
+    # Metabolizer". Report it honestly as indeterminate instead.
+    if callable_variants == 0:
+        return {
+            "gene": gene_name,
+            "long_name": gene_def["long_name"],
+            "callable_variants": 0,
+            "total_variants": total_variants,
+            "callability_pct": 0.0,
+            "confidence": "none",
+            "confidence_note": conf_note,
+            "indeterminate": True,
+            "activity_score": None,
+            "baseline_activity": gene_def.get("baseline_activity", 2.0),
+            "phenotype": "Indeterminate — no defining variants typed",
+            "phenotype_code": "IND",
+            "phenotype_class": "pheno-indeterminate",
+            "variant_calls": variant_calls,
+            "drug_recs": gene_def["drug_recs"],
+            "cpic_guideline": gene_def["cpic_guideline"],
+            "um_caveat": gene_def.get("um_caveat", ""),
+            "is_binary": False,
+        }
+
     label, code, cls = _classify(activity, gene_def["phenotype_bins"])
     return {
         "gene": gene_name,
         "long_name": gene_def["long_name"],
         "callable_variants": callable_variants,
         "total_variants": total_variants,
-        "callability_pct": round(100 * callable_variants / max(total_variants, 1), 1),
+        "callability_pct": callability_pct,
+        "confidence": confidence,
+        "confidence_note": conf_note,
+        "indeterminate": False,
         "activity_score": round(activity, 2),
         "baseline_activity": gene_def.get("baseline_activity", 2.0),
         "phenotype": label,

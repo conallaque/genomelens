@@ -384,6 +384,13 @@ def build_ydna_html(y_result: Dict) -> str:
         header_badge = '<span class="ydna-badge ydna-badge-amber">Partial (chip gaps)</span>'
 
     y_count_note = f" &nbsp;·&nbsp; {y_count:,} Y-chromosome SNPs in file" if y_count else ""
+    conf_badge = _confidence_badge(y_result.get("confidence"), y_result.get("confidence_note"))
+    coverage_note = ""
+    if y_result.get("n_markers_on_path"):
+        coverage_note = (
+            f' &nbsp;&middot;&nbsp; {y_result.get("n_markers_confirmed", 0)}/'
+            f'{y_result.get("n_markers_on_path")} path markers confirmed'
+        )
 
     return f"""
 <section class="ydna-section" id="y-haplogroup">
@@ -393,11 +400,12 @@ def build_ydna_html(y_result: Dict) -> str:
   <div class="ydna-path-label">Haplogroup path</div>
   <div class="ydna-crumbs">{crumbs if crumbs else "<em>Could not determine path</em>"}</div>
   <div class="ydna-path-note">
-    Terminal haplogroup: <strong>{terminal}</strong>{y_count_note}
+    Terminal haplogroup: <strong>{terminal}</strong>{y_count_note}{coverage_note}
     &nbsp;&middot;&nbsp;
     <span class="crumb-ok" style="padding:2px 6px">&#9679; confirmed SNP</span>
     <span class="crumb-gap" style="padding:2px 6px">&#9675; inferred (not on chip)</span>
   </div>
+  {conf_badge}
 </div>
 
 {marker_table}
@@ -406,6 +414,13 @@ def build_ydna_html(y_result: Dict) -> str:
 {migration_html}
 {ancient_html}
 {further_html}
+<div class="ydna-disclaimer">
+<strong>Informational use only.</strong> Y-haplogroup assignment from a
+genotyping array is limited by which markers the chip carries; terminal
+(most-specific) subclades are frequently inferred across untyped positions
+rather than directly confirmed. This is a genealogical/ancestral indicator,
+not a medical or identity test.
+</div>
 </section>
 """
 
@@ -497,10 +512,13 @@ def build_mtdna_html(mt_result: Dict) -> str:
 <div class="mtdna-result">
   <div class="mtdna-call">{haplogroup}</div>
   <div class="mtdna-evidence">
-    Based on {len(matched)} mtDNA marker(s) on this chip{mt_count_note}.
+    Based on {mt_result.get('n_markers_derived', 0)} derived /
+    {mt_result.get('n_markers_matched', len(matched))} matched markers
+    (of {mt_result.get('n_markers_expected', '—')} on this panel){mt_count_note}.
     Note: mtDNA haplogroup calls from autosomal-chip data are approximate — full
     mitochondrial sequencing remains the gold standard.
   </div>
+  {_confidence_badge(confidence, mt_result.get('confidence_note',''))}
 </div>
 
 {matched_table}
@@ -521,6 +539,31 @@ def _esc(s: str) -> str:
             .replace("&", "&amp;")
             .replace("<", "&lt;")
             .replace(">", "&gt;"))
+
+
+_CONF_LABELS = {
+    "high": "High confidence",
+    "moderate": "Moderate confidence",
+    "low": "Low confidence",
+    "none": "Indeterminate",
+    "n/a": "Not applicable",
+}
+
+
+def _confidence_badge(confidence: Optional[str], note: str = "") -> str:
+    """Render a consistent confidence pill (+ optional explanatory note) used
+    across every score section. Returns '' when no confidence is supplied."""
+    if not confidence:
+        return ""
+    key = str(confidence).lower()
+    label = _CONF_LABELS.get(key, f"{confidence} confidence")
+    note_html = f'<span class="conf-note">{_esc(note)}</span>' if note else ""
+    return (
+        f'<div class="conf-row">'
+        f'<span class="conf-badge conf-{_esc(key).replace("/", "")}">{_esc(label)}</span>'
+        f'{note_html}'
+        f'</div>'
+    )
 
 
 def build_qc_html(qc: Optional[Dict]) -> str:
@@ -607,6 +650,7 @@ def build_prs_html(prs: Optional[Dict]) -> str:
             panel_cards += (
                 f'<div class="prs-card prs-card-na">'
                 f'<div class="prs-name">{_esc(name)}</div>'
+                f'{_confidence_badge(result.get("confidence", "none"))}'
                 f'<div class="prs-na">{_esc(result["reason"])}</div>'
                 f'</div>'
             )
@@ -616,12 +660,22 @@ def build_prs_html(prs: Optional[Dict]) -> str:
         pct = result["percentile"]
         z = result["z_score"]
         callability = result["callability"]
+        confidence = result.get("confidence")
+        conf_badge = _confidence_badge(confidence, result.get("confidence_note"))
+        low_warn = ""
+        if confidence == "low":
+            low_warn = (
+                '<div class="prs-lowconf">⚠️ Low coverage — this percentile is '
+                'unreliable and is shown for transparency only.</div>'
+            )
+        n_used = result.get("n_used", len(result["used"]))
+        n_exp = result.get("n_expected", len(result["used"]) + len(result["missing"]))
         details = (
             f'<div class="prs-details">'
             f'<div><span class="prs-lab">Z-score:</span> <strong>{z:+.2f}</strong></div>'
             f'<div><span class="prs-lab">Percentile:</span> <strong>{pct:.0f}th</strong></div>'
-            f'<div><span class="prs-lab">Callable variants:</span> '
-            f'{len(result["used"])}/{len(result["used"])+len(result["missing"])} '
+            f'<div><span class="prs-lab">Variants typed:</span> '
+            f'{n_used}/{n_exp} '
             f'({callability}%)</div>'
             f'</div>'
         )
@@ -640,6 +694,8 @@ def build_prs_html(prs: Optional[Dict]) -> str:
   </div>
   <div class="prs-desc">{_esc(panel["description"])}</div>
   {track}
+  {conf_badge}
+  {low_warn}
   {details}
   <div class="prs-context">
     <strong>Population lifetime risk:</strong> {_esc(panel["population_lifetime_risk"])}<br>
@@ -773,7 +829,13 @@ def build_pgx_html(pgx: Optional[Dict]) -> str:
                     f'<td colspan="3" class="pgx-na">not on chip</td>'
                     f'</tr>'
                 )
-        if result.get("is_binary"):
+        if result.get("indeterminate"):
+            # No defining variants typed — do NOT imply a phenotype/activity.
+            score_row = (
+                f'<div class="pgx-pheno {result["phenotype_class"]}">'
+                f'{_esc(result["phenotype"])}</div>'
+            )
+        elif result.get("is_binary"):
             score_row = (
                 f'<div class="pgx-score">'
                 f'<span class="pgx-pheno {result["phenotype_class"]}">'
@@ -792,6 +854,7 @@ def build_pgx_html(pgx: Optional[Dict]) -> str:
                 f'<div class="pgx-pheno {result["phenotype_class"]}">'
                 f'{_esc(result["phenotype"])}</div>'
             )
+        conf_badge = _confidence_badge(result.get("confidence"), result.get("confidence_note"))
         drug_rows = ""
         for drug in result["drug_recs"]:
             recs_inline = ""
@@ -824,8 +887,9 @@ def build_pgx_html(pgx: Optional[Dict]) -> str:
     <div class="pgx-gene-long">{_esc(result["long_name"])}</div>
   </div>
   {score_row}
+  {conf_badge}
   <div class="pgx-callability">
-    Callability: {result['callable_variants']}/{result['total_variants']}
+    Defining variants typed: {result['callable_variants']}/{result['total_variants']}
     ({result['callability_pct']}%)
   </div>
   <details class="pgx-details">
@@ -1205,6 +1269,15 @@ def build_expanded_pgs_html(epgs: Optional[Dict]) -> str:
             tier_cls = result["tier_class"]
             pct = result["percentile"]
             cov = result.get("coverage", {})
+            confidence = result.get("confidence")
+            conf_badge = _confidence_badge(confidence, result.get("confidence_note"))
+            low_warn = ""
+            if confidence == "low":
+                low_warn = (
+                    f'<div class="prs-lowconf">⚠️ Only '
+                    f'{cov.get("pct_callable",0)}% of the scoring file is covered — '
+                    'this percentile is unreliable and shown for transparency only.</div>'
+                )
             cards += f"""
 <div class="prs-card">
   <div class="prs-card-head">
@@ -1215,6 +1288,8 @@ def build_expanded_pgs_html(epgs: Optional[Dict]) -> str:
   <div class="prs-track">
     <div class="prs-track-pointer" style="left:{pct}%"></div>
   </div>
+  {conf_badge}
+  {low_warn}
   <div class="prs-details">
     <div><span class="prs-lab">Percentile:</span> <strong>{pct:.0f}th</strong></div>
     <div><span class="prs-lab">Z-score:</span> <strong>{result.get('z_score', 0):+.2f}</strong></div>
@@ -1233,6 +1308,7 @@ def build_expanded_pgs_html(epgs: Optional[Dict]) -> str:
             cards += (
                 f'<div class="prs-card prs-card-na">'
                 f'<div class="prs-name">{_esc(panel.get("label", slug))}</div>'
+                f'{_confidence_badge(result.get("confidence", "none"))}'
                 f'<div class="prs-na">{_esc(reason)}</div></div>'
             )
     return f"""
@@ -1244,6 +1320,15 @@ typically hundreds of thousands to millions of weighted SNPs per condition.
 These are the same scores used in clinical-grade polygenic risk assessment.
 Coverage depends on chip density and imputation: <em>chip + imputed / total</em>.
 </p>
+<div class="prs-caveat">
+<strong>Informational use only — not diagnostic.</strong> A genotyping array
+typically covers only a small fraction of a PGS Catalog scoring file, so any
+percentile shown here is an approximation whose reliability is bounded by the
+<em>coverage</em> stat on each card. Scores flagged <em>low confidence</em>
+were computed on too few variants to interpret. Polygenic risk is one input
+alongside family history, lifestyle, and clinical risk factors; confirm
+anything actionable with a clinician.
+</div>
 <div class="prs-grid">{cards}</div>
 </section>
 """
@@ -1276,24 +1361,49 @@ def build_ancestry_html(anc: Optional[Dict]) -> str:
             f'src="data:image/png;base64,{anc["plot_png_b64"]}" />'
             f'</div>'
         )
+    primary = anc.get("primary_population")
+    primary_long = {"EUR": "European", "AFR": "African", "EAS": "East Asian",
+                    "SAS": "South Asian", "AMR": "Admixed American"}.get(primary, primary)
+    n_indep = anc.get("n_aims_independent", anc.get("n_aims_used", 0))
+    n_exp = anc.get("n_aims_expected", "—")
+    conf_badge = _confidence_badge(anc.get("confidence"), anc.get("confidence_note"))
+
+    ambiguous_banner = ""
+    if anc.get("ambiguous"):
+        runner = anc.get("runner_up_population")
+        runner_long = {"EUR": "European", "AFR": "African", "EAS": "East Asian",
+                       "SAS": "South Asian", "AMR": "Admixed American"}.get(runner, runner)
+        ambiguous_banner = (
+            f'<div class="anc-ambiguous">⚠️ <strong>Ambiguous call.</strong> '
+            f'{_esc(primary_long)} and {_esc(runner_long)} fit your markers almost '
+            'equally well; this small panel cannot reliably tell them apart. Treat '
+            'the result as "best guess," not a determination.</div>'
+        )
+
     return f"""
 <section class="anc-section" id="ancestry">
 <h2>Ancestry Estimation <span class="pro-pill">V3</span></h2>
 <p class="anc-intro">
 {_esc(anc.get('method', 'Genotype-based ancestry estimate'))}.
-Based on {anc.get('n_aims_used', 0)} ancestry-informative markers.
-Confidence: <strong>{_esc(anc.get('confidence','—'))}</strong>.
+Based on <strong>{n_indep}</strong> independent ancestry-informative markers
+(of {n_exp} on this panel).
 </p>
+{conf_badge}
+{ambiguous_banner}
 <div class="anc-caveat">
-<strong>Limitations:</strong> This is a rough estimate compared to commercial
-ancestry products (which use proprietary panels of tens of thousands of
-markers and reference populations). It is most accurate for recent
-single-continent ancestry; admixed individuals (and especially those
-without recent European ancestry) may see higher uncertainty.
+<strong>Informational use only — this is not a genealogical or clinical
+ancestry test.</strong> It is a rough estimate next to commercial products
+(which use tens of thousands of markers). The bars below are <em>relative
+affinities</em> — the probability that your genotype best matches each
+<em>single</em> 1000 Genomes population — <strong>not admixture
+proportions</strong>; they should not be read as "% of your DNA." It is most
+meaningful for recent single-continent ancestry. Note that "Admixed American
+(AMR)" is itself a recently-admixed reference group, so it can appear as a
+spurious match for intermediate genotypes.
 </div>
 {plot_html}
+<div class="anc-bars-label">Relative affinity to each reference population (not admixture %):</div>
 <div class="anc-bars">{bars}</div>
-<div class="anc-foot"><em>{_esc(anc.get('confidence_note',''))}</em></div>
 </section>
 """
 
@@ -2541,7 +2651,23 @@ h2{{font-size:21px;font-weight:700;margin-bottom:14px;padding-bottom:8px;
 .pheno-nm{{background:rgba(63,185,80,.18);color:var(--grn)}}
 .pheno-rm{{background:rgba(88,166,255,.18);color:var(--acc)}}
 .pheno-um{{background:rgba(188,140,255,.18);color:var(--pur)}}
+.pheno-indeterminate{{background:var(--bg3);color:var(--muted);border:1px dashed var(--bdr)}}
 .pgx-callability{{font-size:11px;color:var(--muted);margin-bottom:10px}}
+/* Shared confidence badge used by every score section */
+.conf-row{{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:8px 0}}
+.conf-badge{{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;
+  padding:2px 8px;border-radius:10px;white-space:nowrap}}
+.conf-high{{background:rgba(63,185,80,.18);color:var(--grn)}}
+.conf-moderate{{background:rgba(210,153,34,.18);color:var(--ora)}}
+.conf-low{{background:rgba(248,81,73,.16);color:var(--red)}}
+.conf-none{{background:var(--bg3);color:var(--muted);border:1px dashed var(--bdr)}}
+.conf-na{{background:var(--bg3);color:var(--muted)}}
+.conf-note{{font-size:11px;color:var(--muted);line-height:1.45}}
+.prs-lowconf,.anc-ambiguous{{font-size:11.5px;color:var(--ora);background:rgba(210,153,34,.08);
+  border-left:3px solid var(--ora);padding:6px 10px;border-radius:4px;margin:6px 0;line-height:1.45}}
+.anc-bars-label{{font-size:11px;color:var(--muted);margin:10px 0 4px}}
+.ydna-disclaimer{{font-size:11px;color:var(--muted);font-style:italic;margin-top:14px;
+  padding-top:10px;border-top:1px solid var(--bdr);line-height:1.5}}
 .pgx-details summary{{cursor:pointer;font-size:12px;color:var(--muted);padding:4px 0;
   user-select:none}}
 .pgx-details summary:hover{{color:var(--txt)}}
@@ -2981,7 +3107,8 @@ details.phewas-cat summary::-webkit-details-marker{{display:none}}
 <div class="wrap">
 
 <div class="disc">
-<strong>&#9888;&#65039; Research/Educational Use &mdash; Not a Clinical Diagnostic.</strong>
+<strong>&#9888;&#65039; Informational and educational use only &mdash; not a
+clinical diagnostic.</strong>
 This report integrates a curated variant database (400 SNPs), CPIC-style
 pharmacogenomic phenotyping, curated polygenic risk scores, compound
 heterozygosity detection, carrier-status analysis, trait predictions, and
@@ -2992,6 +3119,13 @@ laboratory before any medical decision is made. Polygenic risk scores are
 curated-variant approximations, not full clinical-grade PGS. Always consult
 a qualified physician, clinical pharmacist, or board-certified genetic
 counselor before acting on any finding in this report.
+<br><br>
+<strong>Reading the results:</strong> every score (polygenic, pharmacogenomic,
+ancestry, and haplogroup) is labelled with an explicit <em>confidence</em> level
+and the number of SNPs actually typed versus expected. Results marked
+<em>low confidence</em> or <em>indeterminate</em> were computed on too few
+markers to be reliable and should not be interpreted; they are shown only for
+transparency.
 </div>
 
 <div class="stats">

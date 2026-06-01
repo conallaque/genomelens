@@ -265,6 +265,28 @@ PRS_PANELS: Dict[str, Dict] = {
 }
 
 
+# Coverage thresholds for these small curated panels. Because each panel has
+# only ~15-20 variants and the expected variance shrinks as variants drop out,
+# a score built on a small fraction of the panel is unreliable.
+PRS_MIN_USED = 3           # absolute floor of typed variants for any score
+PRS_LOW_COVERAGE_PCT = 50  # below this the score is downgraded to "low"
+PRS_HIGH_COVERAGE_PCT = 80  # at/above this coverage the score is "high"
+
+
+def _prs_confidence(n_used: int, n_total: int) -> tuple:
+    """Map curated-panel coverage to an explicit confidence level + note."""
+    pct = 100.0 * n_used / max(n_total, 1)
+    base = f"{n_used} of {n_total} panel variants typed ({pct:.0f}%)"
+    if n_used < PRS_MIN_USED or pct < PRS_LOW_COVERAGE_PCT:
+        return "low", (
+            f"{base}. Too few variants for a reliable percentile — the score is "
+            "shown for transparency only and should not be interpreted."
+        )
+    if pct < PRS_HIGH_COVERAGE_PCT:
+        return "moderate", f"{base}. Missing variants add uncertainty to the percentile."
+    return "high", f"{base}."
+
+
 # ─── Core scoring ─────────────────────────────────────────────────────────────
 def _dosage(genotype: str, effect_allele: str) -> Optional[int]:
     if not genotype:
@@ -281,9 +303,11 @@ def _score_panel(snps_df: pd.DataFrame, panel: Dict, sex: Optional[str] = None) 
     """Compute z-score / percentile / tier for a single panel."""
     applies_to = panel.get("applies_to")
     if applies_to == "female" and sex == "male":
-        return {"status": "not_applicable", "reason": "Female-specific risk score; not applicable."}
+        return {"status": "not_applicable", "confidence": "n/a",
+                "reason": "Female-specific risk score; not applicable."}
     if applies_to == "male" and sex == "female":
-        return {"status": "not_applicable", "reason": "Male-specific risk score; not applicable."}
+        return {"status": "not_applicable", "confidence": "n/a",
+                "reason": "Male-specific risk score; not applicable."}
 
     raw_score = 0.0
     expected_mean = 0.0
@@ -309,16 +333,24 @@ def _score_panel(snps_df: pd.DataFrame, panel: Dict, sex: Optional[str] = None) 
         expected_var += (beta ** 2) * 2.0 * af * (1.0 - af)
         used.append({**v, "dosage": dose, "genotype": str(gt).upper()})
 
-    if not used or expected_var <= 0:
+    n_total = len(panel["variants"])
+    if not used or expected_var <= 0 or len(used) < PRS_MIN_USED:
         return {
             "status": "insufficient_data",
             "reason": (
-                f"Only {len(used)} of {len(panel['variants'])} panel variants "
-                "were typed on this chip — not enough for a reliable score."
+                f"Only {len(used)} of {n_total} panel variants "
+                f"were typed on this chip (min {PRS_MIN_USED}) — not enough for a "
+                "score."
             ),
+            "confidence": "none",
+            "n_used": len(used),
+            "n_expected": n_total,
+            "callability": round(100.0 * len(used) / n_total, 1),
             "used": used,
             "missing": missing,
         }
+
+    confidence, confidence_note = _prs_confidence(len(used), n_total)
 
     z_score = (raw_score - expected_mean) / sqrt(expected_var)
     percentile = _norm_cdf(z_score) * 100.0
@@ -347,9 +379,13 @@ def _score_panel(snps_df: pd.DataFrame, panel: Dict, sex: Optional[str] = None) 
         "percentile": round(percentile, 1),
         "tier": tier,
         "tier_class": tier_class,
+        "confidence": confidence,
+        "confidence_note": confidence_note,
+        "n_used": len(used),
+        "n_expected": n_total,
         "used": used,
         "missing": missing,
-        "callability": round(100.0 * len(used) / len(panel["variants"]), 1),
+        "callability": round(100.0 * len(used) / n_total, 1),
     }
 
 
@@ -372,10 +408,13 @@ def analyze_polygenic_scores(snps_df: pd.DataFrame, sex: Optional[str] = None) -
             "result": result,
         }
 
-    # Headline findings: panels with tier Elevated or High
+    # Headline findings: panels with tier Elevated or High — but only when
+    # coverage is good enough to trust the percentile. A "High" tier built on a
+    # handful of typed variants is not a headline finding.
     headline = [
         (name, p) for name, p in panels.items()
         if p["result"].get("tier") in ("Elevated", "High")
+        and p["result"].get("confidence") in ("moderate", "high")
     ]
     return {
         "inferred_sex": sex,
