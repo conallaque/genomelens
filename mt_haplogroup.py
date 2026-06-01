@@ -489,20 +489,44 @@ def analyze_mt_haplogroup(snps_df: pd.DataFrame) -> Dict:
             ),
         }
 
-    haplogroup, confidence = _classify(matched_markers)
+    haplogroup, _ = _classify(matched_markers)
     info = HAPLOGROUP_INFO.get(haplogroup, HAPLOGROUP_INFO["Unknown"])
+
+    # Coverage / confidence. Confidence in a *called* haplogroup is driven by
+    # how many DERIVED markers support it (ancestral markers only rule clades
+    # out). Autosomal chips carry very few mtDNA markers, so we never claim
+    # "high" without at least 3 confirming derived markers.
+    n_derived = sum(1 for m in matched_markers if m["status"] == "derived")
+    n_expected = len(MTDNA_MARKERS)
+    if haplogroup == "Unknown" or n_derived == 0:
+        confidence = "low"
+    elif n_derived >= 3:
+        confidence = "high"
+    elif n_derived == 2:
+        confidence = "moderate"
+    else:
+        confidence = "low"
 
     return {
         "status": "called" if haplogroup != "Unknown" else "low_resolution",
         "haplogroup": haplogroup,
         "confidence": confidence,
+        "confidence_note": (
+            f"{n_derived} derived (haplogroup-defining) marker(s) of "
+            f"{len(matched_markers)} matched, out of {n_expected} on this panel. "
+            "mtDNA calls from autosomal-chip data are coarse — full mtDNA "
+            "sequencing is the gold standard."
+        ),
         "matched_markers": matched_markers,
+        "n_markers_matched": len(matched_markers),
+        "n_markers_derived": n_derived,
+        "n_markers_expected": n_expected,
         "mt_snp_count": int(mt_count),
         "migration": info["migration"],
         "ancient_dna": info["ancient_dna"],
         "further_testing": info["further_testing"],
         "message": (
             f"mtDNA haplogroup called as {haplogroup} ({confidence} confidence) "
-            f"from {len(matched_markers)} matched markers."
+            f"from {n_derived} derived / {len(matched_markers)} matched markers."
         ),
     }

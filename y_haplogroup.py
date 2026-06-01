@@ -1203,6 +1203,7 @@ def analyze_y_haplogroup(snps_df: pd.DataFrame) -> Dict:
     if y_count == 0:
         return {
             "status": "no_y_data",
+            "confidence": "none",
             "y_snp_count": 0,
             "haplogroup_path": "Unknown",
             "terminal_haplogroup": "Unknown",
@@ -1223,6 +1224,7 @@ def analyze_y_haplogroup(snps_df: pd.DataFrame) -> Dict:
     if y_count < 10:
         return {
             "status": "insufficient_y_data",
+            "confidence": "none",
             "y_snp_count": y_count,
             "haplogroup_path": "Insufficient Y-chromosome SNPs",
             "terminal_haplogroup": "Insufficient Y-chromosome SNPs",
@@ -1246,6 +1248,7 @@ def analyze_y_haplogroup(snps_df: pd.DataFrame) -> Dict:
         if walk_status == "ruled_out":
             return {
                 "status": "not_k",
+                "confidence": "low",
                 "y_snp_count": y_count,
                 "haplogroup_path": "Pre-K (A, B, C, D, E, F, G, H, I, or J)",
                 "terminal_haplogroup": "Pre-K",
@@ -1271,6 +1274,7 @@ def analyze_y_haplogroup(snps_df: pd.DataFrame) -> Dict:
         # chip gap at root or other issue
         return {
             "status": "partial",
+            "confidence": "none",
             "y_snp_count": y_count,
             "haplogroup_path": "Unresolved (key markers not on chip)",
             "terminal_haplogroup": "Unknown",
@@ -1299,10 +1303,30 @@ def analyze_y_haplogroup(snps_df: pd.DataFrame) -> Dict:
 
     resolved = walk_status == "resolved"
     confirmed_count = sum(1 for n in walked_path if n["snp_status"] == "confirmed")
+    n_path = len(walked_path)
+
+    # Confidence in the terminal call is driven by how many path markers were
+    # actually confirmed (derived) vs. inferred across chip gaps.
+    if resolved and confirmed_count >= 3:
+        confidence = "high"
+    elif confirmed_count >= 2:
+        confidence = "moderate"
+    else:
+        confidence = "low"
+    confidence_note = (
+        f"{confirmed_count} of {n_path} markers on the assigned path confirmed "
+        f"(derived); the rest inferred across chip gaps. "
+        f"{y_count:,} Y-SNPs typed total. Terminal-branch resolution from chip "
+        "data is limited — targeted Y-SNP or Y-sequencing refines it."
+    )
 
     return {
         "status": "resolved" if resolved else "partial",
+        "confidence": confidence,
+        "confidence_note": confidence_note,
         "y_snp_count": y_count,
+        "n_markers_confirmed": confirmed_count,
+        "n_markers_on_path": n_path,
         "haplogroup_path": " > ".join(n["haplogroup"] for n in walked_path),
         "terminal_haplogroup": terminal["haplogroup"],
         "terminal_description": terminal.get("description", ""),

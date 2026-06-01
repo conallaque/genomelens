@@ -381,10 +381,13 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log("Running ancestry estimation ...")
             ancestry_result = analyze_ancestry(snps_df)
             if ancestry_result.get("available"):
-                top = sorted(ancestry_result["proportions"].items(),
-                             key=lambda x: -x[1])[:3]
-                top_str = ", ".join(f"{sp} {p*100:.0f}%" for sp, p in top)
-                log(f"  Ancestry ({ancestry_result['method'][:36]}...): {top_str}")
+                primary = ancestry_result.get("primary_population", "?")
+                conf = ancestry_result.get("confidence", "?")
+                amb = " [ambiguous]" if ancestry_result.get("ambiguous") else ""
+                log(f"  Ancestry: best match {primary} "
+                    f"({conf} confidence{amb}; "
+                    f"{ancestry_result.get('n_aims_independent', 0)}/"
+                    f"{ancestry_result.get('n_aims_expected', '?')} markers)")
             else:
                 log(f"  Ancestry: {ancestry_result.get('reason','unavailable')}")
         except Exception as e:

@@ -6,6 +6,53 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [Unreleased] — 2026-05-29 — Accuracy & honesty pass
+
+No new features — existing outputs made correct and honest about uncertainty.
+
+### Fixed
+
+- **Ancestry AIM heuristic over-weighted AMR for Southern Europeans.** Two
+  causes addressed in `ancestry_pca.py`:
+  - LD-correlated AIMs (the HERC2 eye-colour pair, the EDAR pair, and the
+    perfectly-correlated LCT/MCM6 pair) were treated as independent and
+    double-/triple-counted the same signal. They are now grouped by `ld_block`
+    and counted once.
+  - Confidence is now driven by the **log-likelihood margin** between the best
+    and runner-up population (not the softmax probability, which exaggerates
+    small gaps on a tiny panel). Ambiguous calls (margin < 2.3 nats ≈ 10:1)
+    are flagged and downgraded to *low*; the heuristic is capped at *moderate*.
+    In a sweep of plausible Southern-European genotypes this downgrades ~91% of
+    spurious AMR-primary calls to low confidence. The five-way numbers are now
+    labelled *relative affinity*, not admixture proportions.
+
+### Changed — explicit confidence + coverage on every score
+
+Every score now reports an explicit confidence level and SNPs-covered-vs-expected,
+and low-coverage results are downgraded or suppressed:
+
+- **PGx** (`pgx.py`): genes with **0 defining variants typed** are now reported
+  as *Indeterminate* instead of a confident "Normal Metabolizer", and an
+  untyped HLA-B*57:01 tag is *Indeterminate* rather than a false "Negative".
+  Per-gene confidence from defining-variant coverage.
+- **Curated PRS** (`prs.py`): explicit confidence from callability; scores below
+  3 typed variants suppressed; low-confidence scores excluded from headline
+  findings.
+- **Expanded PGS** (`pgs_catalog.py`): explicit confidence from coverage (a
+  percentile from <40% of a scoring file is now flagged *low*).
+- **mtDNA / Y haplogroups** (`mt_haplogroup.py`, `y_haplogroup.py`): explicit
+  confidence and matched-vs-expected marker counts.
+
+### Disclaimers
+
+- Strengthened the global banner lead to "Informational and educational use
+  only — not a clinical diagnostic" and added a "Reading the results" note on
+  confidence/coverage labels (`renderers.py`).
+- Added informational-use disclaimers to the Expanded-PGS and Y-DNA sections;
+  relabelled the ancestry bars as relative affinity.
+
+---
+
 ## [8.0.0] — 2026-05-17 — Decomposition + registry migration
 
 V8 is a **foundation release**: zero new user-visible features, substantial
