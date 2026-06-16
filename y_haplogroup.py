@@ -1,17 +1,28 @@
 """
 Y-DNA Haplogroup Analysis Module
-Walks a decision tree of Y-chromosome haplogroup-defining SNPs, focused on
-Macro-haplogroup K and all downstream subclades (K1, K2, K2a, K2b → N, O, Q,
-P → R1a, R1b and its major European branches).
+Walks a decision tree of Y-chromosome haplogroup-defining SNPs covering the
+major backbone of the human Y phylogeny (CT → CF → F → {G, IJK → {IJ → {I, J},
+K → {LT → {L, T}, K2 → {NO → {N, O}, P → {Q, R → R1 → {R1a, R1b}}}}}}).
+
+Marker data (rsID, GRCh37 position, ancestral→derived) is taken from the ISOGG
+Y-SNP index. Each node carries SEVERAL co-defining markers and the call is by
+majority vote across whichever of them the chip actually typed. This makes the
+result robust to a single mistyped/missing SNP.
 
 Tree-walking algorithm:
-  1. Look up each node's defining SNP by rsID, then by chr Y position.
-  2. DERIVED   → confirmed in this haplogroup; recurse into children.
-  3. ANCESTRAL → this branch is ruled out; stop.
-  4. NOT FOUND → chip gap; note it, still attempt children so downstream
-                  confirmed markers can be reported (they implicitly confirm
-                  every ancestor).
-  5. After walking, any gap-walked ancestors are labelled "inferred".
+  1. For each node, look up every defining marker by rsID then by chrY position.
+     DERIVED votes vs ANCESTRAL votes decide the node's status.
+  2. ANCESTRAL  → this branch is ruled out; do not descend.
+  3. DERIVED    → confirmed; descend into children.
+  4. NOT_FOUND  → chip gap; descend ONLY toward a branch that contains a
+                  genuinely-confirmed downstream marker (otherwise stop — never
+                  guess a deeper subclade than the data supports).
+  5. The reported terminal haplogroup is the DEEPEST CONFIRMED node. Inferred
+     (chip-gap) ancestors between two confirmed markers are kept but labelled.
+
+Strand safety: markers whose ancestral/derived alleles are a complementary pair
+(A/T or C/G) cannot be oriented from genotype alone and are skipped — clades are
+defined by non-ambiguous co-markers instead.
 """
 
 from typing import Optional, Dict, List, Tuple
@@ -25,1009 +36,287 @@ def complement(base: str) -> str:
     return base.upper().translate(_COMP)
 
 
-# ── Haplogroup decision tree ───────────────────────────────────────────────────
-#
-# Each node:
-#   haplogroup  – name shown in report (e.g. "R1b")
-#   snp_name    – ISOGG marker name (e.g. "M343")
-#   rsids       – list of rsIDs to try, in priority order (chip-version-aware)
-#   pos         – GRCh37 chr Y position for position-based fallback (int | None)
-#   derived     – derived allele character (uppercase, forward strand)
-#   ancestral   – ancestral allele character (uppercase, forward strand)
-#   description – one-liner shown next to breadcrumb node
-#   migration   – migration narrative paragraph shown in the report section
-#   further     – what Big Y / dedicated panel would add
-#   children    – mutually exclusive downstream branches (list of nodes)
-#
-# Position values are approximate (GRCh37/hg19) from ISOGG Y-DNA SNP Index.
-# rsID values are those most commonly cited in consumer-chip contexts; the same
-# physical mutation sometimes appears under different rsIDs in different chip
-# versions — listing several maximises hit rate.
+def _comp(base: str) -> str:
+    return base.upper().translate(_COMP)
 
-HAPLOGROUP_TREE: Dict = {
-    "haplogroup": "K",
-    "snp_name": "M9",
-    "rsids": ["rs2032597"],
-    "pos": 22_719_028,
-    "derived": "T",
-    "ancestral": "G",
-    "description": "Macro-haplogroup K — ancestor of most non-African men",
-    "migration": (
-        "Macro-haplogroup K (M9) emerged approximately 45,000–47,000 years ago, most "
-        "likely in South or Central Asia, shortly after the 'Out of Africa' dispersal. "
-        "A single man carried the M9 mutation, and today his Y-chromosome descendants "
-        "account for the vast majority of men outside sub-Saharan Africa — including "
-        "virtually all men of European, East Asian, South Asian, Oceanian, and Native "
-        "American descent. Haplogroups N, O, Q, R, S, M, and T all trace back to this "
-        "common K ancestor."
+
+# ── Node builder ────────────────────────────────────────────────────────────────
+#
+# markers: list of (name, rsid, GRCh37_pos, ancestral, derived). rsid may be ""
+# (position-only lookup). Strand-ambiguous pairs (A/T, C/G) are skipped at
+# lookup time, so a clade should always carry at least one non-ambiguous marker.
+
+def _node(haplogroup: str, markers: List[Tuple], description: str = "",
+          migration: str = "", further: str = "", children: Optional[List] = None) -> Dict:
+    rsids = [m[1] for m in markers if m[1]]
+    return {
+        "haplogroup": haplogroup,
+        "snp_name": markers[0][0] if markers else haplogroup,
+        "rsids": rsids,
+        "pos": markers[0][2] if markers else None,
+        "markers": markers,
+        "description": description,
+        "migration": migration,
+        "further": further,
+        "children": children or [],
+    }
+
+
+# ── Haplogroup decision tree (backbone) ─────────────────────────────────────────
+
+HAPLOGROUP_TREE: Dict = _node(
+    "CT", [("M168", "rs2032595", 14813991, "C", "T"),
+           ("M5576", "", 2744386, "G", "T"),
+           ("M5577", "", 2757670, "C", "T")],
+    description="All non-African lineages plus most African ones (everyone except A and B).",
+    migration=(
+        "Haplogroup CT (M168) marks the common patrilineal ancestor of the vast majority of "
+        "men alive today, living in Africa roughly 70,000 years ago, just before the "
+        "out-of-Africa expansion."
     ),
-    "further": (
-        "FTDNA Big Y-700 or equivalent long-read Y-chromosome sequencing would confirm "
-        "K and immediately resolve which downstream branch you belong to. If your chip "
-        "does not include M9, any confirmed downstream K marker (M207, M175, M231, "
-        "M242, M343, M269 …) implicitly confirms K ancestry."
-    ),
-    "children": [
-        # ── T (M70) ────────────────────────────────────────────────────────────
-        {
-            "haplogroup": "T",
-            "snp_name": "M70",
-            "rsids": ["rs9786474", "rs2032605"],
-            "pos": 21_569_730,
-            "derived": "C",
-            "ancestral": "A",
-            "description": "Haplogroup T — Middle East, East Africa, Mediterranean",
-            "migration": (
-                "Haplogroup T (M70) is an ancient non-African lineage found at moderate "
-                "frequencies in East Africa (particularly Ethiopia and the Horn), the Middle "
-                "East, Anatolia, and Mediterranean Europe. It is especially notable among the "
-                "Lemba people of southern Africa and certain Ethiopian populations. T reached "
-                "southern Europe via Neolithic expansions from the Fertile Crescent ~8,000–10,000 "
-                "years ago, and remains a minor haplogroup in Europe — more common in Sardinia, "
-                "the Canary Islands, and parts of Italy. Famous proposed T carriers include "
-                "Thomas Jefferson (T1a1)."
+    further="Any confirmed downstream marker implicitly confirms CT.",
+    children=[
+        _node(
+            "E", [("M66", "rs2032627", 21881573, "A", "C"),
+                  ("M155", "", 21736331, "G", "A"),
+                  ("M156", "", 21717227, "T", "C")],
+            description="Common in Africa, the Middle East and southern Europe (approximates DE/E).",
+            migration=(
+                "Haplogroup E arose in Africa or the Near East ~50,000 years ago and is today "
+                "the most common lineage in Africa, with significant frequencies in the Levant "
+                "and Mediterranean Europe."
             ),
-            "further": (
-                "Big Y-700 would identify your T subclade: T1a1 (Middle Eastern / Lemba), "
-                "T1a2 (South Asian), or T1b (rare). FTDNA's Haplogroup T Project has thousands "
-                "of members with detailed geographic correlations."
-            ),
-            "children": [],
-        },
-        # ── K1 (P226) ──────────────────────────────────────────────────────────
-        {
-            "haplogroup": "K1",
-            "snp_name": "P226",
-            "rsids": [],
-            "pos": None,
-            "derived": "T",
-            "ancestral": "C",
-            "description": "Haplogroup K1 — rare Oceanian/Australian branch",
-            "migration": (
-                "Haplogroup K1 (P226, P228, P230) is one of the rarest Y-chromosome lineages "
-                "in the world, found almost exclusively among Aboriginal Australians, some "
-                "Melanesian populations, and very rarely in Southeast Asia. It represents an "
-                "extremely ancient split from macro-haplogroup K that accompanied the earliest "
-                "human migrations into the Sahul landmass (Australia and New Guinea) roughly "
-                "50,000–65,000 years ago. K1 is essentially absent in all European, East Asian, "
-                "and African populations — finding K1 outside Oceania would be remarkable."
-            ),
-            "further": (
-                "K1 is too rare and region-specific to be resolved further with consumer chips. "
-                "Whole Y-chromosome sequencing and consultation with specialists in Australian "
-                "Aboriginal genetics would be needed."
-            ),
-            "children": [],
-        },
-        # ── K2a (P295) — ancestor of S and M ───────────────────────────────────
-        {
-            "haplogroup": "K2a",
-            "snp_name": "P295",
-            "rsids": [],
-            "pos": 6_826_764,
-            "derived": "C",
-            "ancestral": "T",
-            "description": "Haplogroup K2a — ancestor of S and M (Melanesia)",
-            "migration": (
-                "Haplogroup K2a is the common ancestor of haplogroups S and M, both found "
-                "almost exclusively in Papua New Guinea, Melanesia, and nearby island groups. "
-                "K2a lineages represent an ancient migration into the Sahul landmass and are "
-                "essentially absent outside Oceania."
-            ),
-            "further": (
-                "K2a subclades S and M are highly region-specific. Specialized Y-chromosome "
-                "sequencing and collaboration with Melanesian genetic research groups would "
-                "be needed to resolve your specific subclade."
-            ),
-            "children": [
-                {
-                    "haplogroup": "S",
-                    "snp_name": "M230",
-                    "rsids": [],
-                    "pos": 14_843_410,
-                    "derived": "T",
-                    "ancestral": "G",
-                    "description": "Haplogroup S — Highland Papua New Guinea",
-                    "migration": (
-                        "Haplogroup S (B254/M230) is the dominant Y-chromosome lineage in the "
-                        "highlands of Papua New Guinea, where it reaches frequencies exceeding "
-                        "50% in some populations. It traces back to the founding populations of "
-                        "Sahul and has diversified extensively over the past 40,000+ years of "
-                        "relative isolation. S subclades correlate closely with linguistic "
-                        "groups and geographic regions within Papua New Guinea."
+        ),
+        _node(
+            "CF", [("M3690", "", 15203676, "A", "G"),
+                   ("P143", "rs4141886", 14197867, "G", "A")],
+            description="Ancestor of haplogroups C and F — nearly all non-African men.",
+            children=[
+                _node(
+                    "F", [("M89", "rs2032652", 21917313, "C", "T"),
+                          ("M235", "rs7067496", 14832620, "T", "G"),
+                          ("P135", "rs9786502", 21618856, "C", "T")],
+                    description="Ancestor of >90% of all men outside Africa.",
+                    migration=(
+                        "Haplogroup F (M89) appeared ~48,000 years ago in South Asia or the Near "
+                        "East. Its descendants — G, H, I, J, K and everything below K — account "
+                        "for the overwhelming majority of non-African paternal lineages."
                     ),
-                    "further": (
-                        "Full Y-chromosome sequencing is the only way to resolve S subclades "
-                        "meaningfully. The S tree is still being built by research groups "
-                        "studying Papuan genetics."
-                    ),
-                    "children": [],
-                },
-                {
-                    "haplogroup": "M",
-                    "snp_name": "M4",
-                    "rsids": [],
-                    "pos": 8_602_381,
-                    "derived": "C",
-                    "ancestral": "T",
-                    "description": "Haplogroup M — Melanesia and eastern Indonesia",
-                    "migration": (
-                        "Haplogroup M (M4/P256) is found primarily in Papua New Guinea, "
-                        "Melanesia, and the Maluku Islands of eastern Indonesia. Like S, it "
-                        "represents a deep founding Sahul lineage. Its subclades (M1–M5) track "
-                        "geographic and linguistic boundaries across Melanesian islands."
-                    ),
-                    "further": (
-                        "Specialized Y-chromosome sequencing and FTDNA's Polynesian/Melanesian "
-                        "projects would provide subclade resolution for M."
-                    ),
-                    "children": [],
-                },
-            ],
-        },
-        # ── K2b (M526) — the big branch: N, O, Q, P → R ────────────────────────
-        {
-            "haplogroup": "K2b",
-            "snp_name": "M526",
-            "rsids": [],
-            "pos": 15_017_066,
-            "derived": "T",
-            "ancestral": "C",
-            "description": "Haplogroup K2b — ancestor of N, O, Q, and R (most Eurasian men)",
-            "migration": (
-                "Haplogroup K2b (M526) is the common ancestor of haplogroups N, O, Q, and R — "
-                "the four lineages that dominate Eurasian, East Asian, Oceanian, and Native "
-                "American Y-chromosomes. K2b likely arose in Central or South Asia approximately "
-                "40,000–45,000 years ago. From there, its descendants dispersed in all "
-                "directions: N and O moved eastward into Asia, Q eventually crossed into the "
-                "Americas, and the P/R branch spread across Eurasia with the later "
-                "Indo-European expansions."
-            ),
-            "further": (
-                "M526 is rarely included on consumer chips. Any confirmed downstream marker "
-                "(N-M231, O-M175, Q-M242, or R-M207) implicitly confirms K2b. Big Y-700 "
-                "would definitively resolve which K2b branch you are in."
-            ),
-            "children": [
-                # ── N (M231) ──────────────────────────────────────────────────
-                {
-                    "haplogroup": "N",
-                    "snp_name": "M231",
-                    "rsids": ["rs9341278", "rs9785941", "rs2032630"],
-                    "pos": 9_388_483,
-                    "derived": "T",
-                    "ancestral": "C",
-                    "description": "Haplogroup N — North Eurasia, Finland, Siberia, Turkic peoples",
-                    "migration": (
-                        "Haplogroup N (M231) spans a vast arc from northeastern Europe across "
-                        "Siberia to East Asia and is the defining Y-chromosome lineage of "
-                        "Uralic-speaking peoples. Today ~60% of Finnish men, ~67% of Estonian "
-                        "men, and high fractions of Sami, Nenets, Selkup, and Yakut men carry N. "
-                        "N likely originated in East or Central Asia ~20,000–30,000 years ago and "
-                        "expanded westward into northeastern Europe during the Mesolithic or "
-                        "Neolithic, probably carried by ancestral Uralic speakers. Its European "
-                        "expansion correlates with the spread of Finnish, Estonian, and "
-                        "historically related languages. Major subclades include N1a1a (formerly "
-                        "N3, dominant in Finnic and Baltic peoples) and N1b (Siberian)."
-                    ),
-                    "further": (
-                        "Big Y-700 + FTDNA's Haplogroup N Project would resolve N1a vs N1b and "
-                        "identify geographically specific branches (Finnish N1a1a1, Siberian N1b, "
-                        "etc.). N1a1a is well-studied with hundreds of subclades mapped to "
-                        "specific Uralic language groups."
-                    ),
-                    "children": [
-                        # ── N1 (CTS11726/L735) ────────────────────────────────
-                        {
-                            "haplogroup": "N1",
-                            "snp_name": "CTS11726/L735",
-                            "rsids": [],
-                            "pos": 18_380_393,
-                            "derived": "G",
-                            "ancestral": "A",
-                            "description": "Haplogroup N1 — main branch covering nearly all living N men",
-                            "migration": (
-                                "N1 (CTS11726, equivalent SNP L735) contains essentially every "
-                                "living N-bearing man outside of a handful of rare N2 lineages. "
-                                "The split between N1 and the sibling N2 branch occurred deep in "
-                                "Asia ~20,000+ years ago. From N1, two major subclades emerged: "
-                                "N1a (which became the dominant northern Eurasian / Uralic "
-                                "lineage) and N1b (Siberian)."
+                    children=[
+                        _node(
+                            "G", [("M201", "rs2032636", 15027529, "G", "T"),
+                                  ("M3242", "", 7145960, "C", "T"),
+                                  ("M3248", "", 7565637, "G", "A")],
+                            description="Caucasus, Anatolia and Mediterranean Europe; early Neolithic farmers.",
+                            migration=(
+                                "Haplogroup G (M201) is associated with the spread of early "
+                                "farming from the Near East and Caucasus into Neolithic Europe."
                             ),
-                            "further": (
-                                "CTS11726 and L735 are typically only on Big Y-700 or dedicated "
-                                "Y-SNP panels — not on consumer autosomal+Y chips."
-                            ),
-                            "children": [
-                                # ── N1a (M2291/F1206) ─────────────────────────
-                                {
-                                    "haplogroup": "N1a",
-                                    "snp_name": "M2291/F1206",
-                                    "rsids": [],
-                                    "pos": 8_430_571,
-                                    "derived": "G",
-                                    "ancestral": "A",
-                                    "description": "Haplogroup N1a — ancestor of the Finnic/Uralic N1a1 expansion",
-                                    "migration": (
-                                        "N1a (M2291, equivalent F1206) is the parent of N1a1 "
-                                        "(M46/Tat), the lineage that came to dominate northeastern "
-                                        "European and Uralic-speaking populations. N1a likely "
-                                        "diverged in Central or East Asia and spread westward "
-                                        "across Siberia before the major N1a1 expansion."
-                                    ),
-                                    "further": (
-                                        "M2291/F1206 are Big Y-discovered SNPs without dbSNP IDs "
-                                        "and almost never appear on consumer chips."
-                                    ),
-                                    "children": [
-                                        # ── N1a1 (M46/Tat) ────────────────────
-                                        {
-                                            "haplogroup": "N1a1",
-                                            "snp_name": "M46/Tat",
-                                            "rsids": ["rs2032673", "rs9785945"],
-                                            "pos": 14_179_811,
-                                            "derived": "T",
-                                            "ancestral": "C",
-                                            "description": "Haplogroup N1a1 — Tat-positive, classical 'northern N'",
-                                            "migration": (
-                                                "N1a1 (M46/Tat) is the famous Tat-C lineage of "
-                                                "Finnic, Baltic, Sami, and northern Russian "
-                                                "populations. It expanded westward across Siberia "
-                                                "into northeastern Europe during the Bronze Age, "
-                                                "carried by ancestral Uralic speakers, and is the "
-                                                "single most common Y-haplogroup among Finns "
-                                                "(~58%), Estonians (~34%), and Sami (~40%)."
+                        ),
+                        _node(
+                            "IJK", [("M522", "rs9786714", 7173143, "G", "A"),
+                                    ("M523", "rs9786139", 6753519, "A", "G")],
+                            description="Ancestor of haplogroups I, J and K.",
+                            children=[
+                                _node(
+                                    "IJ", [("P123", "rs17315821", 19166861, "T", "C"),
+                                           ("P127", "rs7892893", 8590752, "C", "T"),
+                                           ("P129", "rs17306699", 14144593, "A", "G")],
+                                    description="Ancestor of haplogroups I and J.",
+                                    children=[
+                                        _node(
+                                            "I", [("M170", "rs2032597", 14847792, "A", "C"),
+                                                  ("M161", "", 21717515, "G", "T")],
+                                            description="Indigenous European lineage (e.g. I1 Nordic, I2 Balkan/Sardinian).",
+                                            migration=(
+                                                "Haplogroup I (M170) is the oldest European-specific "
+                                                "lineage, present among Palaeolithic hunter-gatherers "
+                                                "and still common across Europe."
                                             ),
-                                            "further": (
-                                                "Tat-positive testing is widely available, but "
-                                                "downstream M178/L708/CTS9976/L1026/Z1936 "
-                                                "resolution requires Big Y-700."
+                                            children=[
+                                                _node("I1", [("M253", "rs9341296", 15022707, "C", "T"),
+                                                             ("P30", "rs112707890", 14496753, "G", "A"),
+                                                             ("P40", "rs113686221", 14484394, "C", "T")],
+                                                      description="Scandinavia / Northwest Europe."),
+                                                _node("I2", [("M438", "rs17307294", 16638804, "A", "G"),
+                                                             ("PF3781", "rs35547782", 18700150, "C", "T")],
+                                                      description="Southeastern / Central Europe, Sardinia."),
+                                            ],
+                                        ),
+                                        _node(
+                                            "J", [("M304", "rs13447352", 22749853, "A", "C"),
+                                                  ("M280", "rs13447367", 21878762, "G", "A"),
+                                                  ("M289", "rs13447368", 21878708, "G", "A")],
+                                            description="Near East, Arabia, Caucasus, Mediterranean.",
+                                            migration=(
+                                                "Haplogroup J (M304) originated in the Near East and "
+                                                "spread with Neolithic farmers and later Semitic and "
+                                                "Mediterranean populations."
                                             ),
-                                            "children": [
-                                                # ── N1a1a (M178) ──────────────
-                                                {
-                                                    "haplogroup": "N1a1a",
-                                                    "snp_name": "M178",
-                                                    "rsids": ["rs367573274"],
-                                                    "pos": 21_717_307,
-                                                    "derived": "A",
-                                                    "ancestral": "T",
-                                                    "description": "N1a1a — the dominant European N branch (formerly 'N3')",
-                                                    "migration": (
-                                                        "N1a1a (M178) is the European face of N: "
-                                                        "almost all Finnish, Estonian, Lithuanian, "
-                                                        "Latvian, and northern Russian N men belong "
-                                                        "here. M178 marks the founder lineage that "
-                                                        "swept westward into the eastern Baltic "
-                                                        "~2,500–3,500 years ago, very likely with "
-                                                        "early Finno-Ugric speakers."
+                                            children=[
+                                                _node("J1", [("M267", "rs9341313", 22741818, "T", "G")],
+                                                      description="Arabia, Levant, Caucasus."),
+                                                _node("J2", [("M172", "rs2032604", 14969634, "T", "G"),
+                                                             ("L228", "", 7771358, "C", "T")],
+                                                      description="Anatolia, Levant, Mediterranean."),
+                                            ],
+                                        ),
+                                    ],
+                                ),
+                                _node(
+                                    "K", [("P128", "rs17250121", 20837553, "C", "T"),
+                                          ("P131", "rs9786043", 15472863, "C", "T"),
+                                          ("P132", "rs3853054", 8679843, "G", "T")],
+                                    description="Macro-haplogroup K — ancestor of L, T, N, O, Q, R and more.",
+                                    migration=(
+                                        "Macro-haplogroup K (M9 and equivalents) emerged ~45,000 years "
+                                        "ago in South or Central Asia. Its descendants dominate Europe, "
+                                        "Asia, Oceania and the Americas."
+                                    ),
+                                    further=(
+                                        "Defined here by P128/P131/P132 rather than M9, which is not on "
+                                        "most consumer chips."
+                                    ),
+                                    children=[
+                                        _node(
+                                            "LT", [("P326", "", 8467290, "T", "C"),
+                                                   ("PF5525", "", 6994764, "G", "A"),
+                                                   ("PF5531", "", 8628308, "C", "T")],
+                                            description="Ancestor of haplogroups L and T (also called K1).",
+                                            children=[
+                                                _node("L", [("M20", "rs3911", 21733454, "A", "G"),
+                                                            ("M11", "rs3902", 21730647, "A", "G"),
+                                                            ("M185", "rs2032607", 14904859, "C", "T")],
+                                                      description="South Asia, with branches in the Near East."),
+                                                _node(
+                                                    "T", [("M272", "rs9341308", 22738775, "A", "G"),
+                                                          ("M320", "rs13447374", 15030767, "T", "G"),
+                                                          ("PF5597", "", 6794129, "G", "A")],
+                                                    description="A relatively rare lineage of the Near East, East Africa and the Mediterranean.",
+                                                    migration=(
+                                                        "Haplogroup T (M184/M272) is an old and "
+                                                        "geographically scattered lineage found at low "
+                                                        "frequency around the Near East, East Africa, the "
+                                                        "Mediterranean and the Horn of Africa, with deep "
+                                                        "roots tracing back to the early diversification "
+                                                        "of macro-haplogroup K."
                                                     ),
-                                                    "further": (
-                                                        "Big Y-700 resolves M178 into L708 → "
-                                                        "CTS9976 → L1026 (Finnish/Baltic) or Z1936 "
-                                                        "(Siberian/Uralic) and onward into terminal "
-                                                        "branches with surname-level resolution."
-                                                    ),
-                                                    "children": [
-                                                        # ── N1a1a1 (L708) ─────
-                                                        {
-                                                            "haplogroup": "N1a1a1",
-                                                            "snp_name": "L708",
-                                                            "rsids": [],
-                                                            "pos": 13_954_389,
-                                                            "derived": "A",
-                                                            "ancestral": "G",
-                                                            "description": "N1a1a1 — phylo-equivalent layer below M178",
-                                                            "migration": (
-                                                                "N1a1a1 (L708) sits just below M178 "
-                                                                "and contains essentially all living "
-                                                                "M178-positive men. It is one of "
-                                                                "several phylo-equivalent SNPs in "
-                                                                "this region."
-                                                            ),
-                                                            "further": (
-                                                                "L708 was discovered by FTDNA's Walk "
-                                                                "Through the Y / Big Y. It has no "
-                                                                "dbSNP rsID and is not on any consumer "
-                                                                "chip."
-                                                            ),
-                                                            "children": [
-                                                                # ── N1a1a1a (CTS9976) ───
-                                                                {
-                                                                    "haplogroup": "N1a1a1a",
-                                                                    "snp_name": "CTS9976",
-                                                                    "rsids": [],
-                                                                    "pos": 17_713_080,
-                                                                    "derived": "T",
-                                                                    "ancestral": "C",
-                                                                    "description": "N1a1a1a — parent of the L1026 vs Z1936 split",
-                                                                    "migration": (
-                                                                        "CTS9976 defines the node "
-                                                                        "above the major L1026 "
-                                                                        "(Finnic/Baltic) vs Z1936 "
-                                                                        "(Siberian/Uralic) split that "
-                                                                        "occurred ~4,000 years ago in "
-                                                                        "western Siberia or the Urals."
-                                                                    ),
-                                                                    "further": (
-                                                                        "CTS-series SNPs are Big "
-                                                                        "Y-only markers."
-                                                                    ),
-                                                                    "children": [
-                                                                        {
-                                                                            "haplogroup": "N1a1a1a1",
-                                                                            "snp_name": "L1026",
-                                                                            "rsids": [],
-                                                                            "pos": 16_887_278,
-                                                                            "derived": "G",
-                                                                            "ancestral": "A",
-                                                                            "description": "N1a1a1a1 — Finnish/Baltic core lineage",
-                                                                            "migration": (
-                                                                                "L1026 is the defining "
-                                                                                "SNP of the Finnish "
-                                                                                "and Baltic N branch. "
-                                                                                "~50% of Finnish men "
-                                                                                "and very high "
-                                                                                "fractions of Estonian, "
-                                                                                "Latvian, and "
-                                                                                "Lithuanian men are "
-                                                                                "L1026-positive. Its "
-                                                                                "subclades (VL29, "
-                                                                                "Z1934, CTS1737) map "
-                                                                                "cleanly onto Finnic, "
-                                                                                "Baltic, and Russian-"
-                                                                                "speaking populations."
+                                                    children=[
+                                                        _node(
+                                                            "T1a", [("M70", "rs2032672", 21893881, "A", "C"),
+                                                                    ("PF7472.1", "", 16212441, "G", "A")],
+                                                            description="The dominant and most widespread branch of haplogroup T.",
+                                                            children=[
+                                                                _node(
+                                                                    "T1a1", [("L454", "", 14577272, "C", "T"),
+                                                                             ("FGC3945.2", "", 8032311, "G", "A"),
+                                                                             ("CTS5542", "", 16350661, "A", "C")],
+                                                                    description="Major sub-branch of T1a, common in Europe and the Near East.",
+                                                                    children=[
+                                                                        _node(
+                                                                            "T1a1a", [("CTS2611", "", 14389760, "G", "A"),
+                                                                                      ("L905", "", 6659212, "A", "C")],
+                                                                            description="A widespread T1a1 subclade found across Europe, the Near East and North Africa.",
+                                                                            further=(
+                                                                                "FTDNA Big Y-700 or equivalent Y-sequencing "
+                                                                                "would resolve subclades below T1a1a."
                                                                             ),
-                                                                            "further": (
-                                                                                "Big Y-700 + FTDNA's "
-                                                                                "N-L1026 Project place "
-                                                                                "you in a terminal "
-                                                                                "branch (e.g. N-VL29, "
-                                                                                "N-Z1934, N-CTS1737) "
-                                                                                "linked to specific "
-                                                                                "Finnic or Baltic "
-                                                                                "regional lineages."
-                                                                            ),
-                                                                            "children": [],
-                                                                        },
-                                                                        {
-                                                                            "haplogroup": "N1a1a1a2",
-                                                                            "snp_name": "Z1936",
-                                                                            "rsids": [],
-                                                                            "pos": 16_439_111,
-                                                                            "derived": "C",
-                                                                            "ancestral": "T",
-                                                                            "description": "N1a1a1a2 — Siberian/Uralic branch (Sami, Volga-Uralic)",
-                                                                            "migration": (
-                                                                                "Z1936 is the parallel "
-                                                                                "branch to L1026, "
-                                                                                "dominant among Sami "
-                                                                                "(~40%+), Khanty, "
-                                                                                "Mansi, and Volga-"
-                                                                                "Uralic peoples "
-                                                                                "(Mari, Udmurt, Komi). "
-                                                                                "It traces a more "
-                                                                                "eastern path through "
-                                                                                "the Urals into "
-                                                                                "northern Fennoscandia."
-                                                                            ),
-                                                                            "further": (
-                                                                                "Big Y-700 + FTDNA's "
-                                                                                "N-Z1936 Project "
-                                                                                "resolves Sami-specific "
-                                                                                "vs Volga-Uralic "
-                                                                                "branches."
-                                                                            ),
-                                                                            "children": [],
-                                                                        },
+                                                                        ),
                                                                     ],
-                                                                },
+                                                                ),
                                                             ],
-                                                        },
+                                                        ),
                                                     ],
-                                                },
+                                                ),
                                             ],
-                                        },
-                                    ],
-                                },
-                                # ── N1b (P43) ─────────────────────────────────
-                                {
-                                    "haplogroup": "N1b",
-                                    "snp_name": "P43",
-                                    "rsids": [],
-                                    "pos": 21_466_748,
-                                    "derived": "C",
-                                    "ancestral": "T",
-                                    "description": "Haplogroup N1b — Siberian / Samoyedic N branch",
-                                    "migration": (
-                                        "N1b (P43) is the sister branch to N1a and is concentrated "
-                                        "in Samoyedic peoples (Nenets, Nganasan, Selkup) and "
-                                        "northern Siberian populations, with notable frequencies "
-                                        "among Northern Khanty and some Turkic groups. It is "
-                                        "virtually absent in Europe. N1b diverged from N1a deep "
-                                        "in Siberia and stayed east of the Urals."
-                                    ),
-                                    "further": (
-                                        "P43 is on a few dedicated Y-SNP panels but rarely on "
-                                        "consumer chips. Big Y-700 resolves P43 into B187 vs B188 "
-                                        "and onward."
-                                    ),
-                                    "children": [
-                                        {
-                                            "haplogroup": "N1b1",
-                                            "snp_name": "B187",
-                                            "rsids": [],
-                                            "pos": None,
-                                            "derived": "T",
-                                            "ancestral": "C",
-                                            "description": "N1b1 — one of two major P43 sub-branches",
-                                            "migration": (
-                                                "B187 defines one of the two main P43 lineages, "
-                                                "found in Nganasan and some Selkup populations."
-                                            ),
-                                            "further": (
-                                                "B-series SNPs were discovered through Big Y / "
-                                                "academic WGS and have no dbSNP rsIDs. Only Big "
-                                                "Y-700 (or equivalent WGS) can call them."
-                                            ),
-                                            "children": [],
-                                        },
-                                        {
-                                            "haplogroup": "N1b2",
-                                            "snp_name": "B188",
-                                            "rsids": [],
-                                            "pos": None,
-                                            "derived": "T",
-                                            "ancestral": "C",
-                                            "description": "N1b2 — second major P43 sub-branch",
-                                            "migration": (
-                                                "B188 is the parallel P43 sub-branch to B187, "
-                                                "concentrated in Nenets and northern Samoyedic "
-                                                "groups."
-                                            ),
-                                            "further": (
-                                                "Big Y-700 is required — B188 is not on any "
-                                                "consumer chip."
-                                            ),
-                                            "children": [],
-                                        },
-                                    ],
-                                },
-                            ],
-                        },
-                        # ── N2 (Y6503) ────────────────────────────────────────
-                        {
-                            "haplogroup": "N2",
-                            "snp_name": "Y6503",
-                            "rsids": [],
-                            "pos": None,
-                            "derived": "T",
-                            "ancestral": "C",
-                            "description": "Haplogroup N2 — rare deep-rooted sister of N1",
-                            "migration": (
-                                "N2 (Y6503) is an extremely rare deep branch of N, sister to "
-                                "the entire N1 clade. It has been reported in a handful of "
-                                "Vietnamese, Han Chinese, and other East Asian samples and is "
-                                "essentially absent in Europe and Siberia. Y6503 was identified "
-                                "by YFull from full Y-sequencing of academic samples."
-                            ),
-                            "further": (
-                                "Y6503 has no dbSNP rsID and is only callable via Big Y-700 or "
-                                "full Y-chromosome sequencing. Anyone landing here would be a "
-                                "valuable contribution to FTDNA's Haplogroup N Project."
-                            ),
-                            "children": [],
-                        },
-                    ],
-                },
-                # ── O (M175) ──────────────────────────────────────────────────
-                {
-                    "haplogroup": "O",
-                    "snp_name": "M175",
-                    "rsids": ["rs2032658"],
-                    "pos": 13_907_985,
-                    "derived": "A",
-                    "ancestral": "G",
-                    "description": "Haplogroup O — dominant East and Southeast Asian lineage",
-                    "migration": (
-                        "Haplogroup O (M175) accounts for 80–90% of Y-chromosomes in East and "
-                        "Southeast Asia — Chinese, Japanese, Korean, Vietnamese, Thai, Malay, and "
-                        "Filipino populations all show very high O frequencies. O likely emerged "
-                        "in Southeast Asia or southern China ~30,000–40,000 years ago. Its major "
-                        "expansion correlates with the rise of rice agriculture in the Yangtze "
-                        "River valley and subsequent Han Chinese demographic growth. Subclades: "
-                        "O1 (Southeast Asia, Austronesian speakers, Taiwan Aboriginal), O2 (Han "
-                        "Chinese, Korean, Japanese), O3 (widespread across East and Southeast "
-                        "Asia, associated with Sino-Tibetan expansions). O is essentially absent "
-                        "in Europe, Africa, and the Americas."
-                    ),
-                    "further": (
-                        "Big Y-700 or dedicated East Asian Y-DNA panels would identify your "
-                        "O subclade (O1a, O1b, O2, O3) with geographic precision, distinguishing "
-                        "between different East and Southeast Asian ethnic groups."
-                    ),
-                    "children": [],
-                },
-                # ── Q (M242) ──────────────────────────────────────────────────
-                {
-                    "haplogroup": "Q",
-                    "snp_name": "M242",
-                    "rsids": ["rs2032646"],
-                    "pos": 8_028_953,
-                    "derived": "T",
-                    "ancestral": "C",
-                    "description": "Haplogroup Q — founding haplogroup of most Native Americans",
-                    "migration": (
-                        "Haplogroup Q (M242) is most famous as the founding Y-chromosome lineage "
-                        "of the majority of indigenous Americans. Q-bearing populations crossed "
-                        "the Bering land bridge approximately 15,000–20,000 years ago, and in "
-                        "the Americas, Q-M3 (a subclade) reaches 90%+ frequency in many "
-                        "indigenous groups from Alaska to Tierra del Fuego. Outside the Americas, "
-                        "Q is found in Siberia (Ket, Selkup, Yeniseian speakers), Central Asia, "
-                        "and at low frequency in South Asia, the Middle East, and Europe. "
-                        "Notably, ~5% of Ashkenazi Jewish men carry Q1b2, a Middle Eastern "
-                        "branch with a distinct history from the Native American Q1a branch."
-                    ),
-                    "further": (
-                        "Big Y-700 would distinguish Q1a (Siberian/Native American) from Q1b "
-                        "(Middle Eastern/Ashkenazi) and resolve specific subclade with geographic "
-                        "and population significance. The Q-M3 branch is essentially "
-                        "diagnostic of Native American ancestry."
-                    ),
-                    "children": [],
-                },
-                # ── P (P331) — ancestor of R ────────────────────────────────
-                {
-                    "haplogroup": "P",
-                    "snp_name": "P331",
-                    "rsids": ["rs2032652"],
-                    "pos": 22_738_626,
-                    "derived": "C",
-                    "ancestral": "A",
-                    "description": "Haplogroup P — ancestor of R (major Eurasian lineage)",
-                    "migration": (
-                        "Haplogroup P (P331/M45/P226) is the direct ancestor of haplogroup R — "
-                        "the dominant Y-chromosome lineage in Europe and Central Asia. P itself "
-                        "likely arose in Central or South Asia ~35,000–40,000 years ago, and "
-                        "virtually all living P-bearing men today belong to downstream R subclades. "
-                        "P* (without R) is extremely rare."
-                    ),
-                    "further": (
-                        "Finding P without R confirmed downstream would be unusual. Big Y-700 "
-                        "would immediately resolve R1a vs R1b placement."
-                    ),
-                    "children": [
-                        # ── R (M207) ──────────────────────────────────────────
-                        {
-                            "haplogroup": "R",
-                            "snp_name": "M207",
-                            "rsids": ["rs9785952", "rs2032658"],
-                            "pos": 8_019_819,
-                            "derived": "T",
-                            "ancestral": "C",
-                            "description": "Haplogroup R — dominant European and Central/South Asian lineage",
-                            "migration": (
-                                "Haplogroup R (M207) is one of the most widespread Y-chromosome "
-                                "haplogroups in Eurasia. It arose ~27,000–35,000 years ago, probably "
-                                "in Central Asia or South Asia, before the Last Glacial Maximum. "
-                                "After the LGM, R diversified rapidly into R1a and R1b. R1a spread "
-                                "eastward and westward with the Indo-European expansions from the "
-                                "Pontic-Caspian steppe, while R1b came to dominate Western Europe "
-                                "following the Yamnaya expansion ~5,000 years ago. Together, R1a "
-                                "and R1b account for roughly 60–70% of all European Y-chromosomes."
-                            ),
-                            "further": (
-                                "Big Y-700 would immediately resolve R1a vs R1b, which have very "
-                                "different geographic distributions and migration histories. "
-                                "Both branches have been deeply studied and have dedicated FTDNA "
-                                "project pages with tens of thousands of members."
-                            ),
-                            "children": [
-                                # ── R1 (M173) ─────────────────────────────────
-                                {
-                                    "haplogroup": "R1",
-                                    "snp_name": "M173",
-                                    "rsids": ["rs9786153"],
-                                    "pos": 13_470_467,
-                                    "derived": "T",
-                                    "ancestral": "C",
-                                    "description": "Haplogroup R1 — European and Central/South Asian R",
-                                    "migration": (
-                                        "Haplogroup R1 contains nearly all R-bearing men in Europe, "
-                                        "Central Asia, and South Asia, split into R1a (eastward "
-                                        "expansions, Eastern European and South Asian) and R1b "
-                                        "(westward expansions, Western European)."
-                                    ),
-                                    "further": (
-                                        "Distinguishing R1a (M420) from R1b (M343) is the critical "
-                                        "next step. Many consumer chips include markers for this "
-                                        "split. M420 and M343 are the defining SNPs to look for."
-                                    ),
-                                    "children": [
-                                        # ── R1a (M420) ────────────────────────
-                                        {
-                                            "haplogroup": "R1a",
-                                            "snp_name": "M420",
-                                            "rsids": ["rs2032655", "rs3908938"],
-                                            "pos": 14_734_005,
-                                            "derived": "T",
-                                            "ancestral": "C",
-                                            "description": "Haplogroup R1a — Indo-European steppe expansion (Eastern Europe, South Asia)",
-                                            "migration": (
-                                                "Haplogroup R1a (M420/M17) is the signature Y-DNA lineage "
-                                                "of the Indo-European expansion from the Pontic-Caspian "
-                                                "steppe. Today it is found at highest frequencies in Eastern "
-                                                "Europe: ~55–65% in Poland, ~40–50% in Russia and Ukraine, "
-                                                "~45% in the Czech Republic, and up to 70%+ in certain "
-                                                "South Asian Brahmin caste populations. R1a entered Europe "
-                                                "~4,900 years ago with the Corded Ware culture, and reached "
-                                                "South Asia with Indo-Aryan migrations ~3,500 years ago. "
-                                                "R1a-Z282 (Z283, M458, Z280) defines the Eastern European "
-                                                "branch; R1a-Z93 (Z94, M780, L342) defines the South/Central "
-                                                "Asian branch. R1a men are descendants of the Yamnaya steppe "
-                                                "herders who revolutionised Eurasian prehistory with horses, "
-                                                "wheeled vehicles, and Proto-Indo-European language."
-                                            ),
-                                            "further": (
-                                                "Big Y-700 would distinguish R1a-Z282 (Eastern European) "
-                                                "from R1a-Z93 (South/Central Asian), and within Z282 "
-                                                "identify branches like M458 (Polish/Czech) or Z280 "
-                                                "(Russian/Baltic). FTDNA's R1a Project has >30,000 members "
-                                                "with richly annotated geographic and surname data."
-                                            ),
-                                            "children": [
-                                                {
-                                                    "haplogroup": "R1a1",
-                                                    "snp_name": "SRY10831.2",
-                                                    "rsids": ["rs35284194"],
-                                                    "pos": 2_711_327,
-                                                    "derived": "A",
-                                                    "ancestral": "G",
-                                                    "description": "R1a1 — near-universal R1a subclade (contains Z282 and Z93)",
-                                                    "migration": (
-                                                        "R1a1 (SRY10831.2/M17) contains almost all R1a men. "
-                                                        "The primary split is between Z282 (European) and "
-                                                        "Z93 (South/Central Asian). These are not typically "
-                                                        "on consumer chips."
-                                                    ),
-                                                    "further": (
-                                                        "Z282 (European) vs Z93 (South Asian) is the next "
-                                                        "critical branching point. Both are well-studied and "
-                                                        "are the first markers tested in targeted R1a panels."
-                                                    ),
-                                                    "children": [],
-                                                },
-                                            ],
-                                        },
-                                        # ── R1b (M343) ────────────────────────
-                                        {
-                                            "haplogroup": "R1b",
-                                            "snp_name": "M343",
-                                            "rsids": ["rs9786153", "rs2032655"],
-                                            "pos": 2_887_824,
-                                            "derived": "A",
-                                            "ancestral": "C",
-                                            "description": "Haplogroup R1b — dominant Western European lineage",
-                                            "migration": (
-                                                "Haplogroup R1b (M343) is the most common Y-chromosome "
-                                                "lineage in Western Europe, reaching 80–95% in Ireland, "
-                                                "Wales, the Basque Country, and Atlantic coastal regions. "
-                                                "R1b arrived in Europe via the Yamnaya steppe expansion "
-                                                "~5,000 years ago, sweeping through the continent in "
-                                                "association with the Bell Beaker culture and rapidly "
-                                                "displacing earlier Neolithic and Mesolithic Y-lineages. "
-                                                "This expansion is archaeogenetically one of the most "
-                                                "dramatic demographic replacements in prehistory: within "
-                                                "~500 years, Yamnaya-related ancestry replaced ~90% of "
-                                                "the previous male lineages in much of Western Europe. "
-                                                "R1b is also found at significant frequencies in Central "
-                                                "Asia (R1b-M73, Bashkirs ~50%), the Middle East, and "
-                                                "North Africa."
-                                            ),
-                                            "further": (
-                                                "R1b is extremely well studied. Big Y-700 + FTDNA projects "
-                                                "for R1b-U106 (Germanic), R1b-P312 (Celtic/Latin), or "
-                                                "R1b-L21 (Irish/Scottish/Welsh/Breton) would place you "
-                                                "in a terminal subclade connecting to genetic families "
-                                                "with common ancestors 500–1,500 years ago — often "
-                                                "traceable to specific surnames, regions, or clan lineages."
-                                            ),
-                                            "children": [
-                                                {
-                                                    "haplogroup": "R1b1",
-                                                    "snp_name": "L278",
-                                                    "rsids": [],
-                                                    "pos": 22_748_026,
-                                                    "derived": "A",
-                                                    "ancestral": "G",
-                                                    "description": "R1b1 — primary R1b subclade",
-                                                    "migration": (
-                                                        "R1b1 contains essentially all R1b men. Its main "
-                                                        "branch R1b1a (P297) separates Western European R1b "
-                                                        "(M269) from Central Asian R1b (M73)."
-                                                    ),
-                                                    "further": "M269 is the key marker separating Western European from Central Asian R1b.",
-                                                    "children": [
-                                                        {
-                                                            "haplogroup": "R1b1a",
-                                                            "snp_name": "P297",
-                                                            "rsids": [],
-                                                            "pos": 22_752_468,
-                                                            "derived": "T",
-                                                            "ancestral": "C",
-                                                            "description": "R1b1a — ancestor of M269 (European) and M73 (Central Asian) R1b",
-                                                            "migration": (
-                                                                "R1b1a (P297) is found in Europe, Central "
-                                                                "Asia, and the Middle East. It predates the "
-                                                                "split between the dominant Western European "
-                                                                "M269 branch and the Central Asian M73 branch."
+                                        ),
+                                        _node(
+                                            "K2", [("M526", "rs2033003", 23550924, "A", "C")],
+                                            description="Ancestor of N, O, P, Q and R.",
+                                            children=[
+                                                _node(
+                                                    "NO", [("M2313", "", 8674808, "C", "T"),
+                                                           ("CTS11667", "", 23208284, "G", "A")],
+                                                    description="Ancestor of haplogroups N and O.",
+                                                    children=[
+                                                        _node("N", [("M231", "rs9341278", 15469724, "G", "A"),
+                                                                    ("M232", "", 15437152, "C", "T")],
+                                                              description="Northern Eurasia, Siberia, Finland, Baltic.",
+                                                              migration=(
+                                                                  "Haplogroup N (M231) spread across northern "
+                                                                  "Eurasia and is common among Uralic-speaking "
+                                                                  "and Siberian populations.")),
+                                                        _node("O", [("M297", "rs13447345", 22746689, "A", "G"),
+                                                                    ("M1530", "", 7060243, "G", "A")],
+                                                              description="East and Southeast Asia — the most common lineage there.",
+                                                              migration=(
+                                                                  "Haplogroup O (M175) is the dominant paternal "
+                                                                  "lineage of East and Southeast Asia.")),
+                                                    ],
+                                                ),
+                                                _node(
+                                                    "P", [("P295", "rs895530", 7963031, "T", "G"),
+                                                          ("PF5862", "rs7892927", 7628900, "G", "A")],
+                                                    description="Ancestor of haplogroups Q and R (also called K2b2).",
+                                                    children=[
+                                                        _node("Q", [("M242", "rs8179021", 15018582, "C", "T"),
+                                                                    ("M1064", "", 6778043, "G", "A")],
+                                                              description="Siberia and the indigenous Americas.",
+                                                              migration=(
+                                                                  "Haplogroup Q (M242) crossed Beringia and is "
+                                                                  "the predominant lineage of indigenous "
+                                                                  "peoples of the Americas.")),
+                                                        _node(
+                                                            "R", [("M207", "rs2032658", 15581983, "A", "G"),
+                                                                  ("P224", "rs17307398", 17285993, "C", "T")],
+                                                            description="Ancestor of R1a and R1b — most common in Europe and South Asia.",
+                                                            migration=(
+                                                                "Haplogroup R (M207) is the most common lineage "
+                                                                "in Europe and is widespread across South and "
+                                                                "Central Asia."
                                                             ),
-                                                            "further": "M269 vs M73 testing distinguishes Western European from Central Asian R1b1a.",
-                                                            "children": [
-                                                                # ── R1b-M269 ──────────────────────
-                                                                {
-                                                                    "haplogroup": "R1b1a2",
-                                                                    "snp_name": "M269",
-                                                                    "rsids": ["rs9786153", "rs9384893"],
-                                                                    "pos": 17_231_092,
-                                                                    "derived": "C",
-                                                                    "ancestral": "T",
-                                                                    "description": "R1b-M269 — dominant Western European R1b",
-                                                                    "migration": (
-                                                                        "R1b-M269 is the most common Y-chromosome "
-                                                                        "haplogroup in Western Europe. All modern "
-                                                                        "Irish, Welsh, English, French, Spanish, "
-                                                                        "Portuguese, and Italian R1b men are "
-                                                                        "M269-positive. This lineage arrived in "
-                                                                        "Europe during the Bell Beaker expansion "
-                                                                        "~4,800–5,000 years ago, sweeping through "
-                                                                        "the continent from the Atlantic coast "
-                                                                        "inward. M269 frequency: Ireland/Wales ~90%, "
-                                                                        "England ~70%, France ~60%, Spain ~55%, "
-                                                                        "Germany ~45%, Italy ~40%. It is essentially "
-                                                                        "absent east of the Carpathians, where R1a "
-                                                                        "dominates."
-                                                                    ),
-                                                                    "further": (
-                                                                        "Downstream M269 branches are geographically "
-                                                                        "precise and rarely on consumer chips. Big "
-                                                                        "Y-700 or dedicated R1b panels are needed:\n"
-                                                                        "• U106/Z381 — Germanic (German, Dutch, "
-                                                                        "English, Danish, ~25–35% of those regions)\n"
-                                                                        "• P312/S116 — Western/Southern European "
-                                                                        "(British Isles, France, Iberia, Italy)\n"
-                                                                        "  – L21/M529 — Irish/Scottish/Welsh/Breton\n"
-                                                                        "  – DF27/S250 — Iberian / S. French\n"
-                                                                        "  – U152/S28 — Italian/Alpine/Gaulish\n"
-                                                                        "Once in a terminal subclade, FTDNA project "
-                                                                        "members with matching haplogroups often "
-                                                                        "share common ancestors 500–1,500 years ago."
-                                                                    ),
-                                                                    "children": [
-                                                                        # ── U106 ──────────────────────────
-                                                                        {
-                                                                            "haplogroup": "R1b-U106",
-                                                                            "snp_name": "U106",
-                                                                            "rsids": [],
-                                                                            "pos": None,
-                                                                            "derived": "T",
-                                                                            "ancestral": "C",
-                                                                            "description": "R1b-U106 — Germanic / North-Central European",
-                                                                            "migration": (
-                                                                                "R1b-U106 (Z381) is concentrated in Northern "
-                                                                                "and Central Europe — Germany, Netherlands, "
-                                                                                "England, Denmark, Belgium — where it reaches "
-                                                                                "25–35%. Its spread is associated with Germanic "
-                                                                                "tribal expansions of the 1st millennium CE. "
-                                                                                "It is also found at lower levels in Scotland, "
-                                                                                "Ireland, Poland, and Scandinavia. Subclades "
-                                                                                "Z156, Z18, and Z301 further partition U106 "
-                                                                                "by regional Germanic ancestry."
-                                                                            ),
-                                                                            "further": (
-                                                                                "FTDNA Big Y-700 + R1b-U106 Project (one of "
-                                                                                "the largest Y-DNA projects, >10,000 members) "
-                                                                                "would identify your terminal subclade and "
-                                                                                "connect you to surname lineage groups with "
-                                                                                "common ancestors in the medieval period."
-                                                                            ),
-                                                                            "children": [],
-                                                                        },
-                                                                        # ── P312 ──────────────────────────
-                                                                        {
-                                                                            "haplogroup": "R1b-P312",
-                                                                            "snp_name": "P312",
-                                                                            "rsids": [],
-                                                                            "pos": None,
-                                                                            "derived": "C",
-                                                                            "ancestral": "T",
-                                                                            "description": "R1b-P312 — Western/Southern European (Celtic, Iberian, Latin)",
-                                                                            "migration": (
-                                                                                "R1b-P312 (S116) is the dominant R1b subclade "
-                                                                                "in Western and Southern Europe — British Isles, "
-                                                                                "France, Spain, Portugal, and Italy. Its three "
-                                                                                "main branches align with major European "
-                                                                                "historical populations: L21 (Celtic Northwest "
-                                                                                "Europe), DF27 (Iberian/Basque), and U152 "
-                                                                                "(Italian/Alpine/Gaulish). P312 is tightly "
-                                                                                "associated with the Bell Beaker culture's "
-                                                                                "Atlantic expansion."
-                                                                            ),
-                                                                            "further": (
-                                                                                "FTDNA's R1b-P312 Project and Big Y-700 would "
-                                                                                "identify your branch: L21 (Irish/British), "
-                                                                                "DF27 (Iberian), U152 (Italian), or DF19 (rare)."
-                                                                            ),
-                                                                            "children": [
-                                                                                {
-                                                                                    "haplogroup": "R1b-L21",
-                                                                                    "snp_name": "L21",
-                                                                                    "rsids": [],
-                                                                                    "pos": None,
-                                                                                    "derived": "T",
-                                                                                    "ancestral": "C",
-                                                                                    "description": "R1b-L21 — Irish, Scottish, Welsh, Breton",
-                                                                                    "migration": (
-                                                                                        "R1b-L21 (M529/S145) is found at very high "
-                                                                                        "frequency in Ireland (>80%), Scotland (~65%), "
-                                                                                        "Wales (~75%), Brittany (~70%), and is common "
-                                                                                        "in England (~35%) and NW France. It is "
-                                                                                        "strongly associated with Celtic-speaking "
-                                                                                        "peoples and their ancestors from the "
-                                                                                        "Bronze Age Atlantic facade. L21 subclades "
-                                                                                        "DF21 (Scottish), DF13 (Irish, widespread), "
-                                                                                        "Z253 (Irish), and L513 (linked to medieval "
-                                                                                        "Irish royal dynasties) allow direct "
-                                                                                        "connection to named historical lineages."
-                                                                                    ),
-                                                                                    "further": (
-                                                                                        "Big Y-700 + FTDNA R1b-L21 Project is the "
-                                                                                        "gold standard for Celtic genetic genealogy. "
-                                                                                        "Terminal subclades often connect to named "
-                                                                                        "Irish septs, Scottish clans, Welsh families, "
-                                                                                        "or Breton lineages with common ancestors "
-                                                                                        "500–1,500 years ago."
-                                                                                    ),
-                                                                                    "children": [],
-                                                                                },
-                                                                                {
-                                                                                    "haplogroup": "R1b-DF27",
-                                                                                    "snp_name": "DF27",
-                                                                                    "rsids": [],
-                                                                                    "pos": None,
-                                                                                    "derived": "T",
-                                                                                    "ancestral": "C",
-                                                                                    "description": "R1b-DF27 — Iberian Peninsula and southern France",
-                                                                                    "migration": (
-                                                                                        "R1b-DF27 (S250/Z209) is the dominant R1b "
-                                                                                        "subclade in Spain (~70%), Portugal (~65%), "
-                                                                                        "and the Basque Country (~85%), and is common "
-                                                                                        "in southern France. It is strongly associated "
-                                                                                        "with pre-Roman Iberian and Gaulish populations. "
-                                                                                        "The Basque association is striking — despite "
-                                                                                        "Basques speaking a language isolate, their "
-                                                                                        "Y-chromosomes show heavy Bell Beaker/R1b input."
-                                                                                    ),
-                                                                                    "further": (
-                                                                                        "FTDNA's Iberian R1b Project and Big Y-700 "
-                                                                                        "resolve DF27 into ZZ12 (widespread) and Z195 "
-                                                                                        "(Iberian-specific) with regional geographic "
-                                                                                        "correlations."
-                                                                                    ),
-                                                                                    "children": [],
-                                                                                },
-                                                                                {
-                                                                                    "haplogroup": "R1b-U152",
-                                                                                    "snp_name": "U152",
-                                                                                    "rsids": [],
-                                                                                    "pos": None,
-                                                                                    "derived": "T",
-                                                                                    "ancestral": "C",
-                                                                                    "description": "R1b-U152 — Italian, Swiss, Alpine",
-                                                                                    "migration": (
-                                                                                        "R1b-U152 (S28/Z36) is the dominant R1b "
-                                                                                        "subclade in Italy, Switzerland, and the "
-                                                                                        "Alpine regions, reaching 40–55% in northern "
-                                                                                        "Italy and parts of France. It is associated "
-                                                                                        "with Gaulish, Celtic, and early Roman-period "
-                                                                                        "populations of the Western Alps and Po Valley."
-                                                                                    ),
-                                                                                    "further": (
-                                                                                        "FTDNA's R1b-U152 Project and Big Y-700 "
-                                                                                        "resolve to Italian regional subclades and "
-                                                                                        "Alpine genetic families with exceptional "
-                                                                                        "geographic precision."
-                                                                                    ),
-                                                                                    "children": [],
-                                                                                },
+                                                            children=[
+                                                                _node(
+                                                                    "R1", [("M173", "rs2032624", 15026424, "A", "C"),
+                                                                           ("M306", "rs1558843", 22750583, "C", "A"),
+                                                                           ("P225", "rs17307070", 15590342, "G", "T")],
+                                                                    description="Ancestor of R1a and R1b.",
+                                                                    children=[
+                                                                        _node("R1a", [("M420", "rs17250535", 23473201, "T", "A"),
+                                                                                      ("M64.2", "rs2032626", 21903383, "A", "G"),
+                                                                                      ("M87", "rs2032644", 21906109, "T", "C")],
+                                                                              description="Eastern Europe, Central and South Asia."),
+                                                                        _node(
+                                                                            "R1b", [("M343", "rs9786184", 2887824, "C", "A"),
+                                                                                    ("M228.1", "rs9341273", 15591445, "T", "C")],
+                                                                            description="Western Europe — the most common European lineage.",
+                                                                            children=[
+                                                                                _node("R1b1a2", [("M269", "rs9786153", 22739367, "T", "C"),
+                                                                                                 ("PF6399", "rs2058276", 2668456, "C", "T")],
+                                                                                      description="The dominant Western-European R1b branch."),
                                                                             ],
-                                                                        },
+                                                                        ),
                                                                     ],
-                                                                },
-                                                                # ── R1b-M73 (Central Asian) ────────
-                                                                {
-                                                                    "haplogroup": "R1b1a1",
-                                                                    "snp_name": "M73",
-                                                                    "rsids": [],
-                                                                    "pos": None,
-                                                                    "derived": "T",
-                                                                    "ancestral": "C",
-                                                                    "description": "R1b-M73 — Central Asian R1b (Bashkir, Kazakh, Mongol)",
-                                                                    "migration": (
-                                                                        "R1b-M73 is the primary Central Asian R1b lineage, "
-                                                                        "found at high frequencies among Bashkirs (~50%), "
-                                                                        "Mongolians, and some Turkic and Caucasian populations. "
-                                                                        "It represents an eastern branch of R1b1a that "
-                                                                        "remained on the steppe rather than participating "
-                                                                        "in the Yamnaya expansion into Western Europe."
-                                                                    ),
-                                                                    "further": "Big Y-700 would definitively confirm M73 vs M269 placement.",
-                                                                    "children": [],
-                                                                },
+                                                                ),
                                                             ],
-                                                        },
+                                                        ),
                                                     ],
-                                                },
+                                                ),
                                             ],
-                                        },
-                                        # ── R2 (M479) ─────────────────────────
-                                        {
-                                            "haplogroup": "R2",
-                                            "snp_name": "M479",
-                                            "rsids": [],
-                                            "pos": 7_763_788,
-                                            "derived": "A",
-                                            "ancestral": "G",
-                                            "description": "Haplogroup R2 — South Asian R lineage",
-                                            "migration": (
-                                                "Haplogroup R2 (M479) is found primarily in South "
-                                                "Asia — India, Pakistan, Afghanistan — and at low "
-                                                "frequency in the Middle East and Central Asia. It "
-                                                "is the second most common R subclade in India after "
-                                                "R1a, reaching ~10–15% in Pakistan and NW India, "
-                                                "and is associated with ancient South Asian lineages "
-                                                "predating the Indo-Aryan migrations."
-                                            ),
-                                            "further": (
-                                                "Big Y-700 + FTDNA's South Asian projects would "
-                                                "identify R2 subclades with population specificity "
-                                                "within South Asian groups."
-                                            ),
-                                            "children": [],
-                                        },
+                                        ),
                                     ],
-                                },
+                                ),
                             ],
-                        },
+                        ),
                     ],
-                },
+                ),
             ],
-        },
+        ),
     ],
-}
+)
 
 
-# ── Lookup helpers ─────────────────────────────────────────────────────────────
+# ── Lookup tables ────────────────────────────────────────────────────────────────
 
 def _build_lookup(snps_df: pd.DataFrame) -> Tuple[Dict[str, str], Dict[int, str]]:
     """
@@ -1040,7 +329,6 @@ def _build_lookup(snps_df: pd.DataFrame) -> Tuple[Dict[str, str], Dict[int, str]
     rsid_map: Dict[str, str] = {}
     pos_map: Dict[int, str] = {}
 
-    # normalise chromosome label to Y across formats
     def _is_y(chrom_val) -> bool:
         return str(chrom_val).strip().upper() in ("Y", "24")
 
@@ -1054,7 +342,6 @@ def _build_lookup(snps_df: pd.DataFrame) -> Tuple[Dict[str, str], Dict[int, str]
         if not gt or gt in ("NAN", "--", "0", ""):
             continue
 
-        # collapse 'AA' → 'A', keep 'AC' as-is (shouldn't occur on Y but be safe)
         if len(gt) == 2 and gt[0] == gt[1]:
             gt = gt[0]
 
@@ -1071,229 +358,230 @@ def _build_lookup(snps_df: pd.DataFrame) -> Tuple[Dict[str, str], Dict[int, str]
     return rsid_map, pos_map
 
 
-def _lookup(node: Dict, rsid_map: Dict, pos_map: Dict) -> Tuple[str, str]:
-    """
-    Determine whether this node's SNP is DERIVED / ANCESTRAL / NOT_FOUND.
-    Checks rsIDs first, then position, then strand-complement of each.
+# ── Node lookup (multi-marker majority vote) ────────────────────────────────────
 
-    Returns (status, genotype_found).
+def _lookup(node: Dict, rsid_map: Dict, pos_map: Dict) -> Tuple[str, int, int, List[str]]:
     """
-    derived = node.get("derived", "").upper()
-    ancestral = node.get("ancestral", "").upper()
-    comp_derived = complement(derived) if derived else ""
-    comp_ancestral = complement(ancestral) if ancestral else ""
+    Vote across all of a node's defining markers.
 
-    # By rsID
-    for rsid in node.get("rsids", []):
-        gt = rsid_map.get(rsid, "")
+    Returns (status, n_derived, n_ancestral, evidence):
+      status ∈ {'derived', 'ancestral', 'conflict', 'not_found'}
+      evidence : human-readable per-marker calls, e.g. ['M89:T✓', 'P135:C–']
+
+    Strand-ambiguous markers (ancestral/derived a complementary pair) are skipped
+    because the observed base cannot be oriented.
+    """
+    n_der = n_anc = 0
+    evidence: List[str] = []
+
+    for marker in node.get("markers", []):
+        name, rsid, pos, anc, der = marker
+        anc = anc.upper()
+        der = der.upper()
+        if _comp(anc) == der:        # strand-ambiguous → uninformative
+            continue
+
+        gt = ""
+        if rsid:
+            gt = rsid_map.get(rsid, "")
+        if not gt and pos:
+            gt = pos_map.get(int(pos), "")
         if not gt:
             continue
-        g = gt[0] if len(gt) >= 1 else ""
-        if g == derived or g == comp_derived:
-            return "derived", gt
-        if g == ancestral or g == comp_ancestral:
-            return "ancestral", gt
 
-    # By position
-    pos = node.get("pos")
-    if pos:
-        gt = pos_map.get(int(pos), "")
-        if gt:
-            g = gt[0] if gt else ""
-            if g == derived or g == comp_derived:
-                return "derived", gt
-            if g == ancestral or g == comp_ancestral:
-                return "ancestral", gt
+        g = gt[0]
+        if g == der or g == _comp(der):
+            n_der += 1
+            evidence.append(f"{name}:{g}✓")
+        elif g == anc or g == _comp(anc):
+            n_anc += 1
+            evidence.append(f"{name}:{g}–")
 
-    return "not_found", ""
+    if n_der and n_der > n_anc:
+        status = "derived"
+    elif n_anc and n_anc > n_der:
+        status = "ancestral"
+    elif n_der and n_anc:
+        status = "conflict"          # equal split — treat as a gap, do not assert
+    else:
+        status = "not_found"
+    return status, n_der, n_anc, evidence
 
 
 # ── Tree walker ────────────────────────────────────────────────────────────────
 
-def _walk(
-    node: Dict,
-    rsid_map: Dict,
-    pos_map: Dict,
-    path: List[Dict],
-    depth: int,
-) -> Tuple[List[Dict], str, List[str]]:
+def _make_entry(node: Dict, status: str, n_der: int, n_anc: int, evidence: List[str]) -> Dict:
+    return {
+        "haplogroup": node["haplogroup"],
+        "snp_name": node["snp_name"],
+        "rsids": node.get("rsids", []),
+        "pos": node.get("pos"),
+        "description": node.get("description", ""),
+        "migration": node.get("migration", ""),
+        "further": node.get("further", ""),
+        "children": node.get("children", []),
+        "snp_status": "confirmed" if status == "derived" else "chip_gap",
+        "found_genotype": ", ".join(evidence) if evidence else "–",
+        "n_derived": n_der,
+        "n_ancestral": n_anc,
+        "contradiction": [],
+    }
+
+
+def _walk(node: Dict, rsid_map: Dict, pos_map: Dict, prefix: List[Dict], depth: int):
     """
-    Recursive tree walk. Returns (path, final_status, gap_snp_names).
-
-    Strategy for NOT_FOUND (chip gap):
-      - Still descend into children so that a confirmed downstream marker
-        (e.g. R-M207 present even though K-M9 is absent) can be reported.
-      - All gap ancestors are marked snp_status='chip_gap' / 'inferred'.
+    Recursive walk. Returns (path, status) or None if this node is ruled out
+    (ancestral). Never descends past a node unless a downstream marker is
+    genuinely confirmed, so the reported lineage cannot run deeper than the data.
     """
-    if depth > 25:
-        return path, "max_depth", []
+    if depth > 30:
+        return prefix, "max_depth"
 
-    status, gt = _lookup(node, rsid_map, pos_map)
-
+    status, n_der, n_anc, evidence = _lookup(node, rsid_map, pos_map)
     if status == "ancestral":
-        return path, "ruled_out", []   # this branch definitively excluded
+        return None                                  # branch excluded
 
-    node_entry = {k: v for k, v in node.items() if k != "children"}
-    node_entry["found_genotype"] = gt if gt else "–"
-    node_entry["snp_status"] = "confirmed" if status == "derived" else "chip_gap"
-
-    new_path = path + [node_entry]
+    entry = _make_entry(node, status, n_der, n_anc, evidence)
+    path = prefix + [entry]
     children = node.get("children", [])
 
     if not children:
-        final_st = "resolved" if status == "derived" else "chip_gap"
-        return new_path, final_st, ([] if status == "derived" else [node["snp_name"]])
+        return path, ("resolved" if status == "derived" else "chip_gap")
 
-    # Check children to find which branch (if any) is confirmed or gap-traversable
-    confirmed_child = None
-    gap_children: List[str] = []
-    ruled_out: List[str] = []
-
+    confirmed: List[Tuple[Dict, int]] = []
+    gaps: List[Dict] = []
     for child in children:
-        cs, cgt = _lookup(child, rsid_map, pos_map)
+        cs, cder, _canc, _ev = _lookup(child, rsid_map, pos_map)
         if cs == "derived":
-            confirmed_child = child
-            break
-        elif cs == "not_found":
-            gap_children.append(child["snp_name"])
-        else:
-            ruled_out.append(child["snp_name"])
+            confirmed.append((child, cder))
+        elif cs in ("not_found", "conflict"):
+            gaps.append(child)
+        # ancestral children are excluded
 
-    if confirmed_child:
-        return _walk(confirmed_child, rsid_map, pos_map, new_path, depth + 1)
+    if confirmed:
+        confirmed.sort(key=lambda x: -x[1])
+        if len(confirmed) > 1:
+            # Biologically impossible: a man belongs to ONE lineage. Flag it.
+            entry["contradiction"] = [c["haplogroup"] for c, _ in confirmed]
+        res = _walk(confirmed[0][0], rsid_map, pos_map, path, depth + 1)
+        if res is None:
+            return path, ("resolved" if status == "derived" else "chip_gap")
+        return res
 
-    if gap_children:
-        unruled = [c for c in children if c["snp_name"] not in ruled_out]
-        if len(unruled) == 1:
-            return _walk(unruled[0], rsid_map, pos_map, new_path, depth + 1)
-        # Multiple gap children: lookahead to find branch with most confirmed descendants
-        best_result = None
-        best_confirmed = 0
-        for child in unruled:
-            r_path, r_status, r_gaps = _walk(child, rsid_map, pos_map, new_path, depth + 1)
-            confirmed_in = sum(1 for n in r_path if n.get("snp_status") == "confirmed")
-            if confirmed_in > best_confirmed:
-                best_confirmed = confirmed_in
-                best_result = (r_path, r_status, r_gaps)
-        if best_result and best_confirmed > 0:
-            return best_result
-        return new_path, "chip_gap", gap_children
+    # Only chip-gap children: descend only toward a confirmed descendant.
+    best = None
+    best_confirmed = 0
+    branches_with_support: List[str] = []
+    for child in gaps:
+        res = _walk(child, rsid_map, pos_map, path, depth + 1)
+        if res is None:
+            continue
+        rpath, _rstatus = res
+        # count confirmations strictly BELOW the current node
+        below = sum(1 for n in rpath[len(path):] if n["snp_status"] == "confirmed")
+        if below > 0:
+            branches_with_support.append(child["haplogroup"])
+        if below > best_confirmed:
+            best_confirmed = below
+            best = res
+    if best and best_confirmed > 0:
+        if len(branches_with_support) > 1:
+            # Confirmed markers in two mutually-exclusive branches — impossible.
+            entry["contradiction"] = sorted(set(branches_with_support))
+        return best
 
-    # All children were ancestral — current node is the terminal haplogroup
-    return new_path, "resolved", []
+    return path, ("resolved" if status == "derived" else "chip_gap")
 
 
 # ── Public API ─────────────────────────────────────────────────────────────────
 
+def _empty(status: str, y_count: int, message: str, **extra) -> Dict:
+    base = {
+        "status": status,
+        "confidence": "none",
+        "y_snp_count": y_count,
+        "haplogroup_path": "Unknown",
+        "terminal_haplogroup": "Unknown",
+        "terminal_description": "",
+        "terminal_migration": None,
+        "path": [],
+        "chip_gaps": [],
+        "not_tested_branches": [],
+        "further_testing": "",
+        "message": message,
+    }
+    base.update(extra)
+    return base
+
+
 def analyze_y_haplogroup(snps_df: pd.DataFrame) -> Dict:
     """
-    Analyse Y-chromosome SNPs and return a result dict with keys:
-      status              – 'resolved' | 'partial' | 'no_y_data' | 'not_k'
-      y_snp_count         – number of Y-SNPs found in the file
-      haplogroup_path     – human-readable path string, e.g. "K > K2b > P > R > R1b"
-      terminal_haplogroup – name of deepest confirmed/inferred haplogroup
-      path                – list of node dicts (each has snp_status: confirmed/chip_gap)
-      chip_gaps           – SNP names of markers not on chip that block further resolution
-      further_testing     – text describing what FTDNA Big Y would add
-      message             – one-line summary for the terminal log
+    Analyse Y-chromosome SNPs and return a result dict. The terminal haplogroup
+    reported is always the DEEPEST CONFIRMED node — markers that are merely
+    inferred across chip gaps never drive the call.
     """
     rsid_map, pos_map = _build_lookup(snps_df)
     y_count = len(rsid_map)
 
     if y_count == 0:
-        return {
-            "status": "no_y_data",
-            "confidence": "none",
-            "y_snp_count": 0,
-            "haplogroup_path": "Unknown",
-            "terminal_haplogroup": "Unknown",
-            "terminal_description": "",
-            "terminal_migration": None,
-            "path": [],
-            "chip_gaps": [],
-            "not_tested_branches": [],
-            "further_testing": "",
-            "message": (
-                "No Y-chromosome SNPs found in this file. Possible reasons: "
-                "(1) the person is female and has no Y chromosome, "
-                "(2) the chip or lab does not genotype Y-chromosome markers, or "
-                "(3) Y-SNPs are stored under a chromosome label not yet recognised."
-            ),
-        }
+        return _empty(
+            "no_y_data", 0,
+            "No Y-chromosome SNPs found in this file. Possible reasons: the person is "
+            "female, the chip does not genotype Y markers, or Y-SNPs are stored under "
+            "an unrecognised chromosome label.",
+        )
 
     if y_count < 10:
-        return {
-            "status": "insufficient_y_data",
-            "confidence": "none",
-            "y_snp_count": y_count,
-            "haplogroup_path": "Insufficient Y-chromosome SNPs",
-            "terminal_haplogroup": "Insufficient Y-chromosome SNPs",
-            "terminal_description": "",
-            "terminal_migration": None,
-            "path": [],
-            "chip_gaps": [],
-            "not_tested_branches": [],
-            "further_testing": "",
-            "message": (
-                f"Insufficient Y-chromosome SNPs ({y_count} found, minimum 10 required) "
-                "to make a reliable haplogroup call."
-            ),
-        }
+        return _empty(
+            "insufficient_y_data", y_count,
+            f"Insufficient Y-chromosome SNPs ({y_count} found, minimum 10 required) "
+            "to make a reliable haplogroup call.",
+            haplogroup_path="Insufficient Y-chromosome SNPs",
+            terminal_haplogroup="Insufficient Y-chromosome SNPs",
+        )
 
-    walked_path, walk_status, chip_gaps = _walk(
-        HAPLOGROUP_TREE, rsid_map, pos_map, [], 0
-    )
+    res = _walk(HAPLOGROUP_TREE, rsid_map, pos_map, [], 0)
 
-    if not walked_path:
-        if walk_status == "ruled_out":
-            return {
-                "status": "not_k",
-                "confidence": "low",
-                "y_snp_count": y_count,
-                "haplogroup_path": "Pre-K (A, B, C, D, E, F, G, H, I, or J)",
-                "terminal_haplogroup": "Pre-K",
-                "terminal_description": "Y-chromosome branches that diverged before Haplogroup K arose",
-                "terminal_migration": (
-                    "Your Y-chromosome lineage appears to belong to a non-K haplogroup — "
-                    "one of A, B, C, D, E, F, G, H, I, or J. These haplogroups represent "
-                    "deep branches of the human Y-chromosome tree that diverged from the K "
-                    "ancestor more than 45,000 years ago. Haplogroup E is the most common "
-                    "non-K lineage outside Africa, found widely in Africa, and at lower "
-                    "levels in the Middle East and Southern Europe. Haplogroups G, I, J "
-                    "are common in the Middle East, Caucasus, and parts of Europe."
-                ),
-                "path": [],
-                "chip_gaps": [],
-                "not_tested_branches": [],
-                "further_testing": (
-                    "Contact FTDNA or a specialist in human Y-chromosome phylogenetics "
-                    "to confirm your haplogroup assignment and identify your specific subclade."
-                ),
-                "message": "Y-chromosome does not appear to be in Haplogroup K.",
-            }
-        # chip gap at root or other issue
-        return {
-            "status": "partial",
-            "confidence": "none",
-            "y_snp_count": y_count,
-            "haplogroup_path": "Unresolved (key markers not on chip)",
-            "terminal_haplogroup": "Unknown",
-            "terminal_description": "",
-            "terminal_migration": None,
-            "path": [],
-            "chip_gaps": chip_gaps or [HAPLOGROUP_TREE["snp_name"]],
-            "not_tested_branches": [],
-            "further_testing": HAPLOGROUP_TREE.get("further", ""),
-            "message": "Could not resolve haplogroup — defining markers not on chip.",
-        }
+    if res is None:
+        # Root (CT) is ancestral → haplogroup A or B (pre-CT), or no usable markers.
+        return _empty(
+            "pre_ct", y_count,
+            "Y-chromosome does not carry the CT (M168) derived allele — the lineage "
+            "appears to belong to haplogroup A or B, the deepest branches of the human "
+            "Y tree. Specialist testing is needed to confirm and place it.",
+            haplogroup_path="A or B (pre-CT)",
+            terminal_haplogroup="A or B",
+            further_testing="Contact a Y-chromosome phylogenetics specialist or FTDNA.",
+        )
 
-    terminal = walked_path[-1]
+    full_path, walk_status = res
 
-    # Collect untested branches downstream of the terminal node
+    confirmed_idx = [i for i, n in enumerate(full_path) if n["snp_status"] == "confirmed"]
+    if not confirmed_idx:
+        # No marker confirmed anywhere — cannot assert anything beyond the root.
+        gap_names = [n["snp_name"] for n in full_path]
+        return _empty(
+            "partial", y_count,
+            "Could not confirm any haplogroup-defining marker on this chip.",
+            haplogroup_path="Unresolved (defining markers not on chip)",
+            chip_gaps=gap_names,
+            further_testing=HAPLOGROUP_TREE.get("further", ""),
+        )
+
+    # Terminal = deepest CONFIRMED node. Trailing inferred guesses are dropped.
+    deepest = confirmed_idx[-1]
+    path = full_path[: deepest + 1]
+    terminal = path[-1]
+
+    confirmed_count = sum(1 for n in path if n["snp_status"] == "confirmed")
+    inferred = [n["snp_name"] for n in path if n["snp_status"] == "chip_gap"]
+    contradictions = [c for n in path for c in n.get("contradiction", [])]
+
+    # Untested branches immediately below the terminal node.
     not_tested: List[Dict] = []
     for child in terminal.get("children", []):
-        cs, _ = _lookup(child, rsid_map, pos_map)
-        if cs == "not_found":
+        cs, _d, _a, _ev = _lookup(child, rsid_map, pos_map)
+        if cs in ("not_found", "conflict"):
             not_tested.append({
                 "haplogroup": child["haplogroup"],
                 "snp_name": child["snp_name"],
@@ -1301,24 +589,29 @@ def analyze_y_haplogroup(snps_df: pd.DataFrame) -> Dict:
                 "further": child.get("further", ""),
             })
 
-    resolved = walk_status == "resolved"
-    confirmed_count = sum(1 for n in walked_path if n["snp_status"] == "confirmed")
-    n_path = len(walked_path)
+    is_leaf = not terminal.get("children")
+    resolved = is_leaf or (walk_status == "resolved")
 
-    # Confidence in the terminal call is driven by how many path markers were
-    # actually confirmed (derived) vs. inferred across chip gaps.
-    if resolved and confirmed_count >= 3:
+    if contradictions:
+        confidence = "low"
+    elif confirmed_count >= 3:
         confidence = "high"
     elif confirmed_count >= 2:
         confidence = "moderate"
     else:
         confidence = "low"
+
     confidence_note = (
-        f"{confirmed_count} of {n_path} markers on the assigned path confirmed "
-        f"(derived); the rest inferred across chip gaps. "
-        f"{y_count:,} Y-SNPs typed total. Terminal-branch resolution from chip "
-        "data is limited — targeted Y-SNP or Y-sequencing refines it."
+        f"{confirmed_count} of {len(path)} markers on the assigned path confirmed "
+        f"(derived by majority vote of co-defining SNPs); the remainder inferred across "
+        f"chip gaps. {y_count:,} Y-SNPs typed total."
     )
+    if contradictions:
+        confidence_note += (
+            "  WARNING: conflicting derived calls were seen for branches that are "
+            f"mutually exclusive ({', '.join(sorted(set(contradictions)))}) — the "
+            "underlying genotypes or marker definitions may be unreliable here."
+        )
 
     return {
         "status": "resolved" if resolved else "partial",
@@ -1326,15 +619,16 @@ def analyze_y_haplogroup(snps_df: pd.DataFrame) -> Dict:
         "confidence_note": confidence_note,
         "y_snp_count": y_count,
         "n_markers_confirmed": confirmed_count,
-        "n_markers_on_path": n_path,
-        "haplogroup_path": " > ".join(n["haplogroup"] for n in walked_path),
+        "n_markers_on_path": len(path),
+        "haplogroup_path": " > ".join(n["haplogroup"] for n in path),
         "terminal_haplogroup": terminal["haplogroup"],
         "terminal_description": terminal.get("description", ""),
         "terminal_migration": terminal.get("migration", ""),
-        "path": walked_path,
-        "chip_gaps": chip_gaps,
+        "path": path,
+        "chip_gaps": inferred,
         "not_tested_branches": not_tested,
-        "further_testing": terminal.get("further", ""),
+        "contradictions": sorted(set(contradictions)),
+        "further_testing": terminal.get("further", "") or HAPLOGROUP_TREE.get("further", ""),
         "message": (
             f"Y-DNA: {terminal['haplogroup']} "
             f"({'resolved' if resolved else 'partial — chip gaps'}, "
