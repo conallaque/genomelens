@@ -19,6 +19,23 @@
     "biomarkers": [],
     "bloodwork": null,
     "exercise": {
+      "aerobic_estimates": {
+        "lactate_threshold_estimate": "Lactate threshold typically 75-85% HRmax.",
+        "test_protocols": [
+          "30-30 sec ramp test or 2400m time trial \u2192 estimate VO2max",
+          "30-min all-out time trial; average HR \u2248 lactate threshold HR (Joe Friel)",
+          "Lab gold standard: graded incremental treadmill / cycle ergometer + gas analysis"
+        ],
+        "tier": "Unknown",
+        "vo2max_estimate": "Trainability unknown \u2014 assume average."
+      },
+      "caffeine_ergogenic": {
+        "factors": [
+          "rs762551 (CYP1A2) AC"
+        ],
+        "guidance": "Slow metaboliser \u2014 high-dose pre-workout caffeine likely impairs rather than enhances endurance and elevates BP. Stick to \u22641 mg/kg if any; consider beta-alanine, beetroot juice, or no stimulant.",
+        "responder": "Null / negative responder"
+      },
       "chronotype": {
         "chronotype": "Evening",
         "factors": [
@@ -32,6 +49,143 @@
         "summary": "BDNF Val/Val \u2014 efficient activity-dependent BDNF secretion. Strong cognitive-benefit response to aerobic exercise.",
         "training_note": "Conventional aerobic training (3-4 \u00d7/week, 40-60 min Zone 2) is highly effective for mood, memory, and neuroplasticity outcomes."
       },
+      "composite_profile": {
+        "attributes": {
+          "endurance": 0,
+          "hypertrophy": 35,
+          "low_injury": 90,
+          "pain": 50,
+          "power": 100,
+          "recovery": 35,
+          "vo2max": 50
+        },
+        "bottom_sports": [
+          {
+            "fit_score": 33.5,
+            "sport": "Distance running (5-10k)"
+          },
+          {
+            "fit_score": 31.8,
+            "sport": "Triathlon"
+          },
+          {
+            "fit_score": 23.5,
+            "sport": "Marathon / ultra"
+          }
+        ],
+        "overall_score": 51.4,
+        "ranked_sports": [
+          {
+            "fit_score": 85.5,
+            "sport": "Sprinting (100-400m)"
+          },
+          {
+            "fit_score": 83.2,
+            "sport": "Olympic weightlifting"
+          },
+          {
+            "fit_score": 72.0,
+            "sport": "Powerlifting"
+          },
+          {
+            "fit_score": 70.2,
+            "sport": "Football (American)"
+          },
+          {
+            "fit_score": 65.5,
+            "sport": "Basketball"
+          },
+          {
+            "fit_score": 62.5,
+            "sport": "Rock climbing"
+          },
+          {
+            "fit_score": 55.5,
+            "sport": "Soccer / football"
+          },
+          {
+            "fit_score": 55.0,
+            "sport": "Swimming"
+          }
+        ],
+        "summary": "Composite athletic index: 51.4/100. Top-matched sport: Sprinting (100-400m) (fit 85.5). Strongest attribute: power (100). Weakest: endurance (0)."
+      },
+      "concurrent_training": {
+        "interference_level": "High",
+        "rule": "Separate strength and endurance by \u22656 h on same day, or alternate days. Keep weekly endurance \u2264 90 min total when in a strength block."
+      },
+      "daily_readiness": {
+        "formula": "Daily readiness (0-100) = 0.30\u00b7HRV_norm + 0.25\u00b7Sleep_norm + 0.15\u00b7RestingHR_norm + 0.15\u00b7SubjectiveEnergy + 0.10\u00b7Soreness_inverse + 0.05\u00b7Mood. Each component normalised vs your 14-day rolling baseline.",
+        "personal_note": "Slow-recovery genotype \u2014 be MORE conservative with thresholds. Push red to 55, treat 50-64 as orange.",
+        "thresholds": [
+          {
+            "action": "Green \u2014 push hard. PRs encouraged. Heavy day or VO2max.",
+            "range": "85-100"
+          },
+          {
+            "action": "Yellow \u2014 normal session, hold RPE \u22648. Skip max efforts.",
+            "range": "65-84"
+          },
+          {
+            "action": "Orange \u2014 reduce volume 30%. Easy aerobic or technique work only.",
+            "range": "50-64"
+          },
+          {
+            "action": "Red \u2014 full rest or 20 min walk. Forcing it now buys nothing.",
+            "range": "<50"
+          }
+        ],
+        "tracking": "Daily HRV (rMSSD on waking via Whoop/Oura/HRV4Training), resting HR, subjective 1-5 sliders for energy/soreness/mood. Take a 14-day baseline before computing deviations. 3 consecutive days <baseline = mandatory deload."
+      },
+      "deload": {
+        "frequency": "Every 4-6 weeks (slow recovery: every 4; fast: every 6).",
+        "structure": [
+          "Volume \u221250% (cut sets in half, keep load).",
+          "Intensity \u221220% on top sets (RPE 6-7 instead of 8-9).",
+          "Cut highest-impact work (sprints, plyo, max-effort lifts) first.",
+          "Sleep extension +30 min; emphasise pre-bed nutrition (40 g protein + carbs).",
+          "Mobility/aerobic flush 2-3 sessions; full rest 1-2 days."
+        ],
+        "trigger_signals": "If you see: HRV \u2193 >7% for 3+ days, RPE drift (same load feels harder), sleep quality dropping, joint pain accumulating, plateau in PRs \u2265 2 weeks \u2192 deload immediately, don't wait for the scheduled one."
+      },
+      "fat_loss": {
+        "factors": [
+          "rs9939609 (FTO) AT"
+        ],
+        "fto_risk_allele": true,
+        "guidance": "FTO obesity-risk allele \u2014 GOOD NEWS: large studies show \u2265150 min/week of moderate aerobic exercise NEUTRALISES the FTO weight-gain effect. Aerobic exercise is non-negotiable. Strength training adds compounding benefit by raising RMR. Combine with high-protein/high-fibre eating for best fat-loss outcomes."
+      },
+      "hr_zones": {
+        "formula": "HRmax \u2248 208 \u2212 0.7 \u00d7 age (Tanaka). Zones as % HRmax:",
+        "polarised": "80/20 rule: 80% of weekly training in Z1\u2013Z2, 20% in Z3\u2013Z5. Avoid the 'grey zone' (Z3 every day) \u2014 neither builds base nor builds peak.",
+        "zones": [
+          {
+            "pct": "50\u201360%",
+            "use": "Active recovery, warm-up/cool-down",
+            "zone": "Z1 Recovery"
+          },
+          {
+            "pct": "60\u201370%",
+            "use": "Mitochondrial / fat oxidation \u2014 most weekly volume",
+            "zone": "Z2 Aerobic base"
+          },
+          {
+            "pct": "70\u201380%",
+            "use": "Lactate-clearance work, 'comfortably hard'",
+            "zone": "Z3 Tempo"
+          },
+          {
+            "pct": "80\u201390%",
+            "use": "Lactate threshold intervals (8\u201320 min)",
+            "zone": "Z4 Threshold"
+          },
+          {
+            "pct": "90\u2013100%",
+            "use": "3\u20135 min hard intervals \u2014 high-leverage capacity work",
+            "zone": "Z5 VO2max"
+          }
+        ]
+      },
       "injury_risk": {
         "risks": [
           {
@@ -40,6 +194,131 @@
             "mitigation": "Favourable tendon-stiffness profile \u2014 running economy advantage.",
             "tissue": "Achilles / patellar tendon"
           }
+        ]
+      },
+      "injury_risk_map": {
+        "overall_index": 20.2,
+        "regions": [
+          {
+            "interventions": "Vitamin D >40 ng/mL, calcium 1000 mg, heavy strength 2\u00d7/wk, mileage <10%/wk increase.",
+            "region": "Bone / stress fracture",
+            "risk_pct": 33
+          },
+          {
+            "interventions": "Nordic curls 2\u00d7/wk, single-leg RDLs, hop-stick drills, FMS screening.",
+            "region": "Knee / ACL",
+            "risk_pct": 20
+          },
+          {
+            "interventions": "Band external rotations, face pulls 100/week, scapular control, avoid kipping pullups early.",
+            "region": "Rotator cuff / shoulder",
+            "risk_pct": 20
+          },
+          {
+            "interventions": "McGill big-3 daily (curl-up, side bridge, bird-dog), hip-hinge mastery before loading, no flexed-spine loading.",
+            "region": "Lumbar disc",
+            "risk_pct": 20
+          },
+          {
+            "interventions": "Spanish squats / decline squats 2\u00d7/wk, isometric wall sits, manage running volume jumps.",
+            "region": "Patellar tendon",
+            "risk_pct": 18
+          },
+          {
+            "interventions": "Daily heel drops (eccentric), slow gradual mileage build, calf raises 3\u00d7/wk.",
+            "region": "Achilles tendon",
+            "risk_pct": 10
+          }
+        ]
+      },
+      "iron_endurance": {
+        "factors": [
+          "rs1799945 (HFE H63D) CG"
+        ],
+        "guidance": "Endurance athletes with HFE variants have higher iron stores than peers \u2014 DO NOT supplement iron without lab confirmation. Annual ferritin + transferrin saturation check. Excess iron blunts mitochondrial function and increases oxidative damage in athletes.",
+        "hfe_carrier": true
+      },
+      "mental_skills": {
+        "factors": [
+          "rs4680 (COMT) AG"
+        ],
+        "profile": "Val/Met balanced",
+        "strategies": [
+          "Flexible stress-performance curve \u2014 both calm and aroused states work."
+        ]
+      },
+      "mobility": {
+        "daily_minutes": 7,
+        "guidance": "Mobility is a SKILL \u2014 daily small doses outperform weekly 30-min sessions. Pair to existing cues (post-shower, post-workout).",
+        "items": [
+          "Hip flexor \u2014 couch stretch 2 min/side daily",
+          "T-spine \u2014 open-book / quadruped rotation 2 min daily",
+          "Ankle dorsiflexion \u2014 wall test + banded mobilisation 2 min/side, 3\u00d7/wk",
+          "Shoulder \u2014 wall slides + 90/90 ER, 5 min, 3\u00d7/wk",
+          "Hip mobility (90/90 transitions, frog stretch) \u2014 5 min daily \u2014 heavy hip work compresses ROM"
+        ]
+      },
+      "motivation": {
+        "factors": [
+          "DRD2/COMT not typed"
+        ],
+        "guidance": "Typical dopaminergic reward \u2014 exercise habit usually forms within 6\u20138 weeks of consistency. Use that 'runner's high' window.",
+        "low_dopamine_reward": false
+      },
+      "pain_tolerance": {
+        "factors": [
+          "rs4680 (COMT Val158Met) AG"
+        ],
+        "guidance": "Typical pain perception \u2014 RPE scales reliably.",
+        "tolerance": "Average"
+      },
+      "periodisation": [
+        {
+          "focus": "8\u201312 reps, 12\u201316 sets/muscle/wk, RPE 7\u20138",
+          "phase": "Weeks 1\u20134 \u2014 Hypertrophy"
+        },
+        {
+          "focus": "3\u20136 reps, heavy compounds, RPE 7\u20139",
+          "phase": "Weeks 5\u20138 \u2014 Strength"
+        },
+        {
+          "focus": "1\u20133 reps + plyometrics + Olympic lifts",
+          "phase": "Weeks 9\u201311 \u2014 Power/peak"
+        },
+        {
+          "focus": "\u221240% volume, technique focus",
+          "phase": "Week 12 \u2014 Deload"
+        }
+      ],
+      "plyometric_progression": {
+        "phases": [
+          {
+            "drills": "Pogo hops 3\u00d710, line hops 3\u00d720, ankle bounce 3\u00d715, low box step-down 3\u00d75/side",
+            "level": "Foundational",
+            "weeks": "1-3"
+          },
+          {
+            "drills": "Box jump 4\u00d73 (focus on soft landing), broad jump 4\u00d73, squat jump 3\u00d75",
+            "level": "Bilateral jumps",
+            "weeks": "4-6"
+          },
+          {
+            "drills": "Single-leg box jump 3\u00d73/leg, lateral bound 3\u00d74/side, depth jump (12 in box) 3\u00d73",
+            "level": "Unilateral / reactive",
+            "weeks": "7-9"
+          },
+          {
+            "drills": "Depth jump (18-24 in) 3\u00d73, drop-to-broad-jump 3\u00d73, hurdle hops 3\u00d75",
+            "level": "Advanced reactive",
+            "weeks": "10-12"
+          }
+        ],
+        "ready": true,
+        "rules": [
+          "Plyometrics first in session, before fatigue.",
+          "Quality over quantity \u2014 stop a set the moment landing mechanics degrade.",
+          "\u226572 h between max-effort plyometric sessions.",
+          "Total foot contacts/week: beginner <80, intermediate 80-150, advanced 150-250."
         ]
       },
       "power_endurance": {
@@ -51,6 +330,588 @@
         "ratio_pct_power": 100,
         "recommendation": "Prioritise heavy strength (3-6 reps) and explosive work (jumps, sprints, Olympic lifts). 2-3 short conditioning sessions/week is sufficient. Avoid chronic high-volume aerobic which blunts your strength response."
       },
+      "protocols": {
+        "cycling_ftp_demo": {
+          "ftp_test_protocols": [
+            "20-min all-out \u00d7 0.95 = FTP estimate (Allen & Coggan)",
+            "Ramp test (Zwift/TrainerRoad): 1-min steps + 75% of final 1-min power",
+            "8-min \u00d7 2 with 10-min recovery \u00d7 0.90"
+          ],
+          "ftp_watts": 250,
+          "zones": [
+            {
+              "watts": "<137",
+              "zone": "Z1 Active recovery"
+            },
+            {
+              "watts": "137-187 W",
+              "zone": "Z2 Endurance"
+            },
+            {
+              "watts": "190-225 W",
+              "zone": "Z3 Tempo"
+            },
+            {
+              "watts": "227-262 W",
+              "zone": "Z4 Lactate threshold"
+            },
+            {
+              "watts": "265-300 W",
+              "zone": "Z5 VO2max"
+            },
+            {
+              "watts": "302-375 W",
+              "zone": "Z6 Anaerobic"
+            },
+            {
+              "watts": ">375",
+              "zone": "Z7 Neuromuscular"
+            }
+          ]
+        },
+        "detraining_timeline": [
+          {
+            "period": "Day 1-3 off",
+            "what_happens": "Glycogen stores stay full; soreness clears. ZERO detraining."
+          },
+          {
+            "period": "Week 1",
+            "what_happens": "Plasma volume drops 5-10%; HR rises 5-10 bpm at given pace. Strength UNCHANGED."
+          },
+          {
+            "period": "Week 2",
+            "what_happens": "VO2max -4-6%. Strength still preserved (neural).  Hypertrophy maintained 2-3 weeks even without training."
+          },
+          {
+            "period": "Weeks 3-4",
+            "what_happens": "VO2max -10%. Strength begins to drop. Re-introduce 2\u00d7 lifting/wk to preserve."
+          },
+          {
+            "period": "Weeks 5-8",
+            "what_happens": "Substantial detraining. VO2max -15-20%. Hypertrophy losses begin (but slow)."
+          },
+          {
+            "period": "Beyond 12 weeks",
+            "what_happens": "Detraining largely complete for endurance. Strength can hold longer (esp. with maintenance volume)."
+          },
+          {
+            "period": "RETRAINING \u2014 muscle memory",
+            "what_happens": "Myonuclei from prior hypertrophy persist 10+ years \u2014 return to previous size 2-3\u00d7 faster than initial gains. Strength can return in 4-8 weeks vs months."
+          }
+        ],
+        "fitness_tests": {
+          "30min_time_trial_threshold": {
+            "formula": "Lactate threshold HR \u2248 average HR over final 20 min of 30-min all-out time trial (Friel).",
+            "how_to": "30 min all-out solo TT on familiar route (running, rowing, or cycling). Wear HR monitor."
+          },
+          "beep_test_multistage": {
+            "best_for": "Team-sport athletes (soccer, basketball, rugby).",
+            "formula": "Level/shuttle reached \u2192 table lookup \u2192 VO2max",
+            "how_to": "20 m shuttle runs, pace increases every minute. Continue to failure."
+          },
+          "cooper_12min_run": {
+            "formula": "VO2max (ml/kg/min) = (distance_m \u2212 504.9) / 44.73",
+            "how_to": "Warm up 10 min. Run as far as possible in exactly 12 min on flat track.",
+            "interpretation_men_30y": {
+              "Average (2200-2400m)": "39-44",
+              "Below (<2200m)": "<39",
+              "Excellent (>2800m)": ">52",
+              "Good (2400-2800m)": "44-52"
+            },
+            "interpretation_women_30y": {
+              "Average (1800-2000m)": "31-37",
+              "Below (<1800m)": "<31",
+              "Excellent (>2300m)": ">45",
+              "Good (2000-2300m)": "37-45"
+            }
+          },
+          "rockport_1mile_walk": {
+            "best_for": "De-conditioned, older athletes, or anyone unable to run.",
+            "formula": "VO2max = 132.853 \u2212 0.0769\u00b7weight_lb \u2212 0.3877\u00b7age + 6.315\u00b7(1 if male else 0) \u2212 3.2649\u00b7time_min \u2212 0.1565\u00b7HR_at_finish",
+            "how_to": "Walk 1 mile (1.6 km) as briskly as possible. Record time + HR at finish."
+          },
+          "two_km_row": {
+            "formula": "Erg score (time) \u2192 table for VO2max. World class men: <6:00 / women: <7:00.",
+            "how_to": "All-out 2 km on Concept2. Damper 4-6, drag factor 120-130 men / 110-120 women."
+          },
+          "ymca_step_test": {
+            "best_for": "Quick, equipment-light screen.",
+            "formula": "3 min stepping on 12-in box at 24 steps/min; recovery HR for 1 min predicts VO2max."
+          }
+        },
+        "hr_zone_demo_age_35": {
+          "HR_reserve": 124,
+          "HRmax_tanaka": 184,
+          "age": 35,
+          "note": "Karvonen (using HR reserve) is more individually accurate than flat %HRmax.",
+          "resting_hr": 60,
+          "zones": [
+            {
+              "bpm_range_karvonen": "122-134",
+              "pct_hrmax": "50-60%",
+              "zone": "Z1 Recovery"
+            },
+            {
+              "bpm_range_karvonen": "134-147",
+              "pct_hrmax": "60-70%",
+              "zone": "Z2 Aerobic base"
+            },
+            {
+              "bpm_range_karvonen": "147-159",
+              "pct_hrmax": "70-80%",
+              "zone": "Z3 Tempo"
+            },
+            {
+              "bpm_range_karvonen": "159-172",
+              "pct_hrmax": "80-90%",
+              "zone": "Z4 Threshold"
+            },
+            {
+              "bpm_range_karvonen": "172-184",
+              "pct_hrmax": "90-100%",
+              "zone": "Z5 VO2max"
+            }
+          ]
+        },
+        "hrv_guided_week": {
+          "context_modifiers": [
+            "Alcohol, illness, poor sleep all crash HRV \u2014 diagnose cause before reducing training.",
+            "Caffeine before measurement skews readings \u2014 measure fasted.",
+            "Hormonal cycle (female): HRV dips luteal phase \u2014 normal, not a red flag.",
+            "Travel + altitude crash HRV 24-72 h \u2014 give yourself a buffer."
+          ],
+          "decision_rules": [
+            {
+              "action": "Green light \u2014 schedule HARDEST session this cycle.",
+              "signal": "Today \u2265 7-day mean AND trending up"
+            },
+            {
+              "action": "Normal \u2014 execute as planned.",
+              "signal": "Today within \u00b15% of 7-day mean"
+            },
+            {
+              "action": "Yellow \u2014 reduce volume 25%, intensity cap RPE 7.",
+              "signal": "Today < 7-day mean by 5-10%"
+            },
+            {
+              "action": "Orange \u2014 easy aerobic only (Z1 20-30 min).",
+              "signal": "Today < 7-day mean by >10% (1 day)"
+            },
+            {
+              "action": "RED \u2014 mandatory full deload or rest week. Don't push through.",
+              "signal": "3 consecutive days < baseline"
+            }
+          ],
+          "implementation": "Whoop, Oura, Garmin, HRV4Training, Elite HRV \u2014 all valid. Consistency matters more than device. Take 4 weeks to build baseline before acting on day-to-day deviations.",
+          "tracking": "AM HRV (rMSSD or proprietary) immediately on waking, daily. Track 14-day rolling mean and 7-day rolling mean. Daily reading interpreted relative to baseline."
+        },
+        "lifting_cues": [
+          {
+            "common_faults": [
+              "Knee valgus (caving in) \u2014 strengthen glute med",
+              "Butt wink (lumbar flexion at bottom) \u2014 improve hip mobility, reduce depth temporarily",
+              "Forward chest drop \u2014 strengthen upper back, work paused squats"
+            ],
+            "cues": [
+              "Spread the floor with feet (external rotation creates hip stability)",
+              "Knees track over middle toes \u2014 drive them out at the bottom",
+              "Sit between your hips, not back onto your heels",
+              "Maintain a tall chest \u2014 eyes forward, not up"
+            ],
+            "lift": "Back squat",
+            "setup": "Bar across mid-traps. Brace 360\u00b0. Feet shoulder-width, slight toe-out 15-20\u00b0."
+          },
+          {
+            "common_faults": [
+              "Round upper back (acceptable if controlled, dangerous if uncontrolled)",
+              "Hyperextending at top \u2014 neutral spine, glute squeeze, no leaning back",
+              "Bar drifting forward \u2014 keep lats tight, bar against legs"
+            ],
+            "cues": [
+              "'Bend the bar around your shins' \u2014 lat engagement",
+              "Take the slack out of the bar before pulling (creates total-body tension)",
+              "Push the floor away \u2014 don't yank up",
+              "Hips and shoulders rise together \u2014 no early hip shoot"
+            ],
+            "lift": "Deadlift (conventional)",
+            "setup": "Mid-foot under bar. Hinge to grip; shins touch bar. Squeeze armpits."
+          },
+          {
+            "common_faults": [
+              "Flared elbows \u2014 shoulder impingement risk",
+              "Bouncing off chest \u2014 lose tension, eccentric value, and shoulder stability",
+              "Shoulders rolling forward at lockout \u2014 keep blades pinned"
+            ],
+            "cues": [
+              "'Bend the bar' \u2014 internal rotation cue for chest engagement",
+              "Elbows ~45-70\u00b0 from torso (not 90\u00b0)",
+              "Touch bar at lower-sternum/upper-abdomen \u2014 not nipples",
+              "Drive feet through floor on press (leg drive)"
+            ],
+            "lift": "Bench press",
+            "setup": "Eyes under bar. Shoulder blades retracted + depressed. Arch lower back, feet planted."
+          },
+          {
+            "common_faults": [
+              "Excessive lower-back arch \u2014 soft brace, weaker core",
+              "Pressing forward \u2014 bar drifts away from base of support"
+            ],
+            "cues": [
+              "'Push your head through the window' once bar passes face",
+              "Squeeze glutes hard to prevent lumbar extension",
+              "Bar path straight up \u2014 bar finishes over middle of foot"
+            ],
+            "lift": "Overhead press",
+            "setup": "Bar in front rack. Glutes + abs braced. Feet hip-width."
+          },
+          {
+            "common_faults": [
+              "Rounding lower back \u2014 reduce ROM, strengthen lats",
+              "Squatting instead of hinging \u2014 restart pattern with PVC pipe"
+            ],
+            "cues": [
+              "Push hips BACK (not down) \u2014 hinge, don't squat",
+              "Feel hamstrings stretch; bar slides along thighs",
+              "Stop when you feel a strong stretch \u2014 not at the floor"
+            ],
+            "lift": "Romanian deadlift (RDL)",
+            "setup": "Stand tall with bar at hip. Soft-knee."
+          },
+          {
+            "common_faults": [
+              "Kipping when working strict \u2014 eliminate momentum",
+              "Shrugging into ears \u2014 re-set scaps each rep"
+            ],
+            "cues": [
+              "'Pull elbows down toward back pockets'",
+              "Chest to bar, not chin over",
+              "Full hang at bottom (active hang, not dead hang) for full ROM"
+            ],
+            "lift": "Pull-up",
+            "setup": "Hang from bar, shoulder-width grip. Shoulder blades pulled down/back BEFORE pulling."
+          }
+        ],
+        "master_athlete": [
+          {
+            "adjustments": [
+              "Add 1 mandatory deload every 5-6 weeks",
+              "Prioritise sleep extension on hard days",
+              "Mobility 10 min/day non-negotiable"
+            ],
+            "decade": "30s",
+            "key_changes": "Recovery slightly slower vs 20s. Mostly indistinguishable from younger."
+          },
+          {
+            "adjustments": [
+              "Heavy strength 2\u00d7/wk minimum \u2014 counters sarcopenia",
+              "Joint-friendly modalities (rowing, cycling) substitute high-impact",
+              "Pre-workout mobility extended to 12-15 min",
+              "Protein target 1.8-2.0 g/kg (vs 1.6 for younger adults)"
+            ],
+            "decade": "40s",
+            "key_changes": "Testosterone -1% per year. Mitochondrial decline begins. Connective tissue stiffens."
+          },
+          {
+            "adjustments": [
+              "VO2max work 2\u00d7/wk preserves cardiac function (Joyner)",
+              "Heavy lifting (\u226580% 1RM) 1-2\u00d7/wk \u2014 bone-loading",
+              "Recovery: 72 h between hard same-system sessions",
+              "Power output (jumps, throws, sprints) preserved with explicit speed work weekly"
+            ],
+            "decade": "50s",
+            "key_changes": "VO2max declines ~1% per year if untrained, ~0.5% if trained. Bone density drops post-menopause."
+          },
+          {
+            "adjustments": [
+              "Strength training 3\u00d7/wk (compound + accessories)",
+              "Balance work daily (single-leg work, eyes-closed stands)",
+              "Protein 2.0-2.4 g/kg to overcome anabolic resistance",
+              "Vitamin D \u226540 ng/mL, calcium 1200 mg \u2014 bone health",
+              "Cardio remains important: 150 min moderate + 2 vigorous sessions/wk"
+            ],
+            "decade": "60s+",
+            "key_changes": "Sarcopenia accelerates without strength training. Balance becomes critical."
+          }
+        ],
+        "movement_screen": [
+          {
+            "checks": "Heels stay down, knees track over feet, chest tall, bar over feet",
+            "common_fail": "Heels rise / knees cave \u2192 ankle + hip mobility limits",
+            "remedy": "Calf stretches, banded ankle mob, goblet squats with elevated heels",
+            "test": "Overhead squat (PVC overhead, feet shoulder-width)"
+          },
+          {
+            "checks": "Vertical torso, knee tracks straight, no lateral shift",
+            "common_fail": "Knee caves / lateral shift \u2192 glute med weak / hip mobility",
+            "remedy": "Single-leg work, lateral band walks, hip airplane",
+            "test": "In-line lunge (heel-to-toe, bar vertical along spine)"
+          },
+          {
+            "checks": "Raised leg passes hip line; opposite leg stays flat",
+            "common_fail": "<70\u00b0 \u2192 hamstring tightness / posterior chain restriction",
+            "remedy": "Banded supine hamstring stretch, 90/90 work",
+            "test": "Active straight-leg raise (lying, leg straight up)"
+          },
+          {
+            "checks": "Fingertips touch or within 1 fist-width",
+            "common_fail": "Asymmetry > 1 hand-width \u2192 thoracic + shoulder mobility deficit",
+            "remedy": "Wall slides, T-spine extensions, sleeper stretch",
+            "test": "Shoulder mobility (reach behind back, fingertip distance)"
+          },
+          {
+            "checks": "Body rises as one unit \u2014 no sag, no buckling",
+            "common_fail": "Hip sag \u2192 core weakness",
+            "remedy": "Plank progressions, dead bugs, bird-dogs (McGill big 3)",
+            "test": "Trunk stability push-up (push-up with feet together, hands under shoulders)"
+          },
+          {
+            "checks": "Maintain spine alignment, controlled tempo",
+            "common_fail": "Hip shift / rotation \u2192 anti-rotation core weak",
+            "remedy": "Pallof presses, side planks with rotation",
+            "test": "Rotary stability (quadruped: same-side hand+knee out, then under)"
+          },
+          {
+            "checks": "30 sec eyes open easy; 20+ sec eyes closed",
+            "common_fail": "<10 sec eyes closed \u2192 proprioceptive deficit, fall risk",
+            "remedy": "Daily 1-min single-leg stand each leg, bosu work, tai chi",
+            "test": "Single-leg balance (eyes open then closed, 30 sec each)"
+          }
+        ],
+        "race_time_demo": {
+          "caveat": "Riegel assumes adequate endurance training for the longer distance. Less accurate beyond ~3\u00d7 extrapolation.",
+          "known": "5 km in 24.0 min",
+          "predicted_target": "21.1 km in 110.4 min (5.23 min/km pace)"
+        },
+        "recovery_matrix": [
+          {
+            "effect_size": "\u2605\u2605\u2605\u2605\u2605 \u2014 single highest-leverage intervention",
+            "evidence": "Sleep <7 h drops max strength 4-7%, REM testosterone rises ~15% per extra hour to 8 h",
+            "modality": "Sleep 8-9 h",
+            "protocol": "Hard floor: never below 7 h on training weeks. Cool room (16-19 \u00b0C), dark, devices off 30 min pre-bed."
+          },
+          {
+            "effect_size": "\u2605\u2605\u2605\u2605",
+            "evidence": "Glycogen resynthesis 50% faster with 1 g/kg carbs + 0.3 g/kg protein within 30 min vs 2 h delay",
+            "modality": "Carbs + protein post-workout",
+            "protocol": "0.3 g/kg protein + 0.5-1 g/kg carbs within 1-2 h of finishing."
+          },
+          {
+            "effect_size": "\u2605\u2605\u2605\u2605",
+            "evidence": "2% dehydration = ~10% endurance performance drop; full rehydration requires sodium",
+            "modality": "Hydration \u22651.5\u00d7 sweat lost",
+            "protocol": "Weigh before/after; replace 150% with electrolyte-containing fluid in 4 h."
+          },
+          {
+            "effect_size": "\u2605\u2605\u2605",
+            "evidence": "Improves lactate clearance, reduces DOMS perception, no fitness cost",
+            "modality": "Active recovery (Z1 20-30 min)",
+            "protocol": "Easy bike/walk/swim 20-30 min day after hard session \u2014 RPE 3-4."
+          },
+          {
+            "effect_size": "\u2605\u2605\u2605",
+            "evidence": "Plasma volume +7% in 10 sessions (Scoon), endurance perf +7% trained athletes, cardiovascular adaptation",
+            "modality": "Sauna (Finnish, dry)",
+            "protocol": "80-90 \u00b0C, 20-30 min, 3-4\u00d7/wk POST-exercise. Rehydrate."
+          },
+          {
+            "effect_size": "\u2605\u2605 (paradoxical for hypertrophy)",
+            "evidence": "Reduces inflammation/DOMS but blunts strength/hypertrophy adaptations 12+ h post-lift",
+            "modality": "Cold-water immersion",
+            "protocol": "Use only on heavy endurance/competition days. AVOID within 6 h of strength training."
+          },
+          {
+            "effect_size": "\u2605\u2605",
+            "evidence": "Modest DOMS reduction; perceptual rather than mechanical benefit",
+            "modality": "Massage / soft-tissue work",
+            "protocol": "1-2\u00d7/wk during heavy blocks. Foam roll daily 10 min self-massage."
+          },
+          {
+            "effect_size": "\u2605",
+            "evidence": "Small reduction in DOMS, no clear performance benefit",
+            "modality": "Compression garments",
+            "protocol": "Optional \u2014 useful during long travel or back-to-back competition."
+          },
+          {
+            "effect_size": "\u2605\u2605",
+            "evidence": "ROM gains, no acute DOMS reduction. Performed pre-strength acutely DECREASES force.",
+            "modality": "Stretching (static, post-session)",
+            "protocol": "Static stretching post-workout only or in separate mobility session."
+          },
+          {
+            "effect_size": "\u2605\u2605",
+            "evidence": "Reduces DOMS markers (CK, IL-6) and improves sleep onset",
+            "modality": "Tart cherry juice 12 oz",
+            "protocol": "Pre-bed during heavy training weeks (consider sugar load)."
+          },
+          {
+            "effect_size": "\u2605\u2605",
+            "evidence": "Improves sleep onset and quality; muscle relaxation",
+            "modality": "Magnesium 200-400 mg pre-bed",
+            "protocol": "Glycinate or threonate form, 200-400 mg 30 min before bed."
+          },
+          {
+            "effect_size": "\u2605\u2605\u2605 (for competition only)",
+            "evidence": "Restores adenosine-receptor sensitivity; greater ergogenic effect on race day",
+            "modality": "Caffeine cycling (off 5-7 d pre-event)",
+            "protocol": "Caffeine taper 7 days pre-event, then 3-6 mg/kg 45 min pre-race."
+          },
+          {
+            "effect_size": "\u2605\u2605\u2605\u2605",
+            "evidence": "16-22% greater fitness gains in HRV-guided vs fixed-plan groups (Vesterinen 2016)",
+            "modality": "HRV-guided autoregulation",
+            "protocol": "Track AM HRV; hard sessions only when HRV \u2265 rolling mean; easy or rest below."
+          }
+        ],
+        "running_pace_demo_threshold_5min_km": {
+          "threshold_pace_min_km": 5.0,
+          "zones": [
+            {
+              "pace_min_km": "6.50-7.00",
+              "zone": "Z1 Recovery"
+            },
+            {
+              "pace_min_km": "5.75-6.25",
+              "zone": "Z2 Aerobic base"
+            },
+            {
+              "pace_min_km": "5.25-5.50",
+              "zone": "Z3 Tempo (mara/half pace)"
+            },
+            {
+              "pace_min_km": "4.85-5.15",
+              "zone": "Z4 Threshold (10k pace)"
+            },
+            {
+              "pace_min_km": "4.40-4.75",
+              "zone": "Z5 VO2max (5k/3k pace)"
+            },
+            {
+              "pace_min_km": "3.90-4.25",
+              "zone": "Z6 Anaerobic (1k/400m)"
+            }
+          ]
+        },
+        "sport_specific_plans": [
+          {
+            "meet_day": "1 light opener at 92% of PR, 2nd at PR, 3rd a +2.5 kg PR attempt.",
+            "sport": "Powerlifting",
+            "weeks": [
+              {
+                "accessory": "RDL, pause squats, close-grip bench, rows, walking lunges. 3\u00d710-12.",
+                "phase": "Hypertrophy (wk 1-4)",
+                "schedule": "Squat 2\u00d7/wk, Bench 2\u00d7/wk, Deadlift 1\u00d7/wk. 4\u00d78 @ 70-75%."
+              },
+              {
+                "accessory": "Reduce volume; same exercises 3\u00d76-8.",
+                "phase": "Strength (wk 5-8)",
+                "schedule": "Same lifts. 5\u00d75 @ 80%, +2.5-5 kg/wk on top set."
+              },
+              {
+                "accessory": "Minimal \u2014 pause work, lockouts.",
+                "phase": "Peak (wk 9-11)",
+                "schedule": "Top set 1-3 reps @ 87-93%, back-off 3\u00d75 @ 80%."
+              },
+              {
+                "phase": "Taper (wk 12)",
+                "schedule": "\u221240% volume, single @ 90% midweek, full rest 48 h pre-meet."
+              }
+            ]
+          },
+          {
+            "sport": "Olympic Weightlifting",
+            "weeks": [
+              {
+                "focus": "Bar path, receiving positions, foot work. Video every session.",
+                "phase": "Technique block (wk 1-4)",
+                "schedule": "Snatch + variants 3\u00d7/wk, C&J + variants 3\u00d7/wk, Squat 3\u00d7/wk. 70-80%."
+              },
+              {
+                "phase": "Strength block (wk 5-8)",
+                "schedule": "Same lift split. Squat 5\u00d75 @ 80-85%. Olympic lifts 70-85%."
+              },
+              {
+                "phase": "Intensity (wk 9-11)",
+                "schedule": "Snatch + C&J at 85-95%, singles + doubles."
+              },
+              {
+                "phase": "Peak/competition (wk 12)",
+                "schedule": "Heavy single mid-week, deload, comp day."
+              }
+            ]
+          },
+          {
+            "meet_day": "1 light opener at 92% of PR, 2nd at PR, 3rd a +2.5 kg PR attempt.",
+            "sport": "Powerlifting",
+            "weeks": [
+              {
+                "accessory": "RDL, pause squats, close-grip bench, rows, walking lunges. 3\u00d710-12.",
+                "phase": "Hypertrophy (wk 1-4)",
+                "schedule": "Squat 2\u00d7/wk, Bench 2\u00d7/wk, Deadlift 1\u00d7/wk. 4\u00d78 @ 70-75%."
+              },
+              {
+                "accessory": "Reduce volume; same exercises 3\u00d76-8.",
+                "phase": "Strength (wk 5-8)",
+                "schedule": "Same lifts. 5\u00d75 @ 80%, +2.5-5 kg/wk on top set."
+              },
+              {
+                "accessory": "Minimal \u2014 pause work, lockouts.",
+                "phase": "Peak (wk 9-11)",
+                "schedule": "Top set 1-3 reps @ 87-93%, back-off 3\u00d75 @ 80%."
+              },
+              {
+                "phase": "Taper (wk 12)",
+                "schedule": "\u221240% volume, single @ 90% midweek, full rest 48 h pre-meet."
+              }
+            ]
+          }
+        ],
+        "supplement_stacks": {
+          "evidence_tiers": {
+            "A_proven": [
+              "Creatine",
+              "Caffeine (responder genotype)",
+              "Carbs intra-workout >90 min",
+              "Beta-alanine",
+              "Beetroot/nitrate",
+              "Protein post-workout"
+            ],
+            "B_some_evidence": [
+              "Citrulline",
+              "L-theanine",
+              "Tart cherry",
+              "Sodium bicarbonate"
+            ],
+            "C_avoid_or_unproven": [
+              "BCAAs (whole protein superior)",
+              "Glutamine for performance",
+              "Most 'fat-burner' stacks",
+              "Excess vitamin C/E (blunts adaptation)",
+              "Testosterone-boosters (almost all useless)"
+            ]
+          },
+          "intra_workout": [
+            "Sessions <60 min: water only",
+            "60-90 min: 30 g carbs/h (sports drink or gel)",
+            "90+ min endurance: 60-90 g carbs/h + 500-750 ml fluid + 300-500 mg Na",
+            "Hot conditions: + 200-300 mg sodium per L fluid above standard"
+          ],
+          "personalised_priority": "Strength-focused: creatine + caffeine + protein. Endurance-focused: beetroot + carbs + caffeine + sodium. Strength tier: Low hypertrophy / strength-leaning responder. VO2 tier: Unknown.",
+          "post_workout": [
+            "Protein 0.3 g/kg within 1-2 h (whey/leucine ideal for MPS spike)",
+            "Carbs 0.5-1 g/kg if glycogen-depleted",
+            "Tart cherry juice 12 oz on heavy days (DOMS + sleep)",
+            "Vitamin D 1000-2000 IU with the meal (if deficient)",
+            "Magnesium 200-400 mg if going to bed within 4 h"
+          ],
+          "pre_workout": [
+            "Caffeine \u22641 mg/kg or skip",
+            "Beta-alanine 3-5 g daily (loading 2-4 wk; benefits 1-4 min efforts)",
+            "Creatine monohydrate 5 g daily (timing doesn't matter; total stack)",
+            "Beetroot juice 500 ml 2-3 h pre \u2014 endurance + repeated sprints (nitric oxide)",
+            "Citrulline malate 6-8 g 60 min pre \u2014 strength volume, blood flow"
+          ]
+        }
+      },
       "recovery": {
         "factors": [
           "rs1800795 (IL6 -174) GG \u2014 high baseline inflammatory tone"
@@ -59,7 +920,119 @@
         "protocol": "Expect prolonged DOMS and slower clearance of training stress. 48-72 h between hard sessions on the same muscle group. Aggressive recovery: sleep \u22658 h, omega-3, tart cherry, contrast showers.",
         "speed": "Slow"
       },
+      "sample_workouts": [
+        {
+          "best_window": "16:00 \u2013 20:00",
+          "blocks": [
+            "Warm-up (10 min): bike 5 min, dynamic mobility, glute activation, 3 ramping squat sets",
+            "Back squat \u2014 5\u00d73 @ 85% 1RM, 3-min rest",
+            "Romanian deadlift \u2014 4\u00d76 @ 75%, 2-min rest",
+            "Bulgarian split squat \u2014 3\u00d78/leg @ moderate DBs, 90 sec",
+            "Nordic curl \u2014 3\u00d75 (eccentric 4 sec)",
+            "Standing calf raise \u2014 3\u00d712",
+            "Finisher: weighted plank 3\u00d745 sec",
+            "Cool-down: 5 min walk + hip flexor + quad stretch"
+          ],
+          "duration": "60-70 min",
+          "name": "A \u2014 Lower Body Strength (Heavy)",
+          "rpe_target": "Top set RPE 8 (2 reps in reserve)"
+        },
+        {
+          "best_window": "16:00 \u2013 20:00",
+          "blocks": [
+            "Warm-up (10 min): pogo hops, A-skips, band activation",
+            "Box jump \u2014 5\u00d73 (max height attainable cleanly), 90 sec rest",
+            "Hang power clean \u2014 5\u00d73 @ 70%, 2-min rest",
+            "Push press \u2014 4\u00d74 @ 75%",
+            "Broad jump \u2014 4\u00d73, 90 sec",
+            "Med-ball rotational throw \u2014 3\u00d76/side",
+            "Cool-down: 5 min easy + ankle/hip mobility"
+          ],
+          "duration": "45-55 min",
+          "name": "B \u2014 Power / Plyometric Day",
+          "rpe_target": "Bar-speed focused \u2014 no grinding reps. RPE 7-8."
+        },
+        {
+          "best_window": "Anytime",
+          "blocks": [
+            "Warm-up: 5 min easy bike",
+            "8 \u00d7 30-sec sprint @ 90% effort / 90-sec walk recovery",
+            "Cool-down: 5 min easy + breathing reset"
+          ],
+          "duration": "25-30 min",
+          "name": "C \u2014 Conditioning (Power-Friendly)",
+          "rpe_target": "Each sprint RPE 9; full rest between."
+        }
+      ],
+      "sleep": {
+        "factors": [
+          "Sleep SNPs not typed"
+        ],
+        "guidance": "Standard 7.5\u20139 h target. Sleep-extension protocol on hard training weeks: +30\u201360 min vs baseline. Track HRV trend; <baseline 3 days = mandatory deload.",
+        "sleep_phenotype": "Average"
+      },
       "status": "ok",
+      "strength_trainability": {
+        "factors": [
+          "Strength SNPs not typed"
+        ],
+        "recommendation": "Hypertrophy genes lean low \u2014 focus on strength (3\u20136 reps, heavy) where neural adaptations drive bigger early gains, plus high-volume blocks (8\u201312 weeks) for body composition. Consistency beats genes.",
+        "score": 0.5,
+        "tier": "Low hypertrophy / strength-leaning responder"
+      },
+      "stress_fracture": {
+        "elevated_risk": true,
+        "factors": [
+          "rs2228570 (VDR FokI) TT",
+          "rs1800012 (COL1A1) GG"
+        ],
+        "guidance": "Elevated stress-fracture risk markers \u2014 for runners/jumpers: ramp running mileage \u226410%/week, alternate impact days with cycling/swim, prioritise vitamin D \u226540 ng/mL, calcium 1000 mg/day, and bone-loading strength work (heavy squats, jumps) 2\u00d7/week \u2014 these strengthen bone more than running."
+      },
+      "tapering": {
+        "duration_days": 7,
+        "structure": [
+          "D-7: heavy single + light volume",
+          "D-6: rest",
+          "D-5: speed work, low volume",
+          "D-4: rest",
+          "D-3: opener \u2014 top set @ 90%, 2-3 sets only",
+          "D-2: full rest",
+          "D-1: short activation, no fatigue",
+          "Competition day"
+        ],
+        "volume_change": "\u221240% sets, intensity maintained"
+      },
+      "thermal_adaptation": {
+        "cold_protocol": "Cold exposure 2-3 min @ 50-59 \u00b0F (10-15 \u00b0C) 3-5\u00d7/wk pre-breakfast \u2014 increases brown-fat activity over 4-6 weeks (S\u00f8berg protocol: 11 min/wk minimum across multiple sessions). Avoid IMMEDIATELY post-strength training (blunts hypertrophy adaptation 12+ h).",
+        "cold_tolerance": "Average",
+        "factors": [
+          "Thermal SNPs not typed"
+        ],
+        "heat_protocol": "Sauna 80-90 \u00b0C, 20-30 min, 3-4\u00d7/wk post-exercise \u2014 heat-shock protein induction, plasma volume +7%, cardiac output adaptation. Endurance performance improves ~7% in trained athletes after 10 sauna sessions (Scoon et al). Rehydrate 1.5\u00d7 sweat lost."
+      },
+      "training_nutrition": {
+        "intra_workout": "Strength sessions: water only is fine. >90 min lift: 20 g intra-EAAs or carbs optional.",
+        "post_workout": "Within 1\u20132 h: 0.3 g/kg protein (20\u201340 g) + carbs (1 g/kg if depleted). Examples: Greek yoghurt + berries + granola; chicken + rice + veg. Hydrate to 150% of fluid lost (weigh in/out).",
+        "pre_workout": "60\u201390 min before: 0.5\u20131 g/kg carbs + 20 g protein (e.g. oats+whey, rice cake+jam+yoghurt). "
+      },
+      "vo2max": {
+        "factors": [
+          "VO2max SNPs not typed"
+        ],
+        "guidance": "Trainability SNPs not typed \u2014 assume average response.",
+        "score": 0,
+        "tier": "Unknown"
+      },
+      "warmup": {
+        "cooldown": "5 min easy cardio + 5 min static stretching (focus on tight areas \u2014 hips, calves, T-spine).",
+        "duration_min": 10,
+        "protocol": [
+          "5 min easy cardio (bike/row/jog) \u2014 raise core temp",
+          "Dynamic mobility: leg swings, hip openers, T-spine rotations \u2014 3 min",
+          "Activation: glute bridges 2\u00d710, band pull-aparts 2\u00d715, scap pushups 2\u00d710",
+          "Specific ramp: 3 ascending sets to working weight (50/70/90%)"
+        ]
+      },
       "weekly_template": [
         {
           "day": "Mon",
@@ -106,6 +1079,13 @@
         "guidance": "No alcohol-risk variants typed \u2014 standard moderation applies (\u22641-2 drinks/day for men, \u22641 for women).",
         "risk": "Standard"
       },
+      "antioxidants": {
+        "factors": [
+          "Antioxidant SNPs not typed"
+        ],
+        "guidance": "Standard endogenous antioxidant capacity \u2014 a normal varied diet suffices. Aim for diverse plant colours weekly.",
+        "reduced_capacity": false
+      },
       "avoid": [
         "Sugary drinks",
         "White bread / pastries",
@@ -113,8 +1093,17 @@
         "Processed meats / deli",
         "Salted snacks",
         "High-sodium soups & sauces",
-        "Fresh milk / ice cream (lactose intolerance)"
+        "Fresh milk / ice cream (lactose intolerance)",
+        "Butter/coconut oil as primary fats",
+        "Processed red meat"
       ],
+      "b12": {
+        "factors": [
+          "rs1801198 (TCN2) GC"
+        ],
+        "guidance": "Variants in B12 transport/secretor status \u2014 prioritise high-bioavailable B12 sources: clams, beef liver, sardines, eggs, dairy. Consider 500 \u00b5g methylcobalamin sublingual 2\u20133\u00d7/week if vegetarian/vegan.",
+        "lower_functional_b12": true
+      },
       "caffeine": {
         "cutoff_time": "12:00",
         "factors": [
@@ -124,6 +1113,55 @@
         "guidance": "Slow metaboliser \u2014 caffeine half-life prolonged (8+ h). Cap at 200 mg/day (\u2248 1 large coffee) and avoid after lunch. Higher dose links to elevated CV risk in slow metabolisers. L-Theanine 100-200 mg paired with caffeine smooths anxiety response.",
         "limit_mg": 200,
         "metabolism": "Slow (*1F carrier)"
+      },
+      "caloric": {
+        "gain_surplus_kcal": 250,
+        "guidance": "Compute TDEE from formula. For fat loss: subtract 400\u2013500 kcal (smaller deficit if appetite-elevated genotype \u2014 sustainability beats speed). For lean gain: +250 kcal with strength training. Protein floor regardless of goal: 1.6\u20132.0 g/kg body weight, distributed across 3\u20134 meals.",
+        "loss_deficit_kcal": 400,
+        "protein_g_per_kg": 1.8,
+        "tdee_formula": "Mifflin-St Jeor: BMR(\u2642) = 10\u00b7kg + 6.25\u00b7cm \u2212 5\u00b7age + 5; (\u2640) \u2212161. TDEE = BMR \u00d7 activity (1.4 sedentary, 1.55 moderate, 1.75 active, 1.9 athlete)."
+      },
+      "cardiometabolic_dashboard": {
+        "axes": [
+          {
+            "axis": "LDL response to saturated fat",
+            "leverage": "LDL stays low even on higher-sat-fat diets \u2014 Mediterranean fine, dairy OK.",
+            "percentile": 3.4,
+            "tier": "Very low"
+          },
+          {
+            "axis": "Postprandial triglyceride response",
+            "leverage": "TG handling robust \u2014 moderate refined carbs tolerated.",
+            "percentile": 0.3,
+            "tier": "Very low"
+          },
+          {
+            "axis": "HDL maintenance",
+            "leverage": "Insufficient typed variants \u2014 assume average.",
+            "percentile": null,
+            "tier": "Insufficient data"
+          },
+          {
+            "axis": "Glycaemic vulnerability",
+            "leverage": "Robust glucose tolerance \u2014 standard carb intake fine.",
+            "percentile": 5.5,
+            "tier": "Very low"
+          },
+          {
+            "axis": "Blood-pressure response to sodium",
+            "leverage": "BP stays low on standard sodium intake.",
+            "percentile": 2.0,
+            "tier": "Very low"
+          }
+        ]
+      },
+      "choline": {
+        "factors": [
+          "PEMT/MTHFD1 not typed"
+        ],
+        "guidance": "Adequate intake target 425 mg/day (women) / 550 mg/day (men). 1\u20132 whole eggs daily covers most.",
+        "increased_need": false,
+        "target_mg": 425
       },
       "daily_template": [
         {
@@ -151,6 +1189,18 @@
           "meal": "Evening"
         }
       ],
+      "detoxification": {
+        "cruciferous_target_servings_per_week": 3,
+        "guidance": "Phase I/II balance acceptable. Support with cruciferous veg 3\u00d7/week + alliums + adequate protein for amino-acid conjugation pool.",
+        "phase1_typed": [
+          "CYP1A2 AC"
+        ],
+        "phase2_typed": [
+          "GSTP1 AG",
+          "COMT AG"
+        ],
+        "slow_phase2_clearance": false
+      },
       "emphasise": [
         "Non-starchy vegetables",
         "Berries",
@@ -160,8 +1210,18 @@
         "Leafy greens daily (folate + nitrates)",
         "Nuts & seeds (small handful daily)",
         "Berries (antioxidant load)",
-        "Lactose-free dairy, aged cheeses, kefir/yoghurt"
+        "Lactose-free dairy, aged cheeses, kefir/yoghurt",
+        "Oily fish 3\u20134\u00d7/week (salmon, sardines, mackerel) \u2014 FADS poor converter",
+        "Extra-virgin olive oil (primary fat), Mediterranean pattern"
       ],
+      "fiber": {
+        "factors": [
+          "Elevated appetite \u2014 fibre is the most powerful free satiety lever.",
+          "Salt-sensitive \u2014 potassium-rich high-fibre foods (legumes, potato) double-up benefit."
+        ],
+        "guidance": "Target 40 g fibre/day \u2014 most adults eat 15. Practical: 1 cup oats (8 g), 1 cup berries (8 g), 1 cup beans/lentils (15 g), 2 cups veg (10 g), 1 oz chia/flax (10 g). Ramp up 5 g/week to avoid GI distress; pair with water increase.",
+        "target_g": 40
+      },
       "gluten": {
         "celiac_risk_haplotype": false,
         "factors": [
@@ -170,12 +1230,67 @@
         ],
         "guidance": "No DQ2/DQ8 risk haplotype typed/detected \u2014 coeliac disease is essentially ruled out. Gluten avoidance unnecessary for autoimmune reasons."
       },
+      "glycemic_threshold": {
+        "factors": [
+          "TCF7L2 CT"
+        ],
+        "guidance": "Personal carb ceiling: ~65 g/meal at breakfast/lunch, ~50 g at dinner (circadian glucose tolerance drops PM). Reference portions: 1 cup cooked rice \u2248 45 g, 1 medium banana \u2248 27 g, 1 slice bread \u2248 15 g, 1 cup oats \u2248 27 g, 1 medium potato \u2248 37 g, 1 cup berries \u2248 14 g. Pairing with 25-30 g protein + 10 g fibre + healthy fat blunts glucose excursion 30-50%.",
+        "max_carbs_dinner_g": 50,
+        "max_carbs_per_meal_g": 65
+      },
+      "histamine": {
+        "elevated_risk": false,
+        "factors": [
+          "Histamine SNPs not typed"
+        ],
+        "guidance": "Normal histamine clearance \u2014 fermented and aged foods well tolerated; they contribute meaningfully to gut-microbiome diversity.",
+        "score": 0
+      },
+      "hydration": {
+        "factors": [
+          "Hydration SNPs not typed"
+        ],
+        "guidance": "Baseline: 30\u201335 mL/kg body weight daily, +500\u2013750 mL per hour exercise. Salt-sensitive: pre-load 500 mL water on waking; emphasise potassium-rich fluids (coconut water, broth) over electrolyte powders.",
+        "target_ml_per_kg": 33
+      },
+      "inflammation": {
+        "factors": [
+          "rs1800795 (IL6 -174) GG"
+        ],
+        "guidance": "Mediterranean pattern with 2\u00d7 weekly fish, daily berries + nuts, 1 tsp turmeric, minimise processed foods.",
+        "score": 2,
+        "tier": "Mild inflammatory tendency"
+      },
+      "iron": {
+        "factors": [
+          "rs1800562 (HFE C282Y) GG",
+          "rs1799945 (HFE H63D) CG",
+          "rs855791 (TMPRSS6) GG"
+        ],
+        "guidance": "Single H63D copy \u2014 minimal clinical risk; no action needed.",
+        "overload_risk": "Mild"
+      },
       "lactose": {
         "factors": [
           "rs4988235 (LCT) GA"
         ],
         "guidance": "Lactase non-persistence \u2014 symptomatic lactose intolerance likely. Choose lactose-free milk, aged cheeses (parmesan, cheddar), fermented dairy (yoghurt, kefir) which are partially pre-digested. Plant milks for liquid dairy.",
         "tolerance": "Intolerant (non-persistent)"
+      },
+      "macro_periodisation": {
+        "guidance": "Cycling carbs by training load improves body composition and insulin sensitivity vs flat macros. Elevated-appetite genotype: limit carb cycling depth \u2014 large --day swings can trigger evening cravings.",
+        "rest_day": {
+          "carb_timing": "Lower-carb day \u2014 emphasise protein, vegetables, healthy fats. Useful for insulin sensitivity restoration.",
+          "pct_carbs": 22,
+          "pct_fat": 48,
+          "pct_protein": 30
+        },
+        "training_day": {
+          "carb_timing": "60% of carbs in pre+post-workout window (65 g pre-session 60 min before, refill within 2 h post). Remaining 40% spread across other meals.",
+          "pct_carbs": 47,
+          "pct_fat": 28,
+          "pct_protein": 25
+        }
       },
       "macros": {
         "factors": [
@@ -189,6 +1304,13 @@
         "pct_protein": 35,
         "rationale": "Lower-carb skew (~30%) \u2014 your variants reduce glucose tolerance."
       },
+      "meal_timing": {
+        "eating_window": "10:00\u201320:00",
+        "factors": [
+          "rs1801260 (CLOCK) TT"
+        ],
+        "guidance": "Evening chronotype \u2014 push first meal later, but cap last meal \u226420:00 to preserve overnight fast."
+      },
       "methylation": {
         "factors": [
           "rs1801133 (MTHFR C677T) CT",
@@ -197,6 +1319,1005 @@
         "guidance": "Emphasise folate-rich foods: leafy greens (spinach, kale, romaine), liver, lentils, asparagus, broccoli. Avoid synthetic folic-acid fortified products (many cereals, breads) \u2014 they compete with active folate. Choose methylfolate-supplemented options if available.",
         "needs_methylation_support": true
       },
+      "omega3": {
+        "ala_conversion": "Poor",
+        "epa_dha_target_mg": 1500,
+        "factors": [
+          "rs174547 (FADS1) TC"
+        ],
+        "guidance": "Reduced-activity FADS desaturase variant \u2014 ALA from flax/chia/walnut converts inefficiently (<5%) to EPA/DHA. Hit 1.5\u20132 g combined EPA+DHA daily from oily fish (salmon, sardines, mackerel, herring) 3\u20134\u00d7/week, or algal-/fish-oil supplementation. Vegetarians: algae-oil 500\u20131000 mg EPA+DHA daily."
+      },
+      "polygenic_scores": {
+        "Alcohol_dependence_protection": {
+          "coverage": 100.0,
+          "max_possible": 4.1,
+          "missing": [],
+          "percentile": 0.1,
+          "score": 0.0,
+          "tier": "Very low",
+          "typed": [
+            "ADH1B*2 (rs1229984)=GG",
+            "ALDH2*2 (rs671)=GG"
+          ],
+          "z": -3.0
+        },
+        "BP_systolic": {
+          "coverage": 25.0,
+          "max_possible": 0.64,
+          "missing": [
+            "ACE",
+            "NPPA",
+            "MTHFR-NPPA"
+          ],
+          "percentile": 2.0,
+          "score": 0.1,
+          "tier": "Very low",
+          "typed": [
+            "AGT (rs699)=AG"
+          ],
+          "z": -2.06
+        },
+        "Caffeine_consumption": {
+          "coverage": 0,
+          "max_possible": 0.62,
+          "missing": [
+            "CYP1A2/15q24",
+            "AHR"
+          ],
+          "percentile": null,
+          "score": 0.0,
+          "tier": "Insufficient data",
+          "typed": [],
+          "z": null
+        },
+        "Coeliac_risk": {
+          "coverage": 100.0,
+          "max_possible": 2.8,
+          "missing": [],
+          "percentile": 0.1,
+          "score": 0.0,
+          "tier": "Very low",
+          "typed": [
+            "HLA-DQ2.5 (rs2187668)=CC",
+            "HLA-DQ8 (rs7454108)=AA"
+          ],
+          "z": -3.0
+        },
+        "HDL_cholesterol": {
+          "coverage": 0,
+          "max_possible": 1.36,
+          "missing": [
+            "CETP",
+            "CETP -629",
+            "LPL",
+            "LIPC"
+          ],
+          "percentile": null,
+          "score": 0.0,
+          "tier": "Insufficient data",
+          "typed": [],
+          "z": null
+        },
+        "LDL_cholesterol": {
+          "coverage": 16.7,
+          "max_possible": 1.74,
+          "missing": [
+            "LDLR",
+            "SORT1",
+            "CELSR2",
+            "PCSK9",
+            "APOA2"
+          ],
+          "percentile": 3.4,
+          "score": 0.34,
+          "tier": "Very low",
+          "typed": [
+            "APOE \u03b54 (rs429358)=TC"
+          ],
+          "z": -1.83
+        },
+        "Obesity_BMI": {
+          "coverage": 16.7,
+          "max_possible": 2.22,
+          "missing": [
+            "MC4R",
+            "LEPR",
+            "TMEM18",
+            "SH2B1",
+            "GNPDA2"
+          ],
+          "percentile": 2.6,
+          "score": 0.39,
+          "tier": "Very low",
+          "typed": [
+            "FTO (rs9939609)=AT"
+          ],
+          "z": -1.95
+        },
+        "T2D": {
+          "coverage": 28.6,
+          "max_possible": 1.88,
+          "missing": [
+            "MTNR1B",
+            "KCNJ11",
+            "SLC30A8",
+            "PPARG",
+            "CDKAL1"
+          ],
+          "percentile": 5.5,
+          "score": 0.44,
+          "tier": "Very low",
+          "typed": [
+            "TCF7L2 (rs7903146)=CT",
+            "FTO (rs9939609)=AT"
+          ],
+          "z": -1.6
+        },
+        "Triglycerides": {
+          "coverage": 16.7,
+          "max_possible": 1.72,
+          "missing": [
+            "ZPR1/APOA5",
+            "APOA5",
+            "GCKR",
+            "ANGPTL3",
+            "LPL"
+          ],
+          "percentile": 0.3,
+          "score": 0.07,
+          "tier": "Very low",
+          "typed": [
+            "FADS1 (rs174547)=TC"
+          ],
+          "z": -2.76
+        },
+        "Vitamin_D_deficiency": {
+          "coverage": 66.7,
+          "max_possible": 0.78,
+          "missing": [
+            "DHCR7"
+          ],
+          "percentile": 92.8,
+          "score": 0.58,
+          "tier": "Very high",
+          "typed": [
+            "CYP2R1 (rs10741657)=GG",
+            "GC/VDBP (rs2282679)=CC"
+          ],
+          "z": 1.46
+        }
+      },
+      "protocols": {
+        "cooking_methods": {
+          "oil_smoke_points_C": {
+            "Avocado oil": 271,
+            "Butter": 150,
+            "Coconut oil": 175,
+            "Extra-virgin olive oil": 190,
+            "Ghee": 250,
+            "Industrial seed oils (corn, soybean)": "Avoid as primary",
+            "Refined olive oil": 240
+          },
+          "practical": [
+            "Default to steam, sous-vide, slow-cook, and lower-temp roasting.",
+            "Marinade meats 30+ min in acid (lemon, vinegar, yoghurt) before any dry heat.",
+            "Pair high-AGE meals with high-polyphenol foods (berries, herbs, tea).",
+            "Use a thermometer \u2014 most home ovens overshoot by 15-20 \u00b0C."
+          ],
+          "rationale": "Advanced glycation end-products (AGEs) form when proteins/fats are exposed to dry, high heat. They accelerate vascular ageing and oxidative stress. Same food, different method, can differ 10-100\u00d7 in AGE load.",
+          "rules": [
+            {
+              "AGE_load": "Lowest",
+              "method": "Steam, boil, poach, sous-vide",
+              "use_for": "Fish, vegetables, eggs (poached), chicken, beans"
+            },
+            {
+              "AGE_load": "Low",
+              "method": "Stew, braise, slow-cook (wet, <100 \u00b0C)",
+              "use_for": "Tough cuts (chuck, shank), legumes, root vegetables"
+            },
+            {
+              "AGE_load": "Moderate",
+              "method": "Stir-fry (high oil, short time)",
+              "use_for": "Vegetables + tofu; use a smoke-point-stable oil (avocado, refined olive)"
+            },
+            {
+              "AGE_load": "Moderate",
+              "method": "Bake/roast at \u2264180 \u00b0C with marinade",
+              "use_for": "Marinade (acid + olive oil) cuts AGE formation 30-50%"
+            },
+            {
+              "AGE_load": "High",
+              "method": "Grill, broil, pan-sear, deep-fry",
+              "use_for": "Use sparingly; never char meat. Pair with antioxidant veg/herbs."
+            },
+            {
+              "AGE_load": "Very high",
+              "method": "Char-grill / barbecue",
+              "use_for": "Avoid. If used: trim charred bits, marinate in lemon/vinegar/garlic \u226530 min first."
+            }
+          ]
+        },
+        "cycle_phase": {
+          "RED_S_screening": "Relative Energy Deficiency in Sport \u2014 if cycle becomes irregular or absent while training hard, ENERGY AVAILABILITY is likely too low. Target >40 kcal/kg lean mass/day. Long-term bone density, immunity, performance all suffer. This is a red-flag medical issue, not a body-comp 'win'.",
+          "follicular_d1_14": {
+            "iron": "Replace menstrual losses \u2014 vitamin C with iron-rich meals",
+            "macro_emphasis": "Higher carb tolerance (insulin sensitivity peak)",
+            "training": "Best window for strength PRs and high-intensity work"
+          },
+          "luteal_d17_28": {
+            "cravings": "Magnesium 400 mg/day from food (pumpkin seeds, dark chocolate, leafy greens)",
+            "macro_emphasis": "+5-10% calories (BMR rises 100-300 kcal), more complex carbs and magnesium",
+            "training": "Endurance feels harder (higher core temp); shorten intervals"
+          },
+          "menstrual_d1_5": {
+            "macro_emphasis": "Iron-rich foods + vitamin C cofactor",
+            "training": "Reduce volume 20-30% if symptoms; gentle movement helps cramps"
+          },
+          "note": "Activate by passing reproductive_state. Tailors macros, iron, and training-fuelling to follicular/ovulatory/luteal/menstrual phases.",
+          "ovulation_d14_16": {
+            "macro_emphasis": "Antioxidants for ovulatory inflammation \u2014 berries, leafy greens",
+            "training": "Peak power output \u2014 schedule key sessions"
+          }
+        },
+        "fasting": {
+          "break_fast_meal": "Break-fast meal: 30-40 g protein + 8-10 g fibre + healthy fat + low-GI carbs \u226430 g. e.g. 3-egg omelette + spinach + avocado + \u00bd cup berries.",
+          "cautions": [
+            "Pregnant/breastfeeding \u2192 no fasting beyond \u226412 h overnight.",
+            "History of eating disorder \u2192 no restrictive windows.",
+            "On glucose-lowering meds \u2192 coordinate with physician.",
+            "Heavy training day \u2192 no fasted workouts >75 min unless adapted."
+          ],
+          "rationale": "Elevated-appetite genotype \u2014 long fasts can trigger evening binges. Start with 12-h overnight fast; progress to 14:10 only if it doesn't drive compensatory overeating. AVOID OMAD/20:4 \u2014 these undermine adherence.",
+          "recommended_protocol": "12:12 (gentle) or 14:10"
+        },
+        "glucose_simulator": [
+          {
+            "available_carbs_g": 73.5,
+            "carb_ceiling_for_this_meal_g": 65,
+            "estimated_iAUC": 595,
+            "estimated_peak_mg_dL": 173,
+            "meal": "Bagel + orange juice (na\u00efve)",
+            "modifiers_applied": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "verdict": "Caution \u2014 modify (split carbs, walk, protein-first)"
+          },
+          {
+            "available_carbs_g": 72.5,
+            "carb_ceiling_for_this_meal_g": 65,
+            "estimated_iAUC": 194,
+            "estimated_peak_mg_dL": 128,
+            "meal": "Bagel + OJ \u2014 engineered (eggs first, vinegar, walk)",
+            "modifiers_applied": [
+              "protein-first sequencing",
+              "vinegar 1 tbsp pre-meal",
+              null,
+              null,
+              "15 min post-meal walk",
+              null
+            ],
+            "verdict": "Safe \u2014 peak <140 mg/dL"
+          },
+          {
+            "available_carbs_g": 52.0,
+            "carb_ceiling_for_this_meal_g": 65,
+            "estimated_iAUC": 295,
+            "estimated_peak_mg_dL": 120,
+            "meal": "White rice + grilled chicken + broccoli",
+            "modifiers_applied": [
+              "protein-first sequencing",
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "verdict": "Safe \u2014 peak <140 mg/dL"
+          },
+          {
+            "available_carbs_g": 40.5,
+            "carb_ceiling_for_this_meal_g": 65,
+            "estimated_iAUC": 184,
+            "estimated_peak_mg_dL": 109,
+            "meal": "Steel-cut oats + berries + Greek yoghurt",
+            "modifiers_applied": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "verdict": "Safe \u2014 peak <140 mg/dL"
+          },
+          {
+            "available_carbs_g": 23.0,
+            "carb_ceiling_for_this_meal_g": 65,
+            "estimated_iAUC": 54,
+            "estimated_peak_mg_dL": 94,
+            "meal": "Power salad (greens + chickpeas + chicken + olive oil)",
+            "modifiers_applied": [
+              null,
+              "vinegar 1 tbsp pre-meal",
+              "fibre 14 g",
+              "fat 22 g slows absorption",
+              null,
+              null
+            ],
+            "verdict": "Safe \u2014 peak <140 mg/dL"
+          },
+          {
+            "available_carbs_g": 82.0,
+            "carb_ceiling_for_this_meal_g": 50,
+            "estimated_iAUC": 528,
+            "estimated_peak_mg_dL": 168,
+            "meal": "Spaghetti bolognese (dinner)",
+            "modifiers_applied": [
+              null,
+              null,
+              null,
+              "fat 18 g slows absorption",
+              null,
+              "evening circadian penalty"
+            ],
+            "verdict": "Caution \u2014 modify (split carbs, walk, protein-first)"
+          }
+        ],
+        "meal_plan_30d": [
+          {
+            "breakfast": "3-egg veggie omelette + \u00bd avocado + side spinach",
+            "day": 1,
+            "dinner": "Sheet-pan salmon + broccoli + sweet potato + olive oil + lemon",
+            "lunch": "Mediterranean bowl: quinoa, chickpeas, cucumber, tomato, aged pecorino, olive oil, lemon",
+            "snack_am": "Apple + 1 oz almonds",
+            "snack_pm": "Edamame + sea salt"
+          },
+          {
+            "breakfast": "Smoked-salmon + lactose-free cream aged cheese roll-ups + cucumber + capers",
+            "day": 2,
+            "dinner": "Sheet-pan salmon +  beans, ground turkey, tomato, peppers, cumin",
+            "lunch": "Power salad: arugula, grilled chicken, white beans, avocado, pumpkin seeds",
+            "snack_am": "Greek yoghurt + berries",
+            "snack_pm": "Cottage cheese + cinnamon + walnuts"
+          },
+          {
+            "breakfast": "lactose-free Greek yoghurt + walnuts + raspberries + chia seeds",
+            "day": 3,
+            "dinner": "Grilled chicken thighs + roasted Brussels sprouts + farro",
+            "lunch": "Tuna Ni\u00e7oise: greens, hard-boiled eggs, olives, green beans, potato, anchovy",
+            "snack_am": "Carrots + hummus",
+            "snack_pm": "Dark chocolate (\u226575%) + few walnuts"
+          },
+          {
+            "breakfast": "Skyr (lactose-free) bowl + flax + walnuts + cinnamon",
+            "day": 4,
+            "dinner": "Cod en papillote + cherry tomatoes + olives + capers + spinach",
+            "lunch": "Lentil soup + side salad + olive oil + sourdough (or GF crackers)",
+            "snack_am": "Hard-boiled egg + 1 oz cheese",
+            "snack_pm": "Beef/turkey jerky + olives"
+          },
+          {
+            "breakfast": "Tofu scramble + mushrooms + spinach + nutritional yeast",
+            "day": 5,
+            "dinner": "Tofu stir-fry + bok choy + shiitake + brown rice + ginger-tamari",
+            "lunch": "Salmon poke bowl: brown rice, edamame, cucumber, avocado, sesame, nori",
+            "snack_am": "Edamame + sea salt",
+            "snack_pm": "Apple + 1 oz almonds"
+          },
+          {
+            "breakfast": "3-egg veggie omelette + \u00bd avocado + side spinach",
+            "day": 6,
+            "dinner": "Sheet-pan salmon + roasted vegetables",
+            "lunch": "Turkey + hummus wrap (or lettuce wraps) + carrot sticks + bell pepper",
+            "snack_am": "Cottage cheese + cinnamon + walnuts",
+            "snack_pm": "Greek yoghurt + berries"
+          },
+          {
+            "breakfast": "Smoked-salmon + lactose-free cream aged cheese roll-ups + cucumber + capers",
+            "day": 7,
+            "dinner": "Shrimp scampi + zucchini noodles + garlic + parsley",
+            "lunch": "Cold soba + grilled tofu + sesame + scallions + miso dressing",
+            "snack_am": "Dark chocolate (\u226575%) + few walnuts",
+            "snack_pm": "Carrots + hummus"
+          },
+          {
+            "breakfast": "lactose-free Greek yoghurt + walnuts + raspberries + chia seeds",
+            "day": 8,
+            "dinner": "Sheet-pan salmon + roasted vegetables",
+            "lunch": "Stuffed bell peppers: ground turkey, quinoa, tomato, herbs",
+            "snack_am": "Beef/turkey jerky + olives",
+            "snack_pm": "Hard-boiled egg + 1 oz cheese"
+          },
+          {
+            "breakfast": "Skyr (lactose-free) bowl + flax + walnuts + cinnamon",
+            "day": 9,
+            "dinner": "Sheet-pan salmon + broccoli + sweet potato + olive oil + lemon",
+            "lunch": "Mediterranean bowl: quinoa, chickpeas, cucumber, tomato, aged pecorino, olive oil, lemon",
+            "snack_am": "Apple + 1 oz almonds",
+            "snack_pm": "Edamame + sea salt"
+          },
+          {
+            "breakfast": "Tofu scramble + mushrooms + spinach + nutritional yeast",
+            "day": 10,
+            "dinner": "Sheet-pan salmon +  beans, ground turkey, tomato, peppers, cumin",
+            "lunch": "Power salad: arugula, grilled chicken, white beans, avocado, pumpkin seeds",
+            "snack_am": "Greek yoghurt + berries",
+            "snack_pm": "Cottage cheese + cinnamon + walnuts"
+          },
+          {
+            "breakfast": "3-egg veggie omelette + \u00bd avocado + side spinach",
+            "day": 11,
+            "dinner": "Grilled chicken thighs + roasted Brussels sprouts + farro",
+            "lunch": "Tuna Ni\u00e7oise: greens, hard-boiled eggs, olives, green beans, potato, anchovy",
+            "snack_am": "Carrots + hummus",
+            "snack_pm": "Dark chocolate (\u226575%) + few walnuts"
+          },
+          {
+            "breakfast": "Smoked-salmon + lactose-free cream aged cheese roll-ups + cucumber + capers",
+            "day": 12,
+            "dinner": "Cod en papillote + cherry tomatoes + olives + capers + spinach",
+            "lunch": "Lentil soup + side salad + olive oil + sourdough (or GF crackers)",
+            "snack_am": "Hard-boiled egg + 1 oz cheese",
+            "snack_pm": "Beef/turkey jerky + olives"
+          },
+          {
+            "breakfast": "lactose-free Greek yoghurt + walnuts + raspberries + chia seeds",
+            "day": 13,
+            "dinner": "Tofu stir-fry + bok choy + shiitake + brown rice + ginger-tamari",
+            "lunch": "Salmon poke bowl: brown rice, edamame, cucumber, avocado, sesame, nori",
+            "snack_am": "Edamame + sea salt",
+            "snack_pm": "Apple + 1 oz almonds"
+          },
+          {
+            "breakfast": "Skyr (lactose-free) bowl + flax + walnuts + cinnamon",
+            "day": 14,
+            "dinner": "Sheet-pan salmon + roasted vegetables",
+            "lunch": "Turkey + hummus wrap (or lettuce wraps) + carrot sticks + bell pepper",
+            "snack_am": "Cottage cheese + cinnamon + walnuts",
+            "snack_pm": "Greek yoghurt + berries"
+          },
+          {
+            "breakfast": "Tofu scramble + mushrooms + spinach + nutritional yeast",
+            "day": 15,
+            "dinner": "Shrimp scampi + zucchini noodles + garlic + parsley",
+            "lunch": "Cold soba + grilled tofu + sesame + scallions + miso dressing",
+            "snack_am": "Dark chocolate (\u226575%) + few walnuts",
+            "snack_pm": "Carrots + hummus"
+          },
+          {
+            "breakfast": "3-egg veggie omelette + \u00bd avocado + side spinach",
+            "day": 16,
+            "dinner": "Sheet-pan salmon + roasted vegetables",
+            "lunch": "Stuffed bell peppers: ground turkey, quinoa, tomato, herbs",
+            "snack_am": "Beef/turkey jerky + olives",
+            "snack_pm": "Hard-boiled egg + 1 oz cheese"
+          },
+          {
+            "breakfast": "Smoked-salmon + lactose-free cream aged cheese roll-ups + cucumber + capers",
+            "day": 17,
+            "dinner": "Sheet-pan salmon + broccoli + sweet potato + olive oil + lemon",
+            "lunch": "Mediterranean bowl: quinoa, chickpeas, cucumber, tomato, aged pecorino, olive oil, lemon",
+            "snack_am": "Apple + 1 oz almonds",
+            "snack_pm": "Edamame + sea salt"
+          },
+          {
+            "breakfast": "lactose-free Greek yoghurt + walnuts + raspberries + chia seeds",
+            "day": 18,
+            "dinner": "Sheet-pan salmon +  beans, ground turkey, tomato, peppers, cumin",
+            "lunch": "Power salad: arugula, grilled chicken, white beans, avocado, pumpkin seeds",
+            "snack_am": "Greek yoghurt + berries",
+            "snack_pm": "Cottage cheese + cinnamon + walnuts"
+          },
+          {
+            "breakfast": "Skyr (lactose-free) bowl + flax + walnuts + cinnamon",
+            "day": 19,
+            "dinner": "Grilled chicken thighs + roasted Brussels sprouts + farro",
+            "lunch": "Tuna Ni\u00e7oise: greens, hard-boiled eggs, olives, green beans, potato, anchovy",
+            "snack_am": "Carrots + hummus",
+            "snack_pm": "Dark chocolate (\u226575%) + few walnuts"
+          },
+          {
+            "breakfast": "Tofu scramble + mushrooms + spinach + nutritional yeast",
+            "day": 20,
+            "dinner": "Cod en papillote + cherry tomatoes + olives + capers + spinach",
+            "lunch": "Lentil soup + side salad + olive oil + sourdough (or GF crackers)",
+            "snack_am": "Hard-boiled egg + 1 oz cheese",
+            "snack_pm": "Beef/turkey jerky + olives"
+          },
+          {
+            "breakfast": "3-egg veggie omelette + \u00bd avocado + side spinach",
+            "day": 21,
+            "dinner": "Tofu stir-fry + bok choy + shiitake + brown rice + ginger-tamari",
+            "lunch": "Salmon poke bowl: brown rice, edamame, cucumber, avocado, sesame, nori",
+            "snack_am": "Edamame + sea salt",
+            "snack_pm": "Apple + 1 oz almonds"
+          },
+          {
+            "breakfast": "Smoked-salmon + lactose-free cream aged cheese roll-ups + cucumber + capers",
+            "day": 22,
+            "dinner": "Sheet-pan salmon + roasted vegetables",
+            "lunch": "Turkey + hummus wrap (or lettuce wraps) + carrot sticks + bell pepper",
+            "snack_am": "Cottage cheese + cinnamon + walnuts",
+            "snack_pm": "Greek yoghurt + berries"
+          },
+          {
+            "breakfast": "lactose-free Greek yoghurt + walnuts + raspberries + chia seeds",
+            "day": 23,
+            "dinner": "Shrimp scampi + zucchini noodles + garlic + parsley",
+            "lunch": "Cold soba + grilled tofu + sesame + scallions + miso dressing",
+            "snack_am": "Dark chocolate (\u226575%) + few walnuts",
+            "snack_pm": "Carrots + hummus"
+          },
+          {
+            "breakfast": "Skyr (lactose-free) bowl + flax + walnuts + cinnamon",
+            "day": 24,
+            "dinner": "Sheet-pan salmon + roasted vegetables",
+            "lunch": "Stuffed bell peppers: ground turkey, quinoa, tomato, herbs",
+            "snack_am": "Beef/turkey jerky + olives",
+            "snack_pm": "Hard-boiled egg + 1 oz cheese"
+          },
+          {
+            "breakfast": "Tofu scramble + mushrooms + spinach + nutritional yeast",
+            "day": 25,
+            "dinner": "Sheet-pan salmon + broccoli + sweet potato + olive oil + lemon",
+            "lunch": "Mediterranean bowl: quinoa, chickpeas, cucumber, tomato, aged pecorino, olive oil, lemon",
+            "snack_am": "Apple + 1 oz almonds",
+            "snack_pm": "Edamame + sea salt"
+          },
+          {
+            "breakfast": "3-egg veggie omelette + \u00bd avocado + side spinach",
+            "day": 26,
+            "dinner": "Sheet-pan salmon +  beans, ground turkey, tomato, peppers, cumin",
+            "lunch": "Power salad: arugula, grilled chicken, white beans, avocado, pumpkin seeds",
+            "snack_am": "Greek yoghurt + berries",
+            "snack_pm": "Cottage cheese + cinnamon + walnuts"
+          },
+          {
+            "breakfast": "Smoked-salmon + lactose-free cream aged cheese roll-ups + cucumber + capers",
+            "day": 27,
+            "dinner": "Grilled chicken thighs + roasted Brussels sprouts + farro",
+            "lunch": "Tuna Ni\u00e7oise: greens, hard-boiled eggs, olives, green beans, potato, anchovy",
+            "snack_am": "Carrots + hummus",
+            "snack_pm": "Dark chocolate (\u226575%) + few walnuts"
+          },
+          {
+            "breakfast": "lactose-free Greek yoghurt + walnuts + raspberries + chia seeds",
+            "day": 28,
+            "dinner": "Cod en papillote + cherry tomatoes + olives + capers + spinach",
+            "lunch": "Lentil soup + side salad + olive oil + sourdough (or GF crackers)",
+            "snack_am": "Hard-boiled egg + 1 oz cheese",
+            "snack_pm": "Beef/turkey jerky + olives"
+          },
+          {
+            "breakfast": "Skyr (lactose-free) bowl + flax + walnuts + cinnamon",
+            "day": 29,
+            "dinner": "Tofu stir-fry + bok choy + shiitake + brown rice + ginger-tamari",
+            "lunch": "Salmon poke bowl: brown rice, edamame, cucumber, avocado, sesame, nori",
+            "snack_am": "Edamame + sea salt",
+            "snack_pm": "Apple + 1 oz almonds"
+          },
+          {
+            "breakfast": "Tofu scramble + mushrooms + spinach + nutritional yeast",
+            "day": 30,
+            "dinner": "Sheet-pan salmon + roasted vegetables",
+            "lunch": "Turkey + hummus wrap (or lettuce wraps) + carrot sticks + bell pepper",
+            "snack_am": "Cottage cheese + cinnamon + walnuts",
+            "snack_pm": "Greek yoghurt + berries"
+          }
+        ],
+        "mind_diet": {
+          "additional_\u03b54_specific": [
+            "Choline 550 mg/day (eggs, liver) \u2014 precursor for acetylcholine",
+            "Sleep 7-9 h \u2014 glymphatic A\u03b2 clearance happens in deep sleep",
+            "Aerobic exercise 150+ min/week \u2014 single most-evidenced cognitive intervention",
+            "Avoid coconut oil and saturated tropical fats despite hype \u2014 \u03b54 LDL response is harsh",
+            "Consider DHA-rich algae oil 1 g/day if fish intake limited"
+          ],
+          "applicable": true,
+          "header": "MIND diet (Mediterranean-DASH-Intervention for Neurodegenerative Delay). Strongest evidence base for slowing cognitive decline; effect size in MIND trial \u2248 53% lower Alzheimer's risk with high adherence vs low.",
+          "high_leverage_actions": [
+            "Daily 1 cup leafy greens \u2014 biggest single win",
+            "Walnuts daily (1 oz) \u2014 only nut with meaningful ALA",
+            "Salmon or sardines 2-3\u00d7/week \u2014 direct DHA",
+            "Eliminate butter; cook in EVOO",
+            "Berries 2\u00d7 weekly minimum (frozen counts)"
+          ],
+          "include_weekly": [
+            {
+              "food": "Leafy greens",
+              "servings": "\u22656/week",
+              "why": "Folate, lutein, vitamin K1 \u2014 slows cognitive decline ~11 yrs equivalent"
+            },
+            {
+              "food": "Other vegetables",
+              "servings": "\u22651/day",
+              "why": "Carotenoids, vitamin C"
+            },
+            {
+              "food": "Berries",
+              "servings": "\u22652/week",
+              "why": "Anthocyanins cross blood-brain barrier; flavonoids improve memory"
+            },
+            {
+              "food": "Nuts (especially walnuts)",
+              "servings": "\u22655/week",
+              "why": "\u03b1-linolenic acid, vitamin E, polyphenols"
+            },
+            {
+              "food": "Olive oil",
+              "servings": "Primary cooking fat",
+              "why": "Oleocanthal \u2014 natural ibuprofen-like anti-inflammatory; MUFA"
+            },
+            {
+              "food": "Whole grains",
+              "servings": "\u22653/day",
+              "why": "B vitamins, fibre"
+            },
+            {
+              "food": "Fish (esp oily)",
+              "servings": "\u22651/week (aim 2-3)",
+              "why": "DHA \u2014 neuronal membrane; \u03b54 carriers especially benefit"
+            },
+            {
+              "food": "Beans/legumes",
+              "servings": "\u22653/week",
+              "why": "Folate, fibre, B vitamins"
+            },
+            {
+              "food": "Poultry",
+              "servings": "\u22652/week",
+              "why": "Lean protein"
+            },
+            {
+              "food": "Wine (red, if no contraindication)",
+              "servings": "\u22641 glass/day",
+              "why": "Resveratrol \u2014 discontinue if any ALDH2 variant"
+            }
+          ],
+          "limit_strictly": [
+            {
+              "food": "Red meat (including beef, pork)",
+              "limit": "\u22643 servings/week"
+            },
+            {
+              "food": "Butter / margarine",
+              "limit": "<1 tbsp/day \u2014 olive oil instead"
+            },
+            {
+              "food": "Cheese",
+              "limit": "\u22641 serving/week"
+            },
+            {
+              "food": "Pastries / sweets",
+              "limit": "\u22644 servings/week"
+            },
+            {
+              "food": "Fried / fast food",
+              "limit": "\u22641 serving/week \u2014 ideally 0"
+            }
+          ]
+        },
+        "minerals": [
+          {
+            "mineral": "Magnesium",
+            "note": "Most adults eat <300 mg. Glycinate form best-absorbed if supplementing 200-400 mg/night.",
+            "rda_mg": 500,
+            "sources": "Pumpkin seeds (1 oz=170), dark chocolate (1 oz=65), almonds (1 oz=80), spinach (cup=150), avocado (1=60), black beans (cup=120)"
+          },
+          {
+            "mineral": "Potassium",
+            "note": "Salt-sensitive: lean hard on potassium \u2014 lowers SBP 4-5 mmHg as much as a drug.",
+            "rda_mg": 4700,
+            "sources": "Potato (1 medium=900), spinach (cup cooked=840), banana (450), salmon (4 oz=500), lentils (cup=730), avocado (1=975), yoghurt (1 cup=380)"
+          },
+          {
+            "mineral": "Zinc",
+            "note": "Vegetarians need +50% (phytate). Don't exceed 40 mg supplemented \u2014 depletes copper.",
+            "rda_mg": 11,
+            "sources": "Oysters (3 oz=74!), beef (3 oz=7), pumpkin seeds (1 oz=2.2), chickpeas (cup=2.5), cashews (1 oz=1.6)"
+          },
+          {
+            "mineral": "Selenium",
+            "note": "2 Brazil nuts/week is the simplest selenium strategy. Toxic above 400 \u00b5g/day.",
+            "rda_mcg": 55,
+            "sources": "Brazil nuts (1 nut=68-90 \u2014 TWO nuts = full week's need!), tuna (3 oz=92), sardines (3 oz=45), eggs (15)"
+          },
+          {
+            "mineral": "Copper",
+            "note": "Excess zinc (>40 mg/day chronic) depletes copper \u2014 watch this if supplementing zinc.",
+            "rda_mg": 0.9,
+            "sources": "Liver (3 oz=12!!), oysters (3 oz=4.8), cashews (1 oz=0.6), sunflower seeds (1 oz=0.5)"
+          },
+          {
+            "mineral": "Iodine",
+            "note": "Vegans avoiding seaweed and iodised salt commonly deficient \u2014 track carefully.",
+            "rda_mcg": 150,
+            "sources": "Seaweed (1 sheet nori=20), cod (3 oz=99), iodised salt (1 g=77), yoghurt (cup=75), eggs (24)"
+          },
+          {
+            "mineral": "Chromium",
+            "note": "Glucose tolerance support \u2014 minor effect; food sources sufficient.",
+            "rda_mcg": 35,
+            "sources": "Broccoli (\u00bd cup=11), grape juice (cup=8), whole grains, beef"
+          },
+          {
+            "mineral": "Calcium",
+            "note": "If avoiding dairy: fortified plant milks (250-450 mg/cup), canned fish with bones, leafy greens.",
+            "rda_mg": 1000,
+            "sources": "Yoghurt (cup=300), milk (cup=300), sardines w/bones (3 oz=325), kale (cup cooked=180), tofu set with Ca (\u00bd cup=250-400)"
+          },
+          {
+            "mineral": "Sodium",
+            "note": "Salt-sensitive \u2014 strict \u22641500 mg/day",
+            "rda_mg": 1500,
+            "sources": "Processed foods dominate \u2014 bread, soup, sauce. Be aware not avoid."
+          }
+        ],
+        "polyphenols": {
+          "foods": [
+            {
+              "food": "Berries (\u00bd cup)",
+              "key_polyphenols": "Anthocyanins, ellagitannins",
+              "mg": 380
+            },
+            {
+              "food": "Coffee (8 oz)",
+              "key_polyphenols": "Chlorogenic acid",
+              "mg": 350
+            },
+            {
+              "food": "Dark chocolate (1 oz, \u226575%)",
+              "key_polyphenols": "Catechins, procyanidins",
+              "mg": 250
+            },
+            {
+              "food": "Green tea (8 oz)",
+              "key_polyphenols": "EGCG",
+              "mg": 200
+            },
+            {
+              "food": "Red onion (\u00bd medium)",
+              "key_polyphenols": "Quercetin",
+              "mg": 130
+            },
+            {
+              "food": "Extra-virgin olive oil (1 tbsp)",
+              "key_polyphenols": "Oleocanthal, hydroxytyrosol",
+              "mg": 90
+            },
+            {
+              "food": "Apples (1 medium, with skin)",
+              "key_polyphenols": "Quercetin, catechins",
+              "mg": 110
+            },
+            {
+              "food": "Cherries (\u00bd cup)",
+              "key_polyphenols": "Anthocyanins",
+              "mg": 130
+            },
+            {
+              "food": "Walnuts (1 oz)",
+              "key_polyphenols": "Ellagic acid, urolithins (precursor)",
+              "mg": 90
+            },
+            {
+              "food": "Pomegranate (\u00bd fruit)",
+              "key_polyphenols": "Punicalagins",
+              "mg": 600
+            },
+            {
+              "food": "Turmeric (1 tsp + pepper + fat)",
+              "key_polyphenols": "Curcumin",
+              "mg": 200
+            },
+            {
+              "food": "Red wine (5 oz \u2014 if no alcohol contraindication)",
+              "key_polyphenols": "Resveratrol, anthocyanins",
+              "mg": 200
+            }
+          ],
+          "guidance": "Polyphenol target: 1500 mg/day. Mixing diverse sources beats single-source mega-dosing. Daily template: 1 cup berries (380), 8 oz coffee (350), 2 tbsp olive oil (180), 1 cup green tea (200), 1 apple (110), 1 oz dark chocolate (250). Total \u22481500 mg. Polyphenols cluster: anthocyanins (berries) + flavanols (cocoa, tea) + hydroxytyrosols (olive) + lignans (flax, sesame) + curcuminoids (turmeric) = broad signalling. Reduced antioxidant capacity flagged \u2014 double down on diversity.",
+          "target_mg_per_day": 1500
+        },
+        "pre_bed_mps": {
+          "avoid_pre_bed": [
+            "High-fat very-late meals (>20 g fat within 2 h of sleep can fragment sleep)",
+            "Alcohol (suppresses REM, blunts MPS)",
+            "Large carb loads if glycaemic-vulnerable \u2014 slow-release fine, sugar-spike not"
+          ],
+          "options": [
+            "1 cup Greek yoghurt (or skyr) + 1 tbsp almond butter + cinnamon (~30 g protein)",
+            "Casein shake 30 g + water",
+            "Cottage cheese \u00bd cup + walnuts (~28 g protein)",
+            "If lactose-intolerant: pea-isolate or rice-isolate 40 g + 1 tbsp tahini"
+          ],
+          "rationale": "Overnight is the longest fasting window. 30-40 g slow-digesting protein 1-2 h before sleep elevates overnight MPS ~22% (Trommelen 2016) and doesn't impair sleep quality. Especially valuable for those training PM or with strength/hypertrophy goals."
+        },
+        "restaurant_guides": [
+          {
+            "cuisine": "Italian",
+            "order": [
+              "Antipasto: grilled vegetables, olives, prosciutto (skip if iron overload)",
+              "Primi: minestrone, ribollita, or simple tomato pasta (\u00bd portion if appetite-elevated)",
+              "Secondi: grilled fish (branzino, salmon), chicken piccata, osso buco",
+              "Contorni: saut\u00e9ed greens, roasted vegetables, white-bean salad",
+              "Skip: heavy cream sauces, deep-fried calamari, charred meats"
+            ],
+            "your_tweak": "ApoE \u03b54 \u2014 choose tomato/olive-oil sauces over cream; skip butter."
+          },
+          {
+            "cuisine": "Japanese / sushi",
+            "order": [
+              "Edamame, miso soup, seaweed salad to start",
+              "Sashimi (salmon, tuna, mackerel) or chirashi over white rice",
+              "Brown-rice rolls if available; skip tempura batter",
+              "Grilled fish + steamed vegetables main",
+              "Skip: spicy mayo rolls, cream-cheese rolls"
+            ],
+            "your_tweak": "Sushi/sashimi excellent for FADS poor-converters (direct EPA/DHA)."
+          },
+          {
+            "cuisine": "Mexican",
+            "order": [
+              "Guacamole + jicama sticks instead of chips",
+              "Fish tacos on corn tortillas (gluten-free)",
+              "Bowls: black beans + chicken + salsa + avocado + greens (skip rice if low-carb)",
+              "Side: salsa verde, pico de gallo",
+              "Skip: deep-fried chimichangas, queso, sour-cream lakes"
+            ],
+            "your_tweak": "Lactose: ask for no cheese/sour cream"
+          },
+          {
+            "cuisine": "Indian",
+            "order": [
+              "Tandoori chicken or fish tikka (marinated, lower AGEs than fried)",
+              "Daal (lentil) + chana masala (chickpea)",
+              "Side: cucumber raita (skip if lactose), kachumber salad",
+              "Naan \u00bd portion or skip; brown basmati if available",
+              "Skip: korma/butter chicken (heavy cream), samosas, pakoras"
+            ],
+            "your_tweak": "ApoE \u03b54 \u2014 avoid butter chicken/korma; pick tikka, daal, vegetable curries."
+          },
+          {
+            "cuisine": "American / Steakhouse",
+            "order": [
+              "Wedge or house salad (dressing on side)",
+              "Filet mignon or grilled fish \u2014 \u22646 oz portion",
+              "Sides: roasted Brussels, asparagus, steamed broccoli, sweet potato (no marshmallow)",
+              "Skip: fried appetisers, creamed spinach, mac & cheese, dessert bread"
+            ],
+            "your_tweak": "Choose leaner cuts, smaller portions. Appetite-elevated \u2014 order an appetiser salad first."
+          },
+          {
+            "cuisine": "Mediterranean / Greek",
+            "order": [
+              "Greek salad, tabbouleh, hummus, baba ghanoush",
+              "Grilled lamb or chicken souvlaki, grilled fish",
+              "Side: rice pilaf (\u00bd portion), grilled vegetables",
+              "Skip: spanakopita (phyllo/cheese), gyro (high-AGE)"
+            ],
+            "your_tweak": "Generally well-suited \u2014 Mediterranean pattern is best-evidence for most genotypes."
+          },
+          {
+            "cuisine": "Thai / Vietnamese",
+            "order": [
+              "Tom yum, pho (broth) to start",
+              "Curries with vegetables + protein, brown rice if available",
+              "Grilled fish, larb, summer rolls (rice paper = GF)",
+              "Skip: pad thai (sugar-heavy), deep-fried spring rolls"
+            ],
+            "your_tweak": "Standard."
+          },
+          {
+            "cuisine": "Fast / casual (when stuck)",
+            "order": [
+              "Chipotle: bowl, double protein, fajita veg, black beans, fresh salsa, guac",
+              "Sweetgreen / Cava: kale + greens base, protein + chickpeas + veg, olive-oil-based dressing",
+              "McDonald's last resort: grilled chicken salad, apple slices, water",
+              "Starbucks: egg-white bites + Americano (skip pastries)"
+            ],
+            "your_tweak": "Pre-portion mentally: half the rice, skip the bread, double the vegetables."
+          }
+        ],
+        "travel_jetlag": {
+          "header": "5-step protocol to compress jet-lag adjustment from 1 day/timezone to ~half.",
+          "steps": [
+            {
+              "action": "Begin shifting meal times 1 h/day toward destination. East travel: earlier; west: later. Hydrate aggressively. Stop caffeine 8 h before intended sleep window.",
+              "step": "Pre-flight (24-48 h before)"
+            },
+            {
+              "action": "Set watch to destination time immediately. Eat ONLY at destination meal times \u2014 even if not hungry, force a small protein-fat meal. Skip the in-flight cocktail (alcohol worsens circadian disruption). 240-360 mL water per hour.",
+              "step": "On the plane"
+            },
+            {
+              "action": "First destination-morning meal: heavy protein (30 g) + caffeine + 10-15 min sunlight exposure. Anchors cortisol awakening response to new time zone.",
+              "step": "Arrival breakfast"
+            },
+            {
+              "action": "Carb-leaning dinner finished by 19:00 local. Tryptophan-rich (turkey, salmon, pumpkin seeds) + complex carbs to spike serotonin \u2192 melatonin conversion. Melatonin 0.3-0.5 mg 4 h before intended sleep \u2014 micro-dose, not the 3-5 mg sold OTC (too much sedates without phase-shifting).",
+              "step": "First evening"
+            },
+            {
+              "action": "Maintain destination meal timing strictly. Don't nap >20 min before 14:00 local. Daily morning sunlight 15 min. Caffeine cutoff 8 h before intended bedtime.",
+              "step": "Days 2-3"
+            }
+          ],
+          "supplements_considered": [
+            "Melatonin 0.3 mg micro-dose 4 h before bed at destination",
+            "L-theanine 200 mg with caffeine for smoother wake-up",
+            "Electrolyte mix on flight \u2014 dehydration amplifies jet-lag fatigue"
+          ]
+        }
+      },
+      "recipes": [
+        {
+          "ingredients": [
+            "1 whole egg + 3 egg whites",
+            "\u00bd cup riced cauliflower saut\u00e9ed",
+            "1 cup coconut/almond yoghurt",
+            "\u00bd cup mixed berries (blueberries + raspberries)",
+            "1 tbsp ground flaxseed + 1 tbsp chia",
+            "1 tbsp chopped walnuts",
+            "1 tbsp extra-virgin olive oil drizzle",
+            "Pinch cinnamon + dash of vanilla"
+          ],
+          "macros_est": "~35 g protein \u00b7 12 g carbs \u00b7 28 g fat \u00b7 8 g fibre",
+          "method": "1) Cook oats with water + cinnamon. 2) Scramble eggs in olive oil. 3) Assemble bowl: oats base, top with yoghurt, eggs alongside, scatter berries, flax, chia, walnuts. 4) Drizzle olive oil. Eat within 30 min.",
+          "name": "High-Protein Breakfast Bowl",
+          "why_for_you": [
+            "Reduced whole-egg dose limits saturated fat (APOE \u03b54)",
+            "Flax+chia give ALA for FADS poor converters",
+            "Greek yoghurt = aged-fermented, lower-lactose protein",
+            "Berries deliver anthocyanins (Nrf2 antioxidant pathway)"
+          ]
+        },
+        {
+          "ingredients": [
+            "2 cups mixed greens (arugula + spinach + romaine)",
+            "1 cup chickpeas (rinsed)",
+            "5 oz grilled chicken or canned tuna (water-packed)",
+            "\u00bd cucumber + 1 cup cherry tomatoes + \u00bc red onion",
+            "\u00bc avocado",
+            "2 tbsp pumpkin seeds",
+            "Dressing: 2 tbsp olive oil + 1 tbsp lemon juice + Dijon + garlic"
+          ],
+          "macros_est": "~35 g protein \u00b7 30 g carbs \u00b7 22 g fat \u00b7 16 g fibre",
+          "method": "1) Toss greens with dressing in large bowl. 2) Layer beans/chickpeas, cucumber, tomatoes, onion, avocado. 3) Top with protein + seeds. 4) Mix thoroughly so flavour reaches every bite (eating speed matters \u2014 aim 20 min).",
+          "name": "Volume-Density Power Salad",
+          "why_for_you": [
+            "FTO/MC4R appetite genotype \u2014 volume + fibre + protein density",
+            "Chickpeas: fibre + protein + folate",
+            "Avocado MUFA + olive oil for HDL maintenance"
+          ]
+        },
+        {
+          "ingredients": [
+            "1 lb wild salmon fillets",
+            "1 lb broccoli + Brussels sprouts (Phase II / cruciferous)",
+            "1 cup cauliflower rice",
+            "1 red onion + 1 lemon (sliced)",
+            "3 tbsp extra-virgin olive oil",
+            "4 garlic cloves minced + 1 tsp turmeric + \u00bd tsp black pepper + 1 tsp oregano",
+            "1 tbsp tahini + 2 tbsp lemon juice + water (drizzle sauce)"
+          ],
+          "macros_est": "~45 g protein \u00b7 18 g carbs \u00b7 30 g fat \u00b7 11 g fibre",
+          "method": "1) Preheat oven 425 \u00b0F. 2) Toss cruciferous + sweet potato + onion in olive oil + spices on sheet pan; roast 18 min. 3) Add protein + lemon slices; roast 12 more min (salmon) or 18 (chicken). 4) Whisk tahini + lemon + water. 5) Plate, drizzle tahini sauce, finish with fresh parsley.",
+          "name": "Mediterranean Sheet-Pan Dinner",
+          "why_for_you": [
+            "Salmon = direct EPA+DHA (FADS poor converter)",
+            "Cruciferous + roasted at 400 \u00b0F with olive oil (sulforaphane induces Phase II detox enzymes)",
+            "Turmeric + pepper + olive oil: 2000% bioavailability boost for curcumin",
+            "ApoE \u03b54 friendly \u2014 fish + olive oil, no butter"
+          ]
+        }
+      ],
       "salt": {
         "factors": [
           "rs699 (AGT M235T) AG \u2014 salt-sensitive hypertension allele"
@@ -204,7 +2325,105 @@
         "guidance": "Reduce sodium to \u22642.3 g/day; emphasise potassium-rich foods (leafy greens, beans, potato). DASH-style pattern especially beneficial.",
         "sensitive": true
       },
+      "satiety": {
+        "appetite_phenotype": "Mildly elevated hunger",
+        "factors": [
+          "rs9939609 (FTO) AT"
+        ],
+        "guidance": "High-satiety eating pattern is critical. Anchor every meal with: (1) 30\u201340 g protein (eggs, Greek yoghurt, fish, lean meat, tofu), (2) 8\u201310 g fibre (legumes, berries, vegetables), (3) volume from non-starchy veg. Front-load calories to breakfast/lunch; keep dinner lighter. Avoid liquid calories (juice, smoothies as meals \u2014 they bypass satiety). Pre-meal water 500 mL + salad reduces total intake. 12-hour overnight fast helps; longer (16:8) only if it doesn't trigger evening binges.",
+        "satiety_score": 1
+      },
+      "saturated_fat": {
+        "apoe_genotype": "\u03b54 carrier",
+        "factors": [
+          "APOE: rs429358=TC, rs7412=CC (\u03b54 carrier)"
+        ],
+        "guidance": "APOE \u03b54 carrier \u2014 markedly elevated LDL response to saturated fat. Cap saturated fat at \u226415 g/day (~7% of calories). Replace butter/coconut oil with extra-virgin olive oil and avocado; limit red meat to 1\u20132\u00d7/week, choose poultry/fish. Prioritise MUFA (olive, avocado, almonds) and PUFA (walnuts, fatty fish). Mediterranean pattern is best-evidence.",
+        "saturated_fat_cap_g": 15
+      },
+      "shopping_list": [
+        {
+          "category": "Proteins",
+          "items": [
+            "20 oz wild salmon/sardines/mackerel",
+            "15 oz chicken/turkey breast",
+            "4 large eggs",
+            "6 cans (15 oz) of mixed beans/lentils/chickpeas",
+            "Tofu/tempeh block (14 oz)"
+          ]
+        },
+        {
+          "category": "Dairy / alternatives",
+          "items": [
+            "5 \u00d7 6 oz Greek yoghurt or kefir",
+            "3 oz aged cheese (parmesan/cheddar/manchego)"
+          ]
+        },
+        {
+          "category": "Produce \u2014 vegetables",
+          "items": [
+            "10 cups spinach/kale/arugula",
+            "3 crowns broccoli OR Brussels sprouts bag",
+            "5 bulbs garlic / large onions",
+            "5 mixed bell peppers / carrots / beets"
+          ]
+        },
+        {
+          "category": "Produce \u2014 fruit",
+          "items": [
+            "7 cups frozen mixed berries (cheapest year-round)",
+            "7 pieces of fruit (apples, pears, citrus)"
+          ]
+        },
+        {
+          "category": "Nuts / seeds / fats",
+          "items": [
+            "7 oz mixed walnuts/almonds (raw, unsalted)",
+            "10 tbsp ground flaxseed + chia jar",
+            "21 tbsp extra-virgin olive oil (~5 oz)"
+          ]
+        },
+        {
+          "category": "Grains / staples",
+          "items": [
+            "5 servings: rolled oats, quinoa, brown rice"
+          ]
+        },
+        {
+          "category": "Beverages / extras",
+          "items": [
+            "Coffee \u2014 4 cups/week",
+            "Green tea \u2014 3 cups/week",
+            "Dark chocolate (\u226575% cacao) \u2014 3 oz",
+            "Turmeric (ground), black pepper, ginger, garlic powder, oregano, cinnamon"
+          ]
+        }
+      ],
       "status": "ok",
+      "taste": {
+        "bitter": "Unknown",
+        "bitter_guidance": "Bitter-taste variant not typed.",
+        "factors": [
+          "Taste-perception SNPs not typed"
+        ],
+        "fat_guidance": "Normal fat-taste \u2014 internal satiety cues for high-fat foods are reliable.",
+        "fat_taste": "Unknown"
+      },
+      "vitamin_a": {
+        "beta_carotene_converter": "Normal",
+        "factors": [
+          "BCO1 not typed"
+        ],
+        "guidance": "Normal \u03b2-carotene conversion \u2014 colourful plant sources (sweet potato, carrot, kale, pumpkin) cover retinol needs."
+      },
+      "vitamin_c": {
+        "factors": [
+          "SLC23A SNPs not typed"
+        ],
+        "guidance": "Standard 90 mg/day (men)/75 mg (women) from varied produce.",
+        "higher_need": false,
+        "target_mg": 90
+      },
       "vitamin_d_food": {
         "factors": [
           "rs10741657 (CYP2R1) GG",
@@ -213,6 +2432,41 @@
         ],
         "guidance": "Prioritise high-D foods: wild salmon, sardines, herring, egg yolks, UV-treated mushrooms, fortified dairy. Combine with daytime sun exposure where possible (10-30 min, depending on skin tone, latitude, season).",
         "needs_more_intake": true
+      },
+      "vitamin_e": {
+        "factors": [
+          "CYP4F2 not typed"
+        ],
+        "guidance": "Standard vitamin-E from nuts/seeds/oils. Supplementation usually unnecessary.",
+        "higher_retention": false
+      },
+      "weekly_food_matrix": {
+        "servings_per_week": {
+          "Aged cheese (matchbox-sized)": 3,
+          "Alcohol (standard drink)": 3,
+          "Allium veg (garlic/onion/leek)": 5,
+          "Berries (1/2 cup)": 7,
+          "Coffee (8 oz)": 4,
+          "Colorful veg (bell pepper/carrot/beet)": 5,
+          "Cruciferous veg (broccoli/cauliflower/Brussels)": 3,
+          "Dark chocolate (\u226575%, 1 oz)": 3,
+          "Extra-virgin olive oil (tbsp)": 21,
+          "Greek yoghurt / kefir": 5,
+          "Green tea (cups)": 3,
+          "Leafy greens (1 cup cooked or 2 raw)": 10,
+          "Lean protein (chicken/turkey/lean beef)": 3,
+          "Legumes (beans/lentils/chickpeas)": 6,
+          "Nuts (1 oz)": 7,
+          "Oily fish (salmon/sardines/mackerel)": 4,
+          "Processed/cured meat": 0,
+          "Red meat (lean cut, palm-sized)": 1,
+          "Seeds (chia/flax/pumpkin, 1 tbsp)": 10,
+          "Sugary drinks": 0,
+          "Tofu/tempeh": 1,
+          "Whole eggs": 4,
+          "Whole fruit (apple/pear/citrus)": 7,
+          "Whole grains (oats/quinoa/brown rice)": 5
+        }
       }
     },
     "supplements": {

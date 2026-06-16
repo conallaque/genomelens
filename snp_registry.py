@@ -604,6 +604,93 @@ _RECORDS: list[SNPRecord] = [
                     "(GWAS leukocyte-telomere length).",
         source="Codd 2013",
     ),
+
+    # ── Gut health panel (gut_health.py) ─────────────────────────────────
+    SNPRecord(
+        rsid="rs4988235", gene="MCM6", chrom="2",
+        pos_grch37=136_608_646, pos_grch38=135_851_076,
+        ancestral="G", derived="A",
+        description="MCM6/LCT −13910 — derived A (+ strand) is the lactase-"
+                    "persistence allele. Often reported as −13910C>T on the "
+                    "− strand; the registry is canonical + strand G/A.",
+        source="Enattah 2002 (Nat Genet)",
+        aliases=("-13910C>T", "LCT -13910"),
+    ),
+    SNPRecord(
+        rsid="rs10156191", gene="AOC1", chrom="7",
+        pos_grch37=150_553_605, pos_grch38=150_856_517,
+        ancestral="C", derived="T",
+        description="AOC1 (DAO) Thr16Met — derived T lowers diamine-oxidase "
+                    "activity, implicated in dietary histamine intolerance.",
+        source="Maintz 2011",
+        aliases=("Thr16Met",),
+    ),
+    SNPRecord(
+        rsid="rs2066844", gene="NOD2", chrom="16",
+        pos_grch37=50_745_926, pos_grch38=50_712_015,
+        ancestral="C", derived="T",
+        description="NOD2 R702W — derived T is a Crohn's-disease "
+                    "susceptibility allele.",
+        source="Hugot 2001 (Nature)",
+        aliases=("R702W",),
+    ),
+    SNPRecord(
+        rsid="rs11209026", gene="IL23R", chrom="1",
+        pos_grch37=67_705_958, pos_grch38=67_240_275,
+        ancestral="G", derived="A",
+        description="IL23R R381Q — derived A is protective against "
+                    "inflammatory bowel disease.",
+        source="Duerr 2006 (Science)",
+        aliases=("R381Q",),
+    ),
+
+    # ── Metals & oxidative stress panel (metal_oxidative.py) ─────────────
+    SNPRecord(
+        rsid="rs34637584", gene="LRRK2", chrom="12",
+        pos_grch37=40_734_202, pos_grch38=40_340_400,
+        ancestral="G", derived="A",
+        description="LRRK2 G2019S — derived A is the most common Mendelian "
+                    "risk variant for Parkinson's disease.",
+        source="Healy 2008 (Lancet Neurol)",
+        aliases=("G2019S",),
+        clinical_significance="Pathogenic",
+    ),
+    SNPRecord(
+        rsid="rs1001179", gene="CAT", chrom="11",
+        pos_grch37=34_460_231, pos_grch38=34_438_684,
+        ancestral="C", derived="T",
+        description="CAT −262C>T promoter — derived T alters catalase "
+                    "expression and oxidative-stress handling.",
+        source="Forsberg 2001",
+        aliases=("-262C>T",),
+    ),
+    SNPRecord(
+        rsid="rs1061472", gene="ATP7B", chrom="13",
+        pos_grch37=52_524_488, pos_grch38=51_950_352,
+        ancestral="T", derived="C",
+        description="ATP7B K832R — copper-transport variant. Canonical "
+                    "+ strand T/C; commonly reported A/G on the − strand "
+                    "(− strand G = + strand C).",
+        source="dbSNP; ATP7B copper metabolism",
+        aliases=("K832R",),
+    ),
+    SNPRecord(
+        rsid="rs8052394", gene="MT1A", chrom="16",
+        pos_grch37=56_673_828, pos_grch38=56_639_916,
+        ancestral="A", derived="G",
+        description="MT1A metallothionein variant — derived G associated "
+                    "with altered zinc/cadmium handling.",
+        source="dbSNP; metallothionein literature",
+    ),
+    SNPRecord(
+        rsid="rs28366003", gene="MT2A", chrom="16",
+        pos_grch37=56_642_491, pos_grch38=56_608_579,
+        ancestral="A", derived="G",
+        description="MT2A −5A>G promoter metallothionein variant — derived G "
+                    "associated with altered metal-binding capacity.",
+        source="dbSNP; metallothionein literature",
+        aliases=("-5A>G",),
+    ),
 ]
 
 

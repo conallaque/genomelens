@@ -1,4 +1,21 @@
 {
+  "aerobic_estimates": {
+    "lactate_threshold_estimate": "Lactate threshold typically 75-85% HRmax.",
+    "test_protocols": [
+      "30-30 sec ramp test or 2400m time trial \u2192 estimate VO2max",
+      "30-min all-out time trial; average HR \u2248 lactate threshold HR (Joe Friel)",
+      "Lab gold standard: graded incremental treadmill / cycle ergometer + gas analysis"
+    ],
+    "tier": "Unknown",
+    "vo2max_estimate": "Trainability unknown \u2014 assume average."
+  },
+  "caffeine_ergogenic": {
+    "factors": [
+      "rs762551 (CYP1A2) AC"
+    ],
+    "guidance": "Slow metaboliser \u2014 high-dose pre-workout caffeine likely impairs rather than enhances endurance and elevates BP. Stick to \u22641 mg/kg if any; consider beta-alanine, beetroot juice, or no stimulant.",
+    "responder": "Null / negative responder"
+  },
   "chronotype": {
     "chronotype": "Evening",
     "factors": [
@@ -12,6 +29,143 @@
     "summary": "BDNF Val/Val \u2014 efficient activity-dependent BDNF secretion. Strong cognitive-benefit response to aerobic exercise.",
     "training_note": "Conventional aerobic training (3-4 \u00d7/week, 40-60 min Zone 2) is highly effective for mood, memory, and neuroplasticity outcomes."
   },
+  "composite_profile": {
+    "attributes": {
+      "endurance": 0,
+      "hypertrophy": 35,
+      "low_injury": 90,
+      "pain": 50,
+      "power": 100,
+      "recovery": 35,
+      "vo2max": 50
+    },
+    "bottom_sports": [
+      {
+        "fit_score": 33.5,
+        "sport": "Distance running (5-10k)"
+      },
+      {
+        "fit_score": 31.8,
+        "sport": "Triathlon"
+      },
+      {
+        "fit_score": 23.5,
+        "sport": "Marathon / ultra"
+      }
+    ],
+    "overall_score": 51.4,
+    "ranked_sports": [
+      {
+        "fit_score": 85.5,
+        "sport": "Sprinting (100-400m)"
+      },
+      {
+        "fit_score": 83.2,
+        "sport": "Olympic weightlifting"
+      },
+      {
+        "fit_score": 72.0,
+        "sport": "Powerlifting"
+      },
+      {
+        "fit_score": 70.2,
+        "sport": "Football (American)"
+      },
+      {
+        "fit_score": 65.5,
+        "sport": "Basketball"
+      },
+      {
+        "fit_score": 62.5,
+        "sport": "Rock climbing"
+      },
+      {
+        "fit_score": 55.5,
+        "sport": "Soccer / football"
+      },
+      {
+        "fit_score": 55.0,
+        "sport": "Swimming"
+      }
+    ],
+    "summary": "Composite athletic index: 51.4/100. Top-matched sport: Sprinting (100-400m) (fit 85.5). Strongest attribute: power (100). Weakest: endurance (0)."
+  },
+  "concurrent_training": {
+    "interference_level": "High",
+    "rule": "Separate strength and endurance by \u22656 h on same day, or alternate days. Keep weekly endurance \u2264 90 min total when in a strength block."
+  },
+  "daily_readiness": {
+    "formula": "Daily readiness (0-100) = 0.30\u00b7HRV_norm + 0.25\u00b7Sleep_norm + 0.15\u00b7RestingHR_norm + 0.15\u00b7SubjectiveEnergy + 0.10\u00b7Soreness_inverse + 0.05\u00b7Mood. Each component normalised vs your 14-day rolling baseline.",
+    "personal_note": "Slow-recovery genotype \u2014 be MORE conservative with thresholds. Push red to 55, treat 50-64 as orange.",
+    "thresholds": [
+      {
+        "action": "Green \u2014 push hard. PRs encouraged. Heavy day or VO2max.",
+        "range": "85-100"
+      },
+      {
+        "action": "Yellow \u2014 normal session, hold RPE \u22648. Skip max efforts.",
+        "range": "65-84"
+      },
+      {
+        "action": "Orange \u2014 reduce volume 30%. Easy aerobic or technique work only.",
+        "range": "50-64"
+      },
+      {
+        "action": "Red \u2014 full rest or 20 min walk. Forcing it now buys nothing.",
+        "range": "<50"
+      }
+    ],
+    "tracking": "Daily HRV (rMSSD on waking via Whoop/Oura/HRV4Training), resting HR, subjective 1-5 sliders for energy/soreness/mood. Take a 14-day baseline before computing deviations. 3 consecutive days <baseline = mandatory deload."
+  },
+  "deload": {
+    "frequency": "Every 4-6 weeks (slow recovery: every 4; fast: every 6).",
+    "structure": [
+      "Volume \u221250% (cut sets in half, keep load).",
+      "Intensity \u221220% on top sets (RPE 6-7 instead of 8-9).",
+      "Cut highest-impact work (sprints, plyo, max-effort lifts) first.",
+      "Sleep extension +30 min; emphasise pre-bed nutrition (40 g protein + carbs).",
+      "Mobility/aerobic flush 2-3 sessions; full rest 1-2 days."
+    ],
+    "trigger_signals": "If you see: HRV \u2193 >7% for 3+ days, RPE drift (same load feels harder), sleep quality dropping, joint pain accumulating, plateau in PRs \u2265 2 weeks \u2192 deload immediately, don't wait for the scheduled one."
+  },
+  "fat_loss": {
+    "factors": [
+      "rs9939609 (FTO) AT"
+    ],
+    "fto_risk_allele": true,
+    "guidance": "FTO obesity-risk allele \u2014 GOOD NEWS: large studies show \u2265150 min/week of moderate aerobic exercise NEUTRALISES the FTO weight-gain effect. Aerobic exercise is non-negotiable. Strength training adds compounding benefit by raising RMR. Combine with high-protein/high-fibre eating for best fat-loss outcomes."
+  },
+  "hr_zones": {
+    "formula": "HRmax \u2248 208 \u2212 0.7 \u00d7 age (Tanaka). Zones as % HRmax:",
+    "polarised": "80/20 rule: 80% of weekly training in Z1\u2013Z2, 20% in Z3\u2013Z5. Avoid the 'grey zone' (Z3 every day) \u2014 neither builds base nor builds peak.",
+    "zones": [
+      {
+        "pct": "50\u201360%",
+        "use": "Active recovery, warm-up/cool-down",
+        "zone": "Z1 Recovery"
+      },
+      {
+        "pct": "60\u201370%",
+        "use": "Mitochondrial / fat oxidation \u2014 most weekly volume",
+        "zone": "Z2 Aerobic base"
+      },
+      {
+        "pct": "70\u201380%",
+        "use": "Lactate-clearance work, 'comfortably hard'",
+        "zone": "Z3 Tempo"
+      },
+      {
+        "pct": "80\u201390%",
+        "use": "Lactate threshold intervals (8\u201320 min)",
+        "zone": "Z4 Threshold"
+      },
+      {
+        "pct": "90\u2013100%",
+        "use": "3\u20135 min hard intervals \u2014 high-leverage capacity work",
+        "zone": "Z5 VO2max"
+      }
+    ]
+  },
   "injury_risk": {
     "risks": [
       {
@@ -20,6 +174,131 @@
         "mitigation": "Favourable tendon-stiffness profile \u2014 running economy advantage.",
         "tissue": "Achilles / patellar tendon"
       }
+    ]
+  },
+  "injury_risk_map": {
+    "overall_index": 20.2,
+    "regions": [
+      {
+        "interventions": "Vitamin D >40 ng/mL, calcium 1000 mg, heavy strength 2\u00d7/wk, mileage <10%/wk increase.",
+        "region": "Bone / stress fracture",
+        "risk_pct": 33
+      },
+      {
+        "interventions": "Nordic curls 2\u00d7/wk, single-leg RDLs, hop-stick drills, FMS screening.",
+        "region": "Knee / ACL",
+        "risk_pct": 20
+      },
+      {
+        "interventions": "Band external rotations, face pulls 100/week, scapular control, avoid kipping pullups early.",
+        "region": "Rotator cuff / shoulder",
+        "risk_pct": 20
+      },
+      {
+        "interventions": "McGill big-3 daily (curl-up, side bridge, bird-dog), hip-hinge mastery before loading, no flexed-spine loading.",
+        "region": "Lumbar disc",
+        "risk_pct": 20
+      },
+      {
+        "interventions": "Spanish squats / decline squats 2\u00d7/wk, isometric wall sits, manage running volume jumps.",
+        "region": "Patellar tendon",
+        "risk_pct": 18
+      },
+      {
+        "interventions": "Daily heel drops (eccentric), slow gradual mileage build, calf raises 3\u00d7/wk.",
+        "region": "Achilles tendon",
+        "risk_pct": 10
+      }
+    ]
+  },
+  "iron_endurance": {
+    "factors": [
+      "rs1799945 (HFE H63D) CG"
+    ],
+    "guidance": "Endurance athletes with HFE variants have higher iron stores than peers \u2014 DO NOT supplement iron without lab confirmation. Annual ferritin + transferrin saturation check. Excess iron blunts mitochondrial function and increases oxidative damage in athletes.",
+    "hfe_carrier": true
+  },
+  "mental_skills": {
+    "factors": [
+      "rs4680 (COMT) AG"
+    ],
+    "profile": "Val/Met balanced",
+    "strategies": [
+      "Flexible stress-performance curve \u2014 both calm and aroused states work."
+    ]
+  },
+  "mobility": {
+    "daily_minutes": 7,
+    "guidance": "Mobility is a SKILL \u2014 daily small doses outperform weekly 30-min sessions. Pair to existing cues (post-shower, post-workout).",
+    "items": [
+      "Hip flexor \u2014 couch stretch 2 min/side daily",
+      "T-spine \u2014 open-book / quadruped rotation 2 min daily",
+      "Ankle dorsiflexion \u2014 wall test + banded mobilisation 2 min/side, 3\u00d7/wk",
+      "Shoulder \u2014 wall slides + 90/90 ER, 5 min, 3\u00d7/wk",
+      "Hip mobility (90/90 transitions, frog stretch) \u2014 5 min daily \u2014 heavy hip work compresses ROM"
+    ]
+  },
+  "motivation": {
+    "factors": [
+      "DRD2/COMT not typed"
+    ],
+    "guidance": "Typical dopaminergic reward \u2014 exercise habit usually forms within 6\u20138 weeks of consistency. Use that 'runner's high' window.",
+    "low_dopamine_reward": false
+  },
+  "pain_tolerance": {
+    "factors": [
+      "rs4680 (COMT Val158Met) AG"
+    ],
+    "guidance": "Typical pain perception \u2014 RPE scales reliably.",
+    "tolerance": "Average"
+  },
+  "periodisation": [
+    {
+      "focus": "8\u201312 reps, 12\u201316 sets/muscle/wk, RPE 7\u20138",
+      "phase": "Weeks 1\u20134 \u2014 Hypertrophy"
+    },
+    {
+      "focus": "3\u20136 reps, heavy compounds, RPE 7\u20139",
+      "phase": "Weeks 5\u20138 \u2014 Strength"
+    },
+    {
+      "focus": "1\u20133 reps + plyometrics + Olympic lifts",
+      "phase": "Weeks 9\u201311 \u2014 Power/peak"
+    },
+    {
+      "focus": "\u221240% volume, technique focus",
+      "phase": "Week 12 \u2014 Deload"
+    }
+  ],
+  "plyometric_progression": {
+    "phases": [
+      {
+        "drills": "Pogo hops 3\u00d710, line hops 3\u00d720, ankle bounce 3\u00d715, low box step-down 3\u00d75/side",
+        "level": "Foundational",
+        "weeks": "1-3"
+      },
+      {
+        "drills": "Box jump 4\u00d73 (focus on soft landing), broad jump 4\u00d73, squat jump 3\u00d75",
+        "level": "Bilateral jumps",
+        "weeks": "4-6"
+      },
+      {
+        "drills": "Single-leg box jump 3\u00d73/leg, lateral bound 3\u00d74/side, depth jump (12 in box) 3\u00d73",
+        "level": "Unilateral / reactive",
+        "weeks": "7-9"
+      },
+      {
+        "drills": "Depth jump (18-24 in) 3\u00d73, drop-to-broad-jump 3\u00d73, hurdle hops 3\u00d75",
+        "level": "Advanced reactive",
+        "weeks": "10-12"
+      }
+    ],
+    "ready": true,
+    "rules": [
+      "Plyometrics first in session, before fatigue.",
+      "Quality over quantity \u2014 stop a set the moment landing mechanics degrade.",
+      "\u226572 h between max-effort plyometric sessions.",
+      "Total foot contacts/week: beginner <80, intermediate 80-150, advanced 150-250."
     ]
   },
   "power_endurance": {
@@ -31,6 +310,588 @@
     "ratio_pct_power": 100,
     "recommendation": "Prioritise heavy strength (3-6 reps) and explosive work (jumps, sprints, Olympic lifts). 2-3 short conditioning sessions/week is sufficient. Avoid chronic high-volume aerobic which blunts your strength response."
   },
+  "protocols": {
+    "cycling_ftp_demo": {
+      "ftp_test_protocols": [
+        "20-min all-out \u00d7 0.95 = FTP estimate (Allen & Coggan)",
+        "Ramp test (Zwift/TrainerRoad): 1-min steps + 75% of final 1-min power",
+        "8-min \u00d7 2 with 10-min recovery \u00d7 0.90"
+      ],
+      "ftp_watts": 250,
+      "zones": [
+        {
+          "watts": "<137",
+          "zone": "Z1 Active recovery"
+        },
+        {
+          "watts": "137-187 W",
+          "zone": "Z2 Endurance"
+        },
+        {
+          "watts": "190-225 W",
+          "zone": "Z3 Tempo"
+        },
+        {
+          "watts": "227-262 W",
+          "zone": "Z4 Lactate threshold"
+        },
+        {
+          "watts": "265-300 W",
+          "zone": "Z5 VO2max"
+        },
+        {
+          "watts": "302-375 W",
+          "zone": "Z6 Anaerobic"
+        },
+        {
+          "watts": ">375",
+          "zone": "Z7 Neuromuscular"
+        }
+      ]
+    },
+    "detraining_timeline": [
+      {
+        "period": "Day 1-3 off",
+        "what_happens": "Glycogen stores stay full; soreness clears. ZERO detraining."
+      },
+      {
+        "period": "Week 1",
+        "what_happens": "Plasma volume drops 5-10%; HR rises 5-10 bpm at given pace. Strength UNCHANGED."
+      },
+      {
+        "period": "Week 2",
+        "what_happens": "VO2max -4-6%. Strength still preserved (neural).  Hypertrophy maintained 2-3 weeks even without training."
+      },
+      {
+        "period": "Weeks 3-4",
+        "what_happens": "VO2max -10%. Strength begins to drop. Re-introduce 2\u00d7 lifting/wk to preserve."
+      },
+      {
+        "period": "Weeks 5-8",
+        "what_happens": "Substantial detraining. VO2max -15-20%. Hypertrophy losses begin (but slow)."
+      },
+      {
+        "period": "Beyond 12 weeks",
+        "what_happens": "Detraining largely complete for endurance. Strength can hold longer (esp. with maintenance volume)."
+      },
+      {
+        "period": "RETRAINING \u2014 muscle memory",
+        "what_happens": "Myonuclei from prior hypertrophy persist 10+ years \u2014 return to previous size 2-3\u00d7 faster than initial gains. Strength can return in 4-8 weeks vs months."
+      }
+    ],
+    "fitness_tests": {
+      "30min_time_trial_threshold": {
+        "formula": "Lactate threshold HR \u2248 average HR over final 20 min of 30-min all-out time trial (Friel).",
+        "how_to": "30 min all-out solo TT on familiar route (running, rowing, or cycling). Wear HR monitor."
+      },
+      "beep_test_multistage": {
+        "best_for": "Team-sport athletes (soccer, basketball, rugby).",
+        "formula": "Level/shuttle reached \u2192 table lookup \u2192 VO2max",
+        "how_to": "20 m shuttle runs, pace increases every minute. Continue to failure."
+      },
+      "cooper_12min_run": {
+        "formula": "VO2max (ml/kg/min) = (distance_m \u2212 504.9) / 44.73",
+        "how_to": "Warm up 10 min. Run as far as possible in exactly 12 min on flat track.",
+        "interpretation_men_30y": {
+          "Average (2200-2400m)": "39-44",
+          "Below (<2200m)": "<39",
+          "Excellent (>2800m)": ">52",
+          "Good (2400-2800m)": "44-52"
+        },
+        "interpretation_women_30y": {
+          "Average (1800-2000m)": "31-37",
+          "Below (<1800m)": "<31",
+          "Excellent (>2300m)": ">45",
+          "Good (2000-2300m)": "37-45"
+        }
+      },
+      "rockport_1mile_walk": {
+        "best_for": "De-conditioned, older athletes, or anyone unable to run.",
+        "formula": "VO2max = 132.853 \u2212 0.0769\u00b7weight_lb \u2212 0.3877\u00b7age + 6.315\u00b7(1 if male else 0) \u2212 3.2649\u00b7time_min \u2212 0.1565\u00b7HR_at_finish",
+        "how_to": "Walk 1 mile (1.6 km) as briskly as possible. Record time + HR at finish."
+      },
+      "two_km_row": {
+        "formula": "Erg score (time) \u2192 table for VO2max. World class men: <6:00 / women: <7:00.",
+        "how_to": "All-out 2 km on Concept2. Damper 4-6, drag factor 120-130 men / 110-120 women."
+      },
+      "ymca_step_test": {
+        "best_for": "Quick, equipment-light screen.",
+        "formula": "3 min stepping on 12-in box at 24 steps/min; recovery HR for 1 min predicts VO2max."
+      }
+    },
+    "hr_zone_demo_age_35": {
+      "HR_reserve": 124,
+      "HRmax_tanaka": 184,
+      "age": 35,
+      "note": "Karvonen (using HR reserve) is more individually accurate than flat %HRmax.",
+      "resting_hr": 60,
+      "zones": [
+        {
+          "bpm_range_karvonen": "122-134",
+          "pct_hrmax": "50-60%",
+          "zone": "Z1 Recovery"
+        },
+        {
+          "bpm_range_karvonen": "134-147",
+          "pct_hrmax": "60-70%",
+          "zone": "Z2 Aerobic base"
+        },
+        {
+          "bpm_range_karvonen": "147-159",
+          "pct_hrmax": "70-80%",
+          "zone": "Z3 Tempo"
+        },
+        {
+          "bpm_range_karvonen": "159-172",
+          "pct_hrmax": "80-90%",
+          "zone": "Z4 Threshold"
+        },
+        {
+          "bpm_range_karvonen": "172-184",
+          "pct_hrmax": "90-100%",
+          "zone": "Z5 VO2max"
+        }
+      ]
+    },
+    "hrv_guided_week": {
+      "context_modifiers": [
+        "Alcohol, illness, poor sleep all crash HRV \u2014 diagnose cause before reducing training.",
+        "Caffeine before measurement skews readings \u2014 measure fasted.",
+        "Hormonal cycle (female): HRV dips luteal phase \u2014 normal, not a red flag.",
+        "Travel + altitude crash HRV 24-72 h \u2014 give yourself a buffer."
+      ],
+      "decision_rules": [
+        {
+          "action": "Green light \u2014 schedule HARDEST session this cycle.",
+          "signal": "Today \u2265 7-day mean AND trending up"
+        },
+        {
+          "action": "Normal \u2014 execute as planned.",
+          "signal": "Today within \u00b15% of 7-day mean"
+        },
+        {
+          "action": "Yellow \u2014 reduce volume 25%, intensity cap RPE 7.",
+          "signal": "Today < 7-day mean by 5-10%"
+        },
+        {
+          "action": "Orange \u2014 easy aerobic only (Z1 20-30 min).",
+          "signal": "Today < 7-day mean by >10% (1 day)"
+        },
+        {
+          "action": "RED \u2014 mandatory full deload or rest week. Don't push through.",
+          "signal": "3 consecutive days < baseline"
+        }
+      ],
+      "implementation": "Whoop, Oura, Garmin, HRV4Training, Elite HRV \u2014 all valid. Consistency matters more than device. Take 4 weeks to build baseline before acting on day-to-day deviations.",
+      "tracking": "AM HRV (rMSSD or proprietary) immediately on waking, daily. Track 14-day rolling mean and 7-day rolling mean. Daily reading interpreted relative to baseline."
+    },
+    "lifting_cues": [
+      {
+        "common_faults": [
+          "Knee valgus (caving in) \u2014 strengthen glute med",
+          "Butt wink (lumbar flexion at bottom) \u2014 improve hip mobility, reduce depth temporarily",
+          "Forward chest drop \u2014 strengthen upper back, work paused squats"
+        ],
+        "cues": [
+          "Spread the floor with feet (external rotation creates hip stability)",
+          "Knees track over middle toes \u2014 drive them out at the bottom",
+          "Sit between your hips, not back onto your heels",
+          "Maintain a tall chest \u2014 eyes forward, not up"
+        ],
+        "lift": "Back squat",
+        "setup": "Bar across mid-traps. Brace 360\u00b0. Feet shoulder-width, slight toe-out 15-20\u00b0."
+      },
+      {
+        "common_faults": [
+          "Round upper back (acceptable if controlled, dangerous if uncontrolled)",
+          "Hyperextending at top \u2014 neutral spine, glute squeeze, no leaning back",
+          "Bar drifting forward \u2014 keep lats tight, bar against legs"
+        ],
+        "cues": [
+          "'Bend the bar around your shins' \u2014 lat engagement",
+          "Take the slack out of the bar before pulling (creates total-body tension)",
+          "Push the floor away \u2014 don't yank up",
+          "Hips and shoulders rise together \u2014 no early hip shoot"
+        ],
+        "lift": "Deadlift (conventional)",
+        "setup": "Mid-foot under bar. Hinge to grip; shins touch bar. Squeeze armpits."
+      },
+      {
+        "common_faults": [
+          "Flared elbows \u2014 shoulder impingement risk",
+          "Bouncing off chest \u2014 lose tension, eccentric value, and shoulder stability",
+          "Shoulders rolling forward at lockout \u2014 keep blades pinned"
+        ],
+        "cues": [
+          "'Bend the bar' \u2014 internal rotation cue for chest engagement",
+          "Elbows ~45-70\u00b0 from torso (not 90\u00b0)",
+          "Touch bar at lower-sternum/upper-abdomen \u2014 not nipples",
+          "Drive feet through floor on press (leg drive)"
+        ],
+        "lift": "Bench press",
+        "setup": "Eyes under bar. Shoulder blades retracted + depressed. Arch lower back, feet planted."
+      },
+      {
+        "common_faults": [
+          "Excessive lower-back arch \u2014 soft brace, weaker core",
+          "Pressing forward \u2014 bar drifts away from base of support"
+        ],
+        "cues": [
+          "'Push your head through the window' once bar passes face",
+          "Squeeze glutes hard to prevent lumbar extension",
+          "Bar path straight up \u2014 bar finishes over middle of foot"
+        ],
+        "lift": "Overhead press",
+        "setup": "Bar in front rack. Glutes + abs braced. Feet hip-width."
+      },
+      {
+        "common_faults": [
+          "Rounding lower back \u2014 reduce ROM, strengthen lats",
+          "Squatting instead of hinging \u2014 restart pattern with PVC pipe"
+        ],
+        "cues": [
+          "Push hips BACK (not down) \u2014 hinge, don't squat",
+          "Feel hamstrings stretch; bar slides along thighs",
+          "Stop when you feel a strong stretch \u2014 not at the floor"
+        ],
+        "lift": "Romanian deadlift (RDL)",
+        "setup": "Stand tall with bar at hip. Soft-knee."
+      },
+      {
+        "common_faults": [
+          "Kipping when working strict \u2014 eliminate momentum",
+          "Shrugging into ears \u2014 re-set scaps each rep"
+        ],
+        "cues": [
+          "'Pull elbows down toward back pockets'",
+          "Chest to bar, not chin over",
+          "Full hang at bottom (active hang, not dead hang) for full ROM"
+        ],
+        "lift": "Pull-up",
+        "setup": "Hang from bar, shoulder-width grip. Shoulder blades pulled down/back BEFORE pulling."
+      }
+    ],
+    "master_athlete": [
+      {
+        "adjustments": [
+          "Add 1 mandatory deload every 5-6 weeks",
+          "Prioritise sleep extension on hard days",
+          "Mobility 10 min/day non-negotiable"
+        ],
+        "decade": "30s",
+        "key_changes": "Recovery slightly slower vs 20s. Mostly indistinguishable from younger."
+      },
+      {
+        "adjustments": [
+          "Heavy strength 2\u00d7/wk minimum \u2014 counters sarcopenia",
+          "Joint-friendly modalities (rowing, cycling) substitute high-impact",
+          "Pre-workout mobility extended to 12-15 min",
+          "Protein target 1.8-2.0 g/kg (vs 1.6 for younger adults)"
+        ],
+        "decade": "40s",
+        "key_changes": "Testosterone -1% per year. Mitochondrial decline begins. Connective tissue stiffens."
+      },
+      {
+        "adjustments": [
+          "VO2max work 2\u00d7/wk preserves cardiac function (Joyner)",
+          "Heavy lifting (\u226580% 1RM) 1-2\u00d7/wk \u2014 bone-loading",
+          "Recovery: 72 h between hard same-system sessions",
+          "Power output (jumps, throws, sprints) preserved with explicit speed work weekly"
+        ],
+        "decade": "50s",
+        "key_changes": "VO2max declines ~1% per year if untrained, ~0.5% if trained. Bone density drops post-menopause."
+      },
+      {
+        "adjustments": [
+          "Strength training 3\u00d7/wk (compound + accessories)",
+          "Balance work daily (single-leg work, eyes-closed stands)",
+          "Protein 2.0-2.4 g/kg to overcome anabolic resistance",
+          "Vitamin D \u226540 ng/mL, calcium 1200 mg \u2014 bone health",
+          "Cardio remains important: 150 min moderate + 2 vigorous sessions/wk"
+        ],
+        "decade": "60s+",
+        "key_changes": "Sarcopenia accelerates without strength training. Balance becomes critical."
+      }
+    ],
+    "movement_screen": [
+      {
+        "checks": "Heels stay down, knees track over feet, chest tall, bar over feet",
+        "common_fail": "Heels rise / knees cave \u2192 ankle + hip mobility limits",
+        "remedy": "Calf stretches, banded ankle mob, goblet squats with elevated heels",
+        "test": "Overhead squat (PVC overhead, feet shoulder-width)"
+      },
+      {
+        "checks": "Vertical torso, knee tracks straight, no lateral shift",
+        "common_fail": "Knee caves / lateral shift \u2192 glute med weak / hip mobility",
+        "remedy": "Single-leg work, lateral band walks, hip airplane",
+        "test": "In-line lunge (heel-to-toe, bar vertical along spine)"
+      },
+      {
+        "checks": "Raised leg passes hip line; opposite leg stays flat",
+        "common_fail": "<70\u00b0 \u2192 hamstring tightness / posterior chain restriction",
+        "remedy": "Banded supine hamstring stretch, 90/90 work",
+        "test": "Active straight-leg raise (lying, leg straight up)"
+      },
+      {
+        "checks": "Fingertips touch or within 1 fist-width",
+        "common_fail": "Asymmetry > 1 hand-width \u2192 thoracic + shoulder mobility deficit",
+        "remedy": "Wall slides, T-spine extensions, sleeper stretch",
+        "test": "Shoulder mobility (reach behind back, fingertip distance)"
+      },
+      {
+        "checks": "Body rises as one unit \u2014 no sag, no buckling",
+        "common_fail": "Hip sag \u2192 core weakness",
+        "remedy": "Plank progressions, dead bugs, bird-dogs (McGill big 3)",
+        "test": "Trunk stability push-up (push-up with feet together, hands under shoulders)"
+      },
+      {
+        "checks": "Maintain spine alignment, controlled tempo",
+        "common_fail": "Hip shift / rotation \u2192 anti-rotation core weak",
+        "remedy": "Pallof presses, side planks with rotation",
+        "test": "Rotary stability (quadruped: same-side hand+knee out, then under)"
+      },
+      {
+        "checks": "30 sec eyes open easy; 20+ sec eyes closed",
+        "common_fail": "<10 sec eyes closed \u2192 proprioceptive deficit, fall risk",
+        "remedy": "Daily 1-min single-leg stand each leg, bosu work, tai chi",
+        "test": "Single-leg balance (eyes open then closed, 30 sec each)"
+      }
+    ],
+    "race_time_demo": {
+      "caveat": "Riegel assumes adequate endurance training for the longer distance. Less accurate beyond ~3\u00d7 extrapolation.",
+      "known": "5 km in 24.0 min",
+      "predicted_target": "21.1 km in 110.4 min (5.23 min/km pace)"
+    },
+    "recovery_matrix": [
+      {
+        "effect_size": "\u2605\u2605\u2605\u2605\u2605 \u2014 single highest-leverage intervention",
+        "evidence": "Sleep <7 h drops max strength 4-7%, REM testosterone rises ~15% per extra hour to 8 h",
+        "modality": "Sleep 8-9 h",
+        "protocol": "Hard floor: never below 7 h on training weeks. Cool room (16-19 \u00b0C), dark, devices off 30 min pre-bed."
+      },
+      {
+        "effect_size": "\u2605\u2605\u2605\u2605",
+        "evidence": "Glycogen resynthesis 50% faster with 1 g/kg carbs + 0.3 g/kg protein within 30 min vs 2 h delay",
+        "modality": "Carbs + protein post-workout",
+        "protocol": "0.3 g/kg protein + 0.5-1 g/kg carbs within 1-2 h of finishing."
+      },
+      {
+        "effect_size": "\u2605\u2605\u2605\u2605",
+        "evidence": "2% dehydration = ~10% endurance performance drop; full rehydration requires sodium",
+        "modality": "Hydration \u22651.5\u00d7 sweat lost",
+        "protocol": "Weigh before/after; replace 150% with electrolyte-containing fluid in 4 h."
+      },
+      {
+        "effect_size": "\u2605\u2605\u2605",
+        "evidence": "Improves lactate clearance, reduces DOMS perception, no fitness cost",
+        "modality": "Active recovery (Z1 20-30 min)",
+        "protocol": "Easy bike/walk/swim 20-30 min day after hard session \u2014 RPE 3-4."
+      },
+      {
+        "effect_size": "\u2605\u2605\u2605",
+        "evidence": "Plasma volume +7% in 10 sessions (Scoon), endurance perf +7% trained athletes, cardiovascular adaptation",
+        "modality": "Sauna (Finnish, dry)",
+        "protocol": "80-90 \u00b0C, 20-30 min, 3-4\u00d7/wk POST-exercise. Rehydrate."
+      },
+      {
+        "effect_size": "\u2605\u2605 (paradoxical for hypertrophy)",
+        "evidence": "Reduces inflammation/DOMS but blunts strength/hypertrophy adaptations 12+ h post-lift",
+        "modality": "Cold-water immersion",
+        "protocol": "Use only on heavy endurance/competition days. AVOID within 6 h of strength training."
+      },
+      {
+        "effect_size": "\u2605\u2605",
+        "evidence": "Modest DOMS reduction; perceptual rather than mechanical benefit",
+        "modality": "Massage / soft-tissue work",
+        "protocol": "1-2\u00d7/wk during heavy blocks. Foam roll daily 10 min self-massage."
+      },
+      {
+        "effect_size": "\u2605",
+        "evidence": "Small reduction in DOMS, no clear performance benefit",
+        "modality": "Compression garments",
+        "protocol": "Optional \u2014 useful during long travel or back-to-back competition."
+      },
+      {
+        "effect_size": "\u2605\u2605",
+        "evidence": "ROM gains, no acute DOMS reduction. Performed pre-strength acutely DECREASES force.",
+        "modality": "Stretching (static, post-session)",
+        "protocol": "Static stretching post-workout only or in separate mobility session."
+      },
+      {
+        "effect_size": "\u2605\u2605",
+        "evidence": "Reduces DOMS markers (CK, IL-6) and improves sleep onset",
+        "modality": "Tart cherry juice 12 oz",
+        "protocol": "Pre-bed during heavy training weeks (consider sugar load)."
+      },
+      {
+        "effect_size": "\u2605\u2605",
+        "evidence": "Improves sleep onset and quality; muscle relaxation",
+        "modality": "Magnesium 200-400 mg pre-bed",
+        "protocol": "Glycinate or threonate form, 200-400 mg 30 min before bed."
+      },
+      {
+        "effect_size": "\u2605\u2605\u2605 (for competition only)",
+        "evidence": "Restores adenosine-receptor sensitivity; greater ergogenic effect on race day",
+        "modality": "Caffeine cycling (off 5-7 d pre-event)",
+        "protocol": "Caffeine taper 7 days pre-event, then 3-6 mg/kg 45 min pre-race."
+      },
+      {
+        "effect_size": "\u2605\u2605\u2605\u2605",
+        "evidence": "16-22% greater fitness gains in HRV-guided vs fixed-plan groups (Vesterinen 2016)",
+        "modality": "HRV-guided autoregulation",
+        "protocol": "Track AM HRV; hard sessions only when HRV \u2265 rolling mean; easy or rest below."
+      }
+    ],
+    "running_pace_demo_threshold_5min_km": {
+      "threshold_pace_min_km": 5.0,
+      "zones": [
+        {
+          "pace_min_km": "6.50-7.00",
+          "zone": "Z1 Recovery"
+        },
+        {
+          "pace_min_km": "5.75-6.25",
+          "zone": "Z2 Aerobic base"
+        },
+        {
+          "pace_min_km": "5.25-5.50",
+          "zone": "Z3 Tempo (mara/half pace)"
+        },
+        {
+          "pace_min_km": "4.85-5.15",
+          "zone": "Z4 Threshold (10k pace)"
+        },
+        {
+          "pace_min_km": "4.40-4.75",
+          "zone": "Z5 VO2max (5k/3k pace)"
+        },
+        {
+          "pace_min_km": "3.90-4.25",
+          "zone": "Z6 Anaerobic (1k/400m)"
+        }
+      ]
+    },
+    "sport_specific_plans": [
+      {
+        "meet_day": "1 light opener at 92% of PR, 2nd at PR, 3rd a +2.5 kg PR attempt.",
+        "sport": "Powerlifting",
+        "weeks": [
+          {
+            "accessory": "RDL, pause squats, close-grip bench, rows, walking lunges. 3\u00d710-12.",
+            "phase": "Hypertrophy (wk 1-4)",
+            "schedule": "Squat 2\u00d7/wk, Bench 2\u00d7/wk, Deadlift 1\u00d7/wk. 4\u00d78 @ 70-75%."
+          },
+          {
+            "accessory": "Reduce volume; same exercises 3\u00d76-8.",
+            "phase": "Strength (wk 5-8)",
+            "schedule": "Same lifts. 5\u00d75 @ 80%, +2.5-5 kg/wk on top set."
+          },
+          {
+            "accessory": "Minimal \u2014 pause work, lockouts.",
+            "phase": "Peak (wk 9-11)",
+            "schedule": "Top set 1-3 reps @ 87-93%, back-off 3\u00d75 @ 80%."
+          },
+          {
+            "phase": "Taper (wk 12)",
+            "schedule": "\u221240% volume, single @ 90% midweek, full rest 48 h pre-meet."
+          }
+        ]
+      },
+      {
+        "sport": "Olympic Weightlifting",
+        "weeks": [
+          {
+            "focus": "Bar path, receiving positions, foot work. Video every session.",
+            "phase": "Technique block (wk 1-4)",
+            "schedule": "Snatch + variants 3\u00d7/wk, C&J + variants 3\u00d7/wk, Squat 3\u00d7/wk. 70-80%."
+          },
+          {
+            "phase": "Strength block (wk 5-8)",
+            "schedule": "Same lift split. Squat 5\u00d75 @ 80-85%. Olympic lifts 70-85%."
+          },
+          {
+            "phase": "Intensity (wk 9-11)",
+            "schedule": "Snatch + C&J at 85-95%, singles + doubles."
+          },
+          {
+            "phase": "Peak/competition (wk 12)",
+            "schedule": "Heavy single mid-week, deload, comp day."
+          }
+        ]
+      },
+      {
+        "meet_day": "1 light opener at 92% of PR, 2nd at PR, 3rd a +2.5 kg PR attempt.",
+        "sport": "Powerlifting",
+        "weeks": [
+          {
+            "accessory": "RDL, pause squats, close-grip bench, rows, walking lunges. 3\u00d710-12.",
+            "phase": "Hypertrophy (wk 1-4)",
+            "schedule": "Squat 2\u00d7/wk, Bench 2\u00d7/wk, Deadlift 1\u00d7/wk. 4\u00d78 @ 70-75%."
+          },
+          {
+            "accessory": "Reduce volume; same exercises 3\u00d76-8.",
+            "phase": "Strength (wk 5-8)",
+            "schedule": "Same lifts. 5\u00d75 @ 80%, +2.5-5 kg/wk on top set."
+          },
+          {
+            "accessory": "Minimal \u2014 pause work, lockouts.",
+            "phase": "Peak (wk 9-11)",
+            "schedule": "Top set 1-3 reps @ 87-93%, back-off 3\u00d75 @ 80%."
+          },
+          {
+            "phase": "Taper (wk 12)",
+            "schedule": "\u221240% volume, single @ 90% midweek, full rest 48 h pre-meet."
+          }
+        ]
+      }
+    ],
+    "supplement_stacks": {
+      "evidence_tiers": {
+        "A_proven": [
+          "Creatine",
+          "Caffeine (responder genotype)",
+          "Carbs intra-workout >90 min",
+          "Beta-alanine",
+          "Beetroot/nitrate",
+          "Protein post-workout"
+        ],
+        "B_some_evidence": [
+          "Citrulline",
+          "L-theanine",
+          "Tart cherry",
+          "Sodium bicarbonate"
+        ],
+        "C_avoid_or_unproven": [
+          "BCAAs (whole protein superior)",
+          "Glutamine for performance",
+          "Most 'fat-burner' stacks",
+          "Excess vitamin C/E (blunts adaptation)",
+          "Testosterone-boosters (almost all useless)"
+        ]
+      },
+      "intra_workout": [
+        "Sessions <60 min: water only",
+        "60-90 min: 30 g carbs/h (sports drink or gel)",
+        "90+ min endurance: 60-90 g carbs/h + 500-750 ml fluid + 300-500 mg Na",
+        "Hot conditions: + 200-300 mg sodium per L fluid above standard"
+      ],
+      "personalised_priority": "Strength-focused: creatine + caffeine + protein. Endurance-focused: beetroot + carbs + caffeine + sodium. Strength tier: Low hypertrophy / strength-leaning responder. VO2 tier: Unknown.",
+      "post_workout": [
+        "Protein 0.3 g/kg within 1-2 h (whey/leucine ideal for MPS spike)",
+        "Carbs 0.5-1 g/kg if glycogen-depleted",
+        "Tart cherry juice 12 oz on heavy days (DOMS + sleep)",
+        "Vitamin D 1000-2000 IU with the meal (if deficient)",
+        "Magnesium 200-400 mg if going to bed within 4 h"
+      ],
+      "pre_workout": [
+        "Caffeine \u22641 mg/kg or skip",
+        "Beta-alanine 3-5 g daily (loading 2-4 wk; benefits 1-4 min efforts)",
+        "Creatine monohydrate 5 g daily (timing doesn't matter; total stack)",
+        "Beetroot juice 500 ml 2-3 h pre \u2014 endurance + repeated sprints (nitric oxide)",
+        "Citrulline malate 6-8 g 60 min pre \u2014 strength volume, blood flow"
+      ]
+    }
+  },
   "recovery": {
     "factors": [
       "rs1800795 (IL6 -174) GG \u2014 high baseline inflammatory tone"
@@ -39,7 +900,119 @@
     "protocol": "Expect prolonged DOMS and slower clearance of training stress. 48-72 h between hard sessions on the same muscle group. Aggressive recovery: sleep \u22658 h, omega-3, tart cherry, contrast showers.",
     "speed": "Slow"
   },
+  "sample_workouts": [
+    {
+      "best_window": "16:00 \u2013 20:00",
+      "blocks": [
+        "Warm-up (10 min): bike 5 min, dynamic mobility, glute activation, 3 ramping squat sets",
+        "Back squat \u2014 5\u00d73 @ 85% 1RM, 3-min rest",
+        "Romanian deadlift \u2014 4\u00d76 @ 75%, 2-min rest",
+        "Bulgarian split squat \u2014 3\u00d78/leg @ moderate DBs, 90 sec",
+        "Nordic curl \u2014 3\u00d75 (eccentric 4 sec)",
+        "Standing calf raise \u2014 3\u00d712",
+        "Finisher: weighted plank 3\u00d745 sec",
+        "Cool-down: 5 min walk + hip flexor + quad stretch"
+      ],
+      "duration": "60-70 min",
+      "name": "A \u2014 Lower Body Strength (Heavy)",
+      "rpe_target": "Top set RPE 8 (2 reps in reserve)"
+    },
+    {
+      "best_window": "16:00 \u2013 20:00",
+      "blocks": [
+        "Warm-up (10 min): pogo hops, A-skips, band activation",
+        "Box jump \u2014 5\u00d73 (max height attainable cleanly), 90 sec rest",
+        "Hang power clean \u2014 5\u00d73 @ 70%, 2-min rest",
+        "Push press \u2014 4\u00d74 @ 75%",
+        "Broad jump \u2014 4\u00d73, 90 sec",
+        "Med-ball rotational throw \u2014 3\u00d76/side",
+        "Cool-down: 5 min easy + ankle/hip mobility"
+      ],
+      "duration": "45-55 min",
+      "name": "B \u2014 Power / Plyometric Day",
+      "rpe_target": "Bar-speed focused \u2014 no grinding reps. RPE 7-8."
+    },
+    {
+      "best_window": "Anytime",
+      "blocks": [
+        "Warm-up: 5 min easy bike",
+        "8 \u00d7 30-sec sprint @ 90% effort / 90-sec walk recovery",
+        "Cool-down: 5 min easy + breathing reset"
+      ],
+      "duration": "25-30 min",
+      "name": "C \u2014 Conditioning (Power-Friendly)",
+      "rpe_target": "Each sprint RPE 9; full rest between."
+    }
+  ],
+  "sleep": {
+    "factors": [
+      "Sleep SNPs not typed"
+    ],
+    "guidance": "Standard 7.5\u20139 h target. Sleep-extension protocol on hard training weeks: +30\u201360 min vs baseline. Track HRV trend; <baseline 3 days = mandatory deload.",
+    "sleep_phenotype": "Average"
+  },
   "status": "ok",
+  "strength_trainability": {
+    "factors": [
+      "Strength SNPs not typed"
+    ],
+    "recommendation": "Hypertrophy genes lean low \u2014 focus on strength (3\u20136 reps, heavy) where neural adaptations drive bigger early gains, plus high-volume blocks (8\u201312 weeks) for body composition. Consistency beats genes.",
+    "score": 0.5,
+    "tier": "Low hypertrophy / strength-leaning responder"
+  },
+  "stress_fracture": {
+    "elevated_risk": true,
+    "factors": [
+      "rs2228570 (VDR FokI) TT",
+      "rs1800012 (COL1A1) GG"
+    ],
+    "guidance": "Elevated stress-fracture risk markers \u2014 for runners/jumpers: ramp running mileage \u226410%/week, alternate impact days with cycling/swim, prioritise vitamin D \u226540 ng/mL, calcium 1000 mg/day, and bone-loading strength work (heavy squats, jumps) 2\u00d7/week \u2014 these strengthen bone more than running."
+  },
+  "tapering": {
+    "duration_days": 7,
+    "structure": [
+      "D-7: heavy single + light volume",
+      "D-6: rest",
+      "D-5: speed work, low volume",
+      "D-4: rest",
+      "D-3: opener \u2014 top set @ 90%, 2-3 sets only",
+      "D-2: full rest",
+      "D-1: short activation, no fatigue",
+      "Competition day"
+    ],
+    "volume_change": "\u221240% sets, intensity maintained"
+  },
+  "thermal_adaptation": {
+    "cold_protocol": "Cold exposure 2-3 min @ 50-59 \u00b0F (10-15 \u00b0C) 3-5\u00d7/wk pre-breakfast \u2014 increases brown-fat activity over 4-6 weeks (S\u00f8berg protocol: 11 min/wk minimum across multiple sessions). Avoid IMMEDIATELY post-strength training (blunts hypertrophy adaptation 12+ h).",
+    "cold_tolerance": "Average",
+    "factors": [
+      "Thermal SNPs not typed"
+    ],
+    "heat_protocol": "Sauna 80-90 \u00b0C, 20-30 min, 3-4\u00d7/wk post-exercise \u2014 heat-shock protein induction, plasma volume +7%, cardiac output adaptation. Endurance performance improves ~7% in trained athletes after 10 sauna sessions (Scoon et al). Rehydrate 1.5\u00d7 sweat lost."
+  },
+  "training_nutrition": {
+    "intra_workout": "Strength sessions: water only is fine. >90 min lift: 20 g intra-EAAs or carbs optional.",
+    "post_workout": "Within 1\u20132 h: 0.3 g/kg protein (20\u201340 g) + carbs (1 g/kg if depleted). Examples: Greek yoghurt + berries + granola; chicken + rice + veg. Hydrate to 150% of fluid lost (weigh in/out).",
+    "pre_workout": "60\u201390 min before: 0.5\u20131 g/kg carbs + 20 g protein (e.g. oats+whey, rice cake+jam+yoghurt). "
+  },
+  "vo2max": {
+    "factors": [
+      "VO2max SNPs not typed"
+    ],
+    "guidance": "Trainability SNPs not typed \u2014 assume average response.",
+    "score": 0,
+    "tier": "Unknown"
+  },
+  "warmup": {
+    "cooldown": "5 min easy cardio + 5 min static stretching (focus on tight areas \u2014 hips, calves, T-spine).",
+    "duration_min": 10,
+    "protocol": [
+      "5 min easy cardio (bike/row/jog) \u2014 raise core temp",
+      "Dynamic mobility: leg swings, hip openers, T-spine rotations \u2014 3 min",
+      "Activation: glute bridges 2\u00d710, band pull-aparts 2\u00d715, scap pushups 2\u00d710",
+      "Specific ramp: 3 ascending sets to working weight (50/70/90%)"
+    ]
+  },
   "weekly_template": [
     {
       "day": "Mon",

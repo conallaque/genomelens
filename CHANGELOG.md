@@ -6,6 +6,40 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [Unreleased] — 2026-06-16 — Y-DNA correctness & registry completion
+
+### Fixed
+
+- **Y-DNA haplogroup analysis reported the wrong haplogroup.** The decision
+  tree in `y_haplogroup.py` had corrupted marker data — duplicate/mis-mapped
+  rsIDs (e.g. `rs2032658`, actually M207/R, was attached to the O node), wrong
+  positions and flipped ancestral/derived alleles, some copied from the
+  synthetic test genome. Combined with first-derived-child-wins descent it
+  produced confident wrong calls (e.g. terminal O for a haplogroup-T sample
+  with only 1/3 path markers confirmed). The backbone was rebuilt from the
+  ISOGG Y-SNP index (verified rsID + GRCh37 position + ancestral→derived),
+  rooted at CT so non-K lineages (I, J, E, G) are representable. Lookup now
+  votes across several co-defining markers per node, skips strand-ambiguous
+  (A/T, C/G) SNPs, reports only the deepest **confirmed** node (no
+  over-calling), still descends through chip gaps toward genuinely confirmed
+  downstream markers, and flags biologically-impossible contradictory calls.
+
+### Added
+
+- **`snp_registry`: registered the gut-health and metals/oxidative panel
+  SNPs** that `gut_health.py` and `metal_oxidative.py` referenced but the
+  registry did not know about (`rs4988235`, `rs10156191`, `rs2066844`,
+  `rs11209026`, `rs34637584`, `rs1001179`, `rs1061472`, `rs8052394`,
+  `rs28366003`), each with verified GRCh37/GRCh38 coordinates and + strand
+  ancestral/derived alleles.
+- **`rs1061472` (ATP7B K832R) is a documented strand flip.** carrier.py labels
+  the coding-strand `G`; the registry stores canonical + strand `T/C`
+  (complement(C) == G), so it reconciles as a strand flip, not a biology
+  disagreement. Added to the locked strand-flip set in the carrier
+  consistency test.
+
+---
+
 ## [Unreleased] — 2026-05-29 — Accuracy & honesty pass
 
 No new features — existing outputs made correct and honest about uncertainty.
