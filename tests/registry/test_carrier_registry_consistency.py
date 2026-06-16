@@ -30,11 +30,16 @@ def test_at_least_thirteen_reconciled_directly() -> None:
 
 
 def test_known_strand_flips_remain_documented() -> None:
-    """The three strand-flipped variants are an explicit design choice
+    """The strand-flipped variants are an explicit design choice
     (carrier.py uses gene-coding-strand labels; registry uses + strand).
-    Locking them here so any future "fix" that breaks the flip surfaces."""
+    Locking them here so any future "fix" that breaks the flip surfaces.
+
+    rs1061472 (ATP7B K832R) joined the set when it was added to the registry
+    for the metals/oxidative panel: carrier.py labels the coding-strand G,
+    the registry stores canonical + strand T/C — complement(C) == G, so it
+    reconciles as a strand flip, not a biology disagreement."""
     audit = carrier.audit_against_registry()
-    expected = {"rs28929474", "rs5030858", "rs5742904"}
+    expected = {"rs28929474", "rs5030858", "rs5742904", "rs1061472"}
     assert set(audit["strand_flipped"]) == expected, (
         f"Strand-flipped set drifted. Expected {expected}, "
         f"got {set(audit['strand_flipped'])}. If this is intentional, "
