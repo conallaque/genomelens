@@ -258,7 +258,7 @@ def generate_narrative_report(
 
     try:
         resp = requests.post(
-            "http://localhost:11434/api/chat",
+            "http://localhost:11434/api/generate",
             json={
                 "model": model,
                 "messages": [{"role": "user", "content": prompt}],
