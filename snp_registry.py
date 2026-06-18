@@ -691,6 +691,63 @@ _RECORDS: list[SNPRecord] = [
         source="dbSNP; metallothionein literature",
         aliases=("-5A>G",),
     ),
+    SNPRecord(
+        rsid="rs13107325", gene="SLC39A8", chrom="4",
+        pos_grch37=103_188_709, pos_grch38=102_267_552,
+        ancestral="C", derived="T",
+        description="SLC39A8 (ZIP8) A391T — derived T (Thr391) lowers "
+                    "manganese/zinc transport; highly pleiotropic (blood "
+                    "pressure, lipids, neuropsychiatric, IBD). Canonical "
+                    "+ strand C/T; arrays often report on the − strand as "
+                    "G/A (− strand A = + strand T = effect allele).",
+        source="dbSNP; GWAS of Mn metabolism & pleiotropy",
+        aliases=("A391T",),
+    ),
+    SNPRecord(
+        rsid="rs896378", gene="SLC39A14", chrom="8",
+        pos_grch37=22_262_321, pos_grch38=22_404_808,
+        ancestral="T", derived="C",
+        description="SLC39A14 (ZIP14) common coding variant — ZIP14 is a "
+                    "manganese/zinc/iron importer; benign missense near "
+                    "Leu33. Research-grade. Reference + strand T; common "
+                    "allele C. (Ancestral state ambiguous; reports + strand "
+                    "reference vs common.)",
+        source="dbSNP rs896378",
+    ),
+    SNPRecord(
+        rsid="rs1893590", gene="ABCG1", chrom="21",
+        pos_grch37=43_619_595, pos_grch38=42_199_485,
+        ancestral="A", derived="C",
+        description="ABCG1 −204A>C promoter variant — ABCG1 mediates "
+                    "cholesterol/sterol efflux; derived C associated with "
+                    "lower HDL-C in candidate-gene studies. Research-grade.",
+        source="dbSNP; PMID 25398214 (ABCG1/HDL)",
+        aliases=("-204A>C",),
+    ),
+    SNPRecord(
+        rsid="rs4147565", gene="GSTM1", chrom="1",
+        pos_grch37=110_231_777, pos_grch38=109_689_155,
+        ancestral="G", derived="A",
+        description="GSTM1 within-gene marker (glutathione-S-transferase Mu "
+                    "1). The functional GSTM1-null state is a whole-gene "
+                    "DELETION (CNV), not this SNP — null shows up as a "
+                    "no-call/hemizygous genotype, so this is only a "
+                    "research-grade proxy; PCR/CNV assay is the gold standard.",
+        source="dbSNP; GST copy-number literature (PMC6118300)",
+    ),
+    SNPRecord(
+        rsid="rs4630", gene="GSTT1", chrom="22",
+        pos_grch37=24_376_322, pos_grch38=None,
+        ancestral="G", derived="A",
+        description="GSTT1 within-gene coding marker (glutathione-S-transferase "
+                    "Theta 1). The functional GSTT1-null state is a whole-gene "
+                    "DELETION (CNV), not this SNP — null shows up as a "
+                    "no-call/hemizygous genotype, so this is only a "
+                    "research-grade proxy; PCR/CNV assay is the gold standard. "
+                    "GRCh38 omitted: this CNV-prone region has no clean "
+                    "primary-chromosome hg38 placement.",
+        source="dbSNP; GST copy-number literature (PMC6118300)",
+    ),
 ]
 
 

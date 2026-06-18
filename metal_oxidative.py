@@ -5,8 +5,9 @@ Metal Handling, Oxidative Defense & Neurodegeneration Panel
 Covers a cluster of genes the other modules did not surface as a section:
 
   * Neurodegeneration (Parkinson's) — LRRK2, GBA
-  * Metal handling                  — MT1A, MT2A, ATP7B
-  * Oxidative defense               — CAT, G6PD
+  * Metal handling                  — MT1A, MT2A, ATP7B, HFE, SLC39A8,
+                                       SLC39A14, ABCG1
+  * Oxidative defense               — CAT, G6PD, GSTM1, GSTT1
 
 Two of these SNPs (GBA rs76763715, G6PD rs1050828) are already registered
 and used by carrier.py for *recessive disease* status. This module reuses
@@ -15,7 +16,18 @@ oxidative fragility (G6PD) — rather than re-declaring them.
 
 The metallothionein (MT1A/MT2A) and ATP7B-K832R signals are research-grade
 on consumer chips and are flagged ``confidence: low``. They are not a
-substitute for clinical copper studies or heavy-metal panels.
+substitute for clinical copper studies or heavy-metal panels. The same
+``low`` caveat applies to the ZIP transporters (SLC39A8/SLC39A14) and ABCG1.
+
+GSTM1 and GSTT1 are glutathione-S-transferase genes whose functional
+variant is a whole-gene *deletion* (the "null" genotype), not a point SNP.
+Consumer arrays do not genotype the deletion directly; the proxy SNPs used
+here only hint at it, and a true null call requires a PCR/CNV assay — so
+these are flagged ``confidence: low`` and read conservatively.
+
+HFE (C282Y/H63D) is the exception: it is a clinically-validated
+iron-overload locus reused from the carrier records, and a C282Y homozygous
+call is surfaced at higher confidence.
 
 Output shape matches wellness.py so the renderer can group by category:
   {category, trait, result, action, evidence, confidence}
@@ -166,6 +178,116 @@ def _mt_heavy_metal(snps):
             "evidence": "; ".join(parts), "confidence": "low"}
 
 
+def _hfe_iron(snps):
+    # Reuses the registered HFE C282Y / H63D SNPs (carrier.py uses them for
+    # hereditary-hemochromatosis carrier status). Here: the iron-overload
+    # angle for the metal-handling section.
+    c282y = _dose(snps, "rs1800562", "A")   # derived A = C282Y
+    h63d = _dose(snps, "rs1799945", "G")     # derived G = H63D
+    if c282y is None and h63d is None:
+        return None
+    parts = []
+    if c282y is not None:
+        parts.append(f"C282Y rs1800562 A-dose {c282y}")
+    if h63d is not None:
+        parts.append(f"H63D rs1799945 G-dose {h63d}")
+    finding = {"category": CAT_METAL,
+               "trait": "HFE Iron Overload (Hemochromatosis)",
+               "evidence": "; ".join(parts), "confidence": "low"}
+    if (c282y or 0) >= 2:
+        finding["result"] = ("Homozygous for HFE C282Y — the classical "
+                  "hereditary-hemochromatosis genotype, the strongest common "
+                  "genetic cause of iron overload. Penetrance is incomplete, "
+                  "especially in women; many homozygotes never accumulate "
+                  "clinically significant iron.")
+        finding["action"] = ("Confirm with serum ferritin and transferrin "
+                  "saturation; discuss with a clinician. Periodic phlebotomy "
+                  "is the established treatment if iron studies are elevated.")
+        finding["confidence"] = "high"
+        finding["clinical_variant"] = {
+            "gene": "HFE",
+            "rsid": "rs1800562",
+            "variant": "C282Y (p.Cys282Tyr) homozygous",
+            "dose": c282y,
+            "clinical_significance": "Pathogenic (when homozygous)",
+            "inheritance": "autosomal recessive (incomplete penetrance)",
+            "note": ("HFE C282Y homozygosity is the classical hereditary "
+                     "hemochromatosis genotype. Consumer-chip call — confirm "
+                     "with iron studies before any clinical action."),
+        }
+    elif (c282y or 0) == 1 and (h63d or 0) >= 1:
+        finding["result"] = ("Compound heterozygous C282Y/H63D — a minority "
+                  "develop mild iron overload. Lower risk than C282Y "
+                  "homozygosity.")
+        finding["action"] = ("Consider a one-time ferritin / transferrin-"
+                  "saturation check; routine monitoring is usually "
+                  "unnecessary unless iron studies are elevated.")
+        finding["confidence"] = "moderate"
+    elif (c282y or 0) >= 1 or (h63d or 0) >= 1:
+        finding["result"] = ("Carries a single HFE variant (heterozygous "
+                  "C282Y or H63D). Generally not associated with clinically "
+                  "significant iron overload on its own.")
+        finding["action"] = ("No HFE-specific action indicated. See the "
+                  "Carrier Status section for the hemochromatosis angle.")
+    else:
+        finding["result"] = ("No HFE C282Y or H63D variant detected — typical "
+                  "iron-handling genotype at these loci.")
+        finding["action"] = "No HFE-specific action indicated."
+    return finding
+
+
+def _zip_transporters(snps):
+    # SLC39A8 (ZIP8) and SLC39A14 (ZIP14) — divalent-metal importers handling
+    # zinc/manganese (and iron for ZIP14). Collapsed into one finding.
+    a8 = _dose(snps, "rs13107325", "T")   # derived T = A391T, reduced transport
+    a14 = _dose(snps, "rs896378", "C")    # common ZIP14 coding allele
+    if a8 is None and a14 is None:
+        return None
+    parts = []
+    if a8 is not None:
+        parts.append(f"SLC39A8 rs13107325 T-dose {a8}")
+    if a14 is not None:
+        parts.append(f"SLC39A14 rs896378 C-dose {a14}")
+    if (a8 or 0) >= 1:
+        result = ("Carries the SLC39A8 (ZIP8) A391T allele, which lowers "
+                  "zinc/manganese transport and is one of the most pleiotropic "
+                  "common variants (linked to blood pressure, lipids, "
+                  "neuropsychiatric traits and IBD in large GWAS). Effect per "
+                  "trait is small. SLC39A14 (ZIP14) variation co-reported.")
+    else:
+        result = ("No reduced-transport SLC39A8 A391T allele detected; "
+                  "ZIP8/ZIP14 zinc/manganese transport genotype is typical "
+                  "for the variants tested.")
+    action = ("Research-grade only — not a clinical zinc/manganese test. "
+              "Ensure adequate but not excessive dietary zinc and manganese; "
+              "do not megadose. Discuss any specific metabolic concern with a "
+              "clinician.")
+    return {"category": CAT_METAL,
+            "trait": "ZIP Zinc/Manganese Transport (SLC39A8/SLC39A14)",
+            "result": result, "action": action,
+            "evidence": "; ".join(parts), "confidence": "low"}
+
+
+def _abcg1_efflux(snps):
+    dose = _dose(snps, "rs1893590", "C")  # derived C = -204A>C, lower HDL
+    if dose is None:
+        return None
+    if dose >= 1:
+        result = ("Carries the ABCG1 −204A>C allele, associated in candidate-"
+                  "gene studies with reduced cholesterol/sterol efflux and "
+                  "lower HDL-C. ABCG1 moves cholesterol and oxysterols out of "
+                  "cells, complementing the lipid modules. Research-grade.")
+    else:
+        result = ("No ABCG1 −204A>C allele detected — typical cholesterol-"
+                  "efflux genotype at this locus.")
+    action = ("No action from this SNP alone. See the lipid/cardiometabolic "
+              "sections for HDL and cholesterol guidance; standard heart-"
+              "healthy measures apply regardless of this variant.")
+    return {"category": CAT_METAL, "trait": "ABCG1 Cholesterol Efflux",
+            "result": result, "action": action,
+            "evidence": f"rs1893590 C-allele dose: {dose}", "confidence": "low"}
+
+
 # ─── Oxidative defense ────────────────────────────────────────────────────
 
 def _cat_catalase(snps):
@@ -216,6 +338,38 @@ def _g6pd_oxidative(snps):
             "evidence": f"rs1050828 T-allele dose: {dose}", "confidence": conf}
 
 
+def _gst_detox(snps):
+    # GSTM1 / GSTT1 glutathione-S-transferases — phase-II conjugation enzymes
+    # central to xenobiotic detox and oxidative defense. The functional null
+    # is a whole-gene DELETION, which consumer arrays don't call directly;
+    # these proxy SNPs only hint at it (a no-call can mean the deletion OR
+    # simply missing data). Strictly research-grade.
+    m1 = _dose(snps, "rs4147565", "A")   # within-GSTM1 proxy marker
+    t1 = _dose(snps, "rs4630", "A")       # within-GSTT1 proxy marker
+    if m1 is None and t1 is None:
+        return None
+    parts = []
+    if m1 is not None:
+        parts.append(f"GSTM1 rs4147565 A-dose {m1}")
+    if t1 is not None:
+        parts.append(f"GSTT1 rs4630 A-dose {t1}")
+    result = ("Glutathione-S-transferase (GSTM1/GSTT1) proxy genotypes. These "
+              "enzymes conjugate glutathione to detoxify carcinogens, drugs "
+              "and oxidative by-products. The clinically relevant 'null' "
+              "(absent-enzyme) state is a whole-gene deletion that these "
+              "consumer-chip SNPs cannot call directly — treat as a weak hint "
+              "only, never as a confirmed null.")
+    action = ("Research-grade only — do NOT treat as a detox-capacity or "
+              "cancer-risk test. A true GSTM1/GSTT1-null determination needs a "
+              "PCR/CNV assay. General prudence: avoid tobacco smoke and other "
+              "carcinogen exposures, and eat cruciferous vegetables (induce "
+              "phase-II detox enzymes).")
+    return {"category": CAT_OXID,
+            "trait": "Glutathione-S-Transferase Detox (GSTM1/GSTT1)",
+            "result": result, "action": action,
+            "evidence": "; ".join(parts), "confidence": "low"}
+
+
 # ─── Master analyzer ──────────────────────────────────────────────────────
 
 def analyze_metal_oxidative(snps_df: pd.DataFrame) -> Dict:
@@ -223,9 +377,10 @@ def analyze_metal_oxidative(snps_df: pd.DataFrame) -> Dict:
         # Neurodegeneration
         _lrrk2_g2019s, _gba_parkinsons,
         # Metal handling
-        _atp7b_copper, _mt_heavy_metal,
+        _atp7b_copper, _mt_heavy_metal, _hfe_iron,
+        _zip_transporters, _abcg1_efflux,
         # Oxidative defense
-        _cat_catalase, _g6pd_oxidative,
+        _cat_catalase, _g6pd_oxidative, _gst_detox,
     ]
     predictions: List[Dict] = []
     for a in analyzers:
