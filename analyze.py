@@ -152,6 +152,10 @@ try:
 except ImportError:
     build_personalized_plan = None
     render_plan_html = None
+try:
+    from health_economics import analyze_health_economics
+except ImportError:
+    analyze_health_economics = None
 
 SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
@@ -1023,6 +1027,7 @@ _RENDERER_NAMES = frozenset({
     "build_ancestry_html", "build_carrier_html", "build_counseling_html",
     "build_expanded_pgs_html", "build_genetic_age_html", "build_hla_html",
     "build_html_report", "build_imputation_html", "build_interactions_html",
+    "build_economics_html",
     "build_local_ancestry_html", "build_medications_html", "build_mr_html",
     "build_mtdna_html", "build_pgx_html", "build_pgx_sim_html",
     "build_phewas_html", "build_prs_html", "build_qc_html",

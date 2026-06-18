@@ -81,6 +81,7 @@ from analyze import (
     export_fhir,
     build_personalized_plan,
     render_plan_html,
+    analyze_health_economics,
     build_carrier_report,
     render_carrier_html,
     build_emergency_card,
@@ -557,35 +558,44 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Nutrition module failed: {e}")
 
-    # Save Tier 1 JSON for reference / downstream use
+    # Save Tier 1 JSON for reference / downstream use. The dict is hoisted
+    # into a variable so the same structured findings feed both the on-disk
+    # JSON and the health-economics module below (single source of truth).
+    tier1_summary = {
+        "report_version": REPORT_VERSION,
+        "generated": datetime.datetime.now().isoformat(),
+        "file_hash": (qc_result or {}).get("file_hash", "n/a"),
+        "apoe_genotype": apoe_genotype,
+        "y_haplogroup": y_result.get("haplogroup_path"),
+        "y_haplogroup_status": y_result.get("status"),
+        "mt_haplogroup": mt_result.get("haplogroup") if mt_result else None,
+        "qc_grade": (qc_result or {}).get("grade"),
+        "total_matched": len(tier1_results),
+        "prs_summary": {
+            name: {"tier": p["result"].get("tier"),
+                   "percentile": p["result"].get("percentile")}
+            for name, p in (prs_result or {}).get("panels", {}).items()
+        } if prs_result else {},
+        "pgx_summary": {
+            g: {"phenotype": r["phenotype"], "activity_score": r.get("activity_score")}
+            for g, r in (pgx_result or {}).get("per_gene", {}).items()
+        } if pgx_result else {},
+        "variants": tier1_results,
+    }
     tier1_path = SCRIPT_DIR / "tier1_results.json"
     with open(tier1_path, "w") as f:
-        json.dump(
-            {
-                "report_version": REPORT_VERSION,
-                "generated": datetime.datetime.now().isoformat(),
-                "file_hash": (qc_result or {}).get("file_hash", "n/a"),
-                "apoe_genotype": apoe_genotype,
-                "y_haplogroup": y_result.get("haplogroup_path"),
-                "y_haplogroup_status": y_result.get("status"),
-                "mt_haplogroup": mt_result.get("haplogroup") if mt_result else None,
-                "qc_grade": (qc_result or {}).get("grade"),
-                "total_matched": len(tier1_results),
-                "prs_summary": {
-                    name: {"tier": p["result"].get("tier"),
-                           "percentile": p["result"].get("percentile")}
-                    for name, p in (prs_result or {}).get("panels", {}).items()
-                } if prs_result else {},
-                "pgx_summary": {
-                    g: {"phenotype": r["phenotype"], "activity_score": r.get("activity_score")}
-                    for g, r in (pgx_result or {}).get("per_gene", {}).items()
-                } if pgx_result else {},
-                "variants": tier1_results,
-            },
-            f,
-            indent=2,
-        )
+        json.dump(tier1_summary, f, indent=2)
     log(f"  Tier 1 results saved: {tier1_path}")
+
+    # ── Health economics: clinical & payer ROI for genomic interventions ──
+    economics_result: Optional[Dict] = None
+    if analyze_health_economics is not None:
+        try:
+            economics_result = analyze_health_economics(tier1_summary, snps_df)
+            log(f"  Health economics: {economics_result.get('n_findings', 0)} findings "
+                f"with modeled ROI")
+        except Exception as e:
+            log(f"  WARNING: Health economics module failed: {e}")
 
     ai_results: Dict[str, str] = {}
     exec_summary: Optional[str] = None
@@ -648,6 +658,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         genetic_age_result=genetic_age_result,
         pgx_sim_result=pgx_sim_result,
         reproductive_result=reproductive_result,
+        economics_result=economics_result,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:

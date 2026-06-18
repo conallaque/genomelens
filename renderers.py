@@ -1978,6 +1978,127 @@ with your prescriber before any medication change.</strong>
 """
 
 
+def build_economics_html(economics_result: Optional[Dict]) -> str:
+    """Render the health-economics section: findings ranked by ROI, a clinic
+    ROI dashboard and a payer-impact brief. Returns "" when there is nothing
+    to show (no module / no findings), matching every sibling renderer."""
+    if not economics_result:
+        return ""
+    findings = economics_result.get("findings_with_economics") or []
+    if not findings:
+        return ""
+
+    def _money(v):
+        try:
+            return f"${float(v):,.0f}"
+        except (TypeError, ValueError):
+            return "—"
+
+    # ── Main summary: high-confidence findings only (per the report's
+    # confidence-tiering convention). The detailed table below keeps every
+    # finding with its confidence badge.
+    high_conf = economics_result.get("high_confidence") or [
+        f for f in findings if f.get("confidence") == "high"
+    ]
+    headline_html = ""
+    if high_conf:
+        top = sorted(high_conf, key=lambda f: (f.get("roi") or 0), reverse=True)[:3]
+        items = "".join(
+            f'<li><strong>{_esc(f.get("finding",""))}</strong> — '
+            f'ROI <span class="econ-roi">{f.get("roi")}:1</span>, '
+            f'value {_money(f.get("outcome_value"))} for {_money(f.get("intervention_cost"))} '
+            f'({_esc(f.get("cost_basis",""))})</li>'
+            for f in top
+        )
+        headline_html = (
+            '<div class="econ-headline"><h3>Top high-confidence interventions</h3>'
+            f'<ul class="econ-headline-list">{items}</ul></div>'
+        )
+
+    # ── Findings table (already ROI-ranked by the module) ──
+    rows = ""
+    for f in findings:
+        conf = f.get("confidence", "n/a")
+        roi = f.get("roi")
+        roi_txt = f"{roi}:1" if roi is not None else "—"
+        payback = f.get("payback_months")
+        payback_txt = f"{payback} mo" if payback is not None else "—"
+        rows += (
+            f'<tr class="conf-{_esc(conf)}">'
+            f'<td><strong>{_esc(f.get("finding",""))}</strong>'
+            f'<div class="econ-benefit">{_esc(f.get("clinical_benefit",""))}</div></td>'
+            f'<td>{_money(f.get("intervention_cost"))}'
+            f'<div class="econ-sub">{_esc(f.get("cost_basis",""))}</div></td>'
+            f'<td>{_money(f.get("outcome_value"))}</td>'
+            f'<td class="econ-roi"><strong>{roi_txt}</strong></td>'
+            f'<td>{payback_txt}</td>'
+            f'<td>{_money(f.get("npv_3year"))}</td>'
+            f'<td><span class="econ-conf econ-conf-{_esc(conf)}">{_esc(conf)}</span></td>'
+            f'</tr>\n'
+        )
+
+    # ── Clinic dashboard ──
+    clinic = economics_result.get("clinic_dashboard") or {}
+    clinic_html = ""
+    if clinic.get("n_findings"):
+        clinic_html = f"""
+<div class="econ-panel">
+  <h3>Clinic ROI Dashboard <span class="econ-pop">{clinic.get('patient_count')} patients</span></h3>
+  <div class="econ-cards">
+    <div class="econ-card"><div class="econ-card-v">{_money(clinic.get('avg_cost_per_patient'))}</div><div class="econ-card-l">Avg cost / patient</div></div>
+    <div class="econ-card"><div class="econ-card-v">{_money(clinic.get('avg_benefit_per_patient'))}</div><div class="econ-card-l">Avg benefit / patient</div></div>
+    <div class="econ-card"><div class="econ-card-v">{clinic.get('avg_roi')}:1</div><div class="econ-card-l">Average ROI</div></div>
+    <div class="econ-card"><div class="econ-card-v">{clinic.get('payback_period_months')} mo</div><div class="econ-card-l">Payback period</div></div>
+  </div>
+  <p class="econ-model">Subscription model: {_money(clinic.get('revenue_model_monthly'))}/patient/month
+  at {int(float(clinic.get('gross_margin', 0)) * 100)}% gross margin.
+  Across {clinic.get('patient_count')} patients — cost {_money(clinic.get('total_cost'))},
+  modeled benefit {_money(clinic.get('total_benefit'))}.</p>
+</div>"""
+
+    # ── Payer impact ──
+    payer = economics_result.get("payer_impact") or {}
+    payer_html = ""
+    if payer.get("affected_members"):
+        cpq = payer.get("cost_per_qaly")
+        cpq_txt = _money(cpq) if cpq is not None else "n/a"
+        payer_html = f"""
+<div class="econ-panel">
+  <h3>Payer Impact <span class="econ-pop">{payer.get('member_population'):,} members</span></h3>
+  <div class="econ-cards">
+    <div class="econ-card"><div class="econ-card-v">{payer.get('affected_members'):,}</div><div class="econ-card-l">Members affected</div></div>
+    <div class="econ-card"><div class="econ-card-v">{_money(payer.get('total_cost'))}</div><div class="econ-card-l">Total intervention cost</div></div>
+    <div class="econ-card"><div class="econ-card-v">{_money(payer.get('total_benefit'))}</div><div class="econ-card-l">Modeled savings</div></div>
+    <div class="econ-card"><div class="econ-card-v">{payer.get('roi')}:1</div><div class="econ-card-l">Aggregate ROI</div></div>
+    <div class="econ-card"><div class="econ-card-v">{cpq_txt}</div><div class="econ-card-l">Cost per QALY</div></div>
+    <div class="econ-card"><div class="econ-card-v">{_money(payer.get('net_savings'))}</div><div class="econ-card-l">Net savings</div></div>
+  </div>
+</div>"""
+
+    disclaimer = _esc(economics_result.get("disclaimer", ""))
+
+    return f"""
+<section class="econ-section" id="health-economics">
+<h2>Health Economics <span class="pro-pill">ROI</span></h2>
+<p class="econ-intro">
+Clinical and payer return-on-investment for acting on your genomic findings.
+Each intervention's cost is weighed against the modeled value of the adverse
+outcome it averts, with payback period and 3-year NPV (discounted at 3%).
+</p>
+{headline_html}
+<div class="tbl-wrap">
+<table class="econ-tbl"><thead><tr>
+<th>Finding &amp; intervention</th><th>Cost</th><th>Outcome value</th>
+<th>ROI</th><th>Payback</th><th>NPV (3y)</th><th>Confidence</th>
+</tr></thead><tbody>{rows}</tbody></table>
+</div>
+{clinic_html}
+{payer_html}
+<p class="econ-disclaimer"><strong>Estimates only.</strong> {disclaimer}</p>
+</section>
+"""
+
+
 # ── HTML report builder ───────────────────────────────────────────────────────
 
 def build_html_report(
@@ -2012,6 +2133,7 @@ def build_html_report(
     genetic_age_result: Optional[Dict] = None,
     pgx_sim_result: Optional[Dict] = None,
     reproductive_result: Optional[Dict] = None,
+    economics_result: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -2244,6 +2366,7 @@ def build_html_report(
     genetic_age_html = build_genetic_age_html(genetic_age_result)
     pgx_sim_html = build_pgx_sim_html(pgx_sim_result)
     reproductive_html = build_reproductive_html(reproductive_result)
+    economics_html = build_economics_html(economics_result)
 
     # ── Full HTML ──
     html = f"""<!DOCTYPE html>
@@ -3090,6 +3213,38 @@ details.phewas-cat summary::-webkit-details-marker{{display:none}}
   background:var(--bg3);padding:8px 12px;border-radius:4px;margin-bottom:6px}}
 .rep-advice,.rep-outlook{{font-size:12.5px;color:var(--txt);line-height:1.6;margin-top:4px}}
 .rep-advice strong,.rep-outlook strong{{color:#f472b6}}
+/* ==== Health Economics ==== */
+.econ-section{{margin:30px 0}}
+.econ-intro{{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px;max-width:760px}}
+.econ-tbl{{width:100%;border-collapse:collapse;font-size:12.5px}}
+.econ-tbl th{{text-align:left;padding:8px 10px;background:var(--bg3);color:var(--muted);
+  font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--bdr)}}
+.econ-tbl td{{padding:9px 10px;border-bottom:1px solid var(--bdr);vertical-align:top}}
+.econ-benefit{{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.5}}
+.econ-sub{{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.4px}}
+.econ-roi{{color:var(--grn);font-size:14px;white-space:nowrap}}
+.econ-headline{{background:var(--bg2);border:1px solid var(--bdr);border-left:3px solid var(--grn);
+  border-radius:var(--r);padding:14px 18px;margin-bottom:16px}}
+.econ-headline h3{{font-size:13px;text-transform:uppercase;letter-spacing:.6px;
+  color:var(--muted);margin-bottom:8px}}
+.econ-headline-list{{margin:0;padding-left:18px;font-size:13px;line-height:1.7}}
+.econ-conf{{font-size:10px;text-transform:uppercase;letter-spacing:.4px;padding:2px 7px;
+  border-radius:8px;background:var(--bg3);color:var(--muted)}}
+.econ-conf-high{{background:rgba(63,185,80,.18);color:var(--grn)}}
+.econ-conf-moderate{{background:rgba(210,153,34,.18);color:var(--ora)}}
+.econ-conf-low{{background:var(--bg3);color:var(--dim)}}
+.econ-panel{{margin-top:20px;background:var(--bg2);border:1px solid var(--bdr);
+  border-radius:var(--r);padding:16px 18px}}
+.econ-panel h3{{font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:10px}}
+.econ-pop{{font-size:11px;font-weight:500;color:var(--muted);background:var(--bg3);
+  padding:2px 9px;border-radius:8px}}
+.econ-cards{{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}}
+.econ-card{{background:var(--bg3);border-radius:6px;padding:12px;text-align:center}}
+.econ-card-v{{font-size:18px;font-weight:700;color:var(--acc2)}}
+.econ-card-l{{font-size:11px;color:var(--muted);margin-top:4px}}
+.econ-model{{font-size:12px;color:var(--muted);line-height:1.6;margin-top:12px}}
+.econ-disclaimer{{font-size:11.5px;color:var(--dim);line-height:1.6;margin-top:16px;
+  font-style:italic;border-top:1px solid var(--bdr);padding-top:12px}}
 </style>
 </head>
 <body>
@@ -3154,6 +3309,7 @@ transparency.
   {"<a href='#expanded-pgs' class='nl nl-v3'>Expanded PGS</a>" if expanded_pgs_html else ""}
   {"<a href='#pharmacogenomics' class='nl nl-pro'>Pharmacogenomics</a>" if pgx_html else ""}
   {"<a href='#medication-review' class='nl nl-v3'>Medication Review</a>" if medications_html else ""}
+  {"<a href='#health-economics' class='nl nl-pro'>Health Economics</a>" if economics_html else ""}
   {"<a href='#variant-interactions' class='nl nl-pro'>Variant Interactions</a>" if interactions_html else ""}
   {"<a href='#carrier-status' class='nl nl-pro'>Carrier Status</a>" if carrier_html else ""}
   {"<a href='#trait-predictions' class='nl nl-pro'>Trait Predictions</a>" if traits_html else ""}
@@ -3197,6 +3353,8 @@ transparency.
 {pgx_html}
 
 {medications_html}
+
+{economics_html}
 
 {interactions_html}
 
