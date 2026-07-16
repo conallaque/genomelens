@@ -478,6 +478,17 @@ def tier1_lookup(
         else:
             risk_copies = genotype.count(risk_allele)
 
+        # Provenance: distinguish a directly-typed call from a statistically
+        # imputed one. When --impute is used, snps_df carries `source`
+        # ('chip'/'imputed') and `r2` columns; surface them so imputed matches
+        # (which can be many) are never mistaken for measured genotypes.
+        source = row.get("source", "chip") if hasattr(row, "get") else "chip"
+        r2 = row.get("r2") if hasattr(row, "get") else None
+        try:
+            r2 = round(float(r2), 2) if r2 is not None and str(r2) != "nan" else None
+        except (TypeError, ValueError):
+            r2 = None
+
         results.append(
             {
                 "rsid": rsid,
@@ -491,6 +502,9 @@ def tier1_lookup(
                 "summary": entry["summary"],
                 "recommendation": entry["recommendation"],
                 "cross_references": entry.get("cross_references", []),
+                "chip_coverage_note": entry.get("chip_coverage_note"),
+                "source": source if source in ("chip", "imputed") else "chip",
+                "r2": r2,
             }
         )
 

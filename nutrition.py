@@ -1062,12 +1062,16 @@ def _render_advanced_sections(result: Dict) -> str:
     shop = result.get("shopping_list")
     recipes = result.get("recipes")
 
-    if not pgs:
-        return ""
-
-    # Polygenic scores table
+    # NOTE: every section below (dashboard, inflammation, histamine, detox,
+    # glycemic, periodisation, matrix, shopping, recipes) and _render_protocols
+    # guards on its OWN data. Do NOT gate the whole function on `pgs` — that
+    # previously dropped all of them, plus the entire protocols layer (30-day
+    # plan, glucose sim, minerals, cycle phase), whenever no polygenic scores
+    # were computed, even though those sections were all computed and present.
+    # Polygenic scores table (rendered only when polygenic scores exist).
+    pgs_html = ""
     pgs_rows = []
-    for trait, s in pgs.items():
+    for trait, s in (pgs or {}).items():
         pct = s.get("percentile")
         bar_width = pct if pct is not None else 0
         pct_text = f"{pct}%" if pct is not None else "—"
@@ -1079,7 +1083,8 @@ def _render_advanced_sections(result: Dict) -> str:
             f'<div><div class="pgs-bar"><div style="width:{bar_width}%"></div></div></div>'
             f'</div>'
         )
-    pgs_html = f"""
+    if pgs:
+        pgs_html = f"""
 <h2>Polygenic Scores (percentile vs general population)</h2>
 <div class="nu-card">
   <p style="font-size:0.88em;color:#666">Composite gene scores from GWAS-weighted SNPs.

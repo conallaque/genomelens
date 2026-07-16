@@ -379,7 +379,8 @@ def render_bloodwork_html(result: Dict, file_label: str = "") -> str:
                 <td><strong>{_esc(r['trait'])}</strong><br>
                     <span style="color:#777;font-size:0.85em">{_esc(r['category'])}</span></td>
                 <td class="bw-num">{_esc(r['predicted'])} {_esc(r['unit'])}<br>
-                    <span style="color:#777;font-size:0.85em">{_esc(r['predicted_tier'])}</span></td>
+                    <span style="color:#777;font-size:0.85em">{_esc(r['predicted_tier'])}</span>
+                    {f'<br><span style="color:#999;font-size:0.78em">genetic coverage {r["callability_pct"]:.0f}% ({r.get("n_used",0)} SNPs)</span>' if r.get('callability_pct') else ''}</td>
                 <td class="bw-num">{_esc(r['actual'])} {_esc(r['unit'])}<br>
                     <span style="color:#777;font-size:0.85em">{_esc(r['actual_tier'])}</span></td>
                 <td class="bw-num">{r['delta_abs']:+.2f}<br>

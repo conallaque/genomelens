@@ -98,6 +98,16 @@ try:
 except ImportError:
     _MODULE_LOAD_ERROR = ""
 
+try:
+    from pharmgkb_clinical import analyze_pharmgkb_clinical
+except ImportError:
+    analyze_pharmgkb_clinical = None
+
+try:
+    from top_drugs_screen import analyze_top_drugs
+except ImportError:
+    analyze_top_drugs = None
+
 
 def _render_longevity_html(integrated: dict, file_label: str = "") -> str:
     import html as _h
@@ -597,6 +607,30 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Health economics module failed: {e}")
 
+    # ── ClinPGx/PharmGKB clinical-variant annotations for typed rsIDs ──
+    pharmgkb_result: Optional[Dict] = None
+    if analyze_pharmgkb_clinical is not None:
+        try:
+            pharmgkb_result = analyze_pharmgkb_clinical(snps_df)
+            if pharmgkb_result.get("available"):
+                log(f"  PharmGKB annotations: {pharmgkb_result['n_typed_variants']} typed "
+                    f"positions ({pharmgkb_result['n_high']} high-evidence), "
+                    f"{pharmgkb_result['n_drugs']} drugs")
+        except Exception as e:
+            log(f"  WARNING: PharmGKB clinical module failed: {e}")
+
+    # ── Top-prescribed-drugs pharmacogenomic screen ──
+    top_drugs_result: Optional[Dict] = None
+    if analyze_top_drugs is not None:
+        try:
+            top_drugs_result = analyze_top_drugs(snps_df, pgx_result)
+            if top_drugs_result.get("available"):
+                log(f"  Top-drugs screen: {top_drugs_result['n_screened']} drugs "
+                    f"({top_drugs_result['n_actionable']} genotype-actionable, "
+                    f"{top_drugs_result['n_with_pgx']} with PGx data)")
+        except Exception as e:
+            log(f"  WARNING: Top-drugs screen failed: {e}")
+
     ai_results: Dict[str, str] = {}
     exec_summary: Optional[str] = None
     cross_cat: Optional[str] = None
@@ -659,6 +693,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
         pgx_sim_result=pgx_sim_result,
         reproductive_result=reproductive_result,
         economics_result=economics_result,
+        pharmgkb_result=pharmgkb_result,
+        top_drugs_result=top_drugs_result,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:

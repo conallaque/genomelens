@@ -1229,10 +1229,33 @@ def _render_exercise_protocols(result: Dict) -> str:
     plans = p.get("sport_specific_plans")
     if plans:
         cards = ""
+
+        def _week_body(w: Dict) -> str:
+            # Week dicts are heterogeneous across sports: strength plans use
+            # `schedule`(+`accessory`); endurance plans (marathon / cycling /
+            # triathlon) use `weekly_mileage_km`(+`key_workouts`). Render every
+            # descriptive field that is present rather than a single fallback,
+            # so no plan's weeks render blank.
+            parts = []
+            if w.get("weekly_mileage_km"):
+                parts.append(
+                    f"<em>Weekly volume (km):</em> {_esc(w['weekly_mileage_km'])}"
+                )
+            if w.get("schedule"):
+                parts.append(_esc(w["schedule"]))
+            if w.get("key_workouts"):
+                parts.append(f"<em>Key workouts:</em> {_esc(w['key_workouts'])}")
+            if w.get("accessory"):
+                parts.append(f"<em>Accessory:</em> {_esc(w['accessory'])}")
+            if not parts:  # legacy fallback
+                body = w.get("weekly_template", w.get("focus", ""))
+                if body:
+                    parts.append(_esc(body))
+            return "<br>".join(parts)
+
         for pl in plans:
             weeks = "".join(
-                f"<li><strong>{_esc(w.get('phase',''))}:</strong> "
-                f"{_esc(w.get('schedule', w.get('weekly_template', w.get('focus',''))))}</li>"
+                f"<li><strong>{_esc(w.get('phase',''))}:</strong> {_week_body(w)}</li>"
                 for w in pl["weeks"]
             )
             extra = ""

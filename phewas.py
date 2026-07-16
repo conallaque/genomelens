@@ -535,7 +535,9 @@ def _score_trait(snps_df: pd.DataFrame, trait: Dict, sex: Optional[str]) -> Dict
         exp_mean += beta * 2.0 * af
         exp_var += (beta ** 2) * 2.0 * af * (1.0 - af)
         n_used += 1
-        used_variants.append({"rsid": rsid, "dose": d, "beta": beta})
+        used_variants.append(
+            {"rsid": rsid, "effect_allele": ea, "dose": d, "beta": beta, "af": af}
+        )
 
     if n_used == 0 or exp_var <= 0:
         return {"status": "insufficient",
@@ -569,6 +571,8 @@ def _score_trait(snps_df: pd.DataFrame, trait: Dict, sex: Optional[str]) -> Dict
         "n_used": n_used,
         "n_total": len(trait["variants"]),
         "callability_pct": round(100 * n_used / len(trait["variants"]), 1),
+        "used_variants": used_variants,
+        "missing_variants": missing_variants,
     }
 
 

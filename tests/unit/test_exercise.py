@@ -62,3 +62,28 @@ def test_render_html_smoke(synthetic_snps_df) -> None:
     assert "<html" in html.lower()
     assert "Personalised Exercise" in html
     assert result["power_endurance"]["bias"] in html
+
+
+def test_sport_plan_weeks_render_all_schemas() -> None:
+    """Regression: endurance plans (marathon/cycling/tri) use
+    weekly_mileage_km/key_workouts, strength plans use schedule/accessory.
+    The week renderer must surface every schema, never a blank body."""
+    protocols = {
+        "sport_specific_plans": [
+            {"sport": "Marathon", "weeks": [
+                {"phase": "Base (wk 1-6)",
+                 "weekly_mileage_km": "40 to 60 km",
+                 "key_workouts": "Long run +1km/wk; 1 tempo."}]},
+            {"sport": "Powerlifting", "weeks": [
+                {"phase": "Hypertrophy",
+                 "schedule": "Squat 2x/wk 4x8.",
+                 "accessory": "RDL, rows 3x10-12."}]},
+        ]
+    }
+    html = ex._render_exercise_protocols({"protocols": protocols})
+    for needle in ("40 to 60 km", "Long run +1km/wk", "Key workouts",
+                   "Squat 2x/wk", "RDL, rows", "Accessory"):
+        assert needle in html, f"missing: {needle}"
+    # no phase header with an empty body
+    assert "</strong> </li>" not in html
+    assert "</strong></li>" not in html

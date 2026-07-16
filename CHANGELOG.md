@@ -6,6 +6,159 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [Unreleased] — 2026-07-08 — Depth pass: surface computed-but-dropped data
+
+No new genotype rules and no invented data. A systematic audit of all ~29
+`build_*`/`render_*` functions found fields that analysis modules already
+compute (and route to the renderer) but the renderer silently discarded. This
+pass surfaces the high-value ones and fixes one live rendering bug. Every value
+below is produced by an existing module from the sample's own genotype or is
+author-curated in `snp_database.json` — nothing is synthesised.
+
+### Fixed
+
+- **Endurance training plans rendered blank weeks (live bug).** In
+  `render_exercise_html`, the sport-plan week body used a fallback chain
+  (`schedule → weekly_template → focus`) that matched none of the keys the
+  marathon / road-cycling / triathlon plans actually use
+  (`weekly_mileage_km`, `key_workouts`) — so every week of those plans printed
+  its phase label followed by an empty body. The renderer now surfaces every
+  descriptive field present per week, and additionally shows the powerlifting
+  `accessory` prescription it had also been dropping.
+- **Nutrition advanced layer dropped when no polygenic scores (live bug).**
+  `_render_advanced_sections` early-returned `""` whenever `polygenic_scores`
+  was falsy, silently discarding the cardiometabolic dashboard, inflammation,
+  histamine, detox, glycemic, periodisation, food matrix, shopping list,
+  recipes, **and** the entire protocols layer (30-day plan, glucose simulation,
+  minerals, cycle-phase timing) — all computed and each already self-guarded.
+  The PGS table is now the only block gated on `polygenic_scores`; every other
+  section renders on its own data.
+
+### Added — verified fields now shown
+
+- **Curated variant catalogue** — each row gains an expandable "Recommendation
+  & context" block: `recommendation` (all 612 entries; previously only the
+  one-line `summary` showed), `chip_coverage_note` (27 entries — so a chip gap
+  isn't read as "confirmed absent"), and `cross_references` (24 entries).
+  `analyze.py` now threads `chip_coverage_note` into each tier-1 record.
+- **Carrier status** — the affected/carrier tables now show the variant
+  `rsid` (dbSNP-linked), the `pathogenic_allele` that defines carrier status,
+  the ethnicity-specific `carrier_frequency` (9 entries, e.g. "European ~1:25"),
+  and any indel `chip_caveat` — all previously computed and dropped.
+- **Polygenic risk scores** — each panel card gains a "Contributing variants"
+  table (`result.used[]`): rsID, gene, effect allele, the sample's genotype,
+  effect-allele copies, per-allele odds ratio (exp of the published log-OR),
+  and effect-allele frequency — plus a note listing panel variants not typed
+  on this chip (`result.missing[]`). Previously collapsed to a bare count.
+- **PGx dose simulation** — per-gene contributions (`clearance`,
+  `dose_factor`, `ae_rr`) are shown inline per gene, so for multi-gene drugs
+  (e.g. warfarin VKORC1×CYP2C9) the combined estimate is auditable rather than
+  an opaque product.
+- **Health economics** — the findings table gains a QALY-gain column with
+  per-finding cost-per-QALY (the standard cost-effectiveness metric), replacing
+  reliance on the single payer-level aggregate.
+- **PheWAS** — each biomarker trait gains an expandable "Evidence & contributing
+  variants" block: the GWAS reference, the standardised Z-score against the
+  reference mean/SD, the driving variants (rsID / effect allele / your copies /
+  per-allele β), and the untyped panel SNPs. `phewas._score_trait` now returns
+  the `used_variants` / `missing_variants` it already computed (additive
+  contract change; the enriched entries also carry effect allele + AF).
+- **Ancestry** — surfaces the `evidence_margin_nats` (which the module calls
+  "the honest measure of confidence" — the best-vs-runner-up log-likelihood
+  gap) and an expandable table of the ancestry-informative markers used, with
+  LD-redundant markers flagged so they aren't read as independent evidence.
+- **Expanded PGS (PGS Catalog)** — per-panel low-r² imputed-variant count and
+  not-covered count added to the coverage line; section-level Elevated/High
+  headline summary added (previously only the curated-PRS renderer had one).
+- **Genetic longevity** — each panel (longevity / telomere / skin) now shows
+  its Z-score and variant coverage; especially important for the telomere proxy
+  which can rest on ≤2 variants.
+- **Bloodwork** — each predicted row shows the genetic coverage (% callable +
+  SNP count) behind the prediction, i.e. how much genotype the estimate rests on.
+- **HLA** — untested alleles now name the specific tag SNP(s) missing from the
+  chip instead of an opaque "Untested".
+- **References** — the curated ClinVar clinical-significance assertion is shown
+  per reference (previously dropped).
+- **QC** — no-call count and average per-domain callability added to the data-
+  quality header.
+- **Local ancestry** — each discordant segment now shows its per-superpopulation
+  log-likelihoods, the confidence gap, and the number of AIMs in the window.
+
+### Added — top prescribed-drugs pharmacogenomic screen
+
+- **`top_prescribed_drugs.json` + `top_drugs_screen.py` + a new report section.**
+  A curated menu of the ~630 most commonly prescribed U.S. medications (generic
+  names + class + brand) is screened against the genome. For each drug the
+  pharmacogenomic relevance is computed entirely from **real bundled data** —
+  `drug_database.json` (CPIC/DPWG drug↔gene↔marker↔dosing) and
+  `cpic_data/drugs.tsv` (ClinPGx/PharmGKB per-drug CPIC-pair & clinical-
+  annotation levels) — cross-referenced with the user's per-gene metabolizer
+  phenotypes from `pgx.py`. Drugs are tiered: (1) **genotype-actionable** —
+  the drug's gene is one where the user is a non-normal metabolizer (open);
+  (2) relevant gene typed & normal; (3) PGx-relevant but the gene is
+  unresolved on this chip (→ `--impute` would resolve many); (4) no known PGx
+  interaction in the bundled databases. Tiers 2–4 are collapsed.
+  **Accuracy contract:** the prescribed-drugs file supplies *only* names and
+  classes; every gene link and evidence level is from CPIC/PharmGKB, and drugs
+  with no database entry are reported as "no known interaction," never as a
+  fabricated finding. The section is explicitly not a dosing instruction — the
+  star-allele `pgx.py` section remains authoritative. Wired into the pipeline
+  behind a graceful `try/except ImportError`.
+
+### Added — new data & provenance
+
+- **ClinPGx / PharmGKB clinical-variant annotations** (`pharmgkb_clinical.py` +
+  a new report section). The downloaded `cpic_data/clinicalVariants.tsv`
+  (~4,300 rsID-keyed rows, 591 drugs) was previously read by no module. Every
+  variant on the chip is now cross-referenced against it; positions the user
+  carries are reported with gene, genotype, drug(s), evidence level, and
+  phenotype. **Accuracy guardrails (deliberate):** (1) evidence tiers are
+  labelled as *ClinPGx/PharmGKB clinical-annotation levels* (per the bundled
+  README), explicitly **not** CPIC guideline strength; (2) high-evidence
+  (Level 1A/1B/2A/2B) positions are shown openly, the weak/unreplicated
+  Level 3/4 long tail behind a collapsed, labelled disclosure; (3) framed as
+  "a genotype at an annotated position," **not** a direction-of-effect call,
+  because the source table carries no risk allele — the dedicated `pgx.py`
+  star-allele section remains authoritative for the actionable genes (flagged
+  ↗ PGx). Wired into the pipeline behind a graceful `try/except ImportError`.
+- **Imputation provenance now flows to results.** `analyze.tier1_lookup` reads
+  the `source` (`chip`/`imputed`) and `r2` columns that `--impute` adds to
+  `snps_df`, records them on each variant, and the catalogue flags imputed
+  calls with an `imputed r²=…` badge. Audit of the impute path confirmed the
+  merged chip+imputed frame is reassigned *before* tier1 matching and every
+  analysis (so imputed variants already flow into all modules) and that no
+  module filters them out; this closes the honesty gap so a large `--impute`
+  run never presents a statistical call as a measured one.
+
+### Notes
+
+- Purely additive: no rows, fields, or sections were removed; existing columns
+  are unchanged. Verified by the full suite (**193 passing**, +15 new tests:
+  catalogue context block + imputed-provenance threading, exercise & nutrition
+  regression tests, the PheWAS producer contract, the PharmGKB module, and the
+  top-prescribed-drugs screen). Each renderer change was additionally exercised
+  by calling the
+  build function directly with a producer dict. Golden snapshots unaffected
+  (they cover the V6 personalisation dicts, not the report HTML).
+- The PRS "contributing variants" panel's note on untyped variants was
+  corrected after review: untyped panel variants are **excluded** from the
+  score (both raw score and expected mean/variance use typed variants only) —
+  they are not treated as 0-copy reference, so there is no directional
+  "downward bias"; lower coverage simply means a less complete estimate.
+- **Registry mass-migration (58 → 612 records) was scoped and declined.**
+  `snp_database.json` carries no GRCh37/38 coordinates or ancestral/derived
+  alleles, so populating the coordinate-based registry from it would require
+  unverifiable, fabricated coordinates. Deferred until a verified coordinate
+  source (dbSNP/ClinVar dump) can be added offline.
+- **Remaining audited opportunities (still deferred, lower value):** nutrition
+  `polygenic_scores[].typed` per-locus genotypes + cycle-phase dosage lines;
+  Y-DNA per-node migration narratives + structured `contradictions`; mtDNA
+  per-marker derived/ancestral status; traits tested/not-tested counts;
+  medications catalogued/uncatalogued drug counts. All follow the same
+  fabrication-free "surface a computed-but-dropped field" pattern.
+
+---
+
 ## [Unreleased] — 2026-06-16 — Y-DNA correctness & registry completion
 
 ### Fixed

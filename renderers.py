@@ -27,6 +27,7 @@ module-load time.
 from __future__ import annotations
 
 import datetime
+import math
 import re
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -604,8 +605,10 @@ def build_qc_html(qc: Optional[Dict]) -> str:
     <div class="qc-grade-stats">
       Total SNPs: <strong>{qc['total_snps']:,}</strong> &nbsp;·&nbsp;
       Callability: <strong>{qc['callability_pct']}%</strong> &nbsp;·&nbsp;
+      {f"No-calls: <strong>{qc['no_call_count']:,}</strong> &nbsp;·&nbsp;" if qc.get('no_call_count') is not None else ''}
       Chip: <strong>{_esc(qc['file_format'])}</strong> &nbsp;·&nbsp;
       Inferred sex: <strong>{_esc(qc['inferred_sex'])}</strong>
+      {f"&nbsp;·&nbsp; Avg domain callability: <strong>{qc['average_domain_callability']}%</strong>" if qc.get('average_domain_callability') is not None else ''}
     </div>
     <div class="qc-grade-stats">
       Autosomal: {qc['autosomal_count']:,} &nbsp;·&nbsp;
@@ -686,6 +689,54 @@ def build_prs_html(prs: Optional[Dict]) -> str:
             f'<div class="prs-track-pointer" style="left:{pct}%"></div>'
             f'</div>'
         )
+        # Per-variant breakdown: which SNPs actually drove this score, with the
+        # scored genotype, dosage, and published per-allele effect. All values
+        # come straight from the panel definition + the sample's genotype —
+        # nothing synthesised. Previously collapsed to a bare count.
+        variants_detail = ""
+        used = result.get("used", [])
+        if used:
+            vrows = ""
+            for u in sorted(used, key=lambda x: -abs(x.get("log_or", 0.0))):
+                lor = u.get("log_or", 0.0)
+                orr = math.exp(lor)
+                af = u.get("af")
+                af_txt = f"{af:.0%}" if isinstance(af, (int, float)) else "—"
+                vrows += (
+                    f'<tr><td class="rsid-cell">'
+                    f'<a href="https://www.ncbi.nlm.nih.gov/snp/{_esc(u.get("rsid",""))}" '
+                    f'target="_blank" rel="noopener">{_esc(u.get("rsid",""))}</a></td>'
+                    f'<td><strong>{_esc(u.get("gene",""))}</strong></td>'
+                    f'<td>{_esc(u.get("effect_allele",""))}</td>'
+                    f'<td class="gt-cell">{_esc(u.get("genotype",""))}</td>'
+                    f'<td>{u.get("dosage",0)}</td>'
+                    f'<td>{orr:.2f}</td>'
+                    f'<td>{af_txt}</td></tr>'
+                )
+            missing = result.get("missing", [])
+            missing_note = ""
+            if missing:
+                mnames = ", ".join(
+                    _esc(m.get("rsid", "")) for m in missing[:20] if m.get("rsid")
+                )
+                extra = f" +{len(missing) - 20} more" if len(missing) > 20 else ""
+                missing_note = (
+                    f'<div class="prs-missing">{len(missing)} panel variant(s) '
+                    f"not typed on this chip: {mnames}{extra}. These are excluded "
+                    f"from the score entirely (both the raw score and its expected "
+                    f"mean/variance are computed over typed variants only), so a "
+                    f"score built on fewer variants is a less complete estimate — "
+                    f"see the coverage/confidence indicator above.</div>"
+                )
+            variants_detail = (
+                f'<details class="prs-variants"><summary>Contributing variants '
+                f"({len(used)})</summary>"
+                f'<div class="tbl-wrap"><table class="snp-tbl"><thead><tr>'
+                f"<th>rsID</th><th>Gene</th><th>Effect allele</th>"
+                f"<th>Your genotype</th><th>Copies</th><th>Per-allele OR</th>"
+                f"<th>Effect-allele freq</th></tr></thead><tbody>{vrows}</tbody>"
+                f"</table></div>{missing_note}</details>"
+            )
         panel_cards += f"""
 <div class="prs-card">
   <div class="prs-card-head">
@@ -697,6 +748,7 @@ def build_prs_html(prs: Optional[Dict]) -> str:
   {conf_badge}
   {low_warn}
   {details}
+  {variants_detail}
   <div class="prs-context">
     <strong>Population lifetime risk:</strong> {_esc(panel["population_lifetime_risk"])}<br>
     <strong>High-tier implication:</strong> {_esc(panel["high_tier_implication"])}
@@ -1044,22 +1096,46 @@ def build_carrier_html(carr: Optional[Dict]) -> str:
             return ""
         rows = ""
         for c in items:
+            implication = _esc(
+                c.get("carrier_implication")
+                if items is carr["carriers"]
+                else (c.get("affected_implication") if items is carr["affected"] else "—")
+            )
+            # Standard carrier-report context the producer already computes:
+            # ethnicity-specific carrier frequency and any chip caveat.
+            freq = c.get("carrier_frequency")
+            if freq:
+                implication += (
+                    f'<div class="carr-freq"><em>Carrier frequency:</em> {_esc(freq)}</div>'
+                )
+            caveat = c.get("chip_caveat")
+            if caveat:
+                implication += f'<div class="carr-caveat">{_esc(caveat)}</div>'
+            rsid = c.get("rsid", "")
+            rsid_cell = (
+                f'<a href="https://www.ncbi.nlm.nih.gov/snp/{_esc(rsid)}" '
+                f'target="_blank" rel="noopener">{_esc(rsid)}</a>'
+                if rsid
+                else "—"
+            )
             rows += f"""
 <tr>
+<td class="rsid-cell">{rsid_cell}</td>
 <td><strong>{_esc(c["gene"])}</strong></td>
 <td>{_esc(c["variant"])}</td>
 <td>{_esc(c["disease"])}</td>
 <td class="gt-cell">{_esc(c.get("genotype",""))}</td>
+<td class="gt-cell">{_esc(c.get("pathogenic_allele",""))}</td>
 <td>{_esc(c["inheritance"])}</td>
-<td class="sum-cell">{_esc(c.get("carrier_implication") if items is carr["carriers"] else (c.get("affected_implication") if items is carr["affected"] else "—"))}</td>
+<td class="sum-cell">{implication}</td>
 </tr>
 """
         return f"""
 <h3 class="carr-h3 {css_class}">{_esc(title)} ({len(items)})</h3>
 <div class="tbl-wrap">
 <table class="snp-tbl">
-<thead><tr><th>Gene</th><th>Variant</th><th>Condition</th><th>Genotype</th>
-<th>Inheritance</th><th>Implication</th></tr></thead>
+<thead><tr><th>rsID</th><th>Gene</th><th>Variant</th><th>Condition</th><th>Genotype</th>
+<th>Pathogenic allele</th><th>Inheritance</th><th>Implication</th></tr></thead>
 <tbody>{rows}</tbody></table>
 </div>
 """
@@ -1178,12 +1254,17 @@ def build_references_html(refs: Optional[List[Dict]]) -> str:
         guidelines = ""
         if r.get("guidelines"):
             guidelines = "<br>" + "; ".join(_esc(g) for g in r["guidelines"])
+        # ClinVar clinical-significance assertion, curated per reference but
+        # previously dropped. Shown as a labelled tag in the evidence cell.
+        clinvar = ""
+        if r.get("clinvar"):
+            clinvar = f'<br><span class="ref-clinvar">ClinVar: {_esc(r["clinvar"])}</span>'
         rows += f"""
 <tr>
 <td class="rsid-cell"><a href="https://www.ncbi.nlm.nih.gov/snp/{_esc(r["rsid"])}" target="_blank" rel="noopener">{_esc(r["rsid"])}</a></td>
 <td><strong>{_esc(r["gene"])}</strong> {_esc(r["variant_name"])}</td>
 <td><span class="ref-level {level_class(r["evidence_level"])}">{_esc(r["evidence_level"])}</span></td>
-<td class="sum-cell">{_esc(r["evidence_summary"])}{guidelines}</td>
+<td class="sum-cell">{_esc(r["evidence_summary"])}{clinvar}{guidelines}</td>
 <td class="ref-pmids">{pmid_links}</td>
 </tr>
 """
@@ -1296,6 +1377,8 @@ def build_expanded_pgs_html(epgs: Optional[Dict]) -> str:
     <div><span class="prs-lab">Coverage:</span>
       <strong>{cov.get('pct_callable',0)}%</strong>
       ({cov.get('chip',0)} chip + {cov.get('imputed',0)} imputed / {cov.get('total',0)})</div>
+    {f'<div><span class="prs-lab">Low-r² imputed used:</span> {cov.get("low_r2",0):,}</div>' if cov.get('low_r2') else ''}
+    {f'<div><span class="prs-lab">Not covered:</span> {cov.get("missing",0):,}</div>' if cov.get('missing') else ''}
   </div>
   <div class="prs-context">
     <strong>Lifetime context:</strong> {_esc(panel.get('population_lifetime_risk','—'))}
@@ -1310,6 +1393,25 @@ def build_expanded_pgs_html(epgs: Optional[Dict]) -> str:
                 f'<div class="prs-name">{_esc(panel.get("label", slug))}</div>'
                 f'{_confidence_badge(result.get("confidence", "none"))}'
                 f'<div class="prs-na">{_esc(reason)}</div></div>'
+            )
+
+    # Section-level headline: elevated/high panels (computed by the module but
+    # previously only surfaced by the curated-PRS renderer, not here).
+    headline_html = ""
+    hf = epgs.get("headline_findings") or []
+    if hf:
+        items = "".join(
+            f'<li><strong>{_esc(p.get("label", slug))}</strong> — '
+            f'<span class="prs-tier {p["result"]["tier_class"]}">'
+            f'{_esc(p["result"]["tier"])}</span> '
+            f'({p["result"]["percentile"]:.0f}th percentile)</li>'
+            for slug, p in hf
+            if p.get("result", {}).get("tier_class")
+        )
+        if items:
+            headline_html = (
+                f'<div class="prs-headline"><strong>Elevated / High PGS '
+                f"Catalog findings:</strong><ul>{items}</ul></div>"
             )
     return f"""
 <section class="epgs-section" id="expanded-pgs">
@@ -1329,6 +1431,7 @@ were computed on too few variants to interpret. Polygenic risk is one input
 alongside family history, lifestyle, and clinical risk factors; confirm
 anything actionable with a clinician.
 </div>
+{headline_html}
 <div class="prs-grid">{cards}</div>
 </section>
 """
@@ -1380,6 +1483,44 @@ def build_ancestry_html(anc: Optional[Dict]) -> str:
             'the result as "best guess," not a determination.</div>'
         )
 
+    # Evidence margin + the actual markers behind the call. The module labels
+    # evidence_margin_nats "the honest measure of confidence"; used_aims are the
+    # AIMs typed (some flagged LD-redundant and not double-counted). All computed
+    # by ancestry_pca — previously only leaked textually in the ambiguous branch.
+    margin = anc.get("evidence_margin_nats")
+    margin_html = ""
+    if margin is not None:
+        margin_html = (
+            f'<div class="anc-margin"><em>Evidence margin:</em> {margin} nats — '
+            f"the log-likelihood gap between the best and runner-up population "
+            f"(larger = more confident; &lt;2.3 nats ≈ within 10×, treated as "
+            f"ambiguous).</div>"
+        )
+    aims = anc.get("used_aims") or []
+    aims_html = ""
+    if aims:
+        arows = "".join(
+            f'<tr class="{"" if a.get("counted", True) else "anc-aim-redundant"}">'
+            f'<td class="rsid-cell">'
+            f'<a href="https://www.ncbi.nlm.nih.gov/snp/{_esc(a.get("rsid",""))}" '
+            f'target="_blank" rel="noopener">{_esc(a.get("rsid",""))}</a></td>'
+            f'<td><strong>{_esc(a.get("gene",""))}</strong></td>'
+            f'<td class="gt-cell">{_esc(a.get("genotype",""))}</td>'
+            f'<td>{_esc(a.get("effect_allele",""))}</td>'
+            f'<td>{a.get("dosage","")}</td>'
+            f'<td>{"counted" if a.get("counted", True) else "LD-redundant (not double-counted)"}</td>'
+            f"</tr>"
+            for a in aims
+        )
+        aims_html = (
+            f'<details class="anc-aims"><summary>Ancestry-informative markers '
+            f"used ({len(aims)})</summary>"
+            f'<div class="tbl-wrap"><table class="snp-tbl"><thead><tr>'
+            f"<th>rsID</th><th>Gene</th><th>Genotype</th><th>Effect allele</th>"
+            f"<th>Copies</th><th>Role</th></tr></thead><tbody>{arows}</tbody>"
+            f"</table></div></details>"
+        )
+
     return f"""
 <section class="anc-section" id="ancestry">
 <h2>Ancestry Estimation <span class="pro-pill">V3</span></h2>
@@ -1389,6 +1530,7 @@ Based on <strong>{n_indep}</strong> independent ancestry-informative markers
 (of {n_exp} on this panel).
 </p>
 {conf_badge}
+{margin_html}
 {ambiguous_banner}
 <div class="anc-caveat">
 <strong>Informational use only — this is not a genealogical or clinical
@@ -1404,6 +1546,7 @@ spurious match for intermediate genotypes.
 {plot_html}
 <div class="anc-bars-label">Relative affinity to each reference population (not admixture %):</div>
 <div class="anc-bars">{bars}</div>
+{aims_html}
 </section>
 """
 
@@ -1428,9 +1571,25 @@ def build_hla_html(h: Optional[Dict]) -> str:
             continue
         if status == "untested":
             badge = '<span class="hla-status hla-na">Untested (tag SNPs not on chip)</span>'
+            # Name the specific tag SNPs that would have been needed, so the gap
+            # is concrete rather than an opaque "untested".
+            untested = a.get("untested_tags") or []
+            untested_html = ""
+            if untested:
+                chips = "".join(
+                    f'<code class="hla-tag hla-tag-missing">{_esc(t.get("rsid", ""))}</code>'
+                    for t in untested
+                    if isinstance(t, dict) and t.get("rsid")
+                )
+                if chips:
+                    untested_html = (
+                        f'<div class="hla-detail">Tag SNP(s) not typed on this '
+                        f"chip: {chips}</div>"
+                    )
             cards += (
                 f'<div class="hla-card">'
                 f'<div class="hla-head"><span class="hla-allele">{_esc(a["allele"])}</span>{badge}</div>'
+                f"{untested_html}"
                 f'</div>'
             )
             continue
@@ -1593,10 +1752,24 @@ def build_local_ancestry_html(la: Optional[Dict]) -> str:
             genes = ""
             if w.get("genes"):
                 genes = " — " + ", ".join(_esc(g) for g in w["genes"])
+            # Per-window quantitative evidence: the confidence gap and the
+            # per-superpopulation log-likelihoods that produced the call.
+            ll = w.get("log_liks") or {}
+            ll_txt = ""
+            if ll:
+                ranked = sorted(ll.items(), key=lambda kv: -kv[1])
+                ll_txt = " · ".join(f"{_esc(sp)} {v:.1f}" for sp, v in ranked)
+            gap_txt = f", gap {w['gap']:.1f}" if w.get("gap") is not None else ""
+            aims_txt = f", {w['n_aims']} AIMs" if w.get("n_aims") is not None else ""
+            evidence = (
+                f'<div class="la-ll">log-lik: {ll_txt}{gap_txt}{aims_txt}</div>'
+                if ll_txt
+                else ""
+            )
             items += (
                 f'<li>chr{_esc(w["chrom"])} {w["start_mb"]:.0f}-{w["end_mb"]:.0f} Mb: '
                 f'<span class="la-sp la-sp-{w["call"].lower()}">{_esc(w["call"])}</span> '
-                f'({w.get("confidence","?")}){genes}</li>'
+                f'({w.get("confidence","?")}){genes}{evidence}</li>'
             )
         deviant_html = (
             f'<details class="la-deviant"><summary>Ancestry-discordant segments ({la["n_deviant"]})</summary>'
@@ -1635,9 +1808,57 @@ def build_phewas_html(p: Optional[Dict]) -> str:
             tier_cls = res["tier_class"]
             pct = res["percentile"]
             val = res.get("predicted_value")
+
+            # Evidence behind the estimate: GWAS reference, the standardised
+            # Z-score against the reference distribution, and the specific
+            # variants that drove the score (rsID, effect allele, your dose,
+            # published per-allele effect). All produced by phewas._score_trait.
+            bits = []
+            ref = t.get("reference")
+            if ref:
+                bits.append(f'<div class="ph-ref"><em>GWAS source:</em> {_esc(ref)}</div>')
+            z = res.get("z_score")
+            if z is not None:
+                bits.append(
+                    f'<div class="ph-z"><em>Z-score:</em> {z:+.2f} '
+                    f"(reference mean {t.get('mean','—')} {_esc(unit)}, "
+                    f"SD {t.get('sd','—')})</div>"
+                )
+            uv = res.get("used_variants") or []
+            if uv:
+                vrows = "".join(
+                    f'<tr><td class="rsid-cell">'
+                    f'<a href="https://www.ncbi.nlm.nih.gov/snp/{_esc(u.get("rsid",""))}" '
+                    f'target="_blank" rel="noopener">{_esc(u.get("rsid",""))}</a></td>'
+                    f'<td>{_esc(u.get("effect_allele",""))}</td>'
+                    f'<td>{u.get("dose",0)}</td>'
+                    f'<td>{u.get("beta",0.0):+.3f}</td></tr>'
+                    for u in uv
+                )
+                bits.append(
+                    f'<div class="tbl-wrap"><table class="snp-tbl"><thead><tr>'
+                    f"<th>rsID</th><th>Effect allele</th><th>Your copies</th>"
+                    f"<th>Per-allele β</th></tr></thead><tbody>{vrows}</tbody>"
+                    f"</table></div>"
+                )
+            miss = res.get("missing_variants") or []
+            if miss:
+                mtxt = ", ".join(_esc(m) for m in miss[:20])
+                extra = f" +{len(miss) - 20} more" if len(miss) > 20 else ""
+                bits.append(
+                    f'<div class="ph-missing">{len(miss)} panel SNP(s) not typed '
+                    f"(excluded from the score): {mtxt}{extra}.</div>"
+                )
+            detail = ""
+            if bits:
+                detail = (
+                    f'<details class="ph-detail"><summary>Evidence &amp; '
+                    f'contributing variants</summary>{"".join(bits)}</details>'
+                )
+
             rows += (
                 f'<tr>'
-                f'<td>{_esc(tname)}</td>'
+                f'<td>{_esc(tname)}{detail}</td>'
                 f'<td><span class="prs-tier {tier_cls}">{_esc(res["tier"])}</span></td>'
                 f'<td>{pct:.0f}th</td>'
                 f'<td class="gt-cell">{val} {_esc(unit)}</td>'
@@ -1741,12 +1962,31 @@ def build_genetic_age_html(g: Optional[Dict]) -> str:
     long_pct = g["longevity"]["percentile"]
     years = g.get("longevity_years_offset", 0)
     direction = g.get("longevity_direction", "")
+
+    def _panel_meta(panel: Dict) -> str:
+        # Z-score + variant coverage as inner text. These panels are small (the
+        # telomere proxy can be ≤2 variants), so coverage is essential honesty —
+        # a percentile built on 1–2 SNPs is far weaker than the full panel.
+        nu, nt = panel.get("n_used"), panel.get("n_total")
+        z = panel.get("z")
+        parts = []
+        if z is not None:
+            parts.append(f"Z {z:+.2f}")
+        if nu is not None and nt:
+            parts.append(f"{nu}/{nt} variants")
+        return " · ".join(parts)
+
+    def _meta_div(panel: Dict) -> str:
+        m = _panel_meta(panel)
+        return f'<div class="ga-sub-meta">{m}</div>' if m else ""
+
     sub_blocks = ""
     if g.get("telomere"):
         sub_blocks += (
             f'<div class="ga-sub">'
             f'<div class="ga-sub-name">Telomere Length (genetic proxy)</div>'
             f'<div class="ga-sub-val">{g["telomere"]["percentile"]:.0f}th percentile</div>'
+            f'{_meta_div(g["telomere"])}'
             f'</div>'
         )
     if g.get("skin_aging"):
@@ -1754,6 +1994,7 @@ def build_genetic_age_html(g: Optional[Dict]) -> str:
             f'<div class="ga-sub">'
             f'<div class="ga-sub-name">Skin Aging</div>'
             f'<div class="ga-sub-val">{g["skin_aging"]["percentile"]:.0f}th percentile</div>'
+            f'{_meta_div(g["skin_aging"])}'
             f'</div>'
         )
     return f"""
@@ -1764,6 +2005,7 @@ def build_genetic_age_html(g: Optional[Dict]) -> str:
   <div class="ga-headline-meta">
     <div>percentile genetic longevity</div>
     <div class="ga-years">{years:+.1f} years vs European mean</div>
+    {_meta_div(g["longevity"])}
   </div>
 </div>
 <div class="ga-narr">{_esc(g.get("narrative",""))}</div>
@@ -1782,9 +2024,28 @@ def build_pgx_sim_html(s: Optional[Dict]) -> str:
         df = d["combined_dose_factor"]
         ae_color = "var(--red)" if ae > 2 else ("var(--ora)" if ae > 1.3 else "var(--grn)")
         df_color = "var(--red)" if df == 0 else ("var(--ora)" if df < 0.8 else "var(--grn)")
+        def _gene_metrics(g: Dict) -> str:
+            # Per-gene contribution to the combined estimate. For multi-gene
+            # drugs (e.g. warfarin VKORC1×CYP2C9) the combined metrics are a
+            # product of these; showing each gene's share makes the result
+            # auditable. Values are computed by pgx_simulation, not shown until now.
+            bits = []
+            if g.get("clearance") is not None:
+                bits.append(f'clearance {g["clearance"]}%')
+            if g.get("dose_factor") is not None:
+                bits.append(f'dose ×{g["dose_factor"]}')
+            if g.get("ae_rr") is not None:
+                bits.append(f'AE risk ×{g["ae_rr"]}')
+            return (
+                f' <span class="sim-gene-metrics">({" · ".join(bits)})</span>'
+                if bits
+                else ""
+            )
+
         gene_lines = "".join(
             f'<div class="sim-gene-line"><strong>{_esc(g["gene"])}</strong> '
-            f'<span class="pgx-pheno {("pheno-pm" if g["phenotype_code"]=="PM" else "pheno-um" if g["phenotype_code"]=="UM" else "pheno-im" if g["phenotype_code"]=="IM" else "pheno-rm" if g["phenotype_code"]=="RM" else "pheno-nm")}">{_esc(g["phenotype_code"])}</span> '
+            f'<span class="pgx-pheno {("pheno-pm" if g["phenotype_code"]=="PM" else "pheno-um" if g["phenotype_code"]=="UM" else "pheno-im" if g["phenotype_code"]=="IM" else "pheno-rm" if g["phenotype_code"]=="RM" else "pheno-nm")}">{_esc(g["phenotype_code"])}</span>'
+            f'{_gene_metrics(g)} '
             f'{_esc(g.get("note",""))}</div>'
             for g in d["gene_findings"]
         )
@@ -2023,6 +2284,17 @@ def build_economics_html(economics_result: Optional[Dict]) -> str:
         roi_txt = f"{roi}:1" if roi is not None else "—"
         payback = f.get("payback_months")
         payback_txt = f"{payback} mo" if payback is not None else "—"
+        # QALY gain + cost-per-QALY are computed per finding but were dropped in
+        # favour of the payer aggregate. Cost/QALY is the standard cost-
+        # effectiveness metric (≈ <$50k/QALY is conventionally "cost-effective").
+        qaly = f.get("qaly_gain")
+        qaly_txt = f"{qaly:.3f}".rstrip("0").rstrip(".") if isinstance(qaly, (int, float)) else "—"
+        cpq = f.get("cost_per_qaly")
+        cpq_sub = (
+            f'<div class="econ-sub">{_money(cpq)}/QALY</div>'
+            if isinstance(cpq, (int, float))
+            else ""
+        )
         rows += (
             f'<tr class="conf-{_esc(conf)}">'
             f'<td><strong>{_esc(f.get("finding",""))}</strong>'
@@ -2030,6 +2302,7 @@ def build_economics_html(economics_result: Optional[Dict]) -> str:
             f'<td>{_money(f.get("intervention_cost"))}'
             f'<div class="econ-sub">{_esc(f.get("cost_basis",""))}</div></td>'
             f'<td>{_money(f.get("outcome_value"))}</td>'
+            f'<td>{qaly_txt}{cpq_sub}</td>'
             f'<td class="econ-roi"><strong>{roi_txt}</strong></td>'
             f'<td>{payback_txt}</td>'
             f'<td>{_money(f.get("npv_3year"))}</td>'
@@ -2089,12 +2362,209 @@ outcome it averts, with payback period and 3-year NPV (discounted at 3%).
 <div class="tbl-wrap">
 <table class="econ-tbl"><thead><tr>
 <th>Finding &amp; intervention</th><th>Cost</th><th>Outcome value</th>
-<th>ROI</th><th>Payback</th><th>NPV (3y)</th><th>Confidence</th>
+<th>QALY gain</th><th>ROI</th><th>Payback</th><th>NPV (3y)</th><th>Confidence</th>
 </tr></thead><tbody>{rows}</tbody></table>
 </div>
 {clinic_html}
 {payer_html}
 <p class="econ-disclaimer"><strong>Estimates only.</strong> {disclaimer}</p>
+</section>
+"""
+
+
+def build_pharmgkb_html(pk: Optional[Dict]) -> str:
+    """ClinPGx/PharmGKB clinical-annotation positions typed on this chip.
+
+    High-evidence (Level 1A/1B/2A/2B) positions are shown open; the weak,
+    unreplicated Level 3/4 long tail is behind a collapsed, explicitly-labelled
+    disclosure. Every row is framed as an *annotated position* (with the user's
+    genotype), NOT a direction-of-effect call — the source table has no risk
+    allele. See module docstring for the accuracy contract.
+    """
+    if not pk or not pk.get("available"):
+        return ""
+
+    def _level_badge(lvl: str) -> str:
+        cls = "pk-lvl-high" if lvl in ("1A", "1B", "2A", "2B") else "pk-lvl-low"
+        return f'<span class="pk-lvl {cls}">{_esc(lvl)}</span>'
+
+    def _rows(entries: List[Dict]) -> str:
+        out = ""
+        for e in entries:
+            pgx_note = (
+                ' <span class="pk-pgx" title="Also analysed at allele level in '
+                'the Pharmacogenomics section">↗ PGx</span>'
+                if e.get("pgx_gene")
+                else ""
+            )
+            # One row per annotation (drug group) so every association is listed.
+            for a in e["annotations"]:
+                drugs = ", ".join(_esc(d) for d in a.get("drugs", [])) or "—"
+                phen = ", ".join(_esc(p) for p in a.get("phenotypes", [])) or "—"
+                out += (
+                    f"<tr>"
+                    f'<td class="rsid-cell">'
+                    f'<a href="https://www.ncbi.nlm.nih.gov/snp/{_esc(e["rsid"])}" '
+                    f'target="_blank" rel="noopener">{_esc(e["rsid"])}</a></td>'
+                    f'<td><strong>{_esc(e["gene"])}</strong>{pgx_note}</td>'
+                    f'<td class="gt-cell">{_esc(e["genotype"])}</td>'
+                    f"<td>{_level_badge(a.get('level',''))}</td>"
+                    f"<td>{drugs}</td>"
+                    f'<td>{_esc(a.get("type",""))}</td>'
+                    f"<td>{phen}</td>"
+                    f"</tr>\n"
+                )
+        return out
+
+    def _table(entries: List[Dict]) -> str:
+        return (
+            f'<div class="tbl-wrap"><table class="snp-tbl"><thead><tr>'
+            f"<th>rsID</th><th>Gene</th><th>Your genotype</th><th>Evidence</th>"
+            f"<th>Drug(s)</th><th>Association</th><th>Phenotype</th>"
+            f"</tr></thead><tbody>{_rows(entries)}</tbody></table></div>"
+        )
+
+    high_html = _table(pk["high"]) if pk.get("high") else ""
+    low_html = ""
+    if pk.get("low"):
+        low_html = (
+            f'<details class="pk-lowtail"><summary>Weak / unreplicated '
+            f"annotations — ClinPGx Level 3 & 4 ({pk['n_low']} positions). "
+            f"Single-study, case-report, in-vitro, or non-significant; shown "
+            f"for completeness, not for action.</summary>{_table(pk['low'])}</details>"
+        )
+
+    return f"""
+<section class="pk-section" id="pharmgkb-clinical">
+<h2>Pharmacogenomic Variant Annotations <span class="pro-pill">ClinPGx</span></h2>
+<p class="pk-intro">
+Every variant on this chip cross-referenced against the
+<strong>ClinPGx / PharmGKB clinical-variant annotation</strong> database
+({pk.get('n_dataset_rsid_rows',0):,} annotated rsIDs). You carry a genotype at
+<strong>{pk['n_typed_variants']}</strong> annotated positions
+({pk['n_high']} high-evidence, {pk['n_low']} weak) spanning
+{pk['n_drugs']} drugs, across {pk['n_annotation_rows']} annotation records.
+</p>
+<div class="pk-caveat">
+<strong>Read this as "positions worth knowing about," not a phenotype call.</strong>
+Evidence levels are the <a href="https://www.clinpgx.org/page/clinAnnLevels"
+target="_blank" rel="noopener">ClinPGx/PharmGKB clinical-annotation levels</a>
+(1A/1B strong & replicated → 3/4 weak/unreplicated) — <em>not</em> CPIC
+guideline strength. The source table carries no risk allele or direction of
+effect, so this panel flags that you have a genotype at an annotated position;
+it does not tell you which way it pushes. For the clinically-actionable genes
+(marked <span class="pk-pgx">↗ PGx</span>), the dedicated <a
+href="#pharmacogenomics">Pharmacogenomics</a> section — with star-allele calls
+and CPIC dosing — is authoritative.
+</div>
+<h3 class="pk-h3">High-evidence annotations (ClinPGx Level 1A / 1B / 2A / 2B)</h3>
+{high_html or '<p class="pk-none">No high-evidence annotated positions typed on this chip.</p>'}
+{low_html}
+</section>
+"""
+
+
+def build_top_drugs_html(td: Optional[Dict]) -> str:
+    """Top-prescribed-medications pharmacogenomic screen.
+
+    Four tiers: drugs your genotype may affect (open); PGx drugs where your
+    relevant gene is typed and normal; PGx drugs where the gene is unresolved
+    on this chip; and drugs with no known PGx interaction — the last three
+    collapsed. Gene phenotypes come from pgx.py; drug↔gene links and evidence
+    levels from CPIC + ClinPGx/PharmGKB. Nothing here is a dosing instruction —
+    the Pharmacogenomics section is authoritative for direction.
+    """
+    if not td or not td.get("available"):
+        return ""
+
+    def _pheno_cell(e: Dict) -> str:
+        gp = e.get("gene_phenotypes") or []
+        if not gp:
+            return "—"
+        return "<br>".join(
+            f'{_esc(p["gene"])}: <strong>{_esc(p.get("phenotype") or p.get("code") or "")}</strong>'
+            for p in gp
+        )
+
+    def _lvl(e: Dict) -> str:
+        cp = e.get("cpic_level")
+        cl = e.get("clin_level")
+        bits = []
+        if cp:
+            bits.append(f'<span class="td-lvl td-cpic">CPIC {_esc(cp)}</span>')
+        if cl:
+            bits.append(f'<span class="td-lvl td-clin">PharmGKB {_esc(cl)}</span>')
+        return " ".join(bits) or "—"
+
+    def _table(rows: List[Dict], with_pheno: bool) -> str:
+        body = ""
+        for e in rows:
+            genes = ", ".join(_esc(g) for g in e.get("genes", [])) or "—"
+            pheno = f"<td>{_pheno_cell(e)}</td>" if with_pheno else ""
+            body += (
+                f"<tr><td><strong>{_esc(e['generic'])}</strong>"
+                f'<div class="td-brand">{_esc(e.get("brand",""))}</div></td>'
+                f"<td>{_esc(e.get('class',''))}</td>"
+                f"<td>{genes}</td>"
+                f"{pheno}"
+                f"<td>{_lvl(e)}</td></tr>\n"
+            )
+        pheno_th = "<th>Your metabolizer status</th>" if with_pheno else ""
+        return (
+            f'<div class="tbl-wrap"><table class="snp-tbl"><thead><tr>'
+            f"<th>Drug</th><th>Class</th><th>PGx gene(s)</th>{pheno_th}"
+            f"<th>Evidence</th></tr></thead><tbody>{body}</tbody></table></div>"
+        )
+
+    actionable_html = (
+        _table(td["actionable"], True)
+        if td.get("actionable")
+        else '<p class="td-none">No top-prescribed drug maps to a gene where your '
+             "genotype is a non-normal metabolizer (given the genes typed on this chip).</p>"
+    )
+    tn = (
+        f'<details class="td-fold"><summary>Standard dosing likely — relevant gene '
+        f'typed & normal ({td["n_typed_normal"]})</summary>{_table(td["typed_normal"], True)}</details>'
+        if td.get("typed_normal") else ""
+    )
+    pr = (
+        f'<details class="td-fold"><summary>Pharmacogenomically relevant, but the '
+        f'gene was not resolved on this chip ({td["n_pgx_relevant"]}) — imputation '
+        f'(--impute) would resolve many</summary>{_table(td["pgx_relevant"], True)}</details>'
+        if td.get("pgx_relevant") else ""
+    )
+    npx = (
+        f'<details class="td-fold"><summary>No known pharmacogenomic interaction '
+        f'in the bundled CPIC/PharmGKB databases ({td["n_no_pgx"]})</summary>'
+        f'{_table(td["no_pgx"], False)}</details>'
+        if td.get("no_pgx") else ""
+    )
+
+    return f"""
+<section class="td-section" id="top-drugs">
+<h2>Top Prescribed Drugs — Pharmacogenomic Screen <span class="pro-pill">PGx</span></h2>
+<p class="td-intro">
+Each of the <strong>{td['n_screened']}</strong> most commonly prescribed
+medications, screened against your genome using the bundled CPIC/DPWG drug
+database and the ClinPGx/PharmGKB drug table.
+<strong>{td['n_with_pgx']}</strong> have documented pharmacogenomic data;
+<strong>{td['n_actionable']}</strong> map to a gene where your genotype is a
+non-normal metabolizer and may warrant a dosing discussion.
+</p>
+<div class="td-caveat">
+<strong>Not a prescription or dosing instruction.</strong> Drug↔gene links and
+evidence levels are from CPIC and ClinPGx/PharmGKB; your metabolizer status is
+from the star-allele calls in the <a href="#pharmacogenomics">Pharmacogenomics</a>
+section, which is authoritative for direction and dosing. Drugs shown as "no
+known interaction" simply have no entry in the bundled databases — absence of a
+gene-drug pair here is not proof of safety. Always consult your prescriber or
+pharmacist.
+</div>
+<h3 class="td-h3">Review with your prescriber — your genotype may change dosing ({td['n_actionable']})</h3>
+{actionable_html}
+{tn}
+{pr}
+{npx}
 </section>
 """
 
@@ -2134,6 +2604,8 @@ def build_html_report(
     pgx_sim_result: Optional[Dict] = None,
     reproductive_result: Optional[Dict] = None,
     economics_result: Optional[Dict] = None,
+    pharmgkb_result: Optional[Dict] = None,
+    top_drugs_result: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -2193,6 +2665,58 @@ def build_html_report(
                     f'{s.get("primary_category", "")}">↗ {s.get("primary_category", "")}</span>'
                 )
             row_cls = " ".join(row_classes)
+
+            # Surface the verified per-variant context that the curated
+            # database already carries but the summary column alone hid:
+            # actionable recommendation, chip-coverage caveats, and the
+            # cross-system implications. All author-curated text — nothing
+            # is synthesised here.
+            detail_bits = []
+            rec = s.get("recommendation")
+            if rec:
+                detail_bits.append(
+                    f'<div class="rec-line"><span class="rec-label">'
+                    f'What to do</span> {_esc(rec)}</div>'
+                )
+            cov = s.get("chip_coverage_note")
+            if cov:
+                detail_bits.append(
+                    f'<div class="rec-line rec-cov"><span class="rec-label">'
+                    f'Chip coverage</span> {_esc(cov)}</div>'
+                )
+            xrefs = s.get("cross_references") or []
+            if xrefs and not s.get("is_cross_ref"):
+                xref_items = "".join(
+                    f'<li><strong>{_esc(x.get("category", ""))}:</strong> '
+                    f'{_esc(x.get("implication", ""))}</li>'
+                    for x in xrefs
+                    if isinstance(x, dict) and x.get("implication")
+                )
+                if xref_items:
+                    detail_bits.append(
+                        f'<div class="rec-line"><span class="rec-label">'
+                        f'Related systems</span><ul class="rec-xref">'
+                        f"{xref_items}</ul></div>"
+                    )
+            detail_html = ""
+            if detail_bits:
+                detail_html = (
+                    '<details class="var-detail"><summary>'
+                    "Recommendation &amp; context</summary>"
+                    f'<div class="var-detail-body">{"".join(detail_bits)}</div>'
+                    "</details>"
+                )
+
+            # Imputed calls are statistical, not measured — flag them (with R²
+            # when available) so an expanded --impute run stays honest.
+            imp_badge = ""
+            if s.get("source") == "imputed":
+                r2 = s.get("r2")
+                r2txt = f" r²={r2}" if r2 is not None else ""
+                imp_badge = (
+                    f' <span class="imp-badge" title="Statistically imputed '
+                    f'(1000G), not directly typed on the chip">imputed{r2txt}</span>'
+                )
             rows += (
                 f'<tr class="{row_cls}">'
                 f'<td class="rsid-cell">'
@@ -2200,10 +2724,10 @@ def build_html_report(
                 f'target="_blank" rel="noopener">{s["rsid"]}</a></td>'
                 f'<td><strong>{s["gene"]}</strong></td>'
                 f'<td>{s["variant_name"]}{xref_badge}</td>'
-                f'<td class="gt-cell">{s["my_genotype"]}</td>'
+                f'<td class="gt-cell">{s["my_genotype"]}{imp_badge}</td>'
                 f'<td>{risk_indicator(s["risk_copies"])}</td>'
                 f'<td>{significance_badge(s["significance"])}</td>'
-                f'<td class="sum-cell">{s["summary"]}</td>'
+                f'<td class="sum-cell">{s["summary"]}{detail_html}</td>'
                 f"</tr>\n"
             )
 
@@ -2367,6 +2891,8 @@ def build_html_report(
     pgx_sim_html = build_pgx_sim_html(pgx_sim_result)
     reproductive_html = build_reproductive_html(reproductive_result)
     economics_html = build_economics_html(economics_result)
+    pharmgkb_html = build_pharmgkb_html(pharmgkb_result)
+    top_drugs_html = build_top_drugs_html(top_drugs_result)
 
     # ── Full HTML ──
     html = f"""<!DOCTYPE html>
@@ -2500,6 +3026,17 @@ h2{{font-size:21px;font-weight:700;margin-bottom:14px;padding-bottom:8px;
 .rsid-cell{{font-family:var(--mono);font-size:12px;white-space:nowrap}}
 .gt-cell{{font-family:var(--mono);font-weight:700;font-size:14px}}
 .sum-cell{{font-size:12px;color:var(--muted);max-width:280px;line-height:1.5}}
+.var-detail{{margin-top:6px}}
+.var-detail>summary{{cursor:pointer;font-size:11px;font-weight:600;color:var(--accent,#2563eb);list-style:none;user-select:none}}
+.var-detail>summary::-webkit-details-marker{{display:none}}
+.var-detail>summary::before{{content:"\\25B8 ";font-size:10px}}
+.var-detail[open]>summary::before{{content:"\\25BE "}}
+.var-detail-body{{margin-top:6px;padding:8px 10px;background:var(--card2,rgba(127,127,127,.06));border-left:2px solid var(--accent,#2563eb);border-radius:4px}}
+.rec-line{{font-size:12px;line-height:1.55;color:var(--txt);margin:4px 0}}
+.rec-line .rec-label{{display:inline-block;font-weight:700;font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-right:6px}}
+.rec-cov{{color:var(--warn,#b45309)}}
+.rec-xref{{margin:4px 0 0 0;padding-left:16px}}
+.rec-xref li{{margin:3px 0}}
 
 /* ==== BADGES ==== */
 .badge{{display:inline-block;padding:2px 8px;border-radius:10px;
@@ -2737,6 +3274,10 @@ h2{{font-size:21px;font-weight:700;margin-bottom:14px;padding-bottom:8px;
   border:1px solid var(--bdr);border-radius:6px;padding:10px 12px}}
 .prs-context strong{{color:var(--txt)}}
 .prs-ref{{font-size:11px;color:var(--dim);margin-top:4px}}
+.prs-variants{{margin:8px 0}}
+.prs-variants>summary{{cursor:pointer;font-size:11px;font-weight:600;color:var(--accent,#2563eb)}}
+.prs-variants table{{margin-top:6px;font-size:11px}}
+.prs-missing{{font-size:11px;color:var(--warn,#b45309);margin-top:6px;line-height:1.5}}
 
 /* ==== PGX SECTION ==== */
 .pgx-section{{margin-bottom:42px}}
@@ -2789,6 +3330,39 @@ h2{{font-size:21px;font-weight:700;margin-bottom:14px;padding-bottom:8px;
 .prs-lowconf,.anc-ambiguous{{font-size:11.5px;color:var(--ora);background:rgba(210,153,34,.08);
   border-left:3px solid var(--ora);padding:6px 10px;border-radius:4px;margin:6px 0;line-height:1.45}}
 .anc-bars-label{{font-size:11px;color:var(--muted);margin:10px 0 4px}}
+.ga-sub-meta{{font-size:10.5px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}}
+.hla-tag-missing{{opacity:.7;text-decoration:line-through}}
+.ref-clinvar{{font-size:11px;color:var(--muted);font-weight:600}}
+.la-ll{{font-size:10.5px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}}
+.pk-intro{{font-size:12.5px;color:var(--txt);line-height:1.6;margin:6px 0}}
+.pk-caveat{{font-size:11.5px;color:var(--muted);line-height:1.55;background:var(--bg2);border:1px solid var(--bdr);border-left:3px solid var(--accent,#2563eb);padding:8px 12px;border-radius:5px;margin:8px 0}}
+.pk-caveat strong{{color:var(--txt)}}
+.pk-h3{{font-size:13px;text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px;font-weight:700}}
+.pk-lvl{{display:inline-block;padding:1px 7px;border-radius:9px;font-size:10.5px;font-weight:700}}
+.pk-lvl-high{{background:rgba(34,153,84,.15);color:var(--grn,#2e8b57)}}
+.pk-lvl-low{{background:rgba(127,127,127,.13);color:var(--muted)}}
+.pk-pgx{{font-size:10px;color:var(--accent,#2563eb);font-weight:600}}
+.pk-lowtail{{margin-top:12px}}
+.pk-lowtail>summary{{cursor:pointer;font-size:11.5px;font-weight:600;color:var(--warn,#b45309);line-height:1.5}}
+.pk-none{{font-size:12px;color:var(--muted)}}
+.imp-badge{{display:inline-block;font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:8px;background:rgba(147,112,219,.18);color:#7c5cbf;letter-spacing:.02em;vertical-align:middle}}
+.td-intro{{font-size:12.5px;color:var(--txt);line-height:1.6;margin:6px 0}}
+.td-caveat{{font-size:11.5px;color:var(--muted);line-height:1.55;background:var(--bg2);border:1px solid var(--bdr);border-left:3px solid var(--accent,#2563eb);padding:8px 12px;border-radius:5px;margin:8px 0}}
+.td-caveat strong{{color:var(--txt)}}
+.td-h3{{font-size:13px;text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px;font-weight:700;color:var(--red,#c0392b)}}
+.td-brand{{font-size:10px;color:var(--muted)}}
+.td-lvl{{display:inline-block;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700;margin-right:3px}}
+.td-cpic{{background:rgba(34,153,84,.16);color:var(--grn,#2e8b57)}}
+.td-clin{{background:rgba(127,127,127,.13);color:var(--muted)}}
+.td-fold{{margin-top:12px}}
+.td-fold>summary{{cursor:pointer;font-size:12px;font-weight:600;color:var(--accent,#2563eb);line-height:1.5}}
+.td-none{{font-size:12px;color:var(--muted)}}
+.anc-margin{{font-size:11px;color:var(--muted);margin:6px 0;line-height:1.45}}
+.anc-margin em{{color:var(--txt);font-style:normal;font-weight:600}}
+.anc-aims{{margin-top:8px}}
+.anc-aims>summary{{cursor:pointer;font-size:11px;font-weight:600;color:var(--accent,#2563eb)}}
+.anc-aims table{{margin-top:6px;font-size:11px}}
+.anc-aim-redundant{{opacity:.6}}
 .ydna-disclaimer{{font-size:11px;color:var(--muted);font-style:italic;margin-top:14px;
   padding-top:10px;border-top:1px solid var(--bdr);line-height:1.5}}
 .pgx-details summary{{cursor:pointer;font-size:12px;color:var(--muted);padding:4px 0;
@@ -2851,6 +3425,9 @@ h2{{font-size:21px;font-weight:700;margin-bottom:14px;padding-bottom:8px;
 .carr-nc,.carr-ut{{font-size:12px;color:var(--muted);line-height:1.6;margin-top:14px;
   padding:10px 14px;background:var(--bg2);border:1px solid var(--bdr);border-radius:6px}}
 .carr-nc strong,.carr-ut strong{{color:var(--txt)}}
+.carr-freq{{font-size:11px;color:var(--muted);margin-top:4px}}
+.carr-freq em{{color:var(--txt);font-style:normal;font-weight:600}}
+.carr-caveat{{font-size:11px;color:var(--warn,#b45309);margin-top:4px;line-height:1.5}}
 
 /* ==== TRAITS ==== */
 .traits-section{{margin-bottom:42px}}
@@ -3126,6 +3703,12 @@ tr.roh-med td{{background:rgba(210,153,34,.05)}}
 .phewas-headline li{{margin-bottom:4px}}
 details.phewas-cat{{margin-bottom:10px;background:var(--bg2);border:1px solid var(--bdr);
   border-radius:6px}}
+.ph-detail{{margin-top:6px}}
+.ph-detail>summary{{cursor:pointer;font-size:11px;font-weight:600;color:var(--accent,#2563eb)}}
+.ph-ref,.ph-z{{font-size:11px;color:var(--muted);margin:4px 0}}
+.ph-ref em,.ph-z em{{color:var(--txt);font-style:normal;font-weight:600}}
+.ph-detail table{{margin-top:6px;font-size:11px}}
+.ph-missing{{font-size:11px;color:var(--warn,#b45309);margin-top:6px;line-height:1.5}}
 details.phewas-cat summary{{cursor:pointer;list-style:none;padding:11px 16px;
   display:flex;justify-content:space-between;font-weight:700}}
 details.phewas-cat summary::-webkit-details-marker{{display:none}}
@@ -3190,6 +3773,7 @@ details.phewas-cat summary::-webkit-details-marker{{display:none}}
 .sim-metric-val{{font-size:20px;font-weight:800;font-family:var(--mono)}}
 .sim-genes{{margin-bottom:10px;font-size:12.5px;line-height:1.7}}
 .sim-gene-line{{margin-bottom:4px}}
+.sim-gene-metrics{{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}}
 .sim-ddi summary{{cursor:pointer;font-size:12px;color:var(--muted);font-weight:600}}
 .sim-ddi ul{{padding:8px 0 0 20px;font-size:12px;color:var(--muted)}}
 .sim-ddi li{{margin-bottom:4px;line-height:1.55}}
@@ -3308,6 +3892,8 @@ transparency.
   {"<a href='#polygenic-risk-scores' class='nl nl-pro'>Polygenic Risk Scores</a>" if prs_html else ""}
   {"<a href='#expanded-pgs' class='nl nl-v3'>Expanded PGS</a>" if expanded_pgs_html else ""}
   {"<a href='#pharmacogenomics' class='nl nl-pro'>Pharmacogenomics</a>" if pgx_html else ""}
+  {"<a href='#pharmgkb-clinical' class='nl nl-pro'>PGx Variant Annotations</a>" if pharmgkb_html else ""}
+  {"<a href='#top-drugs' class='nl nl-pro'>Top Drugs Screen</a>" if top_drugs_html else ""}
   {"<a href='#medication-review' class='nl nl-v3'>Medication Review</a>" if medications_html else ""}
   {"<a href='#health-economics' class='nl nl-pro'>Health Economics</a>" if economics_html else ""}
   {"<a href='#variant-interactions' class='nl nl-pro'>Variant Interactions</a>" if interactions_html else ""}
@@ -3351,6 +3937,10 @@ transparency.
 {expanded_pgs_html}
 
 {pgx_html}
+
+{pharmgkb_html}
+
+{top_drugs_html}
 
 {medications_html}
 

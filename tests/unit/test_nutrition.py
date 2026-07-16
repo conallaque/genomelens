@@ -64,3 +64,22 @@ def test_render_html_includes_macro_bar(synthetic_snps_df) -> None:
     html = nu.render_nutrition_html(result)
     assert "Macronutrient Ratio" in html
     assert "nu-macro-bar" in html
+
+
+def test_advanced_sections_not_gated_on_polygenic_scores() -> None:
+    """Regression: _render_advanced_sections must not drop the whole advanced
+    layer (dashboard/inflammation/detox/protocols) when polygenic_scores is
+    absent. Each sub-section guards on its own data."""
+    import nutrition as nu
+    no_pgs = {
+        "detoxification": {
+            "phase1_typed": ["CYP1A2 fast"], "phase2_typed": ["GST null"],
+            "cruciferous_target_servings_per_week": 5, "guidance": "Eat crucifers.",
+        },
+    }
+    html = nu._render_advanced_sections(no_pgs)
+    assert "Detoxification" in html, "detox section dropped when no pgs"
+    assert "Polygenic Scores" not in html, "empty pgs table rendered with no pgs"
+    # and pgs table still renders when present
+    with_pgs = {"polygenic_scores": {"obesity": {"percentile": 70, "tier": "High", "coverage": 85}}}
+    assert "Polygenic Scores" in nu._render_advanced_sections(with_pgs)
