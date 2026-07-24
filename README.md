@@ -8,10 +8,12 @@ Unauthorized copying, modification, or distribution is prohibited.
 
 > **Local, privacy-first DNA analysis pipeline.** Turns a consumer raw-data file
 > (23andMe, AncestryDNA, MyHeritage, TellmeGen, FTDNA, …) into a comprehensive
-> HTML report covering pharmacogenomics, polygenic risk, carrier status,
-> ancestry, traits, wellness, personalised supplement/exercise/nutrition stacks,
-> and a clinical-grade HL7 FHIR R4 export — with optional local-LLM
-> interpretation via Ollama.
+> HTML report covering pharmacogenomics (217 CPIC drugs), polygenic risk,
+> carrier status, ancestry with a Y-DNA/mtDNA lineage cross-check, traits,
+> a detoxification & environmental-resilience panel, comprehensive
+> genotype-aware blood-work analysis, wellness, personalised
+> supplement/exercise/nutrition stacks, and a clinical-grade HL7 FHIR R4 export
+> — with optional local-LLM interpretation via Ollama.
 >
 > **No DNA file ever leaves your machine.**
 
@@ -28,8 +30,8 @@ Unauthorized copying, modification, or distribution is prohibited.
 ## Quickstart (90 seconds, zero AI required)
 
 ```bash
-git clone https://github.com/<you>/dna-project.git
-cd dna-project
+git clone https://github.com/conallaque/genomelens.git
+cd genomelens
 python3 -m venv .venv && source .venv/bin/activate
 pip install pandas numpy snps scipy scikit-learn requests
 
@@ -52,6 +54,29 @@ emit a clinical EHR bundle.
 > with a licensed physician and a board-certified genetic counsellor.
 
 ---
+
+## What's new in V18–V19 — analysis depth (current)
+
+The most recent releases add three major analysis capabilities. Full details in
+[`CHANGELOG.md`](CHANGELOG.md); headline items:
+
+- 🩸 **Comprehensive blood-work engine (V19).** Beyond the original
+  genetics-vs-labs comparison, every biomarker is now classified against both
+  standard clinical ranges *and* tighter functional/optimal ranges across 12
+  body-system panels, with ~12 calculated markers (non-HDL, TG:HDL, ApoB:ApoA1,
+  HOMA-IR, eGFR, transferrin saturation, NLR, FIB-4, …), **genotype-aware
+  interpretation** (your HFE/APOE/TCF7L2/MTHFR/GC/FUT2/ABCG2/UGT1A1/LPA variants
+  contextualise flagged results), and per-system + overall health scores.
+- 🧬 **Ancestry lineage cross-check (V18).** The autosomal ancestry estimate is
+  now reconciled against the Y-DNA and mtDNA haplogroups (geographic
+  concordant/discordant verdict). Fixes a strand/palindrome bug that could
+  mis-call European samples; dosage is now strand-aware.
+- 🌫️ **Detoxification & environmental-resilience panel (V18).** Phase I/II
+  xenobiotic handling (CYP1A1/1A2/1B1, GSTs, NQO1, EPHX1, NAT2), the NRF2
+  antioxidant axis, and heavy-metal handling — with a wildfire-smoke resilience
+  score and a genotype-personalised protocol. The metal/oxidative panel is now
+  wired into the report.
+- 🧪 **208 tests** (was 145 at V8); `REPORT_VERSION` 6.1.0-premium.
 
 ## What's new in V8 — completion of the foundation
 
@@ -136,8 +161,20 @@ durability and correctness gains under the hood:
 - **HLA imputation** — tag-SNP method for clinically relevant alleles.
 - **Wellness predictions** — vitamin metabolism, sleep, fitness, stress.
 - **ROH scan** — runs of homozygosity / consanguinity context.
-- **Ancestry PCA** — global ancestry proportions from 1000 Genomes.
+- **Ancestry PCA + lineage cross-check** — global ancestry proportions from
+  1000 Genomes, strand-aware and reconciled against the Y-DNA/mtDNA haplogroups
+  (flags autosomal calls that contradict the deep paternal/maternal lineage).
 - **Local ancestry painting** — chromosome-by-chromosome SVG ideogram.
+- **Detoxification & environmental resilience** — Phase I/II xenobiotic handling
+  (CYP1A1/1A2/1B1, GSTs, NQO1, EPHX1, NAT2), NRF2 antioxidant axis, and
+  heavy-metal handling, with a wildfire-smoke resilience score + protocol.
+- **Metal handling, oxidative defense & neurodegeneration** — LRRK2/GBA, HFE,
+  G6PD, ATP7B, metallothioneins, ZIP transporters, catalase.
+- **Gut-health panel** — FUT2 secretor status, lactase, histamine (AOC1), and
+  related loci.
+- **Top-prescribed-drugs screen + PharmGKB clinical annotations** — genotype
+  actionability across the most common prescriptions.
+- **Health economics** — modeled clinical/payer ROI for genomic interventions.
 - **PheWAS** — phenome-wide biomarker percentile predictions (LDL, HDL, CRP,
   HbA1c, vitamin D, ferritin, testosterone, TSH, …).
 - **Mendelian randomization** — causal-direction projections.
@@ -147,9 +184,14 @@ durability and correctness gains under the hood:
 - **QC** — callability grading, sex inference, file hash, format detection.
 
 ### V6 personalisation modules
-- **Blood-work comparison** (`--bloodwork labs.json`) — contrasts predicted
-  biomarker values against measured labs; flags confirmed/partial/diverged
-  rows with SD-scaled deltas.
+- **Comprehensive blood-work analysis** (`--bloodwork labs.json`) — two layers:
+  (1) a clinical engine classifying ~50 biomarkers against standard *and*
+  functional/optimal ranges across 12 body systems, with ~12 calculated markers
+  (non-HDL, TG:HDL, ApoB:ApoA1, HOMA-IR, eGFR, transferrin saturation, NLR,
+  FIB-4, …), genotype-aware interpretation (HFE, APOE, TCF7L2, MTHFR, GC, FUT2,
+  ABCG2, UGT1A1, LPA), and per-system + overall health scores; and (2) the
+  original genetics-vs-labs comparison flagging confirmed/partial/diverged rows
+  with SD-scaled deltas.
 - **Personalised supplement stack** — tiered (essential/recommended/optional)
   recommendations driven by methylation, vitamin, hormone, inflammation, and
   detox SNPs. Includes dose, timing, form, monthly cost, and interactions.
@@ -269,8 +311,8 @@ page.
 ### 1. Clone
 
 ```bash
-git clone https://github.com/<you>/dna-project.git
-cd dna-project
+git clone https://github.com/conallaque/genomelens.git
+cd genomelens
 ```
 
 ### 2. Python deps
@@ -337,17 +379,28 @@ python analyze.py genome.csv --impute --pdf --carrier-report \
 
 ```json
 {
-  "ldl": 142,           "hdl": 48,            "triglycerides": 180,
-  "fasting_glucose": 96, "hba1c": 5.7,        "crp": 2.4,
-  "ferritin": 180,      "vitamin_d": 22,      "vitamin_b12": 410,
-  "testosterone": 480,  "shbg": 32,           "tsh": 1.8,
-  "alt": 28,            "creatinine": 1.0,    "uric_acid": 6.2,
-  "systolic_bp": 128,   "diastolic_bp": 82,   "heart_rate": 64
+  "sex": "M",            "age": 41,
+  "total_cholesterol": 210, "ldl": 142,     "hdl": 48,
+  "triglycerides": 180,  "apob": 105,       "lp_a": 35,
+  "fasting_glucose": 96, "hba1c": 5.7,      "fasting_insulin": 9,
+  "crp": 2.4,            "homocysteine": 11, "uric_acid": 6.2,
+  "alt": 28,             "ast": 24,          "ggt": 30,
+  "bilirubin_total": 0.9, "creatinine": 1.0, "bun": 15,
+  "tsh": 1.8,            "ferritin": 180,   "iron": 110, "tibc": 320,
+  "vitamin_d": 22,       "vitamin_b12": 410, "folate": 12,
+  "hemoglobin": 14.8,    "wbc": 6.1,        "platelets": 235,
+  "neutrophils": 3.6,    "lymphocytes": 1.9, "magnesium": 2.0,
+  "testosterone": 480,   "shbg": 32,        "omega3_index": 6.5,
+  "systolic_bp": 128,    "diastolic_bp": 82, "resting_hr": 64
 }
 ```
 
-Keys are case-insensitive and accept common synonyms (`ldl_c`, `hgb`, `hb`,
-`b12`, `e2`, `sbp`, …). Missing or `null` values are ignored.
+Every field is optional — supply whatever your panel reports and the rest is
+skipped. Keys are case-insensitive and accept common synonyms (`ldl_c`, `hgb`,
+`hb`, `b12`, `e2`, `sbp`, …). Adding `sex` and `age` unlocks sex-specific
+reference ranges and the eGFR / FIB-4 calculated markers. Calculated markers
+(non-HDL, TG:HDL, ApoB:ApoA1, HOMA-IR, transferrin saturation, …) are derived
+automatically wherever their inputs are present.
 
 ---
 
@@ -364,7 +417,7 @@ After a full run, the working directory will contain:
 | `carrier_report.html` | `--carrier-report` | Standalone family-planning doc. |
 | `emergency_card.html` | `--emergency-card` | One-page actionable summary. |
 | `narrative_report.html` | `--narrative` | LLM-written prose summary. |
-| `bloodwork.html` | `--bloodwork` | Predicted-vs-actual lab comparison. |
+| `bloodwork.html` | `--bloodwork` | Comprehensive clinical panel (reference/optimal ranges, calculated markers, genotype-aware flags, system scores) + genetics-vs-labs comparison. |
 | `supplements.html` | auto | Tiered supplement stack with reasoning + chip gaps. |
 | `exercise.html` | auto | Power/endurance bias + weekly template. |
 | `nutrition.html` | auto | Macro ratios + food lists + daily plan. |
@@ -495,9 +548,9 @@ If this tool informs research or teaching material, please cite it as:
 ```bibtex
 @software{dna_analysis_tool,
   title  = {DNA Analysis Tool — local, privacy-first genomics pipeline},
-  author = {{Project contributors}},
+  author = {Aque, Conall R.},
   year   = {2026},
-  url    = {https://github.com/<you>/dna-project},
+  url    = {https://github.com/conallaque/genomelens},
   note   = {Local consumer-chip → clinical-grade FHIR R4 export}
 }
 ```
