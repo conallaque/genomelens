@@ -6,6 +6,54 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.0.0-premium] — 2026-07-24 — Ancestry lineage cross-check + Detoxification panel
+
+Two headline additions and one real bug fix. No synthesised data — every new
+finding is computed from the sample's own genotype against curated,
+registry-backed markers.
+
+### Fixed
+
+- **Autosomal ancestry mis-called European samples as South/East Asian.** Two
+  compounding defects in `ancestry_pca.py`: (1) the `SLC45A2` AIM (rs16891982),
+  a C/G *palindrome*, had its effect allele hard-coded to the wrong strand, so a
+  European `GG` genotype scored as "zero European alleles"; (2) `_dosage` was not
+  strand-aware, so markers reported on the opposite strand (e.g. `LCT` rs4988235
+  `AA`) read as dosage 0. On a real T1a1a sample this flipped the call from
+  European to South Asian. Dosage is now strand-aware, palindromic markers are
+  displayed but excluded from scoring, and the AIM panel is expanded. The same
+  sample now resolves European with a decisive evidence margin.
+
+### Added
+
+- **Uniparental (Y-DNA / mtDNA) geographic cross-check.** The ancestry section
+  now maps the terminal Y-DNA and mtDNA haplogroups to geographic expectations
+  over the five 1000G superpopulations and renders a concordant / plausible /
+  discordant verdict against the autosomal call. A discordant deep-lineage check
+  forces autosomal confidence to "low" — a small panel that contradicts the deep
+  paternal/maternal lineage is treated as the suspect, not the haplogroup.
+- **Detoxification & Environmental Resilience section (`detox.py`).** Phase I
+  bioactivation (CYP1A1/1A2/1B1, AHR), Phase II conjugation (EPHX1, NAT2, NQO1,
+  GSTM1/T1/P1), the NRF2 antioxidant axis (NFE2L2, SOD2, GPX1, CAT, HMOX1) and
+  heavy-metal handling (ALAD, AS3MT, PON1, metallothioneins). Produces a
+  composite wildfire-smoke resilience index (the "activate-but-don't-clear"
+  Phase I/II mismatch) and a genotype-personalised protocol (sulforaphane/NRF2,
+  glutathione/NAC, selenium, plus AQI/HEPA/N95 behavioural guidance framed for
+  Great Lakes / Upper-Peninsula wildfire-smoke seasons). 14 new SNPs registered.
+- **Metal Handling, Oxidative Defense & Neurodegeneration section.** Wires the
+  previously-orphaned `metal_oxidative.py` (LRRK2/GBA, HFE, G6PD, ATP7B,
+  metallothioneins, ZIP transporters, catalase) into the report — it computed
+  findings but was never rendered.
+
+### Tests
+
+- 193 → 203 passing. New `tests/registry/test_detox_registry_consistency.py`
+  (registry coverage + smoke-resilience scoring) and
+  `tests/unit/test_ancestry_crosscheck.py` (strand-aware dosage, palindrome
+  exclusion, European call, and lineage concordance/discordance).
+
+---
+
 ## [Unreleased] — 2026-07-08 — Depth pass: surface computed-but-dropped data
 
 No new genotype rules and no invented data. A systematic audit of all ~29

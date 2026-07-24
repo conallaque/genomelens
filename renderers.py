@@ -1437,6 +1437,68 @@ anything actionable with a clinician.
 """
 
 
+def _build_crosscheck_html(cc: Optional[Dict]) -> str:
+    """Render the Y-DNA / mtDNA geographic cross-check box."""
+    if not cc:
+        return ""
+    verdict = cc.get("verdict", "uninformative")
+    palette = {
+        "concordant":    ("#3fb950", "✓", "Lineages agree"),
+        "plausible":     ("#d29922", "≈", "Broadly compatible"),
+        "discordant":    ("#f85149", "⚠", "Lineage conflict"),
+        "uninformative": ("#8b949e", "•", "No strong constraint"),
+    }
+    color, glyph, label = palette.get(verdict, palette["uninformative"])
+
+    def _line_card(line, which):
+        if not line:
+            return ""
+        dist = line.get("dist", {})
+        chips = "".join(
+            f'<span style="display:inline-block;padding:1px 7px;margin:2px;border-radius:10px;'
+            f'background:var(--bg4);font-size:.8em">{_esc(sp)} {w*100:.0f}%</span>'
+            for sp, w in sorted(dist.items(), key=lambda kv: -kv[1]) if w >= 0.05
+        )
+        conf = line.get("confidence", "")
+        return (
+            f'<div style="flex:1;min-width:240px;background:var(--bg2);border:1px solid var(--bdr);'
+            f'border-radius:8px;padding:12px">'
+            f'<div style="font-size:.85em;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">{_esc(which)}</div>'
+            f'<div style="font-size:1.35em;font-weight:700;margin:2px 0">{_esc(line.get("haplogroup","?"))}'
+            f'<span style="font-size:.55em;color:var(--muted);font-weight:400"> · {_esc(conf)} conf</span></div>'
+            f'<div style="color:var(--muted);font-size:.9em;margin-bottom:6px">{_esc(line.get("region",""))}</div>'
+            f'<div>{chips}</div>'
+            f'</div>'
+        )
+
+    cards = _line_card(cc.get("paternal"), "Paternal line · Y-DNA") + \
+            _line_card(cc.get("maternal"), "Maternal line · mtDNA")
+    explanations = "".join(
+        f'<li>{ex}</li>' for ex in cc.get("explanations", [])
+    )
+    return f"""
+<div class="anc-crosscheck" style="border:1.5px solid {color};border-radius:10px;
+     padding:16px;margin:18px 0;background:linear-gradient(180deg,var(--bg3),var(--bg2))">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+    <span style="font-size:1.5em;color:{color}">{glyph}</span>
+    <div>
+      <div style="font-weight:700;font-size:1.1em">Deep-Lineage Cross-Check — {_esc(label)}</div>
+      <div style="color:var(--muted);font-size:.9em">{_esc(cc.get("summary",""))}</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin:12px 0">{cards}</div>
+  <ul style="margin:6px 0 0 18px;line-height:1.5">{explanations}</ul>
+  <div style="color:var(--dim);font-size:.82em;margin-top:10px">
+    Your Y-DNA (strict paternal line) and mtDNA (strict maternal line) each trace
+    a <em>single</em> ancestor back tens of thousands of years — they aren't the
+    same as a whole-genome admixture estimate, but they must be geographically
+    <em>compatible</em> with it. When they aren't, the small autosomal panel is
+    the suspect, not the haplogroup.
+  </div>
+</div>
+"""
+
+
 def build_ancestry_html(anc: Optional[Dict]) -> str:
     if not anc or not anc.get("available"):
         return ""
@@ -1499,6 +1561,14 @@ def build_ancestry_html(anc: Optional[Dict]) -> str:
     aims = anc.get("used_aims") or []
     aims_html = ""
     if aims:
+        def _aim_role(a: Dict) -> str:
+            if a.get("palindromic"):
+                return "palindrome — shown only, cannot be strand-oriented"
+            if not a.get("counted", True):
+                return "LD-redundant (not double-counted)"
+            if a.get("selection"):
+                return "counted (selection-influenced marker)"
+            return "counted"
         arows = "".join(
             f'<tr class="{"" if a.get("counted", True) else "anc-aim-redundant"}">'
             f'<td class="rsid-cell">'
@@ -1508,7 +1578,7 @@ def build_ancestry_html(anc: Optional[Dict]) -> str:
             f'<td class="gt-cell">{_esc(a.get("genotype",""))}</td>'
             f'<td>{_esc(a.get("effect_allele",""))}</td>'
             f'<td>{a.get("dosage","")}</td>'
-            f'<td>{"counted" if a.get("counted", True) else "LD-redundant (not double-counted)"}</td>'
+            f'<td>{_esc(_aim_role(a))}</td>'
             f"</tr>"
             for a in aims
         )
@@ -1521,6 +1591,18 @@ def build_ancestry_html(anc: Optional[Dict]) -> str:
             f"</table></div></details>"
         )
 
+    crosscheck_html = _build_crosscheck_html(anc.get("haplogroup_crosscheck"))
+    n_palin = anc.get("n_aims_palindromic", 0)
+    palin_note = ""
+    if n_palin:
+        palin_note = (
+            f'<div class="anc-margin"><em>Strand safety:</em> {n_palin} '
+            f"palindromic marker(s) (A/T or C/G, e.g. SLC45A2) were displayed but "
+            f"excluded from scoring — their strand can't be recovered from "
+            f"genotype alone, and mis-orienting one was a known cause of spurious "
+            f"non-European calls. Remaining markers are read strand-aware.</div>"
+        )
+
     return f"""
 <section class="anc-section" id="ancestry">
 <h2>Ancestry Estimation <span class="pro-pill">V3</span></h2>
@@ -1531,6 +1613,8 @@ Based on <strong>{n_indep}</strong> independent ancestry-informative markers
 </p>
 {conf_badge}
 {margin_html}
+{palin_note}
+{crosscheck_html}
 {ambiguous_banner}
 <div class="anc-caveat">
 <strong>Informational use only — this is not a genealogical or clinical
@@ -1547,6 +1631,202 @@ spurious match for intermediate genotypes.
 <div class="anc-bars-label">Relative affinity to each reference population (not admixture %):</div>
 <div class="anc-bars">{bars}</div>
 {aims_html}
+</section>
+"""
+
+
+# ── Detoxification & metal / oxidative sections ───────────────────────────────
+
+_DETOX_IMPACT_STYLE = {
+    "higher-load":      ("#f85149", "activates faster"),
+    "reduced-clearance":("#f85149", "clears slower"),
+    "reduced":          ("#d29922", "reduced"),
+    "intermediate":     ("#8b949e", "intermediate"),
+    "typical":          ("#3fb950", "typical"),
+    "protective":       ("#3fb950", "protective"),
+}
+
+
+def build_detox_html(dx: Optional[Dict]) -> str:
+    """Detoxification & Environmental Resilience — smoke / PAH / heavy metals."""
+    if not dx or not dx.get("available"):
+        return ""
+
+    sr = dx.get("smoke_resilience", {})
+    sr_color = sr.get("color", "#8b949e")
+    mismatch_badge = ""
+    if sr.get("activate_but_dont_clear"):
+        mismatch_badge = (
+            '<div style="margin-top:8px;padding:8px 12px;border-radius:6px;'
+            'background:rgba(248,81,73,.12);border:1px solid #f8514955;font-size:.9em">'
+            '⚠ <strong>Activate-but-don’t-clear pattern detected:</strong> your '
+            'Phase I enzymes bioactivate combustion toxicants faster than your '
+            'Phase II / antioxidant system clears them — the genotype combination '
+            'most worth protecting against smoke exposure.</div>'
+        )
+
+    score_card = f"""
+<div style="border:1.5px solid {sr_color};border-radius:10px;padding:16px;margin:14px 0;
+     background:linear-gradient(180deg,var(--bg3),var(--bg2))">
+  <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+    <div style="font-size:1.4em;font-weight:800;color:{sr_color}">{_esc(sr.get('tier','—'))}</div>
+    <div style="color:var(--muted);font-size:.9em">Wildfire-smoke resilience index</div>
+  </div>
+  <p style="margin:8px 0 0;line-height:1.55">{_esc(sr.get('headline',''))}</p>
+  <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-size:.86em;color:var(--muted)">
+    <span>Phase I activation hits: <strong>{sr.get('activation_hits',0)}</strong></span>
+    <span>Phase II clearance deficits: <strong>{sr.get('clearance_deficit_hits',0)}</strong></span>
+    <span>Antioxidant deficits: <strong>{sr.get('antioxidant_deficit_hits',0)}</strong></span>
+  </div>
+  {mismatch_badge}
+</div>
+"""
+
+    # Findings grouped by domain
+    domains_html = ""
+    by_cat = dx.get("by_category", {})
+    for cat in dx.get("category_order", list(by_cat.keys())):
+        items = by_cat.get(cat, [])
+        if not items:
+            continue
+        rows = ""
+        for f in items:
+            color, label = _DETOX_IMPACT_STYLE.get(f.get("impact"), ("#8b949e", f.get("impact", "")))
+            rows += f"""
+<div style="border:1px solid var(--bdr);border-left:4px solid {color};border-radius:6px;
+     padding:12px;margin:8px 0;background:var(--bg2)">
+  <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+    <div style="font-weight:700">{_esc(f.get('trait',''))}
+      <span style="font-weight:400;color:var(--muted);font-size:.85em"> · {_esc(f.get('gene',''))}</span></div>
+    <div><span style="color:{color};font-weight:600;font-size:.85em">{_esc(label)}</span>
+      <span style="color:var(--dim);font-size:.8em"> · {_esc(f.get('confidence',''))} confidence</span></div>
+  </div>
+  <div style="margin:6px 0;line-height:1.5">{_esc(f.get('result',''))}</div>
+  <div style="font-size:.9em;color:var(--acc2)"><strong>Action:</strong> {_esc(f.get('action',''))}</div>
+  <div style="font-size:.78em;color:var(--dim);margin-top:4px;font-family:var(--mono)">
+    {_esc(f.get('rsid',''))} · genotype {_esc(f.get('genotype',''))} · {_esc(f.get('evidence',''))}</div>
+</div>
+"""
+        domains_html += (
+            f'<h3 style="margin-top:18px">{_esc(cat)}</h3>{rows}'
+        )
+
+    # Personalised protocol
+    proto = dx.get("protocol", {})
+
+    def _proto_block(title, items, key_item="item", key_detail="detail"):
+        if not items:
+            return ""
+        lis = ""
+        for it in items:
+            emph = it.get("emphasis")
+            star = (' <span style="background:var(--red);color:#fff;border-radius:4px;'
+                    'padding:0 6px;font-size:.7em;vertical-align:middle">PRIORITY</span>'
+                    if emph == "high" else "")
+            lis += (
+                f'<li style="margin:8px 0"><strong>{_esc(it.get(key_item,""))}</strong>{star}'
+                f'<div style="color:var(--muted);font-size:.92em;line-height:1.5;margin-top:2px">'
+                f'{_esc(it.get(key_detail,""))}</div></li>'
+            )
+        return (f'<h3 style="margin-top:18px">{_esc(title)}</h3>'
+                f'<ul style="list-style:none;padding-left:0;margin:0">{lis}</ul>')
+
+    protocol_html = (
+        _proto_block("Your personalised nutrition levers", proto.get("nutrition"))
+        + _proto_block("Behavioural protection during smoke events", proto.get("behavioural"))
+        + _proto_block("Heavy-metal exposure & measurement", proto.get("metal"))
+    )
+
+    michigan = dx.get("michigan_context", "")
+    michigan_html = (
+        f'<div style="border-left:4px solid var(--acc);background:var(--bg2);'
+        f'padding:12px 14px;border-radius:6px;margin:14px 0;line-height:1.55">'
+        f'📍 {_esc(michigan)}</div>' if michigan else ""
+    )
+
+    return f"""
+<section class="detox-section" id="detoxification">
+<h2>Detoxification &amp; Environmental Resilience <span class="pro-pill">V10</span></h2>
+<p class="anc-intro">
+How your genome handles the toxicant load from <strong>wildfire / wood / tobacco
+smoke</strong> and <strong>heavy metals</strong> — the balance between Phase I
+activation, Phase II conjugation, and the antioxidant response, plus a
+genotype-tuned action plan.
+</p>
+{michigan_html}
+{score_card}
+<div class="detox-domains">{domains_html}</div>
+<div class="detox-protocol">
+  <h2 style="font-size:1.25em;margin-top:24px">Your Personalised Detox Protocol</h2>
+  {protocol_html}
+</div>
+<div class="anc-caveat" style="margin-top:16px">
+<strong>Informational, not diagnostic.</strong> These are consumer-chip
+genotype tendencies, not measurements of your toxicant burden or detox capacity.
+A true GSTM1/GSTT1-null status needs a PCR/CNV assay; blood-lead, urine
+heavy-metals and lung function are lab/clinical tests. The behavioural
+protections during smoke events benefit everyone regardless of genotype — the
+genetics only personalise <em>emphasis</em>. Discuss supplements (especially NAC
+and selenium) with a clinician before starting.
+</div>
+</section>
+"""
+
+
+def build_metal_oxidative_html(mx: Optional[Dict]) -> str:
+    """Metal-handling, oxidative-defense & neurodegeneration panel (wires in the
+    previously-unrendered metal_oxidative module)."""
+    if not mx or not mx.get("predictions"):
+        return ""
+    conf_color = {"high": "#3fb950", "moderate": "#d29922", "low": "#8b949e"}
+    domains_html = ""
+    for cat in mx.get("categories", list(mx.get("by_category", {}).keys())):
+        items = mx.get("by_category", {}).get(cat, [])
+        if not items:
+            continue
+        rows = ""
+        for f in items:
+            c = conf_color.get(f.get("confidence"), "#8b949e")
+            clinical = ""
+            if f.get("clinical_variant"):
+                cv = f["clinical_variant"]
+                clinical = (
+                    f'<div style="margin-top:6px;padding:6px 10px;border-radius:6px;'
+                    f'background:rgba(248,81,73,.10);border:1px solid #f8514955;font-size:.85em">'
+                    f'🧬 <strong>Clinically-reportable:</strong> {_esc(cv.get("gene",""))} '
+                    f'{_esc(cv.get("variant",""))} — {_esc(cv.get("clinical_significance",""))} '
+                    f'({_esc(cv.get("inheritance",""))})</div>'
+                )
+            rows += f"""
+<div style="border:1px solid var(--bdr);border-left:4px solid {c};border-radius:6px;
+     padding:12px;margin:8px 0;background:var(--bg2)">
+  <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+    <div style="font-weight:700">{_esc(f.get('trait',''))}</div>
+    <div style="color:var(--dim);font-size:.8em">{_esc(f.get('confidence',''))} confidence</div>
+  </div>
+  <div style="margin:6px 0;line-height:1.5">{_esc(f.get('result',''))}</div>
+  <div style="font-size:.9em;color:var(--acc2)"><strong>Action:</strong> {_esc(f.get('action',''))}</div>
+  <div style="font-size:.78em;color:var(--dim);margin-top:4px;font-family:var(--mono)">{_esc(f.get('evidence',''))}</div>
+  {clinical}
+</div>
+"""
+        domains_html += f'<h3 style="margin-top:18px">{_esc(cat)}</h3>{rows}'
+
+    return f"""
+<section class="metalox-section" id="metal-oxidative">
+<h2>Metal Handling, Oxidative Defense &amp; Neurodegeneration <span class="pro-pill">V9</span></h2>
+<p class="anc-intro">
+A functional look at copper/iron/zinc handling, red-cell and cellular
+antioxidant defenses, and the LRRK2/GBA Parkinson's-risk loci — a complement to
+the Detoxification section above and the Wellness oxidative-stress trait.
+</p>
+<div class="metalox-domains">{domains_html}</div>
+<div class="anc-caveat" style="margin-top:14px">
+<strong>Mostly research-grade.</strong> Metallothionein, ZIP-transporter and
+GST proxy signals are hints, not clinical metal/detox tests. HFE C282Y
+homozygosity and G6PD deficiency are the higher-confidence, clinically
+actionable exceptions and are flagged as such.
+</div>
 </section>
 """
 
@@ -2606,6 +2886,8 @@ def build_html_report(
     economics_result: Optional[Dict] = None,
     pharmgkb_result: Optional[Dict] = None,
     top_drugs_result: Optional[Dict] = None,
+    metal_oxidative_result: Optional[Dict] = None,
+    detox_result: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -2893,6 +3175,9 @@ def build_html_report(
     economics_html = build_economics_html(economics_result)
     pharmgkb_html = build_pharmgkb_html(pharmgkb_result)
     top_drugs_html = build_top_drugs_html(top_drugs_result)
+    # ── V9/V10 sections ──
+    detox_html = build_detox_html(detox_result)
+    metal_oxidative_html = build_metal_oxidative_html(metal_oxidative_result)
 
     # ── Full HTML ──
     html = f"""<!DOCTYPE html>
@@ -3074,6 +3359,8 @@ h2{{font-size:21px;font-weight:700;margin-bottom:14px;padding-bottom:8px;
 /* ==== FOOTER ==== */
 .ftr{{text-align:center;padding:28px;color:var(--dim);font-size:12px;
   border-top:1px solid var(--bdr);margin-top:40px}}
+.ftr-cite{{margin-top:12px;color:var(--muted);font-size:12px;line-height:1.5}}
+.ftr-copy{{margin-top:4px;color:var(--dim);font-size:11px}}
 
 /* ==== PRINT ==== */
 @media print{{
@@ -3900,6 +4187,8 @@ transparency.
   {"<a href='#carrier-status' class='nl nl-pro'>Carrier Status</a>" if carrier_html else ""}
   {"<a href='#trait-predictions' class='nl nl-pro'>Trait Predictions</a>" if traits_html else ""}
   {"<a href='#wellness' class='nl nl-v4'>Wellness</a>" if wellness_html else ""}
+  {"<a href='#detoxification' class='nl nl-v5'>Detoxification</a>" if detox_html else ""}
+  {"<a href='#metal-oxidative' class='nl nl-v5'>Metal &amp; Oxidative</a>" if metal_oxidative_html else ""}
   {"<a href='#genetic-age' class='nl nl-v5'>Genetic Age</a>" if genetic_age_html else ""}
   {"<a href='#hla-immune' class='nl nl-v5'>HLA / Immune</a>" if hla_html else ""}
   {"<a href='#pgx-simulation' class='nl nl-v5'>Drug Simulation</a>" if pgx_sim_html else ""}
@@ -3953,6 +4242,10 @@ transparency.
 {traits_html}
 
 {wellness_html}
+
+{detox_html}
+
+{metal_oxidative_html}
 
 {genetic_age_html}
 
@@ -4058,6 +4351,11 @@ evidence, which continues to evolve.</p>
 <footer class="ftr">
 DNA Analysis Report &nbsp;&middot;&nbsp; Generated locally &amp; privately &nbsp;&middot;&nbsp;
 Educational use only &mdash; not medical advice
+<div class="ftr-cite">
+  <strong>Suggested citation:</strong> Aque, C.&nbsp;R. ({datetime.datetime.now():%Y}).
+  <em>DNA Analysis Tool</em> (Version {REPORT_VERSION}) [Computer software].
+</div>
+<div class="ftr-copy">&copy; {datetime.datetime.now():%Y} Conall&nbsp;R.&nbsp;Aque. All rights reserved.</div>
 </footer>
 </body>
 </html>"""

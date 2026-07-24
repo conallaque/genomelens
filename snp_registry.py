@@ -748,6 +748,146 @@ _RECORDS: list[SNPRecord] = [
                     "primary-chromosome hg38 placement.",
         source="dbSNP; GST copy-number literature (PMC6118300)",
     ),
+
+    # ── Detoxification & environmental resilience (smoke / PAH / metals) ──
+    # Added for detox.py: Phase I bioactivation (CYP1A1/1B1/AHR), Phase II
+    # conjugation (EPHX1, NAT2, NQO1), and heavy-metal handling (ALAD, AS3MT,
+    # PON1). GRCh37 positions taken from 23andMe/AncestryDNA + dbSNP; a few
+    # GRCh38 positions omitted where not cleanly verified.
+    SNPRecord(
+        rsid="rs1048943", gene="CYP1A1", chrom="15",
+        pos_grch37=75_012_985, pos_grch38=74_720_644,
+        ancestral="A", derived="G",
+        description="CYP1A1 Ile462Val (m2) — Val462 raises inducibility/activity "
+                    "toward polycyclic aromatic hydrocarbons from smoke; more "
+                    "Phase I bioactivation.",
+        source="dbSNP; CYP1A1 smoking/PAH literature",
+        aliases=("Ile462Val", "CYP1A1*2C", "m2"),
+    ),
+    SNPRecord(
+        rsid="rs4646903", gene="CYP1A1", chrom="15",
+        pos_grch37=75_011_641, pos_grch38=74_719_300,
+        ancestral="T", derived="C",
+        description="CYP1A1 m1 (3' UTR MspI) — variant allele associated with "
+                    "higher CYP1A1 inducibility, especially in smokers.",
+        source="dbSNP; CYP1A1 MspI literature",
+        aliases=("CYP1A1*2A", "m1", "MspI"),
+    ),
+    SNPRecord(
+        rsid="rs1056836", gene="CYP1B1", chrom="2",
+        pos_grch37=38_298_203, pos_grch38=38_071_060,
+        ancestral="C", derived="G",
+        description="CYP1B1 Leu432Val — Val432 increases activity toward PAHs "
+                    "and estrogen substrates; a Phase I activation route.",
+        source="dbSNP; CYP1B1 literature",
+        aliases=("Leu432Val", "L432V"),
+    ),
+    SNPRecord(
+        rsid="rs2066853", gene="AHR", chrom="7",
+        pos_grch37=17_379_110, pos_grch38=17_339_484,
+        ancestral="G", derived="A",
+        description="AHR Arg554Lys — modulates aryl-hydrocarbon-receptor "
+                    "signalling that induces the CYP1 enzymes on smoke/dioxin "
+                    "exposure.",
+        source="dbSNP; AhR signalling literature",
+        aliases=("Arg554Lys", "R554K"),
+    ),
+    SNPRecord(
+        rsid="rs1051740", gene="EPHX1", chrom="1",
+        pos_grch37=226_019_633, pos_grch38=225_831_932,
+        ancestral="T", derived="C",
+        description="EPHX1 Tyr113His (exon 3) — His113 (C) lowers microsomal "
+                    "epoxide-hydrolase activity ('slow'), reducing clearance of "
+                    "PAH epoxides from smoke.",
+        source="dbSNP; EPHX1 activity literature",
+        aliases=("Tyr113His", "Y113H"),
+    ),
+    SNPRecord(
+        rsid="rs2234922", gene="EPHX1", chrom="1",
+        pos_grch37=226_026_406, pos_grch38=225_838_705,
+        ancestral="A", derived="G",
+        description="EPHX1 His139Arg (exon 4) — Arg139 (G) raises epoxide-"
+                    "hydrolase activity ('fast'); combines with Y113H to predict "
+                    "overall EPHX1 activity.",
+        source="dbSNP; EPHX1 activity literature",
+        aliases=("His139Arg", "H139R"),
+    ),
+    SNPRecord(
+        rsid="rs1801280", gene="NAT2", chrom="8",
+        pos_grch37=18_257_854, pos_grch38=18_400_343,
+        ancestral="T", derived="C",
+        description="NAT2*5 (I114T, T341C) — slow-acetylator allele; slower "
+                    "clearance of aromatic amines from tobacco/combustion smoke.",
+        source="dbSNP; NAT2 acetylator literature",
+        aliases=("NAT2*5", "I114T"),
+    ),
+    SNPRecord(
+        rsid="rs1799930", gene="NAT2", chrom="8",
+        pos_grch37=18_258_103, pos_grch38=18_400_592,
+        ancestral="G", derived="A",
+        description="NAT2*6 (R197Q, G590A) — slow-acetylator allele for aromatic "
+                    "amine detoxification.",
+        source="dbSNP; NAT2 acetylator literature",
+        aliases=("NAT2*6", "R197Q"),
+    ),
+    SNPRecord(
+        rsid="rs1799931", gene="NAT2", chrom="8",
+        pos_grch37=18_258_370, pos_grch38=18_400_859,
+        ancestral="G", derived="A",
+        description="NAT2*7 (G286E, G857A) — slow-acetylator allele contributing "
+                    "to the NAT2 slow phenotype.",
+        source="dbSNP; NAT2 acetylator literature",
+        aliases=("NAT2*7", "G286E"),
+    ),
+    SNPRecord(
+        rsid="rs1800566", gene="NQO1", chrom="16",
+        pos_grch37=69_745_145, pos_grch38=69_711_242,
+        ancestral="C", derived="T",
+        description="NQO1 Pro187Ser (C609T) — Ser187 (T) greatly reduces NQO1 "
+                    "activity, impairing quinone detoxification (benzene/smoke) "
+                    "and antioxidant recycling.",
+        source="dbSNP; NQO1 P187S literature",
+        aliases=("Pro187Ser", "P187S", "NQO1*2"),
+    ),
+    SNPRecord(
+        rsid="rs2071746", gene="HMOX1", chrom="22",
+        pos_grch37=35_776_290, pos_grch38=35_380_301,
+        ancestral="A", derived="T",
+        description="HMOX1 -413A>T promoter — modulates expression of heme "
+                    "oxygenase-1, a cytoprotective enzyme induced by particulate "
+                    "/ oxidative stress.",
+        source="dbSNP; HMOX1 promoter literature",
+        aliases=("-413A>T",),
+    ),
+    SNPRecord(
+        rsid="rs662", gene="PON1", chrom="7",
+        pos_grch37=94_937_446, pos_grch38=95_308_134,
+        ancestral="A", derived="G",
+        description="PON1 Q192R — Arg192 (G) shifts paraoxonase-1 substrate "
+                    "specificity (organophosphate hydrolysis vs oxidised-lipid "
+                    "clearance).",
+        source="dbSNP; PON1 Q192R literature",
+        aliases=("Q192R", "Gln192Arg"),
+    ),
+    SNPRecord(
+        rsid="rs1800435", gene="ALAD", chrom="9",
+        pos_grch37=116_153_891, pos_grch38=113_391_612,
+        ancestral="C", derived="G",
+        description="ALAD K59N (ALAD2 allele) — alters lead binding in blood; "
+                    "associated in some cohorts with higher blood-lead retention "
+                    "for a given exposure.",
+        source="dbSNP; ALAD lead-kinetics literature",
+        aliases=("K59N", "ALAD2"),
+    ),
+    SNPRecord(
+        rsid="rs11191439", gene="AS3MT", chrom="10",
+        pos_grch37=104_638_723, pos_grch38=102_878_966,
+        ancestral="T", derived="C",
+        description="AS3MT Met287Thr — influences arsenite-methyltransferase "
+                    "activity and the arsenic methylation/excretion profile.",
+        source="dbSNP; AS3MT arsenic-methylation literature",
+        aliases=("Met287Thr", "M287T"),
+    ),
 ]
 
 

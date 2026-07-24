@@ -91,6 +91,8 @@ from analyze import (
     diff_runs,
     render_diff_text,
     run_chat,
+    analyze_metal_oxidative,
+    analyze_detox,
 )
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:
@@ -390,7 +392,11 @@ def run_pipeline(args: argparse.Namespace) -> int:
     if analyze_ancestry is not None:
         try:
             log("Running ancestry estimation ...")
-            ancestry_result = analyze_ancestry(snps_df)
+            # Pass the Y-DNA / mtDNA calls so the estimate can be cross-checked
+            # against the deep paternal/maternal lineages (a small autosomal
+            # panel that contradicts them is flagged, not trusted at face value).
+            ancestry_result = analyze_ancestry(snps_df, y_result=y_result,
+                                               mt_result=mt_result)
             if ancestry_result.get("available"):
                 primary = ancestry_result.get("primary_population", "?")
                 conf = ancestry_result.get("confidence", "?")
@@ -607,6 +613,28 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Health economics module failed: {e}")
 
+    # ── Metal handling / oxidative-defense / neurodegeneration panel ──
+    metal_oxidative_result: Optional[Dict] = None
+    if analyze_metal_oxidative is not None:
+        try:
+            metal_oxidative_result = analyze_metal_oxidative(snps_df)
+            log(f"  Metal/oxidative panel: "
+                f"{metal_oxidative_result.get('n_predictions', 0)} findings")
+        except Exception as e:
+            log(f"  WARNING: Metal/oxidative module failed: {e}")
+
+    # ── Detoxification & environmental resilience (smoke / PAH / metals) ──
+    detox_result: Optional[Dict] = None
+    if analyze_detox is not None:
+        try:
+            detox_result = analyze_detox(snps_df)
+            if detox_result.get("available"):
+                sr = detox_result.get("smoke_resilience", {})
+                log(f"  Detoxification: {detox_result.get('n_findings', 0)} findings; "
+                    f"smoke-resilience tier = {sr.get('tier', '?')}")
+        except Exception as e:
+            log(f"  WARNING: Detoxification module failed: {e}")
+
     # ── ClinPGx/PharmGKB clinical-variant annotations for typed rsIDs ──
     pharmgkb_result: Optional[Dict] = None
     if analyze_pharmgkb_clinical is not None:
@@ -695,6 +723,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
         economics_result=economics_result,
         pharmgkb_result=pharmgkb_result,
         top_drugs_result=top_drugs_result,
+        metal_oxidative_result=metal_oxidative_result,
+        detox_result=detox_result,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:
