@@ -6,6 +6,42 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.1.0-premium] — 2026-07-24 — Comprehensive blood-work engine
+
+Turns the bloodwork module from a genetics-only comparison into a full clinical
+analysis. The original PheWAS genetic-prediction layer is preserved unchanged;
+everything below is additive (attached under a new ``clinical`` key).
+
+### Added
+
+- **Clinical + optimal reference-range engine.** A ~50-biomarker catalogue
+  (lipids, glycemic, inflammation, liver, kidney, thyroid, iron, CBC,
+  electrolytes, hormones, vitamins, blood pressure) classifies each value
+  against BOTH standard clinical ranges and tighter functional/optimal ranges
+  (Optimal / Normal / Borderline / High / Low / Critical), with sex-specific
+  ranges where relevant.
+- **~12 calculated markers** derived from whatever inputs are present: non-HDL,
+  Total:HDL, TG:HDL (insulin-resistance proxy), ApoB:ApoA1, remnant cholesterol,
+  HOMA-IR, eGFR (CKD-EPI 2021), transferrin saturation, neutrophil:lymphocyte
+  ratio, mean arterial pressure, BUN:creatinine, FIB-4, and a free-testosterone
+  estimate.
+- **Genotype-aware interpretation.** Flagged biomarkers pull the user's own
+  variants for context — e.g. high ferritin + HFE C282Y → hemochromatosis flag;
+  high LDL/ApoB + APOE ε4; high glucose + TCF7L2; high homocysteine + MTHFR;
+  low vitamin D + GC/CYP2R1; B12 + FUT2 secretor status; uric acid + ABCG2;
+  isolated high bilirubin + UGT1A1 (Gilbert's); Lp(a) as a genetic risk factor.
+- **Per-system and overall health scores**, priority out-of-range flag list,
+  and a visual reference/optimal range bar per marker in the report.
+- `REPORT_VERSION` → 6.1.0-premium.
+
+### Tests
+
+- +6 unit tests for the clinical engine (status tiers, sex-specific ranges,
+  derived markers, scoring/flags, HFE genotype note, clinical attachment).
+  Bloodwork golden snapshot refreshed to include the new ``clinical`` key.
+
+---
+
 ## [6.0.0-premium] — 2026-07-24 — Ancestry lineage cross-check + Detoxification panel
 
 Two headline additions and one real bug fix. No synthesised data — every new

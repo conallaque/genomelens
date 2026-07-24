@@ -161,3 +161,69 @@ def test_html_contains_explainer(tmp_path) -> None:
     assert "How to read this table" in html
     assert "0.75" in html and "1.5" in html
     assert "5–20%" in html or "5-20%" in html
+
+
+# ── V6.1 comprehensive clinical engine ───────────────────────────────────────
+
+def _bm_by_id(cid):
+    return bw._BM_BY_ID[cid]
+
+
+def test_classify_clinical_status_tiers() -> None:
+    ldl = _bm_by_id("ldl")           # high-bad, clinical <100, optimal 50-99
+    assert bw.classify_clinical(75, ldl) == "optimal"
+    assert bw.classify_clinical(120, ldl) == "high"
+    assert bw.classify_clinical(200, ldl) == "critical_high"   # critical_high=190
+    vitd = _bm_by_id("vitamin_d")    # low-bad, clinical 30-100, optimal 40-60
+    assert bw.classify_clinical(50, vitd) == "optimal"
+    assert bw.classify_clinical(34, vitd) == "borderline"      # in clinical, below optimal
+    assert bw.classify_clinical(18, vitd) == "low"
+
+
+def test_sex_specific_ranges() -> None:
+    hdl = _bm_by_id("hdl")
+    # 45 is optimal for a man (>=40 clinical, >=55 optimal → borderline) but LOW for a woman (<50)
+    assert bw.classify_clinical(45, hdl, sex="M") == "borderline"
+    assert bw.classify_clinical(45, hdl, sex="F") == "low"
+
+
+def test_derived_markers_computed() -> None:
+    vals = {"total_cholesterol": 200, "hdl": 40, "ldl": 130, "triglycerides": 160,
+            "fasting_glucose": 100, "fasting_insulin": 10, "iron": 150, "tibc": 300,
+            "creatinine": 1.0, "systolic_bp": 130, "diastolic_bp": 80}
+    d = bw.compute_derived_markers(vals, {"sex": "M", "age": 40})
+    assert d["non_hdl"] == 160
+    assert d["tg_hdl_ratio"] == 4.0
+    assert d["homa_ir"] == round(100 * 10 / 405, 2)
+    assert d["transferrin_sat"] == 50.0
+    assert "egfr" in d and d["egfr"] > 0
+    assert d["map"] == 97
+
+
+def test_analyze_clinical_scores_and_flags() -> None:
+    labs = {"ldl": 180, "hdl": 65, "fasting_glucose": 85, "vitamin_d": 55}
+    res = bw.analyze_clinical_bloodwork(labs, snps_df=None, meta={"sex": "M"})
+    assert res["available"] and res["n_markers"] >= 4
+    # LDL 180 must be a flag; systems must include Lipids
+    names = {f["name"] for f in res["flags"]}
+    assert "LDL Cholesterol" in names
+    assert any(s["system"] == "Lipids & Cardiovascular" for s in res["systems"])
+    assert 0 <= res["overall_score"] <= 100
+
+
+def test_genotype_note_hfe_iron_overload() -> None:
+    import pandas as pd
+    # C282Y homozygous (rs1800562 AA) + high ferritin → hemochromatosis note
+    df = pd.DataFrame({"genotype": {"rs1800562": "AA"}})
+    note = bw._genotype_note("ferritin", "high", df)
+    assert "C282Y" in note and "hemochromatosis" in note.lower()
+    # no genotype data → no note
+    assert bw._genotype_note("ferritin", "high", None) == ""
+
+
+def test_clinical_attached_to_compare_output(tmp_path) -> None:
+    p = tmp_path / "labs.json"
+    p.write_text(json.dumps({"ldl": 160, "hdl": 40, "triglycerides": 200}))
+    result = bw.compare_bloodwork(str(p), phewas_result=None)
+    assert "clinical" in result and result["clinical"]["available"]
+    assert result["clinical"]["n_derived"] >= 1   # tg_hdl_ratio at least

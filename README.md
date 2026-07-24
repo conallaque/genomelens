@@ -19,7 +19,7 @@ Unauthorized copying, modification, or distribution is prohibited.
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![privacy](https://img.shields.io/badge/network-localhost%20only-purple)
-![tests](https://img.shields.io/badge/tests-203%20passing-brightgreen)
+![tests](https://img.shields.io/badge/tests-208%20passing-brightgreen)
 ![registry](https://img.shields.io/badge/SNP%20registry-unified-blueviolet)
 ![analyze.py](https://img.shields.io/badge/analyze.py-1%2C055%20lines-orange)
 

@@ -521,7 +521,9 @@ def run_pipeline(args: argparse.Namespace) -> int:
         else:
             try:
                 log(f"Comparing bloodwork JSON ({args.bloodwork}) to PheWAS predictions ...")
-                bloodwork_result = compare_bloodwork(args.bloodwork, phewas_result)
+                _bw_meta = {"sex": (qc_result or {}).get("inferred_sex")}
+                bloodwork_result = compare_bloodwork(
+                    args.bloodwork, phewas_result, snps_df=snps_df, meta=_bw_meta)
                 log(f"  Bloodwork: {bloodwork_result['n_matched']}/{bloodwork_result['n_labs_supplied']} "
                     f"labs compared, accuracy {bloodwork_result.get('accuracy_pct', 0)}% "
                     f"({bloodwork_result['n_confirmed']} confirmed, "
