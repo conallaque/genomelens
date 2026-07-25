@@ -281,3 +281,15 @@ def test_personal_economics_empty() -> None:
     assert econ["available"] is False and econ["n_items"] == 0
     html = he.render_economic_analysis_html(econ)
     assert "No modeled economic-impact" in html
+
+
+def test_biological_aging_high_confidence_grounded() -> None:
+    import health_economics as he
+    econ = he.analyze_personal_economics(bloodwork_result={"clinical": {"advanced": {
+        "indices": [], "biological_age": {
+            "accel": 1.2, "chronological": 41, "mortality_10yr_pct": 2.6, "inputs": {}}},
+        "flags": []}})
+    b = next(i for i in econ["items"] if i["category"] == "Biological aging")
+    assert b["confidence"] == "high"                     # grounded in the clock, not hand-waved
+    assert "mortality" in b["basis"].lower() and "Levine" in b["basis"]
+    assert b["net"] > 0

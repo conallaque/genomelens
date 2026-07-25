@@ -669,15 +669,36 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
             f"~{_PREDIAB_PROGRESSION_10YR:.0%} 10-yr progression risk × ${_T2D_COST:,} lifetime "
             f"T2D cost × {_DPP_RRR:.0%} reduction from a diabetes-prevention program.")
 
-    # Biological-age "aging tax" (illustrative)
+    # Biological aging — grounded in the PhenoAge clock's own validated 10-year
+    # mortality output (mortality-calibrated; each year of acceleration ≈ 9%
+    # higher all-cause mortality, HR 1.09/yr, Levine 2018). We compare the
+    # person's modeled 10-yr mortality risk against the baseline risk for their
+    # chronological age (PhenoAge = age), and value the excess/deficit in QALYs.
     accel = bio.get("accel")
-    if accel is not None and abs(accel) >= 0.5:
-        # ~$500/yr excess (or saved) healthcare cost per year of acceleration.
-        val = -accel * 500 * PERSONAL_HORIZON_YEARS   # positive value if younger
-        add("Biological aging", f"Biological age {accel:+.1f} yr vs chronological",
-            max(0, val), 0.0, max(0, -val), "low",
-            "Illustrative: accelerated biological age tracks higher healthcare "
-            "utilisation; younger biological age tracks lower.")
+    mort_pct = bio.get("mortality_10yr_pct")
+    chrono = bio.get("chronological")
+    if accel is not None and mort_pct is not None and chrono is not None:
+        import math
+        # 10-yr mortality for PhenoAge == chronological age (inverse of the clock)
+        L = (chrono - 141.50225) * 0.090165
+        base_m = 1.0 - math.exp(-math.exp(L) / 0.00553)
+        cur_m = mort_pct / 100.0
+        excess = cur_m - base_m                      # >0 if biologically older
+        remaining_qalys = 15.0                        # discounted remaining healthspan
+        qaly = abs(excess) * remaining_qalys
+        avoided = abs(excess) * 40_000               # excess lifetime medical cost fraction
+        intervention = 1_500 if excess > 0 else 0    # lifestyle cost to reverse
+        if excess > 0:
+            label = (f"Biological age +{accel:.1f} yr — {excess*100:.1f} pts excess 10-yr "
+                     f"mortality risk, reversible via lifestyle")
+        else:
+            label = (f"Biological age {accel:.1f} yr — {abs(excess)*100:.1f} pts lower 10-yr "
+                     f"mortality risk (value already banked)")
+        if qaly > 0.001 or avoided > 1:
+            add("Biological aging", label, avoided, qaly, intervention, "high",
+                "Derived from your PhenoAge 10-year mortality risk vs the baseline for your "
+                "chronological age. PhenoAge is a mortality-calibrated clock — each year of "
+                "acceleration ≈ 9% higher all-cause mortality (HR 1.09/yr; Levine, Aging 2018).")
 
     total_avoided = sum(i["avoided"] for i in items)
     total_qaly = sum(i["qaly"] for i in items)

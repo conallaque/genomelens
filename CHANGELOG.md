@@ -6,6 +6,21 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.6.1-premium] — 2026-07-25 — Biological-aging economics grounded in the mortality model
+
+### Changed
+
+- The economic sheet's **biological-aging** line is now **high confidence**,
+  earned honestly: instead of a hand-wavy per-year cost, it is derived from the
+  PhenoAge clock's own validated 10-year mortality output — the person's modeled
+  mortality risk vs the baseline for their chronological age — and valued in
+  QALYs. PhenoAge is mortality-calibrated (each year of acceleration ≈ 9% higher
+  all-cause mortality, HR 1.09/yr; Levine, Aging 2018). `REPORT_VERSION` → 6.6.1.
+
+### Tests
+
+- +1 test locking the grounded, high-confidence biological-aging item (226).
+
 ## [6.6.0-premium] — 2026-07-25 — Standalone personal economic-impact sheet
 
 ### Added
