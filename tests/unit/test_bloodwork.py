@@ -227,3 +227,96 @@ def test_clinical_attached_to_compare_output(tmp_path) -> None:
     result = bw.compare_bloodwork(str(p), phewas_result=None)
     assert "clinical" in result and result["clinical"]["available"]
     assert result["clinical"]["n_derived"] >= 1   # tg_hdl_ratio at least
+
+
+# ── V6.2 advanced composite indices & biological age ──────────────────────────
+
+def _adv(labs, meta=None):
+    return bw.compute_advanced_indices(labs, {}, meta or {"sex": "M", "age": 41})
+
+
+def _idx(adv, iid):
+    return next((i for i in adv["indices"] if i["id"] == iid), None)
+
+
+def test_phenoage_healthy_is_younger() -> None:
+    # Healthy 40yo → biological age materially younger (validated hand-calc ~32.7)
+    pa = bw._phenoage(4.5, 1.0, 90, 0.5, 30, 90, 13.0, 65, 5.5, 40)
+    assert 31.5 < pa < 34.0
+    # Unhealthy 40yo → older
+    pa2 = bw._phenoage(4.0, 1.1, 130, 5.0, 20, 92, 15.5, 120, 9.0, 40)
+    assert pa2 > 48
+
+
+def test_phenoage_requires_si_conversion() -> None:
+    # Sanity: feeding glucose raw (mg/dL) without conversion would explode xb;
+    # our implementation converts, so a normal panel stays near chronological age.
+    pa = bw._phenoage(4.4, 1.0, 100, 1.0, 28, 90, 13.5, 75, 6.0, 45)
+    assert 38 < pa < 52   # plausible, not hundreds
+
+
+def test_tyg_index() -> None:
+    adv = _adv({"triglycerides": 180, "fasting_glucose": 104})
+    i = _idx(adv, "tyg")
+    assert i is not None and abs(i["value"] - 9.14) < 0.02
+    assert i["status"] == "cl-high"   # >=8.75
+
+
+def test_sampson_ldl() -> None:
+    adv = _adv({"total_cholesterol": 210, "hdl": 42, "triglycerides": 180})
+    i = _idx(adv, "ldl_sampson")
+    assert i is not None and abs(i["value"] - 136) <= 2
+
+
+def test_fib4_and_sii() -> None:
+    adv = _adv({"ast": 30, "alt": 42, "platelets": 240, "neutrophils": 4.0,
+                "lymphocytes": 1.6, "monocytes": 0.5}, {"sex": "M", "age": 41})
+    assert abs(_idx(adv, "fib4_adv")["value"] - 0.79) < 0.03
+    assert _idx(adv, "sii")["value"] == 600
+    assert abs(_idx(adv, "siri")["value"] - 1.25) < 0.02
+
+
+def test_metabolic_syndrome_flags_present() -> None:
+    adv = _adv({"triglycerides": 180, "hdl": 38, "fasting_glucose": 104,
+                "systolic_bp": 135, "diastolic_bp": 88}, {"sex": "M", "age": 41})
+    i = _idx(adv, "metsyn")
+    assert i["status"] == "cl-high"   # >=3 criteria
+    assert i["status_label"] == "Present"
+
+
+def test_corrected_calcium_and_anion_gap() -> None:
+    adv = _adv({"calcium": 9.4, "albumin": 4.4, "sodium": 140,
+                "chloride": 102, "co2": 25})
+    assert abs(_idx(adv, "corr_ca")["value"] - 9.1) < 0.05
+    assert _idx(adv, "anion_gap")["value"] == 13
+
+
+def test_advanced_attached_to_clinical() -> None:
+    res = bw.analyze_clinical_bloodwork(
+        {"triglycerides": 150, "fasting_glucose": 95, "hdl": 45, "total_cholesterol": 190},
+        snps_df=None, meta={"sex": "M", "age": 40})
+    assert "advanced" in res and res["advanced"]["available"]
+    assert res["advanced"]["n_indices"] >= 3
+
+
+def test_mets_ir_and_fli_and_pni_aisi() -> None:
+    adv = _adv({"fasting_glucose": 100, "triglycerides": 150, "hdl": 45, "bmi": 28,
+                "ggt": 40, "triglycerides": 150, "waist": 95,
+                "albumin": 4.4, "lymphocytes": 1.8, "neutrophils": 4.0,
+                "monocytes": 0.5, "platelets": 250})
+    assert _idx(adv, "mets_ir") is not None
+    assert _idx(adv, "fli") is not None
+    pni = _idx(adv, "pni")
+    assert pni is not None and abs(pni["value"] - (10*4.4 + 0.005*1800)) < 0.1
+    assert _idx(adv, "aisi") is not None
+
+
+def test_phenoage_levers_and_mortality() -> None:
+    pa, mort = bw._phenoage_core(4.4, 1.0, 104, 3.4, 30, 90, 13.8, 75, 6.1, 41)
+    assert 0.0 < mort < 1.0
+    lev = bw.phenoage_levers(4.4, 1.0, 104, 3.4, 30, 90, 13.8, 75, 6.1, 41)
+    assert lev["recoverable_years"] > 0
+    # RDW (largest CBC coefficient) should be a top lever here
+    assert lev["levers"] and lev["levers"][0]["marker"] in ("RDW", "Fasting glucose", "hs-CRP")
+    # each lever quantifies years recovered by optimizing that marker
+    assert all(l["years_cost"] > 0 for l in lev["levers"])

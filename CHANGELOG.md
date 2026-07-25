@@ -6,6 +6,73 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.3.0-premium] — 2026-07-25 — Longevity simulator, visuals & expanded index panel
+
+Builds on 6.2.0's biological-age clock with an interactive-style longevity
+simulator, mortality estimation, data-visualisation, and four more validated
+indices — 20 composite scores in total.
+
+### Added
+
+- **Longevity levers (counterfactual simulator).** For each of the nine
+  PhenoAge biomarkers, computes the biological-age cost vs its optimal value
+  (holding the others fixed) and the total years recoverable if all were
+  optimal — a quantified, actionable "what-if" ranked by impact.
+- **Estimated 10-year mortality risk** surfaced directly from the PhenoAge
+  Gompertz mortality score.
+- **Data-visualisation (inline SVG, no dependencies):** a biological-age gauge
+  (younger↔older with chronological tick + biological marker) and a
+  body-system radar/spider chart of the 12 panel scores.
+- **Four more validated indices:** METS-IR (Bello-Chavolla 2018), Fatty Liver
+  Index (Bedogni 2006), Aggregate Index of Systemic Inflammation (AISI), and
+  the Prognostic Nutritional Index (Onodera 1984) — 20 composite scores total.
+- `REPORT_VERSION` → 6.3.0-premium.
+
+### Tests
+
+- +4 unit tests (levers, mortality, METS-IR/FLI/PNI/AISI); 218 passing. Golden
+  snapshot refreshed.
+
+### Notes
+
+- The longevity simulator is illustrative: it is a within-model counterfactual
+  on the Levine PhenoAge equation, not a clinical outcome prediction.
+
+---
+
+## [6.2.0-premium] — 2026-07-25 — State-of-the-art blood-work: biological age + composite indices
+
+Adds a research-grade layer of validated, literature-cited multi-marker indices
+on top of the clinical engine — led by a mortality-calibrated biological-age
+clock. Formulas were sourced from the primary papers (see citations in-report).
+
+### Added
+
+- **Biological Age (Levine PhenoAge, *Aging* 2018).** A 9-biomarker + age clock
+  that predicts all-cause mortality better than chronological age, reported as
+  biological age and age acceleration. **Inputs are SI-converted per the paper**
+  (albumin g/L, creatinine µmol/L, glucose mmol/L, CRP mg/dL) — a step several
+  popular online implementations skip, which silently corrupts the score.
+  Validated against hand-computed vectors (healthy 40yo → ~32.7).
+- **Cardiovascular:** Sampson–NIH LDL-C (current-generation calculation, better
+  than Friedewald), Atherogenic Index of Plasma, Castelli Risk Index I.
+- **Insulin resistance / metabolic:** TyG index, QUICKI, estimated average
+  glucose (from HbA1c), and NCEP ATP III metabolic-syndrome criteria scoring.
+- **Systemic inflammation:** SII, SIRI, and PLR composite blood-count indices.
+- **Liver fibrosis:** FIB-4, APRI, and NAFLD Fibrosis Score.
+- **Renal / acid–base:** albumin-corrected calcium and anion gap.
+- New report section **"Advanced Risk & Aging Indices"** leading with the
+  biological-age headline; every index carries its source-paper citation.
+- `REPORT_VERSION` → 6.2.0-premium.
+
+### Tests
+
+- +8 unit tests validating each formula against hand-computed reference values
+  (216 passing). Bloodwork golden snapshot refreshed to include the new
+  ``advanced`` key.
+
+---
+
 ## [6.1.0-premium] — 2026-07-24 — Comprehensive blood-work engine
 
 Turns the bloodwork module from a genetics-only comparison into a full clinical

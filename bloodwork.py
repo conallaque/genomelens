@@ -892,6 +892,385 @@ def _genotype_note(bm_id: str, status: str, snps_df) -> str:
 
 # ── master clinical analyzer ──────────────────────────────────────────────────
 
+# ══════════════════════════════════════════════════════════════════════════
+# ADVANCED COMPOSITE INDICES & BIOLOGICAL AGE (V6.2)
+# ══════════════════════════════════════════════════════════════════════════
+#
+# Validated, published multi-marker indices — a biological-age clock plus
+# cardiovascular, insulin-resistance, inflammation and liver-fibrosis scores.
+# Each carries its literature citation. Formulas and thresholds sourced from the
+# primary papers (see citations); reference ranges are approximate.
+
+ADV_GROUP_ORDER = [
+    "Biological Age", "Cardiovascular Risk", "Insulin Resistance & Metabolic",
+    "Systemic Inflammation", "Liver Fibrosis", "Renal & Acid–Base",
+]
+
+
+def _phenoage_core(albumin_gdl, creatinine_mgdl, glucose_mgdl, crp_mgL,
+                   lymph_pct, mcv, rdw, alp, wbc, age) -> Tuple[float, float]:
+    """Levine 2018 PhenoAge. Returns (biological_age, 10-year_mortality_risk).
+    Inputs are US clinical units and are converted to the formula's SI units
+    (albumin g/L, creatinine µmol/L, glucose mmol/L, CRP mg/dL) before applying
+    the published coefficients — skipping this conversion (as several online
+    implementations do) makes the score meaningless.
+    Ref: Levine et al., Aging 2018, doi:10.18632/aging.101414."""
+    alb = albumin_gdl * 10.0                 # g/dL → g/L
+    creat = creatinine_mgdl * 88.4017        # mg/dL → µmol/L
+    glu = glucose_mgdl / 18.0182             # mg/dL → mmol/L
+    crp = max(crp_mgL / 10.0, 1e-3)          # mg/L → mg/dL (floored for ln)
+    ln_crp = _math.log(crp)
+    xb = (-19.907
+          - 0.0336 * alb + 0.0095 * creat + 0.1953 * glu + 0.0954 * ln_crp
+          - 0.0120 * lymph_pct + 0.0268 * mcv + 0.3306 * rdw
+          + 0.00188 * alp + 0.0554 * wbc + 0.0804 * age)
+    g = 0.0076927
+    m = 1.0 - _math.exp(-_math.exp(xb) * (_math.exp(120 * g) - 1.0) / g)
+    m = min(max(m, 1e-9), 1.0 - 1e-9)
+    pheno = 141.50225 + _math.log(-0.00553 * _math.log(1.0 - m)) / 0.090165
+    return pheno, m
+
+
+def _phenoage(albumin_gdl, creatinine_mgdl, glucose_mgdl, crp_mgL,
+              lymph_pct, mcv, rdw, alp, wbc, age) -> float:
+    return _phenoage_core(albumin_gdl, creatinine_mgdl, glucose_mgdl, crp_mgL,
+                          lymph_pct, mcv, rdw, alp, wbc, age)[0]
+
+
+# Ideal biomarker targets (US clinical units) for the PhenoAge longevity
+# simulator — mid-optimal values that push each term toward "younger".
+_PHENOAGE_IDEAL = {
+    "albumin": 4.7, "creatinine": 0.85, "glucose": 85.0, "crp": 0.5,
+    "lymph_pct": 35.0, "mcv": 85.0, "rdw": 12.2, "alp": 48.0, "wbc": 4.8,
+}
+_PHENOAGE_LABELS = {
+    "albumin": "Albumin", "creatinine": "Creatinine", "glucose": "Fasting glucose",
+    "crp": "hs-CRP", "lymph_pct": "Lymphocyte %", "mcv": "MCV", "rdw": "RDW",
+    "alp": "Alkaline phosphatase", "wbc": "White blood cells",
+}
+
+
+def phenoage_levers(alb, creat, glu, crp, lymph_pct, mcv, rdw, alp, wbc, age) -> Dict:
+    """Counterfactual attribution: how many biological-age years each modifiable
+    marker is costing, and how many are recoverable if all were optimal."""
+    cur = {"albumin": alb, "creatinine": creat, "glucose": glu, "crp": crp,
+           "lymph_pct": lymph_pct, "mcv": mcv, "rdw": rdw, "alp": alp, "wbc": wbc}
+
+    def pa(d):
+        return _phenoage(d["albumin"], d["creatinine"], d["glucose"], d["crp"],
+                         d["lymph_pct"], d["mcv"], d["rdw"], d["alp"], d["wbc"], age)
+
+    base = pa(cur)
+    levers = []
+    for k, ideal in _PHENOAGE_IDEAL.items():
+        mod = dict(cur)
+        mod[k] = ideal
+        delta = base - pa(mod)          # years recovered by optimizing this marker
+        if delta > 0.15:
+            levers.append({
+                "marker": _PHENOAGE_LABELS[k], "current": round(cur[k], 2),
+                "ideal": ideal, "years_cost": round(delta, 1),
+            })
+    levers.sort(key=lambda x: -x["years_cost"])
+    all_ideal = dict(cur)
+    all_ideal.update(_PHENOAGE_IDEAL)
+    best = pa(all_ideal)
+    recoverable = round(max(0.0, base - best), 1)
+    return {"levers": levers, "recoverable_years": recoverable,
+            "best_possible": round(best, 1)}
+
+
+def compute_advanced_indices(labs: Dict[str, float], derived: Dict[str, float],
+                             meta: Dict) -> Dict:
+    src: Dict[str, float] = {**labs, **derived}
+
+    def g(*keys):
+        for k in keys:
+            v = src.get(k)
+            if v is not None:
+                try:
+                    return float(v)
+                except (TypeError, ValueError):
+                    continue
+        return None
+
+    sex = (meta.get("sex") or "").upper()[:1] or None
+    age = meta.get("age") or g("age")
+    indices: List[Dict] = []
+    bio = None
+
+    def add(id, name, value, unit, group, status, label, interp, cite):
+        indices.append({
+            "id": id, "name": name, "value": value, "unit": unit, "group": group,
+            "status": status, "status_label": label, "interp": interp,
+            "citation": cite,
+        })
+
+    glu = g("fasting_glucose", "glucose")
+    tg = g("triglycerides", "tg")
+    hdl = g("hdl", "hdl_c")
+    tc = g("total_cholesterol", "cholesterol")
+    ldl = g("ldl", "ldl_c")
+    ins = g("fasting_insulin", "insulin")
+    alb = g("albumin")
+    neut = g("neutrophils")
+    lym = g("lymphocytes")
+    plt = g("platelets")
+    mono = g("monocytes")
+    ast = g("ast")
+    alt = g("alt")
+    a1c = g("hba1c", "a1c")
+    bmi = g("bmi")
+
+    # ── Biological Age (PhenoAge) ───────────────────────────────────────────
+    crp = g("crp", "hs_crp")
+    mcv = g("mcv")
+    rdw = g("rdw")
+    alp = g("alp", "alkaline_phosphatase")
+    wbc = g("wbc")
+    lymph_pct = g("lymphocyte_percent", "lymph_pct", "lymphocytes_percent")
+    if lymph_pct is None and lym is not None and wbc:
+        lymph_pct = 100.0 * lym / wbc
+    creat_v = g("creatinine")
+    pa_inputs = [alb, creat_v, glu, crp, lymph_pct, mcv, rdw, alp, wbc, age]
+    if all(x is not None for x in pa_inputs):
+        pa, mort = _phenoage_core(alb, creat_v, glu, crp, lymph_pct, mcv, rdw, alp, wbc, age)
+        accel = pa - age
+        levers = phenoage_levers(alb, creat_v, glu, crp, lymph_pct, mcv, rdw, alp, wbc, age)
+        status = "cl-optimal" if accel <= -1 else ("cl-high" if accel >= 3 else "cl-borderline")
+        interp = (
+            f"Your blood-derived biological age is <strong>{pa:.1f}</strong> vs a "
+            f"chronological age of {age:.0f} — "
+            + ("<strong>younger</strong> than your years (favourable)."
+               if accel < 0 else
+               "<strong>older</strong> than your years.")
+            + " PhenoAge predicts all-cause mortality better than chronological age."
+        )
+        bio = {"phenoage": round(pa, 1), "chronological": round(age, 0),
+               "accel": round(accel, 1), "status": status, "interp": interp,
+               "mortality_10yr_pct": round(mort * 100, 1),
+               "levers": levers["levers"], "recoverable_years": levers["recoverable_years"],
+               "best_possible": levers["best_possible"]}
+        add("phenoage", "Biological Age (PhenoAge)", round(pa, 1), "yrs",
+            "Biological Age", status, f"{accel:+.1f} yr vs chronological", interp,
+            "Levine et al., <em>Aging</em> 2018 (10.18632/aging.101414)")
+
+    # ── Cardiovascular risk ratios ──────────────────────────────────────────
+    if tc and hdl and tg and tg <= 800:
+        nonhdl = tc - hdl
+        ldl_s = (tc / 0.948 - hdl / 0.971
+                 - (tg / 8.56 + tg * nonhdl / 2140.0 - tg * tg / 16100.0) - 9.44)
+        st = "cl-optimal" if ldl_s < 100 else ("cl-high" if ldl_s >= 160 else "cl-borderline")
+        add("ldl_sampson", "LDL-C (Sampson–NIH, calculated)", round(ldl_s, 0), "mg/dL",
+            "Cardiovascular Risk", st,
+            {"cl-optimal": "Optimal", "cl-borderline": "Borderline", "cl-high": "High"}[st],
+            "The current-generation LDL calculation (more accurate than Friedewald, "
+            "especially at high triglycerides / low LDL).",
+            "Sampson et al., <em>JAMA Cardiol</em> 2020")
+    if tg and hdl:
+        aip = _math.log10(tg / hdl)
+        st = "cl-optimal" if aip < 0.11 else ("cl-high" if aip > 0.21 else "cl-borderline")
+        add("aip", "Atherogenic Index of Plasma (AIP)", round(aip, 2), "",
+            "Cardiovascular Risk", st,
+            {"cl-optimal": "Low risk", "cl-borderline": "Medium risk", "cl-high": "High risk"}[st],
+            "log10(TG/HDL) — tracks small-dense LDL and cardiovascular risk. "
+            "<0.11 low, 0.11–0.21 medium, >0.21 high.",
+            "Dobiášová & Frohlich, <em>Clin Biochem</em> 2001")
+    if tc and hdl:
+        c1 = tc / hdl
+        st = "cl-optimal" if c1 < 3.5 else ("cl-high" if c1 > 5 else "cl-borderline")
+        add("castelli1", "Castelli Risk Index I (TC/HDL)", round(c1, 2), "",
+            "Cardiovascular Risk", st,
+            {"cl-optimal": "Optimal", "cl-borderline": "Moderate", "cl-high": "High"}[st],
+            "Total:HDL cholesterol ratio; <3.5 optimal.",
+            "Castelli et al., <em>Circulation</em> 1983")
+
+    # ── Insulin resistance & metabolic ──────────────────────────────────────
+    if tg and glu:
+        tyg = _math.log(tg * glu / 2.0)
+        st = "cl-optimal" if tyg < 8.5 else ("cl-high" if tyg >= 8.75 else "cl-borderline")
+        add("tyg", "TyG Index (insulin resistance)", round(tyg, 2), "",
+            "Insulin Resistance & Metabolic", st,
+            {"cl-optimal": "Low IR", "cl-borderline": "Borderline", "cl-high": "Insulin-resistant"}[st],
+            "ln(TG×glucose/2). A simple, well-validated insulin-resistance surrogate "
+            "that rivals HOMA-IR; ≥8.75 flags metabolic-syndrome risk.",
+            "Simental-Méndez 2008; Guerrero-Romero 2010")
+    if ins and glu and ins > 0 and glu > 0:
+        quicki = 1.0 / (_math.log10(ins) + _math.log10(glu))
+        st = "cl-optimal" if quicki >= 0.36 else ("cl-high" if quicki < 0.33 else "cl-borderline")
+        add("quicki", "QUICKI (insulin sensitivity)", round(quicki, 3), "",
+            "Insulin Resistance & Metabolic", st,
+            {"cl-optimal": "Sensitive", "cl-borderline": "Reduced", "cl-high": "Resistant"}[st],
+            "Quantitative insulin-sensitivity check index; higher = more sensitive "
+            "(≥0.36 healthy, <0.33 insulin-resistant).",
+            "Katz et al., <em>JCEM</em> 2000")
+    if glu and tg and hdl and bmi and hdl > 0:
+        mets_ir = _math.log(2 * glu + tg) * bmi / _math.log(hdl)
+        st = "cl-optimal" if mets_ir < 40 else ("cl-high" if mets_ir >= 50 else "cl-borderline")
+        add("mets_ir", "METS-IR (metabolic score for IR)", round(mets_ir, 1), "",
+            "Insulin Resistance & Metabolic", st,
+            {"cl-optimal": "Sensitive", "cl-borderline": "Intermediate", "cl-high": "Resistant"}[st],
+            "A validated insulin-resistance score combining glucose, triglycerides, "
+            "HDL and BMI; predicts incident diabetes and cardiovascular mortality.",
+            "Bello-Chavolla et al., <em>Eur J Endocrinol</em> 2018")
+    if a1c:
+        eag = 28.7 * a1c - 46.7
+        note = ""
+        if glu:
+            note = (f" Your measured fasting glucose is {glu:.0f}; a fasting value well "
+                    f"below the {eag:.0f} average suggests post-meal spikes carry your average up."
+                    if glu < eag - 15 else "")
+        add("eag", "Estimated Average Glucose (from HbA1c)", round(eag, 0), "mg/dL",
+            "Insulin Resistance & Metabolic", "cl-normal", "3-month average",
+            "The average glucose your HbA1c corresponds to." + note,
+            "Nathan et al. (ADAG), <em>Diabetes Care</em> 2008")
+    # Metabolic syndrome (NCEP ATP III): ≥3 of 5
+    ms_crit = []
+    if tg is not None:
+        ms_crit.append(("Triglycerides ≥150", tg >= 150))
+    if hdl is not None:
+        thr = 50 if sex == "F" else 40
+        ms_crit.append((f"HDL <{thr}", hdl < thr))
+    sbp, dbp = g("systolic_bp", "sbp"), g("diastolic_bp", "dbp")
+    if sbp is not None or dbp is not None:
+        ms_crit.append(("BP ≥130/85", (sbp or 0) >= 130 or (dbp or 0) >= 85))
+    if glu is not None:
+        ms_crit.append(("Glucose ≥100", glu >= 100))
+    waist = g("waist", "waist_circumference")
+    if waist is not None:
+        thr = 88 if sex == "F" else 102  # cm
+        ms_crit.append((f"Waist ≥{thr}cm", waist >= thr))
+    elif bmi is not None:
+        ms_crit.append(("BMI ≥30 (waist proxy)", bmi >= 30))
+    if len(ms_crit) >= 3:
+        n_met = sum(1 for _, m in ms_crit if m)
+        has_ms = n_met >= 3
+        st = "cl-high" if has_ms else ("cl-borderline" if n_met == 2 else "cl-optimal")
+        crit_txt = "; ".join(f"{'✓' if m else '✗'} {c}" for c, m in ms_crit)
+        add("metsyn", "Metabolic Syndrome (ATP III)", f"{n_met}/{len(ms_crit)}", "criteria",
+            "Insulin Resistance & Metabolic", st,
+            ("Present" if has_ms else ("Borderline" if n_met == 2 else "Absent")),
+            f"Meets {n_met} of {len(ms_crit)} evaluable criteria ({'≥3 = metabolic syndrome' if has_ms else 'need 3'}). {crit_txt}.",
+            "NCEP ATP III / Grundy et al., <em>Circulation</em> 2005")
+
+    # ── Systemic inflammation indices ───────────────────────────────────────
+    if neut and lym and plt and lym > 0:
+        sii = plt * neut / lym
+        st = "cl-optimal" if sii < 330 else ("cl-high" if sii > 500 else "cl-borderline")
+        add("sii", "Systemic Immune-Inflammation Index (SII)", round(sii, 0), "",
+            "Systemic Inflammation", st,
+            {"cl-optimal": "Low", "cl-borderline": "Moderate", "cl-high": "Elevated"}[st],
+            "Platelets×Neutrophils/Lymphocytes — a composite inflammation/immune-"
+            "activation index linked to cardiovascular and cancer outcomes.",
+            "Hu et al., <em>Clin Cancer Res</em> 2014")
+    if neut and mono and lym and lym > 0:
+        siri = neut * mono / lym
+        st = "cl-optimal" if siri < 1.0 else ("cl-high" if siri > 1.5 else "cl-borderline")
+        add("siri", "Systemic Inflammation Response Index (SIRI)", round(siri, 2), "",
+            "Systemic Inflammation", st,
+            {"cl-optimal": "Low", "cl-borderline": "Moderate", "cl-high": "Elevated"}[st],
+            "Neutrophils×Monocytes/Lymphocytes — monocyte-weighted; tracks the "
+            "chronic low-grade inflammation behind atherosclerosis and aging.",
+            "Qi et al., <em>Cancer</em> 2016")
+    if plt and lym and lym > 0:
+        plr = plt / lym
+        st = "cl-optimal" if plr < 150 else ("cl-high" if plr > 200 else "cl-borderline")
+        add("plr", "Platelet:Lymphocyte Ratio (PLR)", round(plr, 0), "",
+            "Systemic Inflammation", st,
+            {"cl-optimal": "Low", "cl-borderline": "Moderate", "cl-high": "Elevated"}[st],
+            "A thrombo-inflammatory ratio complementary to the NLR.",
+            "Templeton et al., <em>JNCI</em> 2014")
+    if neut and mono and plt and lym and lym > 0:
+        aisi = neut * mono * plt / lym
+        st = "cl-optimal" if aisi < 250 else ("cl-high" if aisi > 500 else "cl-borderline")
+        add("aisi", "Aggregate Index of Systemic Inflammation (AISI)", round(aisi, 0), "",
+            "Systemic Inflammation", st,
+            {"cl-optimal": "Low", "cl-borderline": "Moderate", "cl-high": "Elevated"}[st],
+            "Neutrophils×Monocytes×Platelets/Lymphocytes — a four-cell aggregate "
+            "inflammation index tied to all-cause and cardiovascular mortality.",
+            "Putzu et al., 2018; NHANES analyses")
+    if alb and lym:
+        pni = 10 * alb + 0.005 * (lym * 1000.0)   # lymphocytes K/µL → /µL
+        st = "cl-optimal" if pni >= 50 else ("cl-high" if pni < 45 else "cl-borderline")
+        add("pni", "Prognostic Nutritional Index (PNI)", round(pni, 1), "",
+            "Systemic Inflammation", st,
+            {"cl-optimal": "Robust", "cl-borderline": "Borderline", "cl-high": "Low reserve"}[st],
+            "10×albumin + 0.005×lymphocytes — a nutrition/immune-reserve index; "
+            "higher reflects better protein status and resilience.",
+            "Onodera et al., 1984")
+
+    # ── Liver fibrosis panel ────────────────────────────────────────────────
+    if age and ast and alt and plt and alt > 0:
+        fib4 = age * ast / (plt * _math.sqrt(alt))
+        st = "cl-optimal" if fib4 < 1.3 else ("cl-high" if fib4 > 2.67 else "cl-borderline")
+        add("fib4_adv", "FIB-4 (liver fibrosis)", round(fib4, 2), "",
+            "Liver Fibrosis", st,
+            {"cl-optimal": "Low risk", "cl-borderline": "Indeterminate", "cl-high": "Advanced-fibrosis risk"}[st],
+            "Age×AST/(Platelets×√ALT). <1.3 low, 1.3–2.67 indeterminate, >2.67 → "
+            "refer for advanced-fibrosis evaluation.",
+            "Sterling et al., <em>Hepatology</em> 2006")
+    if ast and plt:
+        apri = (ast / 40.0) * 100.0 / plt
+        st = "cl-optimal" if apri < 0.5 else ("cl-high" if apri > 1.5 else "cl-borderline")
+        add("apri", "APRI (AST-platelet ratio)", round(apri, 2), "",
+            "Liver Fibrosis", st,
+            {"cl-optimal": "Low", "cl-borderline": "Indeterminate", "cl-high": "Significant fibrosis"}[st],
+            "(AST/ULN×100)/platelets — a second non-invasive fibrosis marker.",
+            "Wai et al., <em>Hepatology</em> 2003")
+    if age and ast and alt and plt and bmi and alb and alt > 0:
+        diab = 1 if (a1c and a1c >= 6.5) or (glu and glu >= 100) else 0
+        nfs = (-1.675 + 0.037 * age + 0.094 * bmi + 1.13 * diab
+               + 0.99 * (ast / alt) - 0.013 * plt - 0.66 * alb)
+        st = "cl-optimal" if nfs < -1.455 else ("cl-high" if nfs > 0.676 else "cl-borderline")
+        add("nfs", "NAFLD Fibrosis Score", round(nfs, 2), "",
+            "Liver Fibrosis", st,
+            {"cl-optimal": "F0–F2 (low)", "cl-borderline": "Indeterminate", "cl-high": "F3–F4 (advanced)"}[st],
+            "A fatty-liver-specific fibrosis score (needs BMI). <−1.455 low, >0.676 advanced.",
+            "Angulo et al., <em>Hepatology</em> 2007")
+    ggt = g("ggt")
+    waist = g("waist", "waist_circumference")
+    if tg and bmi and ggt and waist and tg > 0 and ggt > 0:
+        lp = (0.953 * _math.log(tg) + 0.139 * bmi + 0.718 * _math.log(ggt)
+              + 0.053 * waist - 15.745)
+        fli = _math.exp(lp) / (1 + _math.exp(lp)) * 100.0
+        st = "cl-optimal" if fli < 30 else ("cl-high" if fli >= 60 else "cl-borderline")
+        add("fli", "Fatty Liver Index (steatosis)", round(fli, 0), "/100",
+            "Liver Fibrosis", st,
+            {"cl-optimal": "Steatosis ruled out", "cl-borderline": "Indeterminate", "cl-high": "Steatosis likely"}[st],
+            "A validated non-invasive predictor of hepatic steatosis (fatty liver) "
+            "from TG, BMI, GGT and waist. <30 rules out, ≥60 rules in.",
+            "Bedogni et al., <em>BMC Gastroenterol</em> 2006")
+
+    # ── Renal & acid–base derived labs ──────────────────────────────────────
+    ca = g("calcium")
+    if ca and alb:
+        cca = ca + 0.8 * (4.0 - alb)
+        st = "cl-optimal" if 8.6 <= cca <= 10.3 else "cl-high"
+        add("corr_ca", "Corrected Calcium", round(cca, 1), "mg/dL",
+            "Renal & Acid–Base", st, "Albumin-adjusted",
+            "Calcium corrected for albumin (the physiologically meaningful value "
+            "when albumin is abnormal).",
+            "Payne et al., <em>BMJ</em> 1973")
+    na, cl, co2 = g("sodium"), g("chloride"), g("co2", "bicarbonate", "hco3")
+    if na and cl and co2:
+        ag = na - (cl + co2)
+        st = "cl-optimal" if 8 <= ag <= 12 else "cl-high"
+        add("anion_gap", "Anion Gap", round(ag, 0), "mmol/L",
+            "Renal & Acid–Base", st, "Acid–base",
+            "Na − (Cl + CO₂); a high gap flags a metabolic acidosis worth explaining.",
+            "Standard clinical chemistry")
+
+    groups = [gname for gname in ADV_GROUP_ORDER
+              if any(i["group"] == gname for i in indices)]
+    return {
+        "available": bool(indices),
+        "n_indices": len(indices),
+        "biological_age": bio,
+        "indices": indices,
+        "groups": groups,
+    }
+
+
 def analyze_clinical_bloodwork(labs: Dict[str, float], snps_df=None,
                                meta: Optional[Dict] = None) -> Dict:
     """Classify every supplied biomarker against clinical + optimal ranges,
@@ -961,6 +1340,8 @@ def analyze_clinical_bloodwork(labs: Dict[str, float], snps_df=None,
                    key=lambda r: (-r["severity"], r["name"]))
     optimal_ct = sum(1 for r in rows if r["status"] == "optimal")
 
+    advanced = compute_advanced_indices(labs, derived, meta)
+
     return {
         "available": bool(rows),
         "n_markers": len(rows),
@@ -970,6 +1351,7 @@ def analyze_clinical_bloodwork(labs: Dict[str, float], snps_df=None,
         "overall_score": overall,
         "systems": systems,
         "flags": flags,
+        "advanced": advanced,
         "unrecognized": unrecognized,
         "sex_used": sex,
         "age_used": meta.get("age"),
@@ -1106,12 +1488,186 @@ def _range_bar(r: Dict) -> str:
             f"<div class='cl-dot' style='left:{pct(v):.1f}%;background:{dot_bg}'></div></div>")
 
 
+_ADV_BORDER = {"cl-optimal": "#3fb950", "cl-normal": "#8a94a3",
+               "cl-borderline": "#d29922", "cl-high": "#f85149"}
+
+
+def _svg_age_gauge(chrono: float, bio: float) -> str:
+    """Horizontal gradient gauge: green (younger) → red (older), with a
+    chronological tick and a biological-age marker."""
+    lo, hi = chrono - 18, chrono + 18
+    span = hi - lo
+
+    def px(v):
+        return 15 + 370 * max(0.0, min(1.0, (v - lo) / span))
+
+    accel = bio - chrono
+    bcol = "#1a7f37" if accel <= -1 else ("#b3261e" if accel >= 3 else "#8a6100")
+    xc, xb = px(chrono), px(bio)
+    return f"""
+<svg viewBox="0 0 400 62" width="100%" style="max-width:520px;margin:8px 0" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="agegrad" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#1a7f37"/><stop offset="0.5" stop-color="#d29922"/>
+    <stop offset="1" stop-color="#b3261e"/></linearGradient></defs>
+  <text x="15" y="12" font-size="9" fill="#8a94a3">younger</text>
+  <text x="385" y="12" font-size="9" fill="#8a94a3" text-anchor="end">older</text>
+  <rect x="15" y="20" width="370" height="12" rx="6" fill="url(#agegrad)" opacity="0.85"/>
+  <line x1="{xc:.0f}" y1="16" x2="{xc:.0f}" y2="36" stroke="#41505f" stroke-width="2" stroke-dasharray="3,2"/>
+  <text x="{xc:.0f}" y="50" font-size="9" fill="#41505f" text-anchor="middle">chrono {chrono:.0f}</text>
+  <circle cx="{xb:.0f}" cy="26" r="9" fill="{bcol}" stroke="#fff" stroke-width="2"/>
+  <text x="{xb:.0f}" y="61" font-size="10" font-weight="700" fill="{bcol}" text-anchor="middle">bio {bio:.1f}</text>
+</svg>"""
+
+
+def _svg_radar(systems: List[Dict]) -> str:
+    """Radar/spider chart of body-system health scores (0–100)."""
+    pts = [(s["system"], s["score"]) for s in systems if s.get("score") is not None]
+    n = len(pts)
+    if n < 3:
+        return ""
+    cx = cy = 130
+    R = 96
+    poly = []
+    axes = ""
+    labels = ""
+    for i, (name, score) in enumerate(pts):
+        ang = -_math.pi / 2 + 2 * _math.pi * i / n
+        r = R * max(0.0, min(100.0, score)) / 100.0
+        px_, py_ = cx + r * _math.cos(ang), cy + r * _math.sin(ang)
+        poly.append(f"{px_:.1f},{py_:.1f}")
+        ex, ey = cx + R * _math.cos(ang), cy + R * _math.sin(ang)
+        axes += f'<line x1="{cx}" y1="{cy}" x2="{ex:.1f}" y2="{ey:.1f}" stroke="#e3e7ec" stroke-width="1"/>'
+        lx, ly = cx + (R + 14) * _math.cos(ang), cy + (R + 14) * _math.sin(ang)
+        anchor = "middle" if abs(_math.cos(ang)) < 0.3 else ("start" if _math.cos(ang) > 0 else "end")
+        short = name.split(" ")[0].split("&")[0][:9]
+        labels += (f'<text x="{lx:.1f}" y="{ly:.1f}" font-size="8.5" fill="#5b6673" '
+                   f'text-anchor="{anchor}" dominant-baseline="middle">{_esc(short)}</text>')
+    rings = "".join(
+        f'<circle cx="{cx}" cy="{cy}" r="{R*f:.0f}" fill="none" stroke="#eef1f4" stroke-width="1"/>'
+        for f in (0.33, 0.66, 1.0))
+    avg = sum(s for _, s in pts) / n
+    col = "#1a7f37" if avg >= 80 else ("#b3261e" if avg < 65 else "#8a6100")
+    return f"""
+<svg viewBox="0 0 260 260" width="230" xmlns="http://www.w3.org/2000/svg">
+  {rings}{axes}
+  <polygon points="{' '.join(poly)}" fill="{col}" fill-opacity="0.18" stroke="{col}" stroke-width="2"/>
+  {labels}
+</svg>"""
+
+
+def _render_advanced_section(advanced: Optional[Dict]) -> str:
+    """Biological age + validated composite indices, each with its citation."""
+    if not advanced or not advanced.get("available"):
+        return ""
+
+    hero = ""
+    bio = advanced.get("biological_age")
+    if bio:
+        col = {"cl-optimal": "#1a7f37", "cl-borderline": "#8a6100",
+               "cl-high": "#b3261e"}.get(bio["status"], "#41505f")
+        accel = bio["accel"]
+        arrow = "▼" if accel < 0 else ("▲" if accel > 0 else "•")
+        gauge = _svg_age_gauge(bio["chronological"], bio["phenoage"])
+        mort = bio.get("mortality_10yr_pct")
+        mort_html = ""
+        if mort is not None:
+            mort_html = (
+                f'<div style="text-align:center;min-width:120px;padding:6px 10px">'
+                f'<div style="font-size:1.9em;font-weight:800;color:{col}">{mort:.1f}%</div>'
+                f'<div style="font-size:.74em;color:#8a94a3">estimated 10-year<br>mortality risk</div></div>')
+
+        # Longevity levers simulator
+        levers = bio.get("levers") or []
+        levers_html = ""
+        if levers:
+            maxc = max(l["years_cost"] for l in levers) or 1
+            rows = ""
+            for l in levers[:6]:
+                w = 100 * l["years_cost"] / maxc
+                rows += (
+                    f'<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:.86em">'
+                    f'<div style="width:150px;color:#33404d">{_esc(l["marker"])} '
+                    f'<span style="color:#9aa4b0">{l["current"]}→{l["ideal"]}</span></div>'
+                    f'<div style="flex:1;background:#eef1f4;border-radius:4px;height:12px;overflow:hidden">'
+                    f'<div style="width:{w:.0f}%;height:100%;background:#b3261e;opacity:.75"></div></div>'
+                    f'<div style="width:52px;text-align:right;font-weight:700;color:#b3261e">−{l["years_cost"]:.1f} yr</div>'
+                    f'</div>')
+            rec = bio.get("recoverable_years", 0)
+            levers_html = (
+                f'<div style="margin-top:12px;border-top:1px solid #e3e8ee;padding-top:10px">'
+                f'<div style="font-weight:700;color:#12467a">🧪 Longevity levers — up to '
+                f'<span style="color:#b3261e">{rec:.1f} biological years</span> recoverable</div>'
+                f'<div style="color:#8a94a3;font-size:.8em;margin-bottom:6px">Counterfactual: '
+                f'the biological-age cost of each marker vs its optimal value (holding others fixed).</div>'
+                f'{rows}</div>')
+
+        hero = f"""
+        <div class="cl-hero" style="border:1.5px solid {col};display:block">
+          <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+            <div class="cl-score-ring" style="background:{col}">{bio['phenoage']:.0f}</div>
+            <div style="flex:1;min-width:240px">
+              <h2 style="border:none;margin:0">Biological Age — {bio['phenoage']:.1f} years</h2>
+              <div style="font-size:1.05em;color:{col};font-weight:700;margin:2px 0">
+                {arrow} {accel:+.1f} years vs your chronological age of {bio['chronological']:.0f}</div>
+              <div style="color:#556;line-height:1.5">{bio['interp']}</div>
+            </div>
+            {mort_html}
+          </div>
+          {gauge}
+          {levers_html}
+          <div style="color:#8a94a3;font-size:.78em;margin-top:6px">Levine PhenoAge —
+            a 9-biomarker mortality-calibrated clock (units SI-converted per the paper).</div>
+        </div>"""
+
+    groups_html = ""
+    for gname in advanced.get("groups", []):
+        if gname == "Biological Age":
+            continue
+        members = [i for i in advanced["indices"] if i["group"] == gname]
+        if not members:
+            continue
+        cards = ""
+        for i in members:
+            border = _ADV_BORDER.get(i["status"], "#8a94a3")
+            cards += f"""
+            <div style="border:1px solid #e3e7ec;border-left:4px solid {border};
+                border-radius:8px;padding:11px 13px;background:#fff;break-inside:avoid">
+              <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap">
+                <span style="font-weight:700">{_esc(i['name'])}</span>
+                <span class="cl-badge {i['status']}">{_esc(i['status_label'])}</span>
+              </div>
+              <div style="font-size:1.5em;font-weight:800;margin:3px 0;color:#1a1f26">
+                {_esc(i['value'])} <span style="font-size:.5em;color:#8a94a3;font-weight:600">{_esc(i['unit'])}</span></div>
+              <div style="font-size:.88em;color:#4a5560;line-height:1.45">{i['interp']}</div>
+              <div style="font-size:.75em;color:#9aa4b0;margin-top:5px">📖 {i['citation']}</div>
+            </div>"""
+        groups_html += (
+            f'<h3 style="margin:16px 0 6px">{_esc(gname)}</h3>'
+            f'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">{cards}</div>')
+
+    return f"""
+    <section style="margin:8px 0 6px">
+      <h2 style="font-size:1.35em;border-bottom:2px solid #e3e8ee;padding-bottom:4px;color:#12467a">
+        Advanced Risk &amp; Aging Indices <span style="font-size:.6em;color:#8a94a3;font-weight:400">
+        · {advanced['n_indices']} validated composite scores</span></h2>
+      <p style="color:#667;margin:6px 0 10px">Multi-marker indices from the published literature —
+      a mortality-calibrated biological-age clock plus cardiovascular, insulin-resistance,
+      inflammation and liver-fibrosis scores. Each is cited to its source paper.</p>
+      {hero}
+      {groups_html}
+    </section>"""
+
+
 def _render_clinical_section(clinical: Dict) -> str:
     if not clinical or not clinical.get("available"):
         return ""
     overall = clinical.get("overall_score")
     ring = (f"<div class='cl-score-ring' style='background:{_score_color(overall)}'>"
             f"{overall if overall is not None else '—'}</div>")
+    radar = _svg_radar(clinical.get("systems", []))
+    radar_html = (f'<div style="text-align:center"><div style="font-size:.75em;color:#8a94a3;'
+                  f'text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px">System scores</div>'
+                  f'{radar}</div>') if radar else ""
     hero = f"""
     <div class="cl-hero">
       {ring}
@@ -1127,6 +1683,7 @@ def _render_clinical_section(clinical: Dict) -> str:
           <span class="cl-chip" style="color:#b3261e"><strong>{clinical['n_flagged']}</strong> flagged</span>
         </div>
       </div>
+      {radar_html}
     </div>
     """
 
@@ -1190,7 +1747,9 @@ def _render_clinical_section(clinical: Dict) -> str:
 def render_bloodwork_html(result: Dict, file_label: str = "") -> str:
     """Render the bloodwork analysis as a standalone HTML document: the
     comprehensive clinical panel first, then the genetic-prediction comparison."""
-    clinical_html = _render_clinical_section(result.get("clinical"))
+    clinical_dict = result.get("clinical") or {}
+    advanced_html = _render_advanced_section(clinical_dict.get("advanced"))
+    clinical_html = advanced_html + _render_clinical_section(result.get("clinical"))
 
     gene_header = (
         "<h1 style='margin-top:34px'>Genetic-Prediction Comparison</h1>"
