@@ -175,7 +175,7 @@ SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.7.0-premium"
+REPORT_VERSION = "6.7.1-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",
@@ -535,22 +535,58 @@ def tier1_lookup(
     return results, apoe_genotype
 
 
-def call_ollama(prompt: str, model: str, timeout: int = 600) -> str:
-    """Send a prompt to local Ollama and return the response text."""
+def call_ollama(prompt: str, model: str, timeout: int = 1800,
+                stream: bool = True) -> str:
+    """Send a prompt to local Ollama and return the response text.
+
+    Streaming (default) is critical for long-generating models like ``qwen3:14b``
+    with reasoning enabled: without it, a single Ollama request that legitimately
+    takes 15+ minutes to finish will trip the request-level socket timeout and
+    the whole tier-2 run dies. Streaming resets the read-idle clock every time
+    a token arrives, so a call only fails if the model actually stalls."""
     import requests
 
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
-        "stream": False,
-        "options": {"temperature": 0.3, "num_ctx": 8192},
+        "stream": stream,
+        # 4096-token context is plenty for one small category batch and cuts
+        # KV-cache memory pressure so tokens generate ~2× faster on 14B models.
+        "options": {"temperature": 0.3, "num_ctx": 4096, "num_predict": 1024},
     }
 
     try:
-        resp = requests.post(OLLAMA_URL, json=payload, timeout=timeout)
-        resp.raise_for_status()
-        content = resp.json()["message"]["content"]
-        # Strip <think>...</think> blocks from thinking models (e.g. qwen3)
+        if not stream:
+            resp = requests.post(OLLAMA_URL, json=payload, timeout=timeout)
+            resp.raise_for_status()
+            content = resp.json()["message"]["content"]
+        else:
+            # Stream reset: 90s of *no output at all* is the real-death signal.
+            content_parts: List[str] = []
+            last_token_t = time.time()
+            with requests.post(OLLAMA_URL, json=payload, stream=True,
+                               timeout=(30, timeout)) as resp:
+                resp.raise_for_status()
+                for line in resp.iter_lines(decode_unicode=True):
+                    if not line:
+                        # A truly idle stream is worth aborting — but 90s of
+                        # silence is generous for consumer GPUs starting up.
+                        if time.time() - last_token_t > 90:
+                            raise TimeoutError(
+                                "Ollama stream idle for >90s (model stalled)")
+                        continue
+                    try:
+                        obj = json.loads(line)
+                    except Exception:
+                        continue
+                    piece = (obj.get("message") or {}).get("content", "")
+                    if piece:
+                        content_parts.append(piece)
+                        last_token_t = time.time()
+                    if obj.get("done"):
+                        break
+            content = "".join(content_parts)
+        # Strip <think>...</think> reasoning blocks (qwen3 etc.)
         content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
         return content
     except requests.exceptions.ConnectionError:
@@ -558,7 +594,7 @@ def call_ollama(prompt: str, model: str, timeout: int = 600) -> str:
             "Cannot connect to Ollama at localhost:11434. "
             "Start it with: ollama serve"
         )
-    except requests.exceptions.Timeout:
+    except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout):
         raise TimeoutError("Ollama request timed out.")
     except Exception as e:
         raise RuntimeError(f"Ollama error: {e}")
@@ -587,21 +623,21 @@ def build_category_map(tier1_results: List[Dict]) -> Dict[str, List[Dict]]:
 
 # Categories with more than this many variants are split into sub-batches when
 # sent to the local AI, to keep each request small enough to finish within the
-# Ollama timeout. Empirically tuned for qwen3:14b on consumer hardware.
-AI_BATCH_MAX = 15
+# Ollama read-idle window. Empirically tuned for qwen3:14b in reasoning mode
+# on consumer hardware — an 8-variant prompt reliably completes in ~2–4 min,
+# whereas 15 variants was hitting the wall clock on large panels.
+AI_BATCH_MAX = 8
+AI_BATCH_MIN = 2   # never split below this
 
 
-def _split_into_batches(items: List[Dict], target_max: int = AI_BATCH_MAX) -> List[List[Dict]]:
-    """Split a list of variants into roughly equal batches, each no larger
-    than target_max. For total counts > target_max the batches will each be
-    in the 12-15 range whenever the math allows; smaller totals stay as one
-    batch and pathologically small overflows (e.g. 16 -> 8+8) accept slightly
-    smaller batches rather than exceed target_max.
-    """
+def _split_evenly(items: List[Dict], max_size: int) -> List[List[Dict]]:
+    """Split a list into batches of at most `max_size`, sizes as equal as
+    possible (so the last batch isn't a lonely small one)."""
     n = len(items)
-    if n <= target_max:
+    if n <= max_size:
         return [items]
-    n_batches = math.ceil(n / target_max)
+    import math as _m
+    n_batches = _m.ceil(n / max_size)
     base, extras = divmod(n, n_batches)
     out: List[List[Dict]] = []
     start = 0
@@ -610,6 +646,11 @@ def _split_into_batches(items: List[Dict], target_max: int = AI_BATCH_MAX) -> Li
         out.append(items[start:start + size])
         start += size
     return out
+
+
+def _split_into_batches(items: List[Dict], target_max: int = AI_BATCH_MAX) -> List[List[Dict]]:
+    """Back-compat alias for :func:`_split_evenly` (identical behaviour)."""
+    return _split_evenly(items, target_max)
 
 
 def _build_category_prompt(
@@ -687,22 +728,43 @@ def _run_category_ai_with_batching(
     category: str, snps: List[Dict], model: str
 ) -> Tuple[str, bool]:
     """Run the per-category AI interpretation, splitting into sub-batches if
-    the category has more than AI_BATCH_MAX variants. Returns
-    (combined_ai_text, had_failure). If had_failure is True the caller should
-    record this category for retry; the returned text still contains the
-    best partial output we managed to obtain.
-    """
-    batches = _split_into_batches(snps, target_max=AI_BATCH_MAX)
+    the category has more than AI_BATCH_MAX variants. On a timeout the batch
+    is automatically halved and retried (down to AI_BATCH_MIN), so a single
+    slow response no longer kills the entire category's output."""
 
-    if len(batches) == 1:
+    def _try_one(batch: List[Dict], idx: Optional[int] = None,
+                 total: Optional[int] = None) -> Tuple[str, bool]:
+        """Attempt one AI call. On TimeoutError, halve the batch and recurse
+        (up to AI_BATCH_MIN). Returns (text, had_failure)."""
         try:
-            return (
-                call_ollama(_build_category_prompt(category, batches[0]), model=model),
-                False,
+            t0 = time.time()
+            text = call_ollama(
+                _build_category_prompt(category, batch, idx, total),
+                model=model,
             )
+            log(f"      ✓ {len(batch)} variants in {time.time()-t0:.0f}s")
+            return text, False
+        except TimeoutError as te:
+            if len(batch) <= AI_BATCH_MIN:
+                log(f"    WARNING: {len(batch)}-variant batch timed out even at "
+                    f"minimum size — recording for --retry-failed")
+                return f"*AI analysis timed out for this batch: {te}*", True
+            half = max(AI_BATCH_MIN, len(batch) // 2)
+            log(f"    Batch of {len(batch)} timed out; auto-splitting to {half} and retrying")
+            sub = _split_evenly(batch, half)
+            sub_parts: List[str] = []
+            any_fail = False
+            for j, sb in enumerate(sub, start=1):
+                t, f = _try_one(sb, j, len(sub))
+                sub_parts.append(t); any_fail |= f
+            return "\n\n".join(sub_parts), any_fail
         except Exception as e:
-            log(f"    WARNING: AI analysis failed for {category}: {e}")
+            log(f"    WARNING: AI call failed for {category}: {e}")
             return f"*AI analysis unavailable: {e}*", True
+
+    batches = _split_evenly(snps, AI_BATCH_MAX)
+    if len(batches) == 1:
+        return _try_one(batches[0])
 
     sizes = ", ".join(str(len(b)) for b in batches)
     log(f"    Splitting {len(snps)} variants into {len(batches)} sub-batches ({sizes})")
@@ -713,23 +775,13 @@ def _run_category_ai_with_batching(
         first = offset + 1
         last = offset + len(batch)
         log(f"    Batch {i}/{len(batches)} (variants {first}-{last}) ...")
-        try:
-            text = call_ollama(
-                _build_category_prompt(category, batch, i, len(batches)),
-                model=model,
-            )
-            parts.append(
-                f"**Batch {i} of {len(batches)} (variants {first}–{last})**\n\n{text}"
-            )
-        except Exception as e:
-            log(f"    WARNING: Batch {i}/{len(batches)} failed for {category}: {e}")
-            had_failure = True
-            parts.append(
-                f"**Batch {i} of {len(batches)} (variants {first}–{last})** — "
-                f"*AI analysis unavailable: {e}*"
-            )
+        text, fail = _try_one(batch, i, len(batches))
+        parts.append(
+            f"**Batch {i} of {len(batches)} (variants {first}–{last})**\n\n{text}"
+        )
+        had_failure |= fail
         offset += len(batch)
-        time.sleep(0.5)
+        time.sleep(0.3)
 
     return "\n\n---\n\n".join(parts), had_failure
 

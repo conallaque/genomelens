@@ -76,7 +76,7 @@ The most recent releases add three major analysis capabilities. Full details in
   antioxidant axis, and heavy-metal handling — with a wildfire-smoke resilience
   score and a genotype-personalised protocol. The metal/oxidative panel is now
   wired into the report.
-- 🧪 **225 tests** (was 145 at V8); `REPORT_VERSION` 6.7.0-premium.
+- 🧪 **225 tests** (was 145 at V8); `REPORT_VERSION` 6.7.1-premium.
 
 ## What's new in V8 — completion of the foundation
 

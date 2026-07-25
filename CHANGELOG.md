@@ -6,6 +6,23 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.7.1-premium] — 2026-07-25 — Tier-2 AI: streaming + smaller batches + auto-halving retry
+
+### Fixed
+
+- **Tier-2 AI runs no longer time out on qwen3:14b in reasoning mode.**
+  Three coordinated changes:
+  * `call_ollama` now **streams** by default (`stream=True`), with a 90-second
+    read-idle guard instead of a wall-clock timeout. Long-generating reasoning
+    models no longer silently trip the socket timeout; a call only dies if the
+    stream actually stalls.
+  * **AI_BATCH_MAX 15 → 8** and `num_ctx 8192 → 4096` — each per-category call
+    now reliably finishes in 2–4 min on consumer hardware.
+  * **Auto-halving retry:** when a batch does time out, the runner splits it
+    in half and retries (down to AI_BATCH_MIN=2) instead of dropping the whole
+    batch. Only irreducible failures are recorded for `--retry-failed`.
+- `REPORT_VERSION` → 6.7.1-premium.
+
 ## [6.7.0-premium] — 2026-07-25 — AI chat assistant: deep mode + streaming + rich context
 
 ### Changed
