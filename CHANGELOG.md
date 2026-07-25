@@ -6,6 +6,37 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.4.0-premium] — 2026-07-25 — Interactive bio-age simulator + genetics×aging
+
+### Added
+
+- **Interactive in-browser biological-age simulator.** Sliders for the nine
+  PhenoAge markers, pre-filled with the user's values; the biological age,
+  delta and colour recompute live in the browser using an embedded copy of the
+  Levine formula (static fallback in PDF). A hands-on "what moves my age" tool.
+- **Genetics × Aging tie-in.** Reads longevity-associated variants from the
+  user's own genome — FOXO3 (rs2802292), APOE ε2/ε4, CETP (rs5882), KLOTHO
+  KL-VS (rs9536314), IL6 (rs1800795), TP53 (rs1042522) — and shows the inherited
+  longevity "lean" alongside the phenotypic PhenoAge clock, with the honest
+  caveat that individual effect sizes are modest (meta-analysis of exceptional-
+  longevity GWAS, Revelas 2018).
+- `REPORT_VERSION` → 6.4.0-premium.
+
+### Deliberately not shipped
+
+- The AHA PREVENT 2023 10-year CVD risk equations were researched but **not**
+  implemented: their exact coefficients live in journal supplementary tables
+  that couldn't be verified end-to-end, and a CVD-risk calculator built on
+  guessed coefficients would be clinically misleading. Left as a documented
+  next step pending the verified coefficient set.
+
+### Tests
+
+- +2 unit tests (genetic-longevity reader, simulator render); 220 passing.
+  Golden snapshot refreshed.
+
+---
+
 ## [6.3.0-premium] — 2026-07-25 — Longevity simulator, visuals & expanded index panel
 
 Builds on 6.2.0's biological-age clock with an interactive-style longevity

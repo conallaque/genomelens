@@ -320,3 +320,24 @@ def test_phenoage_levers_and_mortality() -> None:
     assert lev["levers"] and lev["levers"][0]["marker"] in ("RDW", "Fasting glucose", "hs-CRP")
     # each lever quantifies years recovered by optimizing that marker
     assert all(l["years_cost"] > 0 for l in lev["levers"])
+
+
+def test_genetic_longevity_reads_variants() -> None:
+    import pandas as pd
+    df = pd.DataFrame({"genotype": {
+        "rs2802292": "GG",   # FOXO3 longevity (favorable)
+        "rs7412": "CT",      # APOE ε2 present (favorable)
+        "rs429358": "TT",    # no ε4
+    }})
+    gl = bw._genetic_longevity(df)
+    assert gl is not None and gl["n_favorable"] >= 2
+    genes = {v["gene"] for v in gl["variants"]}
+    assert "FOXO3" in genes and "APOE" in genes
+    assert bw._genetic_longevity(None) is None
+
+
+def test_bioage_simulator_renders_sliders() -> None:
+    inputs = {"albumin": 4.4, "creatinine": 1.0, "glucose": 100, "crp": 1.0,
+              "lymph_pct": 30, "mcv": 90, "rdw": 13.5, "alp": 70, "wbc": 6.0, "age": 41}
+    html = bw._render_bioage_simulator(inputs)
+    assert 'type="range"' in html and "phenoAge" in html and "baUpdate" in html

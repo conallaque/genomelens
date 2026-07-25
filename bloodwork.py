@@ -980,8 +980,68 @@ def phenoage_levers(alb, creat, glu, crp, lymph_pct, mcv, rdw, alp, wbc, age) ->
             "best_possible": round(best, 1)}
 
 
+# Longevity-associated variants (meta-analysis of exceptional-longevity GWAS;
+# Revelas 2018, Sebastiani, Broer). Effect sizes are modest — a genetic "lean",
+# not a verdict — and are shown alongside the phenotypic PhenoAge clock.
+def _genetic_longevity(snps_df) -> Optional[Dict]:
+    if snps_df is None:
+        return None
+    variants = []
+
+    def check(rsid, gene, allele, favorable_label, detail):
+        gt = _gt(snps_df, rsid)
+        if not gt:
+            return
+        variants.append({"gene": gene, "rsid": rsid, "genotype": gt,
+                         "favorable": allele in gt, "label": favorable_label,
+                         "detail": detail})
+
+    check("rs2802292", "FOXO3", "G", "longevity G-allele",
+          "The strongest common longevity variant — G-allele carriers have ~1.9× odds of "
+          "reaching 95, with better telomere maintenance and stress resistance.")
+    check("rs5882", "CETP", "G", "Val405 (VV) longevity allele",
+          "CETP Val405 is linked to larger HDL particles, slower cognitive decline and longevity.")
+    check("rs9536314", "KLOTHO", "G", "KL-VS heterozygote advantage",
+          "The klotho KL-VS variant; heterozygosity is associated with longevity and better cognition.")
+    check("rs1800795", "IL6", "G", "-174 G-allele",
+          "An IL-6 promoter variant associated in meta-analysis with exceptional longevity.")
+    check("rs1042522", "TP53", "C", "Pro72 allele",
+          "TP53 Arg72Pro; the Pro allele has been associated with longevity in some cohorts (trade-off with cancer/repair).")
+
+    # APOE ε2 (protective) / ε4 (adverse) from the two tag SNPs
+    e_rs429358 = _gt(snps_df, "rs429358")   # C = ε4 tag
+    e_rs7412 = _gt(snps_df, "rs7412")       # T = ε2 tag
+    if e_rs429358 and e_rs7412:
+        e4 = e_rs429358.count("C")
+        e2 = e_rs7412.count("T")
+        if e2:
+            variants.append({"gene": "APOE", "rsid": "rs7412", "genotype": e_rs7412,
+                             "favorable": True, "label": f"ε2 allele ×{e2}",
+                             "detail": "APOE ε2 is over-represented in centenarians (longevity-protective)."})
+        if e4:
+            variants.append({"gene": "APOE", "rsid": "rs429358", "genotype": e_rs429358,
+                             "favorable": False, "label": f"ε4 allele ×{e4}",
+                             "detail": "APOE ε4 is under-represented in the very old and raises "
+                                       "Alzheimer's / cardiovascular risk."})
+
+    if not variants:
+        return None
+    fav = sum(1 for v in variants if v["favorable"])
+    adv = sum(1 for v in variants if not v["favorable"])
+    if fav and not adv:
+        lean = ("favorable", "Your genome leans toward longevity at the variants tested.")
+    elif adv and not fav:
+        lean = ("adverse", "Your genome carries longevity-adverse variants at the loci tested.")
+    elif fav or adv:
+        lean = ("mixed", "A mix of longevity-favorable and -adverse variants.")
+    else:
+        lean = ("neutral", "No strong genetic longevity signal at these loci.")
+    return {"variants": variants, "n_favorable": fav, "n_adverse": adv,
+            "lean": lean[0], "summary": lean[1]}
+
+
 def compute_advanced_indices(labs: Dict[str, float], derived: Dict[str, float],
-                             meta: Dict) -> Dict:
+                             meta: Dict, snps_df=None) -> Dict:
     src: Dict[str, float] = {**labs, **derived}
 
     def g(*keys):
@@ -1050,7 +1110,10 @@ def compute_advanced_indices(labs: Dict[str, float], derived: Dict[str, float],
                "accel": round(accel, 1), "status": status, "interp": interp,
                "mortality_10yr_pct": round(mort * 100, 1),
                "levers": levers["levers"], "recoverable_years": levers["recoverable_years"],
-               "best_possible": levers["best_possible"]}
+               "best_possible": levers["best_possible"],
+               "inputs": {"albumin": alb, "creatinine": creat_v, "glucose": glu,
+                          "crp": crp, "lymph_pct": round(lymph_pct, 1), "mcv": mcv,
+                          "rdw": rdw, "alp": alp, "wbc": wbc, "age": age}}
         add("phenoage", "Biological Age (PhenoAge)", round(pa, 1), "yrs",
             "Biological Age", status, f"{accel:+.1f} yr vs chronological", interp,
             "Levine et al., <em>Aging</em> 2018 (10.18632/aging.101414)")
@@ -1268,6 +1331,7 @@ def compute_advanced_indices(labs: Dict[str, float], derived: Dict[str, float],
         "biological_age": bio,
         "indices": indices,
         "groups": groups,
+        "genetic_longevity": _genetic_longevity(snps_df),
     }
 
 
@@ -1340,7 +1404,7 @@ def analyze_clinical_bloodwork(labs: Dict[str, float], snps_df=None,
                    key=lambda r: (-r["severity"], r["name"]))
     optimal_ct = sum(1 for r in rows if r["status"] == "optimal")
 
-    advanced = compute_advanced_indices(labs, derived, meta)
+    advanced = compute_advanced_indices(labs, derived, meta, snps_df=snps_df)
 
     return {
         "available": bool(rows),
@@ -1555,6 +1619,124 @@ def _svg_radar(systems: List[Dict]) -> str:
 </svg>"""
 
 
+_BA_SLIDERS = [
+    ("albumin", "Albumin", 3.0, 5.5, 0.1, "g/dL"),
+    ("creatinine", "Creatinine", 0.5, 2.0, 0.05, "mg/dL"),
+    ("glucose", "Fasting glucose", 70, 180, 1, "mg/dL"),
+    ("crp", "hs-CRP", 0.1, 15, 0.1, "mg/L"),
+    ("lymph_pct", "Lymphocyte %", 10, 50, 1, "%"),
+    ("mcv", "MCV", 75, 105, 1, "fL"),
+    ("rdw", "RDW", 11, 18, 0.1, "%"),
+    ("alp", "Alk. phosphatase", 30, 150, 1, "U/L"),
+    ("wbc", "White blood cells", 3, 12, 0.1, "K/µL"),
+]
+
+
+def _render_bioage_simulator(inputs: Optional[Dict]) -> str:
+    """An in-browser interactive PhenoAge calculator: drag the sliders and watch
+    biological age recompute live (works in the HTML report; static in PDF)."""
+    if not inputs:
+        return ""
+    rows = ""
+    for key, label, mn, mx, step, unit in _BA_SLIDERS:
+        val = inputs.get(key)
+        if val is None:
+            continue
+        val = max(mn, min(mx, val))
+        rows += (
+            f'<div style="display:grid;grid-template-columns:130px 1fr 74px;gap:8px;'
+            f'align-items:center;margin:5px 0;font-size:.86em">'
+            f'<label style="color:#33404d">{label}</label>'
+            f'<input type="range" id="ba_{key}" min="{mn}" max="{mx}" step="{step}" '
+            f'value="{val}" oninput="baUpdate()" style="width:100%">'
+            f'<span id="bav_{key}" style="text-align:right;font-variant-numeric:tabular-nums">'
+            f'{val:g} <span style="color:#9aa4b0;font-size:.85em">{unit}</span></span></div>')
+    age = inputs.get("age", 40)
+    keys = [k for k, *_ in _BA_SLIDERS if inputs.get(k) is not None]
+    js_keys = ",".join(f'"{k}"' for k in keys)
+    return f"""
+<div style="border:1px solid #dbe3ec;border-radius:12px;padding:14px 16px;margin:14px 0;
+     background:linear-gradient(135deg,#f7fbff,#eef4fb)">
+  <div style="font-weight:700;color:#12467a;font-size:1.05em">🎛️ Interactive biological-age simulator</div>
+  <div style="color:#667;font-size:.85em;margin-bottom:8px">Drag any marker to its target and watch
+  your biological age recompute live (uses the same Levine PhenoAge formula, in-browser).</div>
+  <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center">
+    <div style="flex:1;min-width:280px">{rows}</div>
+    <div style="text-align:center;min-width:150px">
+      <div style="font-size:.75em;color:#8a94a3;text-transform:uppercase">Simulated bio-age</div>
+      <div id="ba_out" style="font-size:2.6em;font-weight:800;color:#12467a">{inputs.get('age',0):.0f}</div>
+      <div id="ba_delta" style="font-weight:700"></div>
+      <div style="font-size:.75em;color:#9aa4b0">chronological {age:.0f}</div>
+    </div>
+  </div>
+  <script>
+  (function(){{
+    var AGE={age}, KEYS=[{js_keys}];
+    function phenoAge(v){{
+      var alb=v.albumin*10, creat=v.creatinine*88.4017, glu=v.glucose/18.0182;
+      var crp=Math.max(v.crp/10,1e-3), lncrp=Math.log(crp);
+      var xb=-19.907 -0.0336*alb +0.0095*creat +0.1953*glu +0.0954*lncrp
+        -0.0120*v.lymph_pct +0.0268*v.mcv +0.3306*v.rdw +0.00188*v.alp +0.0554*v.wbc +0.0804*AGE;
+      var g=0.0076927;
+      var m=1-Math.exp(-Math.exp(xb)*(Math.exp(120*g)-1)/g);
+      m=Math.min(Math.max(m,1e-9),1-1e-9);
+      return 141.50225 + Math.log(-0.00553*Math.log(1-m))/0.090165;
+    }}
+    window.baUpdate=function(){{
+      var v={{age:AGE}};
+      KEYS.forEach(function(k){{
+        var el=document.getElementById("ba_"+k); v[k]=parseFloat(el.value);
+        var s=document.getElementById("bav_"+k); if(s) s.firstChild.nodeValue=(v[k])+" ";
+      }});
+      // defaults for any missing marker so the formula stays valid
+      ["albumin","creatinine","glucose","crp","lymph_pct","mcv","rdw","alp","wbc"].forEach(function(k){{
+        if(v[k]===undefined) v[k]={{albumin:4.4,creatinine:1.0,glucose:90,crp:1.0,lymph_pct:30,mcv:90,rdw:13,alp:70,wbc:6}}[k];
+      }});
+      var pa=phenoAge(v), d=pa-AGE;
+      var out=document.getElementById("ba_out"), del=document.getElementById("ba_delta");
+      out.textContent=pa.toFixed(1);
+      var col=d<=-1?"#1a7f37":(d>=3?"#b3261e":"#8a6100");
+      out.style.color=col;
+      del.textContent=(d>=0?"+":"")+d.toFixed(1)+" yr";
+      del.style.color=col;
+    }};
+    baUpdate();
+  }})();
+  </script>
+</div>"""
+
+
+def _render_genetic_longevity(gl: Optional[Dict]) -> str:
+    """Longevity-associated variants from the user's genome, alongside the clock."""
+    if not gl or not gl.get("variants"):
+        return ""
+    lean_col = {"favorable": "#1a7f37", "adverse": "#b3261e",
+                "mixed": "#8a6100", "neutral": "#8a94a3"}.get(gl["lean"], "#8a94a3")
+    cards = ""
+    for v in gl["variants"]:
+        col = "#1a7f37" if v["favorable"] else "#b3261e"
+        tag = "✓ favorable" if v["favorable"] else "✕ adverse"
+        cards += (
+            f'<div style="border:1px solid #e3e7ec;border-left:4px solid {col};border-radius:8px;'
+            f'padding:9px 12px;background:#fff;break-inside:avoid">'
+            f'<div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline">'
+            f'<span style="font-weight:700">{_esc(v["gene"])} <span style="color:#9aa4b0;'
+            f'font-weight:400;font-size:.82em">{_esc(v["rsid"])} ({_esc(v["genotype"])})</span></span>'
+            f'<span style="color:{col};font-weight:700;font-size:.8em">{tag}</span></div>'
+            f'<div style="font-size:.82em;color:#4a5560;margin-top:3px">'
+            f'<strong>{_esc(v["label"])}</strong> — {_esc(v["detail"])}</div></div>')
+    return f"""
+    <h3 style="margin:18px 0 4px">Genetics × Aging — longevity variants in your genome</h3>
+    <div style="border-left:4px solid {lean_col};background:#f7f9fb;padding:8px 12px;border-radius:0 6px 6px 0;
+         margin-bottom:8px"><strong style="color:{lean_col}">{_esc(gl['summary'])}</strong>
+      <span style="color:#8a94a3;font-size:.85em"> ({gl['n_favorable']} favorable / {gl['n_adverse']} adverse
+      of {len(gl['variants'])} tested)</span>
+      <div style="color:#8a94a3;font-size:.8em;margin-top:2px">These are your inherited longevity
+      lean; the PhenoAge clock above is your current phenotype. When both point the same way the
+      signal is stronger — but effect sizes are individually modest.</div></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px">{cards}</div>"""
+
+
 def _render_advanced_section(advanced: Optional[Dict]) -> str:
     """Biological age + validated composite indices, each with its citation."""
     if not advanced or not advanced.get("available"):
@@ -1645,6 +1827,8 @@ def _render_advanced_section(advanced: Optional[Dict]) -> str:
             f'<h3 style="margin:16px 0 6px">{_esc(gname)}</h3>'
             f'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">{cards}</div>')
 
+    sim_html = _render_bioage_simulator(bio.get("inputs") if bio else None)
+    genetic_html = _render_genetic_longevity(advanced.get("genetic_longevity"))
     return f"""
     <section style="margin:8px 0 6px">
       <h2 style="font-size:1.35em;border-bottom:2px solid #e3e8ee;padding-bottom:4px;color:#12467a">
@@ -1654,6 +1838,8 @@ def _render_advanced_section(advanced: Optional[Dict]) -> str:
       a mortality-calibrated biological-age clock plus cardiovascular, insulin-resistance,
       inflammation and liver-fibrosis scores. Each is cited to its source paper.</p>
       {hero}
+      {sim_html}
+      {genetic_html}
       {groups_html}
     </section>"""
 
