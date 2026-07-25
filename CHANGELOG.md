@@ -6,6 +6,31 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.7.0-premium] — 2026-07-25 — AI chat assistant: deep mode + streaming + rich context
+
+### Changed
+
+- **Rebuilt the `--chat` REPL** into a genuinely useful assistant:
+  - **Deep-mode system prompt** with a structured answering rubric (direct
+    answer → what the data shows → mechanism → personal fit → action plan →
+    uncertainty → clinician trigger → follow-ups). Default length now 500–1200
+    words; a `/brief` toggle switches to concise 3–6-sentence answers.
+  - **Streaming responses** — tokens print live as the model generates them,
+    with `<think>` blocks filtered and inline bold rendered on the fly.
+  - **Vastly richer context**: now surfaces bloodwork (PhenoAge biological age,
+    10-yr mortality risk, PhenoAge levers, PREVENT ASCVD, flagged biomarkers
+    with their genotype-aware notes), detox / smoke-resilience tier, longevity
+    variants (FOXO3, APOE, CETP, KLOTHO, IL6, TP53), personal 10-yr economics,
+    plus ancestry lineage cross-check — in addition to the existing PRS/PGx/
+    carrier/traits/interactions.
+  - **REPL commands**: `/help`, `/deep`, `/brief`, `/model <name>`, `/topic
+    <name>`, `/context`, `/save <path>`, `/reset`, `/suggest`.
+  - **Follow-up suggestions** printed after every answer, tailored to the
+    topic (PGx / cardio / longevity / diet / detox / diabetes / …).
+  - `num_ctx` bumped to 16384; temperature 0.4 → 0.35; `num_predict` 2048 for
+    deep mode.
+- `REPORT_VERSION` → 6.7.0-premium.
+
 ## [6.6.1-premium] — 2026-07-25 — Biological-aging economics grounded in the mortality model
 
 ### Changed

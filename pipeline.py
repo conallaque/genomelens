@@ -1026,6 +1026,11 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 traits_result=traits_result, carrier_result=carrier_result,
                 interactions_result=interactions_result,
                 ancestry_result=ancestry_result,
+                bloodwork_result=bloodwork_result,
+                detox_result=detox_result,
+                economics_result=economics_result,
+                y_result=y_result,
+                mt_result=mt_result,
             )
 
     return 0
