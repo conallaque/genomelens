@@ -178,6 +178,83 @@ def _classify(delta_sd: float) -> Tuple[str, str]:
     return "Diverged", "bw-diverged"
 
 
+# Markers tracked over time in the longitudinal view: (key, label, unit,
+# good_direction). "bioage"/"overall" are computed, not raw labs.
+_TRAJECTORY_TRACKED = [
+    ("bioage", "Biological Age", "yr", "down"),
+    ("overall", "Health Score", "/100", "up"),
+    ("prevent", "10-yr ASCVD", "%", "down"),
+    ("ldl", "LDL", "mg/dL", "down"),
+    ("hdl", "HDL", "mg/dL", "up"),
+    ("triglycerides", "Triglycerides", "mg/dL", "down"),
+    ("fasting_glucose", "Glucose", "mg/dL", "down"),
+    ("hba1c", "HbA1c", "%", "down"),
+    ("crp", "hs-CRP", "mg/L", "down"),
+    ("systolic_bp", "Systolic BP", "mmHg", "down"),
+    ("alt", "ALT", "U/L", "down"),
+    ("ferritin", "Ferritin", "ng/mL", "down"),
+]
+
+
+def _parse_series(history: List, scalars: Dict) -> List:
+    """Normalize a list of timepoint dicts → sorted [(date, cleaned_labs)]."""
+    out = []
+    for i, entry in enumerate(history):
+        if not isinstance(entry, dict):
+            continue
+        date = entry.get("date") or entry.get("Date") or f"T{i + 1}"
+        merged = {**scalars, **entry}
+        cleaned: Dict[str, float] = {}
+        for k, v in merged.items():
+            if k in ("date", "Date") or v is None:
+                continue
+            try:
+                cleaned[_normalize_key(k)] = float(v)
+            except (TypeError, ValueError):
+                continue
+        out.append((str(date), cleaned))
+    out.sort(key=lambda x: x[0])
+    return out
+
+
+def _build_trajectory(series: List, snps_df, meta: Dict) -> Optional[Dict]:
+    """Compute per-timepoint clinical score, biological age and tracked markers,
+    then assemble the metric trajectories."""
+    if len(series) < 2:
+        return None
+    points = []
+    for date, labs in series:
+        tp_meta = dict(meta)
+        if "age" in labs:
+            tp_meta["age"] = labs["age"]
+        cl = analyze_clinical_bloodwork(labs, snps_df=None, meta=tp_meta)
+        adv = cl.get("advanced") or {}
+        bio = adv.get("biological_age")
+        prevent = next((i["value"] for i in adv.get("indices", [])
+                        if i["id"] == "prevent_ascvd"), None)
+        rec = {"date": date, "overall": cl.get("overall_score"),
+               "bioage": bio["phenoage"] if bio else None, "prevent": prevent}
+        for k in ("ldl", "hdl", "triglycerides", "fasting_glucose", "hba1c",
+                  "crp", "systolic_bp", "alt", "ferritin"):
+            rec[k] = labs.get(k)
+        points.append(rec)
+
+    metrics = []
+    for key, label, unit, good in _TRAJECTORY_TRACKED:
+        vals = [(p["date"], p.get(key)) for p in points if p.get(key) is not None]
+        if len(vals) >= 2:
+            first, last = vals[0][1], vals[-1][1]
+            delta = last - first
+            improving = (delta < 0 and good == "down") or (delta > 0 and good == "up") or delta == 0
+            metrics.append({
+                "key": key, "label": label, "unit": unit, "good": good,
+                "series": vals, "first": round(first, 1), "last": round(last, 1),
+                "delta": round(delta, 1), "improving": improving,
+            })
+    return {"n_timepoints": len(points), "dates": [p["date"] for p in points],
+            "metrics": metrics}
+
+
 def compare_bloodwork(
     bloodwork_path: str,
     phewas_result: Optional[Dict],
@@ -208,9 +285,35 @@ def compare_bloodwork(
     Backwards compatible: callers passing only (path, phewas_result) still get
     the original keys; the new analysis is attached under ``clinical``.
     """
-    labs = load_bloodwork(bloodwork_path)
-    meta = meta or {}
+    meta = dict(meta or {})
+    trajectory = None
+    raw = json.loads(Path(bloodwork_path).expanduser().read_text())
+    if isinstance(raw, (dict, list)) and (
+            isinstance(raw, list) or isinstance(raw.get("history"), list)):
+        if isinstance(raw, list):
+            history, scalars = raw, {}
+        else:
+            history = raw["history"]
+            scalars = {k: v for k, v in raw.items()
+                       if k != "history" and not isinstance(v, (list, dict))}
+        series = _parse_series(history, scalars) if history else []
+        if series:
+            labs = series[-1][1]                      # latest visit = current panel
+            if "sex" not in meta and "sex" in scalars:
+                meta["sex"] = scalars["sex"]
+            if "age" not in meta:
+                a = labs.get("age") or scalars.get("age")
+                if a is not None:
+                    meta["age"] = a
+            trajectory = _build_trajectory(series, snps_df, meta)
+        else:
+            labs = load_bloodwork(bloodwork_path)
+    else:
+        labs = load_bloodwork(bloodwork_path)
+
     clinical = analyze_clinical_bloodwork(labs, snps_df=snps_df, meta=meta)
+    if trajectory:
+        clinical["trajectory"] = trajectory
 
     if not phewas_result or not phewas_result.get("traits"):
         return {
@@ -980,6 +1083,54 @@ def phenoage_levers(alb, creat, glu, crp, lymph_pct, mcv, rdw, alp, wbc, age) ->
             "best_possible": round(best, 1)}
 
 
+# AHA PREVENT 2023 — 10-year ASCVD base-model coefficients (sex-specific).
+# Source: Khan et al., Circulation 2024;149:430-449; coefficients as encoded in
+# the preventr R package (v0.11.0, sysdata.rda) and the cross-validated
+# open-source implementation at github.com/mbottke/Lipids-2026-CDS-Tool.
+_PREVENT_ASCVD_10YR = {
+    "F": {"age": 0.7198830, "nonHdlC": 0.1176967, "hdlC": -0.1511850,
+          "sbpLt110": -0.0835358, "sbpGte110": 0.3592852, "dm": 0.8348585,
+          "smoking": 0.4831078, "egfrLt60": 0.4864619, "egfrGte60": 0.0397779,
+          "bpTx": 0.2265309, "statin": -0.0592374, "bpTxSbpGte110": -0.0395762,
+          "statinNonHdlC": 0.0844423, "ageNonHdlC": -0.0567839, "ageHdlC": 0.0325692,
+          "ageSbpGte110": -0.1035985, "ageDm": -0.2417542, "ageSmoking": -0.0791142,
+          "ageEgfrLt60": -0.1671492, "constant": -3.8199750},
+    "M": {"age": 0.7099847, "nonHdlC": 0.1658663, "hdlC": -0.1144285,
+          "sbpLt110": -0.2837212, "sbpGte110": 0.3239977, "dm": 0.7189597,
+          "smoking": 0.3956973, "egfrLt60": 0.3690075, "egfrGte60": 0.0203619,
+          "bpTx": 0.2036522, "statin": -0.0865581, "bpTxSbpGte110": -0.0322916,
+          "statinNonHdlC": 0.1145630, "ageNonHdlC": -0.0300005, "ageHdlC": 0.0232747,
+          "ageSbpGte110": -0.0927024, "ageDm": -0.2018525, "ageSmoking": -0.0970527,
+          "ageEgfrLt60": -0.1217081, "constant": -3.5006550},
+}
+
+
+def prevent_ascvd_10yr(sex, age, total_chol, hdl, sbp, egfr,
+                       diabetes=0, smoking=0, bp_treated=0, statin=0):
+    """AHA PREVENT 2023 10-year atherosclerotic-CVD risk (%). Cholesterol in
+    mg/dL, SBP mmHg, eGFR mL/min/1.73m². Returns None if sex not F/M."""
+    c = _PREVENT_ASCVD_10YR.get((sex or "").upper()[:1])
+    if c is None:
+        return None
+    to_mmol = lambda mg: mg / 38.67
+    a = (age - 55) / 10.0
+    nh = to_mmol(total_chol - hdl) - 3.5
+    hd = (to_mmol(hdl) - 1.3) / 0.3
+    sl = (min(sbp, 110) - 110) / 20.0
+    sh = (max(sbp, 110) - 130) / 20.0
+    el = (min(egfr, 60) - 60) / -15.0
+    eh = (max(egfr, 60) - 90) / -15.0
+    x = (c["constant"] + c["age"] * a + c["nonHdlC"] * nh + c["hdlC"] * hd
+         + c["sbpLt110"] * sl + c["sbpGte110"] * sh + c["dm"] * diabetes
+         + c["smoking"] * smoking + c["egfrLt60"] * el + c["egfrGte60"] * eh
+         + c["bpTx"] * bp_treated + c["statin"] * statin
+         + c["bpTxSbpGte110"] * (bp_treated * sh) + c["statinNonHdlC"] * (statin * nh)
+         + c["ageNonHdlC"] * (a * nh) + c["ageHdlC"] * (a * hd)
+         + c["ageSbpGte110"] * (a * sh) + c["ageDm"] * (a * diabetes)
+         + c["ageSmoking"] * (a * smoking) + c["ageEgfrLt60"] * (a * el))
+    return _math.exp(x) / (1 + _math.exp(x)) * 100.0
+
+
 # Longevity-associated variants (meta-analysis of exceptional-longevity GWAS;
 # Revelas 2018, Sebastiani, Broer). Effect sizes are modest — a genetic "lean",
 # not a verdict — and are shown alongside the phenotypic PhenoAge clock.
@@ -1147,6 +1298,36 @@ def compute_advanced_indices(labs: Dict[str, float], derived: Dict[str, float],
             {"cl-optimal": "Optimal", "cl-borderline": "Moderate", "cl-high": "High"}[st],
             "Total:HDL cholesterol ratio; <3.5 optimal.",
             "Castelli et al., <em>Circulation</em> 1983")
+    # AHA PREVENT 2023 10-year ASCVD risk (needs age, sex, TC, HDL, SBP, eGFR)
+    egfr = g("egfr")
+    sbp = g("systolic_bp", "sbp")
+    if age and sex in ("M", "F") and tc and hdl and sbp and egfr and 30 <= age <= 79:
+        dm = 1 if (a1c and a1c >= 6.5) or (glu and glu >= 126) else 0
+        smoke = 1 if (g("smoker", "smoking", "current_smoker") or 0) >= 1 else 0
+        bptx = 1 if (g("bp_meds", "antihypertensive", "bp_treated") or 0) >= 1 else 0
+        statin = 1 if (g("statin", "on_statin") or 0) >= 1 else 0
+        risk = prevent_ascvd_10yr(sex, age, tc, hdl, sbp, egfr, dm, smoke, bptx, statin)
+        if risk is not None:
+            st = ("cl-optimal" if risk < 5 else
+                  ("cl-high" if risk >= 20 else "cl-borderline"))
+            band = ("Low (<5%)" if risk < 5 else
+                    ("Borderline (5–7.5%)" if risk < 7.5 else
+                     ("Intermediate (7.5–20%)" if risk < 20 else "High (≥20%)")))
+            assume = []
+            if not smoke and not g("smoker", "smoking"):
+                assume.append("non-smoker")
+            if not bptx and not g("bp_meds"):
+                assume.append("no BP meds")
+            if not statin and not g("statin"):
+                assume.append("no statin")
+            assume_txt = (f" Assumed: {', '.join(assume)} (add smoker/bp_meds/statin to labs to refine)."
+                          if assume else "")
+            add("prevent_ascvd", "10-Year ASCVD Risk (AHA PREVENT 2023)", round(risk, 1), "%",
+                "Cardiovascular Risk", st, band,
+                "The current American Heart Association guideline model for 10-year "
+                "atherosclerotic cardiovascular disease risk (heart attack / stroke). "
+                "≥7.5% is the usual statin-consideration threshold." + assume_txt,
+                "Khan et al., <em>Circulation</em> 2024 (PREVENT)")
 
     # ── Insulin resistance & metabolic ──────────────────────────────────────
     if tg and glu:
@@ -1619,6 +1800,58 @@ def _svg_radar(systems: List[Dict]) -> str:
 </svg>"""
 
 
+def _sparkline(vals: List, color: str) -> str:
+    ys = [v for _, v in vals]
+    n = len(ys)
+    mn, mx = min(ys), max(ys)
+    rng = (mx - mn) or 1.0
+    W, H, pad = 130, 34, 4
+    pts = []
+    for i, y in enumerate(ys):
+        x = pad + (W - 2 * pad) * (i / (n - 1))
+        yy = H - pad - (H - 2 * pad) * ((y - mn) / rng)
+        pts.append((x, yy))
+    poly = " ".join(f"{x:.1f},{y:.1f}" for x, y in pts)
+    lx, ly = pts[-1]
+    dots = "".join(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="1.5" fill="{color}" opacity=".45"/>'
+                   for x, y in pts[:-1])
+    return (f'<svg width="{W}" height="{H}" xmlns="http://www.w3.org/2000/svg">'
+            f'<polyline points="{poly}" fill="none" stroke="{color}" stroke-width="2"/>'
+            f'{dots}<circle cx="{lx:.1f}" cy="{ly:.1f}" r="3" fill="{color}"/></svg>')
+
+
+def _render_trajectory(traj: Optional[Dict]) -> str:
+    """Longitudinal view: sparklines + direction for each tracked metric."""
+    if not traj or not traj.get("metrics"):
+        return ""
+    dates = traj["dates"]
+    cards = ""
+    for m in traj["metrics"]:
+        col = "#1a7f37" if m["improving"] else "#b3261e"
+        arrow = "▼" if m["delta"] < 0 else ("▲" if m["delta"] > 0 else "→")
+        cards += (
+            f'<div style="border:1px solid #e3e7ec;border-radius:8px;padding:10px 12px;'
+            f'background:#fff;break-inside:avoid">'
+            f'<div style="display:flex;justify-content:space-between;align-items:baseline">'
+            f'<span style="font-weight:700;font-size:.9em">{_esc(m["label"])}</span>'
+            f'<span style="color:{col};font-weight:700;font-size:.85em">{arrow} '
+            f'{("+" if m["delta"]>0 else "")}{m["delta"]:g}{_esc(m["unit"])}</span></div>'
+            f'<div style="margin:4px 0">{_sparkline(m["series"], col)}</div>'
+            f'<div style="font-size:.78em;color:#8a94a3">'
+            f'{m["first"]:g} → <strong style="color:{col}">{m["last"]:g}</strong> {_esc(m["unit"])}</div>'
+            f'</div>')
+    return f"""
+    <section style="margin:8px 0">
+      <h2 style="font-size:1.3em;border-bottom:2px solid #e3e8ee;padding-bottom:4px;color:#12467a">
+        Trajectory Over Time <span style="font-size:.6em;color:#8a94a3;font-weight:400">
+        · {traj['n_timepoints']} visits · {_esc(dates[0])} → {_esc(dates[-1])}</span></h2>
+      <p style="color:#667;margin:6px 0 10px">How your biological age, health score, cardiovascular
+      risk and key markers have moved across your panels. <span style="color:#1a7f37">Green</span> =
+      improving, <span style="color:#b3261e">red</span> = worsening (direction-aware per marker).</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">{cards}</div>
+    </section>"""
+
+
 _BA_SLIDERS = [
     ("albumin", "Albumin", 3.0, 5.5, 0.1, "g/dL"),
     ("creatinine", "Creatinine", 0.5, 2.0, 0.05, "mg/dL"),
@@ -1935,7 +2168,9 @@ def render_bloodwork_html(result: Dict, file_label: str = "") -> str:
     comprehensive clinical panel first, then the genetic-prediction comparison."""
     clinical_dict = result.get("clinical") or {}
     advanced_html = _render_advanced_section(clinical_dict.get("advanced"))
-    clinical_html = advanced_html + _render_clinical_section(result.get("clinical"))
+    trajectory_html = _render_trajectory(clinical_dict.get("trajectory"))
+    clinical_html = (trajectory_html + advanced_html
+                     + _render_clinical_section(result.get("clinical")))
 
     gene_header = (
         "<h1 style='margin-top:34px'>Genetic-Prediction Comparison</h1>"

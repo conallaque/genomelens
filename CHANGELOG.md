@@ -6,6 +6,34 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.5.0-premium] — 2026-07-25 — AHA PREVENT CVD risk + longitudinal tracking
+
+### Added
+
+- **AHA PREVENT 2023 10-year ASCVD risk** — the current American Heart
+  Association guideline model for atherosclerotic-cardiovascular-disease risk.
+  Implemented with the **exact sex-specific coefficients** from Khan et al.
+  (*Circulation* 2024), sourced from the `preventr` R package (v0.11.0) and a
+  cross-validated open-source implementation, with correct variable centering,
+  SBP/eGFR splines, and interaction terms; validated numerically (healthy 50F →
+  ~1.3%, high-risk 65F → ~17%). Uses TC/HDL/SBP/eGFR (eGFR derived from
+  creatinine) with optional smoker/BP-med/statin/diabetes flags; flags the 7.5%
+  statin-consideration threshold. (This was the item deliberately deferred in
+  6.4.0 pending verified coefficients — now shipped.)
+- **Longitudinal tracking.** A `labs.json` may now carry a `"history"` array of
+  dated panels (or be a top-level list). The report computes biological age,
+  health score, ASCVD risk and every key marker **per visit** and renders a
+  Trajectory-Over-Time section with direction-aware SVG sparklines (green =
+  improving, red = worsening). Single-panel JSON is unchanged.
+- `REPORT_VERSION` → 6.5.0-premium.
+
+### Tests
+
+- +3 unit tests (PREVENT reference values, PREVENT via clinical path,
+  longitudinal trajectory); 223 passing. Golden snapshot refreshed.
+
+---
+
 ## [6.4.0-premium] — 2026-07-25 — Interactive bio-age simulator + genetics×aging
 
 ### Added

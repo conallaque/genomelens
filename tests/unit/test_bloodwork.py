@@ -341,3 +341,40 @@ def test_bioage_simulator_renders_sliders() -> None:
               "lymph_pct": 30, "mcv": 90, "rdw": 13.5, "alp": 70, "wbc": 6.0, "age": 41}
     html = bw._render_bioage_simulator(inputs)
     assert 'type="range"' in html and "phenoAge" in html and "baUpdate" in html
+
+
+def test_prevent_ascvd_matches_reference() -> None:
+    # Validated against the cross-checked open-source PREVENT implementation.
+    assert abs(bw.prevent_ascvd_10yr("F", 50, 200, 50, 120, 90, 0, 0, 0, 0) - 1.3) < 0.3
+    assert abs(bw.prevent_ascvd_10yr("M", 55, 210, 42, 132, 90, 0, 0, 0, 0) - 3.7) < 0.3
+    # diabetic smoker with high BP → materially higher
+    hi = bw.prevent_ascvd_10yr("F", 65, 240, 40, 150, 70, 1, 1, 0, 0)
+    assert hi > 10
+    assert bw.prevent_ascvd_10yr("X", 50, 200, 50, 120, 90) is None
+
+
+def test_prevent_index_via_clinical() -> None:
+    res = bw.analyze_clinical_bloodwork(
+        {"total_cholesterol": 210, "hdl": 42, "systolic_bp": 132, "creatinine": 1.0},
+        snps_df=None, meta={"sex": "M", "age": 55})
+    ids = {i["id"] for i in res["advanced"]["indices"]}
+    assert "prevent_ascvd" in ids
+
+
+def test_longitudinal_trajectory(tmp_path) -> None:
+    p = tmp_path / "labs.json"
+    p.write_text(json.dumps({"sex": "M", "age": 41, "history": [
+        {"date": "2024-01-01", "ldl": 160, "hdl": 40, "crp": 4.0,
+         "albumin": 4.2, "creatinine": 1.0, "fasting_glucose": 110, "lymphocytes": 1.5,
+         "wbc": 6.5, "mcv": 91, "rdw": 14.2, "alp": 85},
+        {"date": "2025-01-01", "ldl": 110, "hdl": 52, "crp": 1.0,
+         "albumin": 4.6, "creatinine": 0.95, "fasting_glucose": 88, "lymphocytes": 2.0,
+         "wbc": 5.4, "mcv": 89, "rdw": 13.0, "alp": 68},
+    ]}))
+    res = bw.compare_bloodwork(str(p), phewas_result=None)
+    tr = res["clinical"].get("trajectory")
+    assert tr is not None and tr["n_timepoints"] == 2
+    ldl = next(m for m in tr["metrics"] if m["key"] == "ldl")
+    assert ldl["first"] == 160 and ldl["last"] == 110 and ldl["improving"]
+    bio = next((m for m in tr["metrics"] if m["key"] == "bioage"), None)
+    assert bio is not None and bio["improving"]

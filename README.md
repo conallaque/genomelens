@@ -21,7 +21,7 @@ Unauthorized copying, modification, or distribution is prohibited.
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![privacy](https://img.shields.io/badge/network-localhost%20only-purple)
-![tests](https://img.shields.io/badge/tests-220%20passing-brightgreen)
+![tests](https://img.shields.io/badge/tests-223%20passing-brightgreen)
 ![registry](https://img.shields.io/badge/SNP%20registry-unified-blueviolet)
 ![analyze.py](https://img.shields.io/badge/analyze.py-1%2C055%20lines-orange)
 
@@ -76,7 +76,7 @@ The most recent releases add three major analysis capabilities. Full details in
   antioxidant axis, and heavy-metal handling — with a wildfire-smoke resilience
   score and a genotype-personalised protocol. The metal/oxidative panel is now
   wired into the report.
-- 🧪 **220 tests** (was 145 at V8); `REPORT_VERSION` 6.4.0-premium.
+- 🧪 **223 tests** (was 145 at V8); `REPORT_VERSION` 6.5.0-premium.
 
 ## What's new in V8 — completion of the foundation
 
@@ -401,6 +401,20 @@ skipped. Keys are case-insensitive and accept common synonyms (`ldl_c`, `hgb`,
 reference ranges and the eGFR / FIB-4 calculated markers. Calculated markers
 (non-HDL, TG:HDL, ApoB:ApoA1, HOMA-IR, transferrin saturation, …) are derived
 automatically wherever their inputs are present.
+
+**Biological age, AHA PREVENT 10-year cardiovascular risk, and 20+ literature-
+cited composite indices** are computed automatically. For **longitudinal tracking**, pass a
+history of dated panels and the report charts your trajectory over time:
+
+```json
+{
+  "sex": "M", "age": 41,
+  "history": [
+    { "date": "2024-02-10", "ldl": 165, "hdl": 38, "hba1c": 6.0, "crp": 4.0 },
+    { "date": "2025-03-01", "ldl": 105, "hdl": 52, "hba1c": 5.3, "crp": 0.9 }
+  ]
+}
+```
 
 ---
 
