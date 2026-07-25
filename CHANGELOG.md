@@ -6,6 +6,29 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.6.0-premium] — 2026-07-25 — Standalone personal economic-impact sheet
+
+### Added
+
+- **`economic_analysis.html`** — a new standalone page written during a full
+  run, modeling the individual's 10-year economic impact of acting on their
+  results: expected medical-cost avoidance + monetised quality-of-life (QALY)
+  gains, net of intervention cost, across pharmacogenomic/carrier/PRS findings,
+  PREVENT cardiovascular event avoidance, prediabetes→T2D prevention, and
+  biological-age. Headline net value, per-finding table, and ROI vs the ~$700
+  one-time analysis cost. QALYs monetised at the standard $100k/QALY threshold;
+  prominent "illustrative model, not financial/medical advice" disclaimer.
+- `analyze_personal_economics()` + `render_economic_analysis_html()` in
+  `health_economics.py`; wired into the pipeline and `.gitignore`d as a
+  genotype-derived output. On a real profile: modeled net ~$115k, ROI ~165×.
+- `REPORT_VERSION` → 6.6.0-premium.
+
+### Tests
+
+- +2 unit tests (personal-economics modeling + empty case); 225 passing.
+
+---
+
 ## [6.5.0-premium] — 2026-07-25 — AHA PREVENT CVD risk + longitudinal tracking
 
 ### Added

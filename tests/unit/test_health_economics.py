@@ -254,3 +254,30 @@ def test_end_to_end_html_section_appears():
     assert 'id="health-economics"' in html
     assert "Health Economics" in html
     assert "ROI" in html
+
+
+# ── Personal economic-impact sheet ────────────────────────────────────────────
+
+def test_personal_economics_models_items() -> None:
+    import health_economics as he
+    econ = he.analyze_personal_economics(
+        economics_result={"findings_with_economics": [
+            {"clinical_benefit": "Avoid warfarin bleed", "outcome_value": 15000,
+             "prevalence": 0.35, "qaly_gain": 0.3, "cost": 300, "confidence": "high"}]},
+        bloodwork_result={"clinical": {"advanced": {
+            "indices": [{"id": "prevent_ascvd", "value": 9.2}],
+            "biological_age": {"accel": 2.0, "inputs": {"glucose": 108}}}, "flags": []}})
+    assert econ["available"] and econ["n_items"] >= 3
+    cats = {i["category"] for i in econ["items"]}
+    assert "Cardiovascular" in cats and "Metabolic" in cats
+    assert econ["roi"] is not None
+    html = he.render_economic_analysis_html(econ, "t")
+    assert "Economic-Impact Analysis" in html and "ROI" in html
+
+
+def test_personal_economics_empty() -> None:
+    import health_economics as he
+    econ = he.analyze_personal_economics()
+    assert econ["available"] is False and econ["n_items"] == 0
+    html = he.render_economic_analysis_html(econ)
+    assert "No modeled economic-impact" in html

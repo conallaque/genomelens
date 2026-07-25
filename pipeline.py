@@ -82,6 +82,8 @@ from analyze import (
     build_personalized_plan,
     render_plan_html,
     analyze_health_economics,
+    analyze_personal_economics,
+    render_economic_analysis_html,
     build_carrier_report,
     render_carrier_html,
     build_emergency_card,
@@ -904,6 +906,26 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  Bloodwork comparison saved: {bw_path}")
         except Exception as e:
             log(f"  WARNING: Bloodwork HTML failed: {e}")
+
+    # Personal economic-impact sheet — standalone economic_analysis.html
+    if analyze_personal_economics is not None and render_economic_analysis_html is not None:
+        try:
+            personal_econ = analyze_personal_economics(
+                economics_result=economics_result,
+                bloodwork_result=bloodwork_result,
+                genetic_age_result=genetic_age_result,
+                meta={"sex": (qc_result or {}).get("inferred_sex")},
+            )
+            if personal_econ.get("available"):
+                econ_path = output_path.parent / "economic_analysis.html"
+                econ_path.write_text(
+                    render_economic_analysis_html(personal_econ, file_label=file_label),
+                    encoding="utf-8",
+                )
+                log(f"  Economic-impact analysis saved: {econ_path} "
+                    f"(modeled net {personal_econ['total_net']:,}, ROI {personal_econ['roi']}x)")
+        except Exception as e:
+            log(f"  WARNING: Economic-analysis HTML failed: {e}")
 
     # Master dashboard — synthesises all V6 outputs into one page
     if build_personalized_plan is not None and render_plan_html is not None:

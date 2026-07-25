@@ -157,6 +157,12 @@ try:
 except ImportError:
     analyze_health_economics = None
 try:
+    from health_economics import (analyze_personal_economics,
+                                  render_economic_analysis_html)
+except ImportError:
+    analyze_personal_economics = None
+    render_economic_analysis_html = None
+try:
     from metal_oxidative import analyze_metal_oxidative
 except ImportError:
     analyze_metal_oxidative = None
@@ -169,7 +175,7 @@ SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.5.0-premium"
+REPORT_VERSION = "6.6.0-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",

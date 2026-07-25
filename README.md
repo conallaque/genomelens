@@ -21,7 +21,7 @@ Unauthorized copying, modification, or distribution is prohibited.
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![privacy](https://img.shields.io/badge/network-localhost%20only-purple)
-![tests](https://img.shields.io/badge/tests-223%20passing-brightgreen)
+![tests](https://img.shields.io/badge/tests-225%20passing-brightgreen)
 ![registry](https://img.shields.io/badge/SNP%20registry-unified-blueviolet)
 ![analyze.py](https://img.shields.io/badge/analyze.py-1%2C055%20lines-orange)
 
@@ -76,7 +76,7 @@ The most recent releases add three major analysis capabilities. Full details in
   antioxidant axis, and heavy-metal handling — with a wildfire-smoke resilience
   score and a genotype-personalised protocol. The metal/oxidative panel is now
   wired into the report.
-- 🧪 **223 tests** (was 145 at V8); `REPORT_VERSION` 6.5.0-premium.
+- 🧪 **225 tests** (was 145 at V8); `REPORT_VERSION` 6.6.0-premium.
 
 ## What's new in V8 — completion of the foundation
 
@@ -432,6 +432,7 @@ After a full run, the working directory will contain:
 | `emergency_card.html` | `--emergency-card` | One-page actionable summary. |
 | `narrative_report.html` | `--narrative` | LLM-written prose summary. |
 | `bloodwork.html` | `--bloodwork` | Comprehensive clinical panel (reference/optimal ranges, calculated markers, genotype-aware flags, system scores) + genetics-vs-labs comparison. |
+| `economic_analysis.html` | auto | Modeled 10-year economic impact of acting on your results (cost avoidance + QALY value, net value, ROI). |
 | `supplements.html` | auto | Tiered supplement stack with reasoning + chip gaps. |
 | `exercise.html` | auto | Power/endurance bias + weekly template. |
 | `nutrition.html` | auto | Macro ratios + food lists + daily plan. |
