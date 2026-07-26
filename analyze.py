@@ -190,12 +190,16 @@ try:
     from ancestral_story import analyze_ancestral_story
 except ImportError:
     analyze_ancestral_story = None
+try:
+    from neurochemistry import analyze_neurochemistry
+except ImportError:
+    analyze_neurochemistry = None
 
 SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.11.0-premium"
+REPORT_VERSION = "6.12.0-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",

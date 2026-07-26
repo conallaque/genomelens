@@ -6,6 +6,29 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.12.0-premium] — 2026-07-25 — Neurochemistry module (COMT / MAOA / BDNF composite phenotype)
+
+### Added
+
+- **New `neurochemistry.py` module** packaging the "warrior vs worrier" COMT
+  literature with MAOA, BDNF, DRD2/DRD4, 5-HTT, HTR2A, TPH2, CACNA1C, OPRM1,
+  and CHRNA5 into a composite phenotype with concrete recommendations:
+  * Stress-response profile (warrior/worrier/adaptive middle)
+  * Plasticity tier (BDNF-driven learning capacity)
+  * Stimulant response prediction, SSRI response prediction
+  * Caffeine protocol (dose/timing tuned to genotype)
+  * Meditation-style fit (focused-attention vs open-monitoring vs somatic)
+  * Career neurotype signature
+  * Addiction / substance flags (CHRNA5 smoking + OPRM1 opioid/naltrexone)
+- 10 new SNPs registered (rs4633, rs6323, rs1800497, rs1800955, rs25531,
+  rs1006737, rs6313, rs1799971, rs4570625, rs16969968).
+- Wired into pipeline, report section (nav + body), chat context.
+- `REPORT_VERSION` → 6.12.0-premium.
+
+### Tests
+
+- +8 unit tests (COMT classes, MAOA, BDNF, CHRNA5, composite completeness); 260 passing.
+
 ## [6.11.0-premium] — 2026-07-25 — Immunogenetics + Ancestral Story
 
 Two big additions that connect the ancestry, viral-resistance, and historical-

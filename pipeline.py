@@ -100,6 +100,7 @@ from analyze import (
     analyze_blood_type,
     analyze_immunogenetics,
     analyze_ancestral_story,
+    analyze_neurochemistry,
 )
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:
@@ -682,6 +683,18 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Blood-type module failed: {e}")
 
+    # ── Neurochemistry (COMT axis + composite phenotype recommendations) ──
+    neurochemistry_result: Optional[Dict] = None
+    if analyze_neurochemistry is not None:
+        try:
+            neurochemistry_result = analyze_neurochemistry(snps_df)
+            if neurochemistry_result.get("available"):
+                c = neurochemistry_result["composite"]
+                log(f"  Neurochemistry: COMT {c['comt_class']} · MAOA {c['maoa_class']} · "
+                    f"BDNF {c['bdnf_class']}")
+        except Exception as e:
+            log(f"  WARNING: Neurochemistry module failed: {e}")
+
     # ── Immunogenetics (viral/bacterial/parasitic resistance + selection) ──
     immunogenetics_result: Optional[Dict] = None
     if analyze_immunogenetics is not None:
@@ -808,6 +821,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         blood_type_result=blood_type_result,
         immunogenetics_result=immunogenetics_result,
         ancestral_story_result=ancestral_story_result,
+        neurochemistry_result=neurochemistry_result,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:

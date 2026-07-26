@@ -1507,6 +1507,102 @@ def _bar(value: float, max_value: float, color: str) -> str:
         f'<div style="height:100%;width:{pct:.1f}%;background:{color}"></div></div>')
 
 
+def build_neurochemistry_html(nc: Optional[Dict]) -> str:
+    """Neurochemistry — COMT axis + composite phenotype recommendations."""
+    if not nc or not nc.get("available"):
+        return ""
+    c = nc["composite"]
+
+    # ── Hero: composite phenotype summary ────
+    def _pill(label, value, color):
+        return (f'<div style="text-align:center;padding:10px 14px;background:#fff;'
+                f'border:1px solid #e3e7ec;border-radius:8px">'
+                f'<div style="font-size:.72em;color:#8a94a3;text-transform:uppercase;'
+                f'letter-spacing:.05em">{label}</div>'
+                f'<div style="font-size:1.05em;font-weight:700;color:{color}">{value}</div></div>')
+    comt_col = {"warrior": "#b3261e", "worrier": "#2b5f8e",
+                "middle": "#1a7f37"}.get(c["comt_class"], "#33404d")
+    maoa_col = {"MAOA-H": "#1a7f37", "MAOA-L": "#d29922",
+                "heterozygous": "#33404d"}.get(c["maoa_class"], "#33404d")
+    bdnf_col = "#1a7f37" if "Val/Val" in c["bdnf_class"] else "#d29922"
+    hero_pills = (
+        _pill("COMT axis", c["comt_class"].title(), comt_col) +
+        _pill("MAOA", c["maoa_class"], maoa_col) +
+        _pill("BDNF plasticity", c["bdnf_class"].split(" ")[0], bdnf_col))
+
+    subs = "".join(f"<li style='margin:4px 0'>{_esc(s)}</li>" for s in c.get("substance_flags", []))
+    subs_html = (f"<h4 style='margin:10px 0 4px'>Substance / addiction flags</h4>"
+                 f"<ul style='margin:0 0 6px 18px'>{subs}</ul>") if subs else ""
+
+    hero = f"""
+<div style="background:linear-gradient(135deg,#f4f8fc,#eef2f7);border:1px solid #dbe3ec;
+     border-radius:12px;padding:16px 20px;margin:12px 0">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">{hero_pills}</div>
+  <div style="line-height:1.6;color:#33404d">
+    <div style="margin-bottom:4px"><strong>Stress-response profile:</strong> {_esc(c['stress_response_profile'])}</div>
+    <div style="margin-bottom:4px"><strong>Plasticity tier:</strong> {_esc(c['plasticity_tier'])}</div>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:10px;margin:12px 0">
+  <div style="border:1px solid #dbe3ec;border-radius:8px;padding:11px 14px;background:#fff">
+    <div style="font-size:.75em;color:#8a94a3;text-transform:uppercase">Stimulant response</div>
+    <div style="line-height:1.55">{_esc(c['stimulant_response'])}</div></div>
+  <div style="border:1px solid #dbe3ec;border-radius:8px;padding:11px 14px;background:#fff">
+    <div style="font-size:.75em;color:#8a94a3;text-transform:uppercase">SSRI response</div>
+    <div style="line-height:1.55">{_esc(c['ssri_response'])}</div></div>
+  <div style="border:1px solid #dbe3ec;border-radius:8px;padding:11px 14px;background:#fff">
+    <div style="font-size:.75em;color:#8a94a3;text-transform:uppercase">Caffeine protocol</div>
+    <div style="line-height:1.55">{_esc(c['caffeine_protocol'])}</div></div>
+  <div style="border:1px solid #dbe3ec;border-radius:8px;padding:11px 14px;background:#fff">
+    <div style="font-size:.75em;color:#8a94a3;text-transform:uppercase">Meditation-style fit</div>
+    <div style="line-height:1.55">{_esc(c['meditation_fit'])}</div></div>
+  <div style="border:1px solid #dbe3ec;border-radius:8px;padding:11px 14px;background:#fff;grid-column:1/-1">
+    <div style="font-size:.75em;color:#8a94a3;text-transform:uppercase">Career neurotype</div>
+    <div style="line-height:1.55">{_esc(c['career_neurotype'])}</div>{subs_html}</div>
+</div>"""
+
+    # ── Domain findings ────
+    domain_html = ""
+    for cat in nc.get("categories", []):
+        rows = ""
+        for f in nc["by_category"].get(cat, []):
+            rows += f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid #12467a;border-radius:6px;
+     padding:11px 13px;margin:8px 0;background:#fff">
+  <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+    <span style="font-weight:700">{_esc(f['name'])}
+      <span style="font-weight:400;color:#8a94a3;font-size:.85em"> · {_esc(f['gene'])}</span></span>
+    <span style="font-size:.8em;color:#8a94a3">{_esc(f['confidence'])} confidence</span>
+  </div>
+  <div style="font-weight:600;color:#33404d;margin:4px 0">{_esc(f['phenotype'])}</div>
+  <div style="line-height:1.55;color:#4a5560;font-size:.9em">{_esc(f['mechanism'])}</div>
+  <div style="font-size:.86em;color:#2b5f8e;margin-top:4px"><strong>Action:</strong> {_esc(f['action'])}</div>
+  <div style="font-size:.75em;color:#9aa4b0;margin-top:3px">
+    genotype {_esc(f['genotype'])} · {_esc(f['rsid'])} · 📖 {_esc(f['citation'])}</div>
+</div>"""
+        domain_html += f'<h3 style="margin:16px 0 4px">{_esc(cat)}</h3>{rows}'
+
+    return f"""
+<section class="neurochemistry-section" id="neurochemistry">
+<h2>Neurochemistry <span class="pro-pill">V6.12</span></h2>
+<p class="anc-intro">
+Your dopamine, serotonin, plasticity, stress, and reward-signalling profile — packaged
+into a composite phenotype with concrete stimulant, SSRI, caffeine, meditation, and
+career recommendations. Grounded in the primary literature (COMT: Egan 2001 PNAS,
+Diamond 2007; BDNF: Egan 2003 Cell, Chen 2006 Science; MAOA: Caspi 2002 Science).
+</p>
+{hero}
+{domain_html}
+<div class="anc-caveat" style="margin-top:14px">
+Behavioural genetics of common variants operates at the level of <em>population
+tendencies</em>, not individual determinism. Effect sizes for most of these loci
+are modest (OR 1.1-1.5 per allele). Use as a decision-support layer for practices
+you'd already consider — not a verdict on who you are.
+</div>
+</section>
+"""
+
+
 def build_immunogenetics_html(ig: Optional[Dict]) -> str:
     """Immunogenetics — viral/bacterial/parasitic resistance + Historical Selection."""
     if not ig or not ig.get("available"):
@@ -3331,6 +3427,7 @@ def build_html_report(
     blood_type_result: Optional[Dict] = None,
     immunogenetics_result: Optional[Dict] = None,
     ancestral_story_result: Optional[Dict] = None,
+    neurochemistry_result: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -3606,6 +3703,7 @@ def build_html_report(
     deep_ancestry_html = build_deep_ancestry_html(deep_ancestry_result)
     blood_type_html = build_blood_type_html(blood_type_result)
     immunogenetics_html = build_immunogenetics_html(immunogenetics_result)
+    neurochemistry_html = build_neurochemistry_html(neurochemistry_result)
     ancestral_story_html = build_ancestral_story_html(ancestral_story_result)
     medications_html = build_medications_html(medications_result)
     # ── V4 sections ──
@@ -4623,6 +4721,7 @@ transparency.
   {"<a href='#deep-ancestry' class='nl nl-v5'>Deep Ancestry</a>" if deep_ancestry_html else ""}
   {"<a href='#blood-type' class='nl nl-v5'>Blood Type</a>" if blood_type_html else ""}
   {"<a href='#immunogenetics' class='nl nl-v5'>Immunogenetics</a>" if immunogenetics_html else ""}
+  {"<a href='#neurochemistry' class='nl nl-v5'>Neurochemistry</a>" if neurochemistry_html else ""}
   {"<a href='#ancestral-story' class='nl nl-v5'>Ancestral Story</a>" if ancestral_story_html else ""}
   <a href="#y-haplogroup" class="nl">Y-DNA Haplogroup</a>
   {"<a href='#mt-haplogroup' class='nl'>mtDNA Haplogroup</a>" if mt_result else ""}
@@ -4671,6 +4770,8 @@ transparency.
 {blood_type_html}
 
 {immunogenetics_html}
+
+{neurochemistry_html}
 
 {ancestral_story_html}
 
