@@ -1507,6 +1507,102 @@ def _bar(value: float, max_value: float, color: str) -> str:
         f'<div style="height:100%;width:{pct:.1f}%;background:{color}"></div></div>')
 
 
+def build_holistic_synthesis_html(hs: Optional[Dict]) -> str:
+    """Cross-panel synthesis — genome leverage score + insights + priorities.
+    Rendered FIRST after the exec summary so readers see the meta-view."""
+    if not hs or not hs.get("available"):
+        return ""
+
+    gl = hs.get("genome_leverage") or {}
+    score = gl.get("score", 50)
+    tier = gl.get("tier", "—")
+    tier_color = {"Very favorable": "#1a7f37", "Favorable": "#2a9d8f",
+                  "Balanced": "#d29922", "Actionable risk": "#b3261e"}.get(tier, "#41505f")
+
+    reasons_up = "".join(f'<div>+ {_esc(u)}</div>' for u in gl.get("reasons_up", []))
+    reasons_down = "".join(f'<div>− {_esc(d)}</div>' for d in gl.get("reasons_down", []))
+    reasons_col = ""
+    if reasons_up:
+        reasons_col += (f'<div style="color:#1a7f37;font-size:.86em;line-height:1.6">'
+                        f'<div style="font-weight:700">Drivers up</div>{reasons_up}</div>')
+    if reasons_down:
+        reasons_col += (f'<div style="color:#b3261e;font-size:.86em;line-height:1.6;margin-top:8px">'
+                        f'<div style="font-weight:700">Drivers down</div>{reasons_down}</div>')
+
+    leverage_hero = f"""
+<div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;
+     background:linear-gradient(135deg,#f4f8fc,#eef2f7);border:1.5px solid {tier_color};
+     border-radius:14px;padding:20px 24px;margin:14px 0">
+  <div style="text-align:center;min-width:140px">
+    <div style="font-size:.75em;color:#5b6673;text-transform:uppercase;letter-spacing:.05em">
+      Genome Leverage Score</div>
+    <div style="font-size:3em;font-weight:800;color:{tier_color};line-height:1">{score}</div>
+    <div style="font-size:.85em;color:{tier_color};font-weight:700">{_esc(tier)}</div>
+  </div>
+  <div style="flex:1;min-width:280px">
+    <div style="line-height:1.6;color:#33404d">{_esc(gl.get('narrative',''))}</div>
+    <div style="display:flex;gap:20px;margin-top:12px;flex-wrap:wrap">{reasons_col}</div>
+  </div>
+</div>"""
+
+    # Insights
+    insights_html = ""
+    for i in hs.get("insights", []):
+        impact_color = {"actionable": "#b3261e", "caution": "#d29922",
+                        "informational": "#2b5f8e"}.get(i.get("impact"), "#41505f")
+        ev = "".join(
+            f'<span style="background:#eef4fb;color:#12467a;border:1px solid #dbe3ec;'
+            f'border-radius:14px;padding:2px 8px;margin:0 3px 0 0;font-size:.72em">'
+            f'{_esc(e.get("module",""))}</span>'
+            for e in i.get("evidence", [])
+        )
+        insights_html += f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid {impact_color};
+     border-radius:8px;padding:12px 14px;margin:8px 0;background:#fff;break-inside:avoid">
+  <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap">
+    <span style="font-weight:700;color:#12467a">{_esc(i['title'])}</span>
+    <span style="font-size:.78em;color:{impact_color};font-weight:600">
+      {_esc(i.get('impact','—'))} · sev {i.get('severity',1)}</span>
+  </div>
+  <div style="line-height:1.55;color:#33404d;margin:6px 0">{_esc(i['explanation'])}</div>
+  <div style="line-height:1.55;color:#2b5f8e;font-size:.9em">
+    <strong>Action:</strong> {_esc(i['action'])}</div>
+  <div style="margin-top:6px">{ev}</div>
+</div>"""
+
+    # Priority actions
+    priority_html = ""
+    for a in hs.get("priority_actions", []):
+        priority_html += f"""
+<li style="margin:8px 0;line-height:1.55">
+  <strong style="color:#12467a">{a['priority']}. {_esc(a['title'])}</strong>
+  <div style="color:#4a5560;font-size:.9em;margin-top:3px">
+    <em>Why:</em> {_esc(a['why'])}</div>
+  <div style="color:#2b5f8e;font-size:.9em">
+    <em>Action:</em> {_esc(a['action'])}</div></li>"""
+
+    return f"""
+<section class="holistic-section" id="holistic-synthesis">
+<h2>Holistic Synthesis — Cross-Panel Patterns <span class="pro-pill">V6.13</span></h2>
+<p class="anc-intro">
+The synthesis layer: patterns that only exist when you look across panels.
+No single module can catch these — they emerge from the interaction of
+genotype, labs, ancestry, neurochemistry, and behaviour. A Genome Leverage
+Score summarises the overall pattern; specific cross-panel insights follow,
+each cited to the underlying findings that triggered it.
+</p>
+{leverage_hero}
+<h3 style="margin:18px 0 6px">Cross-panel insights ({hs['n_insights']})</h3>
+{insights_html or '<p style="color:var(--muted)">No cross-panel patterns detected.</p>'}
+{f'<h3 style="margin:18px 0 6px">Prioritised actions</h3><ol style="line-height:1.55;padding-left:22px">{priority_html}</ol>' if priority_html else ''}
+<div class="anc-caveat" style="margin-top:14px">
+This is a heuristic synthesis layer; each individual insight is grounded in the
+underlying modules but the composite is judgment, not clinical guidance.
+</div>
+</section>
+"""
+
+
 def build_neurochemistry_html(nc: Optional[Dict]) -> str:
     """Neurochemistry — COMT axis + composite phenotype recommendations."""
     if not nc or not nc.get("available"):
@@ -3428,6 +3524,7 @@ def build_html_report(
     immunogenetics_result: Optional[Dict] = None,
     ancestral_story_result: Optional[Dict] = None,
     neurochemistry_result: Optional[Dict] = None,
+    holistic_synthesis_result: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -3704,6 +3801,7 @@ def build_html_report(
     blood_type_html = build_blood_type_html(blood_type_result)
     immunogenetics_html = build_immunogenetics_html(immunogenetics_result)
     neurochemistry_html = build_neurochemistry_html(neurochemistry_result)
+    holistic_synthesis_html = build_holistic_synthesis_html(holistic_synthesis_result)
     ancestral_story_html = build_ancestral_story_html(ancestral_story_result)
     medications_html = build_medications_html(medications_result)
     # ── V4 sections ──
@@ -4727,6 +4825,7 @@ transparency.
   {"<a href='#mt-haplogroup' class='nl'>mtDNA Haplogroup</a>" if mt_result else ""}
   {"<a href='#counseling-triggers' class='nl nl-pro'>Consultation Triggers</a>" if counseling_html else ""}
   {"<a href='#exec-summary' class='nl'>Executive Summary</a>" if not no_ai and exec_summary else ""}
+  {"<a href='#holistic-synthesis' class='nl nl-v5'>Holistic Synthesis</a>" if holistic_synthesis_html else ""}
   {"<a href='#polygenic-risk-scores' class='nl nl-pro'>Polygenic Risk Scores</a>" if prs_html else ""}
   {"<a href='#expanded-pgs' class='nl nl-v3'>Expanded PGS</a>" if expanded_pgs_html else ""}
   {"<a href='#pharmacogenomics' class='nl nl-pro'>Pharmacogenomics</a>" if pgx_html else ""}
@@ -4782,6 +4881,8 @@ transparency.
 {counseling_html}
 
 {exec_html}
+
+{holistic_synthesis_html}
 
 {prs_html}
 

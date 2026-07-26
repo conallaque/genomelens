@@ -6,6 +6,44 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.13.0-premium] — 2026-07-25 — Holistic Synthesis: cross-panel patterns + Genome Leverage Score
+
+### Added
+
+- **New `holistic_synthesis.py` module** — the cross-panel pattern-detection
+  layer that catches insights only visible when multiple modules are combined:
+  * **FUT2 non-secretor × elevated hs-CRP** — non-secretor microbiome
+    baseline may inflate CRP; trend matters more than absolute values.
+  * **Fasting glucose ≥100 × HbA1c <5.7** — flags acute-stress /
+    poor-sleep morning-of-draw pattern rather than real dysglycemia.
+  * **APOE ε4 × elevated LDL/ApoB** — flags the ~2× lipid amplification
+    that ε4 carriers face.
+  * **CHRNA5 A-carrier × non-smoker** — recognises an actively realised
+    prevention success.
+  * **Ancestral diet fit** — European + LCT + Yamnaya × EEF → Mediterranean
+    + dairy diet is genetically appropriate, not just generically healthy.
+  * **BDNF Val/Val + adaptive neurotype + young adult** — deliberate
+    practice compounds materially more; window matters.
+  * **HFE clear × ferritin > 300** — high ferritin without HFE points to
+    inflammation, diet, alcohol, or fatty liver, not hemochromatosis.
+  * **Coffee protocol synthesis** — COMT × MAOA × CYP1A2 → specific dose
+    and timing recommendations.
+- **Genome Leverage Score (0-100)** — composite of protective/adverse findings
+  across APOE, PRS panels, longevity variants, immunogenetics headlines,
+  neurochemistry composite, PhenoAge acceleration, and flagged clinical
+  markers. Buckets into Very Favorable / Favorable / Balanced / Actionable Risk
+  with a narrative on the "environment = trajectory" leverage implication.
+- **Ranked priority actions** — top 6 cross-panel insights ranked by severity ×
+  confidence × modifiability × actionability.
+- New "Holistic Synthesis" report section rendered immediately after the
+  Executive Summary (meta-view leads the report).
+- `REPORT_VERSION` → 6.13.0-premium.
+
+### Tests
+
+- +6 unit tests (glucose/HbA1c discordance, FUT2×CRP, APOE×lipid,
+  favorable-genome leverage, CHRNA5 prevention, empty-input); 266 passing.
+
 ## [6.12.0-premium] — 2026-07-25 — Neurochemistry module (COMT / MAOA / BDNF composite phenotype)
 
 ### Added

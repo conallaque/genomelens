@@ -101,6 +101,7 @@ from analyze import (
     analyze_immunogenetics,
     analyze_ancestral_story,
     analyze_neurochemistry,
+    analyze_holistic_synthesis,
 )
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:
@@ -695,6 +696,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Neurochemistry module failed: {e}")
 
+    # ── Holistic Synthesis is computed near the end (needs upstream outputs) ──
+
     # ── Immunogenetics (viral/bacterial/parasitic resistance + selection) ──
     immunogenetics_result: Optional[Dict] = None
     if analyze_immunogenetics is not None:
@@ -778,6 +781,35 @@ def run_pipeline(args: argparse.Namespace) -> int:
     else:
         log("Skipping AI analysis (--no-ai)")
 
+    # ── Holistic Synthesis — cross-panel pattern detection ────────────────
+    holistic_synthesis_result: Optional[Dict] = None
+    if analyze_holistic_synthesis is not None:
+        try:
+            _sex = (qc_result or {}).get("inferred_sex")
+            holistic_synthesis_result = analyze_holistic_synthesis(
+                tier1_results={
+                    "apoe_genotype": apoe_genotype,
+                    "prs_summary": {p: r for p, r in
+                                    ((prs_result or {}).get("panels") or {}).items()},
+                    "variants": tier1_results,
+                },
+                bloodwork_result=bloodwork_result,
+                immunogenetics_result=immunogenetics_result,
+                neurochemistry_result=neurochemistry_result,
+                deep_ancestry_result=deep_ancestry_result,
+                ancestry_result=ancestry_result,
+                prs_result=prs_result,
+                pgx_result=pgx_result,
+                meta={"sex": _sex, "smoker": False},
+            )
+            if holistic_synthesis_result.get("available"):
+                gl = holistic_synthesis_result.get("genome_leverage") or {}
+                log(f"  Holistic synthesis: {holistic_synthesis_result['n_insights']} "
+                    f"cross-panel insights · Genome Leverage {gl.get('score','?')}/100 "
+                    f"({gl.get('tier','?')})")
+        except Exception as e:
+            log(f"  WARNING: Holistic synthesis failed: {e}")
+
     log("Generating HTML report ...")
     html = build_html_report(
         tier1_results=tier1_results,
@@ -822,6 +854,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         immunogenetics_result=immunogenetics_result,
         ancestral_story_result=ancestral_story_result,
         neurochemistry_result=neurochemistry_result,
+        holistic_synthesis_result=holistic_synthesis_result,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:
