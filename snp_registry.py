@@ -888,6 +888,139 @@ _RECORDS: list[SNPRecord] = [
         source="dbSNP; AS3MT arsenic-methylation literature",
         aliases=("Met287Thr", "M287T"),
     ),
+
+    # ── Urologic panel (urologic.py) ─────────────────────────────────────
+    # OAB / detrusor
+    SNPRecord(
+        rsid="rs4994", gene="ADRB3", chrom="8",
+        pos_grch37=37_823_798, pos_grch38=37_966_280,
+        ancestral="A", derived="G",
+        description="ADRB3 Trp64Arg — Arg64 (G) alters beta-3 adrenergic "
+                    "receptor signalling; target of mirabegron for OAB.",
+        source="dbSNP; ADRB3 OAB / mirabegron literature",
+        aliases=("Trp64Arg", "W64R"),
+    ),
+    SNPRecord(
+        rsid="rs2229870", gene="CHRM3", chrom="1",
+        pos_grch37=239_853_611, pos_grch38=239_690_311,
+        ancestral="C", derived="T",
+        description="CHRM3 (M3 muscarinic receptor) coding variant — target of "
+                    "antimuscarinic OAB drugs.",
+        source="dbSNP; CHRM3 urologic literature",
+    ),
+    # Prostate — BPH / 5α-reductase / cancer
+    SNPRecord(
+        rsid="rs523349", gene="SRD5A2", chrom="2",
+        pos_grch37=31_805_694, pos_grch38=31_580_827,
+        ancestral="C", derived="G",
+        description="SRD5A2 V89L — Leu89 (G) lowers 5α-reductase-2 activity; "
+                    "modulates BPH progression and 5-ARI drug response.",
+        source="dbSNP; SRD5A2 V89L literature",
+        aliases=("V89L", "Val89Leu"),
+    ),
+    SNPRecord(
+        rsid="rs9282858", gene="SRD5A2", chrom="2",
+        pos_grch37=31_805_826, pos_grch38=31_580_959,
+        ancestral="G", derived="A",
+        description="SRD5A2 A49T — gain-of-function variant associated in some "
+                    "cohorts with more aggressive prostate cancer.",
+        source="dbSNP; SRD5A2 A49T literature",
+        aliases=("A49T", "Ala49Thr"),
+    ),
+    SNPRecord(
+        rsid="rs138213197", gene="HOXB13", chrom="17",
+        pos_grch37=46_805_705, pos_grch38=48_728_343,
+        ancestral="C", derived="T",
+        description="HOXB13 G84E — the highest-penetrance common hereditary "
+                    "prostate-cancer variant; carriers have ~3-4× lifetime risk.",
+        source="dbSNP; Ewing 2012 NEJM; HOXB13 prostate-cancer literature",
+        aliases=("G84E", "Gly84Glu"),
+        clinical_significance="Pathogenic (hereditary prostate cancer risk)",
+    ),
+    SNPRecord(
+        rsid="rs1447295", gene="8q24 (region)", chrom="8",
+        pos_grch37=128_485_038, pos_grch38=127_472_791,
+        ancestral="C", derived="A",
+        description="8q24 prostate-cancer risk locus — A allele modestly raises "
+                    "prostate-cancer risk (per-allele OR ~1.15-1.25).",
+        source="dbSNP; multiple prostate-cancer GWAS",
+    ),
+    SNPRecord(
+        rsid="rs6983267", gene="8q24 (region)", chrom="8",
+        pos_grch37=128_413_305, pos_grch38=127_401_060,
+        ancestral="T", derived="G",
+        description="8q24 prostate-cancer risk locus — G allele raises "
+                    "prostate-cancer risk; also linked to colorectal cancer.",
+        source="dbSNP; Yeager 2007, Haiman 2007 prostate-cancer GWAS",
+    ),
+    SNPRecord(
+        rsid="rs10993994", gene="MSMB", chrom="10",
+        pos_grch37=51_549_496, pos_grch38=46_046_444,
+        ancestral="C", derived="T",
+        description="MSMB β-microseminoprotein promoter — T allele reduces "
+                    "MSMB expression and raises prostate-cancer risk.",
+        source="dbSNP; Eeles 2008, Thomas 2008 prostate-cancer GWAS",
+    ),
+    # Kidney stones
+    SNPRecord(
+        rsid="rs219780", gene="CLDN14", chrom="21",
+        pos_grch37=37_833_307, pos_grch38=36_461_002,
+        ancestral="T", derived="C",
+        description="CLDN14 (claudin-14) — C allele raises paracellular calcium "
+                    "excretion and 40-60% higher calcium-stone risk.",
+        source="dbSNP; Thorleifsson 2009 Nat Genet (kidney stones GWAS)",
+    ),
+    SNPRecord(
+        rsid="rs4074995", gene="SLC34A1", chrom="5",
+        pos_grch37=176_814_244, pos_grch38=177_387_243,
+        ancestral="A", derived="G",
+        description="SLC34A1 (Na-Pi cotransporter) — G allele linked to kidney-"
+                    "stone risk and slightly reduced eGFR.",
+        source="dbSNP; large renal-function GWAS",
+    ),
+    SNPRecord(
+        rsid="rs1042636", gene="CASR", chrom="3",
+        pos_grch37=122_003_769, pos_grch38=122_284_922,
+        ancestral="A", derived="G",
+        description="CASR Arg990Gly — Gly990 (G) is a gain-of-function calcium-"
+                    "sensing-receptor variant that raises urinary calcium.",
+        source="dbSNP; CASR nephrolithiasis literature",
+        aliases=("R990G", "Arg990Gly"),
+    ),
+    SNPRecord(
+        rsid="rs2072499", gene="PKD1", chrom="1",
+        pos_grch37=156_169_610, pos_grch38=156_199_818,
+        ancestral="G", derived="A",
+        description="PKD1 common polymorphism — modest kidney-function modifier "
+                    "in GWAS; NOT a pathogenic PKD1 mutation.",
+        source="dbSNP; renal-function GWAS",
+    ),
+    # Testicular germ-cell cancer
+    SNPRecord(
+        rsid="rs995030", gene="KITLG", chrom="12",
+        pos_grch37=88_890_671, pos_grch38=88_496_894,
+        ancestral="A", derived="G",
+        description="KITLG rs995030 — one of the strongest common testicular "
+                    "germ-cell tumor risk variants (per-allele OR ~1.3-1.4).",
+        source="dbSNP; Kanetsky 2009, Rapley 2009 TGCT GWAS",
+    ),
+    SNPRecord(
+        rsid="rs4324715", gene="SPRY4", chrom="5",
+        pos_grch37=141_705_251, pos_grch38=142_325_664,
+        ancestral="T", derived="C",
+        description="SPRY4 rs4324715 — replicated testicular germ-cell tumor "
+                    "risk locus (modest per-allele effect).",
+        source="dbSNP; TGCT GWAS",
+    ),
+    # Hormone bioavailability
+    SNPRecord(
+        rsid="rs1799941", gene="SHBG", chrom="17",
+        pos_grch37=7_533_423, pos_grch38=7_630_104,
+        ancestral="G", derived="A",
+        description="SHBG rs1799941 — A allele raises SHBG levels; lowers "
+                    "bioavailable free testosterone at any given total-T.",
+        source="dbSNP; Ohlsson 2011 SHBG / free-T GWAS",
+    ),
 ]
 
 

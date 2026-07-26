@@ -1647,6 +1647,62 @@ _DETOX_IMPACT_STYLE = {
 }
 
 
+def build_urologic_html(ur: Optional[Dict]) -> str:
+    """Urologic & Genitourinary panel — OAB, BPH, prostate cancer, kidney stones,
+    testicular / reproductive, DHT metabolism."""
+    if not ur or not ur.get("available"):
+        return ""
+    impact_color = {
+        "higher-load": "#f85149", "reduced": "#d29922",
+        "reduced-clearance": "#f85149", "intermediate": "#8b949e",
+        "typical": "#3fb950", "protective": "#3fb950",
+    }
+    conf_col = {"high": "#3fb950", "moderate": "#d29922", "low": "#8b949e"}
+
+    domains_html = ""
+    for cat in ur.get("categories", []):
+        items = ur["by_category"].get(cat, [])
+        rows = ""
+        for f in items:
+            border = impact_color.get(f["impact"], "#8b949e")
+            rows += f"""
+<div style="border:1px solid var(--bdr);border-left:4px solid {border};border-radius:6px;
+     padding:12px;margin:8px 0;background:var(--bg2)">
+  <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+    <div style="font-weight:700">{_esc(f['trait'])}
+      <span style="font-weight:400;color:var(--muted);font-size:.85em"> · {_esc(f['gene'])}</span></div>
+    <div><span style="color:{border};font-weight:600;font-size:.85em">{_esc(f['impact'])}</span>
+      <span style="color:{conf_col.get(f['confidence'], '#8b949e')};font-size:.8em"> · {_esc(f['confidence'])} confidence</span></div>
+  </div>
+  <div style="margin:6px 0;line-height:1.5">{_esc(f['result'])}</div>
+  <div style="font-size:.9em;color:var(--acc2)"><strong>Action:</strong> {_esc(f['action'])}</div>
+  <div style="font-size:.78em;color:var(--dim);margin-top:4px;font-family:var(--mono)">
+    {_esc(f['rsid'])} · genotype {_esc(f['genotype'])} · {_esc(f['evidence'])}</div>
+</div>"""
+        domains_html += f'<h3 style="margin-top:18px">{_esc(cat)}</h3>{rows}'
+
+    return f"""
+<section class="urologic-section" id="urologic">
+<h2>Urologic &amp; Genitourinary Panel <span class="pro-pill">V6.8</span></h2>
+<p class="anc-intro">
+Genotype-based screen for common urologic conditions — <strong>bladder function
+(OAB)</strong>, <strong>BPH &amp; 5α-reductase</strong>,
+<strong>prostate cancer</strong> (including HOXB13, the top hereditary marker),
+<strong>kidney stones</strong>, <strong>testicular germ-cell cancer</strong>,
+and <strong>androgen bioavailability</strong>. {ur['n_findings']} findings across
+{len(ur.get('categories', []))} sub-panels.
+</p>
+<div class="urologic-domains">{domains_html}</div>
+<div class="anc-caveat" style="margin-top:14px">
+<strong>Consumer-chip screen, not a clinical diagnostic.</strong> A HOXB13 G84E
+positive on this chip is worth confirming with clinical-grade sequencing; family
+history and PSA/urine studies remain the primary clinical tools. Testicular
+self-exam remains the single highest-yield screening action here.
+</div>
+</section>
+"""
+
+
 def build_detox_html(dx: Optional[Dict]) -> str:
     """Detoxification & Environmental Resilience — smoke / PAH / heavy metals."""
     if not dx or not dx.get("available"):
@@ -2888,6 +2944,7 @@ def build_html_report(
     top_drugs_result: Optional[Dict] = None,
     metal_oxidative_result: Optional[Dict] = None,
     detox_result: Optional[Dict] = None,
+    urologic_result: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -3177,6 +3234,7 @@ def build_html_report(
     top_drugs_html = build_top_drugs_html(top_drugs_result)
     # ── V9/V10 sections ──
     detox_html = build_detox_html(detox_result)
+    urologic_html = build_urologic_html(urologic_result)
     metal_oxidative_html = build_metal_oxidative_html(metal_oxidative_result)
 
     # ── Full HTML ──
@@ -4188,6 +4246,7 @@ transparency.
   {"<a href='#trait-predictions' class='nl nl-pro'>Trait Predictions</a>" if traits_html else ""}
   {"<a href='#wellness' class='nl nl-v4'>Wellness</a>" if wellness_html else ""}
   {"<a href='#detoxification' class='nl nl-v5'>Detoxification</a>" if detox_html else ""}
+  {"<a href='#urologic' class='nl nl-v5'>Urologic Panel</a>" if urologic_html else ""}
   {"<a href='#metal-oxidative' class='nl nl-v5'>Metal &amp; Oxidative</a>" if metal_oxidative_html else ""}
   {"<a href='#genetic-age' class='nl nl-v5'>Genetic Age</a>" if genetic_age_html else ""}
   {"<a href='#hla-immune' class='nl nl-v5'>HLA / Immune</a>" if hla_html else ""}
@@ -4244,6 +4303,8 @@ transparency.
 {wellness_html}
 
 {detox_html}
+
+{urologic_html}
 
 {metal_oxidative_html}
 

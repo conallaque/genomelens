@@ -46,6 +46,7 @@ def _summarise_context(
     detox_result: Optional[Dict] = None,
     economics_result: Optional[Dict] = None,
     personal_econ_result: Optional[Dict] = None,
+    urologic_result: Optional[Dict] = None,
     y_result: Optional[Dict] = None,
     mt_result: Optional[Dict] = None,
 ) -> str:
@@ -176,6 +177,17 @@ def _summarise_context(
             for v in gl["variants"][:8]:
                 tag = "FAV" if v["favorable"] else "adv"
                 lines.append(f"    - {v['gene']} {v['rsid']} [{v['genotype']}] {tag}: {v['label']}")
+
+    # ── Urologic panel ───────────────────────────────────────────────────────
+    if urologic_result and urologic_result.get("available"):
+        lines.append(f"\nUROLOGIC PANEL: {urologic_result['n_findings']} findings "
+                     f"({urologic_result.get('n_flagged',0)} flagged) across "
+                     f"{len(urologic_result.get('categories',[]))} sub-panels "
+                     f"(OAB, BPH/prostate, kidney stones, testicular, androgen).")
+        for f in urologic_result.get("findings", []):
+            if f.get("impact") in ("higher-load", "reduced", "reduced-clearance"):
+                lines.append(f"  - {f['gene']} {f['trait'][:60]} "
+                             f"[{f['genotype']}, {f['impact']}]: {f['result'][:140]}...")
 
     # ── Detox / smoke resilience ─────────────────────────────────────────────
     if detox_result and detox_result.get("available"):
@@ -426,6 +438,7 @@ def run_chat(
     detox_result: Optional[Dict] = None,
     economics_result: Optional[Dict] = None,
     personal_econ_result: Optional[Dict] = None,
+    urologic_result: Optional[Dict] = None,
     y_result: Optional[Dict] = None,
     mt_result: Optional[Dict] = None,
 ) -> None:
@@ -439,7 +452,7 @@ def run_chat(
         interactions_result=interactions_result, ancestry_result=ancestry_result,
         bloodwork_result=bloodwork_result, detox_result=detox_result,
         economics_result=economics_result, personal_econ_result=personal_econ_result,
-        y_result=y_result, mt_result=mt_result,
+        urologic_result=urologic_result, y_result=y_result, mt_result=mt_result,
     )
     mode = "deep"
     topic_bias = None

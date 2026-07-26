@@ -95,6 +95,7 @@ from analyze import (
     run_chat,
     analyze_metal_oxidative,
     analyze_detox,
+    analyze_urologic,
 )
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:
@@ -639,6 +640,18 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Detoxification module failed: {e}")
 
+    # ── Urologic & genitourinary panel (OAB, BPH, prostate, stones, testis) ──
+    urologic_result: Optional[Dict] = None
+    if analyze_urologic is not None:
+        try:
+            urologic_result = analyze_urologic(snps_df)
+            if urologic_result.get("available"):
+                log(f"  Urologic panel: {urologic_result.get('n_findings', 0)} "
+                    f"findings across {len(urologic_result.get('categories', []))} "
+                    f"categories ({urologic_result.get('n_flagged', 0)} flagged)")
+        except Exception as e:
+            log(f"  WARNING: Urologic module failed: {e}")
+
     # ── ClinPGx/PharmGKB clinical-variant annotations for typed rsIDs ──
     pharmgkb_result: Optional[Dict] = None
     if analyze_pharmgkb_clinical is not None:
@@ -729,6 +742,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         top_drugs_result=top_drugs_result,
         metal_oxidative_result=metal_oxidative_result,
         detox_result=detox_result,
+        urologic_result=urologic_result,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:
@@ -1028,6 +1042,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 ancestry_result=ancestry_result,
                 bloodwork_result=bloodwork_result,
                 detox_result=detox_result,
+                urologic_result=urologic_result,
                 economics_result=economics_result,
                 y_result=y_result,
                 mt_result=mt_result,

@@ -6,6 +6,33 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.8.0-premium] — 2026-07-25 — Urologic & genitourinary panel
+
+### Added
+
+- **New Urologic module** (`urologic.py`) — a dedicated genotype screen for
+  urologic conditions that the other panels didn't cover (specifically requested
+  after the chat noted OAB was missing). 5 sub-panels, 15 registered SNPs:
+  - **Bladder / OAB** — ADRB3 Trp64Arg (mirabegron target), CHRM3 M3 receptor
+    (antimuscarinic OAB drugs), plus NAT2 acetylator × bladder-cancer risk
+    (cross-referenced from detox).
+  - **Prostate — BPH & cancer** — SRD5A2 V89L (5α-reductase / finasteride
+    response) and A49T, **HOXB13 G84E** (the top hereditary prostate-cancer
+    marker, flagged high-confidence), 8q24 loci (rs1447295, rs6983267), MSMB
+    rs10993994.
+  - **Kidney stones** — CLDN14 rs219780 (calcium-stone risk), SLC34A1
+    rs4074995, CASR R990G, PKD1 rs2072499.
+  - **Testicular germ-cell cancer** — KITLG rs995030, SPRY4 rs4324715.
+  - **Androgen bioavailability** — SHBG rs1799941 (free-T interpretation).
+- New report section **Urologic & Genitourinary Panel**, plus urologic context
+  fed into the chat assistant so questions about OAB / BPH / prostate now
+  ground in the user's actual variants.
+- `REPORT_VERSION` → 6.8.0-premium.
+
+### Tests
+
+- +5 unit tests (registry consistency + panel behaviour); 232 passing.
+
 ## [6.7.2-premium] — 2026-07-25 — Fix cross-category synthesis 400 (per-call num_ctx)
 
 ### Fixed
