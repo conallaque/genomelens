@@ -6,6 +6,31 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.10.0-premium] — 2026-07-25 — Blood type (ABO + RhD + FUT2 secretor)
+
+### Added
+
+- **New `blood_type.py` module** predicting ABO phenotype/genotype (A / B /
+  AB / O — including hidden recessive-O carrier flag), Rh(D) status, and
+  FUT2 secretor status. Wired into report + chat context.
+  - **ABO**: uses rs8176719 (delG frameshift = O allele), rs8176746, rs8176747,
+    rs7853989 for A-vs-B backbone discrimination. Correctly handles the
+    recessive nature of O (A/O genotype → phenotype A).
+  - **Rh(D)**: prefers dedicated tag SNPs (rs590787, rs676785, rs2280330, rs660,
+    rs586178) when present. When absent, uses a **coverage-based inference**
+    over the RHD gene body (chr1:25.58-25.68 Mb): homozygous RHD-deletion
+    individuals have essentially no calls in this region.
+  - **FUT2 rs601338 secretor status**: AA = non-secretor (protective against
+    noroviruses), G-carriers = secretor.
+  - Consolidated blood-group string (e.g. "A+") with population-frequency
+    context and prominent "not a clinical typing" disclaimer.
+- `REPORT_VERSION` → 6.10.0-premium.
+
+### Tests
+
+- +6 unit tests (Type-A/O, Type-O homozygous, Type-AB, RhD-negative via low
+  coverage, secretor status, empty input); 244 passing.
+
 ## [6.9.0-premium] — 2026-07-25 — Deep ancestry: Neanderthal + ancient populations + N-S European axis + migration timelines
 
 ### Added

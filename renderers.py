@@ -1507,6 +1507,70 @@ def _bar(value: float, max_value: float, color: str) -> str:
         f'<div style="height:100%;width:{pct:.1f}%;background:{color}"></div></div>')
 
 
+def build_blood_type_html(bt: Optional[Dict]) -> str:
+    """Blood type inference — ABO + RhD + FUT2 secretor status."""
+    if not bt or not bt.get("available"):
+        return ""
+    combined = bt.get("combined") or "—"
+    a = bt["abo"]; d = bt["rhd"]; s = bt["secretor"]
+
+    # Pick a colour by rarity
+    rarity = {"O+": "#3fb950", "A+": "#3fb950", "B+": "#d29922", "AB+": "#d29922",
+              "O-": "#f85149", "A-": "#f85149", "B-": "#b3261e", "AB-": "#b3261e"}
+    hero_color = rarity.get(combined, "#8b949e")
+
+    abo_evidence = "".join(
+        f'<tr><td class="rsid-cell"><a href="https://www.ncbi.nlm.nih.gov/snp/{_esc(e["rsid"])}" '
+        f'target="_blank" rel="noopener">{_esc(e["rsid"])}</a></td>'
+        f'<td class="gt-cell">{_esc(e["gt"])}</td>'
+        f'<td>{_esc(e["interpretation"])}</td></tr>'
+        for e in a.get("evidence", []))
+
+    hidden_o = ("<div style='margin-top:6px;color:#12467a'><strong>Carries a hidden O allele</strong> "
+                "— you can pass either A or O to a child.</div>"
+                if a.get("carries_hidden_O") else "")
+
+    secretor_html = ""
+    if s.get("available"):
+        secretor_html = f"""
+<h3 style="margin:18px 0 6px">FUT2 Secretor Status</h3>
+<div style="border:1px solid var(--bdr);border-left:4px solid #12467a;background:var(--bg2);
+     border-radius:6px;padding:11px 13px">
+  <div style="font-weight:700">{_esc(s['secretor_status'])}</div>
+  {"".join(f'<div style="color:var(--muted);font-size:.9em;margin-top:3px">{_esc(e["interpretation"])}</div>' for e in s['evidence'])}
+</div>"""
+
+    return f"""
+<section class="bloodtype-section" id="blood-type">
+<h2>Blood Type <span class="pro-pill">V6.10</span></h2>
+<div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin:12px 0;
+     background:linear-gradient(135deg,#f4f8fc,#eef2f7);border:1.5px solid {hero_color};
+     border-radius:14px;padding:20px 24px">
+  <div style="text-align:center;min-width:120px">
+    <div style="font-size:.75em;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Predicted</div>
+    <div style="font-size:3.4em;font-weight:800;color:{hero_color};line-height:1">{_esc(combined)}</div>
+  </div>
+  <div style="flex:1;min-width:220px">
+    <div style="font-size:1.1em"><strong>ABO:</strong> {_esc(a['phenotype'])}
+      <span style="color:var(--muted);font-size:.85em"> · genotype {_esc(a['genotype'])} · {_esc(a['confidence'])} confidence</span></div>
+    <div style="font-size:1em;margin-top:2px"><strong>Rh(D):</strong> {_esc(d['status'])}
+      <span style="color:var(--muted);font-size:.85em"> · {_esc(d['confidence'])} confidence</span></div>
+    {hidden_o}
+    <div style="color:var(--muted);font-size:.85em;margin-top:8px">{_esc(bt.get('population_context', ''))}</div>
+  </div>
+</div>
+<h3 style="margin:14px 0 4px">ABO evidence</h3>
+<div class="tbl-wrap"><table class="snp-tbl"><thead><tr>
+  <th>rsID</th><th>Genotype</th><th>Interpretation</th></tr></thead>
+<tbody>{abo_evidence}</tbody></table></div>
+<h3 style="margin:14px 0 4px">Rh(D) inference</h3>
+<div style="color:var(--muted);font-size:.9em">{_esc(d['method'])}</div>
+{secretor_html}
+<div class="anc-caveat" style="margin-top:12px">{_esc(bt.get('disclaimer',''))}</div>
+</section>
+"""
+
+
 def build_deep_ancestry_html(da: Optional[Dict]) -> str:
     """State-of-the-art deep ancestry — Neanderthal, ancient populations,
     N-S European axis, and haplogroup migration timelines."""
@@ -3097,6 +3161,7 @@ def build_html_report(
     detox_result: Optional[Dict] = None,
     urologic_result: Optional[Dict] = None,
     deep_ancestry_result: Optional[Dict] = None,
+    blood_type_result: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -3370,6 +3435,7 @@ def build_html_report(
     expanded_pgs_html = build_expanded_pgs_html(expanded_pgs_result)
     ancestry_html = build_ancestry_html(ancestry_result)
     deep_ancestry_html = build_deep_ancestry_html(deep_ancestry_result)
+    blood_type_html = build_blood_type_html(blood_type_result)
     medications_html = build_medications_html(medications_result)
     # ── V4 sections ──
     wellness_html = build_wellness_html(wellness_result)
@@ -4384,6 +4450,7 @@ transparency.
   <a href="#apoe" class="nl">APOE Genotype</a>
   {"<a href='#ancestry' class='nl nl-v3'>Ancestry</a>" if ancestry_html else ""}
   {"<a href='#deep-ancestry' class='nl nl-v5'>Deep Ancestry</a>" if deep_ancestry_html else ""}
+  {"<a href='#blood-type' class='nl nl-v5'>Blood Type</a>" if blood_type_html else ""}
   <a href="#y-haplogroup" class="nl">Y-DNA Haplogroup</a>
   {"<a href='#mt-haplogroup' class='nl'>mtDNA Haplogroup</a>" if mt_result else ""}
   {"<a href='#counseling-triggers' class='nl nl-pro'>Consultation Triggers</a>" if counseling_html else ""}
@@ -4427,6 +4494,8 @@ transparency.
 {ancestry_html}
 
 {deep_ancestry_html}
+
+{blood_type_html}
 
 {ydna_section_html}
 

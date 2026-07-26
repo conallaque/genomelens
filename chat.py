@@ -48,6 +48,7 @@ def _summarise_context(
     personal_econ_result: Optional[Dict] = None,
     urologic_result: Optional[Dict] = None,
     deep_ancestry_result: Optional[Dict] = None,
+    blood_type_result: Optional[Dict] = None,
     y_result: Optional[Dict] = None,
     mt_result: Optional[Dict] = None,
 ) -> str:
@@ -178,6 +179,16 @@ def _summarise_context(
             for v in gl["variants"][:8]:
                 tag = "FAV" if v["favorable"] else "adv"
                 lines.append(f"    - {v['gene']} {v['rsid']} [{v['genotype']}] {tag}: {v['label']}")
+
+    # ── Blood type (ABO + Rh + secretor) ─────────────────────────────────────
+    if blood_type_result and blood_type_result.get("available"):
+        bt = blood_type_result
+        lines.append(f"\nBLOOD TYPE (predicted): {bt.get('combined') or '—'} "
+                     f"(ABO {bt['abo']['phenotype']}, genotype {bt['abo']['genotype']}; "
+                     f"Rh {bt['rhd']['status']}). "
+                     f"FUT2: {bt['secretor'].get('secretor_status','?')}.")
+        if bt["abo"].get("carries_hidden_O"):
+            lines.append("  · Carries a hidden O allele (recessive)")
 
     # ── Deep ancestry (Neanderthal + ancient populations + N/S axis) ─────────
     if deep_ancestry_result and deep_ancestry_result.get("available"):
@@ -468,6 +479,7 @@ def run_chat(
     personal_econ_result: Optional[Dict] = None,
     urologic_result: Optional[Dict] = None,
     deep_ancestry_result: Optional[Dict] = None,
+    blood_type_result: Optional[Dict] = None,
     y_result: Optional[Dict] = None,
     mt_result: Optional[Dict] = None,
 ) -> None:
@@ -482,6 +494,7 @@ def run_chat(
         bloodwork_result=bloodwork_result, detox_result=detox_result,
         economics_result=economics_result, personal_econ_result=personal_econ_result,
         urologic_result=urologic_result, deep_ancestry_result=deep_ancestry_result,
+        blood_type_result=blood_type_result,
         y_result=y_result, mt_result=mt_result,
     )
     mode = "deep"

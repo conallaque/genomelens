@@ -97,6 +97,7 @@ from analyze import (
     analyze_detox,
     analyze_urologic,
     analyze_deep_ancestry,
+    analyze_blood_type,
 )
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:
@@ -667,6 +668,18 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Deep-ancestry module failed: {e}")
 
+    # ── Blood type (ABO + Rh + secretor) ──
+    blood_type_result: Optional[Dict] = None
+    if analyze_blood_type is not None:
+        try:
+            blood_type_result = analyze_blood_type(snps_df)
+            if blood_type_result.get("available"):
+                log(f"  Blood type: {blood_type_result.get('combined') or '—'} "
+                    f"({blood_type_result['abo']['genotype']}) · "
+                    f"{blood_type_result['secretor'].get('secretor_status','?')}")
+        except Exception as e:
+            log(f"  WARNING: Blood-type module failed: {e}")
+
     # ── ClinPGx/PharmGKB clinical-variant annotations for typed rsIDs ──
     pharmgkb_result: Optional[Dict] = None
     if analyze_pharmgkb_clinical is not None:
@@ -759,6 +772,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         detox_result=detox_result,
         urologic_result=urologic_result,
         deep_ancestry_result=deep_ancestry_result,
+        blood_type_result=blood_type_result,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:
@@ -1060,6 +1074,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 detox_result=detox_result,
                 urologic_result=urologic_result,
                 deep_ancestry_result=deep_ancestry_result,
+                blood_type_result=blood_type_result,
                 economics_result=economics_result,
                 y_result=y_result,
                 mt_result=mt_result,
