@@ -47,6 +47,7 @@ def _summarise_context(
     economics_result: Optional[Dict] = None,
     personal_econ_result: Optional[Dict] = None,
     urologic_result: Optional[Dict] = None,
+    deep_ancestry_result: Optional[Dict] = None,
     y_result: Optional[Dict] = None,
     mt_result: Optional[Dict] = None,
 ) -> str:
@@ -177,6 +178,33 @@ def _summarise_context(
             for v in gl["variants"][:8]:
                 tag = "FAV" if v["favorable"] else "adv"
                 lines.append(f"    - {v['gene']} {v['rsid']} [{v['genotype']}] {tag}: {v['label']}")
+
+    # ── Deep ancestry (Neanderthal + ancient populations + N/S axis) ─────────
+    if deep_ancestry_result and deep_ancestry_result.get("available"):
+        n = deep_ancestry_result.get("neanderthal") or {}
+        if n.get("available"):
+            lines.append(f"\nDEEP ANCESTRY — Neanderthal affinity ~{n.get('approx_pct','?')}% "
+                         f"({n.get('tier','?')}); {n.get('n_carrying',0)} of "
+                         f"{n.get('n_typed',0)} Neanderthal-tagged loci carrying.")
+            for v in n.get("variants", [])[:5]:
+                if v["n_alleles"] > 0:
+                    lines.append(f"  · Neanderthal allele: {v['gene']} {v['rsid']} "
+                                 f"[{v['genotype']}, dose {v['n_alleles']}] — {v['trait'][:100]}")
+        ap = deep_ancestry_result.get("ancient_populations") or {}
+        if ap.get("available"):
+            top3 = ap["populations"][:3]
+            lines.append("Ancient-population affinity (Yamnaya/EEF/WHG): " +
+                         ", ".join(f"{p['short']} {p['affinity']*100:.0f}%" for p in top3))
+        ea = deep_ancestry_result.get("european_axis") or {}
+        if ea.get("available"):
+            lines.append(f"N-S Europe axis: {ea['lean']} (index {ea['index']})")
+        tl = deep_ancestry_result.get("haplogroup_timeline") or {}
+        if tl.get("y"):
+            lines.append(f"Y-DNA timeline: {tl['y']['haplogroup']} — TMRCA ~"
+                         f"{tl['y']['tmrca_kya']} kya · {tl['y']['origin']}")
+        if tl.get("mt"):
+            lines.append(f"mtDNA timeline: {tl['mt']['haplogroup']} — TMRCA ~"
+                         f"{tl['mt']['tmrca_kya']} kya · {tl['mt']['origin']}")
 
     # ── Urologic panel ───────────────────────────────────────────────────────
     if urologic_result and urologic_result.get("available"):
@@ -439,6 +467,7 @@ def run_chat(
     economics_result: Optional[Dict] = None,
     personal_econ_result: Optional[Dict] = None,
     urologic_result: Optional[Dict] = None,
+    deep_ancestry_result: Optional[Dict] = None,
     y_result: Optional[Dict] = None,
     mt_result: Optional[Dict] = None,
 ) -> None:
@@ -452,7 +481,8 @@ def run_chat(
         interactions_result=interactions_result, ancestry_result=ancestry_result,
         bloodwork_result=bloodwork_result, detox_result=detox_result,
         economics_result=economics_result, personal_econ_result=personal_econ_result,
-        urologic_result=urologic_result, y_result=y_result, mt_result=mt_result,
+        urologic_result=urologic_result, deep_ancestry_result=deep_ancestry_result,
+        y_result=y_result, mt_result=mt_result,
     )
     mode = "deep"
     topic_bias = None

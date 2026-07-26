@@ -96,6 +96,7 @@ from analyze import (
     analyze_metal_oxidative,
     analyze_detox,
     analyze_urologic,
+    analyze_deep_ancestry,
 )
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:
@@ -652,6 +653,20 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Urologic module failed: {e}")
 
+    # ── Deep ancestry (Neanderthal + ancient-pop + N/S Europe + timelines) ──
+    deep_ancestry_result: Optional[Dict] = None
+    if analyze_deep_ancestry is not None:
+        try:
+            deep_ancestry_result = analyze_deep_ancestry(
+                snps_df, y_result=y_result, mt_result=mt_result)
+            if deep_ancestry_result.get("available"):
+                nea = (deep_ancestry_result.get("neanderthal") or {})
+                log(f"  Deep ancestry: Neanderthal ~{nea.get('approx_pct','?')}% "
+                    f"({nea.get('tier','?')}), ancient-pop top = "
+                    f"{(deep_ancestry_result.get('ancient_populations') or {}).get('top','?')}")
+        except Exception as e:
+            log(f"  WARNING: Deep-ancestry module failed: {e}")
+
     # ── ClinPGx/PharmGKB clinical-variant annotations for typed rsIDs ──
     pharmgkb_result: Optional[Dict] = None
     if analyze_pharmgkb_clinical is not None:
@@ -743,6 +758,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         metal_oxidative_result=metal_oxidative_result,
         detox_result=detox_result,
         urologic_result=urologic_result,
+        deep_ancestry_result=deep_ancestry_result,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:
@@ -1043,6 +1059,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 bloodwork_result=bloodwork_result,
                 detox_result=detox_result,
                 urologic_result=urologic_result,
+                deep_ancestry_result=deep_ancestry_result,
                 economics_result=economics_result,
                 y_result=y_result,
                 mt_result=mt_result,

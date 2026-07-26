@@ -174,12 +174,16 @@ try:
     from urologic import analyze_urologic
 except ImportError:
     analyze_urologic = None
+try:
+    from deep_ancestry import analyze_deep_ancestry
+except ImportError:
+    analyze_deep_ancestry = None
 
 SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.8.0-premium"
+REPORT_VERSION = "6.9.0-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",

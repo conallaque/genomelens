@@ -6,6 +6,41 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.9.0-premium] — 2026-07-25 — Deep ancestry: Neanderthal + ancient populations + N-S European axis + migration timelines
+
+### Added
+
+- **New `deep_ancestry.py` module** — a state-of-the-art upgrade of the ancestry
+  section, comparable in depth to the blood-work engine. Four sub-analyses,
+  every SNP grounded in published papers:
+  1. **Neanderthal introgression estimate** using 10+ curated Neanderthal-
+     derived / -tagged SNPs from Sankararaman 2014, Zeberg & Pääbo Nature 2020
+     (3p21.31 COVID haplotype), Vernot & Akey 2014, and BNC2 / immune / X-linked
+     adaptive-introgression loci. Reports affinity, an approximate percent
+     bucket, and the specific carrying variants — with the honest caveat that
+     consumer chips tag only a subset of the ~6,000 Neanderthal-introgressed
+     SNPs (23andMe v5 typing).
+  2. **Ancient-population affinity** — Yamnaya-Steppe / Anatolian-Neolithic
+     Farmer (EEF) / Western Hunter-Gatherer (WHG) fingerprints from
+     Mathieson 2015 & Allentoft 2015 (LCT lactase persistence = Yamnaya-derived,
+     SLC24A5 = near-fixed in EEF, HERC2 blue eyes = WHG-first, etc.).
+  3. **Sub-continental European axis** — a soft Northern-vs-Southern European
+     index over LCT/HERC2/TYR/MC1R with a visual position marker.
+  4. **Y-DNA & mtDNA migration timelines** — TMRCA (from ISOGG/YFull) and the
+     specific migration narrative for the user's haplogroups (T1a1a → Near-East
+     Neolithic ~8-15 kya; mtDNA V → Iberian post-LGM refugium ~15 kya; etc.).
+- New report section **"Deep Ancestry"** rendered inline after the standard
+  ancestry section, with a Neanderthal-affinity hero, ancient-population cards
+  with progress bars, a visual N-S axis marker, and haplogroup timeline cards.
+  Fed into the chat assistant context so questions about "Neanderthal /
+  Yamnaya / Bronze Age / my haplogroups" ground in the user's actual variants.
+- `REPORT_VERSION` → 6.9.0-premium.
+
+### Tests
+
+- +6 unit tests (Neanderthal scoring, ancient-pop ranking, N-S axis,
+  haplogroup-timeline longest-prefix matching, end-to-end); 238 passing.
+
 ## [6.8.0-premium] — 2026-07-25 — Urologic & genitourinary panel
 
 ### Added

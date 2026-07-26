@@ -1499,6 +1499,157 @@ def _build_crosscheck_html(cc: Optional[Dict]) -> str:
 """
 
 
+def _bar(value: float, max_value: float, color: str) -> str:
+    """Simple inline SVG bar."""
+    pct = max(0.0, min(100.0, 100.0 * value / max_value)) if max_value else 0
+    return (
+        f'<div style="height:10px;border-radius:5px;background:var(--bg3,#eef1f4);overflow:hidden">'
+        f'<div style="height:100%;width:{pct:.1f}%;background:{color}"></div></div>')
+
+
+def build_deep_ancestry_html(da: Optional[Dict]) -> str:
+    """State-of-the-art deep ancestry — Neanderthal, ancient populations,
+    N-S European axis, and haplogroup migration timelines."""
+    if not da or not da.get("available"):
+        return ""
+
+    # ── Neanderthal panel ────────────────────────────────────────────────
+    n = da.get("neanderthal") or {}
+    neanderthal_html = ""
+    if n.get("available"):
+        rows = ""
+        for v in n["variants"]:
+            col = "#b3261e" if v["n_alleles"] >= 2 else ("#d29922" if v["n_alleles"] == 1 else "#8b949e")
+            rows += (
+                f'<tr><td class="rsid-cell"><a href="https://www.ncbi.nlm.nih.gov/snp/{_esc(v["rsid"])}" '
+                f'target="_blank" rel="noopener">{_esc(v["rsid"])}</a></td>'
+                f'<td><strong>{_esc(v["gene"])}</strong><div style="color:#8a94a3;font-size:.82em">{_esc(v["trait"])}</div></td>'
+                f'<td class="gt-cell">{_esc(v["genotype"])}</td>'
+                f'<td>{_esc(v["neanderthal_allele"])}</td>'
+                f'<td style="color:{col};font-weight:700">{v["n_alleles"]}</td></tr>')
+        tier_color = {"Below average": "#3fb950", "Average non-African": "#8b949e",
+                      "Above average": "#d29922", "High": "#b3261e"}.get(n["tier"], "#8b949e")
+        neanderthal_html = f"""
+<h3 style="margin:18px 0 6px">🦴 Neanderthal Introgression</h3>
+<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:8px;
+     background:linear-gradient(135deg,#f4f8fc,#eef2f7);border:1px solid #dbe3ec;
+     border-radius:10px;padding:14px 18px">
+  <div style="text-align:center;min-width:110px">
+    <div style="font-size:.75em;color:#8a94a3;text-transform:uppercase">Affinity</div>
+    <div style="font-size:2.3em;font-weight:800;color:{tier_color}">~{n['approx_pct']}%</div>
+    <div style="font-size:.8em;color:#8a94a3">{n['n_neanderthal_alleles']}/{n['max_possible']} tagged alleles</div>
+  </div>
+  <div style="flex:1;min-width:220px">
+    <div style="font-weight:700;color:{tier_color}">{_esc(n['tier'])}</div>
+    <div style="color:#4a5560;line-height:1.55">{_esc(n['tier_note'])}</div>
+    <div style="color:#8a94a3;font-size:.78em;margin-top:4px">
+      Non-Africans average ~2% genome-wide Neanderthal ancestry. This is a curated-panel
+      <em>affinity</em> — not a genome-wide percentage — comparable across users of this tool.
+      Consumer chips tag only a subset of the ~6,000 Neanderthal-introgressed SNPs.</div>
+  </div>
+</div>
+<details><summary>{n['n_typed']} Neanderthal-tagged markers checked</summary>
+<div class="tbl-wrap"><table class="snp-tbl"><thead><tr>
+  <th>rsID</th><th>Locus / trait</th><th>Genotype</th><th>N-allele</th><th>Dose</th></tr></thead>
+<tbody>{rows}</tbody></table></div></details>
+<div style="font-size:.78em;color:#9aa4b0;margin:6px 0 4px">📖 {_esc(n['citation'])}</div>"""
+
+    # ── Ancient populations ─────────────────────────────────────────────
+    ap = da.get("ancient_populations") or {}
+    ancient_html = ""
+    if ap.get("available"):
+        cards = ""
+        top_short = ap.get("top")
+        for p in ap["populations"]:
+            highlight = p["short"] == top_short
+            border = "#12467a" if highlight else "#dbe3ec"
+            cards += f"""
+<div style="border:1.5px solid {border};border-radius:10px;padding:12px 14px;background:#fff;break-inside:avoid">
+  <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap">
+    <span style="font-weight:700;color:#12467a">{_esc(p['name'])}</span>
+    <span style="font-size:.85em;color:#8a94a3">{p['n_carried']}/{p['n_max']} alleles</span>
+  </div>
+  <div style="font-size:1.9em;font-weight:800;color:#12467a;margin:3px 0">{p['affinity']*100:.0f}%</div>
+  {_bar(p['affinity'], 1.0, '#12467a')}
+  <div style="font-size:.86em;color:#4a5560;line-height:1.5;margin-top:6px">{_esc(p['narrative'])}</div>
+</div>"""
+        ancient_html = f"""
+<h3 style="margin:18px 0 6px">🏹 Ancient-Population Affinity</h3>
+<p style="color:#556;margin:4px 0 8px">Your affinity to three major ancient European
+gene pools, scored on the trait alleles ancient-DNA studies have traced to each:</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">{cards}</div>
+<div style="font-size:.78em;color:#9aa4b0;margin-top:4px">📖 {_esc(ap['citation'])}</div>"""
+
+    # ── N-S European axis ───────────────────────────────────────────────
+    ea = da.get("european_axis") or {}
+    axis_html = ""
+    if ea.get("available"):
+        idx = ea["index"] * 100
+        # Position a marker on a horizontal S↔N axis
+        marker = f"""
+<div style="position:relative;height:36px;margin:8px 0">
+  <div style="position:absolute;top:14px;left:0;right:0;height:8px;border-radius:4px;
+       background:linear-gradient(90deg,#e76f51,#e9c46a,#2a9d8f)"></div>
+  <div style="position:absolute;left:{idx:.1f}%;top:6px;transform:translateX(-50%);
+       width:20px;height:20px;border-radius:50%;background:#12467a;border:3px solid #fff;
+       box-shadow:0 0 0 1px rgba(0,0,0,.15)"></div>
+  <div style="position:absolute;left:0;top:32px;font-size:.75em;color:#8a94a3">Southern</div>
+  <div style="position:absolute;right:0;top:32px;font-size:.75em;color:#8a94a3">Northern</div>
+</div>"""
+        axis_html = f"""
+<h3 style="margin:18px 0 6px">🧭 Sub-Continental European Axis</h3>
+<div style="border:1px solid #dbe3ec;border-radius:10px;padding:14px 16px;background:#fbfcfd">
+  <div style="font-weight:700;color:#12467a">{_esc(ea['lean'])}
+    <span style="font-weight:400;color:#8a94a3;font-size:.82em"> · index {ea['index']}</span></div>
+  {marker}
+  <div style="color:#4a5560;line-height:1.5;margin-top:4px">{_esc(ea['note'])}</div>
+  <div style="font-size:.8em;color:#8a94a3;margin-top:8px">
+    Uses LCT (lactase persistence — Yamnaya-derived, Northern-enriched), HERC2 (blue eyes),
+    TYR and MC1R. A soft axis; most modern individuals are admixed across it.</div>
+</div>"""
+
+    # ── Haplogroup migration timeline ───────────────────────────────────
+    tl = da.get("haplogroup_timeline") or {}
+    tl_html = ""
+
+    def _tl_card(entry, kind):
+        if not entry:
+            return ""
+        story = entry.get("story") or ""
+        return f"""
+<div style="border-left:4px solid #12467a;background:#fbfcfd;padding:10px 14px;border-radius:0 8px 8px 0;margin:6px 0">
+  <div style="font-weight:700;color:#12467a">{_esc(kind)} {_esc(entry['haplogroup'])}
+    <span style="font-weight:400;color:#8a94a3;font-size:.85em">
+      · TMRCA ~{entry['tmrca_kya']:g} kya · {_esc(entry['origin'])}</span></div>
+  {f'<div style="color:#4a5560;line-height:1.55;margin-top:4px">{_esc(story)}</div>' if story else ''}
+</div>"""
+
+    if tl.get("y") or tl.get("mt"):
+        tl_html = f"""
+<h3 style="margin:18px 0 6px">🗺️ Haplogroup Migration Timeline</h3>
+{_tl_card(tl.get('y'), 'Y-DNA (paternal)')}
+{_tl_card(tl.get('mt'), 'mtDNA (maternal)')}
+<div style="font-size:.78em;color:#9aa4b0;margin-top:2px">
+  TMRCAs = time to most recent common ancestor, from ISOGG / YFull.
+</div>"""
+
+    return f"""
+<section class="deep-ancestry-section" id="deep-ancestry" style="margin:8px 0">
+<h2 style="font-size:1.35em;border-bottom:2px solid #e3e8ee;padding-bottom:4px;color:#12467a">
+  Deep Ancestry <span style="font-size:.6em;color:#8a94a3;font-weight:400">
+  · archaic + ancient-population + migration</span></h2>
+<p style="color:#667;margin:6px 0 10px">Beyond the continental estimate: your Neanderthal
+introgression, affinity to the three major ancient European gene pools (Yamnaya-Steppe,
+Anatolian Neolithic, Western Hunter-Gatherer), a Northern-vs-Southern European axis, and
+the migration timeline of your Y-DNA and mtDNA haplogroups.</p>
+{neanderthal_html}
+{ancient_html}
+{axis_html}
+{tl_html}
+</section>
+"""
+
+
 def build_ancestry_html(anc: Optional[Dict]) -> str:
     if not anc or not anc.get("available"):
         return ""
@@ -2945,6 +3096,7 @@ def build_html_report(
     metal_oxidative_result: Optional[Dict] = None,
     detox_result: Optional[Dict] = None,
     urologic_result: Optional[Dict] = None,
+    deep_ancestry_result: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -3217,6 +3369,7 @@ def build_html_report(
     imputation_html = build_imputation_html(imputation_info)
     expanded_pgs_html = build_expanded_pgs_html(expanded_pgs_result)
     ancestry_html = build_ancestry_html(ancestry_result)
+    deep_ancestry_html = build_deep_ancestry_html(deep_ancestry_result)
     medications_html = build_medications_html(medications_result)
     # ── V4 sections ──
     wellness_html = build_wellness_html(wellness_result)
@@ -4230,6 +4383,7 @@ transparency.
   {"<a href='#imputation' class='nl nl-v3'>Imputation</a>" if imputation_html else ""}
   <a href="#apoe" class="nl">APOE Genotype</a>
   {"<a href='#ancestry' class='nl nl-v3'>Ancestry</a>" if ancestry_html else ""}
+  {"<a href='#deep-ancestry' class='nl nl-v5'>Deep Ancestry</a>" if deep_ancestry_html else ""}
   <a href="#y-haplogroup" class="nl">Y-DNA Haplogroup</a>
   {"<a href='#mt-haplogroup' class='nl'>mtDNA Haplogroup</a>" if mt_result else ""}
   {"<a href='#counseling-triggers' class='nl nl-pro'>Consultation Triggers</a>" if counseling_html else ""}
@@ -4271,6 +4425,8 @@ transparency.
 {apoe_html}
 
 {ancestry_html}
+
+{deep_ancestry_html}
 
 {ydna_section_html}
 
