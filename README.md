@@ -21,7 +21,7 @@ Unauthorized copying, modification, or distribution is prohibited.
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![privacy](https://img.shields.io/badge/network-localhost%20only-purple)
-![tests](https://img.shields.io/badge/tests-244%20passing-brightgreen)
+![tests](https://img.shields.io/badge/tests-252%20passing-brightgreen)
 ![registry](https://img.shields.io/badge/SNP%20registry-unified-blueviolet)
 ![analyze.py](https://img.shields.io/badge/analyze.py-1%2C055%20lines-orange)
 
@@ -76,7 +76,7 @@ The most recent releases add three major analysis capabilities. Full details in
   antioxidant axis, and heavy-metal handling — with a wildfire-smoke resilience
   score and a genotype-personalised protocol. The metal/oxidative panel is now
   wired into the report.
-- 🧪 **225 tests** (was 145 at V8); `REPORT_VERSION` 6.10.0-premium.
+- 🧪 **225 tests** (was 145 at V8); `REPORT_VERSION` 6.11.0-premium.
 
 ## What's new in V8 — completion of the foundation
 

@@ -182,12 +182,20 @@ try:
     from blood_type import analyze_blood_type
 except ImportError:
     analyze_blood_type = None
+try:
+    from immunogenetics import analyze_immunogenetics
+except ImportError:
+    analyze_immunogenetics = None
+try:
+    from ancestral_story import analyze_ancestral_story
+except ImportError:
+    analyze_ancestral_story = None
 
 SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.10.0-premium"
+REPORT_VERSION = "6.11.0-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",

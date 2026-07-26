@@ -1507,6 +1507,173 @@ def _bar(value: float, max_value: float, color: str) -> str:
         f'<div style="height:100%;width:{pct:.1f}%;background:{color}"></div></div>')
 
 
+def build_immunogenetics_html(ig: Optional[Dict]) -> str:
+    """Immunogenetics — viral/bacterial/parasitic resistance + Historical Selection."""
+    if not ig or not ig.get("available"):
+        return ""
+    impact_color = {"protective": "#3fb950", "susceptible": "#f85149",
+                    "intermediate": "#d29922", "neutral": "#8b949e",
+                    "informational": "#8b949e"}
+    impact_emoji = {"protective": "🛡", "susceptible": "⚠",
+                    "intermediate": "◐", "neutral": "·", "informational": "ℹ"}
+
+    # Headline resistances — hero cards
+    headlines_html = ""
+    if ig.get("headlines"):
+        cards = ""
+        for h in ig["headlines"]:
+            cards += f"""
+<div style="border:1.5px solid #3fb950;border-radius:10px;padding:12px 14px;
+     background:linear-gradient(135deg,#f2f9f4,#eef4fb)">
+  <div style="font-size:1.4em">🛡</div>
+  <div style="font-weight:700;color:#12467a">{_esc(h['name'])}</div>
+  <div style="color:#5b6673;font-size:.9em;margin:4px 0">{_esc(h['verdict'])}</div>
+  <div style="color:#8a94a3;font-size:.78em">{_esc(h['gene'])} · {_esc(h['rsid'])} · genotype {_esc(h['genotype'])}</div>
+</div>"""
+        headlines_html = (f'<h3 style="margin:14px 0 8px;color:#1a7f37">🥇 Headline Resistances</h3>'
+                          f'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:14px">{cards}</div>')
+
+    # All findings by category
+    domain_html = ""
+    for cat in ig.get("categories", []):
+        items = ig["by_category"].get(cat, [])
+        if not items:
+            continue
+        rows = ""
+        for f in items:
+            border = impact_color.get(f["impact"], "#8b949e")
+            emoji = impact_emoji.get(f["impact"], "·")
+            hist = (f'<div style="margin-top:6px;font-size:.82em;color:#12467a;'
+                    f'background:#eef4fb;border-radius:4px;padding:4px 8px">'
+                    f'📜 <strong>Historical:</strong> {_esc(f["historical"])}</div>') if f.get("historical") else ""
+            rows += f"""
+<div style="border:1px solid var(--bdr,#e3e7ec);border-left:4px solid {border};
+     border-radius:6px;padding:11px 13px;margin:8px 0;background:#fff;break-inside:avoid">
+  <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+    <span style="font-weight:700">{emoji} {_esc(f['name'])}
+      <span style="font-weight:400;color:#8a94a3;font-size:.85em"> · {_esc(f['gene'])}</span></span>
+    <span style="font-size:.8em;color:{border};font-weight:600">{_esc(f['impact'])}</span>
+  </div>
+  <div style="font-weight:600;margin:4px 0;color:#33404d">{_esc(f['verdict'])}</div>
+  <div style="color:#4a5560;line-height:1.5;font-size:.9em">{_esc(f['mechanism'])}</div>
+  <div style="font-size:.86em;color:#2b5f8e;margin-top:4px"><strong>Action:</strong> {_esc(f['action'])}</div>
+  <div style="font-size:.75em;color:#9aa4b0;margin-top:3px">
+    genotype {_esc(f['genotype'])} · {_esc(f['rsid'])} · {_esc(f['confidence'])} confidence · 📖 {_esc(f['citation'])}</div>
+  {hist}
+</div>"""
+        domain_html += f'<h3 style="margin:16px 0 4px">{_esc(cat)}</h3>{rows}'
+
+    # Historical Selection Timeline
+    timeline_html = ""
+    tl = ig.get("historical_timeline") or []
+    if tl:
+        rows = ""
+        for ev in tl:
+            rows += f"""
+<tr>
+  <td style="white-space:nowrap;color:#8a94a3">{_esc(ev['epoch'])}</td>
+  <td><strong>{_esc(ev['driver'])}</strong></td>
+  <td>{_esc(ev['finding'])}</td>
+  <td style="color:#4a5560">{_esc(ev['verdict'])}</td>
+</tr>"""
+        timeline_html = f"""
+<h3 style="margin:20px 0 6px;color:#8a4900">📜 Historical Selection Timeline</h3>
+<p style="color:#5b6673;font-size:.9em">Each protective variant in your genome maps to a
+historical pressure that selected for it. Reading down this list is reading a summary of
+what your ancestors survived.</p>
+<div class="tbl-wrap"><table class="snp-tbl"><thead><tr>
+  <th>Epoch</th><th>Selection pressure</th><th>Your variant</th><th>Effect</th></tr></thead>
+<tbody>{rows}</tbody></table></div>"""
+
+    return f"""
+<section class="immunogenetics-section" id="immunogenetics">
+<h2>Immunogenetics <span class="pro-pill">V6.11</span></h2>
+<p class="anc-intro">
+Your genetic resistance and susceptibility to human pathogens — viral, bacterial,
+parasitic — plus a Historical Selection Timeline that connects your protective
+variants to the pandemics that shaped them. {ig['n_findings']} findings:
+<span style="color:#1a7f37"><strong>{ig['n_protective']} protective</strong></span> ·
+<span style="color:#b3261e"><strong>{ig['n_susceptible']} susceptible</strong></span> ·
+{ig['n_intermediate']} intermediate.
+</p>
+{headlines_html}
+{domain_html}
+{timeline_html}
+<div class="anc-caveat" style="margin-top:16px">
+Consumer-chip-based resistance / susceptibility estimates. Population-average
+effects; individual outcomes depend on exposure, vaccination, HLA, and behaviour.
+Vaccination and standard infection prevention still apply regardless of genotype.
+</div>
+</section>
+"""
+
+
+def build_ancestral_story_html(story: Optional[Dict]) -> str:
+    """Long-form Ancestral Story — deterministic chapters + optional AI narrative."""
+    if not story or not story.get("available"):
+        return ""
+
+    ai_html = ""
+    if story.get("ai_used") and story.get("ai_text"):
+        # Convert markdown paragraphs → HTML paragraphs
+        paragraphs = story["ai_text"].split("\n\n")
+        body = ""
+        for p in paragraphs:
+            p = p.strip()
+            if not p:
+                continue
+            if p.startswith("### "):
+                body += f'<h3 style="color:#12467a;margin:12px 0 4px">{_esc(p[4:].strip())}</h3>'
+            elif p.startswith("## "):
+                body += f'<h2 style="color:#12467a;margin:14px 0 6px;border:none">{_esc(p[3:].strip())}</h2>'
+            elif p.startswith("**Chapter"):
+                body += f'<h3 style="color:#12467a;margin:14px 0 4px">{_esc(p.strip("*"))}</h3>'
+            else:
+                # Preserve inline bold
+                import re as _re
+                p_html = _esc(p)
+                p_html = _re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', p_html)
+                body += f'<p style="line-height:1.65;margin:8px 0">{p_html}</p>'
+        ai_html = f"""
+<div style="border-left:4px solid #12467a;padding-left:16px;margin:14px 0;
+     background:linear-gradient(180deg,#fbfcfd,#f5f8fb);padding:16px 20px;border-radius:0 8px 8px 0">
+  <div style="color:#12467a;font-weight:700;margin-bottom:6px">✨ AI-Enhanced Narrative</div>
+  {body}
+</div>"""
+
+    # Deterministic chapters
+    chapters_html = ""
+    for ch in (story.get("template") or {}).get("chapters", []):
+        # Markdown-lite → HTML
+        body = _esc(ch["body"])
+        import re as _re
+        body = _re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
+        body = _re.sub(r'### (.+)', r'<h4 style="color:#12467a;margin:10px 0 4px">\1</h4>', body)
+        body = body.replace("\n\n", "</p><p>")
+        chapters_html += f"""
+<article style="border:1px solid #e3e7ec;border-radius:10px;padding:16px 20px;margin:12px 0;background:#fff">
+  <h3 style="color:#12467a;margin:0 0 8px">{_esc(ch['title'])}</h3>
+  <div style="line-height:1.65"><p>{body}</p></div>
+</article>"""
+
+    return f"""
+<section class="ancestral-story-section" id="ancestral-story">
+<h2>The Ancestral Story <span class="pro-pill">V6.11</span></h2>
+<p class="anc-intro">
+A long-form narrative weaving together your Y-DNA and mtDNA haplogroups, your
+autosomal ancestry components (Neanderthal, Yamnaya, EEF, WHG), and the
+historical-selection events visible in your immune genome. This is the story
+of what your ancestors likely lived through, what they believed, what they ate
+and drank, and what pandemics shaped them. Educational and historical — a
+plausibility-weighted narrative from anonymous DNA-derived data, not a
+documented lineage.
+</p>
+{ai_html}
+{chapters_html}
+</section>
+"""
+
+
 def build_blood_type_html(bt: Optional[Dict]) -> str:
     """Blood type inference — ABO + RhD + FUT2 secretor status."""
     if not bt or not bt.get("available"):
@@ -3162,6 +3329,8 @@ def build_html_report(
     urologic_result: Optional[Dict] = None,
     deep_ancestry_result: Optional[Dict] = None,
     blood_type_result: Optional[Dict] = None,
+    immunogenetics_result: Optional[Dict] = None,
+    ancestral_story_result: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -3436,6 +3605,8 @@ def build_html_report(
     ancestry_html = build_ancestry_html(ancestry_result)
     deep_ancestry_html = build_deep_ancestry_html(deep_ancestry_result)
     blood_type_html = build_blood_type_html(blood_type_result)
+    immunogenetics_html = build_immunogenetics_html(immunogenetics_result)
+    ancestral_story_html = build_ancestral_story_html(ancestral_story_result)
     medications_html = build_medications_html(medications_result)
     # ── V4 sections ──
     wellness_html = build_wellness_html(wellness_result)
@@ -4451,6 +4622,8 @@ transparency.
   {"<a href='#ancestry' class='nl nl-v3'>Ancestry</a>" if ancestry_html else ""}
   {"<a href='#deep-ancestry' class='nl nl-v5'>Deep Ancestry</a>" if deep_ancestry_html else ""}
   {"<a href='#blood-type' class='nl nl-v5'>Blood Type</a>" if blood_type_html else ""}
+  {"<a href='#immunogenetics' class='nl nl-v5'>Immunogenetics</a>" if immunogenetics_html else ""}
+  {"<a href='#ancestral-story' class='nl nl-v5'>Ancestral Story</a>" if ancestral_story_html else ""}
   <a href="#y-haplogroup" class="nl">Y-DNA Haplogroup</a>
   {"<a href='#mt-haplogroup' class='nl'>mtDNA Haplogroup</a>" if mt_result else ""}
   {"<a href='#counseling-triggers' class='nl nl-pro'>Consultation Triggers</a>" if counseling_html else ""}
@@ -4496,6 +4669,10 @@ transparency.
 {deep_ancestry_html}
 
 {blood_type_html}
+
+{immunogenetics_html}
+
+{ancestral_story_html}
 
 {ydna_section_html}
 

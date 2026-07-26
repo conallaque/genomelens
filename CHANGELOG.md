@@ -6,6 +6,43 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.11.0-premium] — 2026-07-25 — Immunogenetics + Ancestral Story
+
+Two big additions that connect the ancestry, viral-resistance, and historical-
+selection threads into the story no consumer service tells.
+
+### Added
+
+- **New `immunogenetics.py` module** — comprehensive viral / bacterial /
+  parasitic resistance + Historical Selection Timeline:
+  * **Viral**: HIV/CCR5-Δ32 (rs333), norovirus & rotavirus/FUT2 (rs601338),
+    hepatitis C spontaneous clearance/IL28B (rs12979860), hepatitis B/HLA-DPB1
+    (rs9277535), COVID-19/OAS1 (rs2660) + 3p21.31 Neanderthal haplotype,
+    influenza/IFITM3 (rs12252) + MX1, prion disease/PRNP codon 129 (rs1799990).
+  * **Bacterial**: plague/ERAP2 rs2549794 (Black Death survivor allele — Klunk
+    2022 Nature), sepsis & RSV/TLR4.
+  * **Parasitic**: P. vivax malaria/Duffy (rs2814778), P. falciparum/HbS &
+    G6PD deficiency.
+  * **Autoimmune trade-offs**: PTPN22, STAT4, IRF5.
+  * **Historical Selection Timeline** — every protective variant mapped to the
+    historical pandemic that likely selected for it (Black Death, malaria
+    endemic zones, kuru, endemic gut viruses, hepatotropic viruses).
+- **New `ancestral_story.py` module** — long-form Ancestral Story narrative
+  weaving haplogroups, deep-ancestry components (Yamnaya/EEF/WHG), and the
+  immunogenetics selection timeline into a chapter-structured story. Two
+  modes: deterministic template (always runs) and AI-enhanced (uses local
+  Ollama when available — a rich structured prompt asks for religions,
+  foods, wines, and historical events to be woven into a 2,000-4,000-word
+  narrative).
+- New report sections: **Immunogenetics** and **The Ancestral Story**, both
+  wired into the pipeline, renderer, and chat context.
+- `REPORT_VERSION` → 6.11.0-premium.
+
+### Tests
+
+- +8 unit tests (CCR5, FUT2, IL28B, PRNP, ERAP2, timeline, empty-input, story
+  template mode); 252 passing.
+
 ## [6.10.0-premium] — 2026-07-25 — Blood type (ABO + RhD + FUT2 secretor)
 
 ### Added

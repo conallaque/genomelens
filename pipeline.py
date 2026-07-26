@@ -98,6 +98,8 @@ from analyze import (
     analyze_urologic,
     analyze_deep_ancestry,
     analyze_blood_type,
+    analyze_immunogenetics,
+    analyze_ancestral_story,
 )
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:
@@ -680,6 +682,37 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Blood-type module failed: {e}")
 
+    # ── Immunogenetics (viral/bacterial/parasitic resistance + selection) ──
+    immunogenetics_result: Optional[Dict] = None
+    if analyze_immunogenetics is not None:
+        try:
+            immunogenetics_result = analyze_immunogenetics(snps_df)
+            if immunogenetics_result.get("available"):
+                log(f"  Immunogenetics: {immunogenetics_result['n_findings']} findings "
+                    f"({immunogenetics_result['n_protective']} protective, "
+                    f"{immunogenetics_result['n_susceptible']} susceptible)")
+        except Exception as e:
+            log(f"  WARNING: Immunogenetics module failed: {e}")
+
+    # ── Ancestral Story (template narrative; AI-enhanced if AI enabled) ──
+    ancestral_story_result: Optional[Dict] = None
+    if analyze_ancestral_story is not None:
+        try:
+            ancestral_story_result = analyze_ancestral_story(
+                y_result=y_result, mt_result=mt_result,
+                deep_ancestry_result=deep_ancestry_result,
+                immunogenetics_result=immunogenetics_result,
+                ancestry_result=ancestry_result,
+                model=args.model,
+                use_ai=not args.no_ai,
+            )
+            if ancestral_story_result.get("available"):
+                mode = "AI-enhanced" if ancestral_story_result.get("ai_used") else "template"
+                log(f"  Ancestral story: {mode} narrative built with "
+                    f"{len(ancestral_story_result['template']['chapters'])} chapters")
+        except Exception as e:
+            log(f"  WARNING: Ancestral-story module failed: {e}")
+
     # ── ClinPGx/PharmGKB clinical-variant annotations for typed rsIDs ──
     pharmgkb_result: Optional[Dict] = None
     if analyze_pharmgkb_clinical is not None:
@@ -773,6 +806,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
         urologic_result=urologic_result,
         deep_ancestry_result=deep_ancestry_result,
         blood_type_result=blood_type_result,
+        immunogenetics_result=immunogenetics_result,
+        ancestral_story_result=ancestral_story_result,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:
