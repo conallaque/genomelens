@@ -21,13 +21,13 @@ def test_at_least_25_wellness_rsids_registered() -> None:
 
 
 def test_known_deferred_rsids_match_changelog() -> None:
-    """The wellness migration deferred 9 rare antioxidant / longevity
-    variants to V8.1 per CHANGELOG.md. Lock that set."""
+    """The wellness migration deferred rare antioxidant / longevity variants
+    to V8.1 per CHANGELOG.md. Lock that set. (rs25531 was migrated into the
+    registry in V6.12 for the neurochemistry module's 5-HTTLPR proxy.)"""
     audit = wellness.audit_against_registry()
     expected_deferred = {
         "rs12934922", "rs174546", "rs1799750", "rs1799752",
-        "rs25531", "rs73598374", "rs7501331", "rs77086077",
-        "rs9420907",
+        "rs73598374", "rs7501331", "rs77086077", "rs9420907",
     }
     assert set(audit["missing"]) == expected_deferred, (
         f"Deferred-to-V8.1 set drifted from CHANGELOG. "
