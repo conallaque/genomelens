@@ -175,7 +175,7 @@ SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.7.1-premium"
+REPORT_VERSION = "6.7.2-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",
@@ -536,7 +536,8 @@ def tier1_lookup(
 
 
 def call_ollama(prompt: str, model: str, timeout: int = 1800,
-                stream: bool = True) -> str:
+                stream: bool = True, num_ctx: int = 4096,
+                num_predict: int = 1024) -> str:
     """Send a prompt to local Ollama and return the response text.
 
     Streaming (default) is critical for long-generating models like ``qwen3:14b``
@@ -550,9 +551,11 @@ def call_ollama(prompt: str, model: str, timeout: int = 1800,
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "stream": stream,
-        # 4096-token context is plenty for one small category batch and cuts
-        # KV-cache memory pressure so tokens generate ~2× faster on 14B models.
-        "options": {"temperature": 0.3, "num_ctx": 4096, "num_predict": 1024},
+        # 4096 is the default for per-category batches (fast, low KV-cache).
+        # Larger prompts (whole-report synthesis, exec summary) pass a bigger
+        # num_ctx explicitly so the request doesn't get rejected with a 400.
+        "options": {"temperature": 0.3, "num_ctx": num_ctx,
+                    "num_predict": num_predict},
     }
 
     try:
@@ -871,7 +874,9 @@ def tier2_analysis(
     )
 
     try:
-        exec_summary = call_ollama(exec_prompt, model=model)
+        # Larger context for the whole-report exec summary.
+        exec_summary = call_ollama(exec_prompt, model=model,
+                                   num_ctx=8192, num_predict=1536)
     except Exception as e:
         log(f"  WARNING: Executive summary failed: {e}")
         exec_summary = f"*Executive summary unavailable: {e}*"
@@ -958,8 +963,14 @@ def cross_category_synthesis(
         "Reminder: educational, not diagnostic."
     )
 
+    # This is the largest single prompt in the pipeline — a full risk-variant
+    # snapshot across every category. Cap prompt size and give it a bigger
+    # context window than per-category calls (which use the default 4096).
+    if len(prompt) > 48_000:
+        prompt = prompt[:48_000] + "\n\n[...truncated to fit context]"
     try:
-        return call_ollama(prompt, model=model)
+        return call_ollama(prompt, model=model,
+                           num_ctx=16384, num_predict=1800)
     except Exception as e:
         log(f"  WARNING: Cross-category synthesis failed: {e}")
         return f"*Cross-category synthesis unavailable: {e}*"

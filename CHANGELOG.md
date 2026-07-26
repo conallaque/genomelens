@@ -6,6 +6,20 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.7.2-premium] — 2026-07-25 — Fix cross-category synthesis 400 (per-call num_ctx)
+
+### Fixed
+
+- 6.7.1 lowered the shared `num_ctx` in `call_ollama` to 4096 for speed on
+  per-category batches, which was correct for those calls but caused the whole-
+  report **cross-category synthesis** (and to a lesser extent the executive
+  summary) to be rejected by Ollama with a 400 Bad Request when the assembled
+  prompt exceeded 4k tokens.
+- `call_ollama` now takes optional `num_ctx` and `num_predict` overrides.
+  Per-category batches keep 4096/1024. Executive summary uses 8192/1536.
+  Cross-category synthesis uses **16384/1800** and its prompt is capped at
+  48k characters as a safety net. `REPORT_VERSION` → 6.7.2-premium.
+
 ## [6.7.1-premium] — 2026-07-25 — Tier-2 AI: streaming + smaller batches + auto-halving retry
 
 ### Fixed
