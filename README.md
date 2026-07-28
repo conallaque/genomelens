@@ -60,7 +60,7 @@ emit a clinical EHR bundle.
 
 ## What it does
 
-GenomeLens runs **41 interlocking analysis modules** (~42,700 lines of Python, a
+GenomeLens runs **41 interlocking analysis modules** (≈42,700 lines of Python, a
 369-test suite) entirely offline — across two input tiers: a consumer chip file
 or a whole-genome / exome **VCF**.
 
@@ -92,7 +92,7 @@ or a whole-genome / exome **VCF**.
 
 ## How this was built
 
-GenomeLens was conceived, architected, and directed by **Conall Aque** — MS
+GenomeLens was conceived, architected, and directed by **[Conall Aque](https://www.linkedin.com/in/conalla/)** — MS
 candidate in Commerce & Economic Development (**financial-economics** focus) at
 Northeastern University, with an undergraduate focus in **health economics** —
 and pair-programmed with an AI coding assistant. The health-economics framing,
@@ -103,10 +103,10 @@ local-AI-on-all-tiers**).
 
 **Market-value context.** Purchased à la carte from commercial providers, the
 testing, analysis, and expert interpretation GenomeLens performs locally would
-run an estimated **$1,500–$3,000+** — e.g. clinical pharmacogenomics (~$250),
-expanded carrier screening (~$350), a hereditary-cancer / ACMG panel (~$250),
-polygenic-risk and ancestry reports (~$350 combined), nutrigenomics and trait
-panels (~$200), and genetic-counsellor-style interpretation (~$200+).
+run an estimated **$1,500–$3,000+** — e.g. clinical pharmacogenomics (≈$250),
+expanded carrier screening (≈$350), a hereditary-cancer / ACMG panel (≈$250),
+polygenic-risk and ancestry reports (≈$350 combined), nutrigenomics and trait
+panels (≈$200), and genetic-counsellor-style interpretation (≈$200+).
 GenomeLens consolidates all of it into a single private, offline tool.
 *Illustrative comparison using typical U.S. self-pay pricing — not a formal
 valuation, and not a substitute for clinical-grade testing.*
@@ -152,13 +152,13 @@ valuation, and not a substitute for clinical-grade testing.*
 - **Mendelian randomization** — causal-direction projections.
 - **Genetic longevity** — biological-age proxy.
 - **Reproductive simulator** — partner-by-partner offspring risk modelling.
-- **Imputation** — Beagle 5.4 against 1000G Phase 3 (optional, ~30-90 min).
+- **Imputation** — Beagle 5.4 against 1000G Phase 3 (optional, ≈30-90 min).
 - **QC** — callability grading, sex inference, file hash, format detection.
 
 ### V6 personalisation modules
 - **Comprehensive blood-work analysis** (`--bloodwork labs.json`) — two layers:
-  (1) a clinical engine classifying ~50 biomarkers against standard *and*
-  functional/optimal ranges across 12 body systems, with ~12 calculated markers
+  (1) a clinical engine classifying ≈50 biomarkers against standard *and*
+  functional/optimal ranges across 12 body systems, with ≈12 calculated markers
   (non-HDL, TG:HDL, ApoB:ApoA1, HOMA-IR, eGFR, transferrin saturation, NLR,
   FIB-4, …), genotype-aware interpretation (HFE, APOE, TCF7L2, MTHFR, GC, FUT2,
   ABCG2, UGT1A1, LPA), and per-system + overall health scores; and (2) the
@@ -299,7 +299,7 @@ pip install -r requirements.txt
 `scikit-learn`, `requests`. Optional: `weasyprint` (PDF), `pysam` + Beagle 5.4
 (imputation).
 
-### 3. One-time data setup (~3 GB)
+### 3. One-time data setup (≈3 GB)
 
 ```bash
 python setup.py --all
