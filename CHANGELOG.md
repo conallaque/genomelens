@@ -6,6 +6,35 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.16.0-premium] — 2026-07-26 — Trait Genetics (honest genotype-level, no fabricated PGS)
+
+### Added
+
+- **`polygenic_traits.py`** — genotype-level single-variant trait reporting.
+  A deliberate honesty decision: **no polygenic percentiles are invented.** A
+  real trait PGS needs thousands of weighted variants standardised against a
+  reference distribution; no trait PGS scoring files exist locally, so a
+  percentile from a handful of SNPs would be fabrication. Instead:
+  * **Chronotype & sleep** — CLOCK rs1801260 (morning/evening), PER2, ABCC9
+    sleep-duration, DEC2 rare short-sleeper.
+  * **Taste, smell & diet** — TAS2R38 bitter (PTC) tasting, OR6A2 cilantro
+    soapy-taste, ABCC11 earwax/body-odour, asparagus anosmia, photic sneeze.
+  * **Appearance & physical** — HERC2 eye colour, MC1R red-hair/skin, IRF4
+    freckling/photoaging, EDAR hair morphology.
+  * **Structural no-score cap** for height (too polygenic to call from a chip),
+    cognition and personality (low-signal + socially fraught). These return an
+    *explanation of why no number is given*, not a score — a hard design limit,
+    not a caveat bolted onto a fabricated value. Cognitive *style* stays in the
+    Neurochemistry section (COMT/BDNF), framed as style, never an IQ measure.
+- New "Trait Genetics" report section + nav entry.
+- `REPORT_VERSION` → 6.16.0-premium.
+
+### Tests
+
+- +7 unit tests (TAS2R38 taster/non-taster, HERC2 eye, ABCC11 earwax, no
+  percentile/score fields ever emitted, no-score polygenic notes present,
+  empty input); 287 passing.
+
 ## [6.15.0-premium] — 2026-07-26 — Family Planning (reproductive genetics upgrade)
 
 ### Added

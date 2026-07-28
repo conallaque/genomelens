@@ -204,12 +204,16 @@ try:
     from addiction_genetics import analyze_addiction_genetics
 except ImportError:
     analyze_addiction_genetics = None
+try:
+    from polygenic_traits import analyze_polygenic_traits
+except ImportError:
+    analyze_polygenic_traits = None
 
 SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.15.0-premium"
+REPORT_VERSION = "6.16.0-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",

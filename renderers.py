@@ -1603,6 +1603,66 @@ underlying modules but the composite is judgment, not clinical guidance.
 """
 
 
+def build_polygenic_traits_html(pt: Optional[Dict]) -> str:
+    """Trait genetics — genotype-level single-variant calls + explicit no-score
+    handling for polygenic/fraught traits."""
+    if not pt or not pt.get("available"):
+        return ""
+
+    conf_color = {"high": "#1a7f37", "moderate": "#2b5f8e", "low": "#8a94a3"}
+
+    domain_html = ""
+    for cat in pt.get("categories", []):
+        cards = ""
+        for f in pt["by_category"].get(cat, []):
+            cc = conf_color.get(f["confidence"], "#8a94a3")
+            cards += f"""
+<div style="border:1px solid #e3e7ec;border-radius:8px;padding:11px 13px;background:#fff;break-inside:avoid">
+  <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap">
+    <span style="font-weight:700">{_esc(f['trait'])}</span>
+    <span style="font-size:.75em;color:{cc}">{_esc(f['confidence'])}</span>
+  </div>
+  <div style="font-weight:600;color:#12467a;margin:3px 0">{_esc(f['call'])}</div>
+  <div style="color:#4a5560;line-height:1.5;font-size:.88em">{_esc(f['detail'])}</div>
+  <div style="font-size:.74em;color:#9aa4b0;margin-top:3px">
+    genotype {_esc(f['genotype'])} · {_esc(f['gene'])} {_esc(f['rsid'])} · 📖 {_esc(f['citation'])}</div>
+</div>"""
+        domain_html += (f'<h3 style="margin:16px 0 6px">{_esc(cat)}</h3>'
+                        f'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px">{cards}</div>')
+
+    # No-score polygenic section (structural honesty)
+    notes_html = ""
+    for n in pt.get("polygenic_notes", []):
+        notes_html += f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid #8a94a3;border-radius:8px;
+     padding:12px 14px;margin:8px 0;background:#fafbfc">
+  <div style="font-weight:700;color:#41505f">{_esc(n['trait'])} — <span style="color:#b3261e">no score given</span></div>
+  <div style="color:#4a5560;line-height:1.55;font-size:.9em;margin-top:4px">{_esc(n['why_no_number'])}</div>
+  <div style="color:#2b5f8e;line-height:1.55;font-size:.9em;margin-top:4px"><strong>Honest take:</strong> {_esc(n['honest_statement'])}</div>
+</div>"""
+
+    return f"""
+<section class="polygenic-traits-section" id="polygenic-traits">
+<h2>Trait Genetics <span class="pro-pill">V6.16</span></h2>
+<p class="anc-intro">
+Genotype-level trait calls for traits where a <em>single variant</em> genuinely
+carries signal — taste, smell, hair, eye colour, chronotype. {pt['n_findings']}
+calls below. Deliberately <strong>no polygenic percentiles</strong>: no trait
+PGS scoring files are available locally, and inventing a percentile from a few
+SNPs would be dishonest.
+</p>
+{domain_html}
+<h3 style="margin:18px 0 6px">Why some traits get no number</h3>
+<p style="color:#5b6673;font-size:.9em">Height is too polygenic to call from a
+chip; cognition and personality PGS explain only a few percent of variance and
+are socially fraught. For these, an explanation replaces a fabricated score —
+a hard design limit, not a caveat.</p>
+{notes_html}
+<div class="anc-caveat" style="margin-top:12px">{_esc(pt.get('methodology_note',''))}</div>
+</section>
+"""
+
+
 def build_family_planning_html(fp: Optional[Dict]) -> str:
     """In-report reproductive-genetics section — carrier compound risk with a
     random partner, dominant transmission (kept separate from penetrance),
@@ -3765,6 +3825,7 @@ def build_html_report(
     holistic_synthesis_result: Optional[Dict] = None,
     addiction_genetics_result: Optional[Dict] = None,
     family_planning_result: Optional[Dict] = None,
+    polygenic_traits_result: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -4044,6 +4105,7 @@ def build_html_report(
     holistic_synthesis_html = build_holistic_synthesis_html(holistic_synthesis_result)
     addiction_genetics_html = build_addiction_genetics_html(addiction_genetics_result)
     family_planning_html = build_family_planning_html(family_planning_result)
+    polygenic_traits_html = build_polygenic_traits_html(polygenic_traits_result)
     ancestral_story_html = build_ancestral_story_html(ancestral_story_result)
     medications_html = build_medications_html(medications_result)
     # ── V4 sections ──
@@ -5064,6 +5126,7 @@ transparency.
   {"<a href='#neurochemistry' class='nl nl-v5'>Neurochemistry</a>" if neurochemistry_html else ""}
   {"<a href='#addiction-genetics' class='nl nl-v5'>Addiction Genetics</a>" if addiction_genetics_html else ""}
   {"<a href='#family-planning' class='nl nl-v5'>Family Planning</a>" if family_planning_html else ""}
+  {"<a href='#polygenic-traits' class='nl nl-v5'>Trait Genetics</a>" if polygenic_traits_html else ""}
   {"<a href='#ancestral-story' class='nl nl-v5'>Ancestral Story</a>" if ancestral_story_html else ""}
   <a href="#y-haplogroup" class="nl">Y-DNA Haplogroup</a>
   {"<a href='#mt-haplogroup' class='nl'>mtDNA Haplogroup</a>" if mt_result else ""}
@@ -5119,6 +5182,8 @@ transparency.
 {addiction_genetics_html}
 
 {family_planning_html}
+
+{polygenic_traits_html}
 
 {ancestral_story_html}
 

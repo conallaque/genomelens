@@ -104,6 +104,7 @@ from analyze import (
     analyze_holistic_synthesis,
     analyze_addiction_genetics,
     analyze_family_planning,
+    analyze_polygenic_traits,
 )
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:
@@ -712,6 +713,17 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Addiction-genetics module failed: {e}")
 
+    # ── Trait genetics (genotype-level single-variant traits) ──
+    polygenic_traits_result: Optional[Dict] = None
+    if analyze_polygenic_traits is not None:
+        try:
+            polygenic_traits_result = analyze_polygenic_traits(snps_df)
+            if polygenic_traits_result.get("available"):
+                log(f"  Trait genetics: {polygenic_traits_result['n_findings']} "
+                    f"single-variant trait calls")
+        except Exception as e:
+            log(f"  WARNING: Trait-genetics module failed: {e}")
+
     # ── Family planning (reproductive genetics — needs carrier + mt + sex) ──
     family_planning_result: Optional[Dict] = None
     if analyze_family_planning is not None:
@@ -890,6 +902,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         holistic_synthesis_result=holistic_synthesis_result,
         addiction_genetics_result=addiction_genetics_result,
         family_planning_result=family_planning_result,
+        polygenic_traits_result=polygenic_traits_result,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:
