@@ -198,12 +198,16 @@ try:
     from holistic_synthesis import analyze_holistic_synthesis
 except ImportError:
     analyze_holistic_synthesis = None
+try:
+    from addiction_genetics import analyze_addiction_genetics
+except ImportError:
+    analyze_addiction_genetics = None
 
 SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.13.0-premium"
+REPORT_VERSION = "6.14.0-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",

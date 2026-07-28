@@ -1603,6 +1603,103 @@ underlying modules but the composite is judgment, not clinical guidance.
 """
 
 
+def build_addiction_genetics_html(ag: Optional[Dict]) -> str:
+    """Addiction genetics — alcohol / opioid / nicotine / cannabis susceptibility."""
+    if not ag or not ag.get("available"):
+        return ""
+    c = ag["composite"]
+
+    tier_color = {
+        "Strongly protected": "#1a7f37", "Modestly protected": "#2a9d8f",
+        "Baseline (typical European)": "#8b949e", "Baseline": "#8b949e",
+        "Mixed": "#d29922",
+        "Modestly susceptible": "#d29922", "Elevated susceptibility": "#b3261e",
+        "Low overall susceptibility": "#1a7f37",
+    }
+    alc_color = tier_color.get(c["alcohol_tier"], "#8b949e")
+    overall_color = tier_color.get(c["overall_tier"], "#8b949e")
+
+    hero = f"""
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;
+     margin:12px 0">
+  <div style="background:linear-gradient(135deg,#f4f8fc,#eef2f7);border:1.5px solid {alc_color};
+       border-radius:12px;padding:14px 18px">
+    <div style="font-size:.75em;color:#5b6673;text-transform:uppercase;letter-spacing:.05em">Alcohol tier</div>
+    <div style="font-size:1.3em;font-weight:800;color:{alc_color};margin:4px 0">{_esc(c['alcohol_tier'])}</div>
+    <div style="color:#4a5560;font-size:.9em;line-height:1.5">{_esc(c['alcohol_narrative'])}</div>
+  </div>
+  <div style="background:linear-gradient(135deg,#f4f8fc,#eef2f7);border:1.5px solid {overall_color};
+       border-radius:12px;padding:14px 18px">
+    <div style="font-size:.75em;color:#5b6673;text-transform:uppercase;letter-spacing:.05em">Overall susceptibility</div>
+    <div style="font-size:1.3em;font-weight:800;color:{overall_color};margin:4px 0">{_esc(c['overall_tier'])}</div>
+    <div style="color:#4a5560;font-size:.9em;line-height:1.5">{_esc(c['overall_narrative'])}</div>
+    <div style="color:#8a94a3;font-size:.78em;margin-top:6px">
+      {c['n_protective']} protective · {c['n_susceptible']} susceptible · {c['n_conditional']} conditional</div>
+  </div>
+</div>"""
+
+    flags_html = ""
+    if c["clinical_flags"]:
+        rows = "".join(
+            f'<div style="border-left:4px solid #12467a;background:#eef4fb;'
+            f'padding:10px 14px;border-radius:0 8px 8px 0;margin:6px 0">'
+            f'<div style="font-weight:700;color:#12467a">{_esc(f["title"])}</div>'
+            f'<div style="color:#4a5560;line-height:1.5;margin-top:3px">{_esc(f["text"])}</div>'
+            f'</div>' for f in c["clinical_flags"])
+        flags_html = (f'<h3 style="margin:18px 0 6px">💡 Clinically useful flags</h3>'
+                      f'{rows}')
+
+    impact_color = {"protective": "#3fb950", "susceptible": "#f85149",
+                    "clinically-relevant": "#12467a", "informational": "#8b949e",
+                    "conditional": "#d29922", "neutral": "#8b949e"}
+    impact_emoji = {"protective": "✅", "susceptible": "⚠", "clinically-relevant": "🩹",
+                    "informational": "ℹ", "conditional": "◐", "neutral": "·"}
+
+    domain_html = ""
+    for cat in ag.get("categories", []):
+        rows = ""
+        for f in ag["by_category"].get(cat, []):
+            border = impact_color.get(f["impact"], "#8b949e")
+            emoji = impact_emoji.get(f["impact"], "·")
+            rows += f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid {border};
+     border-radius:6px;padding:11px 13px;margin:8px 0;background:#fff;break-inside:avoid">
+  <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+    <span style="font-weight:700">{emoji} {_esc(f['name'])}
+      <span style="font-weight:400;color:#8a94a3;font-size:.85em"> · {_esc(f['gene'])}</span></span>
+    <span style="font-size:.8em;color:{border};font-weight:600">{_esc(f['impact'])}</span>
+  </div>
+  <div style="font-weight:600;margin:4px 0;color:#33404d">{_esc(f['verdict'])}</div>
+  <div style="color:#4a5560;line-height:1.55;font-size:.9em">{_esc(f['mechanism'])}</div>
+  <div style="font-size:.86em;color:#2b5f8e;margin-top:4px"><strong>Action:</strong> {_esc(f['action'])}</div>
+  <div style="font-size:.75em;color:#9aa4b0;margin-top:3px">
+    genotype {_esc(f['genotype'])} · {_esc(f['rsid'])} · {_esc(f['confidence'])} confidence · 📖 {_esc(f['citation'])}</div>
+</div>"""
+        domain_html += f'<h3 style="margin:16px 0 4px">{_esc(cat)}</h3>{rows}'
+
+    return f"""
+<section class="addiction-section" id="addiction-genetics">
+<h2>Addiction Genetics <span class="pro-pill">V6.14</span></h2>
+<p class="anc-intro">
+Alcohol, opioid, nicotine, and cannabis susceptibility from your genome, plus
+stress × substance-use interaction loci. Composite tier + clinically-useful
+flags (naltrexone response, opioid dosing, never-smoke warning, trauma-informed-
+care alerts). Grounded in the primary literature (Edenberg 2004; Higuchi 1994;
+Anton 2008; Thorgeirsson 2008; Binder 2008).
+</p>
+{hero}
+{flags_html}
+{domain_html}
+<div class="anc-caveat" style="margin-top:14px">
+Genetics contributes ~50% of the variance in substance-use-disorder risk in
+population studies, but that's variance across the population — not
+deterministic within an individual. Behaviour, environment, life circumstances,
+and trauma history dominate individual outcomes. This section is educational.
+</div>
+</section>
+"""
+
+
 def build_neurochemistry_html(nc: Optional[Dict]) -> str:
     """Neurochemistry — COMT axis + composite phenotype recommendations."""
     if not nc or not nc.get("available"):
@@ -3525,6 +3622,7 @@ def build_html_report(
     ancestral_story_result: Optional[Dict] = None,
     neurochemistry_result: Optional[Dict] = None,
     holistic_synthesis_result: Optional[Dict] = None,
+    addiction_genetics_result: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -3802,6 +3900,7 @@ def build_html_report(
     immunogenetics_html = build_immunogenetics_html(immunogenetics_result)
     neurochemistry_html = build_neurochemistry_html(neurochemistry_result)
     holistic_synthesis_html = build_holistic_synthesis_html(holistic_synthesis_result)
+    addiction_genetics_html = build_addiction_genetics_html(addiction_genetics_result)
     ancestral_story_html = build_ancestral_story_html(ancestral_story_result)
     medications_html = build_medications_html(medications_result)
     # ── V4 sections ──
@@ -4820,6 +4919,7 @@ transparency.
   {"<a href='#blood-type' class='nl nl-v5'>Blood Type</a>" if blood_type_html else ""}
   {"<a href='#immunogenetics' class='nl nl-v5'>Immunogenetics</a>" if immunogenetics_html else ""}
   {"<a href='#neurochemistry' class='nl nl-v5'>Neurochemistry</a>" if neurochemistry_html else ""}
+  {"<a href='#addiction-genetics' class='nl nl-v5'>Addiction Genetics</a>" if addiction_genetics_html else ""}
   {"<a href='#ancestral-story' class='nl nl-v5'>Ancestral Story</a>" if ancestral_story_html else ""}
   <a href="#y-haplogroup" class="nl">Y-DNA Haplogroup</a>
   {"<a href='#mt-haplogroup' class='nl'>mtDNA Haplogroup</a>" if mt_result else ""}
@@ -4871,6 +4971,8 @@ transparency.
 {immunogenetics_html}
 
 {neurochemistry_html}
+
+{addiction_genetics_html}
 
 {ancestral_story_html}
 

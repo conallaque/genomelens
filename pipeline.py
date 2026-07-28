@@ -102,6 +102,7 @@ from analyze import (
     analyze_ancestral_story,
     analyze_neurochemistry,
     analyze_holistic_synthesis,
+    analyze_addiction_genetics,
 )
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:
@@ -698,6 +699,18 @@ def run_pipeline(args: argparse.Namespace) -> int:
 
     # ── Holistic Synthesis is computed near the end (needs upstream outputs) ──
 
+    # ── Addiction genetics (alcohol/opioid/nicotine/cannabis susceptibility) ──
+    addiction_genetics_result: Optional[Dict] = None
+    if analyze_addiction_genetics is not None:
+        try:
+            addiction_genetics_result = analyze_addiction_genetics(snps_df)
+            if addiction_genetics_result.get("available"):
+                c = addiction_genetics_result["composite"]
+                log(f"  Addiction genetics: {addiction_genetics_result['n_findings']} findings · "
+                    f"alcohol tier: {c['alcohol_tier']} · overall: {c['overall_tier']}")
+        except Exception as e:
+            log(f"  WARNING: Addiction-genetics module failed: {e}")
+
     # ── Immunogenetics (viral/bacterial/parasitic resistance + selection) ──
     immunogenetics_result: Optional[Dict] = None
     if analyze_immunogenetics is not None:
@@ -855,6 +868,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         ancestral_story_result=ancestral_story_result,
         neurochemistry_result=neurochemistry_result,
         holistic_synthesis_result=holistic_synthesis_result,
+        addiction_genetics_result=addiction_genetics_result,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:

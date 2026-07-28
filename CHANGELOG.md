@@ -6,6 +6,36 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.14.0-premium] — 2026-07-25 — Addiction Genetics module
+
+### Added
+
+- **New `addiction_genetics.py` module** packaging the well-established addiction
+  genetics literature into a proper report section. 12 loci, 5 sub-panels:
+  * **Alcohol** — ADH1B rs1229984, ALDH2 rs671 (Asian flush), CYP2E1
+    rs2031920, ADH1C rs1693482, GABRA2 rs279858 (dependence-risk).
+  * **Opioid / reward** — OPRM1 A118G rs1799971 (naltrexone response +
+    opioid-dosing flag), DAT1 rs27072.
+  * **Nicotine / stimulant** — CHRNA5 rs16969968, CYP2A6 rs1801272.
+  * **Cannabis / endocannabinoid** — CNR1 rs2023239, FAAH C385A rs324420.
+  * **Stress × substance-use** — CRHR1 rs110402, FKBP5 rs1360780 (gene ×
+    childhood-adversity interaction).
+- **Composite susceptibility profile** — separate alcohol tier + overall tier,
+  each with narrative and driver counts.
+- **Clinically-useful flags** — naltrexone response prediction (OPRM1 G-carrier
+  → strong response), opioid post-surgical dose adjustment, "never start
+  smoking" for CHRNA5 A-carriers, esophageal-cancer risk warning for ALDH2*2
+  carriers who drink, trauma-informed-care alert for FKBP5 T-carriers.
+- 11 new SNPs registered with primary-paper citations.
+- Wired into pipeline, renderer (new "Addiction Genetics" section + nav entry).
+- `REPORT_VERSION` → 6.14.0-premium.
+
+### Tests
+
+- +7 unit tests (ADH1B protection, ALDH2 esophageal flag, GABRA2 risk, OPRM1
+  clinical flags, CHRNA5 never-smoke, alcohol strong-protection combo,
+  empty-input); 273 passing.
+
 ## [6.13.0-premium] — 2026-07-25 — Holistic Synthesis: cross-panel patterns + Genome Leverage Score
 
 ### Added
