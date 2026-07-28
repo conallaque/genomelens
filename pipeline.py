@@ -107,6 +107,8 @@ from analyze import (
     analyze_polygenic_traits,
     analyze_environmental_optimization,
     analyze_life_stage_playbook,
+    analyze_multi_person,
+    render_multi_person_html,
 )
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:
@@ -238,7 +240,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
         sys.exit(retry_failed_categories(model=args.model, override_report=override))
 
     if not args.dna_file:
-        parser.error("dna_file is required unless --retry-failed is used")
+        log("ERROR: dna_file is required unless --retry-failed is used.")
+        return 2
 
     output_path = (
         Path(args.output) if args.output else SCRIPT_DIR / "report.html"
@@ -897,11 +900,9 @@ def run_pipeline(args: argparse.Namespace) -> int:
     life_stage_playbook_result: Optional[Dict] = None
     if analyze_life_stage_playbook is not None:
         try:
-            # Age priority: --age flag, else bloodwork labs age (compare_bloodwork
-            # exposes it as "age_used"), else None.
-            _age = getattr(args, "age", None)
-            if _age is None and bloodwork_result:
-                _age = bloodwork_result.get("age_used")
+            # Age priority: --age flag, else bloodwork labs age; see resolve_age.
+            from life_stage_playbook import resolve_age
+            _age = resolve_age(getattr(args, "age", None), bloodwork_result)
             life_stage_playbook_result = analyze_life_stage_playbook(
                 age=_age,
                 holistic_synthesis_result=holistic_synthesis_result,

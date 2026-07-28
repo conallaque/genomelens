@@ -301,7 +301,7 @@ def test_advanced_attached_to_clinical() -> None:
 
 def test_mets_ir_and_fli_and_pni_aisi() -> None:
     adv = _adv({"fasting_glucose": 100, "triglycerides": 150, "hdl": 45, "bmi": 28,
-                "ggt": 40, "triglycerides": 150, "waist": 95,
+                "ggt": 40, "waist": 95,
                 "albumin": 4.4, "lymphocytes": 1.8, "neutrophils": 4.0,
                 "monocytes": 0.5, "platelets": 250})
     assert _idx(adv, "mets_ir") is not None

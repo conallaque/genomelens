@@ -227,7 +227,7 @@ SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.19.0-premium"
+REPORT_VERSION = "6.19.1-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",
@@ -1095,6 +1095,11 @@ def retry_failed_categories(model: str, override_report: Optional[Path] = None) 
         f"{'y' if len(failed) == 1 else 'ies'} (model: {retry_model})")
     log(f"  Patching: {report_path}")
     log("=" * 60)
+
+    # These renderer helpers are re-exported via this module's __getattr__ shim
+    # for external callers, but bare-name lookups inside this function do not
+    # trigger module __getattr__ — import them explicitly to avoid NameError.
+    from renderers import _cat_id, _patch_ai_section_in_html, md_to_html
 
     still_failed: List[Dict] = []
     patched = 0

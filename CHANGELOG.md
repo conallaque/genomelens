@@ -6,6 +6,42 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.19.1-premium] — 2026-07-26 — Top-down bug sweep (4 real bugs fixed)
+
+Static analysis (ruff F/E9/B across 66 modules) + a full synthetic-genome
+end-to-end run (`--no-ai`, exercising `--compare-genome`, `--age`, and
+`--bloodwork`) surfaced and fixed four real bugs that the unit tests — all of
+which pass genotypes/ages directly — could not catch:
+
+### Fixed
+
+- **`--compare-genome` crashed with NameError.** `analyze_multi_person` /
+  `render_multi_person_html` were used in `pipeline.py` but never imported into
+  its `from analyze import …` block (V39 regression). Now imported.
+- **Life-stage age fallback silently no-op'd.** The `--bloodwork` age fallback
+  read the wrong key path; age actually lives at
+  `bloodwork_result["clinical"]["age_used"]`, not top level. Extracted into a
+  tested `resolve_age()` helper so a run with `--bloodwork` (age 41) now
+  correctly highlights the 40s decade.
+- **`--retry-failed` crashed with NameError.** `retry_failed_categories()` used
+  `_cat_id` / `_patch_ai_section_in_html` / `md_to_html` as bare names; these
+  are only re-exported via the module `__getattr__` shim (attribute access),
+  which does not fire for in-function global lookups. Now imported explicitly.
+- **Bad-usage error path raised NameError.** `pipeline.py` called
+  `parser.error(...)` with no `parser` in scope when `dna_file` was missing
+  without `--retry-failed`; now logs a clean message and returns exit code 2.
+- Cleaned a duplicate `triglycerides` dict key in a bloodwork test.
+
+Confirmed NOT bugs: two B023 "loop variable in closure" warnings
+(`imputation._allele`, `life_stage_playbook.add`) are false positives — both
+closures are invoked synchronously within the same iteration.
+
+### Tests
+
+- +3 `resolve_age` unit tests locking the bloodwork age key path (regressed
+  twice); 315 passing. Full `--no-ai` pipeline verified end-to-end on a
+  synthetic genome with all 11 new report sections rendering.
+
 ## [6.19.0-premium] — 2026-07-26 — Multi-Person Comparison (KING-robust relationship)
 
 ### Added

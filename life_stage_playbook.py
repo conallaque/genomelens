@@ -111,6 +111,21 @@ _DECADE_BASE = {
 _DECADE_ORDER = ["20s", "30s", "40s", "50s", "60s+"]
 
 
+def resolve_age(explicit_age: Optional[int],
+                bloodwork_result: Optional[Dict]) -> Optional[int]:
+    """Resolve the subject's age for the playbook. Priority: an explicit age
+    (from --age), else the age nested in a compare_bloodwork result at
+    ``result["clinical"]["age_used"]`` (its true location — the top level does
+    NOT carry it), else None. Coerced to int."""
+    if explicit_age is not None:
+        return int(explicit_age)
+    if bloodwork_result:
+        a = (bloodwork_result.get("clinical") or {}).get("age_used")
+        if a is not None:
+            return int(a)
+    return None
+
+
 def _decade_for_age(age: Optional[int]) -> Optional[str]:
     if age is None:
         return None

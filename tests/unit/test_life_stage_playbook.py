@@ -62,6 +62,22 @@ def test_all_five_decades_present() -> None:
     assert keys == ["20s", "30s", "40s", "50s", "60s+"]
 
 
+def test_resolve_age_prefers_explicit() -> None:
+    assert lsp.resolve_age(33, {"clinical": {"age_used": 41.0}}) == 33
+
+
+def test_resolve_age_falls_back_to_bloodwork_clinical_age_used() -> None:
+    # Locks the true nested key path (top-level has no age); regressed twice.
+    assert lsp.resolve_age(None, {"clinical": {"age_used": 41.0}}) == 41
+    assert isinstance(lsp.resolve_age(None, {"clinical": {"age_used": 41.0}}), int)
+
+
+def test_resolve_age_none_when_absent() -> None:
+    assert lsp.resolve_age(None, None) is None
+    assert lsp.resolve_age(None, {"clinical": {}}) is None
+    assert lsp.resolve_age(None, {}) is None
+
+
 def test_genome_items_are_source_tagged() -> None:
     r = _run(24)
     for d in r["decades"]:
