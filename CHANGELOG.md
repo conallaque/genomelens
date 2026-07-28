@@ -6,6 +6,40 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.19.0-premium] — 2026-07-26 — Multi-Person Comparison (KING-robust relationship)
+
+### Added
+
+- **`multi_person_module.py`** — compares two genomes via `--compare-genome PATH`,
+  writing a standalone `genome_comparison.html`:
+  * **Proper relationship inference** using the **KING-robust kinship estimator**
+    (Manichaikul 2010): φ = (N_HetHet − 2·N_IBS0) / (N_Het_A + N_Het_B) over
+    shared autosomal biallelic SNPs — robust to population structure, no allele
+    frequencies needed. Standard thresholds classify duplicate/twin / 1st /
+    2nd / 3rd-degree / unrelated; **IBS0 refines parent-child vs full-sibling**.
+    (Deliberately NOT naive percent-identity, which calls unrelated same-ancestry
+    people near-siblings.)
+  * **Genotype concordance** reported descriptively, with an explicit note that
+    concordance is not relationship.
+  * **Couple carrier risk** — shared recessive carrier status → 25% child-affected
+    risk, tied to the Family Planning module.
+  * Confidence scales with shared-marker count; &lt;200 shared SNPs → Indeterminate.
+- **Privacy:** the second genome is never written to the repo; `genome_comparison.html`
+  is gitignored; outputs go beside the user's `--output` path.
+- **New `--compare-genome` CLI flag.**
+- `REPORT_VERSION` → 6.19.0-premium.
+
+### Tests
+
+- +9 multi-person tests (identical→twin, unrelated, parent-child refinement via
+  IBS0, too-few-markers, zero-denominator safety, sex-chromosome exclusion,
+  duplicate-rsID dedup, chip-scale runtime, standalone render) and **+2
+  integration tests** verifying the V35-V39 result dicts actually thread through
+  `build_html_report` into rendered section ids (the wiring the analyzer
+  unit-tests don't cover). `king_kinship` is fully vectorised (whole-chip
+  600k-marker comparison in <1 s) and deduplicates non-unique rsID indices; the
+  life-stage age fallback reads bloodwork's actual `age_used` key. 312 passing.
+
 ## [6.18.0-premium] — 2026-07-26 — Life-Stage Playbook (decade-by-decade)
 
 ### Added

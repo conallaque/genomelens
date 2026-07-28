@@ -149,6 +149,16 @@ def build_parser() -> argparse.ArgumentParser:
               "Life-Stage Playbook. If omitted, age is taken from --bloodwork "
               "labs if present; otherwise all decades are shown un-highlighted."),
     )
+    parser.add_argument(
+        "--compare-genome",
+        default=None,
+        metavar="PATH",
+        help=("Path to a SECOND person's raw DNA file. Writes a standalone "
+              "genome_comparison.html with a KING-robust relationship estimate "
+              "(kinship + IBS0), genotype concordance, and shared recessive "
+              "carrier risk for a couple. The second genome is never written "
+              "to the repo and never committed."),
+    )
 
     # ── v5 flags ──────────────────────────────────────────────────────────
     parser.add_argument(

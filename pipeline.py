@@ -261,6 +261,28 @@ def run_pipeline(args: argparse.Namespace) -> int:
     except Exception:
         file_format = "unknown"
 
+    # ── Optional two-genome comparison (--compare-genome) ──
+    if getattr(args, "compare_genome", None) and analyze_multi_person is not None:
+        try:
+            log(f"Comparing against second genome: {args.compare_genome}")
+            other_df = parse_dna_file(args.compare_genome)
+            mp_result = analyze_multi_person(
+                snps_df, other_df,
+                label_a="You", label_b="Second genome")
+            rel = mp_result["relationship"]
+            log(f"  Relationship estimate: {rel['degree']} "
+                f"(kinship φ={mp_result['king']['kinship']}, "
+                f"{mp_result['king']['n_shared_snps']:,} shared SNPs, "
+                f"{rel['confidence']} confidence)")
+            # Write next to the main report output (gitignored filename).
+            out_dir = Path(args.output).resolve().parent
+            comp_path = out_dir / "genome_comparison.html"
+            with open(comp_path, "w", encoding="utf-8") as f:
+                f.write(render_multi_person_html(mp_result))
+            log(f"  Wrote {comp_path}")
+        except Exception as e:
+            log(f"  WARNING: Genome comparison failed: {e}")
+
     # ── Optional imputation step ──
     imputation_info: Optional[Dict] = None
     if args.impute:
@@ -875,12 +897,11 @@ def run_pipeline(args: argparse.Namespace) -> int:
     life_stage_playbook_result: Optional[Dict] = None
     if analyze_life_stage_playbook is not None:
         try:
-            # Age priority: --age flag, else bloodwork labs age, else None.
+            # Age priority: --age flag, else bloodwork labs age (compare_bloodwork
+            # exposes it as "age_used"), else None.
             _age = getattr(args, "age", None)
             if _age is None and bloodwork_result:
-                _age = (bloodwork_result.get("age")
-                        or (bloodwork_result.get("meta") or {}).get("age")
-                        or (bloodwork_result.get("latest") or {}).get("age"))
+                _age = bloodwork_result.get("age_used")
             life_stage_playbook_result = analyze_life_stage_playbook(
                 age=_age,
                 holistic_synthesis_result=holistic_synthesis_result,
