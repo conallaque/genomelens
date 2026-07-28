@@ -4,26 +4,29 @@ This software is proprietary and confidential.
 Unauthorized copying, modification, or distribution is prohibited.
 
 ---
-# DNA Analysis Tool
+# GenomeLens
 
-> **Local, privacy-first DNA analysis pipeline.** Turns a consumer raw-data file
-> (23andMe, AncestryDNA, MyHeritage, TellmeGen, FTDNA, …) into a comprehensive
-> HTML report covering pharmacogenomics (217 CPIC drugs), polygenic risk,
-> carrier status, ancestry with a Y-DNA/mtDNA lineage cross-check, traits,
-> a detoxification & environmental-resilience panel, comprehensive
-> genotype-aware blood-work analysis, wellness, personalised
-> supplement/exercise/nutrition stacks, and a clinical-grade HL7 FHIR R4 export
-> — with optional local-LLM interpretation via Ollama.
+> **A local, privacy-first genomics engine that treats your health like a portfolio.**
+> GenomeLens turns a consumer DNA file (23andMe, AncestryDNA, MyHeritage, FTDNA, …)
+> *or* a full whole-genome / exome **VCF** into a comprehensive, actionable health
+> report — and models the decisions that maximize your lifetime **return on health**:
+> minimizing the left-tail risk of adverse drug reactions and optimizing everyday
+> diet, fitness, and environmental choices.
 >
-> **No DNA file ever leaves your machine.**
+> **Nothing ever leaves your machine — no cloud, no accounts, no telemetry.
+> Even the AI interpretation runs on a local LLM.**
 
 ![status](https://img.shields.io/badge/status-active-brightgreen)
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
-![license](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
-![privacy](https://img.shields.io/badge/network-localhost%20only-purple)
+![privacy](https://img.shields.io/badge/privacy-100%25%20local%20%C2%B7%20offline-purple)
+![code](https://img.shields.io/badge/code-~42.7k%20lines%20%C2%B7%2041%20modules-orange)
 ![tests](https://img.shields.io/badge/tests-369%20passing-brightgreen)
-![registry](https://img.shields.io/badge/SNP%20registry-unified-blueviolet)
-![analyze.py](https://img.shields.io/badge/analyze.py-1%2C055%20lines-orange)
+![input](https://img.shields.io/badge/input-chip%20%2B%20whole--genome%20VCF-blue)
+![license](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
+
+> ⚠️ **Not medical advice — educational & research use only.** Genetic
+> predispositions are probabilistic; confirm anything actionable with a licensed
+> physician and a board-certified genetic counsellor.
 
 ---
 
@@ -55,89 +58,58 @@ emit a clinical EHR bundle.
 
 ---
 
-## What's new in V18–V19 — analysis depth (current)
+## What it does
 
-The most recent releases add three major analysis capabilities. Full details in
-[`CHANGELOG.md`](CHANGELOG.md); headline items:
+GenomeLens runs **41 interlocking analysis modules** (~42,700 lines of Python, a
+369-test suite) entirely offline — across two input tiers: a consumer chip file
+or a whole-genome / exome **VCF**.
 
-- 🩸 **Comprehensive blood-work engine (V19).** Beyond the original
-  genetics-vs-labs comparison, every biomarker is now classified against both
-  standard clinical ranges *and* tighter functional/optimal ranges across 12
-  body-system panels, with ~12 calculated markers (non-HDL, TG:HDL, ApoB:ApoA1,
-  HOMA-IR, eGFR, transferrin saturation, NLR, FIB-4, …), **genotype-aware
-  interpretation** (your HFE/APOE/TCF7L2/MTHFR/GC/FUT2/ABCG2/UGT1A1/LPA variants
-  contextualise flagged results), and per-system + overall health scores.
-- 🧬 **Ancestry lineage cross-check (V18).** The autosomal ancestry estimate is
-  now reconciled against the Y-DNA and mtDNA haplogroups (geographic
-  concordant/discordant verdict). Fixes a strand/palindrome bug that could
-  mis-call European samples; dosage is now strand-aware.
-- 🌫️ **Detoxification & environmental-resilience panel (V18).** Phase I/II
-  xenobiotic handling (CYP1A1/1A2/1B1, GSTs, NQO1, EPHX1, NAT2), the NRF2
-  antioxidant axis, and heavy-metal handling — with a wildfire-smoke resilience
-  score and a genotype-personalised protocol. The metal/oxidative panel is now
-  wired into the report.
-- 🧪 **225 tests** (was 145 at V8); `REPORT_VERSION` 6.22.1-premium.
+**Clinical & pharmacogenomic**
+- **Pharmacogenomics (CPIC):** drug-response variants + dosing implications that *flag and reduce* adverse-drug-reaction risk.
+- **Clinical variants (ClinVar) — Phase 2:** whole-genome pathogenic / likely-pathogenic screen with ACMG actionable findings, carrier status, compound-heterozygote detection, and ClinVar star-graded confidence.
+- **Carrier & family planning:** recessive carrier status with Hardy-Weinberg partner risk — transmission probability kept distinct from disease penetrance.
 
-## What's new in V8 — completion of the foundation
+**Risk, aging & synthesis**
+- **Polygenic risk:** curated PRS **plus** full PGS Catalog scoring files, EUR-normalised percentiles with coverage-bounded confidence.
+- **Genetics × your bloodwork:** cross-references genotype against uploaded labs — PhenoAge biological age, AHA PREVENT 2023 10-year cardiovascular risk, 20+ composite indices.
+- **Holistic synthesis:** a Genome-Leverage score and cross-panel pattern detection — where genes, labs, and lifestyle compound.
 
-V8 finishes the consolidation work started in V7. Zero new user-visible
-features; substantial structural + correctness gains under the hood.
-Full details in [`CHANGELOG.md`](CHANGELOG.md); headline items:
+**Ancestry & traits**
+- **Ancestry:** autosomal PCA + Y-DNA / mtDNA haplogroups + deep ancestry (Neanderthal %, Yamnaya / EEF / WHG affinity, migration timelines).
+- Literature-grounded **immunogenetics, neurochemistry, addiction genetics, blood type,** and **trait genetics** panels.
 
-- ♻️ **`analyze.py` fully decomposed.** 4 876 lines → 1 055 (78 % reduction
-  over V7 + V8). New focused modules: `cli.py` (parser), `pipeline.py`
-  (orchestration), `renderers.py` (every `build_*_html` function),
-  `snp_registry.py` (variant metadata). Backwards compatible — legacy
-  `from analyze import build_html_report` keeps working via a lazy
-  `__getattr__` shim.
-- 🧬 **Registry migration — three more modules.** `carrier.py`,
-  `wellness.py`, `traits.py` now cross-check against the unified registry
-  at import time. The audit surfaced 3 strand-flipped variants (SERPINA1
-  PiZ, PAH R408W, APOB R3500Q — historically reported on the gene's
-  coding strand; reconciled in CHANGELOG). 0 real biology disagreements.
-- 🔬 **Imputation provenance schema + reference-build auto-detection.**
-  Every parsed `snps_df` is now tagged with a `source` column
-  (`chip` / `imp_high_r2` / `imp_low_r2`) and a `build` attr
-  (`grch37` / `grch38` / `mixed` / `unknown`). Schema only — downstream
-  PRS / PheWAS scoring weighting is V8.1 work.
-- 🧪 **145 tests in ~70 ms** (was 121 in V7). 6 golden snapshots locked
-  the V6 outputs byte-exactly through three major refactors (renderers
-  extraction, pipeline extraction, registry migration) — none drifted.
+**Lifestyle, interop & AI**
+- Nutrigenomics, chronotype-based light timing, exercise programming, and a decade-by-decade life-stage playbook.
+- **HL7 FHIR R4** clinical export.
+- **Local AI on every tier:** an Ollama LLM interprets each module and powers an offline chat assistant — no data ever leaves the machine.
 
-**Deferred to V8.1**, with specific next-steps documented in
-[`CHANGELOG.md`](CHANGELOG.md): confidence intervals on PRS / PheWAS
-(blocked by missing per-variant SE), ancestry-stratified PRS (blocked by
-missing per-population effect sizes), downstream consumption of the
-imputation provenance schema, indel schema extension for carrier.py's
-remaining 33 entries, and registry migration of `pgx` / `phewas` / `prs`
-/ `hla`.
+## Built with rigor
 
-## What's new in V7 — the consolidation release
+- **Unified, strand-aware SNP registry** — one source of truth for GRCh37/38 coordinates and ancestral/derived alleles; caught and fixed palindrome/strand bugs that silently mis-call ancestry.
+- **KING-robust relationship inference** — a proper kinship estimator (not naive percent-identity), IBS0-refined for parent-child vs full-sibling.
+- **Honest by construction** — no fabricated polygenic percentiles; transmission ≠ disease penetrance; ClinVar review-star confidence; every local-AI call sees only deterministic findings, so it cannot invent a risk or a statistic.
+- **369-test suite**, reference-build auto-detection (GRCh37/38), and graceful degradation when optional data or models are absent.
 
-V6 added user-facing features (bloodwork comparison, supplement stack,
-exercise programming, nutrition, FHIR export, master dashboard). **V7 is
-the foundation-rebuild release** — zero new user-visible features, big
-durability and correctness gains under the hood:
+## How this was built
 
-- 🧬 **Unified SNP registry** (`snp_registry.py`) — single source of truth
-  for every variant's GRCh37/38 coordinates, ancestral/derived alleles,
-  gene, and citation. Replaces seven parallel per-module dicts where 46 %
-  of rsIDs previously appeared with risk of inconsistent metadata.
-- 🧪 **121-test pytest suite** — unit tests for the V6 modules, golden
-  snapshot regression tests, registry invariant tests, CLI contract tests.
-  All passing in under 100 ms; locks current behaviour against future
-  refactors.
-- ⚙️ **Real project tooling** — `requirements.txt`, `pyproject.toml`
-  (ruff + mypy + pytest configs), GitHub Actions CI on push/PR, pre-commit
-  hooks. The project is now contributable in a standard Python-ecosystem
-  way.
-- ♻️ **Begun decomposition of the 4 876-line `analyze.py`** — CLI parser
-  extracted to a focused `cli.py` (`dna-analyze` console script). Pipeline
-  + renderers extraction completed in V8.
-- 📘 **Migration playbook** (`docs/MIGRATION_PLAYBOOK.md`) — step-by-step
-  recipe for porting the remaining six legacy modules to the unified
-  registry. `supplements.py` is the V7 proof-of-concept (behaviour
-  byte-preserved per golden snapshots).
+GenomeLens was conceived, architected, and directed by **Conall Aque** — MS
+candidate in Commerce & Economic Development (**financial-economics** focus) at
+Northeastern University, with an undergraduate focus in **health economics** —
+and pair-programmed with an AI coding assistant. The health-economics framing,
+scientific decisions, and privacy-first design are the author's; the AI
+accelerated implementation. Release history is in [`CHANGELOG.md`](CHANGELOG.md)
+(current: **v6.22 — Phase-2 ClinVar screen, dual chip/VCF input,
+local-AI-on-all-tiers**).
+
+**Market-value context.** Purchased à la carte from commercial providers, the
+testing, analysis, and expert interpretation GenomeLens performs locally would
+run an estimated **$1,500–$3,000+** — e.g. clinical pharmacogenomics (~$250),
+expanded carrier screening (~$350), a hereditary-cancer / ACMG panel (~$250),
+polygenic-risk and ancestry reports (~$350 combined), nutrigenomics and trait
+panels (~$200), and genetic-counsellor-style interpretation (~$200+).
+GenomeLens consolidates all of it into a single private, offline tool.
+*Illustrative comparison using typical U.S. self-pay pricing — not a formal
+valuation, and not a substitute for clinical-grade testing.*
 
 ---
 
