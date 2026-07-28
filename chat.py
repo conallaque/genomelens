@@ -49,6 +49,13 @@ def _summarise_context(
     urologic_result: Optional[Dict] = None,
     deep_ancestry_result: Optional[Dict] = None,
     blood_type_result: Optional[Dict] = None,
+    immunogenetics_result: Optional[Dict] = None,
+    neurochemistry_result: Optional[Dict] = None,
+    addiction_genetics_result: Optional[Dict] = None,
+    holistic_synthesis_result: Optional[Dict] = None,
+    polygenic_traits_result: Optional[Dict] = None,
+    environmental_optimization_result: Optional[Dict] = None,
+    family_planning_result: Optional[Dict] = None,
     y_result: Optional[Dict] = None,
     mt_result: Optional[Dict] = None,
 ) -> str:
@@ -247,6 +254,32 @@ def _summarise_context(
         for i in (personal_econ_result.get("items") or [])[:5]:
             lines.append(f"  - {i['category']}: {i['finding']} · net ${i['net']:,} "
                          f"({i['confidence']} confidence)")
+
+    # ── Shared higher-order module digest (immunogenetics, neurochemistry,
+    #    addiction, holistic synthesis, trait genetics, env-opt, family planning)
+    #    so chat reasons over the same rich context as the report AI. ──
+    try:
+        from analyze import _build_module_context
+        digest = _build_module_context(
+            bloodwork_result=bloodwork_result,
+            immunogenetics_result=immunogenetics_result,
+            neurochemistry_result=neurochemistry_result,
+            addiction_genetics_result=addiction_genetics_result,
+            deep_ancestry_result=deep_ancestry_result,
+            blood_type_result=blood_type_result,
+            family_planning_result=family_planning_result,
+            polygenic_traits_result=polygenic_traits_result,
+            environmental_optimization_result=environmental_optimization_result,
+            holistic_synthesis_result=holistic_synthesis_result,
+            detox_result=detox_result,
+            ancestry_result=ancestry_result,
+            y_result=y_result, mt_result=mt_result,
+            max_chars=9000,
+        )
+        if digest:
+            lines.append("\n=== HIGHER-ORDER MODULE ANALYSES ===\n" + digest)
+    except Exception:
+        pass
 
     return "\n".join(lines)
 
@@ -480,6 +513,13 @@ def run_chat(
     urologic_result: Optional[Dict] = None,
     deep_ancestry_result: Optional[Dict] = None,
     blood_type_result: Optional[Dict] = None,
+    immunogenetics_result: Optional[Dict] = None,
+    neurochemistry_result: Optional[Dict] = None,
+    addiction_genetics_result: Optional[Dict] = None,
+    holistic_synthesis_result: Optional[Dict] = None,
+    polygenic_traits_result: Optional[Dict] = None,
+    environmental_optimization_result: Optional[Dict] = None,
+    family_planning_result: Optional[Dict] = None,
     y_result: Optional[Dict] = None,
     mt_result: Optional[Dict] = None,
 ) -> None:
@@ -495,6 +535,13 @@ def run_chat(
         economics_result=economics_result, personal_econ_result=personal_econ_result,
         urologic_result=urologic_result, deep_ancestry_result=deep_ancestry_result,
         blood_type_result=blood_type_result,
+        immunogenetics_result=immunogenetics_result,
+        neurochemistry_result=neurochemistry_result,
+        addiction_genetics_result=addiction_genetics_result,
+        holistic_synthesis_result=holistic_synthesis_result,
+        polygenic_traits_result=polygenic_traits_result,
+        environmental_optimization_result=environmental_optimization_result,
+        family_planning_result=family_planning_result,
         y_result=y_result, mt_result=mt_result,
     )
     mode = "deep"

@@ -1427,9 +1427,14 @@ Coverage depends on chip density and imputation: <em>chip + imputed / total</em>
 typically covers only a small fraction of a PGS Catalog scoring file, so any
 percentile shown here is an approximation whose reliability is bounded by the
 <em>coverage</em> stat on each card. Scores flagged <em>low confidence</em>
-were computed on too few variants to interpret. Polygenic risk is one input
-alongside family history, lifestyle, and clinical risk factors; confirm
-anything actionable with a clinician.
+were computed on too few variants to interpret.
+<strong>A percentile is a rank, not a probability.</strong> For low-base-rate
+conditions — e.g. schizophrenia (~1% lifetime) — even a high percentile implies
+only a small <em>absolute</em> risk: being in the top few percent of a ~1%
+condition still leaves the absolute risk in the low single digits. Read every
+percentile against the "Lifetime context" figure on its card. Polygenic risk is
+one input alongside family history, lifestyle, and clinical risk factors;
+confirm anything actionable with a clinician.
 </div>
 {headline_html}
 <div class="prs-grid">{cards}</div>
@@ -1601,6 +1606,25 @@ underlying modules but the composite is judgment, not clinical guidance.
 </div>
 </section>
 """
+
+
+def _prepend_ai_interpretation(section_html: str, ai_text: Optional[str]) -> str:
+    """Inject a local-AI interpretation callout immediately under a section's
+    <h2> heading. Used for 'AI on all tiers' — every module section gets its own
+    AI interpretation when AI is enabled. No-op if there's no section or no text."""
+    if not section_html or not ai_text:
+        return section_html
+    block = (
+        '<div class="ai-interp" style="border:1px solid #cdd9e5;'
+        'border-left:4px solid #6f42c1;background:linear-gradient(135deg,#f7f4fc,#f1f5fb);'
+        'border-radius:8px;padding:12px 16px;margin:10px 0">'
+        '<div style="font-weight:700;color:#6f42c1;font-size:.9em;margin-bottom:4px">'
+        '🧠 AI interpretation</div>'
+        f'<div style="line-height:1.6">{md_to_html(ai_text)}</div></div>')
+    idx = section_html.find("</h2>")
+    if idx == -1:
+        return block + section_html
+    return section_html[:idx + 5] + block + section_html[idx + 5:]
 
 
 def build_life_stage_playbook_html(lsp: Optional[Dict]) -> str:
@@ -3972,6 +3996,7 @@ def build_html_report(
     polygenic_traits_result: Optional[Dict] = None,
     environmental_optimization_result: Optional[Dict] = None,
     life_stage_playbook_result: Optional[Dict] = None,
+    module_ai: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -4255,6 +4280,18 @@ def build_html_report(
     environmental_optimization_html = build_environmental_optimization_html(environmental_optimization_result)
     life_stage_playbook_html = build_life_stage_playbook_html(life_stage_playbook_result)
     ancestral_story_html = build_ancestral_story_html(ancestral_story_result)
+
+    # AI on all tiers — attach each module's local-AI interpretation under its heading.
+    _mai = module_ai or {}
+    deep_ancestry_html = _prepend_ai_interpretation(deep_ancestry_html, _mai.get("deep-ancestry"))
+    blood_type_html = _prepend_ai_interpretation(blood_type_html, _mai.get("blood-type"))
+    immunogenetics_html = _prepend_ai_interpretation(immunogenetics_html, _mai.get("immunogenetics"))
+    neurochemistry_html = _prepend_ai_interpretation(neurochemistry_html, _mai.get("neurochemistry"))
+    holistic_synthesis_html = _prepend_ai_interpretation(holistic_synthesis_html, _mai.get("holistic-synthesis"))
+    addiction_genetics_html = _prepend_ai_interpretation(addiction_genetics_html, _mai.get("addiction-genetics"))
+    family_planning_html = _prepend_ai_interpretation(family_planning_html, _mai.get("family-planning"))
+    polygenic_traits_html = _prepend_ai_interpretation(polygenic_traits_html, _mai.get("polygenic-traits"))
+    environmental_optimization_html = _prepend_ai_interpretation(environmental_optimization_html, _mai.get("environmental-optimization"))
     medications_html = build_medications_html(medications_result)
     # ── V4 sections ──
     wellness_html = build_wellness_html(wellness_result)

@@ -227,7 +227,7 @@ SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.19.1-premium"
+REPORT_VERSION = "6.20.0-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",
@@ -589,7 +589,7 @@ def tier1_lookup(
 
 def call_ollama(prompt: str, model: str, timeout: int = 1800,
                 stream: bool = True, num_ctx: int = 4096,
-                num_predict: int = 1024) -> str:
+                num_predict: int = 1024, think: Optional[bool] = None) -> str:
     """Send a prompt to local Ollama and return the response text.
 
     Streaming (default) is critical for long-generating models like ``qwen3:14b``
@@ -609,6 +609,13 @@ def call_ollama(prompt: str, model: str, timeout: int = 1800,
         "options": {"temperature": 0.3, "num_ctx": num_ctx,
                     "num_predict": num_predict},
     }
+    # Thinking-model control: for direct synthesis/interpretation tasks we
+    # disable reasoning (think=False) so the whole num_predict budget produces
+    # the visible answer rather than being consumed inside a <think> block —
+    # which otherwise strips to an empty result. Left at the model default when
+    # think is None.
+    if think is not None:
+        payload["think"] = think
 
     try:
         if not stream:
@@ -641,9 +648,16 @@ def call_ollama(prompt: str, model: str, timeout: int = 1800,
                     if obj.get("done"):
                         break
             content = "".join(content_parts)
+        raw = content
         # Strip <think>...</think> reasoning blocks (qwen3 etc.)
-        content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
-        return content
+        stripped = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
+        # Salvage: if stripping left nothing (reasoning ate the whole budget or
+        # the <think> block never closed), recover any post-</think> text, else
+        # return the raw trace stripped of the tags — never silently emit "".
+        if not stripped and raw.strip():
+            after = re.sub(r"^.*</think>", "", raw, flags=re.DOTALL).strip()
+            stripped = after or raw.replace("<think>", "").replace("</think>", "").strip()
+        return stripped
     except requests.exceptions.ConnectionError:
         raise ConnectionError(
             "Cannot connect to Ollama at localhost:11434. "
@@ -841,8 +855,306 @@ def _run_category_ai_with_batching(
     return "\n\n---\n\n".join(parts), had_failure
 
 
+def _build_module_context(
+    bloodwork_result: Optional[Dict] = None,
+    immunogenetics_result: Optional[Dict] = None,
+    neurochemistry_result: Optional[Dict] = None,
+    addiction_genetics_result: Optional[Dict] = None,
+    deep_ancestry_result: Optional[Dict] = None,
+    blood_type_result: Optional[Dict] = None,
+    family_planning_result: Optional[Dict] = None,
+    polygenic_traits_result: Optional[Dict] = None,
+    environmental_optimization_result: Optional[Dict] = None,
+    holistic_synthesis_result: Optional[Dict] = None,
+    detox_result: Optional[Dict] = None,
+    ancestry_result: Optional[Dict] = None,
+    y_result: Optional[Dict] = None,
+    mt_result: Optional[Dict] = None,
+    max_chars: int = 7000,
+    per_section_chars: int = 900,
+) -> str:
+    """Compact, per-section-budgeted digest of the higher-order analysis
+    modules — the 'whole person' beyond the tier-1 SNP category findings.
+
+    Pure and None-safe: every section is optional and independently truncated
+    to ``per_section_chars`` so no single module can crowd the others out, then
+    the whole digest is capped at ``max_chars``. Shared by the executive
+    summary, the cross-category synthesis, and the interactive chat assistant
+    so all three reason over the same rich context.
+    """
+    sections: List[Tuple[str, str]] = []
+
+    def _add(title: str, lines: List[str]) -> None:
+        lines = [str(x) for x in lines if x]
+        if not lines:
+            return
+        body = "\n".join(lines)
+        if len(body) > per_section_chars:
+            body = body[:per_section_chars].rstrip() + " …"
+        sections.append((title, body))
+
+    # ── Holistic synthesis (leverage score — highest-signal framing) ──
+    try:
+        hs = holistic_synthesis_result or {}
+        gl = hs.get("genome_leverage") or {}
+        if gl.get("tier"):
+            ls = [f"Genome Leverage Score: {gl.get('score')}/100 ({gl.get('tier')}). "
+                  f"{gl.get('narrative','')}"]
+            for ins in (hs.get("insights") or [])[:5]:
+                ls.append(f"- {ins.get('title','')}: {ins.get('explanation','')[:160]}")
+            _add("HOLISTIC SYNTHESIS", ls)
+    except Exception:
+        pass
+
+    # ── Bloodwork (biological age + flagged markers) ──
+    try:
+        bw = bloodwork_result or {}
+        clin = bw.get("clinical") or {}
+        adv = clin.get("advanced") or {}
+        bio = adv.get("biological_age") or {}
+        ls = []
+        if bio.get("phenoage") is not None:
+            accel = bio.get("accel")
+            ls.append(f"PhenoAge biological age {bio.get('phenoage'):.1f} "
+                      f"(accel {accel:+.1f} yr)" if accel is not None
+                      else f"PhenoAge {bio.get('phenoage'):.1f}")
+        prevent = adv.get("prevent") or {}
+        if prevent.get("risk10_total") is not None:
+            ls.append(f"PREVENT 10-yr CVD risk ~{prevent['risk10_total']:.1f}%")
+        flags = clin.get("flags") or []
+        for f in flags[:8]:
+            nm = f.get("name") or f.get("marker") or "?"
+            val = f.get("value")
+            note = (f.get("note") or f.get("interpretation") or "")[:80]
+            ls.append(f"- FLAG {nm}={val}: {note}")
+        _add("BLOODWORK (measured labs)", ls)
+    except Exception:
+        pass
+
+    # ── Immunogenetics ──
+    try:
+        ig = immunogenetics_result or {}
+        if ig.get("available"):
+            ls = [f"{ig.get('n_protective',0)} protective / "
+                  f"{ig.get('n_susceptible',0)} susceptible pathogen findings."]
+            for h in (ig.get("headlines") or [])[:4]:
+                ls.append(f"- PROTECTIVE {h.get('name','')} ({h.get('gene','')} "
+                          f"{h.get('genotype','')}): {h.get('verdict','')}")
+            for f in [x for x in (ig.get('findings') or []) if x.get('impact')=='susceptible'][:3]:
+                ls.append(f"- SUSCEPTIBLE {f.get('name','')}: {f.get('verdict','')}")
+            _add("IMMUNOGENETICS", ls)
+    except Exception:
+        pass
+
+    # ── Neurochemistry ──
+    try:
+        nc = (neurochemistry_result or {}).get("composite") or {}
+        if nc:
+            ls = [f"COMT {nc.get('comt_class')} · MAOA {nc.get('maoa_class')} · "
+                  f"BDNF {nc.get('bdnf_class')}.",
+                  nc.get("stress_response_profile", ""),
+                  f"Stimulants: {nc.get('stimulant_response','')[:120]}",
+                  f"Caffeine: {nc.get('caffeine_protocol','')[:120]}"]
+            _add("NEUROCHEMISTRY", ls)
+    except Exception:
+        pass
+
+    # ── Addiction genetics ──
+    try:
+        ag = (addiction_genetics_result or {}).get("composite") or {}
+        if ag:
+            ls = [f"Alcohol tier: {ag.get('alcohol_tier')}. Overall: {ag.get('overall_tier')}."]
+            for f in (ag.get("clinical_flags") or [])[:4]:
+                ls.append(f"- {f.get('title','')}: {f.get('text','')[:100]}")
+            _add("ADDICTION GENETICS", ls)
+    except Exception:
+        pass
+
+    # ── Ancestry + haplogroups ──
+    try:
+        ls = []
+        anc = ancestry_result or {}
+        props = anc.get("proportions") or {}
+        if props:
+            top = sorted(props.items(), key=lambda kv: -kv[1])[:3]
+            ls.append("Autosomal: " + ", ".join(f"{k} {v*100:.0f}%" for k, v in top))
+        cc = anc.get("haplogroup_crosscheck") or {}
+        if cc.get("verdict"):
+            ls.append(f"Lineage cross-check: {cc['verdict']}")
+        if (y_result or {}).get("terminal_haplogroup"):
+            ls.append(f"Y-DNA {y_result['terminal_haplogroup']}")
+        if (mt_result or {}).get("haplogroup"):
+            ls.append(f"mtDNA {mt_result['haplogroup']}")
+        _add("ANCESTRY & LINEAGE", ls)
+    except Exception:
+        pass
+
+    # ── Deep ancestry ──
+    try:
+        dp = deep_ancestry_result or {}
+        ls = []
+        n = dp.get("neanderthal") or {}
+        if n.get("available"):
+            ls.append(f"Neanderthal ~{n.get('approx_pct')}% ({n.get('tier')})")
+        ap = dp.get("ancient_populations") or {}
+        if ap.get("available"):
+            ls.append("Ancient-pop: " + ", ".join(
+                f"{p['short']} {p['affinity']*100:.0f}%" for p in ap.get("populations", [])[:3]))
+        ea = dp.get("european_axis") or {}
+        if ea.get("available"):
+            ls.append(f"N-S axis: {ea.get('lean')} (index {ea.get('index')})")
+        _add("DEEP ANCESTRY", ls)
+    except Exception:
+        pass
+
+    # ── Blood type ──
+    try:
+        bt = blood_type_result or {}
+        if bt.get("available"):
+            _add("BLOOD TYPE", [
+                f"{bt.get('combined') or '—'} — ABO {(bt.get('abo') or {}).get('phenotype')} "
+                f"(genotype {(bt.get('abo') or {}).get('genotype')}), "
+                f"Rh {(bt.get('rhd') or {}).get('status')}. "
+                f"FUT2: {(bt.get('secretor') or {}).get('secretor_status')}."])
+    except Exception:
+        pass
+
+    # ── Family planning ──
+    try:
+        fp = family_planning_result or {}
+        if fp.get("available"):
+            _add("FAMILY PLANNING", [fp.get("summary", "")[:per_section_chars]])
+    except Exception:
+        pass
+
+    # ── Trait genetics ──
+    try:
+        pt = polygenic_traits_result or {}
+        if pt.get("available"):
+            ls = [f"{f.get('trait')}: {f.get('call')}" for f in (pt.get("findings") or [])[:8]]
+            _add("TRAIT GENETICS", ls)
+    except Exception:
+        pass
+
+    # ── Environmental optimization ──
+    try:
+        eo = environmental_optimization_result or {}
+        if eo.get("available"):
+            ls = []
+            if eo.get("circadian"):
+                ls.append(f"Chronotype: {eo['circadian'].get('lean')}")
+            if eo.get("exercise"):
+                ls.append(f"Exercise fit: {eo['exercise'].get('lean')}")
+            if eo.get("vitamin_d"):
+                ls.append(f"Vitamin-D: {eo['vitamin_d'].get('tendency')}")
+            _add("ENVIRONMENTAL OPTIMIZATION", ls)
+    except Exception:
+        pass
+
+    # ── Detox ──
+    try:
+        dt = detox_result or {}
+        tier = dt.get("smoke_resilience_tier") or dt.get("tier")
+        if tier:
+            _add("DETOXIFICATION", [f"Smoke/xenobiotic resilience tier: {tier}"])
+    except Exception:
+        pass
+
+    if not sections:
+        return ""
+
+    out = "\n\n".join(f"[{title}]\n{body}" for title, body in sections)
+    if len(out) > max_chars:
+        out = out[:max_chars].rstrip() + "\n… [context truncated to fit]"
+    return out
+
+
+# Per-module AI ("AI on all tiers"): each new module section gets its own local
+# AI interpretation. Keys are the report section anchor ids so the renderer can
+# attach each interpretation to the right section.
+_MODULE_AI_SPECS: Dict[str, Dict[str, str]] = {
+    "holistic-synthesis": {
+        "kwarg": "holistic_synthesis_result", "title": "Holistic Synthesis",
+        "focus": "Explain what the Genome Leverage Score means for how much this "
+                 "person's choices (vs their genes) drive their long-term outcome, "
+                 "and translate the top cross-panel insights into a short priority order."},
+    "immunogenetics": {
+        "kwarg": "immunogenetics_result", "title": "Immunogenetics",
+        "focus": "Explain the headline protective findings and what they mean day "
+                 "to day, then any susceptibilities and their vaccination/behaviour "
+                 "implications. Note how notable the overall combination is."},
+    "neurochemistry": {
+        "kwarg": "neurochemistry_result", "title": "Neurochemistry",
+        "focus": "Translate the COMT/MAOA/BDNF profile into practical implications "
+                 "for stress, focus, stimulant/caffeine response, and learning — as "
+                 "tendencies, never as a fixed verdict on who they are."},
+    "addiction-genetics": {
+        "kwarg": "addiction_genetics_result", "title": "Addiction Genetics",
+        "focus": "Explain the alcohol and overall susceptibility tiers plainly, and "
+                 "surface the clinically-useful flags (never-smoke, naltrexone "
+                 "response, opioid dosing). Stress that behaviour dominates."},
+    "deep-ancestry": {
+        "kwarg": "deep_ancestry_result", "title": "Deep Ancestry",
+        "focus": "Tell the story of the Neanderthal, ancient-population, and "
+                 "North-South axis findings — where these ancestral components came "
+                 "from and what they say about deep origins."},
+    "blood-type": {
+        "kwarg": "blood_type_result", "title": "Blood Type",
+        "focus": "Explain the predicted ABO/Rh type and secretor status, what the "
+                 "hidden allele means for children, and the confidence caveats."},
+    "family-planning": {
+        "kwarg": "family_planning_result", "title": "Family Planning",
+        "focus": "Explain the reproductive-relevant findings for future children — "
+                 "keeping transmission separate from disease probability — and what, "
+                 "if anything, is worth discussing with a partner or counselor."},
+    "polygenic-traits": {
+        "kwarg": "polygenic_traits_result", "title": "Trait Genetics",
+        "focus": "Interpret the single-variant trait calls (taste, chronotype, "
+                 "appearance) in a light, accurate way; reinforce why no polygenic "
+                 "score is given for height/cognition/personality."},
+    "environmental-optimization": {
+        "kwarg": "environmental_optimization_result", "title": "Environmental Optimization",
+        "focus": "Turn the chronotype, exercise-modality, and vitamin-D findings into "
+                 "a concise, prioritized set of concrete behavioural recommendations."},
+}
+
+
+def ai_interpret_modules(model: str, log=None, **results) -> Dict[str, str]:
+    """AI-interpret each higher-order module ('AI on all tiers'). Returns a dict
+    keyed by report section-id → AI interpretation text. Each call is small and
+    fully local; per-module failures are logged and skipped, never fatal."""
+    _log = log or (lambda *a, **k: None)
+    out: Dict[str, str] = {}
+    for section_id, spec in _MODULE_AI_SPECS.items():
+        res = results.get(spec["kwarg"])
+        if not res:
+            continue
+        digest = _build_module_context(**{spec["kwarg"]: res},
+                                       per_section_chars=1400, max_chars=2200)
+        if not digest:
+            continue
+        prompt = (
+            f"You are a genetic counselor. Interpret the following "
+            f"{spec['title']} analysis for this individual. {spec['focus']}\n\n"
+            f"{digest}\n\n"
+            "Write 2–4 short, plain-language paragraphs. Be specific and grounded "
+            "in the data shown; distinguish strong findings from weak tendencies. "
+            "Do not just restate the numbers — explain what they mean and what to "
+            "do. Educational only, not a medical diagnosis."
+        )
+        try:
+            _log(f"  AI interpreting module: {spec['title']} ...")
+            txt = call_ollama(prompt, model=model, num_ctx=4096, num_predict=1100, think=False)
+            if txt and txt.strip():
+                out[section_id] = txt.strip()
+        except Exception as e:
+            _log(f"  WARNING: module AI for {section_id} failed: {e}")
+    return out
+
+
 def tier2_analysis(
-    tier1_results: List[Dict], apoe_genotype: Optional[str], model: str
+    tier1_results: List[Dict], apoe_genotype: Optional[str], model: str,
+    module_context: str = "",
 ) -> Tuple[Dict[str, str], str, List[Dict]]:
     """Run per-category AI interpretation then an executive summary.
 
@@ -902,33 +1214,45 @@ def tier2_analysis(
             f"{r['risk_copies']} risk allele(s)"
         )
 
+    module_block = (
+        "\n\nBeyond the SNP-level findings above, the report computed these "
+        "higher-order analyses. Weave the most important of them into your "
+        "summary — do not ignore them:\n\n" + module_context
+        if module_context else "")
+
     exec_prompt = (
         "You are a genetic counselor providing an executive summary of a "
-        "comprehensive DNA analysis. Based on the findings below, write "
-        "a 4–6 paragraph executive summary.\n\n"
-        "Key findings:\n"
+        "comprehensive DNA analysis. Based on ALL the findings below — the "
+        "SNP-level findings AND the higher-order module analyses — write a "
+        "5–7 paragraph executive summary that reads like one coherent picture "
+        "of this whole person, not a list.\n\n"
+        "Key SNP-level findings:\n"
         + "\n".join(summary_lines)
         + f"\n\nTotal variants analyzed: {len(tier1_results)}\n"
         f"Categories covered: "
-        f"{', '.join(sorted(set(r['category'] for r in tier1_results)))}\n\n"
-        "Your summary should:\n"
-        "1. Highlight the most important genetic findings and their overall "
-        "meaning\n"
-        "2. Identify the top 3–5 highest-priority actionable areas\n"
-        "3. Note cross-category patterns (e.g. compounding inflammation "
-        "variants, methylation + detox interactions)\n"
-        "4. Provide a balanced, grounded perspective — not alarmist, not "
-        "dismissive\n"
-        "5. Give clear next steps: what to prioritize, monitor, or discuss "
-        "with a doctor\n\n"
+        f"{', '.join(sorted(set(r['category'] for r in tier1_results)))}\n"
+        + module_block
+        + "\n\nYour summary should:\n"
+        "1. Open with the single most important through-line about this person "
+        "(use the Genome Leverage framing if present).\n"
+        "2. Integrate genetics WITH measured labs where both are present "
+        "(e.g. an APOE genotype next to the actual LDL; a PhenoAge result).\n"
+        "3. Identify the top 3–5 highest-priority, highest-leverage actions.\n"
+        "4. Note cross-domain patterns that only appear when modules combine "
+        "(e.g. immunogenetics × inflammation labs; neurochemistry × addiction; "
+        "ancestry-adapted diet × metabolic markers).\n"
+        "5. Be balanced and grounded — neither alarmist nor dismissive; "
+        "distinguish deterministic findings from probabilistic tendencies.\n"
+        "6. End with clear next steps: what to prioritize, monitor, or discuss "
+        "with a physician.\n\n"
         "Use plain language for a scientifically literate non-specialist. "
-        "This is educational information only, not a medical diagnosis."
+        "Educational information only, not a medical diagnosis."
     )
 
     try:
-        # Larger context for the whole-report exec summary.
+        # Larger context now that the exec summary reasons over every module.
         exec_summary = call_ollama(exec_prompt, model=model,
-                                   num_ctx=8192, num_predict=1536)
+                                   num_ctx=16384, num_predict=2048, think=False)
     except Exception as e:
         log(f"  WARNING: Executive summary failed: {e}")
         exec_summary = f"*Executive summary unavailable: {e}*"
@@ -937,7 +1261,7 @@ def tier2_analysis(
 
 
 def cross_category_synthesis(
-    tier1_results: List[Dict], model: str
+    tier1_results: List[Dict], model: str, module_context: str = "",
 ) -> str:
     """Generate a synthesis of how findings across categories interact.
 
@@ -977,19 +1301,25 @@ def cross_category_synthesis(
             f"{primary} ↔ {secondary}"
         )
 
-    if not cat_blocks:
+    if not cat_blocks and not module_context:
         return "*No risk-carrying or cross-referenced variants were found, so no cross-category synthesis was generated.*"
+
+    module_block = (
+        "\n\nHigher-order module analyses (reason across these AND the "
+        "categories above — the richest interactions bridge the two):\n\n"
+        + module_context if module_context else "")
 
     prompt = (
         "You are a genetic counselor synthesising findings ACROSS multiple "
-        "categories of a comprehensive DNA report. Per-category interpretations "
+        "domains of a comprehensive DNA report. Per-category interpretations "
         "have already been generated separately. Your job here is different: "
-        "identify how findings from DIFFERENT categories COMPOUND or INTERACT.\n\n"
+        "identify how findings from DIFFERENT domains COMPOUND or INTERACT.\n\n"
         "Findings by category (risk-carrying or cross-referenced variants only):\n\n"
         + "\n\n".join(cat_blocks)
         + "\n\nVariants that already have explicit cross-category bridges in the "
         "database:\n"
         + ("\n".join(xref_lines) if xref_lines else "  (none)")
+        + module_block
         + "\n\n"
         "Please write a Cross-Category Interactions analysis covering 4–7 of the "
         "most clinically meaningful compounding patterns for this person. For "
@@ -1009,9 +1339,15 @@ def cross_category_synthesis(
         "  • Estrogen metabolism (CYP1B1, COMT) + Cancer Risk\n"
         "  • APOE/lipids + Cognition + Cardiovascular\n"
         "  • Iron (HFE) + Heavy Metal handling (transport-pathway competition)\n"
-        "  • Insulin resistance × Lipids × Inflammation (metabolic syndrome)\n\n"
-        "Only include patterns that are actually relevant to this person's variants. "
-        "Be specific — name the variants, name the action.\n\n"
+        "  • Insulin resistance × Lipids × Inflammation (metabolic syndrome)\n"
+        "  • Immunogenetics × measured inflammation labs (e.g. FUT2 non-secretor "
+        "microbiome baseline vs actual hs-CRP)\n"
+        "  • Neurochemistry × Addiction (dopamine/COMT/reward × alcohol/nicotine tiers)\n"
+        "  • Ancestry-adapted diet (LCT / steppe / farmer) × metabolic labs\n"
+        "  • Genome Leverage tier × current lab trajectory (how much environment "
+        "dominates this person's outcome)\n\n"
+        "Only include patterns that are actually relevant to this person's data. "
+        "Be specific — name the variants/modules, name the action.\n\n"
         "Reminder: educational, not diagnostic."
     )
 
@@ -1022,7 +1358,7 @@ def cross_category_synthesis(
         prompt = prompt[:48_000] + "\n\n[...truncated to fit context]"
     try:
         return call_ollama(prompt, model=model,
-                           num_ctx=16384, num_predict=1800)
+                           num_ctx=16384, num_predict=2560, think=False)
     except Exception as e:
         log(f"  WARNING: Cross-category synthesis failed: {e}")
         return f"*Cross-category synthesis unavailable: {e}*"

@@ -6,6 +6,52 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.20.0-premium] — 2026-07-26 — AI upgrade: whole-genome context + AI on all tiers (fully local)
+
+The local-LLM analysis previously reasoned only over the tier-1 SNP category
+findings — blind to the 11 higher-order modules. This release makes the AI
+reason over the whole person, and gives every module its own AI interpretation.
+
+### Added
+
+- **Shared `_build_module_context()`** — a per-section-budgeted digest of every
+  higher-order module (holistic synthesis / Genome Leverage, bloodwork PhenoAge
+  + flagged labs, immunogenetics, neurochemistry, addiction, deep ancestry,
+  blood type, family planning, trait genetics, environmental optimization,
+  ancestry + haplogroups). Pure, None-safe, budgeted so no module crowds out
+  the others.
+- **Executive summary + cross-category synthesis are now module-aware** — both
+  receive the digest and are instructed to integrate genetics WITH measured
+  labs and to surface cross-domain interactions (immunogenetics × inflammation
+  labs, neurochemistry × addiction, ancestry-diet × metabolic markers, Genome
+  Leverage × lab trajectory). Holistic synthesis now runs BEFORE the AI so its
+  Leverage Score frames the summary.
+- **AI on all tiers** — `ai_interpret_modules()` generates a per-module local-AI
+  interpretation for each module section (🧠 callout injected under each
+  heading). Skippable with `--no-module-ai`.
+- **Chat assistant** now reasons over the same shared digest (was missing 8
+  modules).
+- **Thinking-model robustness** — `call_ollama` gains a `think` toggle; the
+  synthesis/interpretation calls disable reasoning so the whole token budget
+  produces the visible answer (previously a `<think>` block could consume the
+  budget and strip to an EMPTY section). Added a salvage guard so stripping
+  never silently yields "".
+
+### Changed
+
+- Confidence audit: CACNA1C (rs1006737) cross-psychiatric call downgraded to
+  **low** individual-level confidence with sharper "a single OR~1.2 common
+  variant barely moves your personal risk" framing. Expanded-PGS caveat now
+  states plainly that a percentile is a rank, not a probability — for a
+  low-base-rate condition like schizophrenia (~1%) even a high percentile is a
+  small absolute risk.
+
+### Tests
+
+- +7 (module-context budgeting + per-section representation, spec/section-id
+  alignment, AI-callout injector); 322 passing. Live local run on qwen3:14b
+  confirmed non-empty output with the enlarged prompts + think=False.
+
 ## [6.19.1-premium] — 2026-07-26 — Top-down bug sweep (4 real bugs fixed)
 
 Static analysis (ruff F/E9/B across 66 modules) + a full synthetic-genome

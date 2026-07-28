@@ -41,6 +41,8 @@ from analyze import (
     tier1_lookup,
     tier2_analysis,
     cross_category_synthesis,
+    _build_module_context,
+    ai_interpret_modules,
     write_failed_categories,
     retry_failed_categories,
     # Optional module bindings (any of these can be None if the module
@@ -840,34 +842,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Top-drugs screen failed: {e}")
 
     ai_results: Dict[str, str] = {}
-    exec_summary: Optional[str] = None
-    cross_cat: Optional[str] = None
-    failed_categories: List[Dict] = []
-
-    if not args.no_ai:
-        log(f"Starting Tier 2 AI analysis (model: {args.model}) ...")
-        try:
-            ai_results, exec_summary, failed_categories = tier2_analysis(
-                tier1_results, apoe_genotype, model=args.model
-            )
-            log("  AI analysis complete.")
-            # Cross-Category Interactions synthesis runs after per-category passes.
-            try:
-                cross_cat = cross_category_synthesis(tier1_results, model=args.model)
-            except Exception as e:
-                log(f"  WARNING: cross-category synthesis failed: {e}")
-                cross_cat = None
-        except ConnectionError as e:
-            log(f"  ERROR: {e}")
-            log("  Generating Tier 1-only report.")
-            args.no_ai = True
-        except Exception as e:
-            log(f"  ERROR during AI analysis: {e}")
-            log("  Generating report with partial results.")
-    else:
-        log("Skipping AI analysis (--no-ai)")
-
-    # ── Holistic Synthesis — cross-panel pattern detection ────────────────
+    # ── Holistic Synthesis — computed BEFORE the AI block so its Genome
+    #    Leverage Score can frame the executive summary + synthesis prompts. ──
     holistic_synthesis_result: Optional[Dict] = None
     if analyze_holistic_synthesis is not None:
         try:
@@ -895,6 +871,78 @@ def run_pipeline(args: argparse.Namespace) -> int:
                     f"({gl.get('tier','?')})")
         except Exception as e:
             log(f"  WARNING: Holistic synthesis failed: {e}")
+
+    # ── Shared module-context digest fed to every whole-report AI call ──
+    module_context = ""
+    try:
+        module_context = _build_module_context(
+            bloodwork_result=bloodwork_result,
+            immunogenetics_result=immunogenetics_result,
+            neurochemistry_result=neurochemistry_result,
+            addiction_genetics_result=addiction_genetics_result,
+            deep_ancestry_result=deep_ancestry_result,
+            blood_type_result=blood_type_result,
+            family_planning_result=family_planning_result,
+            polygenic_traits_result=polygenic_traits_result,
+            environmental_optimization_result=environmental_optimization_result,
+            holistic_synthesis_result=holistic_synthesis_result,
+            detox_result=detox_result,
+            ancestry_result=ancestry_result,
+            y_result=y_result,
+            mt_result=mt_result,
+        )
+    except Exception as e:
+        log(f"  WARNING: module-context digest failed: {e}")
+
+    exec_summary: Optional[str] = None
+    cross_cat: Optional[str] = None
+    failed_categories: List[Dict] = []
+    module_ai: Dict[str, str] = {}
+
+    if not args.no_ai:
+        log(f"Starting Tier 2 AI analysis (model: {args.model}) ...")
+        try:
+            ai_results, exec_summary, failed_categories = tier2_analysis(
+                tier1_results, apoe_genotype, model=args.model,
+                module_context=module_context,
+            )
+            log("  AI analysis complete.")
+            # Cross-Category Interactions synthesis (now module-aware).
+            try:
+                cross_cat = cross_category_synthesis(
+                    tier1_results, model=args.model, module_context=module_context)
+            except Exception as e:
+                log(f"  WARNING: cross-category synthesis failed: {e}")
+                cross_cat = None
+            # AI on ALL tiers — a per-module AI interpretation for each module
+            # section (skippable with --no-module-ai for a faster run).
+            if not getattr(args, "no_module_ai", False):
+                try:
+                    module_ai = ai_interpret_modules(
+                        model=args.model, log=log,
+                        bloodwork_result=bloodwork_result,
+                        immunogenetics_result=immunogenetics_result,
+                        neurochemistry_result=neurochemistry_result,
+                        addiction_genetics_result=addiction_genetics_result,
+                        deep_ancestry_result=deep_ancestry_result,
+                        blood_type_result=blood_type_result,
+                        family_planning_result=family_planning_result,
+                        polygenic_traits_result=polygenic_traits_result,
+                        environmental_optimization_result=environmental_optimization_result,
+                        holistic_synthesis_result=holistic_synthesis_result,
+                    )
+                    log(f"  Per-module AI: {len(module_ai)} module interpretations generated")
+                except Exception as e:
+                    log(f"  WARNING: per-module AI failed: {e}")
+        except ConnectionError as e:
+            log(f"  ERROR: {e}")
+            log("  Generating Tier 1-only report.")
+            args.no_ai = True
+        except Exception as e:
+            log(f"  ERROR during AI analysis: {e}")
+            log("  Generating report with partial results.")
+    else:
+        log("Skipping AI analysis (--no-ai)")
 
     # ── Life-stage playbook (runs AFTER holistic_synthesis — needs leverage) ──
     life_stage_playbook_result: Optional[Dict] = None
@@ -967,6 +1015,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         polygenic_traits_result=polygenic_traits_result,
         environmental_optimization_result=environmental_optimization_result,
         life_stage_playbook_result=life_stage_playbook_result,
+        module_ai=module_ai,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:
@@ -1269,6 +1318,13 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 urologic_result=urologic_result,
                 deep_ancestry_result=deep_ancestry_result,
                 blood_type_result=blood_type_result,
+                immunogenetics_result=immunogenetics_result,
+                neurochemistry_result=neurochemistry_result,
+                addiction_genetics_result=addiction_genetics_result,
+                holistic_synthesis_result=holistic_synthesis_result,
+                polygenic_traits_result=polygenic_traits_result,
+                environmental_optimization_result=environmental_optimization_result,
+                family_planning_result=family_planning_result,
                 economics_result=economics_result,
                 y_result=y_result,
                 mt_result=mt_result,

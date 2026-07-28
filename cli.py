@@ -150,6 +150,14 @@ def build_parser() -> argparse.ArgumentParser:
               "labs if present; otherwise all decades are shown un-highlighted."),
     )
     parser.add_argument(
+        "--no-module-ai",
+        action="store_true",
+        help=("Skip the per-module AI interpretation pass ('AI on all tiers'). "
+              "The executive summary and cross-category synthesis still run. "
+              "Use for a faster run — each module interpretation is a separate "
+              "local LLM call."),
+    )
+    parser.add_argument(
         "--compare-genome",
         default=None,
         metavar="PATH",

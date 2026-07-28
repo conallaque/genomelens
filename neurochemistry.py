@@ -362,21 +362,25 @@ def _cacna1c(df):
         return None
     n_A = gt.count("A")
     if n_A >= 1:
-        ph = f"CACNA1C rs1006737 A-carrier ({n_A}× A) — cross-psychiatric risk locus"
-        mech = ("rs1006737-A is the strongest common variant associated with "
-                "risk for bipolar disorder, schizophrenia, and major depression "
-                "across large psychiatric GWAS (OR ~1.15-1.3 per allele). Small "
-                "per-allele effect; hetero/homo status is common in the "
-                "general population (~30-40%).")
-        action = ("Awareness only. Mood-stability practices — regular sleep, "
-                  "circadian consistency, structured stress management — matter "
-                  "more given this locus. Not preventive of illness; supportive.")
-        conf = "moderate"
+        ph = f"CACNA1C rs1006737 A-carrier ({n_A}× A) — common cross-psychiatric variant"
+        mech = ("rs1006737-A is a well-replicated common variant associated at the "
+                "POPULATION level with bipolar disorder, schizophrenia, and major "
+                "depression (OR ~1.15-1.3 per allele). Crucially, that is a tiny "
+                "per-individual effect: the allele is carried by ~30-40% of "
+                "healthy people, and on its own it shifts your personal risk "
+                "negligibly. It is not predictive or diagnostic for any single "
+                "person — only a faint tile in a highly polygenic picture.")
+        action = ("No action beyond general mental-wellness basics (sleep, "
+                  "circadian consistency, stress management). This variant is "
+                  "NOT a reason for concern about any psychiatric condition.")
+        # Low confidence at the INDIVIDUAL level: a single OR~1.2 common variant
+        # carries essentially no predictive power for a person (see user note).
+        conf = "low"
     else:
         ph = "CACNA1C rs1006737 G/G — reference genotype"
         mech = "Standard L-type calcium channel expression."
         action = "None specific."
-        conf = "moderate"
+        conf = "low"
     return _find(CAT_MOOD, "CACNA1C rs1006737 (cross-psychiatric)",
                  "CACNA1C", "rs1006737", gt, ph, mech, action, conf,
                  "PGC 2011 & 2013; Green 2013")
