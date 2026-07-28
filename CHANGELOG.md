@@ -6,6 +6,37 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.15.0-premium] — 2026-07-26 — Family Planning (reproductive genetics upgrade)
+
+### Added
+
+- **`family_planning.py` upgrade** — new `analyze_family_planning()` producing an
+  in-report reproductive-genetics section (the existing standalone carrier page
+  is untouched). Reasons quantitatively about what findings mean for future
+  children, with two disciplines held throughout:
+  * **Transmission probability ≠ disease probability.** Dominant variants show
+    50% per-child transmission AND a separate penetrance descriptor — never
+    collapsed into one scary number.
+  * **mtDNA transmission is sex-gated.** A male passes essentially no mtDNA to
+    his children; a female passes hers to all of them. The section renders the
+    correct maternal-line note per inferred sex.
+  * **Recessive compound risk** via Hardy-Weinberg random-partner math:
+    P(child two-copy) = P(partner carrier) × 0.25 (carrier parent) or × 0.5
+    (affected parent), with European carrier frequencies stated and a
+    penetrance-adjusted clinical-risk range.
+  * **Hereditary-cancer partner screening** — flags that most syndromes (HBOC,
+    Lynch, Li-Fraumeni) are dominant (partner screening not the lever), while
+    recessive MUTYH-associated polyposis is the one where partner screening
+    genuinely matters.
+- New "Family Planning" report section + nav entry.
+- `REPORT_VERSION` → 6.15.0-premium.
+
+### Tests
+
+- +7 unit tests (HW math, transmission/penetrance separation, mtDNA sex-gating
+  M/F, semi-dominant handling, MUTYH partner-relevance, affected-parent math);
+  280 passing.
+
 ## [6.14.0-premium] — 2026-07-25 — Addiction Genetics module
 
 ### Added

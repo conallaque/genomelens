@@ -20,7 +20,7 @@ East Asian populations.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 # Per-condition severity + carrier frequency context. "severity" ranks:
@@ -434,3 +434,296 @@ def _safe(s: object) -> str:
             .replace("&", "&amp;")
             .replace("<", "&lt;")
             .replace(">", "&gt;"))
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# V35 — "Your genome as a family-planning document"
+# ══════════════════════════════════════════════════════════════════════════
+#
+# A richer, in-report reproductive-genetics section (distinct from the
+# standalone carrier page above). It reasons quantitatively about what a
+# finding means for *future children*, separating three inheritance modes,
+# and is careful about two things clinicians care about:
+#
+#   1. **Transmission probability ≠ disease probability.** A dominant variant
+#      you carry is transmitted to a child with 50% probability, but whether
+#      that child develops disease also depends on penetrance. These are shown
+#      as separate numbers, never collapsed.
+#   2. **mtDNA transmission is sex-gated.** Mitochondrial DNA is inherited
+#      almost exclusively from the mother. A male passes essentially none of
+#      his mtDNA to his children — so a male's mtDNA findings are relevant to
+#      his own health and his maternal relatives, NOT to his offspring. A
+#      female transmits her mtDNA to *all* of her children.
+#
+# The recessive child-affected risk uses the standard Hardy-Weinberg
+# random-partner calculation:
+#
+#       P(child affected) ≈ P(partner is a carrier) × 0.25
+#
+# where P(partner carrier) is the population carrier frequency for the stated
+# ancestry (European assumed unless noted). This assumes an unrelated partner
+# of the same background and no consanguinity.
+
+# Numeric European heterozygous-carrier frequencies for the recessive
+# conditions the chip-based carrier panel can surface, plus clinical
+# penetrance ranges. Sources: HFE — Allen 2008 (HealthIron), European
+# C282Y carrier ~1 in 8-10; FLG — Palmer 2006, Sandilands 2007.
+_RECESSIVE_CARRIER_FREQ = {
+    # gene -> {ancestry -> het carrier frequency}, penetrance (low, high),
+    #         partner_test, note
+    "HFE": {
+        "freq": {"European": 0.11, "African American": 0.03, "East Asian": 0.001},
+        "penetrance": (0.25, 0.60),
+        "partner_test": "HFE C282Y (rs1800562) and H63D (rs1799945)",
+        "note": ("Hereditary hemochromatosis is recessive with incomplete "
+                 "penetrance. A child who inherits two risk copies is at risk "
+                 "of iron overload, but only 25-60% of homozygotes develop it, "
+                 "and it is treatable with phlebotomy."),
+    },
+    "FLG": {
+        "freq": {"European": 0.08, "African American": 0.01, "East Asian": 0.03},
+        "penetrance": (0.50, 0.90),
+        "partner_test": "FLG common loss-of-function panel (R501X, 2282del4)",
+        "note": ("Filaggrin loss is semi-dominant: even one copy raises a "
+                 "child's eczema / atopic-march risk; two copies typically "
+                 "cause ichthyosis vulgaris. Aggressive early emollient use "
+                 "in at-risk infants reduces the atopic march."),
+    },
+}
+
+
+# Hereditary cancer syndromes worth partner / cascade discussion, with the
+# crucial dominant-vs-recessive distinction that determines whether partner
+# screening is even relevant.
+_HEREDITARY_CANCER = [
+    {"syndrome": "Hereditary Breast & Ovarian Cancer (HBOC)",
+     "genes": "BRCA1, BRCA2, PALB2",
+     "inheritance": "autosomal dominant",
+     "partner_relevance": "low",
+     "note": ("Dominant — if you carry a pathogenic variant, each child has "
+              "50% risk of inheriting it regardless of partner. Partner "
+              "screening is not the point; cascade testing of blood relatives "
+              "and your own enhanced screening are. Consumer chips do NOT "
+              "reliably detect BRCA frameshift founder variants — clinical "
+              "panel sequencing (Invitae/GeneDx/Ambry) is required.")},
+    {"syndrome": "Lynch Syndrome (hereditary colorectal/endometrial)",
+     "genes": "MLH1, MSH2, MSH6, PMS2, EPCAM",
+     "inheritance": "autosomal dominant",
+     "partner_relevance": "low",
+     "note": ("Dominant, high-penetrance. Cascade testing + early/frequent "
+              "colonoscopy is the management. Not chip-detectable — needs "
+              "clinical sequencing if family history suggests it.")},
+    {"syndrome": "MUTYH-Associated Polyposis (MAP)",
+     "genes": "MUTYH",
+     "inheritance": "autosomal recessive",
+     "partner_relevance": "HIGH",
+     "note": ("**The hereditary-cancer syndrome where partner screening "
+              "genuinely matters** — MAP is recessive. If you are a MUTYH "
+              "carrier, a child is affected only if the partner is also a "
+              "carrier (~1-2% of Europeans). Worth partner MUTYH screening if "
+              "you're a known carrier.")},
+    {"syndrome": "Li-Fraumeni Syndrome",
+     "genes": "TP53",
+     "inheritance": "autosomal dominant",
+     "partner_relevance": "low",
+     "note": ("Dominant, very high penetrance, broad cancer spectrum. Rare. "
+              "Clinical sequencing only.")},
+    {"syndrome": "Hereditary Diffuse Gastric Cancer",
+     "genes": "CDH1",
+     "inheritance": "autosomal dominant",
+     "partner_relevance": "low",
+     "note": "Dominant. Clinical sequencing if family history of diffuse gastric / lobular breast cancer."},
+]
+
+
+# A small set of pathogenic mtDNA variants that occasionally appear on
+# consumer arrays. mt_haplogroup classifies lineage, not disease, so this is
+# a best-effort screen — real mtDNA-disease screening needs mtDNA sequencing.
+_MT_DISEASE_VARIANTS = {
+    "rs199476104": ("MT-ND4 m.11778G>A", "Leber Hereditary Optic Neuropathy (LHON)"),
+    "rs199476112": ("MT-ND1 m.3460G>A", "Leber Hereditary Optic Neuropathy (LHON)"),
+    "rs199476118": ("MT-ND6 m.14484T>C", "Leber Hereditary Optic Neuropathy (LHON)"),
+}
+
+
+def _pct(x: float) -> str:
+    if x >= 0.1:
+        return f"{x*100:.0f}%"
+    if x >= 0.01:
+        return f"{x*100:.1f}%"
+    return f"{x*100:.2f}%"
+
+
+def _dosage_of(entry: Dict) -> int:
+    d = entry.get("dosage")
+    return d if isinstance(d, int) else (1 if "AFFECTED" not in entry.get("status_label", "") else 2)
+
+
+def analyze_family_planning(carrier_result: Optional[Dict] = None,
+                            tier1_results: Optional[Dict] = None,
+                            mt_result: Optional[Dict] = None,
+                            snps_df=None,
+                            inferred_sex: Optional[str] = None,
+                            ancestry: str = "European") -> Dict:
+    """Reason quantitatively about what the person's genome means for future
+    children. Returns recessive compound-risk items, dominant-transmission
+    items (transmission vs penetrance kept separate), sex-gated mtDNA notes,
+    and hereditary-cancer partner-screening guidance."""
+    carrier_result = carrier_result or {}
+
+    recessive_items: List[Dict] = []
+    dominant_items: List[Dict] = []
+
+    def _iter(entries, status):
+        for e in entries or []:
+            yield {**e, "_status": status}
+
+    for e in list(_iter(carrier_result.get("carriers", []), "carrier")) + \
+             list(_iter(carrier_result.get("affected", []), "affected")):
+        inh = str(e.get("inheritance", "")).lower()
+        gene = e.get("gene", "")
+        disease = e.get("disease", "")
+        variant = e.get("variant", "")
+        ctx = CONDITION_CONTEXT.get(disease, {})
+
+        is_recessive = "recessive" in inh
+        is_semidominant = "semi-dominant" in inh
+        is_dominant = "dominant" in inh and not is_semidominant
+
+        if is_recessive or is_semidominant:
+            spec = _RECESSIVE_CARRIER_FREQ.get(gene)
+            partner_freq = None
+            child_affected = None
+            penetrance = None
+            clinical_low = clinical_high = None
+            if spec:
+                partner_freq = spec["freq"].get(ancestry, spec["freq"].get("European"))
+                penetrance = spec["penetrance"]
+                if e["_status"] == "carrier":
+                    # child two-copies risk = P(partner carrier) * 0.25
+                    child_affected = partner_freq * 0.25
+                else:  # affected (homozygous) parent
+                    # child two-copies risk = P(partner carrier) * 0.5
+                    child_affected = partner_freq * 0.5
+                clinical_low = child_affected * penetrance[0]
+                clinical_high = child_affected * penetrance[1]
+            recessive_items.append({
+                "gene": gene, "variant": variant, "disease": disease,
+                "status": e["_status"], "inheritance": e.get("inheritance", ""),
+                "ancestry": ancestry,
+                "partner_carrier_freq": partner_freq,
+                "child_two_copy_risk": child_affected,
+                "penetrance": penetrance,
+                "child_clinical_risk": (clinical_low, clinical_high)
+                    if clinical_low is not None else None,
+                "partner_test": (spec or {}).get("partner_test")
+                    or ctx.get("partner_testing"),
+                "note": (spec or {}).get("note") or ctx.get("child_risk", ""),
+                "semidominant": is_semidominant,
+            })
+        elif is_dominant:
+            # Extract a penetrance descriptor from the inheritance string
+            if "incomplete" in inh:
+                pen_txt = "incomplete / low penetrance"
+            elif "moderate" in inh:
+                pen_txt = "moderate penetrance"
+            elif "susceptibility" in inh:
+                pen_txt = "susceptibility only (low penetrance)"
+            else:
+                pen_txt = "penetrance varies"
+            dominant_items.append({
+                "gene": gene, "variant": variant, "disease": disease,
+                "status": e["_status"], "inheritance": e.get("inheritance", ""),
+                "transmission": 0.50,     # per child, if you are heterozygous
+                "penetrance_text": pen_txt,
+                "note": ctx.get("child_risk", ""),
+                "partner_test": ctx.get("partner_testing", "Not standardly recommended."),
+                "outlook": ctx.get("treatment_outlook", ""),
+            })
+
+    # ── mtDNA — sex-gated ────────────────────────────────────────────────
+    sex = (inferred_sex or "").upper()[:1]
+    mt_variants_found = []
+    if snps_df is not None:
+        for rsid, (label, disease) in _MT_DISEASE_VARIANTS.items():
+            try:
+                if rsid in snps_df.index:
+                    gt = snps_df.loc[rsid]
+                    if hasattr(gt, "iloc"):
+                        gt = gt.iloc[0] if getattr(gt, "ndim", 1) > 1 else gt
+                    g = str(gt.get("genotype") if hasattr(gt, "get") else gt).upper()
+                    mt_variants_found.append({"rsid": rsid, "label": label,
+                                              "disease": disease, "genotype": g})
+            except Exception:
+                continue
+    if sex == "M":
+        mt_transmission = ("You are male: your mitochondrial DNA is **not** "
+                           "passed to your children (mtDNA is inherited "
+                           "maternally). Any mtDNA finding is relevant to your "
+                           "own health and to your mother's-line relatives "
+                           "(sisters, maternal cousins), not to your offspring.")
+    elif sex == "F":
+        mt_transmission = ("You are female: **all** of your children inherit "
+                           "your mitochondrial DNA. mtDNA disease variants, if "
+                           "present, transmit to every child (with "
+                           "heteroplasmy-dependent severity).")
+    else:
+        mt_transmission = ("Mitochondrial DNA is inherited maternally: only a "
+                           "female transmits it to her children; a male does "
+                           "not. (Sex was not determined for this sample.)")
+    mt_block = {
+        "sex": sex or "unknown",
+        "haplogroup": (mt_result or {}).get("haplogroup"),
+        "transmission_note": mt_transmission,
+        "pathogenic_variants": mt_variants_found,
+        "screening_note": ("Consumer chips test very few of the ~90 known "
+                           "pathogenic mtDNA point mutations. A clear result "
+                           "here does not rule out mtDNA disease — that needs "
+                           "dedicated mtDNA sequencing."),
+    }
+
+    n_actionable = len([x for x in recessive_items
+                        if x.get("child_two_copy_risk")]) + len(dominant_items)
+
+    return {
+        "available": bool(recessive_items or dominant_items or mt_variants_found
+                          or carrier_result),
+        "ancestry_assumption": ancestry,
+        "recessive_items": recessive_items,
+        "dominant_items": dominant_items,
+        "mtdna": mt_block,
+        "hereditary_cancer": _HEREDITARY_CANCER,
+        "n_recessive": len(recessive_items),
+        "n_dominant": len(dominant_items),
+        "n_actionable": n_actionable,
+        "summary": _fp_summary(recessive_items, dominant_items, mt_block, sex),
+    }
+
+
+def _fp_summary(recessive, dominant, mt_block, sex: str) -> str:
+    bits = []
+    if recessive:
+        with_risk = [r for r in recessive if r.get("child_two_copy_risk")]
+        if with_risk:
+            top = max(with_risk, key=lambda r: r["child_two_copy_risk"])
+            bits.append(
+                f"You carry {len(recessive)} recessive/semi-dominant finding(s). "
+                f"With a random {top['ancestry']} partner, the highest child "
+                f"two-copy risk is ~{_pct(top['child_two_copy_risk'])} "
+                f"({top['gene']} — {top['disease']}), before penetrance.")
+        else:
+            bits.append(f"You carry {len(recessive)} recessive/semi-dominant finding(s).")
+    if dominant:
+        bits.append(
+            f"{len(dominant)} dominant susceptibility variant(s) transmit to each "
+            "child with 50% probability — but transmission is not the same as "
+            "disease; penetrance for these is low-to-moderate.")
+    if sex == "M":
+        bits.append("Your mtDNA does not pass to your children (you are male).")
+    elif sex == "F":
+        bits.append("Your mtDNA passes to all your children (you are female).")
+    if not bits:
+        bits.append("No reproductive-relevant carrier findings detected on this chip.")
+    bits.append("This is chip-based and far from a complete carrier screen; a "
+                "clinical panel covers 250+ recessive conditions.")
+    return " ".join(bits)

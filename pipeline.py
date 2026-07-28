@@ -103,6 +103,7 @@ from analyze import (
     analyze_neurochemistry,
     analyze_holistic_synthesis,
     analyze_addiction_genetics,
+    analyze_family_planning,
 )
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:
@@ -711,6 +712,25 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Addiction-genetics module failed: {e}")
 
+    # ── Family planning (reproductive genetics — needs carrier + mt + sex) ──
+    family_planning_result: Optional[Dict] = None
+    if analyze_family_planning is not None:
+        try:
+            family_planning_result = analyze_family_planning(
+                carrier_result=carrier_result,
+                tier1_results=tier1_results,
+                mt_result=mt_result,
+                snps_df=snps_df,
+                inferred_sex=(qc_result or {}).get("inferred_sex"),
+                ancestry="European",
+            )
+            if family_planning_result.get("available"):
+                log(f"  Family planning: {family_planning_result['n_recessive']} recessive · "
+                    f"{family_planning_result['n_dominant']} dominant · mtDNA "
+                    f"sex-gate = {family_planning_result['mtdna']['sex']}")
+        except Exception as e:
+            log(f"  WARNING: Family-planning module failed: {e}")
+
     # ── Immunogenetics (viral/bacterial/parasitic resistance + selection) ──
     immunogenetics_result: Optional[Dict] = None
     if analyze_immunogenetics is not None:
@@ -869,6 +889,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         neurochemistry_result=neurochemistry_result,
         holistic_synthesis_result=holistic_synthesis_result,
         addiction_genetics_result=addiction_genetics_result,
+        family_planning_result=family_planning_result,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:

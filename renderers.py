@@ -1603,6 +1603,147 @@ underlying modules but the composite is judgment, not clinical guidance.
 """
 
 
+def build_family_planning_html(fp: Optional[Dict]) -> str:
+    """In-report reproductive-genetics section — carrier compound risk with a
+    random partner, dominant transmission (kept separate from penetrance),
+    sex-gated mtDNA, and hereditary-cancer partner-screening guidance."""
+    if not fp or not fp.get("available"):
+        return ""
+
+    def _pct(x):
+        if x is None:
+            return "—"
+        if x >= 0.1:
+            return f"{x*100:.0f}%"
+        if x >= 0.01:
+            return f"{x*100:.1f}%"
+        return f"{x*100:.2f}%"
+
+    # ── Recessive compound-risk cards ────
+    rec_html = ""
+    for it in fp.get("recessive_items", []):
+        cr = it.get("child_two_copy_risk")
+        clin = it.get("child_clinical_risk")
+        risk_line = ""
+        if cr is not None:
+            clin_txt = (f" → ~{_pct(clin[0])}–{_pct(clin[1])} after penetrance"
+                        if clin else "")
+            risk_line = (
+                f'<div style="margin:6px 0;padding:8px 12px;background:#eef4fb;'
+                f'border-radius:6px;font-size:.92em">'
+                f'<strong>Child two-copy risk with a random {_esc(it["ancestry"])} '
+                f'partner:</strong> ~{_pct(cr)}{clin_txt}'
+                f'<div style="color:#8a94a3;font-size:.85em;margin-top:2px">'
+                f'= partner carrier freq ({_pct(it.get("partner_carrier_freq"))}) '
+                f'× {"25% (you carrier)" if it["status"]=="carrier" else "50% (you affected)"}</div>'
+                f'</div>')
+        badge = "semi-dominant" if it.get("semidominant") else "recessive"
+        rec_html += f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid #2a9d8f;border-radius:8px;
+     padding:12px 14px;margin:8px 0;background:#fff;break-inside:avoid">
+  <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline">
+    <span style="font-weight:700">{_esc(it['disease'])}
+      <span style="font-weight:400;color:#8a94a3;font-size:.85em"> · {_esc(it['gene'])} {_esc(it['variant'])}</span></span>
+    <span style="font-size:.78em;color:#2a9d8f;font-weight:600">{badge} · you: {_esc(it['status'])}</span>
+  </div>
+  {risk_line}
+  <div style="color:#4a5560;line-height:1.55;font-size:.9em;margin-top:4px">{_esc(it['note'])}</div>
+  <div style="font-size:.85em;color:#2b5f8e;margin-top:4px"><strong>Partner testing:</strong> {_esc(it.get('partner_test') or '—')}</div>
+</div>"""
+
+    # ── Dominant transmission cards (transmission ≠ disease) ────
+    dom_html = ""
+    for it in fp.get("dominant_items", []):
+        dom_html += f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid #d29922;border-radius:8px;
+     padding:12px 14px;margin:8px 0;background:#fff;break-inside:avoid">
+  <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline">
+    <span style="font-weight:700">{_esc(it['disease'])}
+      <span style="font-weight:400;color:#8a94a3;font-size:.85em"> · {_esc(it['gene'])} {_esc(it['variant'])}</span></span>
+    <span style="font-size:.78em;color:#d29922;font-weight:600">dominant · you: {_esc(it['status'])}</span>
+  </div>
+  <div style="display:flex;gap:16px;margin:6px 0;flex-wrap:wrap">
+    <div style="padding:6px 12px;background:#fff6e5;border-radius:6px">
+      <div style="font-size:.72em;color:#8a6d3b;text-transform:uppercase">Transmission</div>
+      <div style="font-weight:700;color:#8a6d3b">50% per child</div></div>
+    <div style="padding:6px 12px;background:#eef2f7;border-radius:6px">
+      <div style="font-size:.72em;color:#5b6673;text-transform:uppercase">Penetrance</div>
+      <div style="font-weight:700;color:#5b6673">{_esc(it['penetrance_text'])}</div></div>
+  </div>
+  <div style="color:#8a94a3;font-size:.85em;font-style:italic">Inheriting the variant is not the same as developing the condition — most low-penetrance carriers never do.</div>
+  <div style="color:#4a5560;line-height:1.55;font-size:.9em;margin-top:4px">{_esc(it['note'])}</div>
+</div>"""
+
+    # ── mtDNA (sex-gated) ────
+    mt = fp.get("mtdna") or {}
+    if mt.get("pathogenic_variants"):
+        mt_vars = "".join(
+            f'<li>{_esc(v["label"])} ({_esc(v["rsid"])}, {_esc(v["genotype"])}) — {_esc(v["disease"])}</li>'
+            for v in mt["pathogenic_variants"])
+        mt_vars = f'<ul style="margin:6px 0 0 18px">{mt_vars}</ul>'
+    else:
+        mt_vars = ('<div style="color:#8a94a3;font-size:.88em;margin-top:4px">'
+                   'No pathogenic mtDNA variants detected among the few testable '
+                   'on this chip.</div>')
+    mt_html = f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid #7c5cbf;border-radius:8px;
+     padding:12px 14px;margin:8px 0;background:#fff">
+  <div style="font-weight:700">Mitochondrial (maternal-line) transmission
+    {f'· haplogroup {_esc(mt.get("haplogroup"))}' if mt.get("haplogroup") else ''}</div>
+  <div style="color:#33404d;line-height:1.55;margin:6px 0">{_esc(mt['transmission_note'])}</div>
+  {mt_vars}
+  <div style="color:#8a94a3;font-size:.82em;margin-top:6px">{_esc(mt['screening_note'])}</div>
+</div>"""
+
+    # ── Hereditary cancer partner-screening ────
+    hc_rows = ""
+    for c in fp.get("hereditary_cancer", []):
+        rel_color = {"HIGH": "#b3261e", "low": "#8a94a3"}.get(c["partner_relevance"], "#8a94a3")
+        hc_rows += f"""
+<tr>
+  <td><strong>{_esc(c['syndrome'])}</strong><div style="color:#8a94a3;font-size:.85em">{_esc(c['genes'])}</div></td>
+  <td style="white-space:nowrap">{_esc(c['inheritance'])}</td>
+  <td style="color:{rel_color};font-weight:700;white-space:nowrap">{_esc(c['partner_relevance'])}</td>
+  <td style="font-size:.9em">{_esc(c['note'])}</td>
+</tr>"""
+    hc_html = f"""
+<h3 style="margin:18px 0 6px">Hereditary-cancer syndromes &amp; partner screening</h3>
+<p style="color:#5b6673;font-size:.9em">Most hereditary-cancer syndromes are
+<em>dominant</em> — a carrier parent transmits to each child with 50% probability
+regardless of partner, so partner screening isn't the lever (cascade testing of
+relatives + enhanced screening is). The exception is <strong>recessive</strong>
+MUTYH, where partner screening genuinely matters.</p>
+<div class="tbl-wrap"><table class="snp-tbl"><thead><tr>
+  <th>Syndrome / genes</th><th>Inheritance</th><th>Partner screening</th><th>Notes</th>
+</tr></thead><tbody>{hc_rows}</tbody></table></div>"""
+
+    return f"""
+<section class="family-planning-section" id="family-planning">
+<h2>Family Planning <span class="pro-pill">V6.15</span></h2>
+<p class="anc-intro">
+Your genome read as a reproductive-planning document. Risk figures assume an
+unrelated <strong>{_esc(fp.get('ancestry_assumption','European'))}</strong>
+partner (Hardy-Weinberg) unless noted. Two disciplines throughout: (1)
+<em>transmission probability is not disease probability</em> — kept as separate
+numbers; (2) <em>mtDNA transmission is sex-gated</em> — only mothers pass it on.
+</p>
+<div style="background:linear-gradient(135deg,#f4f8fc,#eef2f7);border:1px solid #dbe3ec;
+     border-radius:10px;padding:14px 18px;margin:10px 0;line-height:1.6">{_esc(fp.get('summary',''))}</div>
+{f'<h3 style="margin:16px 0 6px">Recessive / semi-dominant — child risk depends on partner</h3>{rec_html}' if rec_html else ''}
+{f'<h3 style="margin:16px 0 6px">Dominant susceptibility — 50% transmission (≠ disease)</h3>{dom_html}' if dom_html else ''}
+<h3 style="margin:16px 0 6px">Mitochondrial line</h3>
+{mt_html}
+{hc_html}
+<div class="anc-caveat" style="margin-top:14px">
+Chip-based and far from a complete carrier screen. Before or during early
+pregnancy, a board-certified genetic counsellor + a clinical carrier-screening
+panel (250+ recessive conditions via sequencing) is the standard of care.
+Directory: findageneticcounselor.com.
+</div>
+</section>
+"""
+
+
 def build_addiction_genetics_html(ag: Optional[Dict]) -> str:
     """Addiction genetics — alcohol / opioid / nicotine / cannabis susceptibility."""
     if not ag or not ag.get("available"):
@@ -3623,6 +3764,7 @@ def build_html_report(
     neurochemistry_result: Optional[Dict] = None,
     holistic_synthesis_result: Optional[Dict] = None,
     addiction_genetics_result: Optional[Dict] = None,
+    family_planning_result: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -3901,6 +4043,7 @@ def build_html_report(
     neurochemistry_html = build_neurochemistry_html(neurochemistry_result)
     holistic_synthesis_html = build_holistic_synthesis_html(holistic_synthesis_result)
     addiction_genetics_html = build_addiction_genetics_html(addiction_genetics_result)
+    family_planning_html = build_family_planning_html(family_planning_result)
     ancestral_story_html = build_ancestral_story_html(ancestral_story_result)
     medications_html = build_medications_html(medications_result)
     # ── V4 sections ──
@@ -4920,6 +5063,7 @@ transparency.
   {"<a href='#immunogenetics' class='nl nl-v5'>Immunogenetics</a>" if immunogenetics_html else ""}
   {"<a href='#neurochemistry' class='nl nl-v5'>Neurochemistry</a>" if neurochemistry_html else ""}
   {"<a href='#addiction-genetics' class='nl nl-v5'>Addiction Genetics</a>" if addiction_genetics_html else ""}
+  {"<a href='#family-planning' class='nl nl-v5'>Family Planning</a>" if family_planning_html else ""}
   {"<a href='#ancestral-story' class='nl nl-v5'>Ancestral Story</a>" if ancestral_story_html else ""}
   <a href="#y-haplogroup" class="nl">Y-DNA Haplogroup</a>
   {"<a href='#mt-haplogroup' class='nl'>mtDNA Haplogroup</a>" if mt_result else ""}
@@ -4973,6 +5117,8 @@ transparency.
 {neurochemistry_html}
 
 {addiction_genetics_html}
+
+{family_planning_html}
 
 {ancestral_story_html}
 

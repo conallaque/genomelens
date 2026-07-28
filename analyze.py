@@ -62,10 +62,12 @@ try:
 except ImportError:
     analyze_medications = None
 try:
-    from family_planning import build_carrier_report, render_carrier_html
+    from family_planning import (build_carrier_report, render_carrier_html,
+                                  analyze_family_planning)
 except ImportError:
     build_carrier_report = None
     render_carrier_html = None
+    analyze_family_planning = None
 try:
     from chat import run_chat
 except ImportError:
@@ -207,7 +209,7 @@ SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.14.0-premium"
+REPORT_VERSION = "6.15.0-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",
