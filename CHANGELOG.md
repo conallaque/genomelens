@@ -6,6 +6,49 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.22.0-premium] — 2026-07-28 — Phase 2: ClinVar rare/pathogenic-variant screen (WGS)
+
+### Added
+
+- **`clinical_variants.py`** — the sequencing-grade layer a chip can't reach.
+  Streams a whole-genome/exome VCF against a distilled **ClinVar** table for
+  known Pathogenic / Likely-pathogenic variants and classifies each:
+  * **ACMG secondary finding (actionable)** / **carrier** (recessive het) /
+    **affected** (recessive homozygous) / **possible compound heterozygote**
+    (two distinct P/LP variants in one recessive gene — phase unknown) /
+    dominant-risk / X-linked / **inheritance-unknown** (first-class, never guessed).
+  * **Zygosity resolved against the matched ALT** (a `1/2` multiallelic sample
+    is heterozygous for whichever ALT matched).
+  * Confidence graded by **ClinVar review stars** (verified `CLNREVSTAT`
+    mapping); only ≥1★ P/LP shown; VUS counted but not alarmed (flagged only in
+    ACMG genes); 0★ excluded.
+  * **Indel normalisation** so anchor-base/left-alignment representation
+    differences don't cause false negatives.
+  * A **mandatory negative-result disclaimer** — an empty list explicitly does
+    NOT mean "clear". Screening, not diagnosis; confirm in an accredited lab.
+- **`setup.py --clinvar`** downloads ClinVar (GRCh37 + GRCh38) and distils each
+  to a compact P/LP table (`reference/clinvar/`, gitignored); graceful-degrades
+  when absent.
+- New "Clinical Variants (ClinVar)" report section + nav + AI interpretation
+  (fed into the module digest, per-module AI, exec summary, and chat).
+
+### Fixed
+
+- **Per-module AI 500 cascade on the local 30B model.** Changing Ollama
+  `num_ctx` between calls forced a model **reload** that intermittently OOM'd
+  → HTTP 500 (reproduced: 16384 OK, 4096 500, 16384 OK). Standardised on a
+  single `AI_NUM_CTX = 16384` for every call (loads once, never reloads), added
+  `keep_alive`, and a transient-5xx retry. See `docs/TROUBLESHOOTING.md`.
+- Build detection was lost before the clinical-variants stage because
+  pandas `.attrs` doesn't survive the enrichment `concat`; the detected build is
+  now captured once and threaded as a local.
+
+### Tests
+
+- +29 (star/sig parsing, indel-normalised key, ALT-aware zygosity, full
+  distill+screen across every classification branch, build gate, graceful
+  degrade, negative-result disclaimer); 368 passing, 1 skipped.
+
 ## [6.21.0-premium] — 2026-07-26 — Dual input: consumer chip OR whole-genome VCF
 
 The pipeline now accepts **either** a consumer chip export **or** a whole-genome/

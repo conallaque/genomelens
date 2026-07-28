@@ -60,6 +60,7 @@ beagle_cache/
 reference/1000g/
 reference/pgs_scores/
 reference/beagle/
+reference/clinvar/
 reference/*.vcf*
 reference/*.bgen*
 reference/*.bed

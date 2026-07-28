@@ -217,6 +217,10 @@ try:
 except ImportError:
     analyze_life_stage_playbook = None
 try:
+    from clinical_variants import analyze_clinical_variants
+except ImportError:
+    analyze_clinical_variants = None
+try:
     from multi_person_module import (analyze_multi_person,
                                       render_multi_person_html)
 except ImportError:
@@ -227,7 +231,7 @@ SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.21.0-premium"
+REPORT_VERSION = "6.22.0-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",
@@ -587,27 +591,36 @@ def tier1_lookup(
     return results, apoe_genotype
 
 
+# ONE context size for EVERY Ollama call. Changing num_ctx between calls forces
+# Ollama to reload the model, and reloading a large model (e.g. the 30B on a
+# 25GB-unified Mac) intermittently OOMs → HTTP 500. Keeping num_ctx constant
+# means the model loads once and never reloads. 16384 fits the largest prompt
+# (cross-category synthesis, capped at 48k chars ≈ 12k tokens + output).
+AI_NUM_CTX = 16384
+
+
 def call_ollama(prompt: str, model: str, timeout: int = 1800,
-                stream: bool = True, num_ctx: int = 4096,
-                num_predict: int = 1024, think: Optional[bool] = None) -> str:
+                stream: bool = True, num_ctx: int = AI_NUM_CTX,
+                num_predict: int = 1024, think: Optional[bool] = None,
+                retries: int = 2) -> str:
     """Send a prompt to local Ollama and return the response text.
 
-    Streaming (default) is critical for long-generating models like ``qwen3:14b``
-    with reasoning enabled: without it, a single Ollama request that legitimately
-    takes 15+ minutes to finish will trip the request-level socket timeout and
-    the whole tier-2 run dies. Streaming resets the read-idle clock every time
-    a token arrives, so a call only fails if the model actually stalls."""
+    Streaming (default) resets a 90s read-idle guard on every token so a long
+    reasoning generation never trips the socket timeout. ``keep_alive`` holds
+    the model resident between calls, and transient 5xx errors (model reload /
+    momentary OOM) are retried with backoff — the whole tier-2 pass makes many
+    sequential calls, so a single transient blip must not blank a section."""
     import requests
 
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "stream": stream,
-        # 4096 is the default for per-category batches (fast, low KV-cache).
-        # Larger prompts (whole-report synthesis, exec summary) pass a bigger
-        # num_ctx explicitly so the request doesn't get rejected with a 400.
+        # Constant num_ctx (see AI_NUM_CTX) — avoids model-reload thrash.
         "options": {"temperature": 0.3, "num_ctx": num_ctx,
                     "num_predict": num_predict},
+        # Keep the model loaded between the many sequential tier-2 calls.
+        "keep_alive": "15m",
     }
     # Thinking-model control: for direct synthesis/interpretation tasks we
     # disable reasoning (think=False) so the whole num_predict budget produces
@@ -617,13 +630,12 @@ def call_ollama(prompt: str, model: str, timeout: int = 1800,
     if think is not None:
         payload["think"] = think
 
-    try:
+    def _attempt() -> str:
         if not stream:
             resp = requests.post(OLLAMA_URL, json=payload, timeout=timeout)
             resp.raise_for_status()
             content = resp.json()["message"]["content"]
         else:
-            # Stream reset: 90s of *no output at all* is the real-death signal.
             content_parts: List[str] = []
             last_token_t = time.time()
             with requests.post(OLLAMA_URL, json=payload, stream=True,
@@ -631,8 +643,6 @@ def call_ollama(prompt: str, model: str, timeout: int = 1800,
                 resp.raise_for_status()
                 for line in resp.iter_lines(decode_unicode=True):
                     if not line:
-                        # A truly idle stream is worth aborting — but 90s of
-                        # silence is generous for consumer GPUs starting up.
                         if time.time() - last_token_t > 90:
                             raise TimeoutError(
                                 "Ollama stream idle for >90s (model stalled)")
@@ -649,24 +659,32 @@ def call_ollama(prompt: str, model: str, timeout: int = 1800,
                         break
             content = "".join(content_parts)
         raw = content
-        # Strip <think>...</think> reasoning blocks (qwen3 etc.)
         stripped = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
-        # Salvage: if stripping left nothing (reasoning ate the whole budget or
-        # the <think> block never closed), recover any post-</think> text, else
-        # return the raw trace stripped of the tags — never silently emit "".
         if not stripped and raw.strip():
             after = re.sub(r"^.*</think>", "", raw, flags=re.DOTALL).strip()
             stripped = after or raw.replace("<think>", "").replace("</think>", "").strip()
         return stripped
-    except requests.exceptions.ConnectionError:
-        raise ConnectionError(
-            "Cannot connect to Ollama at localhost:11434. "
-            "Start it with: ollama serve"
-        )
-    except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout):
-        raise TimeoutError("Ollama request timed out.")
-    except Exception as e:
-        raise RuntimeError(f"Ollama error: {e}")
+
+    last_err: Optional[Exception] = None
+    for attempt in range(retries + 1):
+        try:
+            return _attempt()
+        except requests.exceptions.ConnectionError:
+            raise ConnectionError(
+                "Cannot connect to Ollama at localhost:11434. "
+                "Start it with: ollama serve")
+        except requests.exceptions.HTTPError as e:
+            status = getattr(getattr(e, "response", None), "status_code", None)
+            last_err = e
+            if status and 500 <= status < 600 and attempt < retries:
+                time.sleep(3 * (attempt + 1))   # brief backoff, then retry
+                continue
+            raise RuntimeError(f"Ollama error: {e}")
+        except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout):
+            raise TimeoutError("Ollama request timed out.")
+        except Exception as e:
+            raise RuntimeError(f"Ollama error: {e}")
+    raise RuntimeError(f"Ollama error after retries: {last_err}")
 
 
 def build_category_map(tier1_results: List[Dict]) -> Dict[str, List[Dict]]:
@@ -868,6 +886,7 @@ def _build_module_context(
     holistic_synthesis_result: Optional[Dict] = None,
     detox_result: Optional[Dict] = None,
     ancestry_result: Optional[Dict] = None,
+    clinical_variants_result: Optional[Dict] = None,
     y_result: Optional[Dict] = None,
     mt_result: Optional[Dict] = None,
     max_chars: int = 7000,
@@ -892,6 +911,21 @@ def _build_module_context(
         if len(body) > per_section_chars:
             body = body[:per_section_chars].rstrip() + " …"
         sections.append((title, body))
+
+    # ── Clinical variants (ClinVar P/LP — highest clinical weight, goes first) ──
+    try:
+        clv = clinical_variants_result or {}
+        if clv.get("available") and clv.get("n_plp", 0) > 0:
+            ls = [f"{clv['n_plp']} ClinVar pathogenic/likely-pathogenic variant(s) "
+                  f"matched: {clv.get('n_actionable',0)} actionable, "
+                  f"{clv.get('n_carrier',0)} carrier, {clv.get('n_affected',0)} "
+                  f"affected-consistent. (Screening, not diagnosis.)"]
+            for f in (clv.get("findings") or [])[:6]:
+                ls.append(f"- {f.get('gene')} [{f.get('category')}] "
+                          f"{f.get('condition','')[:60]} ({f.get('stars')}★, {f.get('zygosity')})")
+            _add("CLINICAL VARIANTS (ClinVar)", ls)
+    except Exception:
+        pass
 
     # ── Holistic synthesis (leverage score — highest-signal framing) ──
     try:
@@ -1073,6 +1107,14 @@ def _build_module_context(
 # AI interpretation. Keys are the report section anchor ids so the renderer can
 # attach each interpretation to the right section.
 _MODULE_AI_SPECS: Dict[str, Dict[str, str]] = {
+    "clinical-variants": {
+        "kwarg": "clinical_variants_result", "title": "Clinical Variants (ClinVar)",
+        "focus": "Explain each pathogenic/likely-pathogenic finding plainly — what "
+                 "the gene/condition is, what carrier vs affected vs actionable "
+                 "means here, and the ClinVar star confidence. Be careful and "
+                 "non-alarmist: stress this is a screen needing accredited-lab "
+                 "confirmation + genetic counseling, and that absence of findings "
+                 "is not absence of risk."},
     "holistic-synthesis": {
         "kwarg": "holistic_synthesis_result", "title": "Holistic Synthesis",
         "focus": "Explain what the Genome Leverage Score means for how much this "
@@ -1144,7 +1186,8 @@ def ai_interpret_modules(model: str, log=None, **results) -> Dict[str, str]:
         )
         try:
             _log(f"  AI interpreting module: {spec['title']} ...")
-            txt = call_ollama(prompt, model=model, num_ctx=4096, num_predict=1100, think=False)
+            txt = call_ollama(prompt, model=model, num_ctx=AI_NUM_CTX,
+                              num_predict=1100, think=False)
             if txt and txt.strip():
                 out[section_id] = txt.strip()
         except Exception as e:

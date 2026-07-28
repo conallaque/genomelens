@@ -1831,6 +1831,104 @@ a hard design limit, not a caveat.</p>
 """
 
 
+def build_clinical_variants_html(cv: Optional[Dict]) -> str:
+    """Phase-2 ClinVar rare/pathogenic screen. Deliberately conservative: strong
+    framing, star-graded confidence, and a MANDATORY negative-result statement
+    (shown whether findings are present or not) so an empty list is never read
+    as 'clear'."""
+    if not cv:
+        return ""
+    if not cv.get("available"):
+        # Still render a short informational block so the section isn't silently
+        # missing (e.g. ClinVar table not downloaded).
+        reason = _esc(cv.get("reason", "not available"))
+        return f"""
+<section class="clinvar-section" id="clinical-variants">
+<h2>Clinical Variants (ClinVar) <span class="pro-pill">V6.22</span> <span class="pro-pill">Phase 2</span></h2>
+<div class="anc-caveat">Rare/pathogenic-variant screening not run: {reason}</div>
+<div class="anc-caveat" style="margin-top:8px">{_esc(cv.get('negative_disclaimer',''))}</div>
+</section>"""
+
+    def _stars(n):
+        return "★" * n + "☆" * (4 - n)
+
+    cat_meta = [
+        ("actionable", "🚨 Actionable (ACMG secondary findings)", "#b3261e"),
+        ("affected", "Affected-consistent (recessive homozygous)", "#b3261e"),
+        ("possible_compound_het", "Possible compound heterozygote (phase unknown)", "#d29922"),
+        ("dominant_risk", "Dominant-gene risk variant", "#d29922"),
+        ("xlinked", "X-linked variant", "#d29922"),
+        ("carrier", "Carrier (recessive heterozygous)", "#2a9d8f"),
+        ("uncertain_inheritance", "Pathogenic; inheritance not determined", "#5b6673"),
+    ]
+    buckets = cv.get("buckets", {})
+    groups_html = ""
+    for key, label, color in cat_meta:
+        items = buckets.get(key) or []
+        if not items:
+            continue
+        rows = ""
+        for f in items:
+            rows += f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid {color};border-radius:6px;
+     padding:10px 13px;margin:7px 0;background:#fff;break-inside:avoid">
+  <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline">
+    <span style="font-weight:700">{_esc(f['gene'])}
+      <span style="font-weight:400;color:#8a94a3;font-size:.85em"> · {_esc(f['condition'])}</span></span>
+    <span style="font-size:.8em;color:{color};font-weight:700" title="ClinVar review confidence">{_stars(f['stars'])}</span>
+  </div>
+  <div style="color:#4a5560;line-height:1.5;font-size:.9em;margin-top:3px">{_esc(f['interpretation'])}</div>
+  <div style="font-size:.74em;color:#9aa4b0;margin-top:3px">
+    {_esc(f['chrom'])}:{f['pos']} {_esc(f['ref'])}&gt;{_esc(f['alt'])} · {_esc(f['significance'])} ·
+    {_esc(f['zygosity'])} · inheritance {_esc(f.get('inheritance','unknown'))}</div>
+</div>"""
+        groups_html += f'<h3 style="margin:14px 0 4px;color:{color}">{label} ({len(items)})</h3>{rows}'
+
+    vus_html = ""
+    if cv.get("vus_in_acmg"):
+        vus_rows = "".join(
+            f"<li>{_esc(f['gene'])} — {_esc(f['condition'])} "
+            f"<span style='color:#9aa4b0'>({_esc(f['chrom'])}:{f['pos']}, {_stars(f['stars'])})</span></li>"
+            for f in cv["vus_in_acmg"])
+        vus_html = f"""
+<h3 style="margin:14px 0 4px;color:#5b6673">Variants of uncertain significance in actionable genes ({cv['n_vus_in_acmg']})</h3>
+<p style="color:#8a94a3;font-size:.88em">Uncertain = <strong>not actionable</strong>. Listed only
+because they fall in ACMG genes and may be reclassified in future ClinVar releases. Do not act on these.</p>
+<ul style="margin:4px 0 0 18px;font-size:.9em">{vus_rows}</ul>"""
+
+    none_found = cv["n_plp"] == 0
+    headline = (
+        f'<div style="background:linear-gradient(135deg,#f2f9f4,#eef4fb);border:1px solid #cfe3d6;'
+        f'border-radius:10px;padding:14px 18px;margin:10px 0">'
+        f'<strong>No ClinVar-classified pathogenic variants matched.</strong> '
+        f'That is reassuring but limited — read the statement below.</div>'
+        if none_found else
+        f'<div style="background:linear-gradient(135deg,#fdf3f3,#f7f4fc);border:1px solid #f0cfcf;'
+        f'border-radius:10px;padding:14px 18px;margin:10px 0">'
+        f'<strong>{cv["n_plp"]}</strong> pathogenic / likely-pathogenic variant(s) matched — '
+        f'{cv["n_actionable"]} actionable, {cv["n_carrier"]} carrier, {cv["n_affected"]} '
+        f'affected-consistent. <strong>These are screening signals, not diagnoses.</strong></div>')
+
+    return f"""
+<section class="clinvar-section" id="clinical-variants">
+<h2>Clinical Variants (ClinVar) <span class="pro-pill">V6.22</span> <span class="pro-pill">Phase 2</span></h2>
+<p class="anc-intro">
+Whole-genome/exome screen against <strong>ClinVar</strong> for known
+pathogenic / likely-pathogenic variants — the sequencing-grade layer a chip
+can't reach. Confidence is graded by ClinVar review stars (★); only ≥1★ P/LP
+findings are shown. {cv['n_scanned']:,} VCF variants scanned.
+</p>
+{headline}
+<div style="background:#fff6e5;border-left:4px solid #d29922;border-radius:0 8px 8px 0;
+     padding:12px 16px;margin:10px 0;line-height:1.55;font-size:.92em">
+  ⚠️ <strong>{_esc(cv.get('negative_disclaimer',''))}</strong></div>
+{groups_html}
+{vus_html}
+<div class="anc-caveat" style="margin-top:14px">{_esc(cv.get('disclaimer',''))}</div>
+</section>
+"""
+
+
 def build_family_planning_html(fp: Optional[Dict]) -> str:
     """In-report reproductive-genetics section — carrier compound risk with a
     random partner, dominant transmission (kept separate from penetrance),
@@ -3996,6 +4094,7 @@ def build_html_report(
     polygenic_traits_result: Optional[Dict] = None,
     environmental_optimization_result: Optional[Dict] = None,
     life_stage_playbook_result: Optional[Dict] = None,
+    clinical_variants_result: Optional[Dict] = None,
     module_ai: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
@@ -4276,6 +4375,7 @@ def build_html_report(
     holistic_synthesis_html = build_holistic_synthesis_html(holistic_synthesis_result)
     addiction_genetics_html = build_addiction_genetics_html(addiction_genetics_result)
     family_planning_html = build_family_planning_html(family_planning_result)
+    clinical_variants_html = build_clinical_variants_html(clinical_variants_result)
     polygenic_traits_html = build_polygenic_traits_html(polygenic_traits_result)
     environmental_optimization_html = build_environmental_optimization_html(environmental_optimization_result)
     life_stage_playbook_html = build_life_stage_playbook_html(life_stage_playbook_result)
@@ -4288,6 +4388,7 @@ def build_html_report(
     immunogenetics_html = _prepend_ai_interpretation(immunogenetics_html, _mai.get("immunogenetics"))
     neurochemistry_html = _prepend_ai_interpretation(neurochemistry_html, _mai.get("neurochemistry"))
     holistic_synthesis_html = _prepend_ai_interpretation(holistic_synthesis_html, _mai.get("holistic-synthesis"))
+    clinical_variants_html = _prepend_ai_interpretation(clinical_variants_html, _mai.get("clinical-variants"))
     addiction_genetics_html = _prepend_ai_interpretation(addiction_genetics_html, _mai.get("addiction-genetics"))
     family_planning_html = _prepend_ai_interpretation(family_planning_html, _mai.get("family-planning"))
     polygenic_traits_html = _prepend_ai_interpretation(polygenic_traits_html, _mai.get("polygenic-traits"))
@@ -5310,6 +5411,7 @@ transparency.
   {"<a href='#immunogenetics' class='nl nl-v5'>Immunogenetics</a>" if immunogenetics_html else ""}
   {"<a href='#neurochemistry' class='nl nl-v5'>Neurochemistry</a>" if neurochemistry_html else ""}
   {"<a href='#addiction-genetics' class='nl nl-v5'>Addiction Genetics</a>" if addiction_genetics_html else ""}
+  {"<a href='#clinical-variants' class='nl nl-v5'>Clinical Variants</a>" if clinical_variants_html else ""}
   {"<a href='#family-planning' class='nl nl-v5'>Family Planning</a>" if family_planning_html else ""}
   {"<a href='#polygenic-traits' class='nl nl-v5'>Trait Genetics</a>" if polygenic_traits_html else ""}
   {"<a href='#environmental-optimization' class='nl nl-v5'>Environmental Optimization</a>" if environmental_optimization_html else ""}
@@ -5367,6 +5469,8 @@ transparency.
 {neurochemistry_html}
 
 {addiction_genetics_html}
+
+{clinical_variants_html}
 
 {family_planning_html}
 

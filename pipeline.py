@@ -109,6 +109,7 @@ from analyze import (
     analyze_polygenic_traits,
     analyze_environmental_optimization,
     analyze_life_stage_playbook,
+    analyze_clinical_variants,
     analyze_multi_person,
     render_multi_person_html,
 )
@@ -266,16 +267,20 @@ def run_pipeline(args: argparse.Namespace) -> int:
     except Exception:
         file_format = "unknown"
 
+    # Capture the detected build NOW — pandas .attrs does not survive the concat
+    # in VCF enrichment (or later transforms), so read it once and thread it as a
+    # plain local rather than re-reading snps_df.attrs downstream.
+    detected_build = snps_df.attrs.get("build", "unknown")
+
     # ── Whole-genome VCF: back-fill curated registry positions the rsID reader
     #    dropped, and profile what the file contains that we can't yet interpret.
     vcf_profile = None
     try:
         import genome_input
         if genome_input.looks_like_vcf(args.dna_file):
-            _build = snps_df.attrs.get("build", "unknown")
-            log(f"Input detected as VCF (build: {_build}). Enriching + profiling ...")
+            log(f"Input detected as VCF (build: {detected_build}). Enriching + profiling ...")
             snps_df, vcf_profile = genome_input.enrich_and_profile_vcf(
-                snps_df, args.dna_file, _build, log=log)
+                snps_df, args.dna_file, detected_build, log=log)
     except Exception as e:
         log(f"  WARNING: VCF enrichment failed: {e}")
 
@@ -780,6 +785,25 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Environmental-optimization module failed: {e}")
 
+    # ── Clinical variants (Phase 2 — ClinVar P/LP screen; VCF input only) ──
+    clinical_variants_result: Optional[Dict] = None
+    if analyze_clinical_variants is not None:
+        try:
+            import genome_input as _gi
+            if _gi.looks_like_vcf(args.dna_file):
+                clinical_variants_result = analyze_clinical_variants(
+                    args.dna_file, detected_build,
+                    inferred_sex=(qc_result or {}).get("inferred_sex"), log=log)
+                if clinical_variants_result.get("available"):
+                    log(f"  Clinical variants (ClinVar): {clinical_variants_result['n_plp']} "
+                        f"P/LP · {clinical_variants_result['n_actionable']} actionable · "
+                        f"{clinical_variants_result['n_carrier']} carrier · "
+                        f"{clinical_variants_result['n_affected']} affected-consistent")
+                else:
+                    log(f"  Clinical variants: {clinical_variants_result.get('reason','n/a')}")
+        except Exception as e:
+            log(f"  WARNING: Clinical-variants module failed: {e}")
+
     # ── Family planning (reproductive genetics — needs carrier + mt + sex) ──
     family_planning_result: Optional[Dict] = None
     if analyze_family_planning is not None:
@@ -901,6 +925,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             holistic_synthesis_result=holistic_synthesis_result,
             detox_result=detox_result,
             ancestry_result=ancestry_result,
+            clinical_variants_result=clinical_variants_result,
             y_result=y_result,
             mt_result=mt_result,
         )
@@ -943,6 +968,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                         polygenic_traits_result=polygenic_traits_result,
                         environmental_optimization_result=environmental_optimization_result,
                         holistic_synthesis_result=holistic_synthesis_result,
+                        clinical_variants_result=clinical_variants_result,
                     )
                     log(f"  Per-module AI: {len(module_ai)} module interpretations generated")
                 except Exception as e:
@@ -1028,6 +1054,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         polygenic_traits_result=polygenic_traits_result,
         environmental_optimization_result=environmental_optimization_result,
         life_stage_playbook_result=life_stage_playbook_result,
+        clinical_variants_result=clinical_variants_result,
         module_ai=module_ai,
     )
 
@@ -1335,6 +1362,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 neurochemistry_result=neurochemistry_result,
                 addiction_genetics_result=addiction_genetics_result,
                 holistic_synthesis_result=holistic_synthesis_result,
+                clinical_variants_result=clinical_variants_result,
                 polygenic_traits_result=polygenic_traits_result,
                 environmental_optimization_result=environmental_optimization_result,
                 family_planning_result=family_planning_result,

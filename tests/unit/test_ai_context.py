@@ -50,7 +50,8 @@ def test_module_ai_spec_keys_match_report_section_ids():
     # renderer can't attach the interpretation.
     valid_ids = {"holistic-synthesis", "immunogenetics", "neurochemistry",
                  "addiction-genetics", "deep-ancestry", "blood-type",
-                 "family-planning", "polygenic-traits", "environmental-optimization"}
+                 "family-planning", "polygenic-traits", "environmental-optimization",
+                 "clinical-variants"}
     assert set(analyze._MODULE_AI_SPECS) <= valid_ids
 
 

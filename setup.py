@@ -307,6 +307,46 @@ def setup_pgs_catalog() -> None:
     log("PGS Catalog setup complete.")
 
 
+def setup_clinvar() -> None:
+    """Download ClinVar (GRCh37 + GRCh38) and distill each to a compact
+    pathogenic/likely-pathogenic table for the Phase-2 clinical-variants screen.
+
+    ~380 MB downloaded once; distilled to small P/LP-only tables in
+    reference/clinvar/. Idempotent — skips a build whose distilled table
+    already exists."""
+    log("ClinVar clinical-variant database setup ...")
+    clinvar_dir = REF_DIR / "clinvar"
+    clinvar_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        from clinical_variants import distill_clinvar_vcf
+    except Exception as e:
+        log(f"  ERROR: cannot import distiller: {e}")
+        return
+
+    builds = {
+        "grch37": "https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/clinvar.vcf.gz",
+        "grch38": "https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/clinvar.vcf.gz",
+    }
+    for build, url in builds.items():
+        distilled = clinvar_dir / f"clinvar_plp_{build}.tsv.gz"
+        if distilled.exists():
+            log(f"  {build}: distilled table already present — skipping.")
+            continue
+        raw = clinvar_dir / f"clinvar_{build}.vcf.gz"
+        log(f"  {build}: downloading ClinVar VCF (~190 MB) ...")
+        if not download_to(url, raw, label=f"ClinVar {build}"):
+            log(f"  {build}: download failed — skipping.")
+            continue
+        log(f"  {build}: distilling to P/LP table ...")
+        n = distill_clinvar_vcf(str(raw), str(distilled), log=log)
+        log(f"  {build}: wrote {n:,} clinically-significant records -> {distilled.name}")
+        try:
+            raw.unlink()   # reclaim ~190 MB; keep only the compact table
+        except Exception:
+            pass
+    log("ClinVar setup complete.")
+
+
 def setup_ancestry() -> None:
     """Set up 1000 Genomes AIMs reference for PCA-based ancestry."""
     log("Ancestry reference setup ...")
@@ -404,11 +444,15 @@ def main() -> None:
                     help="Download PGS Catalog scoring files (~200 MB)")
     ap.add_argument("--ancestry", action="store_true",
                     help="Set up 1000G ancestry reference (~200 MB if full)")
+    ap.add_argument("--clinvar", action="store_true",
+                    help="Download + distill ClinVar for the Phase-2 clinical-"
+                         "variants screen (~380 MB dl, distilled to small tables)")
     ap.add_argument("--all", action="store_true",
-                    help="Run --beagle, --pgs and --ancestry")
+                    help="Run --beagle, --pgs, --ancestry and --clinvar")
     args = ap.parse_args()
 
-    if not any([args.check, args.beagle, args.pgs, args.ancestry, args.all]):
+    if not any([args.check, args.beagle, args.pgs, args.ancestry,
+                args.clinvar, args.all]):
         ap.print_help()
         return
 
@@ -430,6 +474,8 @@ def main() -> None:
         setup_pgs_catalog()
     if args.ancestry or args.all:
         setup_ancestry()
+    if args.clinvar or args.all:
+        setup_clinvar()
 
     write_manifest()
     log("Setup complete.")
