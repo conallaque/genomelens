@@ -212,12 +212,16 @@ try:
     from environmental_optimization import analyze_environmental_optimization
 except ImportError:
     analyze_environmental_optimization = None
+try:
+    from life_stage_playbook import analyze_life_stage_playbook
+except ImportError:
+    analyze_life_stage_playbook = None
 
 SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.17.0-premium"
+REPORT_VERSION = "6.18.0-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",

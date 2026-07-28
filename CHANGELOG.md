@@ -6,6 +6,32 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.18.0-premium] — 2026-07-26 — Life-Stage Playbook (decade-by-decade)
+
+### Added
+
+- **`life_stage_playbook.py`** — decade-by-decade priorities (20s/30s/40s/50s/
+  60s+) synthesised from the whole genome. Runs LATE in the pipeline — after
+  `holistic_synthesis` — because its key input is the Genome Leverage Score.
+  * Each decade = an evidence-based preventive-medicine baseline modulated by
+    genome-specific items, each **tagged to its source module** (CHRNA5 never-
+    smoke → 20s; BDNF Val/Val plasticity window → 20s-30s; APOE ε4 → earlier
+    cardio/cognitive prevention; IFITM3 → flu-vaccine emphasis; leverage tier
+    → "environment dominates, invest early"; reproductive variants → carrier
+    screening window).
+  * **Age-aware:** the current decade is highlighted ("you are here"). Age comes
+    from the new `--age` flag, else `--bloodwork` labs; if unknown, all decades
+    render un-highlighted with an explicit note — no silent default that could
+    tell a 55-year-old "your 20s."
+- **New `--age` CLI flag.**
+- New "Life-Stage Playbook" report section + nav entry.
+- `REPORT_VERSION` → 6.18.0-premium.
+
+### Tests
+
+- +7 unit tests (age→decade highlighting for 24/47/none, CHRNA5 in 20s,
+  leverage framing, all five decades, source-tagging); 301 passing.
+
 ## [6.17.0-premium] — 2026-07-26 — Environmental Optimization (actionable protocols)
 
 ### Added

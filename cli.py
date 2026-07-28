@@ -141,6 +141,14 @@ def build_parser() -> argparse.ArgumentParser:
               "for London). Tunes the Environmental Optimization section's "
               "vitamin-D seasonality. Default 40.0 (temperate N hemisphere)."),
     )
+    parser.add_argument(
+        "--age",
+        type=int,
+        default=None,
+        help=("Your age in years. Highlights the current decade in the "
+              "Life-Stage Playbook. If omitted, age is taken from --bloodwork "
+              "labs if present; otherwise all decades are shown un-highlighted."),
+    )
 
     # ── v5 flags ──────────────────────────────────────────────────────────
     parser.add_argument(

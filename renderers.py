@@ -1603,6 +1603,67 @@ underlying modules but the composite is judgment, not clinical guidance.
 """
 
 
+def build_life_stage_playbook_html(lsp: Optional[Dict]) -> str:
+    """Decade-by-decade life-stage playbook, current decade highlighted."""
+    if not lsp or not lsp.get("available"):
+        return ""
+
+    decades_html = ""
+    for d in lsp.get("decades", []):
+        cur = d.get("is_current")
+        border = "#12467a" if cur else "#e3e7ec"
+        bg = "linear-gradient(135deg,#eef4fb,#f4f8fc)" if cur else "#fff"
+        here = ('<span style="background:#12467a;color:#fff;font-size:.7em;'
+                'font-weight:700;padding:2px 8px;border-radius:10px;margin-left:8px">'
+                'YOU ARE HERE</span>') if cur else ""
+        base_items = "".join(f"<li style='margin:3px 0;line-height:1.5'>{_esc(x)}</li>"
+                             for x in d.get("base", []))
+        genome_items = ""
+        for gi in d.get("genome_items", []):
+            genome_items += (
+                f'<li style="margin:4px 0;line-height:1.5">{_esc(gi["text"])}'
+                f'<span style="color:#9aa4b0;font-size:.8em"> — {_esc(gi["source"])}</span></li>')
+        genome_block = (f'<div style="font-weight:600;font-size:.85em;color:#12467a;'
+                        f'margin-top:8px">Tuned to your genome:</div>'
+                        f'<ul style="margin:4px 0 0 18px">{genome_items}</ul>'
+                        ) if genome_items else ""
+        decades_html += f"""
+<div style="border:1.5px solid {border};border-radius:10px;padding:14px 18px;
+     margin:10px 0;background:{bg};break-inside:avoid">
+  <div style="font-size:1.1em;font-weight:800;color:#12467a">{_esc(d['label'])}{here}</div>
+  <div style="color:#5b6673;font-style:italic;font-size:.9em;margin:2px 0 8px">{_esc(d['theme'])}</div>
+  <ul style="margin:0 0 0 18px">{base_items}</ul>
+  {genome_block}
+</div>"""
+
+    lev = ""
+    if lsp.get("leverage_tier"):
+        lev = (f'<div style="color:#5b6673;font-size:.9em;margin-top:4px">'
+               f'Genome Leverage: <strong>{lsp["leverage_score"]}/100 '
+               f'({_esc(lsp["leverage_tier"])})</strong> — the higher this is, the '
+               f'more these decade choices actually move your outcome.</div>')
+
+    return f"""
+<section class="life-stage-section" id="life-stage-playbook">
+<h2>Life-Stage Playbook <span class="pro-pill">V6.18</span></h2>
+<p class="anc-intro">
+Decade-by-decade priorities synthesised from your whole genome — an
+evidence-based preventive-medicine baseline for each decade, modulated by your
+specific genetic risk profile (every genome-driven item is tagged to its source).
+{_esc(lsp.get('note',''))}
+</p>
+{lev}
+{decades_html}
+<div class="anc-caveat" style="margin-top:12px">
+General preventive-medicine framework personalised by genotype — not a
+substitute for a primary-care physician's individualised screening schedule.
+Screening ages follow current US guidelines and may differ by family history
+and evolving recommendations.
+</div>
+</section>
+"""
+
+
 def build_environmental_optimization_html(eo: Optional[Dict]) -> str:
     """Environmental optimization — light timing, exercise modality, vitamin-D
     seasonality."""
@@ -3910,6 +3971,7 @@ def build_html_report(
     family_planning_result: Optional[Dict] = None,
     polygenic_traits_result: Optional[Dict] = None,
     environmental_optimization_result: Optional[Dict] = None,
+    life_stage_playbook_result: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -4191,6 +4253,7 @@ def build_html_report(
     family_planning_html = build_family_planning_html(family_planning_result)
     polygenic_traits_html = build_polygenic_traits_html(polygenic_traits_result)
     environmental_optimization_html = build_environmental_optimization_html(environmental_optimization_result)
+    life_stage_playbook_html = build_life_stage_playbook_html(life_stage_playbook_result)
     ancestral_story_html = build_ancestral_story_html(ancestral_story_result)
     medications_html = build_medications_html(medications_result)
     # ── V4 sections ──
@@ -5213,6 +5276,7 @@ transparency.
   {"<a href='#family-planning' class='nl nl-v5'>Family Planning</a>" if family_planning_html else ""}
   {"<a href='#polygenic-traits' class='nl nl-v5'>Trait Genetics</a>" if polygenic_traits_html else ""}
   {"<a href='#environmental-optimization' class='nl nl-v5'>Environmental Optimization</a>" if environmental_optimization_html else ""}
+  {"<a href='#life-stage-playbook' class='nl nl-v5'>Life-Stage Playbook</a>" if life_stage_playbook_html else ""}
   {"<a href='#ancestral-story' class='nl nl-v5'>Ancestral Story</a>" if ancestral_story_html else ""}
   <a href="#y-haplogroup" class="nl">Y-DNA Haplogroup</a>
   {"<a href='#mt-haplogroup' class='nl'>mtDNA Haplogroup</a>" if mt_result else ""}
@@ -5272,6 +5336,8 @@ transparency.
 {polygenic_traits_html}
 
 {environmental_optimization_html}
+
+{life_stage_playbook_html}
 
 {ancestral_story_html}
 

@@ -106,6 +106,7 @@ from analyze import (
     analyze_family_planning,
     analyze_polygenic_traits,
     analyze_environmental_optimization,
+    analyze_life_stage_playbook,
 )
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:
@@ -870,6 +871,30 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Holistic synthesis failed: {e}")
 
+    # ── Life-stage playbook (runs AFTER holistic_synthesis — needs leverage) ──
+    life_stage_playbook_result: Optional[Dict] = None
+    if analyze_life_stage_playbook is not None:
+        try:
+            # Age priority: --age flag, else bloodwork labs age, else None.
+            _age = getattr(args, "age", None)
+            if _age is None and bloodwork_result:
+                _age = (bloodwork_result.get("age")
+                        or (bloodwork_result.get("meta") or {}).get("age")
+                        or (bloodwork_result.get("latest") or {}).get("age"))
+            life_stage_playbook_result = analyze_life_stage_playbook(
+                age=_age,
+                holistic_synthesis_result=holistic_synthesis_result,
+                immunogenetics_result=immunogenetics_result,
+                addiction_genetics_result=addiction_genetics_result,
+                neurochemistry_result=neurochemistry_result,
+                family_planning_result=family_planning_result,
+                tier1_results={"apoe_genotype": apoe_genotype},
+            )
+            log(f"  Life-stage playbook: current decade = "
+                f"{life_stage_playbook_result.get('current_decade') or 'unknown (no age)'}")
+        except Exception as e:
+            log(f"  WARNING: Life-stage-playbook module failed: {e}")
+
     log("Generating HTML report ...")
     html = build_html_report(
         tier1_results=tier1_results,
@@ -919,6 +944,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         family_planning_result=family_planning_result,
         polygenic_traits_result=polygenic_traits_result,
         environmental_optimization_result=environmental_optimization_result,
+        life_stage_playbook_result=life_stage_playbook_result,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:
