@@ -133,6 +133,14 @@ def build_parser() -> argparse.ArgumentParser:
         help=("Path to a previous tier1_results.json. Prints a structured "
               "changelog of what changed between runs."),
     )
+    parser.add_argument(
+        "--latitude",
+        type=float,
+        default=40.0,
+        help=("Your approximate latitude in degrees (e.g. 43 for Michigan, 51 "
+              "for London). Tunes the Environmental Optimization section's "
+              "vitamin-D seasonality. Default 40.0 (temperate N hemisphere)."),
+    )
 
     # ── v5 flags ──────────────────────────────────────────────────────────
     parser.add_argument(

@@ -208,12 +208,16 @@ try:
     from polygenic_traits import analyze_polygenic_traits
 except ImportError:
     analyze_polygenic_traits = None
+try:
+    from environmental_optimization import analyze_environmental_optimization
+except ImportError:
+    analyze_environmental_optimization = None
 
 SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.16.0-premium"
+REPORT_VERSION = "6.17.0-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",

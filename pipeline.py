@@ -105,6 +105,7 @@ from analyze import (
     analyze_addiction_genetics,
     analyze_family_planning,
     analyze_polygenic_traits,
+    analyze_environmental_optimization,
 )
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:
@@ -724,6 +725,20 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Trait-genetics module failed: {e}")
 
+    # ── Environmental optimization (light / exercise / vitamin-D × latitude) ──
+    environmental_optimization_result: Optional[Dict] = None
+    if analyze_environmental_optimization is not None:
+        try:
+            environmental_optimization_result = analyze_environmental_optimization(
+                snps_df, latitude=getattr(args, "latitude", 40.0))
+            if environmental_optimization_result.get("available"):
+                ex = (environmental_optimization_result.get("exercise") or {})
+                log(f"  Environmental optimization: exercise lean = "
+                    f"{ex.get('lean','n/a')} · latitude "
+                    f"{environmental_optimization_result['latitude_assumed']:.0f}°")
+        except Exception as e:
+            log(f"  WARNING: Environmental-optimization module failed: {e}")
+
     # ── Family planning (reproductive genetics — needs carrier + mt + sex) ──
     family_planning_result: Optional[Dict] = None
     if analyze_family_planning is not None:
@@ -903,6 +918,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         addiction_genetics_result=addiction_genetics_result,
         family_planning_result=family_planning_result,
         polygenic_traits_result=polygenic_traits_result,
+        environmental_optimization_result=environmental_optimization_result,
     )
 
     with open(output_path, "w", encoding="utf-8") as f:

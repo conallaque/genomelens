@@ -1603,6 +1603,89 @@ underlying modules but the composite is judgment, not clinical guidance.
 """
 
 
+def build_environmental_optimization_html(eo: Optional[Dict]) -> str:
+    """Environmental optimization — light timing, exercise modality, vitamin-D
+    seasonality."""
+    if not eo or not eo.get("available"):
+        return ""
+
+    def _protocol_list(items):
+        return "".join(f"<li style='margin:4px 0;line-height:1.5'>{_esc(x)}</li>"
+                       for x in (items or []))
+
+    # Circadian
+    circ_html = ""
+    c = eo.get("circadian")
+    if c:
+        circ_html = f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid #7c5cbf;border-radius:8px;
+     padding:12px 14px;margin:8px 0;background:#fff">
+  <div style="font-weight:700">🌅 Circadian light timing — <span style="color:#7c5cbf">{_esc(c['lean'])}</span></div>
+  <div style="color:#4a5560;line-height:1.55;font-size:.9em;margin:4px 0">{_esc(c['detail'])}</div>
+  <ul style="margin:6px 0 0 18px">{_protocol_list(c['protocol'])}</ul>
+  <div style="font-size:.74em;color:#9aa4b0;margin-top:4px">{_esc(c['gene'])} {_esc(c['rsid'])} {_esc(c['genotype'])} · 📖 {_esc(c['citation'])}</div>
+</div>"""
+
+    # Exercise
+    ex_html = ""
+    e = eo.get("exercise")
+    if e:
+        basis = "".join(f'<li style="margin:2px 0">{_esc(b["call"])} '
+                        f'<span style="color:#9aa4b0">({_esc(b["genotype"])})</span></li>'
+                        for b in e.get("basis", []))
+        ex_html = f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid #2a9d8f;border-radius:8px;
+     padding:12px 14px;margin:8px 0;background:#fff">
+  <div style="font-weight:700">🏋️ Exercise-modality fit — <span style="color:#2a9d8f">{_esc(e['lean'])}</span></div>
+  <div style="display:flex;gap:14px;margin:6px 0;flex-wrap:wrap">
+    <div style="padding:5px 12px;background:#fff6e5;border-radius:6px">Power score <strong>{e['power_score']}</strong></div>
+    <div style="padding:5px 12px;background:#eef4fb;border-radius:6px">Endurance score <strong>{e['endurance_score']}</strong></div>
+  </div>
+  <ul style="margin:4px 0 6px 18px">{basis}</ul>
+  <div style="font-weight:600;font-size:.88em;color:#33404d">Training emphasis:</div>
+  <ul style="margin:4px 0 0 18px">{_protocol_list(e['emphasis'])}</ul>
+  <div style="color:#8a94a3;font-size:.84em;font-style:italic;margin-top:6px">{_esc(e['caveat'])}</div>
+  <div style="font-size:.74em;color:#9aa4b0;margin-top:3px">📖 {_esc(e['citation'])}</div>
+</div>"""
+
+    # Vitamin D
+    vd_html = ""
+    v = eo.get("vitamin_d")
+    if v:
+        vars_txt = ""
+        if v.get("variants"):
+            vars_txt = ("<div style='font-size:.8em;color:#8a94a3;margin-top:4px'>"
+                        + " · ".join(f"{_esc(x['gene'])} {_esc(x['genotype'])}"
+                                     for x in v["variants"]) + "</div>")
+        vd_html = f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid #d29922;border-radius:8px;
+     padding:12px 14px;margin:8px 0;background:#fff">
+  <div style="font-weight:700">☀️ Vitamin-D seasonality — <span style="color:#8a6d3b">{_esc(v['tendency'])}</span></div>
+  <div style="color:#4a5560;font-size:.88em;margin:3px 0">Supplement months (from latitude {v['latitude_assumed']:.0f}°): <strong>{_esc(v['supplement_months'])}</strong></div>
+  <ul style="margin:6px 0 0 18px">{_protocol_list(v['protocol'])}</ul>
+  {vars_txt}
+  <div style="color:#8a94a3;font-size:.84em;font-style:italic;margin-top:6px">{_esc(v['caveat'])}</div>
+  <div style="font-size:.74em;color:#9aa4b0;margin-top:3px">📖 {_esc(v['citation'])}</div>
+</div>"""
+
+    return f"""
+<section class="env-optimization-section" id="environmental-optimization">
+<h2>Environmental Optimization <span class="pro-pill">V6.17</span></h2>
+<p class="anc-intro">
+Actionable behavioural protocols from your genotype — the "what to actually do
+differently" layer. Light timing tuned to your chronotype, training emphasis
+tuned to your muscle/power genetics, and vitamin-D supplementation tuned to
+your pathway variants × latitude (assumed {eo['latitude_assumed']:.0f}°N —
+pass your real latitude for precision).
+</p>
+{circ_html}
+{ex_html}
+{vd_html}
+<div class="anc-caveat" style="margin-top:12px">{_esc(eo.get('note',''))}</div>
+</section>
+"""
+
+
 def build_polygenic_traits_html(pt: Optional[Dict]) -> str:
     """Trait genetics — genotype-level single-variant calls + explicit no-score
     handling for polygenic/fraught traits."""
@@ -3826,6 +3909,7 @@ def build_html_report(
     addiction_genetics_result: Optional[Dict] = None,
     family_planning_result: Optional[Dict] = None,
     polygenic_traits_result: Optional[Dict] = None,
+    environmental_optimization_result: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate
@@ -4106,6 +4190,7 @@ def build_html_report(
     addiction_genetics_html = build_addiction_genetics_html(addiction_genetics_result)
     family_planning_html = build_family_planning_html(family_planning_result)
     polygenic_traits_html = build_polygenic_traits_html(polygenic_traits_result)
+    environmental_optimization_html = build_environmental_optimization_html(environmental_optimization_result)
     ancestral_story_html = build_ancestral_story_html(ancestral_story_result)
     medications_html = build_medications_html(medications_result)
     # ── V4 sections ──
@@ -5127,6 +5212,7 @@ transparency.
   {"<a href='#addiction-genetics' class='nl nl-v5'>Addiction Genetics</a>" if addiction_genetics_html else ""}
   {"<a href='#family-planning' class='nl nl-v5'>Family Planning</a>" if family_planning_html else ""}
   {"<a href='#polygenic-traits' class='nl nl-v5'>Trait Genetics</a>" if polygenic_traits_html else ""}
+  {"<a href='#environmental-optimization' class='nl nl-v5'>Environmental Optimization</a>" if environmental_optimization_html else ""}
   {"<a href='#ancestral-story' class='nl nl-v5'>Ancestral Story</a>" if ancestral_story_html else ""}
   <a href="#y-haplogroup" class="nl">Y-DNA Haplogroup</a>
   {"<a href='#mt-haplogroup' class='nl'>mtDNA Haplogroup</a>" if mt_result else ""}
@@ -5184,6 +5270,8 @@ transparency.
 {family_planning_html}
 
 {polygenic_traits_html}
+
+{environmental_optimization_html}
 
 {ancestral_story_html}
 

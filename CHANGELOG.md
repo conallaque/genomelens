@@ -6,6 +6,32 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.17.0-premium] — 2026-07-26 — Environmental Optimization (actionable protocols)
+
+### Added
+
+- **`environmental_optimization.py`** — the "what to actually do differently"
+  behavioural layer, three domains:
+  * **Circadian light timing** — from CLOCK chronotype, a concrete morning-
+    light / evening-dark / melatonin-timing protocol tuned to morning vs
+    evening lean.
+  * **Exercise-modality fit** — ACTN3 R577X + ACE I/D proxy → a power-vs-
+    endurance lean with training-emphasis recommendations, framed as "shifts
+    what responds fastest, not your ceiling."
+  * **Vitamin-D seasonality** — vitamin-D-pathway variants (GC/CYP2R1/DHCR7/
+    VDR) × **latitude** → a seasonal supplementation protocol. Latitude drives
+    the recommendation (unambiguous); genotype modulates. Consumer-chip strand
+    caveat stated explicitly.
+- **New `--latitude` CLI flag** (default 40.0 °N) to tune vitamin-D seasonality.
+- New "Environmental Optimization" report section + nav entry.
+- `REPORT_VERSION` → 6.17.0-premium.
+
+### Tests
+
+- +7 unit tests (evening/morning chronotype protocols, power/endurance exercise
+  lean, latitude-driven vitamin-D months, low-allele tendency, latitude-only
+  guidance with no genotypes); 294 passing.
+
 ## [6.16.0-premium] — 2026-07-26 — Trait Genetics (honest genotype-level, no fabricated PGS)
 
 ### Added
