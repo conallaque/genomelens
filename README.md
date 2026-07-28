@@ -23,6 +23,7 @@ Unauthorized copying, modification, or distribution is prohibited.
 ![tests](https://img.shields.io/badge/tests-369%20passing-brightgreen)
 ![input](https://img.shields.io/badge/input-chip%20%2B%20whole--genome%20VCF-blue)
 ![license](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
+[![Buy Me a Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/caque)
 
 > ⚠️ **Not medical advice — educational & research use only.** Genetic
 > predispositions are probabilistic; confirm anything actionable with a licensed
@@ -525,6 +526,16 @@ returns a structured dict, then wire it into `analyze.py` behind a
 
 For larger architectural changes (new pipeline stages, output formats, the
 ongoing analyze.py decomposition), open an issue first to discuss.
+
+---
+
+## Support
+
+GenomeLens is built and maintained by one person, in the open. If it saved you a
+consult, taught you something about your own biology, or you just appreciate the
+engineering, you can help fuel the next module:
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-caque-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/caque)
 
 ---
 
