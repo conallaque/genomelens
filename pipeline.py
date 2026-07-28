@@ -266,6 +266,19 @@ def run_pipeline(args: argparse.Namespace) -> int:
     except Exception:
         file_format = "unknown"
 
+    # ── Whole-genome VCF: back-fill curated registry positions the rsID reader
+    #    dropped, and profile what the file contains that we can't yet interpret.
+    vcf_profile = None
+    try:
+        import genome_input
+        if genome_input.looks_like_vcf(args.dna_file):
+            _build = snps_df.attrs.get("build", "unknown")
+            log(f"Input detected as VCF (build: {_build}). Enriching + profiling ...")
+            snps_df, vcf_profile = genome_input.enrich_and_profile_vcf(
+                snps_df, args.dna_file, _build, log=log)
+    except Exception as e:
+        log(f"  WARNING: VCF enrichment failed: {e}")
+
     # ── Optional two-genome comparison (--compare-genome) ──
     if getattr(args, "compare_genome", None) and analyze_multi_person is not None:
         try:

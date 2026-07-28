@@ -6,6 +6,46 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.21.0-premium] — 2026-07-26 — Dual input: consumer chip OR whole-genome VCF
+
+The pipeline now accepts **either** a consumer chip export **or** a whole-genome/
+exome VCF (`.vcf` / `.vcf.gz`) — Phase 1 of WGS support.
+
+### Added
+
+- **`genome_input.py`** — a dependency-free layer that:
+  * detects input type (chip vs VCF);
+  * converts VCF `GT` + REF/ALT into the pipeline's 2-char SNV genotype strings,
+    with explicit, unit-tested rules for het/hom/haploid/multiallelic/no-call/
+    indel/symbolic/out-of-range;
+  * in a SINGLE streaming pass (stdlib `gzip`, memory-safe on a 100 GB file),
+    **back-fills** curated registry positions the rsID-only VCF reader drops
+    (the `snps` library skips every variant without an rsID — i.e. the entire
+    position-only set), and **profiles** what the file contains that the
+    pipeline can't yet interpret (total variants, count without rsID, count in
+    ACMG actionable genes) — quantifying Phase-2 value with data.
+- **Build safety:** back-fill selects GRCh37 vs GRCh38 positions from the
+  auto-detected build and **refuses** (logs + skips) on `mixed`/`unknown` rather
+  than guessing — a silently-wrong genotype at a curated clinical variant is
+  worse than an absent one.
+- CLI `dna_file` now documents VCF input.
+
+### Scope (honest)
+
+Phase 1 makes both inputs produce a report and recovers curated-catalog
+coverage for position-only variants; a WGS VCF also improves common-variant /
+PGS coverage. It does NOT yet interpret rare/novel variants, ACMG findings, or
+structural/repeat variation — that's Phase 2 (needs a ClinVar database + real
+sequencing). The profiler now reports exactly how much is being left on the
+table.
+
+### Tests
+
+- +18 unit tests (13 genotype-conversion cases, input detection, build-gated
+  back-fill, build-gate refusal, profiling counts); 339 passing, 1 skipped
+  (the pre-existing tier1_results.json integration test, which skips when that
+  runtime artifact is absent).
+
 ## [6.20.0-premium] — 2026-07-26 — AI upgrade: whole-genome context + AI on all tiers (fully local)
 
 The local-LLM analysis previously reasoned only over the tier-1 SNP category

@@ -71,8 +71,9 @@ def build_parser() -> argparse.ArgumentParser:
         "dna_file",
         nargs="?",
         default=None,
-        help=("Path to your raw DNA file (CSV/TXT from 23andMe, AncestryDNA, "
-              "TellmeGen, etc.). Optional when --retry-failed is used."),
+        help=("Path to your raw DNA file — a consumer chip export (CSV/TXT from "
+              "23andMe, AncestryDNA, TellmeGen, …) OR a whole-genome/exome VCF "
+              "(.vcf / .vcf.gz). Optional when --retry-failed is used."),
     )
     parser.add_argument(
         "--output",

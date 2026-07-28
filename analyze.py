@@ -227,7 +227,7 @@ SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.20.0-premium"
+REPORT_VERSION = "6.21.0-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",
