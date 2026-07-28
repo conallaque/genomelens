@@ -19,7 +19,7 @@ Unauthorized copying, modification, or distribution is prohibited.
 
 ![status](https://img.shields.io/badge/status-active-brightgreen)
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
-![license](https://img.shields.io/badge/license-MIT-green)
+![license](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
 ![privacy](https://img.shields.io/badge/network-localhost%20only-purple)
 ![tests](https://img.shields.io/badge/tests-369%20passing-brightgreen)
 ![registry](https://img.shields.io/badge/SNP%20registry-unified-blueviolet)
@@ -579,9 +579,11 @@ output format.
 
 ---
 
-## Licence
+## License
 
-MIT. Use, fork, and modify freely; no warranty.
+**Proprietary — © 2026 Conall Aque. All Rights Reserved.** This repository is
+public for viewing and reference only. Use, copying, modification, or
+distribution without the author's written permission is prohibited. No warranty.
 
 ---
 
