@@ -6,6 +6,24 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.22.1-premium] — 2026-07-28 — ClinVar auto-update
+
+### Changed
+
+- **`setup.py --clinvar` is now auto-updating.** Instead of blindly skipping an
+  existing table, it HEADs NCBI for the ClinVar ``Last-Modified`` and compares
+  it to a ``.meta.json`` sidecar written at last distill — re-downloading only
+  when a newer ClinVar release exists (ClinVar republishes ~weekly). Offline
+  with a table already present → keeps the existing one.
+- **New `--clinvar-refresh`** forces an unconditional rebuild.
+- The clinical-variants screen reads the sidecar's distill date and logs a
+  freshness nudge (re-run `--clinvar`) once the local table is >45 days old;
+  the report result now carries `clinvar_date` / `clinvar_stale`.
+
+### Tests
+
+- +1 (freshness fields surface + stale flag); 369 passing, 1 skipped.
+
 ## [6.22.0-premium] — 2026-07-28 — Phase 2: ClinVar rare/pathogenic-variant screen (WGS)
 
 ### Added

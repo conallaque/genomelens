@@ -147,6 +147,19 @@ def test_missing_table_degrades_gracefully(tmp_path, monkeypatch):
     assert r["negative_disclaimer"]
 
 
+def test_freshness_fields_surface_and_flag_stale(clinvar_table, tmp_path, monkeypatch):
+    import json, datetime
+    # write a 60-day-old meta sidecar next to the distilled table
+    meta = cv.CLINVAR_DIR / "clinvar_plp_grch38.meta.json"
+    old = (datetime.datetime.now() - datetime.timedelta(days=60)).isoformat(timespec="seconds")
+    meta.write_text(json.dumps({"distilled": old, "source_last_modified": "x", "rows": 7}))
+    user = _write_user_vcf(tmp_path, [("17", "41250000", "C", "T", "0/1")])
+    r = cv.analyze_clinical_variants(user, "grch38")
+    assert r["available"]
+    assert r["clinvar_date"] == old
+    assert r["clinvar_stale"] is True     # >45 days → stale
+
+
 def test_negative_result_disclaimer_always_present(clinvar_table, tmp_path):
     user = _write_user_vcf(tmp_path, [("9", "999", "A", "G", "0/1")])  # no matches
     r = cv.analyze_clinical_variants(user, "grch38")

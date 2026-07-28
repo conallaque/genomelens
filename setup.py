@@ -29,7 +29,7 @@ import subprocess
 import sys
 import urllib.request
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 SCRIPT_DIR = Path(__file__).parent
 REF_DIR = SCRIPT_DIR / "reference"
@@ -307,14 +307,34 @@ def setup_pgs_catalog() -> None:
     log("PGS Catalog setup complete.")
 
 
-def setup_clinvar() -> None:
+def _remote_last_modified(url: str) -> Optional[str]:
+    """HEAD the URL and return its Last-Modified header (or None if unreachable).
+    Used to detect when NCBI has published a newer ClinVar than we hold."""
+    import urllib.request
+    try:
+        req = urllib.request.Request(url, method="HEAD")
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return r.headers.get("Last-Modified")
+    except Exception:
+        return None
+
+
+def setup_clinvar(force: bool = False) -> None:
     """Download ClinVar (GRCh37 + GRCh38) and distill each to a compact
     pathogenic/likely-pathogenic table for the Phase-2 clinical-variants screen.
 
-    ~380 MB downloaded once; distilled to small P/LP-only tables in
-    reference/clinvar/. Idempotent — skips a build whose distilled table
-    already exists."""
-    log("ClinVar clinical-variant database setup ...")
+    **Auto-updating:** ClinVar is republished ~weekly. Rather than blindly skip
+    an existing table, this checks NCBI's ``Last-Modified`` against the value
+    stored when we last distilled (in a ``.meta.json`` sidecar) and re-downloads
+    only when a newer ClinVar is actually available. ``force=True``
+    (``--clinvar-refresh``) rebuilds unconditionally. Offline with a table
+    already present → keep the existing one.
+
+    ~380 MB fetched when refreshing; the raw VCFs are deleted after distilling,
+    leaving only the small tables in reference/clinvar/."""
+    import json
+    import datetime as _dt
+    log("ClinVar clinical-variant database setup (auto-updating) ...")
     clinvar_dir = REF_DIR / "clinvar"
     clinvar_dir.mkdir(parents=True, exist_ok=True)
     try:
@@ -329,9 +349,26 @@ def setup_clinvar() -> None:
     }
     for build, url in builds.items():
         distilled = clinvar_dir / f"clinvar_plp_{build}.tsv.gz"
-        if distilled.exists():
-            log(f"  {build}: distilled table already present — skipping.")
-            continue
+        meta_path = clinvar_dir / f"clinvar_plp_{build}.meta.json"
+        remote_lm = _remote_last_modified(url)
+
+        if distilled.exists() and not force:
+            stored = {}
+            if meta_path.exists():
+                try:
+                    stored = json.loads(meta_path.read_text())
+                except Exception:
+                    stored = {}
+            if remote_lm is None:
+                log(f"  {build}: NCBI unreachable — keeping existing table "
+                    f"(distilled {stored.get('distilled','?')}).")
+                continue
+            if stored.get("source_last_modified") == remote_lm:
+                log(f"  {build}: up to date (ClinVar {remote_lm}) — skipping.")
+                continue
+            log(f"  {build}: newer ClinVar available "
+                f"(have {stored.get('source_last_modified','none')} → {remote_lm}); refreshing.")
+
         raw = clinvar_dir / f"clinvar_{build}.vcf.gz"
         log(f"  {build}: downloading ClinVar VCF (~190 MB) ...")
         if not download_to(url, raw, label=f"ClinVar {build}"):
@@ -340,6 +377,11 @@ def setup_clinvar() -> None:
         log(f"  {build}: distilling to P/LP table ...")
         n = distill_clinvar_vcf(str(raw), str(distilled), log=log)
         log(f"  {build}: wrote {n:,} clinically-significant records -> {distilled.name}")
+        meta_path.write_text(json.dumps({
+            "source_last_modified": remote_lm,
+            "distilled": _dt.datetime.now().isoformat(timespec="seconds"),
+            "rows": n, "source_url": url,
+        }, indent=2))
         try:
             raw.unlink()   # reclaim ~190 MB; keep only the compact table
         except Exception:
@@ -446,13 +488,17 @@ def main() -> None:
                     help="Set up 1000G ancestry reference (~200 MB if full)")
     ap.add_argument("--clinvar", action="store_true",
                     help="Download + distill ClinVar for the Phase-2 clinical-"
-                         "variants screen (~380 MB dl, distilled to small tables)")
+                         "variants screen. Auto-updating: re-downloads only when "
+                         "NCBI has a newer release (~380 MB when it refreshes).")
+    ap.add_argument("--clinvar-refresh", action="store_true",
+                    help="Force a ClinVar rebuild even if the local table looks "
+                         "current (ignores the Last-Modified check).")
     ap.add_argument("--all", action="store_true",
                     help="Run --beagle, --pgs, --ancestry and --clinvar")
     args = ap.parse_args()
 
     if not any([args.check, args.beagle, args.pgs, args.ancestry,
-                args.clinvar, args.all]):
+                args.clinvar, args.clinvar_refresh, args.all]):
         ap.print_help()
         return
 
@@ -474,8 +520,8 @@ def main() -> None:
         setup_pgs_catalog()
     if args.ancestry or args.all:
         setup_ancestry()
-    if args.clinvar or args.all:
-        setup_clinvar()
+    if args.clinvar or args.clinvar_refresh or args.all:
+        setup_clinvar(force=args.clinvar_refresh)
 
     write_manifest()
     log("Setup complete.")

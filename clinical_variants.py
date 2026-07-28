@@ -262,6 +262,23 @@ def analyze_clinical_variants(vcf_path: str, build: str,
                            "--clinvar`. (Falls back cleanly; no screen performed.)"),
                 "negative_disclaimer": _NEGATIVE_DISCLAIMER}
 
+    # Freshness (from the setup.py --clinvar sidecar) — ClinVar updates ~weekly.
+    clinvar_date, stale = None, False
+    meta_path = CLINVAR_DIR / f"clinvar_plp_{build}.meta.json"
+    if meta_path.exists():
+        try:
+            import json as _json, datetime as _dt
+            m = _json.loads(meta_path.read_text())
+            clinvar_date = m.get("distilled")
+            if clinvar_date:
+                age = (_dt.datetime.now() - _dt.datetime.fromisoformat(clinvar_date)).days
+                stale = age > 45
+                if stale:
+                    _log(f"  ClinVar table is {age} days old — re-run "
+                         "`python setup.py --clinvar` to auto-update.")
+        except Exception:
+            pass
+
     findings: List[Dict] = []
     n_scanned = 0
     opener = gzip.open if str(vcf_path).lower().endswith((".gz", ".bgz")) else open
@@ -296,7 +313,10 @@ def analyze_clinical_variants(vcf_path: str, build: str,
                     "zygosity": zyg,
                 })
 
-    return _classify(findings, n_scanned, inferred_sex)
+    result = _classify(findings, n_scanned, inferred_sex)
+    result["clinvar_date"] = clinvar_date
+    result["clinvar_stale"] = stale
+    return result
 
 
 def _classify(findings: List[Dict], n_scanned: int,
