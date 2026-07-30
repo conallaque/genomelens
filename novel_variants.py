@@ -365,6 +365,11 @@ def analyze_novel_variants(vcf_path: str, build: str,
                                   "commercial_ok": p.commercial_ok} for p in predictors]
     result["commercial_safe"] = commercial_safe
     result["dropped_noncommercial"] = dropped_nc
+    # Name only the pathogenicity predictors actually used in the disclaimer, so a
+    # --commercial-safe report never even mentions the non-commercial ones.
+    used = ", ".join(p.name for p in predictors if p.axis != "rarity") or "AlphaMissense"
+    result["negative_disclaimer"] = _NEGATIVE_DISCLAIMER.replace(
+        "(AlphaMissense, REVEL, CADD, SpliceAI)", f"({used})")
     return result
 
 
