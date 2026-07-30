@@ -234,8 +234,8 @@ validated on an **Apple M5 / 24 GB**; runs on macOS or Linux, Apple Silicon or I
 
 | Input | RAM | Disk | Typical runtime |
 |---|---|---|---|
-| **Standard chip** (23andMe / AncestryDNA / TellMeGen, ~0.6M SNPs) | ~2–4 GB (fine on 8 GB) | **< 1 GB** (the tool itself) | seconds to ~1 min |
-| **Whole genome (~30×, VCF)** | **~8 GB** recommended (ran comfortably within 24 GB) | **~2–5 GB** for the practical predictor set (AlphaMissense ≈0.65 GB + gnomAD AF ≈3 GB + ClinVar ≈11 MB) **+ room for your VCF** (≈0.5–2 GB) | a few minutes to ~30 min |
+| **Standard chip** (23andMe / AncestryDNA / TellMeGen, ~0.6M SNPs) | ~2–4 GB (fine on 8 GB) | **< 1 GB** (the tool itself) | **~30 s–1 min** without AI · **+2–5 min** with local AI |
+| **Whole genome (~30×, VCF)** | **~8 GB** recommended (ran comfortably within 24 GB) | **~2–5 GB** for the practical predictor set (AlphaMissense ≈0.65 GB + gnomAD AF ≈3 GB + ClinVar ≈11 MB) **+ room for your VCF** (≈0.5–2 GB) | **~2–10 min** without AI (≈2 min measured on the GIAB genome) · **+15–40 min** with local AI |
 
 - The whole-genome **Phase-3 predictor scan is the slow part** — it queries every
   carried variant — and that is the speed-for-accessibility tradeoff. It's also a
@@ -245,6 +245,11 @@ validated on an **Apple M5 / 24 GB**; runs on macOS or Linux, Apple Silicon or I
   commercial-safe set (AlphaMissense + gnomAD) fits in **under 4 GB**.
 - A **chip file needs no extra downloads at all** — the predictor/ClinVar tables are
   only used for whole-genome input.
+- **The AI is the variable part of the runtime.** `--no-ai` gives the full deterministic
+  report in the times above; turning the AI on adds a local per-module interpretation
+  pass. Use a smaller `--model` (e.g. `llama3.1:8b`) to cut that time, or `--no-module-ai`
+  to keep only the executive summary. Times above are on an Apple M5 — expect longer on
+  older/lower-RAM machines, but it still *runs*, which is the point.
 
 Bottom line: **you don't need an expensive rig to analyze your own genome.** A regular
 laptop, some patience, and disk space is enough — and nothing ever leaves the machine.
