@@ -53,6 +53,7 @@ alleles, so alignment holds.
 from __future__ import annotations
 
 import gzip
+import re
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -82,6 +83,59 @@ def looks_like_vcf(path: str) -> bool:
     except Exception:
         pass
     return False
+
+
+# ── Build detection from the VCF header (no rsIDs required) ────────────────────
+# Distinctive per-contig lengths: (GRCh37, GRCh38). A handful of unambiguous
+# chromosomes is enough to call the build straight from the header — essential for
+# whole-genome callsets (e.g. GIAB benchmarks) whose variants have no rsIDs, so the
+# probe-position detector in provenance.py returns "unknown".
+_CONTIG_BUILD_LEN: Dict[str, Tuple[int, int]] = {
+    "1": (249250621, 248956422),
+    "2": (243199373, 242193529),
+    "3": (198022430, 198295559),
+    "7": (159138663, 159345973),
+    "X": (155270560, 156040895),
+}
+
+
+def detect_build_from_vcf_header(path: str, max_header_lines: int = 5000) -> str:
+    """Detect ``grch37`` vs ``grch38`` from a VCF's ``##contig`` lengths (falling
+    back to a ``##reference`` hint). Returns ``"grch37"``, ``"grch38"``, or
+    ``"unknown"``. Does not read variant rows, so it is O(header)."""
+    p = str(path)
+    opener = gzip.open if p.lower().endswith((".gz", ".bgz")) else open
+    votes = {"grch37": 0, "grch38": 0}
+    ref_hint: Optional[str] = None
+    try:
+        with opener(p, "rt", errors="ignore") as f:
+            for i, line in enumerate(f):
+                if not line.startswith("#"):
+                    break                      # past the header
+                if i > max_header_lines:
+                    break
+                low = line.lower()
+                if low.startswith("##reference"):
+                    if any(t in low for t in ("grch38", "hg38", "b38")):
+                        ref_hint = "grch38"
+                    elif any(t in low for t in ("grch37", "hg19", "b37")):
+                        ref_hint = "grch37"
+                elif line.startswith("##contig"):
+                    m_id = re.search(r"ID=([^,>]+)", line)
+                    m_len = re.search(r"length=(\d+)", line)
+                    if m_id and m_len:
+                        pair = _CONTIG_BUILD_LEN.get(_norm_chrom(m_id.group(1)))
+                        if pair:
+                            length = int(m_len.group(1))
+                            if length == pair[0]:
+                                votes["grch37"] += 1
+                            elif length == pair[1]:
+                                votes["grch38"] += 1
+    except Exception:
+        return "unknown"
+    if votes["grch37"] or votes["grch38"]:
+        return "grch37" if votes["grch37"] >= votes["grch38"] else "grch38"
+    return ref_hint or "unknown"
 
 
 # ── Genotype conversion ───────────────────────────────────────────────────────

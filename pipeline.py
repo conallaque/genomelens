@@ -110,6 +110,7 @@ from analyze import (
     analyze_environmental_optimization,
     analyze_life_stage_playbook,
     analyze_clinical_variants,
+    analyze_novel_variants,
     analyze_multi_person,
     render_multi_person_html,
 )
@@ -271,6 +272,25 @@ def run_pipeline(args: argparse.Namespace) -> int:
     # in VCF enrichment (or later transforms), so read it once and thread it as a
     # plain local rather than re-reading snps_df.attrs downstream.
     detected_build = snps_df.attrs.get("build", "unknown")
+
+    # --assume-build overrides everything; otherwise, when probe-based detection
+    # couldn't resolve the build (common for rsID-less whole-genome VCFs such as
+    # GIAB benchmark callsets), fall back to reading it from the VCF header.
+    _assume = getattr(args, "assume_build", None)
+    if _assume:
+        detected_build = _assume
+        log(f"  Build forced by --assume-build: {detected_build}")
+    elif detected_build not in ("grch37", "grch38"):
+        try:
+            import genome_input as _gi_hdr
+            if _gi_hdr.looks_like_vcf(args.dna_file):
+                _hb = _gi_hdr.detect_build_from_vcf_header(args.dna_file)
+                if _hb in ("grch37", "grch38"):
+                    log(f"  Build resolved from VCF header (rsID probes "
+                        f"insufficient): {_hb}")
+                    detected_build = _hb
+        except Exception as _e:
+            log(f"  WARNING: header-based build detection failed: {_e}")
 
     # ── Whole-genome VCF: back-fill curated registry positions the rsID reader
     #    dropped, and profile what the file contains that we can't yet interpret.
@@ -804,6 +824,28 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Clinical-variants module failed: {e}")
 
+    # ── Novel/rare variants (Phase 3 — computational predictor screen; VCF only) ──
+    novel_variants_result: Optional[Dict] = None
+    if analyze_novel_variants is not None:
+        try:
+            import genome_input as _gi3
+            if _gi3.looks_like_vcf(args.dna_file):
+                novel_variants_result = analyze_novel_variants(
+                    args.dna_file, detected_build,
+                    clinvar_result=clinical_variants_result,
+                    inferred_sex=(qc_result or {}).get("inferred_sex"),
+                    commercial_safe=getattr(args, "commercial_safe", False),
+                    log=log)
+                if novel_variants_result.get("available"):
+                    preds = [p["name"] for p in novel_variants_result.get("predictors_used", [])]
+                    log(f"  Novel variants (predicted): "
+                        f"{novel_variants_result['n_predicted_pathogenic']} predicted damaging · "
+                        f"{novel_variants_result['n_rare_damaging']} rare/absent · predictors {preds}")
+                else:
+                    log(f"  Novel variants: {novel_variants_result.get('reason','n/a')}")
+        except Exception as e:
+            log(f"  WARNING: Novel-variants module failed: {e}")
+
     # ── Family planning (reproductive genetics — needs carrier + mt + sex) ──
     family_planning_result: Optional[Dict] = None
     if analyze_family_planning is not None:
@@ -926,6 +968,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             detox_result=detox_result,
             ancestry_result=ancestry_result,
             clinical_variants_result=clinical_variants_result,
+            novel_variants_result=novel_variants_result,
             y_result=y_result,
             mt_result=mt_result,
         )
@@ -969,6 +1012,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                         environmental_optimization_result=environmental_optimization_result,
                         holistic_synthesis_result=holistic_synthesis_result,
                         clinical_variants_result=clinical_variants_result,
+                        novel_variants_result=novel_variants_result,
                     )
                     log(f"  Per-module AI: {len(module_ai)} module interpretations generated")
                 except Exception as e:
@@ -1055,6 +1099,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         environmental_optimization_result=environmental_optimization_result,
         life_stage_playbook_result=life_stage_playbook_result,
         clinical_variants_result=clinical_variants_result,
+        novel_variants_result=novel_variants_result,
         module_ai=module_ai,
     )
 
@@ -1363,6 +1408,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 addiction_genetics_result=addiction_genetics_result,
                 holistic_synthesis_result=holistic_synthesis_result,
                 clinical_variants_result=clinical_variants_result,
+                novel_variants_result=novel_variants_result,
                 polygenic_traits_result=polygenic_traits_result,
                 environmental_optimization_result=environmental_optimization_result,
                 family_planning_result=family_planning_result,

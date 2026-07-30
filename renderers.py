@@ -1929,6 +1929,94 @@ findings are shown. {cv['n_scanned']:,} VCF variants scanned.
 """
 
 
+def build_novel_variants_html(nv: Optional[Dict]) -> str:
+    """Phase-3 computational novel/rare-variant screen. Every finding is a MODEL
+    PREDICTION, not a clinical call — the framing, per-finding label, and mandatory
+    disclaimers all say so. Never presented with ClinVar-style certainty."""
+    if not nv:
+        return ""
+    if not nv.get("available"):
+        reason = _esc(nv.get("reason", "not available"))
+        return f"""
+<section class="clinvar-section" id="novel-variants">
+<h2>Novel &amp; Rare Variants (predicted) <span class="pro-pill">Phase 3</span></h2>
+<div class="anc-caveat">Computational predictor screen not run: {reason}</div>
+<div class="anc-caveat" style="margin-top:8px">{_esc(nv.get('negative_disclaimer',''))}</div>
+</section>"""
+
+    conf_color = {"higher": "#b3261e", "moderate": "#d29922", "low": "#8a94a3"}
+    cat_meta = [
+        ("predicted_splice_disrupting", "🧬 Predicted splice-disrupting (SpliceAI)", "#b3261e"),
+        ("predicted_pathogenic_rare", "🚨 Predicted pathogenic · rare / absent in gnomAD", "#b3261e"),
+        ("predicted_pathogenic_uncommon", "Predicted pathogenic · uncommon", "#d29922"),
+        ("predicted_pathogenic_common", "Predicted pathogenic · common (down-weighted)", "#5b6673"),
+        ("ambiguous", "Ambiguous (predictor uncertain)", "#5b6673"),
+    ]
+    buckets = nv.get("buckets", {})
+    groups_html = ""
+    for key, label, color in cat_meta:
+        items = buckets.get(key) or []
+        if not items:
+            continue
+        rows = ""
+        for f in items:
+            gene = _esc(f.get("gene") or "—")
+            cc = conf_color.get(f.get("confidence"), "#8a94a3")
+            rows += f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid {color};border-radius:6px;
+     padding:10px 13px;margin:7px 0;background:#fff;break-inside:avoid">
+  <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline">
+    <span style="font-weight:700">{gene}
+      <span style="font-weight:400;color:#8a94a3;font-size:.85em"> · {_esc(f.get('rarity','unknown'))}</span></span>
+    <span style="font-size:.78em;color:{cc};font-weight:700" title="predictor consensus confidence">
+      {_esc(f.get('confidence','').upper())} confidence</span>
+  </div>
+  <div style="color:#4a5560;line-height:1.5;font-size:.9em;margin-top:3px">{_esc(f.get('interpretation',''))}</div>
+  <div style="font-size:.74em;color:#9aa4b0;margin-top:3px">
+    {_esc(f['chrom'])}:{f['pos']} {_esc(f['ref'])}&gt;{_esc(f['alt'])} · {_esc(f.get('zygosity','?'))}<br>
+    {_esc(f.get('evidence',''))}</div>
+</div>"""
+        groups_html += f'<h3 style="margin:14px 0 4px;color:{color}">{label} ({len(items)})</h3>{rows}'
+
+    n_pred = nv.get("n_predicted_pathogenic", 0)
+    none_found = n_pred == 0
+    headline = (
+        '<div style="background:linear-gradient(135deg,#f2f9f4,#eef4fb);border:1px solid #cfe3d6;'
+        'border-radius:10px;padding:14px 18px;margin:10px 0">'
+        '<strong>No carried variant was predicted damaging by the available models.</strong> '
+        'Reassuring but limited — this is a computational screen; read the note below.</div>'
+        if none_found else
+        f'<div style="background:linear-gradient(135deg,#fdf3f3,#f7f4fc);border:1px solid #f0cfcf;'
+        f'border-radius:10px;padding:14px 18px;margin:10px 0">'
+        f'<strong>{n_pred}</strong> carried variant(s) predicted damaging '
+        f'({nv.get("n_rare_damaging", 0)} rare/absent). <strong>These are model '
+        f'predictions, not diagnoses</strong> — most predicted-damaging variants are '
+        f'benign in reality.</div>')
+
+    used = nv.get("predictors_used", [])
+    pred_line = ", ".join(f"{p['name']} ({p['license']})" for p in used) or "none"
+    safe_note = (" <span class='pro-pill'>commercial-safe</span>"
+                 if nv.get("commercial_safe") else "")
+
+    return f"""
+<section class="clinvar-section" id="novel-variants">
+<h2>Novel &amp; Rare Variants (predicted) <span class="pro-pill">Phase 3</span>{safe_note}</h2>
+<p class="anc-intro">
+Beyond ClinVar: every carried missense/splice SNV that is <em>not</em> a known
+ClinVar hit is scored by offline computational predictors, and the
+predicted-damaging, rare ones are surfaced. {nv.get('n_queried', 0):,} carried
+variants queried. <strong>Predictors used:</strong> {_esc(pred_line)}.
+</p>
+{headline}
+<div style="background:#fff6e5;border-left:4px solid #d29922;border-radius:0 8px 8px 0;
+     padding:12px 16px;margin:10px 0;line-height:1.55;font-size:.92em">
+  ⚠️ <strong>{_esc(nv.get('negative_disclaimer',''))}</strong></div>
+{groups_html}
+<div class="anc-caveat" style="margin-top:14px">{_esc(nv.get('disclaimer',''))}</div>
+</section>
+"""
+
+
 def build_family_planning_html(fp: Optional[Dict]) -> str:
     """In-report reproductive-genetics section — carrier compound risk with a
     random partner, dominant transmission (kept separate from penetrance),
@@ -4095,6 +4183,7 @@ def build_html_report(
     environmental_optimization_result: Optional[Dict] = None,
     life_stage_playbook_result: Optional[Dict] = None,
     clinical_variants_result: Optional[Dict] = None,
+    novel_variants_result: Optional[Dict] = None,
     module_ai: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
@@ -4376,6 +4465,7 @@ def build_html_report(
     addiction_genetics_html = build_addiction_genetics_html(addiction_genetics_result)
     family_planning_html = build_family_planning_html(family_planning_result)
     clinical_variants_html = build_clinical_variants_html(clinical_variants_result)
+    novel_variants_html = build_novel_variants_html(novel_variants_result)
     polygenic_traits_html = build_polygenic_traits_html(polygenic_traits_result)
     environmental_optimization_html = build_environmental_optimization_html(environmental_optimization_result)
     life_stage_playbook_html = build_life_stage_playbook_html(life_stage_playbook_result)
@@ -4389,6 +4479,7 @@ def build_html_report(
     neurochemistry_html = _prepend_ai_interpretation(neurochemistry_html, _mai.get("neurochemistry"))
     holistic_synthesis_html = _prepend_ai_interpretation(holistic_synthesis_html, _mai.get("holistic-synthesis"))
     clinical_variants_html = _prepend_ai_interpretation(clinical_variants_html, _mai.get("clinical-variants"))
+    novel_variants_html = _prepend_ai_interpretation(novel_variants_html, _mai.get("novel-variants"))
     addiction_genetics_html = _prepend_ai_interpretation(addiction_genetics_html, _mai.get("addiction-genetics"))
     family_planning_html = _prepend_ai_interpretation(family_planning_html, _mai.get("family-planning"))
     polygenic_traits_html = _prepend_ai_interpretation(polygenic_traits_html, _mai.get("polygenic-traits"))
@@ -5412,6 +5503,7 @@ transparency.
   {"<a href='#neurochemistry' class='nl nl-v5'>Neurochemistry</a>" if neurochemistry_html else ""}
   {"<a href='#addiction-genetics' class='nl nl-v5'>Addiction Genetics</a>" if addiction_genetics_html else ""}
   {"<a href='#clinical-variants' class='nl nl-v5'>Clinical Variants</a>" if clinical_variants_html else ""}
+  {"<a href='#novel-variants' class='nl nl-v5'>Novel Variants</a>" if novel_variants_html else ""}
   {"<a href='#family-planning' class='nl nl-v5'>Family Planning</a>" if family_planning_html else ""}
   {"<a href='#polygenic-traits' class='nl nl-v5'>Trait Genetics</a>" if polygenic_traits_html else ""}
   {"<a href='#environmental-optimization' class='nl nl-v5'>Environmental Optimization</a>" if environmental_optimization_html else ""}
@@ -5471,6 +5563,7 @@ transparency.
 {addiction_genetics_html}
 
 {clinical_variants_html}
+{novel_variants_html}
 
 {family_planning_html}
 

@@ -41,6 +41,20 @@ def test_new_sections_appear_in_full_report():
     assert 'id="environmental-optimization"' in renderers.build_environmental_optimization_html(envopt)
     assert 'id="life-stage-playbook"' in renderers.build_life_stage_playbook_html(lsp)
 
+    # Phase-3 novel variants: available and unavailable both render the anchor.
+    nv_ok = {"available": True, "n_predicted_pathogenic": 1, "n_rare_damaging": 1,
+             "n_queried": 10, "predictors_used": [{"name": "AlphaMissense",
+             "license": "CC BY 4.0", "commercial_ok": True}], "commercial_safe": False,
+             "buckets": {"predicted_pathogenic_rare": [{"chrom": "1", "pos": 100,
+             "ref": "C", "alt": "T", "gene": "", "rarity": "unknown", "confidence": "higher",
+             "zygosity": "heterozygous", "evidence": "AlphaMissense likely pathogenic (0.98)",
+             "interpretation": "Computational prediction."}]},
+             "negative_disclaimer": "n", "disclaimer": "d"}
+    assert 'id="novel-variants"' in renderers.build_novel_variants_html(nv_ok)
+    assert 'id="novel-variants"' in renderers.build_novel_variants_html(
+        {"available": False, "reason": "run python setup.py --predictors",
+         "negative_disclaimer": "n"})
+
 
 def test_none_results_render_empty_not_crash():
     # All new renderers must no-op gracefully on None.
@@ -48,3 +62,4 @@ def test_none_results_render_empty_not_crash():
     assert renderers.build_polygenic_traits_html(None) == ""
     assert renderers.build_environmental_optimization_html(None) == ""
     assert renderers.build_life_stage_playbook_html(None) == ""
+    assert renderers.build_novel_variants_html(None) == ""

@@ -210,6 +210,25 @@ def build_parser() -> argparse.ArgumentParser:
               "for ingestion into a clinical EHR."),
     )
 
+    # ── Phase-3 / WGS flags ───────────────────────────────────────────────
+    parser.add_argument(
+        "--assume-build",
+        choices=["grch37", "grch38"],
+        default=None,
+        help=("Force the reference build instead of auto-detecting it. Useful "
+              "for whole-genome VCFs whose variants lack rsIDs (e.g. GIAB "
+              "benchmark callsets), where probe-based detection cannot resolve "
+              "the build. Takes precedence over auto-detection."),
+    )
+    parser.add_argument(
+        "--commercial-safe",
+        action="store_true",
+        help=("Restrict the Phase-3 novel-variant predictors to commercially "
+              "licensed sources only (AlphaMissense + gnomAD). Disables REVEL, "
+              "SpliceAI, and CADD, which are licensed for non-commercial use. "
+              "Also tags the report footer accordingly."),
+    )
+
     return parser
 
 

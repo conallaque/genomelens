@@ -69,9 +69,14 @@ reference/*.fam
 reference/*.tar*
 reference/*.zip
 
+# Predictor reference tables (AlphaMissense / REVEL / CADD / gnomAD / SpliceAI) can be huge
+# (CADD ~81 GB). Belt-and-suspenders: ignore everything under reference/ except tracked metadata.
+reference/*
+
 # Allow setup metadata in reference/
 !reference/setup_manifest.json
 !reference/README*
+!reference/PREDICTOR_LICENSES.md
 
 # ── Python ─────────────────────────────────────────────────────────────────
 __pycache__/

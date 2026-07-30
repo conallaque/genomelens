@@ -221,6 +221,10 @@ try:
 except ImportError:
     analyze_clinical_variants = None
 try:
+    from novel_variants import analyze_novel_variants
+except ImportError:
+    analyze_novel_variants = None
+try:
     from multi_person_module import (analyze_multi_person,
                                       render_multi_person_html)
 except ImportError:
@@ -231,7 +235,7 @@ SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
-REPORT_VERSION = "6.22.1-premium"
+REPORT_VERSION = "6.23.0-premium"
 
 CATEGORY_ORDER = [
     "Hereditary Conditions",
@@ -887,6 +891,7 @@ def _build_module_context(
     detox_result: Optional[Dict] = None,
     ancestry_result: Optional[Dict] = None,
     clinical_variants_result: Optional[Dict] = None,
+    novel_variants_result: Optional[Dict] = None,
     y_result: Optional[Dict] = None,
     mt_result: Optional[Dict] = None,
     max_chars: int = 7000,
@@ -924,6 +929,20 @@ def _build_module_context(
                 ls.append(f"- {f.get('gene')} [{f.get('category')}] "
                           f"{f.get('condition','')[:60]} ({f.get('stars')}★, {f.get('zygosity')})")
             _add("CLINICAL VARIANTS (ClinVar)", ls)
+    except Exception:
+        pass
+
+    # ── Novel/rare predicted variants (computational — clearly hedged) ──
+    try:
+        nvr = novel_variants_result or {}
+        if nvr.get("available") and nvr.get("n_predicted_pathogenic", 0) > 0:
+            ls = [f"{nvr['n_predicted_pathogenic']} carried variant(s) computationally "
+                  f"predicted damaging ({nvr.get('n_rare_damaging', 0)} rare/absent). "
+                  f"Predictions, NOT diagnoses."]
+            for f in (nvr.get("findings") or [])[:6]:
+                ls.append(f"- {f.get('gene') or f.get('chrom')}:{f.get('pos')} "
+                          f"[{f.get('confidence')}] {f.get('evidence', '')[:70]}")
+            _add("NOVEL/RARE VARIANTS (predicted)", ls)
     except Exception:
         pass
 
@@ -1115,6 +1134,14 @@ _MODULE_AI_SPECS: Dict[str, Dict[str, str]] = {
                  "non-alarmist: stress this is a screen needing accredited-lab "
                  "confirmation + genetic counseling, and that absence of findings "
                  "is not absence of risk."},
+    "novel-variants": {
+        "kwarg": "novel_variants_result", "title": "Novel & Rare Variants (predicted)",
+        "focus": "These are COMPUTATIONAL predictions (AlphaMissense/REVEL/CADD/"
+                 "SpliceAI), not clinical findings. Stress that a predicted-damaging "
+                 "call is a model estimate — many predicted-damaging variants are "
+                 "benign in reality — and that 'rare + predicted-damaging' is a "
+                 "hypothesis to confirm in an accredited lab, never a diagnosis. "
+                 "Be measured and non-alarmist."},
     "holistic-synthesis": {
         "kwarg": "holistic_synthesis_result", "title": "Holistic Synthesis",
         "focus": "Explain what the Genome Leverage Score means for how much this "

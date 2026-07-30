@@ -51,7 +51,7 @@ def test_module_ai_spec_keys_match_report_section_ids():
     valid_ids = {"holistic-synthesis", "immunogenetics", "neurochemistry",
                  "addiction-genetics", "deep-ancestry", "blood-type",
                  "family-planning", "polygenic-traits", "environmental-optimization",
-                 "clinical-variants"}
+                 "clinical-variants", "novel-variants"}
     assert set(analyze._MODULE_AI_SPECS) <= valid_ids
 
 

@@ -1,0 +1,500 @@
+"""
+Novel / Rare-Variant Pathogenicity Interpretation — Phase 3 (WGS/VCF)
+=====================================================================
+
+Phase 2 (``clinical_variants.py``) screens a VCF against *known* ClinVar variants.
+It says nothing about the millions of variants ClinVar has not classified. Phase 3
+fills that gap: for every protein-altering variant the sample carries that is **not**
+already a ClinVar P/LP hit, look it up in offline, tabix-indexed **computational
+pathogenicity predictors** and surface the *predicted-damaging, rare* ones — always
+labelled as **computational predictions, never clinical calls**.
+
+Predictor registry (pluggable, each independently graceful):
+  * **AlphaMissense** (CC BY 4.0 — commercial-OK) — primary missense predictor.
+  * **gnomAD** (open) — population allele frequency → rarity gate.
+  * **REVEL / CADD / SpliceAI** — non-commercial; used when present, dropped by
+    ``--commercial-safe``.
+
+Everything is queried by ``chrom:pos:ref:alt`` via ``pysam``/tabix — no Ensembl VEP.
+If ``pysam`` or a predictor table is missing, the module degrades gracefully (it
+never blocks the chip path, which has no need of it).
+
+Educational screening, NOT a clinical diagnostic test.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Callable, Dict, List, Optional, Tuple
+
+# Reuse the strand/indel-normalisation + zygosity helpers from Phase 2 so the two
+# modules agree on what "the same variant" and "carries this allele" mean.
+from clinical_variants import _norm_chrom, norm_key, zygosity_for_alt
+
+SCRIPT_DIR = Path(__file__).parent
+REFERENCE_DIR = SCRIPT_DIR / "reference"
+
+try:                                    # pysam ships arm64 wheels; optional dep.
+    import pysam
+    _HAVE_PYSAM = True
+except Exception:                       # pragma: no cover - import guard
+    pysam = None
+    _HAVE_PYSAM = False
+
+# ── thresholds (documented, adjustable) ───────────────────────────────────────
+_REVEL_DAMAGING = 0.5           # REVEL ≥ 0.5 ≈ likely pathogenic
+_CADD_DAMAGING = 20.0           # CADD PHRED ≥ 20 = top 1% most deleterious
+_SPLICEAI_DELTA = 0.5           # SpliceAI Δ ≥ 0.5 = likely splice-altering
+_RARE_AF = 0.01                 # ≤ 1% = rare
+_VERY_RARE_AF = 0.001           # ≤ 0.1% = very rare
+_MAX_CARRIED_SNVS = 3_000_000   # safety cap on per-variant tabix queries
+
+_NEGATIVE_DISCLAIMER = (
+    "No result here means 'no predictor flagged a carried variant as damaging' — "
+    "NOT 'no risk'. This is a COMPUTATIONAL screen: predictions (AlphaMissense, "
+    "REVEL, CADD, SpliceAI) estimate deleteriousness, they do not diagnose. It "
+    "covers only single-nucleotide missense/splice variants present in your file, "
+    "excludes anything already in the ClinVar screen, and does not confirm any "
+    "finding. It is a hypothesis-generating screen, not a clinical test.")
+
+_DISCLAIMER = (
+    "Computational predictions only. A predicted-pathogenic call is a statistical "
+    "estimate from a machine-learning model, NOT a clinical determination — many "
+    "predicted-damaging variants are benign in reality. Nothing here should change "
+    "medical decisions until confirmed in an accredited diagnostic laboratory and "
+    "discussed with a board-certified genetic counselor.")
+
+
+# ── predictor registry ────────────────────────────────────────────────────────
+
+class Predictor:
+    """One pluggable pathogenicity predictor backed by a tabix-indexed table."""
+
+    def __init__(self, name: str, axis: str, license: str, commercial_ok: bool,
+                 parse: Callable[[List[List[str]], str, str], Optional[float]],
+                 subdir: str = "", glob: str = "", remote_url: str = ""):
+        self.name = name
+        self.axis = axis                 # 'missense' | 'splice' | 'rarity'
+        self.license = license
+        self.commercial_ok = commercial_ok
+        self._parse = parse
+        self.subdir = subdir
+        self.glob = glob
+        self.remote_url = remote_url
+        self._tabix = None               # (TabixFile, chrom_fmt) once opened
+        self.source = ""
+
+    # -- table resolution + open ------------------------------------------------
+    def resolve(self) -> bool:
+        """Locate + open the table (local file preferred, else a remote URL for
+        CADD demos). Returns True if a usable tabix handle is available."""
+        if not _HAVE_PYSAM:
+            return False
+        path = None
+        d = REFERENCE_DIR / self.subdir
+        if d.is_dir() and self.glob:
+            hits = sorted(d.glob(self.glob))
+            if hits:
+                path = str(hits[0])
+        if path is None and self.remote_url:
+            path = self.remote_url          # pysam/htslib can open http(s) + .tbi
+        if path is None:
+            return False
+        self._tabix = _open_tabix(path)
+        self.source = path
+        return self._tabix is not None
+
+    def lookup(self, chrom: str, pos: int, ref: str, alt: str) -> Optional[float]:
+        if self._tabix is None:
+            return None
+        rows = _fetch(self._tabix, chrom, pos)
+        if not rows:
+            return None
+        try:
+            return self._parse(rows, ref.upper(), alt.upper())
+        except Exception:
+            return None
+
+
+def _open_tabix(path: str):
+    """Open a tabix file (local path or http(s) URL) and return
+    ``(TabixFile, chrom_fmt)`` where ``chrom_fmt`` maps a plain chrom to the
+    table's own naming ('1' vs 'chr1'), or None on failure."""
+    try:
+        tbx = pysam.TabixFile(str(path))
+        contigs = set(tbx.contigs)
+    except Exception:
+        return None
+
+    def fmt(chrom: str) -> str:
+        c = _norm_chrom(chrom)
+        if c in contigs:
+            return c
+        if f"chr{c}" in contigs:
+            return f"chr{c}"
+        if c == "MT" and "chrM" in contigs:
+            return "chrM"
+        return c
+    return tbx, fmt
+
+
+def _fetch(tabix_pair, chrom: str, pos: int) -> List[List[str]]:
+    tbx, fmt = tabix_pair
+    try:
+        return [row.split("\t") for row in tbx.fetch(fmt(chrom), pos - 1, pos)]
+    except Exception:
+        return []
+
+
+def _info_field(info: str, key: str) -> Optional[str]:
+    for kv in info.split(";"):
+        if kv.startswith(key + "="):
+            return kv[len(key) + 1:]
+        if kv == key:
+            return ""
+    return None
+
+
+# -- per-predictor row parsers -------------------------------------------------
+
+def _parse_alphamissense(rows, ref, alt):
+    """AlphaMissense TSV: CHROM POS REF ALT genome uniprot transcript prot_var
+    am_pathogenicity am_class. Multiple transcript rows per locus → keep MAX
+    pathogenicity (returned as a (score, class) tuple)."""
+    best_s: Optional[float] = None
+    best_c = ""
+    for c in rows:
+        if len(c) < 10 or c[2].upper() != ref or c[3].upper() != alt:
+            continue
+        try:
+            s = float(c[8])
+        except ValueError:
+            continue
+        if best_s is None or s > best_s:
+            best_s, best_c = s, c[9]
+    if best_s is None:
+        return None
+    return (best_s, best_c)
+
+
+def _parse_revel(rows, ref, alt):
+    """REVEL table (bgzipped CSV→TSV): ... ref alt ... REVEL ... Match ref/alt,
+    return MAX REVEL score. Column layout after setup normalisation:
+    chr pos ref alt REVEL (5-col slim table produced by setup_revel)."""
+    best = None
+    for c in rows:
+        if len(c) < 5 or c[2].upper() != ref or c[3].upper() != alt:
+            continue
+        try:
+            v = float(c[4])
+        except ValueError:
+            continue
+        best = v if best is None or v > best else best
+    return best
+
+
+def _parse_cadd(rows, ref, alt):
+    """CADD whole_genome_SNVs.tsv: Chrom Pos Ref Alt RawScore PHRED. Return PHRED."""
+    for c in rows:
+        if len(c) < 6 or c[2].upper() != ref or c[3].upper() != alt:
+            continue
+        try:
+            return float(c[5])
+        except ValueError:
+            return None
+    return None
+
+
+def _parse_spliceai(rows, ref, alt):
+    """SpliceAI precomputed VCF: INFO SpliceAI=ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|
+    DS_DL|.... Return max delta (DS_*) for the matching ALT."""
+    best = None
+    for c in rows:
+        if len(c) < 8 or c[3].upper() != ref:
+            continue
+        raw = _info_field(c[7], "SpliceAI")
+        if not raw:
+            continue
+        for entry in raw.split(","):
+            parts = entry.split("|")
+            if len(parts) < 6 or parts[0].upper() != alt:
+                continue
+            try:
+                delta = max(float(parts[2]), float(parts[3]),
+                            float(parts[4]), float(parts[5]))
+            except ValueError:
+                continue
+            best = delta if best is None or delta > best else best
+    return best
+
+
+def _parse_gnomad(rows, ref, alt):
+    """gnomAD sites VCF: return AF for the matching ALT (handles multiallelic)."""
+    for c in rows:
+        if len(c) < 8 or c[3].upper() != ref:
+            continue
+        alts = [a.upper() for a in c[4].split(",")]
+        if alt not in alts:
+            continue
+        af = _info_field(c[7], "AF")
+        if af is None:
+            return None
+        parts = af.split(",")
+        idx = alts.index(alt)
+        try:
+            return float(parts[idx]) if idx < len(parts) else float(parts[0])
+        except ValueError:
+            return None
+    return None
+
+
+def _registry() -> List[Predictor]:
+    return [
+        Predictor("AlphaMissense", "missense", "CC BY 4.0", True,
+                  _parse_alphamissense, subdir="alphamissense",
+                  glob="AlphaMissense_*.tsv.gz"),
+        Predictor("gnomAD", "rarity", "open (no restrictions)", True,
+                  _parse_gnomad, subdir="gnomad", glob="gnomad*.vcf.*gz"),
+        Predictor("REVEL", "missense", "non-commercial", False,
+                  _parse_revel, subdir="revel", glob="revel*.tsv.gz"),
+        Predictor("SpliceAI", "splice", "CC BY-NC 4.0", False,
+                  _parse_spliceai, subdir="spliceai", glob="spliceai*.vcf.*gz"),
+        Predictor("CADD", "meta", "non-commercial", False,
+                  _parse_cadd, subdir="cadd", glob="*whole_genome_SNVs*.tsv.gz",
+                  remote_url=_CADD_REMOTE_GRCH38),
+    ]
+
+
+# Public CADD v1.7 whole-genome SNV tables (tabix-indexed) — used for a remote
+# demo query on PUBLIC data only (never the user's private genome).
+_CADD_REMOTE_GRCH38 = ("https://krishna.gs.washington.edu/download/CADD/v1.7/"
+                       "GRCh38/whole_genome_SNVs.tsv.gz")
+
+
+# ── main analysis ─────────────────────────────────────────────────────────────
+
+def analyze_novel_variants(vcf_path: str, build: str,
+                           clinvar_result: Optional[Dict] = None,
+                           inferred_sex: Optional[str] = None,
+                           commercial_safe: bool = False,
+                           allow_remote: bool = False,
+                           log=None) -> Dict:
+    """Screen a user VCF for predicted-damaging novel/rare variants. Mirrors the
+    ``clinical_variants`` result-dict contract for drop-in wiring."""
+    _log = log or (lambda *a, **k: None)
+
+    if not _HAVE_PYSAM:
+        return _unavailable("pysam not installed — run `pip install pysam` "
+                            "(optional 'wgs' extra) to enable Phase-3 predictors.")
+    if build not in ("grch37", "grch38"):
+        return _unavailable(f"Build '{build}' — cannot select predictor tables "
+                            "safely (try --assume-build grch38).")
+
+    # Resolve which predictor tables are actually available.
+    predictors: List[Predictor] = []
+    dropped_nc: List[str] = []
+    for p in _registry():
+        if commercial_safe and not p.commercial_ok:
+            dropped_nc.append(p.name)
+            continue
+        pdir = REFERENCE_DIR / p.subdir
+        local_exists = pdir.is_dir() and any(pdir.glob(p.glob))
+        if not local_exists:
+            # Only fall back to a remote table (CADD demo) when explicitly allowed.
+            if not (p.remote_url and allow_remote):
+                continue
+        if p.resolve():
+            predictors.append(p)
+            _log(f"  Predictor ready: {p.name} ({p.license})")
+
+    if not predictors:
+        return _unavailable(
+            "No Phase-3 predictor tables found — run `python setup.py --predictors` "
+            "(AlphaMissense + REVEL + gnomAD). Falls back cleanly; no screen performed.")
+
+    have = {p.name for p in predictors}
+    gnomad_present = "gnomAD" in have
+
+    # Variants already flagged by the ClinVar screen — skip to add only new signal.
+    known: set = set()
+    for f in (clinvar_result or {}).get("findings") or []:
+        known.add(norm_key(f["chrom"], f["pos"], f["ref"], f["alt"]))
+
+    findings: List[Dict] = []
+    n_scanned = 0
+    n_queried = 0
+    import gzip as _gz
+    opener = _gz.open if str(vcf_path).lower().endswith((".gz", ".bgz")) else open
+    with opener(vcf_path, "rt", errors="ignore") as f:
+        for line in f:
+            if not line or line[0] == "#":
+                continue
+            cols = line.rstrip("\n").split("\t")
+            if len(cols) < 8:
+                continue
+            n_scanned += 1
+            chrom, pos_s, ref, alt_field = cols[0], cols[1], cols[3], cols[4]
+            try:
+                pos = int(pos_s)
+            except ValueError:
+                continue
+            if len(ref) != 1 or ref.upper() not in "ACGT":
+                continue                          # SNV predictors only
+            sample = cols[9] if len(cols) > 9 else ""
+            for ai, alt in enumerate(alt_field.split(","), start=1):
+                alt = alt.upper()
+                if len(alt) != 1 or alt not in "ACGT":
+                    continue
+                zyg = zygosity_for_alt(sample, ai) if sample else "unknown"
+                if zyg is None:                   # sample doesn't carry this allele
+                    continue
+                if norm_key(chrom, pos, ref, alt) in known:
+                    continue                      # already in ClinVar screen
+                if n_queried >= _MAX_CARRIED_SNVS:
+                    continue
+                n_queried += 1
+                rec = _score_variant(predictors, chrom, pos, ref, alt)
+                if rec is None:
+                    continue
+                rec.update({"chrom": _norm_chrom(chrom), "pos": pos,
+                            "ref": ref.upper(), "alt": alt, "zygosity": zyg})
+                findings.append(rec)
+
+    result = _classify(findings, n_scanned, n_queried, gnomad_present)
+    result["predictors_used"] = [{"name": p.name, "license": p.license,
+                                  "commercial_ok": p.commercial_ok} for p in predictors]
+    result["commercial_safe"] = commercial_safe
+    result["dropped_noncommercial"] = dropped_nc
+    return result
+
+
+def _score_variant(predictors: List[Predictor], chrom, pos, ref, alt) -> Optional[Dict]:
+    """Query every predictor; return a finding dict only if the ensemble flags the
+    variant as damaging or splice-altering. Otherwise None."""
+    am_score = am_class = None
+    revel = cadd = splice = af = None
+    for p in predictors:
+        v = p.lookup(chrom, pos, ref, alt)
+        if v is None:
+            continue
+        if p.name == "AlphaMissense":
+            am_score, am_class = v
+        elif p.name == "REVEL":
+            revel = v
+        elif p.name == "CADD":
+            cadd = v
+        elif p.name == "SpliceAI":
+            splice = v
+        elif p.name == "gnomAD":
+            af = v
+
+    missense_hits = []
+    if am_class == "likely_pathogenic":
+        missense_hits.append("AlphaMissense")
+    if revel is not None and revel >= _REVEL_DAMAGING:
+        missense_hits.append("REVEL")
+    if cadd is not None and cadd >= _CADD_DAMAGING:
+        missense_hits.append("CADD")
+    splice_hit = splice is not None and splice >= _SPLICEAI_DELTA
+    ambiguous = am_class == "ambiguous"
+
+    if not missense_hits and not splice_hit and not ambiguous:
+        return None
+
+    return {
+        "am_score": am_score, "am_class": am_class,
+        "revel": revel, "cadd_phred": cadd, "spliceai_delta": splice,
+        "gnomad_af": af, "consensus": missense_hits,
+        "n_missense_hits": len(missense_hits), "splice_hit": splice_hit,
+    }
+
+
+def _rarity(af: Optional[float]) -> str:
+    if af is None:
+        return "unknown"
+    if af <= _VERY_RARE_AF:
+        return "very_rare"
+    if af <= _RARE_AF:
+        return "rare"
+    if af <= 0.05:
+        return "uncommon"
+    return "common"
+
+
+def _confidence(rec: Dict) -> str:
+    n = rec["n_missense_hits"]
+    am = rec.get("am_score")
+    if rec["splice_hit"] or n >= 2 or (am is not None and am >= 0.9):
+        return "higher"
+    if n == 1 or (am is not None and am >= 0.7):
+        return "moderate"
+    return "low"
+
+
+def _classify(findings: List[Dict], n_scanned: int, n_queried: int,
+              gnomad_present: bool) -> Dict:
+    buckets: Dict[str, List[Dict]] = {
+        "predicted_splice_disrupting": [], "predicted_pathogenic_rare": [],
+        "predicted_pathogenic_uncommon": [], "predicted_pathogenic_common": [],
+        "ambiguous": [],
+    }
+    for f in findings:
+        rar = _rarity(f.get("gnomad_af"))
+        f["rarity"] = rar
+        f["confidence"] = _confidence(f)
+        f["gene"] = f.get("gene", "")
+        parts = []
+        if f.get("am_class"):
+            parts.append(f"AlphaMissense {f['am_class'].replace('_', ' ')} "
+                         f"({f['am_score']:.2f})")
+        if f.get("revel") is not None:
+            parts.append(f"REVEL {f['revel']:.2f}")
+        if f.get("cadd_phred") is not None:
+            parts.append(f"CADD {f['cadd_phred']:.0f}")
+        if f.get("spliceai_delta") is not None:
+            parts.append(f"SpliceAI Δ{f['spliceai_delta']:.2f}")
+        af = f.get("gnomad_af")
+        parts.append(f"gnomAD AF {af:.2e}" if af is not None else "gnomAD AF n/a")
+        f["evidence"] = "; ".join(parts)
+        f["interpretation"] = (
+            "Computational prediction — a machine-learning model estimates this "
+            "variant is damaging. NOT a clinical diagnosis; confirm in an "
+            "accredited lab before it means anything.")
+
+        if f["splice_hit"]:
+            buckets["predicted_splice_disrupting"].append(f)
+        elif f["am_class"] == "ambiguous" and f["n_missense_hits"] == 0:
+            buckets["ambiguous"].append(f)
+        elif rar in ("rare", "very_rare", "unknown"):
+            buckets["predicted_pathogenic_rare"].append(f)
+        elif rar == "uncommon":
+            buckets["predicted_pathogenic_uncommon"].append(f)
+        else:
+            buckets["predicted_pathogenic_common"].append(f)
+
+    conf_rank = {"higher": 0, "moderate": 1, "low": 2}
+    for b in buckets.values():
+        b.sort(key=lambda x: (conf_rank.get(x["confidence"], 3),
+                              -(x.get("am_score") or 0)))
+
+    n_rare_damaging = (len(buckets["predicted_pathogenic_rare"])
+                       + len(buckets["predicted_splice_disrupting"]))
+    return {
+        "available": True,
+        "n_scanned": n_scanned,
+        "n_queried": n_queried,
+        "n_predicted_pathogenic": sum(len(v) for k, v in buckets.items()
+                                      if k != "ambiguous"),
+        "n_rare_damaging": n_rare_damaging,
+        "n_ambiguous": len(buckets["ambiguous"]),
+        "gnomad_present": gnomad_present,
+        "buckets": buckets,
+        "findings": [f for b in buckets.values() for f in b],
+        "negative_disclaimer": _NEGATIVE_DISCLAIMER,
+        "disclaimer": _DISCLAIMER,
+    }
+
+
+def _unavailable(reason: str) -> Dict:
+    return {"available": False, "reason": reason,
+            "negative_disclaimer": _NEGATIVE_DISCLAIMER, "disclaimer": _DISCLAIMER}
