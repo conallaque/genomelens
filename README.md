@@ -31,26 +31,72 @@ Unauthorized copying, modification, or distribution is prohibited.
 
 ---
 
-## Quickstart (90 seconds, zero AI required)
+## Quickstart
 
+No bioinformatics experience needed. If you can copy-paste into a terminal, you can run
+this. **Prerequisites:** Python 3.10+ (`python3 --version`) and your raw DNA file.
+
+### 1 — Get your raw DNA file
+- **23andMe:** Account → *Settings* → *Download raw data* → you get a `.txt` (or `.zip`).
+- **AncestryDNA / MyHeritage / TellMeGen / FamilyTreeDNA:** each has a "download raw
+  data" option in account settings → a `.txt`/`.csv`.
+- **Whole genome:** the `.vcf` / `.vcf.gz` from your sequencing provider.
+
+### 2 — Install (one time, ~2 minutes)
 ```bash
 git clone https://github.com/conallaque/genomelens.git
 cd genomelens
 python3 -m venv .venv && source .venv/bin/activate
 pip install pandas numpy snps scipy scikit-learn requests
-
-# Drop your raw DNA file here (don't worry — .gitignore excludes *.csv / *.txt)
-python analyze.py ~/Downloads/genome.csv --no-ai
-
-# Open the result
-open report.html                # macOS
-xdg-open report.html            # Linux
 ```
 
-That's it. You'll get `report.html`, `supplements.html`, `exercise.html`,
-`nutrition.html`, and `personalized_plan.html` in the current directory. Add
-`--bloodwork labs.json` to compare against measured lab values, or `--fhir` to
-emit a clinical EHR bundle.
+### 3 — Run it (fast path, no AI required)
+```bash
+# point it at wherever your file downloaded
+python analyze.py ~/Downloads/genome.txt --no-ai
+
+open report.html          # macOS   ·   use  xdg-open report.html  on Linux
+```
+That's it — `report.html` opens in your browser with the full analysis (plus
+`supplements.html`, `nutrition.html`, `exercise.html`, `personalized_plan.html`).
+Add `--bloodwork labs.json` to fold in real lab values (this unlocks biological age
+**and the full health-economics model**), or `--fhir` for a clinical EHR bundle.
+
+### 4 — Run it with the local AI (Ollama)
+The AI layer writes a plain-language interpretation of **every** section and powers an
+offline Q&A chat — all running **locally**, so nothing ever leaves your machine.
+
+**a. Install Ollama** (free, one time) — download from
+[ollama.com/download](https://ollama.com/download) (or `brew install ollama` on macOS),
+then make sure it's running (open the Ollama app, or run `ollama serve`).
+
+**b. Download a model** (one time):
+```bash
+ollama pull qwen3:14b        # the default (~9 GB) — comfortable on 16 GB+ RAM
+ollama pull llama3.1:8b      # lighter alternative for tighter RAM
+```
+
+**c. Run — just drop `--no-ai`:**
+```bash
+python analyze.py ~/Downloads/genome.txt
+# using the lighter model instead of the default:
+python analyze.py ~/Downloads/genome.txt --model llama3.1:8b
+```
+
+**d. Ask questions** — add `--chat` for an interactive Q&A grounded in your results:
+```bash
+python analyze.py ~/Downloads/genome.txt --chat
+```
+The AI only ever sees your deterministic findings, and a guardrail rejects any number
+it tries to invent (see [Built with rigor](#built-with-rigor)).
+
+### Using a whole genome instead of a chip?
+Same commands — just point at your `.vcf`/`.vcf.gz` and fetch the predictor tables once:
+```bash
+python setup.py --predictors                      # AlphaMissense + gnomAD + REVEL (~4 GB)
+python analyze.py ~/Downloads/genome.vcf.gz        # add --chat / --bloodwork as above
+```
+Disk/RAM/runtime for both input types are in **Runs on any laptop**, below.
 
 > **Disclaimer.** Not medical advice. Educational and research use only.
 > Genetic predispositions are probabilistic; environment, lifestyle, and
