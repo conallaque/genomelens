@@ -157,7 +157,7 @@ or a whole-genome / exome **VCF**.
   - 🧬 **Tells you if a full genome is worth it *for you*** — the extra value of upgrading a chip → whole genome ("marginal ROI").
   - 📊 **Shows its uncertainty honestly** — a Monte-Carlo simulation gives a *range* (95% confidence interval), never one fake-precise number.
   - 🏷️ **Separates price from value** — what the tests *cost to buy* vs what acting on them is *worth*.
-  - *Example on the public GIAB genome: ≈ **$24k** expected value (with a confidence range) — and ≈ **$24k** of that comes from going to a full genome.*
+  - *Example on the public GIAB genome: ≈ **\$24k** expected value (with a confidence range) — and ≈ **\$24k** of that comes from going to a full genome.*
 
 **Ancestry & traits**
 - **Ancestry:** autosomal PCA + Y-DNA / mtDNA haplogroups + deep ancestry (Neanderthal %, Yamnaya / EEF / WHG affinity, migration timelines).
@@ -183,7 +183,7 @@ test's cost:
 > value ≈ E[net benefit | genome known] − E[net benefit | not known] − test cost
 
 **Net Monetary Benefit** is the headline metric — `NMB = ΔQALY × λ − ΔCost` — where λ
-is the willingness-to-pay threshold (**$50k / $100k / $150k per QALY**; Neumann et
+is the willingness-to-pay threshold (**\$50k / \$100k / \$150k per QALY**; Neumann et
 al., *NEJM* 2014). Both future **costs and QALYs** are discounted at 3% (0/3/5%
 sensitivity), the second-panel cost-effectiveness standard. ICER is reported as a
 secondary metric; NMB leads because it handles dominance and negative ICERs cleanly.
@@ -220,25 +220,28 @@ attenuated for other ancestries); and the output is explicitly an *illustrative
 decision-analytic model — not a formal economic evaluation, and not financial or
 medical advice.*
 
-> **Worked example — public GIAB HG001 genome:** modelled expected value ≈ **$24,070**
-> (95% CI ≈ $11k–$41k), chip→WGS marginal ≈ **$24,479**, cost-effective at $100k/QALY
+> **Worked example — public GIAB HG001 genome:** modelled expected value ≈ **\$24,070**
+> (95% CI ≈ \$11k–\$41k), chip→WGS marginal ≈ **\$24,479**, cost-effective at \$100k/QALY
 > with high probability — computed end-to-end, locally, with 0 errors.
 
 ### The math — with a plain-English translation under every equation
 
 Written like a methods section, but **each equation has a translation underneath** so
-you don't need a stats background to follow what's happening.
+you don't need a stats background to follow what's happening. Equations use GitHub's
+math blocks; every symbol is also spelled out in words.
 
-**Notation.** For a finding $i$: $\lambda$ = how much one year of healthy life is worth
-in dollars; $p_i$ = the chance the condition actually happens; $\text{RRR}_i$ = how much
-acting cuts that risk; $\text{COI}_i$ = the lifetime cost of the illness; $q_i$ = healthy
-life-years (QALYs) preserved by acting; $h_i$ = a confidence discount ($1$ for confirmed
-findings, less for computational predictions); $T_i$ = the years it plays out over;
-$r$ = the discount rate; $C_\text{test}$ = the cost of the DNA test.
+**Notation.** For a finding `i`: `λ` = how much one year of healthy life is worth in
+dollars; `p_i` = the chance the condition actually happens; `RRR_i` = how much acting
+cuts that risk; `COI_i` = the lifetime cost of the illness; `q_i` = healthy life-years
+(QALYs) preserved by acting; `h_i` = a confidence discount (1 for confirmed findings,
+less for computational predictions); `T_i` = the years it plays out over; `r` = the
+discount rate; `C_test` = the cost of the DNA test.
 
 **1 · Discounting — value the future a little less than today**
 
-$$D(T,r)=\frac{1}{T}\left(\frac{1}{2}+\sum_{t=1}^{T}\frac{1}{(1+r)^{t}}\right),\qquad r=0.03$$
+```math
+D(T,r)=\frac{1}{T}\left(\frac{1}{2}+\sum_{t=1}^{T}\frac{1}{(1+r)^{t}}\right),\qquad r=0.03
+```
 
 *In plain English:* a dollar — or a healthy year — decades from now is worth less than
 one today. This shrinks future costs **and** future health benefits by 3% per year so we
@@ -246,8 +249,12 @@ never overstate things that pay off far away. It's the standard, conservative co
 
 **2 · What acting on a finding is expected to be worth**
 
-$$\Delta\text{Cost}_i = p_i\cdot\text{RRR}_i\cdot\text{COI}_i\cdot D(T_i,r)\cdot h_i,\qquad
-\Delta\text{QALY}_i = p_i\cdot\text{RRR}_i\cdot q_i\cdot D(T_i,r)\cdot h_i$$
+```math
+\Delta\text{Cost}_i = p_i\cdot\text{RRR}_i\cdot\text{COI}_i\cdot D(T_i,r)\cdot h_i
+```
+```math
+\Delta\text{QALY}_i = p_i\cdot\text{RRR}_i\cdot q_i\cdot D(T_i,r)\cdot h_i
+```
 
 *In plain English:* the benefit of acting = **how likely the problem is** × **how much
 acting reduces it** × **how costly/harmful it is** — discounted for time, and dialed back
@@ -256,7 +263,9 @@ gained.
 
 **2b · Drug-response (pharmacogenomic) findings**
 
-$$\Delta\text{Cost}^{\text{PGx}}_i = P(\text{Rx})\cdot P(\text{ADR}\mid g)\cdot\text{RRR}\cdot C_\text{ADR}$$
+```math
+\Delta\text{Cost}^{\text{PGx}}_i = P(\text{Rx})\cdot P(\text{ADR}\mid g)\cdot\text{RRR}\cdot C_\text{ADR}
+```
 
 *In plain English:* for a medication gene, the value = **chance you'll be prescribed the
 drug** × **chance it harms you given your genotype** × **how much genotype-guided dosing
@@ -265,33 +274,38 @@ getting the wrong prescription.
 
 **3 · Net Monetary Benefit — the bottom line for each finding**
 
-$$\text{NMB}_i = \lambda\cdot\Delta\text{QALY}_i + \Delta\text{Cost}_i - c^{\text{int}}_i$$
+```math
+\text{NMB}_i = \lambda\cdot\Delta\text{QALY}_i + \Delta\text{Cost}_i - c^{\text{int}}_i
+```
 
-*In plain English:* turn the healthy years gained into dollars (at $\lambda$), add the
-money saved, then subtract what acting costs (the screening, drug, or visit, $c^{\text{int}}$).
+*In plain English:* turn the healthy years gained into dollars (at `λ`), add the money
+saved, then subtract what acting costs (the screening, drug, or visit, `c_int`).
 **Positive means it's worth doing.** We lead with this instead of the usual ratio because
 it still behaves sensibly when a step actually *saves* money.
 
 **4 · Value of Information — what the whole test is worth**
 
-$$\text{VOI}_{\text{ex-post}}=\sum_{i}\text{NMB}_i - C_\text{test}
-\qquad\text{(your actual genome)}$$
-
-$$\text{VOI}_{\text{ex-ante}}=\sum_{k}\pi_k\,\text{NMB}_k - C_\text{test}
-\qquad(\pi_k=\text{how common finding }k\text{ is in the population})$$
-
-$$\text{VOI}_{\Delta}=\sum_{i\,\in\,\text{WGS-only}}\text{NMB}_i
-\qquad\text{(extra value of a full genome over a chip)}$$
+```math
+\text{VOI}_{\text{ex-post}}=\sum_{i}\text{NMB}_i - C_\text{test}
+```
+```math
+\text{VOI}_{\text{ex-ante}}=\sum_{k}\pi_k\,\text{NMB}_k - C_\text{test}
+```
+```math
+\text{VOI}_{\Delta}=\sum_{i\,\in\,\text{WGS-only}}\text{NMB}_i
+```
 
 *In plain English:* add up the value of every finding, then subtract what the test cost.
 **Ex-post** = what *your* results are worth. **Ex-ante** = what testing is worth to a
-typical person *before* they know their results. The third line isolates how much *more* a
-full genome gives you than a cheap chip — i.e. "is upgrading worth it?"
+typical person *before* they know their results (`π_k` = how common finding *k* is in the
+population). The third line (**VOI-Δ**) isolates how much *more* a full genome gives you
+than a cheap chip — i.e. "is upgrading worth it?"
 
 **5 · Honest uncertainty — the simulation behind the range**
 
-$$P_{\text{CE}}(\lambda)=\frac{1}{N}\sum_{j=1}^{N}\mathbb{1}\!\left[\text{NMB}^{(j)}(\lambda)>0\right],
-\qquad N=10{,}000$$
+```math
+P_{\text{CE}}(\lambda)=\frac{1}{N}\sum_{j=1}^{N}\mathbb{1}\!\left[\text{NMB}^{(j)}(\lambda)>0\right],\qquad N=10{,}000
+```
 
 *In plain English:* every input above is uncertain, so instead of one number we run the
 whole calculation **10,000 times**, each time drawing plausible values (chances from a
@@ -300,12 +314,12 @@ confidence interval) rather than false precision. The curve this produces — th
 reads as: *"at a given value of a healthy year, what's the probability this is actually
 worth it?"*
 
-**Thresholds & sources.** $\lambda = \$50\text{k}/\$100\text{k}/\$150\text{k}$ per healthy
-year (Neumann et al., *NEJM* 2014); $r = 3\%$ (Second Panel on Cost-Effectiveness in
-Health and Medicine); cost-of-illness from the ADA, AHA, and Alzheimer's Association;
-drug–gene values from published cost-effectiveness studies (Schackman 2008; Kazi 2014;
-Deenen 2016; CPIC). Every figure is illustrative — a transparent model you can inspect,
-not a clinical or financial guarantee.
+**Thresholds & sources.** `λ` = \$50k / \$100k / \$150k per healthy year (Neumann et al.,
+*NEJM* 2014); `r` = 3% (Second Panel on Cost-Effectiveness in Health and Medicine);
+cost-of-illness from the ADA, AHA, and Alzheimer's Association; drug–gene values from
+published cost-effectiveness studies (Schackman 2008; Kazi 2014; Deenen 2016; CPIC).
+Every figure is illustrative — a transparent model you can inspect, not a clinical or
+financial guarantee.
 
 ## Built with rigor
 
@@ -370,12 +384,12 @@ and GenomeLens is built to model the second.
 
 **Price (what the equivalent tests cost to buy).** Purchased à la carte, the
 testing, analysis, and expert interpretation GenomeLens performs locally would run
-roughly **$2,000–$6,000+**: clinical pharmacogenomics (≈$250–$500), expanded
-carrier screening (≈$350–$600), a hereditary-cancer / ACMG secondary-findings panel
-(≈$300–$2,000 at clinical labs), whole-genome sequencing **with** variant
-interpretation (≈$300 raw → $1,000s interpreted), polygenic-risk + ancestry (≈$350),
-biological-age / longevity bloodwork analysis (≈$150–$500), nutrigenomics and trait
-panels (≈$200), plus genetic-counsellor-style interpretation (≈$150–$400 a session)
+roughly **\$2,000–\$6,000+**: clinical pharmacogenomics (≈\$250–\$500), expanded
+carrier screening (≈\$350–\$600), a hereditary-cancer / ACMG secondary-findings panel
+(≈\$300–\$2,000 at clinical labs), whole-genome sequencing **with** variant
+interpretation (≈\$300 raw → \$1,000s interpreted), polygenic-risk + ancestry (≈\$350),
+biological-age / longevity bloodwork analysis (≈\$150–\$500), nutrigenomics and trait
+panels (≈\$200), plus genetic-counsellor-style interpretation (≈\$150–\$400 a session)
 and the ongoing variant re-analysis most services bill as a subscription. GenomeLens
 consolidates all of it into one private, offline tool.
 
@@ -384,7 +398,7 @@ core GenomeLens is a health-economics tool that models the latter. Its built-in
 **Value-of-Information engine** estimates the expected **return on health** of acting
 on your genome (averted adverse drug reactions, earlier screening, prevention) — on
 the order of **tens of thousands of dollars** in risk-adjusted expected value for a
-whole genome (**≈$24k with a 95% confidence interval on the public GIAB demo**).
+whole genome (**≈\$24k with a 95% confidence interval on the public GIAB demo**).
 
 *Illustrative comparison using typical U.S. self-pay pricing; the value figure is a
 modelled, uncertain estimate from the built-in health-economics engine. Not a formal
