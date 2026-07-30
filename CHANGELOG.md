@@ -6,6 +6,45 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [6.23.0] — 2026-07-30 — Phase 3 predictors + Value-of-Information health-economics engine
+
+### Added
+
+- **`novel_variants.py` (Phase 3)** — an offline computational-predictor screen for
+  variants *not* in ClinVar. A pluggable predictor registry (AlphaMissense, REVEL, CADD,
+  SpliceAI, gnomAD) is queried by `chrom:pos:ref:alt` via pysam/tabix; findings are labelled
+  computational predictions, deduplicated against the Phase-2 ClinVar screen, and
+  independently license-toggleable (`--commercial-safe`). Degrades gracefully when tables or
+  `pysam` are absent.
+- **`value_of_information.py`** — a decision-analytic health-economics engine: net monetary
+  benefit with 3% discounting of costs and QALYs, sourced cost-of-illness and published
+  pharmacogenomic cost-effectiveness inputs, ex-ante / ex-post / chip→WGS-marginal
+  value-of-information, and a seeded Monte-Carlo PSA (CEAC + tornado). Runs on both chip and
+  whole-genome input.
+- **AI hallucination guardrails** — module interpretations are grounded only in the
+  deterministic findings under a strict no-invention prompt, and a post-generation validator
+  flags or drops any figure the model introduced that is not in the source data.
+- **`setup.py` predictor downloaders** (`--predictors`, `--alphamissense`, …) and a tracked
+  `reference/PREDICTOR_LICENSES.md` attribution manifest.
+
+### Changed
+
+- **rsID-independent build detection** — whole-genome VCFs whose variants lack rsIDs (e.g.
+  GIAB) now resolve the reference build from the VCF header (`##contig` lengths) and via a
+  new `--assume-build` flag, and proceed through the VCF-native modules instead of aborting.
+- Version tag simplified to plain semantic versioning (dropped the `-premium` suffix).
+
+### Tests
+
+- +18 (novel-variant screen, VOI engine, AI grounding guard, section wiring); 386 passing.
+
+### Validation
+
+- Functional end-to-end run on the public **GIAB HG001 (NA12878)** genome with no runtime
+  errors — build detection, Phase-2 ClinVar, Phase-3 predictors, and the health-economics
+  engine. Outputs are computational estimates, not accuracy-validated against a clinical
+  truth set.
+
 ## [6.22.1-premium] — 2026-07-28 — ClinVar auto-update
 
 ### Changed

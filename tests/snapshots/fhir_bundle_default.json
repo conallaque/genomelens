@@ -244,7 +244,7 @@
           }
         ],
         "policy": [
-          "Findings limited to clinically validated genomic markers: PGx (CPIC), carrier status (autosomal recessive screening panels), HLA tag-SNP imputation, and APOE genotype. PRS, ancestry, traits, wellness, and lifestyle modules are excluded from this clinical bundle."
+          "Findings limited to clinically actionable finding TYPES (not clinically validated results): PGx (CPIC), carrier status (autosomal recessive screening panels), HLA tag-SNP imputation, and APOE genotype. Chip/genome-derived; requires confirmatory clinical testing before any clinical action. PRS, ancestry, traits, wellness, and lifestyle modules are excluded from this clinical bundle."
         ],
         "resourceType": "Provenance",
         "target": [
@@ -271,7 +271,7 @@
     "tag": [
       {
         "code": "consumer-genomics",
-        "display": "Generated from consumer chip raw data \u2014 clinically validated subset only",
+        "display": "Generated from consumer chip raw data \u2014 clinically actionable finding types only, not clinically validated results",
         "system": "https://hl7.org/fhir/R4"
       }
     ]

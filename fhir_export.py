@@ -2,8 +2,10 @@
 HL7 FHIR R4 Clinical Export
 ===========================
 
-Exports only *clinically validated* findings in FHIR R4 Bundle format so a
-genetic counsellor or physician can ingest them into an EHR. Specifically:
+Exports clinically *actionable finding types* in FHIR R4 Bundle format —
+format-compatible with EHR ingestion for review by a genetic counsellor or
+physician, NOT a certified clinical record. Chip/genome-derived; requires
+confirmatory clinical testing before any clinical action. Specifically:
 
   • PGx phenotypes        → Observation (LOINC + CPIC coding)
   • Carrier status        → Observation (genomic, ACMG-style coded variants)
@@ -391,9 +393,11 @@ def _provenance(
         }],
         "policy": [
             # Statement of clinical scope
-            "Findings limited to clinically validated genomic markers: PGx "
-            "(CPIC), carrier status (autosomal recessive screening panels), "
-            "HLA tag-SNP imputation, and APOE genotype. PRS, ancestry, "
+            "Findings limited to clinically actionable finding TYPES (not "
+            "clinically validated results): PGx (CPIC), carrier status "
+            "(autosomal recessive screening panels), HLA tag-SNP imputation, "
+            "and APOE genotype. Chip/genome-derived; requires confirmatory "
+            "clinical testing before any clinical action. PRS, ancestry, "
             "traits, wellness, and lifestyle modules are excluded from this "
             "clinical bundle.",
         ],
@@ -486,7 +490,7 @@ def build_fhir_bundle(
             f"(not direct typing)."
         )
     if not conclusion_parts:
-        conclusion_parts.append("No clinically validated findings reported.")
+        conclusion_parts.append("No clinically actionable finding types reported.")
     conclusion = " ".join(conclusion_parts)
 
     # DiagnosticReport — proper top-level CG-IG resource
@@ -520,7 +524,8 @@ def build_fhir_bundle(
                 "system": "https://hl7.org/fhir/R4",
                 "code": "consumer-genomics",
                 "display": "Generated from consumer chip raw data — clinically "
-                           "validated subset only",
+                           "actionable finding types only, not clinically "
+                           "validated results",
             }],
         },
         "type": "collection",

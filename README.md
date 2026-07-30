@@ -9,8 +9,8 @@ Unauthorized copying, modification, or distribution is prohibited.
 > **A local, privacy-first genomics engine that treats your health like a portfolio.**
 > GenomeLens turns a consumer DNA file (23andMe, AncestryDNA, MyHeritage, FTDNA, …)
 > *or* a full whole-genome / exome **VCF** into a comprehensive, actionable health
-> report — and models the decisions that maximize your lifetime **return on health**:
-> minimizing the left-tail risk of adverse drug reactions and optimizing everyday
+> report — and models the decisions that improve your lifetime **return on health**:
+> reducing the left-tail risk of adverse drug reactions and informing everyday
 > diet, fitness, and environmental choices.
 >
 > **Nothing ever leaves your machine — no cloud, no accounts, no telemetry.
@@ -60,7 +60,8 @@ open report.html          # macOS   ·   use  xdg-open report.html  on Linux
 That's it — `report.html` opens in your browser with the full analysis (plus
 `supplements.html`, `nutrition.html`, `exercise.html`, `personalized_plan.html`).
 Add `--bloodwork labs.json` to fold in real lab values (this unlocks biological age
-**and the full health-economics model**), or `--fhir` for a clinical EHR bundle.
+**and the full health-economics model**), or `--fhir` for an HL7 FHIR R4 bundle
+(EHR-*format*-compatible; educational data, not a certified clinical record).
 
 ### 4 — Run it with the local AI (Ollama)
 The AI layer writes a plain-language interpretation of **every** section and powers an
@@ -88,7 +89,7 @@ python analyze.py ~/Downloads/genome.txt --model llama3.1:8b
 python analyze.py ~/Downloads/genome.txt --chat
 ```
 The AI only ever sees your deterministic findings, and a guardrail rejects any number
-it tries to invent (see [Built with rigor](#built-with-rigor)).
+it tries to invent (see [Engineering notes](#engineering-notes)).
 
 ### Using a whole genome instead of a chip?
 Same commands — just point at your `.vcf`/`.vcf.gz` and fetch the predictor tables once:
@@ -112,14 +113,16 @@ published paper), now a master's in financial economics — circling one questio
 **what is the actual payoff of understanding your own health, in decisions?**
 
 Your genome is the richest, longest-lived input to that question. But the payoff is
-locked behind two barriers. First, **price**: the equivalent tests and expert
-interpretation run into the thousands of dollars. Second, **privacy**: the usual way to
+locked behind two barriers. First, **price**: buying the equivalent analyses and
+interpretation piecemeal runs from a few hundred to a few thousand dollars. Second,
+**privacy**: the usual way to
 unlock them is to hand your genome — the one piece of data you can never change or
 revoke — to a company's cloud, where it can be breached, sold, or repurposed.
 
 That's a health-economics problem hiding in plain sight. The **value of information** in
-a genome is enormous — GenomeLens's own model puts it in the *tens of thousands of
-dollars* of expected health value — yet access to that value is gated by cost and by an
+a genome is large — GenomeLens's own model (a transparent but uncertain estimate) puts it
+in the *tens of thousands of dollars* of expected health value — yet access is gated by
+cost and by an
 unacceptable privacy price. So the *return on health* that genomics promises is, in
 practice, only available to people who can pay and are willing to give themselves away.
 
@@ -157,7 +160,7 @@ or a whole-genome / exome **VCF**.
   - 🧬 **Tells you if a full genome is worth it *for you*** — the extra value of upgrading a chip → whole genome ("marginal ROI").
   - 📊 **Shows its uncertainty honestly** — a Monte-Carlo simulation gives a *range* (95% confidence interval), never one fake-precise number.
   - 🏷️ **Separates price from value** — what the tests *cost to buy* vs what acting on them is *worth*.
-  - *Example on the public GIAB genome: ≈ **\$24k** expected value (with a confidence range) — and ≈ **\$24k** of that comes from going to a full genome.*
+  - *Example (public GIAB genome): ≈ **\$24k** modelled expected value (with a confidence range) — almost all of it from the whole-genome findings; for this healthy reference genome the chip-only part nets ≈ \$0 after test cost. **Your number is individual and can be far lower.***
 
 **Ancestry & traits**
 - **Ancestry:** autosomal PCA + Y-DNA / mtDNA haplogroups + deep ancestry (Neanderthal %, Yamnaya / EEF / WHG affinity, migration timelines).
@@ -165,7 +168,7 @@ or a whole-genome / exome **VCF**.
 
 **Lifestyle, interop & AI**
 - Nutrigenomics, chronotype-based light timing, exercise programming, and a decade-by-decade life-stage playbook.
-- **HL7 FHIR R4** clinical export.
+- **HL7 FHIR R4** export — EHR-*format*-compatible (educational data, not a certified clinical record).
 - **Local AI on every tier — with hallucination guardrails:** an Ollama LLM interprets each module and powers an offline chat assistant; no data ever leaves the machine. Every interpretation is grounded **only** in the deterministic findings under a strict no-invention prompt, and a **post-generation validator flags any statistic the model introduced that is not in the source data** — appending a caution, or dropping the interpretation entirely when it is riddled with fabricated figures.
 
 ## Health economics — the return-on-health engine
@@ -188,13 +191,16 @@ al., *NEJM* 2014). Both future **costs and QALYs** are discounted at 3% (0/3/5%
 sensitivity), the second-panel cost-effectiveness standard. ICER is reported as a
 secondary metric; NMB leads because it handles dominance and negative ICERs cleanly.
 
-**Grounded inputs — no hand-waving.**
+**Grounded inputs.**
 - **Cost-of-illness** per condition — lifetime direct + indirect cost (ADA, AHA,
   Alzheimer's Association), discounted to present value.
 - **Pharmacogenomic economics** from published cost-effectiveness studies: expected
   averted-adverse-drug-reaction value = `P(prescribed) × P(ADR | genotype) ×
   RRR(genotype-guided) × [ADR cost + QALY loss·λ]` — HLA-B\*57:01/abacavir (Schackman
   2008), CYP2C19/clopidogrel (Kazi 2014), DPYD/fluoropyrimidine (Deenen 2016), and more.
+  *(Chip-imputed HLA-B\*57:01 must be confirmed by clinical HLA typing before any abacavir
+  prescribing decision — a false negative here is dangerous. These are educational
+  estimates, not prescribing guidance.)*
 - Phase-3 **predicted (unconfirmed)** variants enter **down-weighted by predictor
   confidence** — uncertain findings contribute less expected value, by construction.
 
@@ -214,15 +220,18 @@ checklist in spirit.
 separately from health-economic *value* (what acting on the findings is worth) —
 conflating the two is exactly the error a health economist should refuse to make.
 
-**Honest by design.** Every parameter is sourced or flagged an assumption; PRS-derived
+**Limitations.** Every parameter is sourced or flagged an assumption; PRS-derived
 estimates carry an **ancestry-transferability caveat** (EUR-biased scores are
 attenuated for other ancestries); and the output is explicitly an *illustrative
 decision-analytic model — not a formal economic evaluation, and not financial or
 medical advice.*
 
 > **Worked example — public GIAB HG001 genome:** modelled expected value ≈ **\$24,070**
-> (95% CI ≈ \$11k–\$41k), chip→WGS marginal ≈ **\$24,479**, cost-effective at \$100k/QALY
-> with high probability — computed end-to-end, locally, with 0 errors.
+> (95% CI ≈ \$11k–\$41k). The chip→WGS marginal (**≈ \$24,479**, reported *gross* of test
+> cost) nearly equals the total because, for this essentially-healthy reference genome, the
+> chip-only contribution nets ≈ \$0 after test cost — so almost all the modelled value comes
+> from the whole-genome findings. A different genome would give a very different number.
+> Computed end-to-end, locally.
 
 ### The math — with a plain-English translation under every equation
 
@@ -321,12 +330,12 @@ published cost-effectiveness studies (Schackman 2008; Kazi 2014; Deenen 2016; CP
 Every figure is illustrative — a transparent model you can inspect, not a clinical or
 financial guarantee.
 
-## Built with rigor
+## Engineering notes
 
 - **Unified, strand-aware SNP registry** — one source of truth for GRCh37/38 coordinates and ancestral/derived alleles; caught and fixed palindrome/strand bugs that silently mis-call ancestry.
 - **KING-robust relationship inference** — a proper kinship estimator (not naive percent-identity), IBS0-refined for parent-child vs full-sibling.
-- **Honest by construction** — no fabricated polygenic percentiles; transmission ≠ disease penetrance; ClinVar review-star confidence; Phase-3 findings are labelled computational predictions, never clinical calls; and a **grounding guardrail rejects any AI-introduced figure absent from the deterministic data**, so the local LLM cannot invent a risk or a statistic.
-- **Validated end-to-end on a public genome** — the full **GIAB HG001 (NA12878)** reference genome runs clean through build detection, Phase-2 ClinVar, the Phase-3 predictor screen, and the health-ROI engine with **0 errors** (3 pathogenic incl. a carrier, 141 predicted-damaging rare variants, modelled ROI reported with a confidence interval).
+- **No fabricated figures** — no invented polygenic percentiles; transmission ≠ disease penetrance; ClinVar review-star confidence; Phase-3 findings are labelled computational predictions, never clinical calls; and a **grounding guardrail rejects any AI-introduced figure absent from the deterministic data**, so the local LLM cannot invent a risk or a statistic.
+- **Runs cleanly end-to-end on a public genome** — a *functional* end-to-end test (not a clinical accuracy validation): the full **GIAB HG001 (NA12878)** reference genome runs through build detection, Phase-2 ClinVar, the Phase-3 predictor screen, and the health-ROI engine with **no runtime errors** — 3 ClinVar pathogenic (incl. a carrier), 141 predicted-damaging rare variants, and a modelled ROI reported with a confidence interval. (Functional check — outputs are computational estimates, not accuracy-validated against a clinical truth set.)
 - **386-test suite**, reference-build auto-detection (GRCh37/38 incl. rsID-less whole-genome VCFs), and graceful degradation when optional data or models are absent.
 
 ## Runs on any laptop — no expensive setup
@@ -335,7 +344,7 @@ GenomeLens deliberately **trades speed for accessibility**. The heavy analyses u
 tabix-indexed lookups that *stream* the genome region-by-region instead of loading it
 into memory, so the whole thing runs on an ordinary laptop — just slower. No
 workstation, no GPU, no cloud, and every tool is free and open-source. Developed and
-validated on an **Apple M5 / 24 GB**; runs on macOS or Linux, Apple Silicon or Intel.
+tested on an **Apple M5 / 24 GB**; runs on macOS or Linux, Apple Silicon or Intel.
 
 | Input | RAM | Disk | Typical runtime |
 |---|---|---|---|
@@ -372,26 +381,40 @@ laptop, some patience, and disk space is enough — and nothing ever leaves the 
 
 GenomeLens was conceived, architected, and directed by **[Conall Aque](https://www.linkedin.com/in/conalla/)** — MS
 candidate in Commerce & Economic Development (**financial-economics** focus) at
-Northeastern University, with an undergraduate focus in **health economics** —
-and pair-programmed with an AI coding assistant. The health-economics framing,
-scientific decisions, and privacy-first design are the author's; the AI
-accelerated implementation. Release history is in [`CHANGELOG.md`](CHANGELOG.md)
+Northeastern University, with an undergraduate focus in **health economics**. To be
+explicit about who did what: the **health-economics modeling, the scientific and product
+decisions, and the privacy-first design are the author's**; the **software implementation
+was largely AI-generated (via an AI coding assistant), directed and reviewed by the
+author**. The contribution on offer here is the applied-economics thinking and the
+direction — not hand-written production code. Release history is in [`CHANGELOG.md`](CHANGELOG.md)
 (current: **v6.23 — Phase-3 novel-variant predictors, the Value-of-Information
 health-ROI engine, and AI hallucination guardrails**).
 
 **Market-value context.** Two different numbers matter here — *price* and *value* —
 and GenomeLens is built to model the second.
 
-**Price (what the equivalent tests cost to buy).** Purchased à la carte, the
-testing, analysis, and expert interpretation GenomeLens performs locally would run
-roughly **\$2,000–\$6,000+**: clinical pharmacogenomics (≈\$250–\$500), expanded
-carrier screening (≈\$350–\$600), a hereditary-cancer / ACMG secondary-findings panel
-(≈\$300–\$2,000 at clinical labs), whole-genome sequencing **with** variant
-interpretation (≈\$300 raw → \$1,000s interpreted), polygenic-risk + ancestry (≈\$350),
-biological-age / longevity bloodwork analysis (≈\$150–\$500), nutrigenomics and trait
-panels (≈\$200), plus genetic-counsellor-style interpretation (≈\$150–\$400 a session)
-and the ongoing variant re-analysis most services bill as a subscription. GenomeLens
-consolidates all of it into one private, offline tool.
+**Price (what comparable analysis costs).** GenomeLens doesn't sequence you — you bring
+your own raw data, and it *substitutes for, at the consumer tier,* the
+**analysis-and-interpretation layer** on top of it. Where people get that data, and the
+rough market range **across** providers (prices vary widely by provider, tier, insurance,
+and promotions — ballpark ranges, not quotes):
+
+- **Consumer genotyping chips** (~0.6M SNPs) — 23andMe, AncestryDNA, MyHeritage,
+  TellMeGen, FamilyTreeDNA — **roughly \$50–\$230**.
+- **30× whole-genome sequencing** — Nebula Genomics, Dante Labs, Sequencing.com,
+  Full Genomes — **roughly \$300–\$1,000+** (raw 30× at the low end; higher-coverage or
+  analysis-bundled tiers at the top).
+
+The **analysis and interpretation** GenomeLens runs on that data — the reports people
+otherwise buy piecemeal (pharmacogenomics, carrier / trait / ancestry, polygenic scores,
+nutrigenomics, counsellor-style write-ups) — is realistically **a few hundred dollars** of
+consumer services, consolidated into one free, private, offline tool.
+
+Some of what it surfaces has **clinical-grade** equivalents at accredited labs
+(hereditary-cancer / ACMG panels, clinically interpreted whole genomes, genetic
+counseling), which run from a few hundred to **several thousand dollars**. GenomeLens is an
+**educational analog** of those, **not a clinical-grade substitute**, and doesn't claim to
+hand you those savings.
 
 **Value (what acting on the findings is worth).** Price is not value — and at its
 core GenomeLens is a health-economics tool that models the latter. Its built-in
@@ -468,9 +491,10 @@ valuation, and not a substitute for clinical-grade testing.*
   methylation guidance, daily meal pattern.
 
 ### Clinical / portfolio outputs
-- **HL7 FHIR R4 export** (`--fhir`) — clinically validated findings only
-  (PGx, carrier, HLA, APOE) emitted as a FHIR Bundle JSON compatible with
-  Epic / Cerner / Athena ingestion.
+- **HL7 FHIR R4 export** (`--fhir`) — clinically *actionable* finding **types**
+  (PGx, carrier, HLA, APOE), chip-derived and requiring confirmatory clinical
+  testing, emitted as an HL7 FHIR R4 Bundle JSON — **format-compatible** with EHR
+  ingestion (Epic / Cerner / Athena), not a certified clinical record.
 - **PDF export** (`--pdf`) — paginated WeasyPrint render.
 - **Emergency medical card** (`--emergency-card`) — one-page actionable summary
   for clinicians.
@@ -744,7 +768,6 @@ After a full run, the working directory will contain:
 
 ## Roadmap
 
-- Whole-genome VCF input
 - Additional PRS panels from PGS Catalog API
 - Bring-your-own-LLM (OpenAI / Anthropic) for users without local GPU
 - Streamlit web UI for non-CLI users (still 100% local)
@@ -763,7 +786,7 @@ pytest --cov --cov-report=term-missing  # with coverage
 pytest --snapshot-update tests/golden/  # regenerate golden snapshots (review the diff!)
 ```
 
-The V7 consolidation ships **121 tests** across:
+The suite ships **386 tests** across:
 
 - `tests/unit/` — per-module behavioural tests (strand-handling, threshold
   boundaries, render smoke tests).
@@ -841,7 +864,7 @@ If this tool informs research or teaching material, please cite it as:
   author = {Aque, Conall R.},
   year   = {2026},
   url    = {https://github.com/conallaque/genomelens},
-  note   = {Local consumer-chip → clinical-grade FHIR R4 export}
+  note   = {Local chip/whole-genome analysis with HL7 FHIR R4 export (educational; not a certified clinical record)}
 }
 ```
 

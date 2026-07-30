@@ -93,7 +93,7 @@ def test_provenance_has_clinical_scope_policy() -> None:
     prov = next(e["resource"] for e in result["bundle"]["entry"]
                 if e["resource"]["resourceType"] == "Provenance")
     assert prov["policy"]
-    assert any("clinically validated" in p.lower() for p in prov["policy"])
+    assert any("clinically actionable" in p.lower() for p in prov["policy"])
     assert any("excluded" in p.lower() or "limit" in p.lower() for p in prov["policy"])
 
 
