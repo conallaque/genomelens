@@ -338,8 +338,10 @@ validated on an **Apple M5 / 24 GB**; runs on macOS or Linux, Apple Silicon or I
   only used for whole-genome input.
 - **⏱ The local AI is by far the slowest part — and it's entirely your choice.** The
   times above are the fast **deterministic** report (`--no-ai`). Turning the AI on runs a
-  local LLM interpretation for *every* module plus the summaries — dozens of calls — so the
-  total is dominated by your model, not your data:
+  local LLM interpretation for *every* module plus the summaries — dozens of calls. This
+  is true for **both** a chip and a whole genome (the AI interprets the same modules
+  either way), so **with AI on, both take a long time** — the total is dominated by your
+  model, not your data:
   - **Small model** (e.g. `--model llama3.1:8b`): roughly **20–60 minutes**.
   - **Large / unfiltered model** (e.g. a 30B): **2–4+ hours** on a laptop.
 
