@@ -111,6 +111,7 @@ from analyze import (
     analyze_life_stage_playbook,
     analyze_clinical_variants,
     analyze_novel_variants,
+    analyze_value_of_information,
     analyze_multi_person,
     render_multi_person_html,
 )
@@ -846,6 +847,27 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Novel-variants module failed: {e}")
 
+    # ── Value of Information (health economics — runs for chip AND WGS) ──
+    voi_result: Optional[Dict] = None
+    if analyze_value_of_information is not None:
+        try:
+            import genome_input as _gi4
+            _input_type = "wgs" if _gi4.looks_like_vcf(args.dna_file) else "chip"
+            voi_result = analyze_value_of_information(
+                economics_result=economics_result,
+                clinical_variants_result=clinical_variants_result,
+                novel_variants_result=novel_variants_result,
+                genetic_age_result=genetic_age_result,
+                input_type=_input_type, log=log)
+            if voi_result.get("available"):
+                log(f"  Value of Information ({_input_type}): expected genome value ≈ "
+                    f"${voi_result.get('voi_expost_mean', 0):,.0f} · chip→WGS marginal ≈ "
+                    f"${voi_result.get('marginal_chip_to_wgs', 0):,.0f}")
+            else:
+                log(f"  Value of Information: {voi_result.get('reason', 'n/a')}")
+        except Exception as e:
+            log(f"  WARNING: Value-of-Information module failed: {e}")
+
     # ── Family planning (reproductive genetics — needs carrier + mt + sex) ──
     family_planning_result: Optional[Dict] = None
     if analyze_family_planning is not None:
@@ -969,6 +991,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             ancestry_result=ancestry_result,
             clinical_variants_result=clinical_variants_result,
             novel_variants_result=novel_variants_result,
+            voi_result=voi_result,
             y_result=y_result,
             mt_result=mt_result,
         )
@@ -1013,6 +1036,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                         holistic_synthesis_result=holistic_synthesis_result,
                         clinical_variants_result=clinical_variants_result,
                         novel_variants_result=novel_variants_result,
+                        voi_result=voi_result,
                     )
                     log(f"  Per-module AI: {len(module_ai)} module interpretations generated")
                 except Exception as e:
@@ -1100,6 +1124,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         life_stage_playbook_result=life_stage_playbook_result,
         clinical_variants_result=clinical_variants_result,
         novel_variants_result=novel_variants_result,
+        voi_result=voi_result,
         module_ai=module_ai,
     )
 
@@ -1409,6 +1434,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 holistic_synthesis_result=holistic_synthesis_result,
                 clinical_variants_result=clinical_variants_result,
                 novel_variants_result=novel_variants_result,
+                voi_result=voi_result,
                 polygenic_traits_result=polygenic_traits_result,
                 environmental_optimization_result=environmental_optimization_result,
                 family_planning_result=family_planning_result,

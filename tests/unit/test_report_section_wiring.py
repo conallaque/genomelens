@@ -55,6 +55,14 @@ def test_new_sections_appear_in_full_report():
         {"available": False, "reason": "run python setup.py --predictors",
          "negative_disclaimer": "n"})
 
+    # Value-of-Information (health economics) renders headline + CEAC.
+    import value_of_information as voi
+    vres = voi.analyze_value_of_information(
+        {"findings_with_economics": [
+            {"finding": "CAD PRS high", "category": "prs", "qaly_gain": 1.5}]},
+        input_type="wgs", n_mc=300)
+    assert 'id="value-of-information"' in renderers.build_voi_html(vres)
+
 
 def test_none_results_render_empty_not_crash():
     # All new renderers must no-op gracefully on None.
@@ -63,3 +71,4 @@ def test_none_results_render_empty_not_crash():
     assert renderers.build_environmental_optimization_html(None) == ""
     assert renderers.build_life_stage_playbook_html(None) == ""
     assert renderers.build_novel_variants_html(None) == ""
+    assert renderers.build_voi_html(None) == ""

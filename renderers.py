@@ -2017,6 +2017,112 @@ variants queried. <strong>Predictors used:</strong> {_esc(pred_line)}.
 """
 
 
+def build_voi_html(voi: Optional[Dict]) -> str:
+    """Value-of-Information health-economics section: the discipline-grade headline
+    answering 'what is knowing your genome worth?'. Every number is illustrative +
+    probabilistic; market PRICE is shown separately from health-economic VALUE."""
+    if not voi:
+        return ""
+    if not voi.get("available"):
+        return f"""
+<section class="clinvar-section" id="value-of-information">
+<h2>Value of Information (health economics) <span class="pro-pill">VOI</span></h2>
+<div class="anc-caveat">{_esc(voi.get('reason', 'not available'))}</div>
+</section>"""
+
+    def _m(v):
+        return f"${v:,.0f}"
+
+    mean = voi.get("voi_expost_mean", voi.get("voi_expost_point", 0))
+    lo, hi = voi.get("voi_ci_low", 0), voi.get("voi_ci_high", 0)
+    marginal = voi.get("marginal_chip_to_wgs", 0)
+    p_ce = voi.get("prob_cost_effective", 0)
+
+    # NMB table (top 8 by NMB).
+    rows = ""
+    for r in (voi.get("nmb_rows") or [])[:8]:
+        tag = ("<span style='color:#8a5cf6;font-size:.8em'> · WGS-only</span>"
+               if r.get("wgs_only") else "")
+        color = "#2a9d8f" if r["nmb"] >= 0 else "#b3261e"
+        rows += (f"<tr><td>{_esc(r['label'])}{tag}</td>"
+                 f"<td style='text-align:right'>{r['dqaly']:.2f}</td>"
+                 f"<td style='text-align:right'>{_m(r['dcost_averted'])}</td>"
+                 f"<td style='text-align:right;color:{color};font-weight:700'>{_m(r['nmb'])}</td>"
+                 f"<td style='color:#8a94a3;font-size:.85em'>{_esc(r['confidence'])}</td></tr>")
+
+    # CEAC inline SVG.
+    ceac = voi.get("ceac") or []
+    ceac_svg = ""
+    if ceac:
+        W, H, PL, PB = 520, 170, 44, 26
+        pts = []
+        for c in ceac:
+            x = PL + (c["lam"] / 200_000) * (W - PL - 10)
+            y = (H - PB) - c["prob"] * (H - PB - 10)
+            pts.append(f"{x:.1f},{y:.1f}")
+        base_x = PL + (voi.get("wtp_base", 100_000) / 200_000) * (W - PL - 10)
+        ceac_svg = f"""
+<svg viewBox="0 0 {W} {H}" style="width:100%;max-width:540px;margin:8px 0">
+  <line x1="{PL}" y1="{H-PB}" x2="{W-6}" y2="{H-PB}" stroke="#c8d0d8"/>
+  <line x1="{PL}" y1="10" x2="{PL}" y2="{H-PB}" stroke="#c8d0d8"/>
+  <line x1="{base_x:.0f}" y1="10" x2="{base_x:.0f}" y2="{H-PB}" stroke="#d29922" stroke-dasharray="4 3"/>
+  <polyline points="{' '.join(pts)}" fill="none" stroke="#2a6df4" stroke-width="2.5"/>
+  <text x="{PL}" y="{H-8}" font-size="10" fill="#8a94a3">$0</text>
+  <text x="{W-60}" y="{H-8}" font-size="10" fill="#8a94a3">$200k/QALY</text>
+  <text x="{PL-6}" y="16" font-size="10" fill="#8a94a3" text-anchor="end">1.0</text>
+  <text x="{base_x:.0f}" y="8" font-size="9" fill="#d29922" text-anchor="middle">λ=$100k</text>
+</svg>
+<div style="font-size:.8em;color:#8a94a3">Cost-effectiveness acceptability curve — P(net benefit &gt; 0) vs willingness-to-pay.</div>"""
+
+    price = voi.get("price", {})
+    methods = "".join(f"<li>{_esc(m)}</li>" for m in (voi.get("methods") or []))
+
+    return f"""
+<section class="clinvar-section" id="value-of-information">
+<h2>Value of Information — Health Economics <span class="pro-pill">VOI</span></h2>
+<p class="anc-intro">
+The return-on-health question, in the author's discipline: <strong>what is knowing
+your genome worth, in expectation?</strong> A decision-analytic model over every
+actionable finding — discounted net monetary benefit, cost-of-illness averted, and
+pharmacogenomic averted-adverse-reactions — with a Monte-Carlo sensitivity analysis.
+</p>
+<div style="display:flex;gap:14px;flex-wrap:wrap;margin:10px 0">
+  <div style="flex:1;min-width:220px;background:linear-gradient(135deg,#eef7f1,#eef4fb);
+       border:1px solid #cfe3d6;border-radius:12px;padding:16px">
+    <div style="color:#5b6673;font-size:.85em">Expected value of your genome (net of test cost)</div>
+    <div style="font-size:2em;font-weight:800;color:#177a54">{_m(mean)}</div>
+    <div style="color:#8a94a3;font-size:.82em">95% CI {_m(lo)} – {_m(hi)} · P(cost-effective @ $100k/QALY) = {p_ce:.0%}</div>
+  </div>
+  <div style="flex:1;min-width:220px;background:linear-gradient(135deg,#f3effe,#eef4fb);
+       border:1px solid #ddd0f5;border-radius:12px;padding:16px">
+    <div style="color:#5b6673;font-size:.85em">Marginal value of upgrading chip → whole genome</div>
+    <div style="font-size:2em;font-weight:800;color:#6b3fd1">{_m(marginal)}</div>
+    <div style="color:#8a94a3;font-size:.82em">added expected value the WGS-only findings unlock</div>
+  </div>
+</div>
+<table style="width:100%;border-collapse:collapse;font-size:.9em;margin-top:6px">
+  <thead><tr style="text-align:left;color:#5b6673;border-bottom:1px solid #e3e7ec">
+    <th>Finding</th><th style="text-align:right">ΔQALY</th><th style="text-align:right">Cost averted</th>
+    <th style="text-align:right">Net monetary benefit</th><th>Conf.</th></tr></thead>
+  <tbody>{rows}</tbody>
+</table>
+{ceac_svg}
+<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px">
+  <div style="flex:1;min-width:240px;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
+    <div style="font-weight:700;color:#5b6673">Market <em>price</em> (what these tests cost to buy)</div>
+    <div style="font-size:.86em;color:#8a94a3;margin:4px 0">
+      à-la-carte ≈ <strong>{_m(price.get('a_la_carte_total',0))}</strong> vs one consolidated run ≈
+      <strong>{_m(price.get('consolidated',0))}</strong>.</div>
+    <div style="font-size:.8em;color:#b0868a">{_esc(price.get('note',''))}</div>
+  </div>
+</div>
+<details style="margin-top:10px"><summary style="cursor:pointer;color:#5b6673;font-weight:600">Methods &amp; assumptions</summary>
+<ul style="font-size:.85em;color:#5b6673;margin:6px 0 0 18px">{methods}</ul></details>
+<div class="anc-caveat" style="margin-top:12px">{_esc(voi.get('disclaimer',''))}</div>
+</section>
+"""
+
+
 def build_family_planning_html(fp: Optional[Dict]) -> str:
     """In-report reproductive-genetics section — carrier compound risk with a
     random partner, dominant transmission (kept separate from penetrance),
@@ -4184,6 +4290,7 @@ def build_html_report(
     life_stage_playbook_result: Optional[Dict] = None,
     clinical_variants_result: Optional[Dict] = None,
     novel_variants_result: Optional[Dict] = None,
+    voi_result: Optional[Dict] = None,
     module_ai: Optional[Dict] = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
@@ -4466,6 +4573,7 @@ def build_html_report(
     family_planning_html = build_family_planning_html(family_planning_result)
     clinical_variants_html = build_clinical_variants_html(clinical_variants_result)
     novel_variants_html = build_novel_variants_html(novel_variants_result)
+    voi_html = build_voi_html(voi_result)
     polygenic_traits_html = build_polygenic_traits_html(polygenic_traits_result)
     environmental_optimization_html = build_environmental_optimization_html(environmental_optimization_result)
     life_stage_playbook_html = build_life_stage_playbook_html(life_stage_playbook_result)
@@ -4480,6 +4588,7 @@ def build_html_report(
     holistic_synthesis_html = _prepend_ai_interpretation(holistic_synthesis_html, _mai.get("holistic-synthesis"))
     clinical_variants_html = _prepend_ai_interpretation(clinical_variants_html, _mai.get("clinical-variants"))
     novel_variants_html = _prepend_ai_interpretation(novel_variants_html, _mai.get("novel-variants"))
+    voi_html = _prepend_ai_interpretation(voi_html, _mai.get("value-of-information"))
     addiction_genetics_html = _prepend_ai_interpretation(addiction_genetics_html, _mai.get("addiction-genetics"))
     family_planning_html = _prepend_ai_interpretation(family_planning_html, _mai.get("family-planning"))
     polygenic_traits_html = _prepend_ai_interpretation(polygenic_traits_html, _mai.get("polygenic-traits"))
@@ -5504,6 +5613,7 @@ transparency.
   {"<a href='#addiction-genetics' class='nl nl-v5'>Addiction Genetics</a>" if addiction_genetics_html else ""}
   {"<a href='#clinical-variants' class='nl nl-v5'>Clinical Variants</a>" if clinical_variants_html else ""}
   {"<a href='#novel-variants' class='nl nl-v5'>Novel Variants</a>" if novel_variants_html else ""}
+  {"<a href='#value-of-information' class='nl nl-v5'>Value of Information</a>" if voi_html else ""}
   {"<a href='#family-planning' class='nl nl-v5'>Family Planning</a>" if family_planning_html else ""}
   {"<a href='#polygenic-traits' class='nl nl-v5'>Trait Genetics</a>" if polygenic_traits_html else ""}
   {"<a href='#environmental-optimization' class='nl nl-v5'>Environmental Optimization</a>" if environmental_optimization_html else ""}
@@ -5564,6 +5674,7 @@ transparency.
 
 {clinical_variants_html}
 {novel_variants_html}
+{voi_html}
 
 {family_planning_html}
 

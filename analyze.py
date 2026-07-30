@@ -225,6 +225,10 @@ try:
 except ImportError:
     analyze_novel_variants = None
 try:
+    from value_of_information import analyze_value_of_information
+except ImportError:
+    analyze_value_of_information = None
+try:
     from multi_person_module import (analyze_multi_person,
                                       render_multi_person_html)
 except ImportError:
@@ -892,6 +896,7 @@ def _build_module_context(
     ancestry_result: Optional[Dict] = None,
     clinical_variants_result: Optional[Dict] = None,
     novel_variants_result: Optional[Dict] = None,
+    voi_result: Optional[Dict] = None,
     y_result: Optional[Dict] = None,
     mt_result: Optional[Dict] = None,
     max_chars: int = 7000,
@@ -943,6 +948,20 @@ def _build_module_context(
                 ls.append(f"- {f.get('gene') or f.get('chrom')}:{f.get('pos')} "
                           f"[{f.get('confidence')}] {f.get('evidence', '')[:70]}")
             _add("NOVEL/RARE VARIANTS (predicted)", ls)
+    except Exception:
+        pass
+
+    # ── Value of Information (health economics — illustrative, uncertain) ──
+    try:
+        v = voi_result or {}
+        if v.get("available"):
+            mean = v.get("voi_expost_mean", v.get("voi_expost_point", 0))
+            ls = [f"Expected value of the genome ≈ ${mean:,.0f} (95% CI "
+                  f"${v.get('voi_ci_low', 0):,.0f}–${v.get('voi_ci_high', 0):,.0f}); "
+                  f"chip→WGS marginal ≈ ${v.get('marginal_chip_to_wgs', 0):,.0f}. "
+                  f"WTP ${v.get('wtp_base', 0):,.0f}/QALY, "
+                  f"{v.get('discount_rate', 0):.0%} discount. Illustrative + uncertain."]
+            _add("VALUE OF INFORMATION (health economics)", ls)
     except Exception:
         pass
 
@@ -1185,7 +1204,63 @@ _MODULE_AI_SPECS: Dict[str, Dict[str, str]] = {
         "kwarg": "environmental_optimization_result", "title": "Environmental Optimization",
         "focus": "Turn the chronotype, exercise-modality, and vitamin-D findings into "
                  "a concise, prioritized set of concrete behavioural recommendations."},
+    "value-of-information": {
+        "kwarg": "voi_result", "title": "Value of Information (Health Economics)",
+        "focus": "Explain the expected-value framing in plain terms: what the modelled "
+                 "dollar figures mean, that they are ILLUSTRATIVE and UNCERTAIN (cite "
+                 "the range, never a single point as fact), and that market price is "
+                 "distinct from health-economic value. Use ONLY the numbers shown."},
 }
+
+
+# ── AI hallucination guardrails ───────────────────────────────────────────────
+# Every local-AI interpretation is grounded ONLY in the deterministic findings we
+# hand it. These guardrails (a) instruct the model to invent nothing, and (b)
+# post-validate the output: any statistic/figure not present in the source data is
+# flagged, and an output riddled with fabricated numbers is dropped entirely so the
+# deterministic section stands alone.
+_AI_GUARDRAILS = (
+    "STRICT GROUNDING RULES — follow exactly:\n"
+    "1. Use ONLY the genes, variants, conditions, and numbers in the DATA block "
+    "below. Introduce NO gene, rsID, statistic, percentage, dollar figure, or risk "
+    "number that is not explicitly present there.\n"
+    "2. Never invent studies, citations, or numeric risks. If a number is not "
+    "given, do not state one.\n"
+    "3. If the data does not support a claim, say it cannot be determined from the "
+    "data — do not guess or fill gaps.\n"
+    "4. Educational only — no diagnosis, no medical advice.\n"
+)
+
+_SAFE_NUMS = {str(i) for i in range(0, 13)}
+
+
+def _extract_numbers(s: str) -> set:
+    """Numeric tokens (percent/dollar/decimal/integer), normalized for comparison."""
+    import re
+    nums = set()
+    for m in re.findall(r"\$?\d[\d,]*\.?\d*%?", s or ""):
+        t = m.replace("$", "").replace(",", "").rstrip("%").rstrip(".")
+        if t:
+            nums.add(t)
+    return nums
+
+
+def _ground_ai_output(text: str, context: str) -> List[str]:
+    """Return the list of numeric claims in `text` that do NOT appear in the
+    grounding `context` (i.e. likely hallucinated statistics). Small integers and
+    plausible years are whitelisted to avoid false positives on ordinary prose."""
+    ctx = _extract_numbers(context)
+    ungrounded = []
+    for n in _extract_numbers(text):
+        if n in ctx or n in _SAFE_NUMS:
+            continue
+        try:
+            if 1900 <= float(n) <= 2100:      # years
+                continue
+        except ValueError:
+            pass
+        ungrounded.append(n)
+    return ungrounded
 
 
 def ai_interpret_modules(model: str, log=None, **results) -> Dict[str, str]:
@@ -1205,18 +1280,31 @@ def ai_interpret_modules(model: str, log=None, **results) -> Dict[str, str]:
         prompt = (
             f"You are a genetic counselor. Interpret the following "
             f"{spec['title']} analysis for this individual. {spec['focus']}\n\n"
-            f"{digest}\n\n"
+            f"{_AI_GUARDRAILS}\n"
+            f"DATA:\n{digest}\n\n"
             "Write 2–4 short, plain-language paragraphs. Be specific and grounded "
-            "in the data shown; distinguish strong findings from weak tendencies. "
-            "Do not just restate the numbers — explain what they mean and what to "
-            "do. Educational only, not a medical diagnosis."
+            "in the DATA above; distinguish strong findings from weak tendencies. "
+            "Explain what the findings mean — but introduce NO new numbers. "
+            "Educational only, not a medical diagnosis."
         )
         try:
             _log(f"  AI interpreting module: {spec['title']} ...")
             txt = call_ollama(prompt, model=model, num_ctx=AI_NUM_CTX,
                               num_predict=1100, think=False)
             if txt and txt.strip():
-                out[section_id] = txt.strip()
+                txt = txt.strip()
+                ungrounded = _ground_ai_output(txt, digest)
+                if len(ungrounded) >= 4:
+                    _log(f"  GUARDRAIL: dropped AI interpretation for {section_id} "
+                         f"({len(ungrounded)} ungrounded figures, e.g. {ungrounded[:4]})")
+                    continue
+                if ungrounded:
+                    _log(f"  GUARDRAIL: {section_id} — {len(ungrounded)} ungrounded "
+                         f"figure(s); caution appended.")
+                    txt += ("\n\n⚠️ Some figures in this AI summary were not present "
+                            "in the source data — trust the deterministic findings "
+                            "above over any number here.")
+                out[section_id] = txt
         except Exception as e:
             _log(f"  WARNING: module AI for {section_id} failed: {e}")
     return out
