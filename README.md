@@ -59,6 +59,35 @@ emit a clinical EHR bundle.
 
 ---
 
+## Why I built this
+
+I've spent the last five years in health economics — a BA focused on it (with a
+published paper), now a master's in financial economics — circling one question:
+**what is the actual payoff of understanding your own health, in decisions?**
+
+Your genome is the richest, longest-lived input to that question. But the payoff is
+locked behind two barriers. First, **price**: the equivalent tests and expert
+interpretation run into the thousands of dollars. Second, **privacy**: the usual way to
+unlock them is to hand your genome — the one piece of data you can never change or
+revoke — to a company's cloud, where it can be breached, sold, or repurposed.
+
+That's a health-economics problem hiding in plain sight. The **value of information** in
+a genome is enormous — GenomeLens's own model puts it in the *tens of thousands of
+dollars* of expected health value — yet access to that value is gated by cost and by an
+unacceptable privacy price. So the *return on health* that genomics promises is, in
+practice, only available to people who can pay and are willing to give themselves away.
+
+**GenomeLens removes both barriers at once.** It runs the analysis locally, for free, on
+a laptop someone might already own — and it doesn't just hand you data, it models the
+return on health: what each finding is worth, what *acting* on it is worth, and whether
+it's worth acting at all. That is applied health economics — value of information,
+cost-effectiveness, and access — turned into something one person can run on their own
+DNA, privately, at zero marginal cost.
+
+The point was never a slick genomics toy. It's that the payoff of knowing your own
+biology shouldn't require a big budget or a surrendered genome. On an ordinary laptop,
+it doesn't.
+
 ## What it does
 
 GenomeLens runs **41 interlocking analysis modules** (≈42,700 lines of Python, a
@@ -148,6 +177,31 @@ medical advice.*
 - **Honest by construction** — no fabricated polygenic percentiles; transmission ≠ disease penetrance; ClinVar review-star confidence; Phase-3 findings are labelled computational predictions, never clinical calls; and a **grounding guardrail rejects any AI-introduced figure absent from the deterministic data**, so the local LLM cannot invent a risk or a statistic.
 - **Validated end-to-end on a public genome** — the full **GIAB HG001 (NA12878)** reference genome runs clean through build detection, Phase-2 ClinVar, the Phase-3 predictor screen, and the health-ROI engine with **0 errors** (3 pathogenic incl. a carrier, 141 predicted-damaging rare variants, modelled ROI reported with a confidence interval).
 - **386-test suite**, reference-build auto-detection (GRCh37/38 incl. rsID-less whole-genome VCFs), and graceful degradation when optional data or models are absent.
+
+## Runs on any laptop — no expensive setup
+
+GenomeLens deliberately **trades speed for accessibility**. The heavy analyses use
+tabix-indexed lookups that *stream* the genome region-by-region instead of loading it
+into memory, so the whole thing runs on an ordinary laptop — just slower. No
+workstation, no GPU, no cloud, and every tool is free and open-source. Developed and
+validated on an **Apple M5 / 24 GB**; runs on macOS or Linux, Apple Silicon or Intel.
+
+| Input | RAM | Disk | Typical runtime |
+|---|---|---|---|
+| **Standard chip** (23andMe / AncestryDNA / TellMeGen, ~0.6M SNPs) | ~2–4 GB (fine on 8 GB) | **< 1 GB** (the tool itself) | seconds to ~1 min |
+| **Whole genome (~30×, VCF)** | **~8 GB** recommended (ran comfortably within 24 GB) | **~2–5 GB** for the practical predictor set (AlphaMissense ≈0.65 GB + gnomAD AF ≈3 GB + ClinVar ≈11 MB) **+ room for your VCF** (≈0.5–2 GB) | a few minutes to ~30 min |
+
+- The whole-genome **Phase-3 predictor scan is the slow part** — it queries every
+  carried variant — and that is the speed-for-accessibility tradeoff. It's also a
+  **one-time cost**: results cache, so you re-report and re-interpret instantly.
+- **CADD is the only large table** (~81 GB if you host it locally, non-commercial).
+  It's optional — skip it, or let the analyzer query it remotely on public data. The
+  commercial-safe set (AlphaMissense + gnomAD) fits in **under 4 GB**.
+- A **chip file needs no extra downloads at all** — the predictor/ClinVar tables are
+  only used for whole-genome input.
+
+Bottom line: **you don't need an expensive rig to analyze your own genome.** A regular
+laptop, some patience, and disk space is enough — and nothing ever leaves the machine.
 
 ## How this was built
 
