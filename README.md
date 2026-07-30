@@ -20,7 +20,7 @@ Unauthorized copying, modification, or distribution is prohibited.
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![privacy](https://img.shields.io/badge/privacy-100%25%20local%20%C2%B7%20offline-purple)
 ![code](https://img.shields.io/badge/code-~42.7k%20lines%20%C2%B7%2041%20modules-orange)
-![tests](https://img.shields.io/badge/tests-369%20passing-brightgreen)
+![tests](https://img.shields.io/badge/tests-386%20passing-brightgreen)
 ![input](https://img.shields.io/badge/input-chip%20%2B%20whole--genome%20VCF-blue)
 ![license](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
 [![Buy Me a Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/caque)
@@ -62,7 +62,7 @@ emit a clinical EHR bundle.
 ## What it does
 
 GenomeLens runs **41 interlocking analysis modules** (≈42,700 lines of Python, a
-369-test suite) entirely offline — across two input tiers: a consumer chip file
+386-test suite) entirely offline — across two input tiers: a consumer chip file
 or a whole-genome / exome **VCF**.
 
 **Clinical & pharmacogenomic**
@@ -75,7 +75,7 @@ or a whole-genome / exome **VCF**.
 - **Polygenic risk:** curated PRS **plus** full PGS Catalog scoring files, EUR-normalised percentiles with coverage-bounded confidence.
 - **Genetics × your bloodwork:** cross-references genotype against uploaded labs — PhenoAge biological age, AHA PREVENT 2023 10-year cardiovascular risk, 20+ composite indices.
 - **Holistic synthesis:** a Genome-Leverage score and cross-panel pattern detection — where genes, labs, and lifestyle compound.
-- **Value of Information (health economics):** a decision-analytic engine that answers *what is knowing your genome worth?* — sourced cost-of-illness, pharmacogenomic averted-ADR economics from published CEA, net monetary benefit with 3% discounting of both costs **and** QALYs, ex-ante/ex-post VOI and the **marginal value of upgrading chip → whole genome**, plus a seeded Monte-Carlo sensitivity analysis (CEAC + tornado). Runs on both a chip and a full genome. Market *price* is reported separately from health-economic *value*.
+- **Health ROI — Value of Information (health economics):** the *return on health* made rigorous — **what is knowing your genome worth, in expectation?** A decision-analytic engine with sourced cost-of-illness, pharmacogenomic averted-ADR economics from published cost-effectiveness studies, **net monetary benefit discounting both costs and QALYs at 3%**, ex-ante/ex-post value-of-information and the **marginal ROI of upgrading a chip → whole genome**, and a seeded Monte-Carlo sensitivity analysis (cost-effectiveness acceptability curve + tornado). Runs on both a chip and a full genome. Market *price* is reported separately from health-economic *value*. *(On the GIAB public genome: modelled expected value ≈ $24k with a 95% CI, chip→WGS marginal ≈ $24k.)*
 
 **Ancestry & traits**
 - **Ancestry:** autosomal PCA + Y-DNA / mtDNA haplogroups + deep ancestry (Neanderthal %, Yamnaya / EEF / WHG affinity, migration timelines).
@@ -84,14 +84,15 @@ or a whole-genome / exome **VCF**.
 **Lifestyle, interop & AI**
 - Nutrigenomics, chronotype-based light timing, exercise programming, and a decade-by-decade life-stage playbook.
 - **HL7 FHIR R4** clinical export.
-- **Local AI on every tier:** an Ollama LLM interprets each module and powers an offline chat assistant — no data ever leaves the machine.
+- **Local AI on every tier — with hallucination guardrails:** an Ollama LLM interprets each module and powers an offline chat assistant; no data ever leaves the machine. Every interpretation is grounded **only** in the deterministic findings under a strict no-invention prompt, and a **post-generation validator flags any statistic the model introduced that is not in the source data** — appending a caution, or dropping the interpretation entirely when it is riddled with fabricated figures.
 
 ## Built with rigor
 
 - **Unified, strand-aware SNP registry** — one source of truth for GRCh37/38 coordinates and ancestral/derived alleles; caught and fixed palindrome/strand bugs that silently mis-call ancestry.
 - **KING-robust relationship inference** — a proper kinship estimator (not naive percent-identity), IBS0-refined for parent-child vs full-sibling.
-- **Honest by construction** — no fabricated polygenic percentiles; transmission ≠ disease penetrance; ClinVar review-star confidence; every local-AI call sees only deterministic findings, so it cannot invent a risk or a statistic.
-- **369-test suite**, reference-build auto-detection (GRCh37/38), and graceful degradation when optional data or models are absent.
+- **Honest by construction** — no fabricated polygenic percentiles; transmission ≠ disease penetrance; ClinVar review-star confidence; Phase-3 findings are labelled computational predictions, never clinical calls; and a **grounding guardrail rejects any AI-introduced figure absent from the deterministic data**, so the local LLM cannot invent a risk or a statistic.
+- **Validated end-to-end on a public genome** — the full **GIAB HG001 (NA12878)** reference genome runs clean through build detection, Phase-2 ClinVar, the Phase-3 predictor screen, and the health-ROI engine with **0 errors** (3 pathogenic incl. a carrier, 141 predicted-damaging rare variants, modelled ROI reported with a confidence interval).
+- **386-test suite**, reference-build auto-detection (GRCh37/38 incl. rsID-less whole-genome VCFs), and graceful degradation when optional data or models are absent.
 
 ## How this was built
 
@@ -101,8 +102,8 @@ Northeastern University, with an undergraduate focus in **health economics** —
 and pair-programmed with an AI coding assistant. The health-economics framing,
 scientific decisions, and privacy-first design are the author's; the AI
 accelerated implementation. Release history is in [`CHANGELOG.md`](CHANGELOG.md)
-(current: **v6.22 — Phase-2 ClinVar screen, dual chip/VCF input,
-local-AI-on-all-tiers**).
+(current: **v6.23 — Phase-3 novel-variant predictors, the Value-of-Information
+health-ROI engine, and AI hallucination guardrails**).
 
 **Market-value context.** Purchased à la carte from commercial providers, the
 testing, analysis, and expert interpretation GenomeLens performs locally would
