@@ -150,7 +150,14 @@ or a whole-genome / exome **VCF**.
 - **Polygenic risk:** curated PRS **plus** full PGS Catalog scoring files, EUR-normalised percentiles with coverage-bounded confidence.
 - **Genetics × your bloodwork:** cross-references genotype against uploaded labs — PhenoAge biological age, AHA PREVENT 2023 10-year cardiovascular risk, 20+ composite indices.
 - **Holistic synthesis:** a Genome-Leverage score and cross-panel pattern detection — where genes, labs, and lifestyle compound.
-- **Health ROI — Value of Information (health economics):** the *return on health* made rigorous — **what is knowing your genome worth, in expectation?** A decision-analytic engine with sourced cost-of-illness, pharmacogenomic averted-ADR economics from published cost-effectiveness studies, **net monetary benefit discounting both costs and QALYs at 3%**, ex-ante/ex-post value-of-information and the **marginal ROI of upgrading a chip → whole genome**, and a seeded Monte-Carlo sensitivity analysis (cost-effectiveness acceptability curve + tornado). Runs on both a chip and a full genome. Market *price* is reported separately from health-economic *value*. *(On the GIAB public genome: modelled expected value ≈ $24k with a 95% CI, chip→WGS marginal ≈ $24k.)*
+- **Health ROI — Value of Information (health economics):** answers one question — **what is knowing your genome actually worth?** — with a real decision model, not a marketing number:
+  - 💵 **Puts a dollar value on each finding** — how much acting on it (screening, prevention, safer prescriptions) is worth to your health.
+  - 📚 **Uses real data, not guesses** — sourced cost-of-illness figures and published drug cost-effectiveness studies.
+  - ⚖️ **Counts future health and money fairly** — discounts both costs and quality-adjusted life-years (QALYs) at 3%, the health-economics standard.
+  - 🧬 **Tells you if a full genome is worth it *for you*** — the extra value of upgrading a chip → whole genome ("marginal ROI").
+  - 📊 **Shows its uncertainty honestly** — a Monte-Carlo simulation gives a *range* (95% confidence interval), never one fake-precise number.
+  - 🏷️ **Separates price from value** — what the tests *cost to buy* vs what acting on them is *worth*.
+  - *Example on the public GIAB genome: ≈ **$24k** expected value (with a confidence range) — and ≈ **$24k** of that comes from going to a full genome.*
 
 **Ancestry & traits**
 - **Ancestry:** autosomal PCA + Y-DNA / mtDNA haplogroups + deep ancestry (Neanderthal %, Yamnaya / EEF / WHG affinity, migration timelines).
