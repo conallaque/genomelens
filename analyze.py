@@ -483,6 +483,25 @@ def parse_dna_file(filepath: str):
         sys.exit(1)
 
     if s.snps is None or s.snps.empty:
+        # A whole-genome/exome VCF whose variants lack rsIDs (e.g. GIAB) parses to
+        # zero rsID-keyed SNPs — but the VCF-native modules (Phase-2 ClinVar,
+        # Phase-3 predictors, VOI) stream the file directly, and enrich_and_profile
+        # back-fills registry positions by coordinate. So for a VCF, proceed with an
+        # empty-but-valid frame instead of aborting.
+        try:
+            import genome_input as _gi
+            is_vcf = _gi.looks_like_vcf(str(path))
+        except Exception:
+            is_vcf = False
+        if is_vcf:
+            log("  No rsID-keyed SNPs parsed (whole-genome VCF without rsIDs) — "
+                "proceeding with VCF-native modules; registry positions will be "
+                "back-filled by coordinate.")
+            import pandas as _pd
+            empty = _pd.DataFrame(columns=["chrom", "pos", "genotype"])
+            empty.index.name = "rsid"
+            empty.attrs["build"] = "unknown"
+            return empty
         log("ERROR: No SNPs found in file. Check the file format.")
         sys.exit(1)
 

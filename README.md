@@ -68,12 +68,14 @@ or a whole-genome / exome **VCF**.
 **Clinical & pharmacogenomic**
 - **Pharmacogenomics (CPIC):** drug-response variants + dosing implications that *flag and reduce* adverse-drug-reaction risk.
 - **Clinical variants (ClinVar) — Phase 2:** whole-genome pathogenic / likely-pathogenic screen with ACMG actionable findings, carrier status, compound-heterozygote detection, and ClinVar star-graded confidence.
+- **Novel & rare variants (predictors) — Phase 3:** for variants *not* in ClinVar, an offline predictor screen (AlphaMissense · REVEL · CADD · SpliceAI · gnomAD rarity) surfaces predicted-damaging rare variants — clearly labelled as computational predictions, never clinical calls, and independently license-toggleable (`--commercial-safe`).
 - **Carrier & family planning:** recessive carrier status with Hardy-Weinberg partner risk — transmission probability kept distinct from disease penetrance.
 
 **Risk, aging & synthesis**
 - **Polygenic risk:** curated PRS **plus** full PGS Catalog scoring files, EUR-normalised percentiles with coverage-bounded confidence.
 - **Genetics × your bloodwork:** cross-references genotype against uploaded labs — PhenoAge biological age, AHA PREVENT 2023 10-year cardiovascular risk, 20+ composite indices.
 - **Holistic synthesis:** a Genome-Leverage score and cross-panel pattern detection — where genes, labs, and lifestyle compound.
+- **Value of Information (health economics):** a decision-analytic engine that answers *what is knowing your genome worth?* — sourced cost-of-illness, pharmacogenomic averted-ADR economics from published CEA, net monetary benefit with 3% discounting of both costs **and** QALYs, ex-ante/ex-post VOI and the **marginal value of upgrading chip → whole genome**, plus a seeded Monte-Carlo sensitivity analysis (CEAC + tornado). Runs on both a chip and a full genome. Market *price* is reported separately from health-economic *value*.
 
 **Ancestry & traits**
 - **Ancestry:** autosomal PCA + Y-DNA / mtDNA haplogroups + deep ancestry (Neanderthal %, Yamnaya / EEF / WHG affinity, migration timelines).
