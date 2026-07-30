@@ -472,6 +472,193 @@ def write_manifest() -> None:
     log(f"  manifest written: {REF_DIR / 'setup_manifest.json'}")
 
 
+# ── Phase-3 predictor tables ─────────────────────────────────────────────────
+# Offline pathogenicity predictors for the novel-variant screen. Each is
+# download -> (transform) -> tabix-index. Licenses are surfaced so a commercial
+# evaluation can drop the non-commercial ones (--commercial-safe).
+
+_AM_URLS = {
+    "hg38": "https://storage.googleapis.com/dm_alphamissense/AlphaMissense_hg38.tsv.gz",
+    "hg19": "https://storage.googleapis.com/dm_alphamissense/AlphaMissense_hg19.tsv.gz",
+}
+_REVEL_URL = "https://rothsj06.dmz.hpc.mssm.edu/revel-v1.3_all_chromosomes.zip"
+_GNOMAD_AF_HG38 = ("https://storage.googleapis.com/gatk-best-practices/"
+                   "somatic-hg38/af-only-gnomad.hg38.vcf.gz")
+
+
+def _ensure_bgzip_tabix(gz_path: Path, seq_col: int, start_col: int,
+                        end_col: int, meta_char: str = "#") -> bool:
+    """Guarantee gz_path is bgzipped + tabix-indexed. Recompresses plain gzip if
+    needed (a large decompress/recompress cycle). Returns True on success."""
+    import shutil
+    import gzip as _gz
+    try:
+        import pysam
+    except Exception:
+        log("    ERROR: pysam not installed — run `pip install pysam`.")
+        return False
+    if Path(str(gz_path) + ".tbi").exists():
+        log(f"    [skip] index present: {gz_path.name}.tbi")
+        return True
+    try:
+        pysam.tabix_index(str(gz_path), seq_col=seq_col, start_col=start_col,
+                          end_col=end_col, meta_char=meta_char, force=True)
+        log(f"    indexed {gz_path.name}")
+        return True
+    except Exception as e:
+        log(f"    {gz_path.name} not bgzipped ({e}); recompressing (several min) ...")
+    raw = gz_path.with_suffix("")
+    try:
+        with _gz.open(gz_path, "rb") as fin, open(raw, "wb") as fout:
+            shutil.copyfileobj(fin, fout, length=1 << 22)
+        gz_path.unlink()
+        pysam.tabix_compress(str(raw), str(gz_path), force=True)
+        raw.unlink()
+        pysam.tabix_index(str(gz_path), seq_col=seq_col, start_col=start_col,
+                          end_col=end_col, meta_char=meta_char, force=True)
+        log(f"    re-bgzipped + indexed {gz_path.name}")
+        return True
+    except Exception as e:
+        log(f"    ERROR indexing {gz_path.name}: {e}")
+        return False
+
+
+def setup_alphamissense(force: bool = False, build: str = "hg38") -> None:
+    """AlphaMissense precomputed missense scores (CC BY 4.0 — commercial-OK)."""
+    log("AlphaMissense (CC BY 4.0, commercial use OK) ...")
+    d = REF_DIR / "alphamissense"
+    d.mkdir(parents=True, exist_ok=True)
+    url = _AM_URLS.get(build, _AM_URLS["hg38"])
+    dest = d / Path(url).name
+    if force and dest.exists():
+        dest.unlink()
+        Path(str(dest) + ".tbi").unlink(missing_ok=True)
+    if not download_to(url, dest, label=dest.name):
+        return
+    _ensure_bgzip_tabix(dest, seq_col=0, start_col=1, end_col=1)
+
+
+def setup_gnomad(force: bool = False) -> None:
+    """gnomAD allele frequencies (open license). Uses GATK's compact AF-only
+    GRCh38 sites VCF (already bgzipped + tabix-indexed remotely)."""
+    log("gnomAD AF (open license, commercial OK) — GATK af-only GRCh38 ...")
+    d = REF_DIR / "gnomad"
+    d.mkdir(parents=True, exist_ok=True)
+    gz = d / "gnomad.af_only.hg38.vcf.gz"
+    tbi = Path(str(gz) + ".tbi")
+    if force:
+        gz.unlink(missing_ok=True)
+        tbi.unlink(missing_ok=True)
+    ok = download_to(_GNOMAD_AF_HG38, gz, label=gz.name)
+    ok = download_to(_GNOMAD_AF_HG38 + ".tbi", tbi, label=tbi.name) and ok
+    if ok and not tbi.exists():
+        _ensure_bgzip_tabix(gz, seq_col=0, start_col=1, end_col=1)
+
+
+def setup_revel(force: bool = False) -> None:
+    """REVEL (NON-COMMERCIAL). Download zip → slim to chr/pos/ref/alt/REVEL per
+    build → sort → bgzip → tabix."""
+    import zipfile
+    import csv
+    log("REVEL (NON-COMMERCIAL license — see PREDICTOR_LICENSES.md) ...")
+    d = REF_DIR / "revel"
+    d.mkdir(parents=True, exist_ok=True)
+    out = d / "revel_grch38.tsv.gz"
+    if out.exists() and not force:
+        log("    [skip] revel_grch38.tsv.gz present")
+        return
+    zpath = d / "revel_all.zip"
+    if not download_to(_REVEL_URL, zpath, label="revel zip (~0.5 GB)"):
+        return
+    try:
+        import pysam
+        with zipfile.ZipFile(zpath) as z:
+            member = next(n for n in z.namelist() if n.endswith(".csv"))
+            raw = d / "revel_grch38.tsv"
+            rows = []
+            with z.open(member) as fh:
+                rdr = csv.reader((ln.decode() for ln in fh))
+                next(rdr, None)                      # header
+                for r in rdr:
+                    if len(r) < 8 or not r[2]:       # grch38_pos empty → skip
+                        continue
+                    rows.append((r[0], int(r[2]), r[3], r[4], r[7]))
+            rows.sort(key=lambda x: (x[0], x[1]))
+            with open(raw, "w") as f:
+                for c, p, ref, alt, rev in rows:
+                    f.write(f"{c}\t{p}\t{ref}\t{alt}\t{rev}\n")
+            pysam.tabix_compress(str(raw), str(out), force=True)
+            pysam.tabix_index(str(out), seq_col=0, start_col=1, end_col=1, force=True)
+            raw.unlink()
+        zpath.unlink()
+        log("    REVEL slim table built + indexed")
+    except Exception as e:
+        log(f"    ERROR building REVEL table: {e}")
+
+
+def setup_spliceai(force: bool = False) -> None:
+    """SpliceAI (NON-COMMERCIAL, gated behind an Illumina BaseSpace login) — cannot
+    be auto-downloaded. Print guided instructions + detect a dropped-in file."""
+    d = REF_DIR / "spliceai"
+    d.mkdir(parents=True, exist_ok=True)
+    hit = list(d.glob("spliceai*.vcf.*gz"))
+    if hit:
+        log(f"SpliceAI table detected: {hit[0].name}")
+        if not Path(str(hit[0]) + ".tbi").exists():
+            _ensure_bgzip_tabix(hit[0], seq_col=0, start_col=1, end_col=1)
+        return
+    log("SpliceAI (NON-COMMERCIAL) requires a manual download:")
+    log("  1. Log in to Illumina BaseSpace: https://basespace.illumina.com/s/5u6ThOblecrh")
+    log("  2. Download spliceai_scores.masked.snv.hg38.vcf.gz  (+ .tbi)")
+    log(f"  3. Drop both files into: {d}")
+    log("  4. Re-run `python setup.py --spliceai` to index/verify.")
+
+
+def setup_cadd(force: bool = False) -> None:
+    """CADD (NON-COMMERCIAL, ~81 GB). Not auto-downloaded — the analysis can query
+    CADD's public tabix file REMOTELY for a demo, or you can host it locally."""
+    log("CADD (NON-COMMERCIAL, ~81 GB) — not downloaded automatically.")
+    log("  Local (fully offline) option — download once (~81 GB):")
+    log("    https://krishna.gs.washington.edu/download/CADD/v1.7/GRCh38/"
+        "whole_genome_SNVs.tsv.gz  (+ .tbi)")
+    log(f"    → place both in {REF_DIR / 'cadd'}/")
+    log("  Demo option: the analyzer can query CADD remotely on PUBLIC data "
+        "(allow_remote=True) — no bulk download.")
+
+
+def setup_predictors(commercial_safe: bool = False, force: bool = False) -> None:
+    """Run the auto-downloadable predictor set. Commercial-safe = AlphaMissense +
+    gnomAD only; otherwise also REVEL (SpliceAI/CADD stay manual)."""
+    setup_alphamissense(force=force)
+    setup_gnomad(force=force)
+    if not commercial_safe:
+        setup_revel(force=force)
+        setup_spliceai(force=force)
+        setup_cadd(force=force)
+    write_predictor_licenses()
+
+
+def write_predictor_licenses() -> None:
+    """Emit reference/PREDICTOR_LICENSES.md — the attribution/notice manifest."""
+    txt = """# Predictor licenses & attribution
+
+GenomeLens' Phase-3 novel-variant screen uses these third-party resources. Their
+licenses differ — the non-commercial ones are disabled by `--commercial-safe`.
+
+| Predictor | License | Commercial use | Source |
+|---|---|---|---|
+| AlphaMissense | CC BY 4.0 | **Yes** (attribution) | Cheng et al., Science 2023 |
+| gnomAD | Open / no restrictions | **Yes** | Broad Institute |
+| REVEL | Non-commercial | No (contact authors) | Ioannidis et al., AJHG 2016 |
+| SpliceAI | CC BY-NC 4.0 | No (Illumina license) | Jaganathan et al., Cell 2019 |
+| CADD | Non-commercial | No (UW license) | Rentzsch et al., NAR 2019 |
+
+Predictions are computational estimates, not clinical determinations.
+"""
+    (REF_DIR / "PREDICTOR_LICENSES.md").write_text(txt)
+    log(f"  wrote {REF_DIR / 'PREDICTOR_LICENSES.md'}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(
         description="One-time setup for DNA Analysis Tool v3",
@@ -493,12 +680,33 @@ def main() -> None:
     ap.add_argument("--clinvar-refresh", action="store_true",
                     help="Force a ClinVar rebuild even if the local table looks "
                          "current (ignores the Last-Modified check).")
+    ap.add_argument("--alphamissense", action="store_true",
+                    help="Download + index AlphaMissense (CC BY 4.0, ~0.6 GB).")
+    ap.add_argument("--revel", action="store_true",
+                    help="Download + index REVEL (non-commercial, ~0.5 GB).")
+    ap.add_argument("--gnomad", action="store_true",
+                    help="Download gnomAD allele-frequency sites (open license).")
+    ap.add_argument("--spliceai", action="store_true",
+                    help="Guide/verify SpliceAI (manual BaseSpace download).")
+    ap.add_argument("--cadd", action="store_true",
+                    help="Guidance for CADD (~81 GB, non-commercial).")
+    ap.add_argument("--predictors", action="store_true",
+                    help="Auto-download the Phase-3 predictor set "
+                         "(AlphaMissense + gnomAD + REVEL).")
+    ap.add_argument("--commercial-safe", action="store_true",
+                    help="With --predictors, restrict to commercially-licensed "
+                         "predictors only (AlphaMissense + gnomAD).")
+    ap.add_argument("--predictors-refresh", action="store_true",
+                    help="Force a re-download/rebuild of predictor tables.")
     ap.add_argument("--all", action="store_true",
                     help="Run --beagle, --pgs, --ancestry and --clinvar")
     args = ap.parse_args()
 
+    _predictor_flags = [args.alphamissense, args.revel, args.gnomad,
+                        args.spliceai, args.cadd, args.predictors,
+                        args.predictors_refresh]
     if not any([args.check, args.beagle, args.pgs, args.ancestry,
-                args.clinvar, args.clinvar_refresh, args.all]):
+                args.clinvar, args.clinvar_refresh, args.all] + _predictor_flags):
         ap.print_help()
         return
 
@@ -522,6 +730,22 @@ def main() -> None:
         setup_ancestry()
     if args.clinvar or args.clinvar_refresh or args.all:
         setup_clinvar(force=args.clinvar_refresh)
+
+    _pf = args.predictors_refresh
+    if args.predictors:
+        setup_predictors(commercial_safe=args.commercial_safe, force=_pf)
+    if args.alphamissense:
+        setup_alphamissense(force=_pf)
+    if args.revel:
+        setup_revel(force=_pf)
+    if args.gnomad:
+        setup_gnomad(force=_pf)
+    if args.spliceai:
+        setup_spliceai(force=_pf)
+    if args.cadd:
+        setup_cadd(force=_pf)
+    if any(_predictor_flags):
+        write_predictor_licenses()
 
     write_manifest()
     log("Setup complete.")

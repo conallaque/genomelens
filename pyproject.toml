@@ -37,6 +37,9 @@ dependencies = [
 [project.optional-dependencies]
 pdf = ["weasyprint>=60"]
 plot = ["matplotlib>=3.8"]
+# Phase-3 whole-genome predictor screen (novel_variants.py). Optional: the chip
+# path never imports pysam, and the module degrades gracefully without it.
+wgs = ["pysam>=0.22"]
 dev = [
     "pytest>=8",
     "pytest-cov>=5",
