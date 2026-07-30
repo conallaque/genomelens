@@ -105,14 +105,29 @@ accelerated implementation. Release history is in [`CHANGELOG.md`](CHANGELOG.md)
 (current: **v6.23 — Phase-3 novel-variant predictors, the Value-of-Information
 health-ROI engine, and AI hallucination guardrails**).
 
-**Market-value context.** Purchased à la carte from commercial providers, the
-testing, analysis, and expert interpretation GenomeLens performs locally would
-run an estimated **$1,500–$3,000+** — e.g. clinical pharmacogenomics (≈$250),
-expanded carrier screening (≈$350), a hereditary-cancer / ACMG panel (≈$250),
-polygenic-risk and ancestry reports (≈$350 combined), nutrigenomics and trait
-panels (≈$200), and genetic-counsellor-style interpretation (≈$200+).
-GenomeLens consolidates all of it into a single private, offline tool.
-*Illustrative comparison using typical U.S. self-pay pricing — not a formal
+**Market-value context.** Two different numbers matter here — *price* and *value* —
+and GenomeLens is built to model the second.
+
+**Price (what the equivalent tests cost to buy).** Purchased à la carte, the
+testing, analysis, and expert interpretation GenomeLens performs locally would run
+roughly **$2,000–$6,000+**: clinical pharmacogenomics (≈$250–$500), expanded
+carrier screening (≈$350–$600), a hereditary-cancer / ACMG secondary-findings panel
+(≈$300–$2,000 at clinical labs), whole-genome sequencing **with** variant
+interpretation (≈$300 raw → $1,000s interpreted), polygenic-risk + ancestry (≈$350),
+biological-age / longevity bloodwork analysis (≈$150–$500), nutrigenomics and trait
+panels (≈$200), plus genetic-counsellor-style interpretation (≈$150–$400 a session)
+and the ongoing variant re-analysis most services bill as a subscription. GenomeLens
+consolidates all of it into one private, offline tool.
+
+**Value (what acting on the findings is worth).** Price is not value — and at its
+core GenomeLens is a health-economics tool that models the latter. Its built-in
+**Value-of-Information engine** estimates the expected **return on health** of acting
+on your genome (averted adverse drug reactions, earlier screening, prevention) — on
+the order of **tens of thousands of dollars** in risk-adjusted expected value for a
+whole genome (**≈$24k with a 95% confidence interval on the public GIAB demo**).
+
+*Illustrative comparison using typical U.S. self-pay pricing; the value figure is a
+modelled, uncertain estimate from the built-in health-economics engine. Not a formal
 valuation, and not a substitute for clinical-grade testing.*
 
 ---
