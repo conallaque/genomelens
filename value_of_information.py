@@ -401,7 +401,7 @@ def _methods(rate: float, wtp: float, test_cost: float, input_type: str) -> List
         "PGx averted-ADR values from published CEA (Schackman 2008; Kazi 2014; "
         "Deenen 2016; CPIC).",
         "Uncertainty via seeded Monte-Carlo PSA (Beta on probabilities, Gamma on "
-        "costs, triangular on λ).",
+        "costs); the WTP threshold λ is swept deterministically for the CEAC.",
         "Phase-3 predicted variants down-weighted by predictor confidence.",
         "Reporting follows the CHEERS 2022 checklist in spirit; illustrative only.",
     ]
