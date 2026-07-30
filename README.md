@@ -86,6 +86,61 @@ or a whole-genome / exome **VCF**.
 - **HL7 FHIR R4** clinical export.
 - **Local AI on every tier — with hallucination guardrails:** an Ollama LLM interprets each module and powers an offline chat assistant; no data ever leaves the machine. Every interpretation is grounded **only** in the deterministic findings under a strict no-invention prompt, and a **post-generation validator flags any statistic the model introduced that is not in the source data** — appending a caution, or dropping the interpretation entirely when it is riddled with fabricated figures.
 
+## Health economics — the return-on-health engine
+
+Health economics is the lens GenomeLens is built around. The question that started
+it: *what is the actual payoff of understanding your own biology — not in theory, but
+in decisions?* The **Value-of-Information (VOI) engine** answers it with a proper
+decision-analytic model instead of a marketing number.
+
+**The model.** Each actionable finding is a decision node — *act* (screen, prevent,
+avoid a drug) vs *population-default care*. The value of the genome is the difference
+in expected net benefit between the informed and uninformed strategies, net of the
+test's cost:
+
+> value ≈ E[net benefit | genome known] − E[net benefit | not known] − test cost
+
+**Net Monetary Benefit** is the headline metric — `NMB = ΔQALY × λ − ΔCost` — where λ
+is the willingness-to-pay threshold (**$50k / $100k / $150k per QALY**; Neumann et
+al., *NEJM* 2014). Both future **costs and QALYs** are discounted at 3% (0/3/5%
+sensitivity), the second-panel cost-effectiveness standard. ICER is reported as a
+secondary metric; NMB leads because it handles dominance and negative ICERs cleanly.
+
+**Grounded inputs — no hand-waving.**
+- **Cost-of-illness** per condition — lifetime direct + indirect cost (ADA, AHA,
+  Alzheimer's Association), discounted to present value.
+- **Pharmacogenomic economics** from published cost-effectiveness studies: expected
+  averted-adverse-drug-reaction value = `P(prescribed) × P(ADR | genotype) ×
+  RRR(genotype-guided) × [ADR cost + QALY loss·λ]` — HLA-B\*57:01/abacavir (Schackman
+  2008), CYP2C19/clopidogrel (Kazi 2014), DPYD/fluoropyrimidine (Deenen 2016), and more.
+- Phase-3 **predicted (unconfirmed)** variants enter **down-weighted by predictor
+  confidence** — uncertain findings contribute less expected value, by construction.
+
+**Three numbers, never conflated.**
+- **Ex-ante (EVSI-style)** — value to a random person *before* testing (population priors).
+- **Ex-post** — value given *this* genome.
+- **Marginal ROI of chip → whole genome** — quantifying "is sequencing worth it *for me*?"
+
+**Uncertainty is first-class.** A seeded **Monte-Carlo probabilistic sensitivity
+analysis** (Beta on probabilities, Gamma on costs, triangular on λ) yields a mean and
+**95% credible interval**, a **cost-effectiveness acceptability curve**, and a one-way
+**tornado** — every figure is a distribution, not a false point estimate. Reporting
+follows the **CHEERS 2022** checklist in spirit.
+
+**Price ≠ value.** Market *price* (what equivalent tests cost to buy) is reported
+separately from health-economic *value* (what acting on the findings is worth) —
+conflating the two is exactly the error a health economist should refuse to make.
+
+**Honest by design.** Every parameter is sourced or flagged an assumption; PRS-derived
+estimates carry an **ancestry-transferability caveat** (EUR-biased scores are
+attenuated for other ancestries); and the output is explicitly an *illustrative
+decision-analytic model — not a formal economic evaluation, and not financial or
+medical advice.*
+
+> **Worked example — public GIAB HG001 genome:** modelled expected value ≈ **$24,070**
+> (95% CI ≈ $11k–$41k), chip→WGS marginal ≈ **$24,479**, cost-effective at $100k/QALY
+> with high probability — computed end-to-end, locally, with 0 errors.
+
 ## Built with rigor
 
 - **Unified, strand-aware SNP registry** — one source of truth for GRCh37/38 coordinates and ancestral/derived alleles; caught and fixed palindrome/strand bugs that silently mis-call ancestry.
