@@ -314,6 +314,11 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
                                  input_type: str = "chip",
                                  n_mc: int = 5000, seed: int = 12345,
                                  log=None) -> Dict:
+    # Records any sub-analysis that failed, so a crashing extension degrades
+    # VISIBLY instead of silently vanishing from the report. A silent
+    # {"available": False} is exactly how the chip-input bug stayed hidden.
+    _degraded: List[Tuple[str, str]] = []
+
     findings = _collect(economics_result, clinical_variants_result,
                         novel_variants_result)
     if not findings:
@@ -370,8 +375,9 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
     _age = _resolve_age(genetic_age_result)
     try:
         result["health_capital"] = analyze_health_capital(age=_age)
-    except Exception:
+    except Exception as _e:
         result["health_capital"] = {"available": False}
+        _degraded.append(("health_capital", repr(_e)))
 
     # Real options: test now vs defer, given falling prices and improving
     # interpretation — the classic option-to-wait, on a depreciating asset.
@@ -380,20 +386,23 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
             voi_now=float(result.get("voi_expost_mean",
                                      result.get("voi_expost_point", 0.0))) + test_cost,
             test_cost=test_cost, age=_age)
-    except Exception:
+    except Exception as _e:
         result["real_option"] = {"available": False}
+        _degraded.append(("real_option", repr(_e)))
 
     # Risk-adjusted framings drawn from the PSA distribution.
     try:
         result["risk_adjusted"] = _risk_adjusted(result, test_cost)
-    except Exception:
+    except Exception as _e:
         result["risk_adjusted"] = {"available": False}
+        _degraded.append(("risk_adjusted", repr(_e)))
 
     # ── Decision-theoretic ceiling: EVPI (what ANY further research could be worth) ──
     try:
         result["evpi"] = analyze_evpi(findings, test_cost)
-    except Exception:
+    except Exception as _e:
         result["evpi"] = {"available": False}
+        _degraded.append(("evpi", repr(_e)))
 
     # ── Expected utility / Arrow–Pratt: a risk-averse agent values variance
     #    reduction above the expected monetary value. ──
@@ -401,8 +410,9 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
         _mean = float(result.get("voi_expost_mean", result.get("voi_expost_point", 0.0)))
         _sd = float((result.get("risk_adjusted") or {}).get("sd", 0.0))
         result["utility"] = analyze_utility(_mean, _sd)
-    except Exception:
+    except Exception as _e:
         result["utility"] = {"available": False}
+        _degraded.append(("utility", repr(_e)))
 
     # ── HEOR deliverables: Markov cohort CEA + payer budget impact ──
     try:
@@ -411,9 +421,11 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
         _mkr["validation"] = _mk.validate_markov(_mkr)
         result["markov"] = _mkr
         result["budget_impact"] = _mk.budget_impact()
-    except Exception:
+    except Exception as _e:
         result["markov"] = {"available": False}
+        _degraded.append(("markov", repr(_e)))
         result["budget_impact"] = {"available": False}
+        _degraded.append(("budget_impact", repr(_e)))
 
     # ── Welfare comparison: local vs centralised analysis, conceding a capability
     #    premium to the centralised alternative so the result isn't assumed. ──
@@ -422,8 +434,9 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
             voi=float(result.get("voi_expost_mean",
                                  result.get("voi_expost_point", 0.0))) + test_cost,
             test_cost=test_cost)
-    except Exception:
+    except Exception as _e:
         result["welfare"] = {"available": False}
+        _degraded.append(("welfare", repr(_e)))
 
     # ── Information economics: adverse selection, genetic discrimination, and why
     #    local-only analysis is an economic design choice. ──
@@ -432,14 +445,16 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
             evpi=float((result.get("evpi") or {}).get("evpi", 0.0)),
             mean_value=float(result.get("voi_expost_mean",
                                         result.get("voi_expost_point", 0.0))))
-    except Exception:
+    except Exception as _e:
         result["information_economics"] = {"available": False}
+        _degraded.append(("information_economics", repr(_e)))
 
     # ── EVPPI: which single parameter is worth resolving (research prioritisation) ──
     try:
         result["evppi"] = analyze_evppi(findings)
-    except Exception:
+    except Exception as _e:
         result["evppi"] = {"available": False}
+        _degraded.append(("evppi", repr(_e)))
 
     # ── Behavioural: prospect theory + hyperbolic discounting explain the adoption
     #    gap between a positive-EV test and actual uptake. ──
@@ -447,16 +462,18 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
         _m2 = float(result.get("voi_expost_mean", result.get("voi_expost_point", 0.0)))
         _sd2 = float((result.get("risk_adjusted") or {}).get("sd", 0.0))
         result["behavioural"] = analyze_behavioural(_m2, _sd2, test_cost)
-    except Exception:
+    except Exception as _e:
         result["behavioural"] = {"available": False}
+        _degraded.append(("behavioural", repr(_e)))
 
     # ── Longevity sensitivity: rising life expectancy raises realised genetic risk
     #    AND lengthens the payoff horizon, so it raises the value of information. ──
     try:
         import genomic_statistics as _gstat
         result["longevity"] = _gstat.longevity_sensitivity(current_age=_age)
-    except Exception:
+    except Exception as _e:
         result["longevity"] = {"available": False}
+        _degraded.append(("longevity", repr(_e)))
 
     # ── Genomics-side rigor: show the ascertainment correction actually applied to a
     #    representative high-penetrance finding, so the bias is visible, not hidden. ──
@@ -465,11 +482,20 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
                ("BreastOvarian", "Colorectal") and f.get("p_event")]
         if pen:
             f0 = pen[0]
+            # split() on an empty label yields [], so guard the index.
+            _tokens = str(f0.get("label", "")).split()
             result["penetrance_correction"] = analyze_penetrance_posterior(
                 prior_penetrance=float(f0.get("p_event", 0.5)),
-                gene=str(f0.get("label", "")).split()[0])
-    except Exception:
-        pass
+                gene=_tokens[0] if _tokens else "")
+    except Exception as _e:
+        _degraded.append(("penetrance_correction", repr(_e)))
+
+    # Surface any degradation rather than letting a failed sub-analysis disappear.
+    result["degraded_components"] = [{"component": k, "error": e} for k, e in _degraded]
+    result["fully_computed"] = not _degraded
+    if _degraded and log:
+        for k, e in _degraded:
+            log(f"  WARNING: value-of-information component '{k}' failed: {e}")
 
     return result
 
