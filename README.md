@@ -25,7 +25,7 @@ Unauthorized copying, modification, or distribution is prohibited.
 ![license](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
 [![Buy Me a Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/caque)
 
-> ⚠️ **Not medical advice — educational & research use only.** Genetic
+> **Not medical advice — educational & research use only.** Genetic
 > predispositions are probabilistic; confirm anything actionable with a licensed
 > physician and a board-certified genetic counsellor.
 
@@ -154,12 +154,14 @@ or a whole-genome / exome **VCF**.
 - **Genetics × your bloodwork:** cross-references genotype against uploaded labs — PhenoAge biological age, AHA PREVENT 2023 10-year cardiovascular risk, 20+ composite indices.
 - **Holistic synthesis:** a Genome-Leverage score and cross-panel pattern detection — where genes, labs, and lifestyle compound.
 - **Health ROI — Value of Information (health economics):** answers one question — **what is knowing your genome actually worth?** — with a real decision model, not a marketing number:
-  - 💵 **Puts a dollar value on each finding** — how much acting on it (screening, prevention, safer prescriptions) is worth to your health.
-  - 📚 **Uses real data, not guesses** — sourced cost-of-illness figures and published drug cost-effectiveness studies.
-  - ⚖️ **Counts future health and money fairly** — discounts both costs and quality-adjusted life-years (QALYs) at 3%, the health-economics standard.
-  - 🧬 **Tells you if a full genome is worth it *for you*** — the extra value of upgrading a chip → whole genome ("marginal ROI").
-  - 📊 **Shows its uncertainty honestly** — a Monte-Carlo simulation gives a *range* (95% confidence interval), never one fake-precise number.
-  - 🏷️ **Separates price from value** — what the tests *cost to buy* vs what acting on them is *worth*.
+  - **Puts a dollar value on each finding** — how much acting on it (screening, prevention, safer prescriptions) is worth to your health.
+  - **Uses real data, not guesses** — sourced cost-of-illness figures and published drug cost-effectiveness studies.
+  - **Counts future health and money fairly** — discounts both costs and quality-adjusted life-years (QALYs) at 3%, the health-economics standard.
+  - **Tells you if a full genome is worth it *for you*** — the extra value of upgrading a chip → whole genome ("marginal ROI").
+  - **Shows its uncertainty honestly** — a Monte-Carlo simulation gives a *range* (95% confidence interval), never one fake-precise number, plus the **downside case** (VaR/CVaR) and **EVPI**, the ceiling on what further testing could be worth.
+  - **Models health as depreciating capital** (Grossman) and **when to test** as a real option — so it can tell you the information is worth more *now* than later.
+  - **Corrects the genetics before the economics** — penetrance is de-biased for ascertainment and GWAS effects are winner's-curse shrunk, so the dollar figures don't inherit inflated risk estimates.
+  - **Separates price from value** — what the tests *cost to buy* vs what acting on them is *worth*.
   - *Example (public GIAB genome): ≈ **\$24k** modelled expected value (with a confidence range) — almost all of it from the whole-genome findings; for this healthy reference genome the chip-only part nets ≈ \$0 after test cost. **Your number is individual and can be far lower.***
 
 **Ancestry & traits**
@@ -215,6 +217,23 @@ swept across its range for the curve) yields a mean and **95% credible interval*
 **cost-effectiveness acceptability curve**, and a one-way **tornado** — every figure is
 a distribution, not a false point estimate. Reporting follows the **CHEERS 2022**
 checklist in spirit.
+
+**Beyond the base case — five further framings.** Each is derived in *The math* below:
+
+| Framing | Question it answers | Theory |
+|---|---|---|
+| **VaR / CVaR** | How bad is a bad outcome? | coherent tail-risk measures |
+| **Health capital** | Why is this worth more when I'm younger? | Grossman (1972) |
+| **Real options** | Should I test now or wait for cheaper sequencing? | Dixit & Pindyck (1994) |
+| **EVPI** | Could *any* further testing change my decision? | Raiffa & Schlaifer (1961); Claxton (1999) |
+| **Expected utility** | What is certainty itself worth to me? | Arrow (1963); Pratt (1964) |
+
+**The genetics is corrected before the economics.** Two biases would otherwise inflate every
+dollar figure: **ascertainment bias** (penetrance from clinically-ascertained families
+overstates risk for an incidentally-identified carrier — Begg 2002; Gabai-Kapara 2014) and the
+**winner's curse** (GWAS effect sizes are upward-biased by the discovery threshold — Zhong &
+Prentice 2008). Both are shrunk before they reach the model, which makes the outputs *smaller*
+and more defensible.
 
 **Price ≠ value.** Market *price* (what equivalent tests cost to buy) is reported
 separately from health-economic *value* (what acting on the findings is worth) —
@@ -323,12 +342,115 @@ confidence interval) rather than false precision. The curve this produces — th
 reads as: *"at a given value of a healthy year, what's the probability this is actually
 worth it?"*
 
+**6 · Left-tail risk — how bad could this reasonably go?**
+
+```math
+\mathrm{VaR}_{95}=F^{-1}(0.05),\qquad
+\mathrm{CVaR}_{95}=\mathbb{E}\!\left[V \mid V\le \mathrm{VaR}_{95}\right]
+```
+
+*In plain English:* an average hides the downside. **VaR** is the 5th-percentile outcome —
+a bad-but-plausible case. **CVaR** (expected shortfall) is the *average of everything at or
+below that*, i.e. "if it does go badly, how badly on average?" CVaR is the measure risk
+managers prefer because, unlike VaR, it's *coherent* — diversifying can never make it look
+artificially worse. This is the metric behind the tool's "left-tail risk" framing.
+
+**7 · Health as depreciating capital (Grossman 1972)**
+
+```math
+H_{t+1}=H_t\bigl(1-\delta(a)\bigr)+I\cdot(1+\varepsilon),\qquad
+\delta(a)=\delta_0 e^{g(a-20)}
+```
+
+*In plain English:* your health is a **stock**, like a machine or a portfolio. It wears out
+a bit each year — and the wear rate `δ` accelerates as you age — while your effort `I`
+(exercise, screening, treatment) tops it back up. Genomic information doesn't add health
+directly; it makes each unit of effort **more efficient** (`ε`) because you target what
+actually matters for you. The key consequence: an efficiency gain compounds over the years
+you have left, so **the same information is worth more the younger you are** — the model
+reproduces exactly that.
+
+**8 · When to test — the option to wait (Dixit & Pindyck 1994)**
+
+```math
+V(T)=\frac{\text{VOI}\cdot\left(1-\tfrac{T}{H}\right)-C\,(1-c)^{T}}{(1+r)^{T}}
+```
+
+*In plain English:* sequencing gets cheaper every year, so why not wait? Because two things
+cut the other way. First, **you can re-analyse stored data for free forever** — so improving
+science reaches early testers too, and isn't a reason to delay. Second, **every year you
+wait is a year you can't act** on what you'd have found (the `1 − T/H` term). For a genome
+with real findings, waiting destroys more value than the price drop recovers → *test now*.
+The model still says "wait" when the value is low relative to price — which is the honest
+answer in that case.
+
+**9 · The ceiling on information value — EVPI**
+
+```math
+\text{EVPI}=\mathbb{E}_{\theta}\!\left[\max_{a} \text{NB}(a,\theta)\right]-\max_{a}\mathbb{E}_{\theta}\!\left[\text{NB}(a,\theta)\right]\;\ge\;0
+```
+
+*In plain English:* imagine a clairvoyant who removes **all** remaining uncertainty. EVPI is
+the most that clairvoyance could possibly be worth — therefore an upper bound on the value of
+*any* further study or confirmatory test. Crucially, **a small EVPI is good news**: it means
+the recommended actions stay optimal across nearly the whole uncertainty range, so the
+decision is robust and more data wouldn't change it. Low EVPI means "act," not "weak analysis."
+
+**10 · Risk preferences — why information is worth more than its average (Arrow–Pratt)**
+
+```math
+u(\text{CE})=\mathbb{E}\bigl[u(W+X)\bigr]
+\;\;\Longrightarrow\;\;
+\text{CE}\approx\mu-\tfrac{1}{2}\,\gamma\,\frac{\sigma^{2}}{W+\mu}
+```
+
+*In plain English:* most people would take a guaranteed \$900 over a coin-flip for \$2,000 —
+that gap is **risk aversion** (`γ`). The **certainty equivalent** is the guaranteed amount
+you'd accept instead of the uncertain outcome; the difference from the average is the **risk
+premium** you'd pay to avoid uncertainty. Since genomic information *reduces* uncertainty
+about your health, a risk-averse person values it **above** its expected dollar value — the
+same logic that makes insurance markets exist (Arrow 1963).
+
+**11 · Correcting the genetics before the economics**
+
+```math
+\text{odds}_{\text{pop}}=\frac{\text{odds}_{\text{lit}}}{\kappa},\qquad
+\text{odds}_{\text{post}}=\text{odds}_{\text{pop}}\times \text{BF}_{\text{FH}},\qquad
+\hat\beta_{\text{shrunk}}=\hat\beta\cdot\phi(|z|)
+```
+
+*In plain English:* two well-known statistical traps would silently inflate every dollar
+figure, so both are corrected **before** the economics runs:
+
+- **Ascertainment bias.** Classic penetrance numbers come from families studied *because*
+  they had lots of cancer. Applying those to someone who found a variant incidentally
+  overstates their risk — so the estimate is shrunk toward the population rate (`κ`), then
+  updated on family history (`BF`).
+- **Winner's curse.** A gene effect discovered *because* it cleared a significance cutoff is
+  biased upward — the discovery sample's noise had to help it get found. Effect sizes are
+  shrunk (`φ`) accordingly.
+
+Both make the final numbers **smaller and more defensible** — which is the point.
+
+**12 · What the model deliberately does not price**
+
+Genomic results create textbook **asymmetric information**: if you know your risk and an
+insurer doesn't, that's **adverse selection** (Akerlof 1970; Rothschild–Stiglitz 1976); if the
+insurer can price on it, fear of **genetic discrimination** deters testing, and socially
+valuable information goes unacquired. In the US, **GINA (2008) covers health insurance and
+employment but *not* life, disability, or long-term-care insurance.** This is the economic
+argument for the tool's design: **analysing locally lets you capture the decision value of
+your genome without disclosing it into a market that would price against you.**
+
 **Thresholds & sources.** `λ` = \$50k / \$100k / \$150k per healthy year (Neumann et al.,
 *NEJM* 2014); `r` = 3% (Second Panel on Cost-Effectiveness in Health and Medicine);
 cost-of-illness from the ADA, AHA, and Alzheimer's Association; drug–gene values from
-published cost-effectiveness studies (Schackman 2008; Kazi 2014; Deenen 2016; CPIC).
-Every figure is illustrative — a transparent model you can inspect, not a clinical or
-financial guarantee.
+published cost-effectiveness studies (Schackman 2008; Kazi 2014; Deenen 2016; CPIC);
+health capital from Grossman (1972); option timing from Dixit & Pindyck (1994); EVPI from
+Raiffa & Schlaifer (1961) and Claxton (1999); risk preferences from Arrow (1963) and Pratt
+(1964); ascertainment correction from Begg (2002) and Gabai-Kapara (2014); winner's-curse
+shrinkage from Zhong & Prentice (2008). Every figure is illustrative — a transparent model
+you can inspect, not a clinical or financial guarantee.
 
 ## Engineering notes
 
@@ -359,7 +481,7 @@ tested on an **Apple M5 / 24 GB**; runs on macOS or Linux, Apple Silicon or Inte
   commercial-safe set (AlphaMissense + gnomAD) fits in **under 4 GB**.
 - A **chip file needs no extra downloads at all** — the predictor/ClinVar tables are
   only used for whole-genome input.
-- **⏱ The local AI is by far the slowest part — and it's entirely your choice.** The
+- **The local AI is by far the slowest part — and it's entirely your choice.** The
   times above are the fast **deterministic** report (`--no-ai`). Turning the AI on runs a
   local LLM interpretation for *every* module plus the summaries — dozens of calls. This
   is true for **both** a chip and a whole genome (the AI interprets the same modules
@@ -510,13 +632,13 @@ valuation, and not a substitute for clinical-grade testing.*
 
 ```mermaid
 flowchart TB
-    raw["📂 Raw chip file<br/>(23andMe / Ancestry /<br/>TellmeGen / FTDNA …)"]
-    cli["⚙️ analyze.py<br/>(CLI orchestrator)"]
-    snps["📊 snps_df<br/>(pandas DataFrame)"]
-    tier1["🔍 Tier 1 lookup<br/>snp_database.json"]
+    raw["Raw chip file<br/>(23andMe / Ancestry /<br/>TellmeGen / FTDNA …)"]
+    cli["analyze.py<br/>(CLI orchestrator)"]
+    snps["snps_df<br/>(pandas DataFrame)"]
+    tier1["Tier 1 lookup<br/>snp_database.json"]
     raw --> cli --> snps --> tier1
 
-    subgraph Core["🧬 Core analyses (pure functions of snps_df)"]
+    subgraph Core["Core analyses (pure functions of snps_df)"]
         direction LR
         QC["qc"]
         PRS["prs"]
@@ -542,7 +664,7 @@ flowchart TB
     end
     tier1 --> Core
 
-    subgraph V6["💎 V6 personalisation"]
+    subgraph V6["V6 personalisation"]
         direction LR
         BW["bloodwork"]
         SU["supplements"]
@@ -554,7 +676,7 @@ flowchart TB
     Core --> V6
     SU & EX & NU & BW --> PP
 
-    subgraph AI["🤖 Tier 2 AI (optional)"]
+    subgraph AI["Tier 2 AI (optional)"]
         direction LR
         OL["Ollama localhost"]
         NAR["narrative"]
@@ -562,7 +684,7 @@ flowchart TB
     end
     Core -.-> AI
 
-    subgraph Out["📄 Outputs"]
+    subgraph Out["Outputs"]
         direction TB
         R["report.html"]
         T1["tier1_results.json"]
@@ -575,7 +697,7 @@ flowchart TB
         PPH["personalized_plan.html"]
         FB["fhir_bundle.json"]
         NRH["narrative_report.html"]
-        PDF["📕 *.pdf"]
+        PDF["*.pdf"]
     end
     Core --> R
     Core --> T1
