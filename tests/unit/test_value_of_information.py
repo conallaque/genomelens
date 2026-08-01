@@ -22,6 +22,39 @@ def _nvr():
         {"chrom": "1", "pos": 100, "am_score": 0.95, "confidence": "higher"}]}}
 
 
+def test_real_health_economics_category_strings_are_recognised():
+    # REGRESSION: health_economics.py labels findings with human-readable sources
+    # ("Pharmacogenomics", "Polygenic Risk", "Genotype", ...). An earlier version
+    # matched only short keys ("pgx"/"prs"/"apoe"), so every chip finding was
+    # silently dropped and the engine reported "no findings" on chip input.
+    real = {"Pharmacogenomics": "pgx", "Polygenic Risk": "coi",
+            "Genotype": "coi", "Exercise / Lifestyle": "coi", "Longevity": "coi"}
+    for cat, expected_kind in real.items():
+        kind, _ = voi._classify_category(cat, "APOE e3/e4" if cat == "Genotype" else "")
+        assert kind == expected_kind, f"{cat!r} → {kind!r}, expected {expected_kind!r}"
+    # Short internal keys must keep working too (both conventions supported).
+    assert voi._classify_category("pgx")[0] == "pgx"
+    assert voi._classify_category("apoe")[1] == "Alzheimer"
+    # Unknown categories are ignored rather than mis-bucketed.
+    assert voi._classify_category("Something Unknown")[0] == ""
+
+
+def test_chip_only_findings_produce_a_valuation():
+    # The engine must work on a consumer chip, not only on a whole-genome VCF.
+    chip = {"findings_with_economics": [
+        {"finding": "CYP2C19 intermediate metabolizer",
+         "category": "Pharmacogenomics", "confidence": "high"},
+        {"finding": "CAD polygenic risk elevated", "category": "Polygenic Risk",
+         "confidence": "moderate", "qaly_gain": 1.5},
+        {"finding": "APOE e3/e4", "category": "Genotype",
+         "confidence": "moderate", "qaly_gain": 1.5},
+    ]}
+    r = voi.analyze_value_of_information(chip, input_type="chip", n_mc=500)
+    assert r["available"] is True, r.get("reason")
+    assert r["n_findings"] == 3
+    assert r["voi_expost_mean"] != 0
+
+
 def test_runs_on_chip_only():
     r = voi.analyze_value_of_information(_econ(), input_type="chip", n_mc=500)
     assert r["available"] is True

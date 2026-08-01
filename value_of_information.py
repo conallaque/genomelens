@@ -144,18 +144,17 @@ def _collect(economics_result: Optional[Dict],
 
     econ = economics_result or {}
     for f in (econ.get("findings_with_economics") or []):
-        cat = (f.get("category") or "").lower()
+        kind, coi_key = _classify_category(f.get("category"), f.get("finding", ""))
         label = f.get("finding", "genetic finding")
         conf = f.get("confidence", "moderate")
-        if cat == "pgx":
-            key = _match_pgx(label)
-            out.append({"label": label, "kind": "pgx", "pgx_key": key,
+        if kind == "pgx":
+            out.append({"label": label, "kind": "pgx",
+                        "pgx_key": _match_pgx(label),
                         "intervention": 100.0, "wgs_only": False,
                         "haircut": 1.0, "confidence": conf})
-        elif cat in ("prs", "apoe", "exercise_longevity"):
-            coi_key = "Alzheimer" if cat == "apoe" else "CAD"
+        elif kind == "coi":
             out.append({"label": label, "kind": "coi", "coi_key": coi_key,
-                        "p_event": 0.20 if cat != "apoe" else 0.15,
+                        "p_event": 0.15 if coi_key == "Alzheimer" else 0.20,
                         "rrr": 0.30, "qaly": float(f.get("qaly_gain") or 0.5),
                         "intervention": 500.0, "horizon": 25, "wgs_only": False,
                         "haircut": 1.0, "confidence": conf})
@@ -194,11 +193,46 @@ def _collect(economics_result: Optional[Dict],
     return out
 
 
+def _classify_category(category: Optional[str], label: str = "") -> Tuple[str, str]:
+    """Map a health-economics finding onto ('pgx'|'coi'|'', coi_key).
+
+    ``health_economics.py`` labels findings with human-readable sources
+    ("Pharmacogenomics", "Polygenic Risk", "Genotype" for APOE, "Exercise /
+    Lifestyle", "Longevity"). Matching those with substrings — rather than exact
+    lowercase keys — keeps the chip path working: a mismatch here silently drops
+    every chip-only finding and makes the whole engine report "no findings", which
+    is exactly the bug this replaced. Short internal keys stay supported so either
+    naming convention works.
+    """
+    cat = (category or "").strip().lower()
+    text = f"{cat} {(label or '').lower()}"
+    if not cat:
+        return ("", "")
+    # Pharmacogenomics
+    if "pharmaco" in cat or cat in ("pgx", "cpic"):
+        return ("pgx", "")
+    # APOE / dementia risk is reported under the generic "Genotype" source.
+    if "apoe" in text or "alzheim" in text or "dementia" in text:
+        return ("coi", "Alzheimer")
+    # Polygenic risk, lifestyle and longevity findings → cardiometabolic proxy.
+    for token in ("polygenic", "prs", "genotype", "exercise", "lifestyle",
+                  "longevity", "cardio", "metabolic"):
+        if token in cat:
+            return ("coi", "CAD")
+    return ("", "")
+
+
 def _match_pgx(label: str) -> str:
-    low = label.lower()
+    """Map a free-text PGx finding onto a PGX_CEA gene-drug pair, else the generic
+    fallback. Note ``PGx-generic`` has no '/' separator, so drug matching must be
+    guarded — indexing ``split('/')[1]`` unconditionally raises on that key."""
+    low = (label or "").lower()
     for key in PGX_CEA:
-        gene = key.split("/")[0].lower()
-        if gene.replace("*", "").split("-")[0] in low or key.split("/")[1] in low:
+        if "/" not in key:                     # the generic fallback entry
+            continue
+        gene, drug = key.split("/", 1)
+        gene_token = gene.lower().replace("*", "").split("-")[0]
+        if (gene_token and gene_token in low) or (drug and drug.lower() in low):
             return key
     return "PGx-generic"
 
