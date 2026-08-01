@@ -2037,6 +2037,7 @@ def build_voi_html(voi: Optional[Dict]) -> str:
     lo, hi = voi.get("voi_ci_low", 0), voi.get("voi_ci_high", 0)
     marginal = voi.get("marginal_chip_to_wgs", 0)
     p_ce = voi.get("prob_cost_effective", 0)
+    var_95, cvar_95 = voi.get("var_95"), voi.get("cvar_95")
 
     # NMB table (top 8 by NMB).
     rows = ""
@@ -2077,6 +2078,102 @@ def build_voi_html(voi: Optional[Dict]) -> str:
     price = voi.get("price", {})
     methods = "".join(f"<li>{_esc(m)}</li>" for m in (voi.get("methods") or []))
 
+    # ── Extended economic framings: health capital, real options, risk-adjusted ──
+    hc = voi.get("health_capital") or {}
+    ro = voi.get("real_option") or {}
+    ra = voi.get("risk_adjusted") or {}
+    extended = ""
+    if hc.get("available") or ro.get("available") or ra.get("available"):
+        blocks = ""
+        if hc.get("available"):
+            defer = hc.get("years_floor_deferred")
+            blocks += f"""
+<div style="flex:1;min-width:250px;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
+  <div style="font-weight:700;color:#5b6673">Health capital (Grossman 1972)</div>
+  <div style="font-size:.86em;color:#5b6673;margin-top:4px">
+    Health is a stock that depreciates faster with age — δ rises from
+    <strong>{hc.get('delta_at_age')}</strong> to <strong>{hc.get('delta_at_end')}</strong>/yr over the horizon.
+    Information doesn't add health directly; it makes health <em>investment</em> more efficient, so its
+    value compounds over the years you have left.</div>
+  <div style="font-size:.86em;color:#177a54;margin-top:6px">
+    Modelled gain: <strong>{hc.get('pv_health_capital_gain')}</strong> discounted health-capital-years
+    {f"· morbidity threshold deferred ≈ <strong>{defer} yr</strong>" if defer else ""}</div>
+</div>"""
+        if ro.get("available"):
+            ov = ro.get("option_value_of_waiting", 0)
+            blocks += f"""
+<div style="flex:1;min-width:250px;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
+  <div style="font-weight:700;color:#5b6673">Optimal timing (real options)</div>
+  <div style="font-size:.86em;color:#5b6673;margin-top:4px">
+    Sequencing is irreversible, prices fall (~{ro.get('assumed_cost_decline',0):.0%}/yr) and interpretation
+    improves (~{ro.get('assumed_knowledge_growth',0):.0%}/yr) — but the data is a permanent asset you can
+    re-analyse free, so waiting only forfeits protection.</div>
+  <div style="font-size:.86em;color:#177a54;margin-top:6px">
+    Option value of waiting: <strong>{_m(ov)}</strong> → {_esc(ro.get('recommendation',''))}</div>
+</div>"""
+        if ra.get("available"):
+            blocks += f"""
+<div style="flex:1;min-width:250px;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
+  <div style="font-weight:700;color:#5b6673">Risk-adjusted view</div>
+  <div style="font-size:.86em;color:#5b6673;margin-top:4px">
+    Return multiple <strong>{ra.get('roi_multiple')}×</strong> the test cost ·
+    reward-to-variability <strong>{ra.get('reward_to_variability')}</strong> ·
+    certainty equivalent <strong>{_m(ra.get('certainty_equivalent', 0))}</strong>
+    (γ = {ra.get('risk_aversion_gamma')}).</div>
+  <div style="font-size:.78em;color:#9aa4b0;margin-top:6px">{_esc(ra.get('note',''))}</div>
+</div>"""
+        ev = voi.get("evpi") or {}
+        if ev.get("available"):
+            blocks += f"""
+<div style="flex:1;min-width:250px;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
+  <div style="font-weight:700;color:#5b6673">Expected Value of Perfect Information</div>
+  <div style="font-size:.86em;color:#5b6673;margin-top:4px">
+    The ceiling on what <em>any</em> further research could be worth:
+    <strong>{_m(ev.get('evpi', 0))}</strong>. Current information already captures
+    <strong>{(ev.get('share_of_information_captured') or 0) * 100:.1f}%</strong> of the
+    achievable benefit.</div>
+  <div style="font-size:.78em;color:#9aa4b0;margin-top:6px">{_esc(ev.get('interpretation',''))}</div>
+</div>"""
+        ut = voi.get("utility") or {}
+        if ut.get("available") and ut.get("by_gamma"):
+            gam_rows = " · ".join(
+                f"γ={g['gamma']:.0f}: {_m(g['certainty_equivalent'])}"
+                for g in ut["by_gamma"])
+            blocks += f"""
+<div style="flex:1;min-width:250px;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
+  <div style="font-weight:700;color:#5b6673">Risk preferences (Arrow–Pratt)</div>
+  <div style="font-size:.86em;color:#5b6673;margin-top:4px">
+    A risk-averse person values variance reduction above the expected value. Certainty
+    equivalents — {gam_rows}.</div>
+  <div style="font-size:.78em;color:#9aa4b0;margin-top:6px">Health information is a
+    variance-reducing asset; that is why insurance markets exist (Arrow 1963).</div>
+</div>"""
+        pc = voi.get("penetrance_correction") or {}
+        if pc.get("available"):
+            blocks += f"""
+<div style="flex:1;min-width:250px;background:#fdf9f3;border:1px solid #f0e2cf;border-radius:10px;padding:12px 14px">
+  <div style="font-weight:700;color:#5b6673">Ascertainment-corrected penetrance</div>
+  <div style="font-size:.86em;color:#5b6673;margin-top:4px">
+    Literature penetrance <strong>{pc.get('prior_literature_penetrance')}</strong> →
+    population-corrected <strong>{pc.get('population_corrected')}</strong> →
+    posterior <strong>{pc.get('posterior_penetrance')}</strong>
+    (×{pc.get('shrinkage_factor')}).</div>
+  <div style="font-size:.78em;color:#9aa4b0;margin-top:6px">{_esc(pc.get('note',''))}</div>
+</div>"""
+        ie = voi.get("information_economics") or {}
+        ie_block = ""
+        if ie.get("available"):
+            ie_block = f"""
+<div style="background:#f7f9fb;border-left:4px solid #6b3fd1;border-radius:0 8px 8px 0;
+     padding:12px 16px;margin-top:12px;font-size:.86em;color:#5b6673;line-height:1.5">
+  <strong>Information economics.</strong> {_esc(ie.get('adverse_selection_note',''))}
+  {_esc(ie.get('discrimination_note',''))}
+  <em>{_esc(ie.get('privacy_as_economic_design',''))}</em>
+</div>"""
+        extended = f"""
+<h3 style="margin:16px 0 6px;color:#5b6673">Extended economic framings</h3>
+<div style="display:flex;gap:14px;flex-wrap:wrap">{blocks}</div>{ie_block}"""
+
     return f"""
 <section class="clinvar-section" id="value-of-information">
 <h2>Value of Information — Health Economics <span class="pro-pill">VOI</span></h2>
@@ -2099,6 +2196,13 @@ pharmacogenomic averted-adverse-reactions — with a Monte-Carlo sensitivity ana
     <div style="font-size:2em;font-weight:800;color:#6b3fd1">{_m(marginal)}</div>
     <div style="color:#8a94a3;font-size:.82em">added expected value the WGS-only findings unlock</div>
   </div>
+{f'''  <div style="flex:1;min-width:220px;background:linear-gradient(135deg,#fdf3f3,#fdf7ee);
+       border:1px solid #f0d9cf;border-radius:12px;padding:16px">
+    <div style="color:#5b6673;font-size:.85em">Downside risk — a bad 1-in-20 outcome</div>
+    <div style="font-size:2em;font-weight:800;color:#b3541e">{_m(cvar_95)}</div>
+    <div style="color:#8a94a3;font-size:.82em">CVaR&#8329;&#8325; (expected shortfall) · VaR&#8329;&#8325; = {_m(var_95)} &mdash; the
+      average and threshold of the worst 5% of simulated outcomes</div>
+  </div>''' if var_95 is not None else ''}
 </div>
 <table style="width:100%;border-collapse:collapse;font-size:.9em;margin-top:6px">
   <thead><tr style="text-align:left;color:#5b6673;border-bottom:1px solid #e3e7ec">
@@ -2107,6 +2211,7 @@ pharmacogenomic averted-adverse-reactions — with a Monte-Carlo sensitivity ana
   <tbody>{rows}</tbody>
 </table>
 {ceac_svg}
+{extended}
 <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px">
   <div style="flex:1;min-width:240px;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
     <div style="font-weight:700;color:#5b6673">Market <em>price</em> (what these tests cost to buy)</div>
