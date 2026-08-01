@@ -236,28 +236,57 @@ def test_renderer_empty_returns_blank():
     assert renderers.build_economics_html({"findings_with_economics": []}) == ""
 
 
-def test_end_to_end_html_section_appears():
-    """Run on the saved tier1_results.json (produced from test_genome.txt) and
-    confirm the economics section is rendered into HTML."""
-    tier1_path = PROJECT_ROOT / "tier1_results.json"
-    if not tier1_path.exists():
-        pytest.skip("tier1_results.json not present — run analyze.py first")
-    d = json.loads(tier1_path.read_text())
-    findings = {
-        "pgx_summary": d.get("pgx_summary", {}),
-        "prs_summary": d.get("prs_summary", {}),
-        "apoe_genotype": d.get("apoe_genotype"),
+def _tier1_fixture() -> dict:
+    """A hermetic tier-1 summary with known-actionable findings.
+
+    Deliberately does NOT read the on-disk ``tier1_results.json``: that file is a
+    gitignored runtime artifact whose contents depend on whichever genome was
+    analysed last, so a test bound to it skips on CI, skips on a fresh clone, and
+    skips silently the moment someone runs a different input. Building the input
+    inline makes this test actually run everywhere.
+    """
+    return {
+        "pgx_summary": {
+            "CYP2C19": {"phenotype": "Intermediate metabolizer", "activity_score": 1.0},
+            "CYP2C9": {"phenotype": "Poor metabolizer", "activity_score": 0.5},
+        },
+        "prs_summary": {
+            "Coronary Artery Disease": {"tier": "High", "percentile": 92},
+            "Type 2 Diabetes": {"tier": "Elevated", "percentile": 78},
+        },
+        "apoe_genotype": "e3/e4",
     }
-    res = he.analyze_health_economics(findings, pd.DataFrame())
-    if res["n_findings"] < 1:
-        # The on-disk tier1_results.json isn't the expected fixture (e.g. it was
-        # regenerated from a different/synthetic genome). Skip rather than fail —
-        # this test validates rendering, not the contents of a stray runtime file.
-        pytest.skip("on-disk tier1_results.json is not the expected fixture")
+
+
+def test_end_to_end_html_section_appears():
+    """Economics analysis → rendered HTML section, on a self-contained fixture."""
+    res = he.analyze_health_economics(_tier1_fixture(), pd.DataFrame())
+    assert res["n_findings"] >= 1, "hermetic fixture should yield actionable findings"
     html = renderers.build_economics_html(res)
     assert 'id="health-economics"' in html
     assert "Health Economics" in html
     assert "ROI" in html
+
+
+def test_on_disk_tier1_matches_engine_when_present():
+    """Opportunistic check against the real runtime artifact, when it happens to be
+    present AND was produced from a genome with actionable findings. Skipping here is
+    legitimate — this asserts nothing the hermetic test above doesn't already cover;
+    it only catches drift between the saved file's shape and the engine's expectations.
+    """
+    tier1_path = PROJECT_ROOT / "tier1_results.json"
+    if not tier1_path.exists():
+        pytest.skip("tier1_results.json not present — optional integration check")
+    d = json.loads(tier1_path.read_text())
+    res = he.analyze_health_economics({
+        "pgx_summary": d.get("pgx_summary", {}),
+        "prs_summary": d.get("prs_summary", {}),
+        "apoe_genotype": d.get("apoe_genotype"),
+    }, pd.DataFrame())
+    # Shape contract must hold regardless of whether the genome had findings.
+    assert isinstance(res.get("n_findings"), int)
+    assert "findings_with_economics" in res
+    assert res.get("status") in ("ok", "no_findings", None) or isinstance(res.get("status"), str)
 
 
 # ── Personal economic-impact sheet ────────────────────────────────────────────
