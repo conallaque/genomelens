@@ -225,8 +225,19 @@ checklist in spirit.
 | **VaR / CVaR** | How bad is a bad outcome? | coherent tail-risk measures |
 | **Health capital** | Why is this worth more when I'm younger? | Grossman (1972) |
 | **Real options** | Should I test now or wait for cheaper sequencing? | Dixit & Pindyck (1994) |
-| **EVPI** | Could *any* further testing change my decision? | Raiffa & Schlaifer (1961); Claxton (1999) |
+| **EVPI / EVPPI** | Could *any* further testing change my decision — and which input matters? | Raiffa & Schlaifer (1961); Claxton (1999); Strong et al. (2014) |
 | **Expected utility** | What is certainty itself worth to me? | Arrow (1963); Pratt (1964) |
+| **Prospect theory + hyperbolic discounting** | Why don't people buy a test that's clearly worth it? | Kahneman & Tversky (1979); Laibson (1997) |
+
+**And on the genetics side, before any of it is monetised:**
+
+| Correction | What it prevents | Theory |
+|---|---|---|
+| **Liability threshold** | Reporting a scary relative risk without the absolute risk | Falconer (1965) |
+| **Competing risks** | Counting disease risk in years you may not be alive for | Fine & Gray (1999) |
+| **Ascertainment de-biasing** | Family-study penetrance applied to an incidental carrier | Begg (2002) |
+| **Winner's curse + James–Stein** | Taking selected, noisy effect sizes at face value | Zhong & Prentice (2008); James & Stein (1961) |
+| **Ancestry portability** | Pretending a European-derived score transfers unchanged | Martin (2019); Privé (2022) |
 
 **The genetics is corrected before the economics.** Two biases would otherwise inflate every
 dollar figure: **ascertainment bias** (penetrance from clinically-ascertained families
@@ -432,7 +443,99 @@ figure, so both are corrected **before** the economics runs:
 
 Both make the final numbers **smaller and more defensible** — which is the point.
 
-**12 · What the model deliberately does not price**
+**12 · From percentile to actual risk — the liability-threshold model (Falconer 1965)**
+
+```math
+T=\Phi^{-1}(1-K),\qquad
+P(\text{affected}\mid \text{PRS})=1-\Phi\!\left(\frac{T-z_q\sqrt{R^2}}{\sqrt{1-R^2}}\right)
+```
+
+*In plain English:* "you're in the 95th percentile" is not a risk. This is the standard
+way to turn it into one. Picture a hidden "liability" scale everyone sits on; you get the
+disease if you cross a threshold `T` set by how common it is (`K`). Your score nudges you
+along that scale, and the answer is how much of your remaining bell curve sits past the
+line. **Crucially it returns absolute risk, not just relative risk** — a "3× higher risk"
+of something rare is still rare, and that's the single most common way consumer genomics
+misleads people.
+
+*(A subtlety worth knowing: risk is convex here, so the median-PRS person sits slightly
+below the population average while the average across everyone comes out exactly at `K`.
+Verified numerically — see the docstring.)*
+
+**13 · Penetrance is a curve, not a number — with competing risks (Fine & Gray 1999)**
+
+```math
+\text{CIF}(t)=\int_0^{t} S_{\text{all}}(u)\,h_{\text{disease}}(u)\,du
+\;<\;1-e^{-\int_0^t h_{\text{disease}}}
+```
+
+*In plain English:* "55% lifetime risk" hides *when*, and ignores that **you can only die
+once**. If something else takes you first, you never get the disease. The naive formula
+(right side) quietly assumes nobody dies of anything else and therefore **overstates
+risk** — by about 9 percentage points in our worked case. The left side is the honest
+version: risk accumulated only over the years you're actually alive to accumulate it.
+
+**14 · Longer lifespans make this worth *more*, not less**
+
+Rising life expectancy pushes in the same direction twice: less competing mortality means
+more genetic risk is actually realised, **and** a longer horizon means prevention compounds
+for more years. Modelled explicitly:
+
+| Scenario | Life expectancy | Realised risk | vs today |
+|---|---|---|---|
+| 2025 baseline | ~79 | 73.2% | — |
+| 2050 projection | ~85 | 77.0% | +5.3% |
+| Longevity-advance | ~95 | 81.0% | +10.8% |
+
+*In plain English:* the model's default assumes today's lifespans. If medicine and applied
+AI extend healthy life within our lifetimes — plausible — then the value reported here is an
+**under**-estimate, not an over-estimate. The conservative choice is genuinely conservative.
+
+**15 · Shrinking many noisy estimates at once (James–Stein / empirical Bayes)**
+
+```math
+\tau^{2}=\max\!\left(0,\ \widehat{\mathrm{Var}}(\hat\beta)-\overline{SE^{2}}\right),\quad
+w_i=\frac{\tau^{2}}{\tau^{2}+SE_i^{2}},\quad
+\beta_i^{*}=w_i\hat\beta_i+(1-w_i)\bar\beta
+```
+
+*In plain English:* when you hold many noisy estimates, taking each at face value is
+provably worse than pulling them all toward the average — the famous James–Stein result.
+The weight `w` is each estimate's reliability, so **the noisiest numbers get pulled the
+hardest**. Same instinct as not trading on a single noisy signal.
+
+**16 · Polygenic scores don't transfer across ancestries — so the model attenuates them**
+
+```math
+R^{2}_{\text{eff}}=R^{2}_{\text{EUR}}\times \rho_{\text{ancestry}},\qquad
+\rho \approx 1.00\,/\,0.65\,/\,0.50\,/\,0.25
+```
+
+*In plain English:* most genetic studies were done in European-ancestry cohorts, so those
+scores predict less well elsewhere — retaining roughly a quarter of their accuracy in
+African-ancestry individuals. Because risk runs through the liability model, **a less
+informative score automatically pulls your estimate back toward the population average**,
+which is the statistically correct behaviour. This is a data-equity problem in genomics,
+and the model surfaces it rather than burying it in a footnote.
+
+**17 · Which uncertainty is worth resolving (EVPPI), and why people still don't test**
+
+```math
+\text{EVPPI}(\varphi)=\mathbb{E}_{\varphi}\!\left[\max_a \mathbb{E}_{\theta\mid\varphi}\text{NB}\right]-\max_a\mathbb{E}_{\theta}\text{NB},
+\qquad 0\le\text{EVPPI}\le\text{EVPI}
+```
+
+*In plain English:* EVPPI asks, one input at a time, *"if I could know this perfectly,
+would I actually decide differently?"* It tells you where a confirmatory test is worth
+buying — and where more precision would be wasted money.
+
+And a behavioural coda: under **prospect theory**, a certain up-front cost hurts about
+**2.25×** more than an equivalent uncertain future gain feels good, while **hyperbolic
+discounting** further shrinks benefits that arrive decades out. Together they explain the
+gap between a test that is clearly worth it on paper and one people actually buy — an
+*adoption* problem, not a valuation problem.
+
+**18 · What the model deliberately does not price**
 
 Genomic results create textbook **asymmetric information**: if you know your risk and an
 insurer doesn't, that's **adverse selection** (Akerlof 1970; Rothschild–Stiglitz 1976); if the
