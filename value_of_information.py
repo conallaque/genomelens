@@ -370,6 +370,27 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
     except Exception:
         result["utility"] = {"available": False}
 
+    # ── HEOR deliverables: Markov cohort CEA + payer budget impact ──
+    try:
+        import markov_model as _mk
+        _mkr = _mk.markov_cost_effectiveness(start_age=_age, wtp=wtp)
+        _mkr["validation"] = _mk.validate_markov(_mkr)
+        result["markov"] = _mkr
+        result["budget_impact"] = _mk.budget_impact()
+    except Exception:
+        result["markov"] = {"available": False}
+        result["budget_impact"] = {"available": False}
+
+    # ── Welfare comparison: local vs centralised analysis, conceding a capability
+    #    premium to the centralised alternative so the result isn't assumed. ──
+    try:
+        result["welfare"] = analyze_welfare_comparison(
+            voi=float(result.get("voi_expost_mean",
+                                 result.get("voi_expost_point", 0.0))) + test_cost,
+            test_cost=test_cost)
+    except Exception:
+        result["welfare"] = {"available": False}
+
     # ── Information economics: adverse selection, genetic discrimination, and why
     #    local-only analysis is an economic design choice. ──
     try:
@@ -947,6 +968,130 @@ def analyze_utility(mean: float, sd: float, wealth: float = 60_000.0) -> Dict:
                       4.0: "high risk aversion"}[gamma],
         })
     return out
+
+
+def analyze_welfare_comparison(voi: float, test_cost: float,
+                               capability_premium: float = 0.15,
+                               p_breach_annual: float = 0.02,
+                               horizon_years: int = 40,
+                               loss_given_breach: float = 25_000.0,
+                               participation_local: float = 0.85,
+                               participation_central: float = 0.60,
+                               participation_source: str = "Miller & Tucker (2018)") -> Dict:
+    """**Welfare comparison: local vs centralised genomic analysis.**
+
+    The economic case for local-only analysis, stated as a surplus comparison rather
+    than a privacy slogan. For an individual:
+
+        S_local   = B_L − C_test
+        S_central = B_C − C_test − E[L_privacy]
+
+    The naive claim "local wins because it has no privacy cost" is *trivially* true and
+    therefore uninteresting: it assumes B_L = B_C. This function concedes the harder
+    case — centralised platforms may deliver a **higher gross benefit** (larger reference
+    panels, curated pipelines, expert review), captured by ``capability_premium`` so
+    B_C = B_L·(1+π). The comparison then has real content:
+
+        **Local is preferred  ⟺  E[L_privacy] > B_C − B_L = π·B_L**
+
+    i.e. local wins only when the expected privacy cost exceeds the capability gap.
+    The function reports the **break-even breach probability** at which a rational agent
+    is indifferent — the number that actually decides the argument.
+
+    **Expected privacy cost.** A genome is non-revocable: unlike a password it cannot be
+    re-keyed after disclosure, so exposure is a *permanent* state, and the hazard applies
+    every year the data sits in a third-party system:
+
+        E[L_privacy] = L · [1 − (1 − p)^T]   (discounted)
+
+    **Social surplus adds a participation channel.** Disclosure risk deters testing
+    altogether (Akerlof-style unravelling): people who decline forfeit the *entire* VOI.
+    Social surplus is therefore participation-weighted, and local analysis can dominate
+    on access even where per-person benefit is identical.
+
+    **The participation gap is empirically grounded, not assumed.** Miller & Tucker
+    (2018, *Management Science* 64(10):4648–4668) exploit state-level variation in US
+    genetic-privacy law and find that regimes granting patients **control** over their
+    genetic data raise testing incidence by **+83%**, while regimes that merely notify
+    people of privacy risk and ask them to consent — *without* granting control — lower
+    testing by **−69%**. That contrast is close to the local-vs-cloud distinction here:
+    local analysis is the maximal-control regime; uploading under a terms-of-service
+    consent is the notice-without-control regime. Survey evidence agrees on direction:
+    NORC finds ~80% of Americans hold privacy concerns about DNA testing, ~17% of
+    non-testers name privacy as the reason they abstain, and four in five non-testers
+    say they would be more willing if privacy were assured.
+
+    The defaults used here (0.85 vs 0.60, a 1.42× ratio) are **deliberately more
+    conservative than the literature**, whose implied ratio between the control and
+    notice-only regimes is far larger.
+    """
+    B_L = float(voi)
+    B_C = B_L * (1.0 + float(capability_premium))          # concede the capability gap
+    r = DISCOUNT_RATE
+
+    # Cumulative probability the data is exposed at least once over the horizon,
+    # with the loss discounted to present value at the mid-point of the horizon.
+    p_any = 1.0 - (1.0 - float(p_breach_annual)) ** int(horizon_years)
+    disc_mid = 1.0 / ((1.0 + r) ** (horizon_years / 2.0))
+    e_loss = p_any * float(loss_given_breach) * disc_mid
+
+    s_local = B_L - test_cost
+    s_central = B_C - test_cost - e_loss
+    capability_gap = B_C - B_L
+
+    # Break-even annual breach probability: solve p_any·L·disc = capability_gap.
+    if loss_given_breach * disc_mid > 0:
+        p_any_star = min(1.0, capability_gap / (loss_given_breach * disc_mid))
+        # invert 1-(1-p)^T = p_any_star
+        p_star = 1.0 - (1.0 - p_any_star) ** (1.0 / max(1, horizon_years)) \
+            if p_any_star < 1.0 else 1.0
+    else:
+        p_star = None
+
+    # Social surplus: participation-weighted (the chilling-effect channel).
+    soc_local = participation_local * s_local
+    soc_central = participation_central * s_central
+    access_gain = (participation_local - participation_central) * max(0.0, s_local)
+
+    return {
+        "available": True,
+        "benefit_local": round(B_L),
+        "benefit_central": round(B_C),
+        "capability_premium_assumed": capability_premium,
+        "capability_gap": round(capability_gap),
+        "expected_privacy_cost": round(e_loss),
+        "prob_exposure_over_horizon": round(p_any, 4),
+        "surplus_local": round(s_local),
+        "surplus_central": round(s_central),
+        "surplus_advantage_local": round(s_local - s_central),
+        "local_preferred": bool(s_local > s_central),
+        "breakeven_annual_breach_prob": (round(p_star, 5) if p_star is not None else None),
+        "participation_local": participation_local,
+        "participation_central": participation_central,
+        "participation_evidence": (
+            "Miller & Tucker (2018, Management Science): US state privacy regimes "
+            "granting patient CONTROL raise genetic-testing incidence +83%; regimes "
+            "with notice-and-consent but no control lower it -69%. NORC: ~80% hold "
+            "privacy concerns, ~17% of non-testers cite privacy as the reason, 4 in 5 "
+            "would be more willing under assured privacy. The 1.42x ratio used here is "
+            "conservative relative to that evidence."),
+        "social_surplus_local": round(soc_local),
+        "social_surplus_central": round(soc_central),
+        "access_channel_gain": round(access_gain),
+        "interpretation": (
+            "Local analysis is preferred when the expected privacy cost exceeds the "
+            "capability gap conceded to centralised platforms. Because a genome cannot "
+            "be revoked, its exposure hazard compounds over the whole horizon, so even "
+            "a low annual breach probability accumulates. A second, larger channel is "
+            "access: disclosure risk deters testing entirely, and a non-tester forfeits "
+            "100% of the value — so local analysis raises social surplus mainly by "
+            "letting more people participate at all."),
+        "caveat": ("Illustrative welfare arithmetic with assumed parameters, not an "
+                   "empirical estimate. The capability premium is deliberately set in "
+                   "favour of the centralised alternative so the comparison is not "
+                   "assumed true by construction."),
+        "src": "Akerlof (1970); Posner (1981) economics of privacy; Acquisti et al. (2016) JEL",
+    }
 
 
 def analyze_insurance_economics(evpi: float, mean_value: float) -> Dict:

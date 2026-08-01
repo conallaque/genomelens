@@ -91,6 +91,31 @@ python analyze.py ~/Downloads/genome.txt --chat
 The AI only ever sees your deterministic findings, and a guardrail rejects any number
 it tries to invent (see [Engineering notes](#engineering-notes)).
 
+> ### ⚠ Important — read before using the chat
+>
+> **This is not medical advice, and the AI is not a doctor or a genetic counsellor.**
+>
+> - The chat assistant is an **educational tool only**. It cannot diagnose, cannot
+>   prescribe, cannot interpret your results clinically, and must **never** be used to
+>   start, stop, or change any medication, treatment, screening, or health decision.
+> - **Language models make mistakes.** The grounding guardrail reduces fabricated
+>   figures but **cannot eliminate error**. Anything the assistant says may be wrong,
+>   incomplete, or misleading — including statements that sound confident and specific.
+> - **Consumer and self-sequenced DNA data is not clinical-grade.** It carries false
+>   positives and false negatives. A finding here is a *hypothesis to confirm*, never a
+>   result to act on.
+> - **A "clear" result does not mean you are not at risk.** Most disease risk is not
+>   captured by this tool at all.
+> - **Take every question or concern to a licensed physician and a board-certified
+>   genetic counsellor**, who can order accredited confirmatory testing and interpret it
+>   in the context of your personal and family history. If you believe you may have a
+>   medical emergency, contact emergency services immediately.
+>
+> By using this software you accept that it is provided for education and research
+> **"as is", without warranty of any kind**, and that you are solely responsible for any
+> decisions you make. See the [LICENSE](LICENSE) and the disclaimers throughout this
+> document.
+
 ### Using a whole genome instead of a chip?
 Same commands — just point at your `.vcf`/`.vcf.gz` and fetch the predictor tables once:
 ```bash
@@ -535,15 +560,143 @@ discounting** further shrinks benefits that arrive decades out. Together they ex
 gap between a test that is clearly worth it on paper and one people actually buy — an
 *adoption* problem, not a valuation problem.
 
-**18 · What the model deliberately does not price**
+**18 · Asymmetric information — what the model deliberately does not price**
 
 Genomic results create textbook **asymmetric information**: if you know your risk and an
 insurer doesn't, that's **adverse selection** (Akerlof 1970; Rothschild–Stiglitz 1976); if the
 insurer can price on it, fear of **genetic discrimination** deters testing, and socially
 valuable information goes unacquired. In the US, **GINA (2008) covers health insurance and
-employment but *not* life, disability, or long-term-care insurance.** This is the economic
-argument for the tool's design: **analysing locally lets you capture the decision value of
-your genome without disclosing it into a market that would price against you.**
+employment but *not* life, disability, or long-term-care insurance.**
+
+**19 · The welfare case for local analysis — and the number that decides it**
+
+This is the economic argument for the tool's whole design, stated so it can be *falsified*
+rather than asserted. The naive version is circular:
+
+```math
+S_{\text{local}} = B - 0 \;>\; S_{\text{central}} = B - C_{\text{privacy}}
+```
+
+That holds for any positive privacy cost **by construction**, because it assumes both
+options deliver the same gross benefit. So the model instead **concedes that centralised
+platforms are better at the analysis** (bigger reference panels, curated pipelines, expert
+review) by a capability premium `π`:
+
+```math
+S_{\text{local}} = B_L - C_{\text{test}},\qquad
+S_{\text{central}} = \underbrace{B_L(1+\pi)}_{\text{better analysis}} - C_{\text{test}} - \mathbb{E}[L_{\text{privacy}}]
+```
+
+```math
+\textbf{Local wins} \iff \mathbb{E}[L_{\text{privacy}}] > \pi B_L
+```
+
+*In plain English:* going local costs you something real — a platform with more data may
+genuinely analyse it better. Local only wins if the expected privacy cost is **bigger than
+that sacrifice**. Note what cancels: `B_L` and the sequencing cost drop out of the
+comparison entirely, because you pay the test either way.
+
+**Exposure is an absorbing state.** A genome cannot be re-keyed after disclosure, so the
+hazard applies every year the data sits in someone else's system, and one breach is enough
+— forever:
+
+```math
+\mathbb{E}[L_{\text{privacy}}] = \underbrace{\bigl[1-(1-p)^{T}\bigr]}_{\text{at least one breach in }T\text{ yrs}} \cdot L \cdot (1+r)^{-T/2}
+```
+
+*(Not `p × T` — that double-counts years after the first breach, and exceeds 1 when
+`pT > 1`. It's a survival problem, not a counting problem.)*
+
+**The break-even.** Setting the two surpluses equal and solving gives the annual breach
+probability at which a rational person is exactly indifferent:
+
+```math
+p^{*} = 1-\left(1-\frac{\pi B_L}{L\,(1+r)^{-T/2}}\right)^{1/T}
+```
+
+With the shipped defaults (`B_L` = \$25k, `π` = 15%, `L` = \$25k, `T` = 40, `r` = 3%):
+**`p* ≈ 0.79% per year.`** Below that, centralised analysis genuinely wins; above it, local
+does. **The model can and does conclude "centralised wins" at low breach risk** — which is
+precisely what makes the opposite conclusion meaningful.
+
+**Then check it against reality.** In 2023 a single credential-stuffing incident exposed
+roughly **6.9 million of ~14 million** 23andMe users — about **49% in one event**, some
+**60×** the 0.79% annual threshold. The empirical hazard clears the bar decisively.
+
+**The bigger channel is access, not exposure — and this one is empirically grounded.**
+Disclosure risk doesn't just impose a cost on people who upload; it stops people testing at
+all, and a non-tester forfeits *100%* of the value. Weighting surplus by participation (`θ`):
+
+```math
+W = \theta \cdot S,\qquad
+\underbrace{(\theta_L-\theta_C)\,S_{\text{local}}}_{\text{access channel}}
+```
+
+The participation gap is **not an assumption**. Miller & Tucker (2018, *Management Science*)
+exploit state-level variation in US genetic-privacy law and find that regimes granting
+patients **control** over their genetic data raise testing incidence by **+83%**, while
+regimes that merely notify people of privacy risk and ask them to consent — *without*
+granting control — **lower testing by 69%**. That contrast maps almost directly onto the
+choice modelled here: local analysis is the maximal-control regime; uploading under a
+terms-of-service click is the notice-without-control regime. Survey evidence agrees on
+direction — NORC finds **~80%** of Americans hold privacy concerns about DNA testing, **~17%**
+of non-testers name privacy as their reason, and **four in five** non-testers say they would
+be more willing if privacy were assured.
+
+The defaults used here (`θ_L` = 0.85 vs `θ_C` = 0.60, a 1.42× ratio) are **deliberately
+more conservative than that literature**, whose implied control-vs-notice ratio is far
+larger. Even so, the access channel is worth **\$6,175** — *larger than the entire
+per-person privacy effect (\$3,923)*.
+
+So the dominant welfare loss from centralisation is **Akerlof-style unravelling among the
+people who never test at all** — a deadweight loss concentrated in transactions that never
+happen, which is precisely why it is easy to miss: it is invisible in the data of people who
+did test. It also reframes what this tool is. GenomeLens is not mainly "the private option
+for people who would have tested anyway" — modelled this way it is an **access
+intervention**, and in welfare terms access effects typically dominate quality effects.
+
+*Why this matters methodologically:* the model converts a values argument ("privacy is
+good") into **a falsifiable empirical question** — *is the annual breach hazard above
+0.79%?* — and then the data answers it. Every parameter here is an assumption you can
+change and re-run; none of it is a slogan.
+
+**20 · Markov cohort model and budget impact — the two standard HEOR deliverables**
+
+A static decision model cannot answer "what happens over 40 years?" or "can a payer afford
+this?" Both canonical structures are implemented in [`markov_model.py`](markov_model.py).
+
+**Markov state-transition cohort model.** A closed cohort moves between health states
+(Well → Disease → Dead) on annual cycles under a validated transition matrix:
+
+```math
+\mathbf{s}_{t+1}=\mathbf{s}_t\mathbf{P},\qquad
+p = 1-e^{-r\Delta t},\qquad
+\text{ICER}=\frac{\Delta \text{Cost}}{\Delta \text{QALY}}
+```
+
+*In plain English:* track a group of people year by year. Each year some stay well, some
+develop the disease, some die — of the disease or of anything else. Add up the costs and
+quality-adjusted life-years each arm accrues, and the difference between the
+genotype-guided arm and standard care gives the **ICER**, the number an HTA body reads.
+
+Conventions a reviewer checks for, all implemented: **half-cycle correction** (states are
+entered continuously, not on cycle boundaries), **rate→probability conversion**
+`p = 1 − e^{−rΔt}` (never `r·Δt`, which can exceed 1), **age-dependent competing mortality**,
+discounting of both costs and QALYs, and structural validation that the cohort is conserved
+and death is absorbing.
+
+**Budget impact analysis (BIA).** CEA asks *is it worth it?*; BIA asks *can we afford it?* —
+and the conventions deliberately differ (ISPOR Task Force):
+
+```math
+\text{PMPM}_y=\frac{\text{Cost}_y^{\text{test}}+\text{Cost}_y^{\text{intervention}}-\text{Offsets}_y}{N_{\text{members}}\times 12}
+```
+
+*In plain English:* a payer doesn't care about 40-year QALYs — they care what hits next
+year's budget. So BIA is short-horizon (1–5 years), scaled to a real plan population,
+**undiscounted** (these are actual cash outlays), phases in **uptake** rather than assuming
+instant adoption, and reports **per-member-per-month** — the metric that actually decides
+formulary placement.
 
 **Thresholds & sources.** `λ` = \$50k / \$100k / \$150k per healthy year (Neumann et al.,
 *NEJM* 2014); `r` = 3% (Second Panel on Cost-Effectiveness in Health and Medicine);

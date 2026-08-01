@@ -2200,6 +2200,87 @@ def build_voi_html(voi: Optional[Dict]) -> str:
     <tbody>{lrows}</tbody></table>
   <div style="font-size:.78em;color:#9aa4b0;margin-top:6px">{_esc(lon.get('direction',''))}</div>
 </div>"""
+        mk_ = voi.get("markov") or {}
+        if mk_.get("available"):
+            sc, gg = mk_.get("standard_care", {}), mk_.get("genomic_guided", {})
+            icer_txt = (f"{_m(mk_['icer'])}/QALY" if mk_.get("icer") is not None
+                        else "n/a")
+            val = (mk_.get("validation") or {}).get("all_passed")
+            blocks += f"""
+<div style="flex:1 1 100%;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
+  <div style="font-weight:700;color:#5b6673">Markov cohort model (state-transition CEA)</div>
+  <table style="width:100%;border-collapse:collapse;font-size:.85em;margin-top:6px">
+    <thead><tr style="text-align:left;color:#8a94a3"><th>Strategy</th>
+      <th style="text-align:right">Cost</th><th style="text-align:right">QALYs</th>
+      <th style="text-align:right">Life-years</th></tr></thead>
+    <tbody>
+      <tr><td>Standard care</td><td style="text-align:right">{_m(sc.get('total_cost',0))}</td>
+        <td style="text-align:right">{sc.get('total_qaly',0):.3f}</td>
+        <td style="text-align:right">{sc.get('total_life_years',0):.3f}</td></tr>
+      <tr><td>Genotype-guided</td><td style="text-align:right">{_m(gg.get('total_cost',0))}</td>
+        <td style="text-align:right">{gg.get('total_qaly',0):.3f}</td>
+        <td style="text-align:right">{gg.get('total_life_years',0):.3f}</td></tr>
+      <tr style="font-weight:700;border-top:1px solid #e3e7ec">
+        <td>Incremental</td><td style="text-align:right">{_m(mk_.get('incremental_cost',0))}</td>
+        <td style="text-align:right">{mk_.get('incremental_qaly',0):+.3f}</td>
+        <td style="text-align:right">{mk_.get('incremental_life_years',0):+.3f}</td></tr>
+    </tbody></table>
+  <div style="font-size:.86em;color:#177a54;margin-top:6px">
+    ICER <strong>{icer_txt}</strong> · NMB {_m(mk_.get('nmb_at_wtp',0))} ·
+    <strong>{_esc(mk_.get('verdict',''))}</strong></div>
+  <div style="font-size:.78em;color:#9aa4b0;margin-top:4px">
+    Annual cycles · half-cycle correction · p = 1−e<sup>−rΔt</sup> · age-dependent competing
+    mortality · both costs and QALYs discounted{' · structural validation passed' if val else ''}.</div>
+</div>"""
+        bi = voi.get("budget_impact") or {}
+        if bi.get("available"):
+            birows = "".join(
+                f"<tr><td>Year {r['year']}</td>"
+                f"<td style='text-align:right'>{r['uptake']:.0%}</td>"
+                f"<td style='text-align:right'>{r['tested_cumulative']:,}</td>"
+                f"<td style='text-align:right'>{_m(r['offsets'])}</td>"
+                f"<td style='text-align:right'>{_m(r['net_budget_impact'])}</td>"
+                f"<td style='text-align:right'>${r['pmpm']:.4f}</td></tr>"
+                for r in bi.get("rows", []))
+            blocks += f"""
+<div style="flex:1 1 100%;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
+  <div style="font-weight:700;color:#5b6673">Budget impact — the payer's question</div>
+  <div style="font-size:.86em;color:#5b6673;margin-top:4px">
+    Plan of {bi.get('plan_members',0):,} members, {bi.get('eligible_population',0):,} eligible.
+    Undiscounted, uptake phased in — <strong>PMPM</strong> is the decision metric.</div>
+  <table style="width:100%;border-collapse:collapse;font-size:.85em;margin-top:6px">
+    <thead><tr style="text-align:left;color:#8a94a3"><th>Year</th>
+      <th style="text-align:right">Uptake</th><th style="text-align:right">Tested</th>
+      <th style="text-align:right">Offsets</th><th style="text-align:right">Net impact</th>
+      <th style="text-align:right">PMPM</th></tr></thead>
+    <tbody>{birows}</tbody></table>
+  <div style="font-size:.86em;color:#177a54;margin-top:6px">
+    Peak PMPM <strong>${bi.get('peak_pmpm',0):.4f}</strong> (year {bi.get('peak_year')}) ·
+    5-year cumulative {_m(bi.get('cumulative_net',0))}
+    {'· becomes cost-saving within the horizon' if bi.get('becomes_cost_saving') else ''}</div>
+</div>"""
+        wf = voi.get("welfare") or {}
+        if wf.get("available"):
+            verdict = ("local analysis preferred" if wf.get("local_preferred")
+                       else "centralised would win at this breach risk")
+            blocks += f"""
+<div style="flex:1 1 100%;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
+  <div style="font-weight:700;color:#5b6673">Welfare: local vs centralised analysis</div>
+  <div style="font-size:.86em;color:#5b6673;margin-top:4px">
+    Conceding centralised platforms a <strong>+{wf.get('capability_premium_assumed',0):.0%}</strong>
+    capability advantage (gap {_m(wf.get('capability_gap',0))}), local is preferred only if the
+    expected privacy cost exceeds it. Expected privacy cost
+    <strong>{_m(wf.get('expected_privacy_cost',0))}</strong>
+    ({wf.get('prob_exposure_over_horizon',0):.0%} chance of exposure over the horizon — a genome
+    cannot be revoked) → <strong>S<sub>local</sub> {_m(wf.get('surplus_local',0))}</strong> vs
+    S<sub>central</sub> {_m(wf.get('surplus_central',0))}: <strong>{_esc(verdict)}</strong>.</div>
+  <div style="font-size:.86em;color:#177a54;margin-top:6px">
+    Break-even annual breach probability:
+    <strong>{(wf.get('breakeven_annual_breach_prob') or 0):.2%}</strong> — below this, centralised
+    analysis wins; above it, local does.</div>
+  <div style="font-size:.78em;color:#9aa4b0;margin-top:6px">{_esc(wf.get('interpretation',''))}</div>
+  <div style="font-size:.78em;color:#b0868a;margin-top:4px">{_esc(wf.get('caveat',''))}</div>
+</div>"""
         ie = voi.get("information_economics") or {}
         ie_block = ""
         if ie.get("available"):

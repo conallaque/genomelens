@@ -220,6 +220,43 @@ def test_longevity_wired_into_voi_result():
     assert blended == sorted(blended)     # longer life → more realised risk
 
 
+def test_welfare_comparison_is_not_assumed_true():
+    # The model must be able to conclude CENTRALISED wins — otherwise the local-wins
+    # result is assumed by construction and carries no information.
+    low_risk = voi.analyze_welfare_comparison(voi=25_000, test_cost=300,
+                                              p_breach_annual=0.001)
+    high_risk = voi.analyze_welfare_comparison(voi=25_000, test_cost=300,
+                                               p_breach_annual=0.05)
+    assert low_risk["local_preferred"] is False      # capability gap dominates
+    assert high_risk["local_preferred"] is True      # privacy cost dominates
+
+
+def test_welfare_breakeven_probability_is_the_pivot():
+    w = voi.analyze_welfare_comparison(voi=25_000, test_cost=300)
+    p_star = w["breakeven_annual_breach_prob"]
+    assert 0.0 < p_star < 1.0
+    just_below = voi.analyze_welfare_comparison(voi=25_000, test_cost=300,
+                                                p_breach_annual=p_star * 0.5)
+    just_above = voi.analyze_welfare_comparison(voi=25_000, test_cost=300,
+                                                p_breach_annual=min(1.0, p_star * 2))
+    assert just_below["local_preferred"] is False
+    assert just_above["local_preferred"] is True
+
+
+def test_welfare_privacy_cost_rises_with_exposure_horizon():
+    # A genome cannot be revoked, so exposure hazard accumulates over the horizon.
+    short = voi.analyze_welfare_comparison(voi=25_000, test_cost=300, horizon_years=5)
+    long = voi.analyze_welfare_comparison(voi=25_000, test_cost=300, horizon_years=40)
+    assert long["prob_exposure_over_horizon"] > short["prob_exposure_over_horizon"]
+
+
+def test_welfare_access_channel_is_positive():
+    # Higher participation under local analysis is itself a social-surplus gain.
+    w = voi.analyze_welfare_comparison(voi=25_000, test_cost=300)
+    assert w["access_channel_gain"] > 0
+    assert w["social_surplus_local"] > w["social_surplus_central"]
+
+
 def test_predicted_variant_downweighted():
     # A high-AM predicted variant should still contribute less than a confirmed
     # ClinVar-actionable finding of similar condition (haircut applied).
