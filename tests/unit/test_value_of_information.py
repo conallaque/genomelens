@@ -192,6 +192,34 @@ def test_information_economics_caveats_present():
     assert "gina" in ie["discrimination_note"].lower()
 
 
+def test_evppi_bounded_by_evpi():
+    # Theory: 0 <= EVPPI(any subset) <= EVPI. Violating this signals a broken estimator.
+    r = voi.analyze_value_of_information(_econ(), _cvr(), input_type="wgs",
+                                        n_mc=1500, seed=21)
+    ev, evppi = r["evpi"], r["evppi"]
+    assert evppi["available"] is True
+    for row in evppi["by_parameter"]:
+        assert row["evppi"] >= 0
+        assert row["evppi"] <= max(ev["evpi"], 1) + 50    # tolerance for MC noise
+
+
+def test_behavioural_present_bias_reduces_value():
+    b = voi.analyze_behavioural(mean=40_000, sd=15_000, test_cost=300)
+    assert b["available"] is True
+    assert b["pv_hyperbolic"] <= b["pv_exponential"]     # present bias discounts more
+    assert b["adoption_gap"] >= 0
+    assert b["loss_aversion_lambda"] > 1                 # losses loom larger
+
+
+def test_longevity_wired_into_voi_result():
+    r = voi.analyze_value_of_information(_econ(), _cvr(), input_type="wgs",
+                                        n_mc=800, seed=3)
+    lon = r["longevity"]
+    assert lon["available"] is True
+    blended = [s["blended"] for s in lon["scenarios"]]
+    assert blended == sorted(blended)     # longer life → more realised risk
+
+
 def test_predicted_variant_downweighted():
     # A high-AM predicted variant should still contribute less than a confirmed
     # ClinVar-actionable finding of similar condition (haircut applied).

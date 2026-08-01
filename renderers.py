@@ -2160,6 +2160,46 @@ def build_voi_html(voi: Optional[Dict]) -> str:
     (×{pc.get('shrinkage_factor')}).</div>
   <div style="font-size:.78em;color:#9aa4b0;margin-top:6px">{_esc(pc.get('note',''))}</div>
 </div>"""
+        ep = voi.get("evppi") or {}
+        if ep.get("available"):
+            top_rows = " · ".join(f"{r['parameter'].replace('_',' ')}: {_m(r['evppi'])}"
+                                  for r in (ep.get("by_parameter") or [])[:3])
+            blocks += f"""
+<div style="flex:1;min-width:250px;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
+  <div style="font-weight:700;color:#5b6673">Which uncertainty actually matters (EVPPI)</div>
+  <div style="font-size:.86em;color:#5b6673;margin-top:4px">{_esc(top_rows)}</div>
+  <div style="font-size:.78em;color:#9aa4b0;margin-top:6px">{_esc(ep.get('interpretation',''))}</div>
+</div>"""
+        bh = voi.get("behavioural") or {}
+        if bh.get("available"):
+            blocks += f"""
+<div style="flex:1;min-width:250px;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
+  <div style="font-weight:700;color:#5b6673">Why people still don't test (behavioural)</div>
+  <div style="font-size:.86em;color:#5b6673;margin-top:4px">
+    Normative value (3% exponential): <strong>{_m(bh.get('pv_exponential',0))}</strong> ·
+    with present bias (β={bh.get('present_bias_beta')}): <strong>{_m(bh.get('pv_hyperbolic',0))}</strong> ·
+    adoption gap <strong>{_m(bh.get('adoption_gap',0))}</strong>.</div>
+  <div style="font-size:.78em;color:#9aa4b0;margin-top:6px">{_esc(bh.get('interpretation',''))}</div>
+</div>"""
+        lon = voi.get("longevity") or {}
+        if lon.get("available") and lon.get("scenarios"):
+            lrows = "".join(
+                f"<tr><td>{_esc(s['scenario'])}</td>"
+                f"<td style='text-align:right'>{s['life_expectancy'] or '—'}</td>"
+                f"<td style='text-align:right'>{s['blended']:.1%}</td>"
+                f"<td style='text-align:right'>{(s['relative_uplift'] or 0):+.1%}</td></tr>"
+                for s in lon["scenarios"])
+            blocks += f"""
+<div style="flex:1 1 100%;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
+  <div style="font-weight:700;color:#5b6673">If people live longer, this is worth more</div>
+  <table style="width:100%;border-collapse:collapse;font-size:.85em;margin-top:6px">
+    <thead><tr style="text-align:left;color:#8a94a3"><th>Scenario</th>
+      <th style="text-align:right">Life expectancy</th>
+      <th style="text-align:right">Realised risk</th>
+      <th style="text-align:right">vs today</th></tr></thead>
+    <tbody>{lrows}</tbody></table>
+  <div style="font-size:.78em;color:#9aa4b0;margin-top:6px">{_esc(lon.get('direction',''))}</div>
+</div>"""
         ie = voi.get("information_economics") or {}
         ie_block = ""
         if ie.get("available"):
