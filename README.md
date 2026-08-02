@@ -6,12 +6,32 @@ Unauthorized copying, modification, or distribution is prohibited.
 ---
 # GenomeLens
 
-> **A local, privacy-first genomics engine that treats your health like a portfolio.**
-> GenomeLens turns a consumer DNA file (23andMe, AncestryDNA, MyHeritage, FTDNA, …)
-> *or* a full whole-genome / exome **VCF** into a comprehensive, actionable health
-> report — and models the decisions that improve your lifetime **return on health**:
-> reducing the left-tail risk of adverse drug reactions and informing everyday
-> diet, fitness, and environmental choices.
+### For reviewers — the 30-second version
+
+1. **What this is:** an applied **health-economics** model that answers *what is knowing
+   your genome actually worth?* — cost-effectiveness, value-of-information, and budget
+   impact — computed on real genomic data, entirely offline.
+2. **Method:** discounted net monetary benefit, Markov cohort CEA, Monte-Carlo PSA with a
+   CEAC, EVPI/EVPPI, and the ascertainment and winner's-curse corrections applied to the
+   genetics *before* anything is monetised.
+3. **Headline result:** on the public GIAB HG001 genome — modelled expected value
+   **≈ \$24,070** (95% CI ≈ \$11k–\$41k), computed end-to-end locally, with the
+   whole-genome-only findings accounting for nearly all of it.
+4. **The methods, with every equation and citation:** [`docs/METHODS.md`](docs/METHODS.md).
+5. **Authorship, plainly:** the health-economics modelling, scientific decisions, and
+   product direction are mine; the **software implementation was largely AI-generated**
+   under my direction and review. What's on offer here is the economics and the judgement,
+   not hand-written production code.
+
+---
+
+> **An applied health-economics engine that treats your health like a portfolio —
+> running entirely on your own machine.**
+> GenomeLens reads a consumer DNA file (23andMe, AncestryDNA, MyHeritage, FTDNA, …)
+> *or* a full whole-genome / exome **VCF**, and models the decisions that improve your
+> lifetime **return on health**: what each finding is worth, what *acting* on it is worth,
+> and whether it is worth acting at all — reducing the left-tail risk of adverse drug
+> reactions and informing everyday diet, fitness, and environmental choices.
 >
 > **Nothing ever leaves your machine — no cloud, no accounts, no telemetry.
 > Even the AI interpretation runs on a local LLM.**
@@ -168,16 +188,7 @@ GenomeLens runs **41 interlocking analysis modules** (≈42,700 lines of Python,
 386-test suite) entirely offline — across two input tiers: a consumer chip file
 or a whole-genome / exome **VCF**.
 
-**Clinical & pharmacogenomic**
-- **Pharmacogenomics (CPIC):** drug-response variants + dosing implications that *flag and reduce* adverse-drug-reaction risk.
-- **Clinical variants (ClinVar) — Phase 2:** whole-genome pathogenic / likely-pathogenic screen with ACMG actionable findings, carrier status, compound-heterozygote detection, and ClinVar star-graded confidence.
-- **Novel & rare variants (predictors) — Phase 3:** for variants *not* in ClinVar, an offline predictor screen (AlphaMissense · REVEL · CADD · SpliceAI · gnomAD rarity) surfaces predicted-damaging rare variants — clearly labelled as computational predictions, never clinical calls, and independently license-toggleable (`--commercial-safe`).
-- **Carrier & family planning:** recessive carrier status with Hardy-Weinberg partner risk — transmission probability kept distinct from disease penetrance.
-
-**Risk, aging & synthesis**
-- **Polygenic risk:** curated PRS **plus** full PGS Catalog scoring files, EUR-normalised percentiles with coverage-bounded confidence.
-- **Genetics × your bloodwork:** cross-references genotype against uploaded labs — PhenoAge biological age, AHA PREVENT 2023 10-year cardiovascular risk, 20+ composite indices.
-- **Holistic synthesis:** a Genome-Leverage score and cross-panel pattern detection — where genes, labs, and lifestyle compound.
+**Health economics — the headline capability**
 - **Health ROI — Value of Information (health economics):** answers one question — **what is knowing your genome actually worth?** — with a real decision model, not a marketing number:
   - **Puts a dollar value on each finding** — how much acting on it (screening, prevention, safer prescriptions) is worth to your health.
   - **Uses real data, not guesses** — sourced cost-of-illness figures and published drug cost-effectiveness studies.
@@ -188,6 +199,17 @@ or a whole-genome / exome **VCF**.
   - **Corrects the genetics before the economics** — penetrance is de-biased for ascertainment and GWAS effects are winner's-curse shrunk, so the dollar figures don't inherit inflated risk estimates.
   - **Separates price from value** — what the tests *cost to buy* vs what acting on them is *worth*.
   - *Example (public GIAB genome): ≈ **\$24k** modelled expected value (with a confidence range) — almost all of it from the whole-genome findings; for this healthy reference genome the chip-only part nets ≈ \$0 after test cost. **Your number is individual and can be far lower.***
+
+**Clinical & pharmacogenomic**
+- **Pharmacogenomics (CPIC):** drug-response variants + dosing implications that *flag and reduce* adverse-drug-reaction risk.
+- **Clinical variants (ClinVar) — Phase 2:** whole-genome pathogenic / likely-pathogenic screen with ACMG actionable findings, carrier status, compound-heterozygote detection, and ClinVar star-graded confidence.
+- **Novel & rare variants (predictors) — Phase 3:** for variants *not* in ClinVar, an offline predictor screen (AlphaMissense · REVEL · CADD · SpliceAI · gnomAD rarity) surfaces predicted-damaging rare variants — clearly labelled as computational predictions, never clinical calls, and independently license-toggleable (`--commercial-safe`).
+- **Carrier & family planning:** recessive carrier status with Hardy-Weinberg partner risk — transmission probability kept distinct from disease penetrance.
+
+**Risk, aging & synthesis**
+- **Polygenic risk:** curated PRS **plus** full PGS Catalog scoring files, EUR-normalised percentiles with coverage-bounded confidence.
+- **Genetics × your bloodwork:** cross-references genotype against uploaded labs — PhenoAge biological age, AHA PREVENT 2023 10-year cardiovascular risk, 20+ composite indices.
+- **Holistic synthesis:** a Genome-Leverage score and cross-panel pattern detection — where genes, labs, and lifestyle compound.
 
 **Ancestry & traits**
 - **Ancestry:** autosomal PCA + Y-DNA / mtDNA haplogroups + deep ancestry (Neanderthal %, Yamnaya / EEF / WHG affinity, migration timelines).
