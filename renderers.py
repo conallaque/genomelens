@@ -2017,6 +2017,73 @@ variants queried. <strong>Predictors used:</strong> {_esc(pred_line)}.
 """
 
 
+def _build_personalized_voi_html(p: Optional[Dict]) -> str:
+    """Individually-relevant HEOR panels for this genome: a personal cost-
+    effectiveness frontier + CEAC, the genome as an appreciating data asset, and the
+    person's percentile in the population value distribution. Market-level analyses
+    are deliberately excluded — they belong in the separate business report."""
+    if not p or not p.get("available"):
+        return ""
+
+    def _dm(v):
+        try:
+            return f"${int(round(float(v))):,}"
+        except Exception:
+            return "—"
+
+    fr = p.get("frontier") or {}
+    ceac = p.get("ceac") or {}
+    ltv = p.get("ltv") or {}
+    frows = "".join(
+        f"<tr><td>{_esc(o['name'])}</td>"
+        f"<td style='text-align:right'>${o['cost']:.0f}</td>"
+        f"<td style='text-align:right'>{o['qaly']:.3f}</td>"
+        f"<td style='text-align:right'>{(_dm(o['icer_vs_previous']) + '/QALY') if o.get('icer_vs_previous') else '—'}</td>"
+        f"<td>{_esc(o.get('status',''))}</td></tr>"
+        for o in (fr.get("frontier") or []))
+    ruled = ", ".join(fr.get("ruled_out") or []) or "none"
+    winner = fr.get("recommended_strategy", "—")
+    # Report the CONFIDENCE IN THE RECOMMENDED strategy (from the CEAC at $100k), so
+    # the probabilistic panel is consistent with the point-estimate recommendation.
+    _at100 = next((r for r in (ceac.get("ceac") or []) if r.get("wtp") == 100_000), None)
+    prob = (_at100 or {}).get("p_optimal", {}).get(winner)
+    pct = p.get("population_percentile")
+    return f"""
+<div style="margin-top:14px;border:1px solid #cfe0d6;background:#f4faf6;border-radius:10px;padding:14px 16px">
+  <div style="font-weight:700;color:#22683f;font-size:1.02em">For your genome specifically</div>
+  <div style="font-size:.86em;color:#48545f;margin:4px 0 10px">{_esc(p.get('plain_english',''))}</div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap">
+    <div style="flex:2;min-width:300px">
+      <div style="font-weight:600;color:#5b6673;font-size:.9em;margin-bottom:4px">
+        Your efficient testing choice (cost-effectiveness frontier)</div>
+      <table style="width:100%;border-collapse:collapse;font-size:.84em">
+        <thead><tr style="text-align:left;color:#8a94a3">
+          <th>Option</th><th style="text-align:right">Cost</th>
+          <th style="text-align:right">QALYs</th><th style="text-align:right">ICER</th>
+          <th>Status</th></tr></thead>
+        <tbody>{frows}</tbody></table>
+      <div style="font-size:.8em;color:#9aa4b0;margin-top:4px">
+        Ruled out as inefficient for you: {_esc(ruled)}.</div>
+    </div>
+    <div style="flex:1;min-width:180px">
+      <div style="background:#fff;border:1px solid #e3e7ec;border-radius:8px;padding:10px 12px;margin-bottom:8px">
+        <div style="font-size:1.3em;font-weight:700;color:#22683f">{_esc(winner)}</div>
+        <div style="font-size:.78em;color:#8a94a3">efficient choice{f" · optimal in {prob:.0%} of simulations" if prob is not None else ""}</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e3e7ec;border-radius:8px;padding:10px 12px;margin-bottom:8px">
+        <div style="font-size:1.3em;font-weight:700;color:#22683f">{pct}<span style="font-size:.5em">th</span></div>
+        <div style="font-size:.78em;color:#8a94a3">percentile of population value</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e3e7ec;border-radius:8px;padding:10px 12px">
+        <div style="font-size:1.3em;font-weight:700;color:#22683f">+{(ltv.get('appreciation_premium') or 0):.0%}</div>
+        <div style="font-size:.78em;color:#8a94a3">appreciation over 10y (free re-analysis)</div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:.76em;color:#b0868a;margin-top:8px">{_esc(p.get('caveat',''))}</div>
+</div>"""
+
+
 def build_voi_html(voi: Optional[Dict]) -> str:
     """Value-of-Information health-economics section: the discipline-grade headline
     answering 'what is knowing your genome worth?'. Every number is illustrative +
@@ -2332,6 +2399,7 @@ pharmacogenomic averted-adverse-reactions — with a Monte-Carlo sensitivity ana
   <tbody>{rows}</tbody>
 </table>
 {ceac_svg}
+{_build_personalized_voi_html(voi.get("personalized"))}
 {extended}
 <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px">
   <div style="flex:1;min-width:240px;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
@@ -3091,8 +3159,21 @@ def build_ancestry_html(anc: Optional[Dict]) -> str:
     n_exp = anc.get("n_aims_expected", "—")
     conf_badge = _confidence_badge(anc.get("confidence"), anc.get("confidence_note"))
 
+    # DEMOTED heuristic mode: show a prominent banner and skip the "best match"
+    # ancestry claim entirely. A selection-confounded ~10-marker panel cannot call
+    # ancestry (it mis-classified a European sample as East Asian); the markers are
+    # presented as individual pigmentation/trait signals instead.
+    suppressed_banner = ""
+    if anc.get("ancestry_call_suppressed"):
+        suppressed_banner = (
+            '<div class="anc-ambiguous"><strong>No ancestry call.</strong> '
+            + _esc(anc.get("suppression_reason", "")) +
+            ' The markers below are individual pigmentation and trait variants, '
+            'shown for interest — not a population assignment.</div>'
+        )
+
     ambiguous_banner = ""
-    if anc.get("ambiguous"):
+    if anc.get("ambiguous") and not anc.get("ancestry_call_suppressed"):
         runner = anc.get("runner_up_population")
         runner_long = {"EUR": "European", "AFR": "African", "EAS": "East Asian",
                        "SAS": "South Asian", "AMR": "Admixed American"}.get(runner, runner)
@@ -3169,6 +3250,7 @@ def build_ancestry_html(anc: Optional[Dict]) -> str:
 Based on <strong>{n_indep}</strong> independent ancestry-informative markers
 (of {n_exp} on this panel).
 </p>
+{suppressed_banner}
 {conf_badge}
 {margin_html}
 {palin_note}

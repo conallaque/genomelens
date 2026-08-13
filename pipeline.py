@@ -478,13 +478,18 @@ def run_pipeline(args: argparse.Namespace) -> int:
             ancestry_result = analyze_ancestry(snps_df, y_result=y_result,
                                                mt_result=mt_result)
             if ancestry_result.get("available"):
-                primary = ancestry_result.get("primary_population", "?")
-                conf = ancestry_result.get("confidence", "?")
-                amb = " [ambiguous]" if ancestry_result.get("ambiguous") else ""
-                log(f"  Ancestry: best match {primary} "
-                    f"({conf} confidence{amb}; "
-                    f"{ancestry_result.get('n_aims_independent', 0)}/"
-                    f"{ancestry_result.get('n_aims_expected', '?')} markers)")
+                if ancestry_result.get("ancestry_call_suppressed"):
+                    log("  Ancestry: no call — fallback marker panel is too small / "
+                        "selection-confounded to classify ancestry (install the 1000G "
+                        "PCA reference for a real call); trait markers shown instead.")
+                else:
+                    primary = ancestry_result.get("primary_population", "?")
+                    conf = ancestry_result.get("confidence", "?")
+                    amb = " [ambiguous]" if ancestry_result.get("ambiguous") else ""
+                    log(f"  Ancestry: best match {primary} "
+                        f"({conf} confidence{amb}; "
+                        f"{ancestry_result.get('n_aims_independent', 0)}/"
+                        f"{ancestry_result.get('n_aims_expected', '?')} markers)")
             else:
                 log(f"  Ancestry: {ancestry_result.get('reason','unavailable')}")
         except Exception as e:
@@ -863,6 +868,21 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 log(f"  Value of Information ({_input_type}): expected genome value ≈ "
                     f"${voi_result.get('voi_expost_mean', 0):,.0f} · chip→WGS marginal ≈ "
                     f"${voi_result.get('marginal_chip_to_wgs', 0):,.0f}")
+                # Individually-relevant health-economics panels (personal frontier,
+                # CEAC, data-asset LTV, population percentile) for this genome.
+                try:
+                    import cohort_simulator as _cs
+                    _pa = resolve_age(getattr(args, "age", None), bloodwork_result) \
+                        if 'resolve_age' in dir() else 40.0
+                    voi_result["personalized"] = _cs.personalize_for_report(
+                        voi_result, age=float(_pa or 40.0))
+                    if voi_result["personalized"].get("available"):
+                        _p = voi_result["personalized"]
+                        log(f"    Personalized: efficient choice = "
+                            f"{_p['frontier']['recommended_strategy']} · "
+                            f"{_p['population_percentile']}th population percentile")
+                except Exception as _pe:
+                    log(f"    (personalized panel skipped: {_pe})")
             else:
                 log(f"  Value of Information: {voi_result.get('reason', 'n/a')}")
         except Exception as e:

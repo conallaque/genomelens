@@ -297,24 +297,45 @@ def estimate_ancestry_heuristic(snps_df: pd.DataFrame) -> Dict:
             "admixture proportions."
         )
 
+    # DEMOTED: this heuristic must NOT emit a headline "you are population X"
+    # ancestry call. The panel is ~10 usable markers, several under strong natural
+    # selection (pigmentation and diet genes: EDAR, ALDH2, ADH1B, LCT), whose
+    # frequencies track local adaptation, not shared descent. A single selected
+    # allele can flip the call — which is exactly how it mis-classified a European
+    # sample as East Asian. A defensible superpopulation call requires the full
+    # 1000G PCA path (reference/ancestry/ present); until then we present these as
+    # what they actually are — individual pigmentation/trait markers — and set
+    # primary_population to None so no downstream layer asserts an ancestry identity.
     return {
         "available": True,
-        "method": ("AIMs-only heuristic (best single-population match by "
-                   "likelihood under 1000G superpop allele-frequency priors; "
-                   "LD-correlated markers counted once)"),
+        "method": ("Pigmentation & trait AIMs (individual markers shown for "
+                   "interest only — NOT an ancestry classification; the panel is "
+                   "too small and too selection-confounded to call ancestry)"),
         "is_admixture_estimate": False,
+        "is_ancestry_call": False,
+        "ancestry_call_suppressed": True,
+        "suppression_reason": (
+            "A superpopulation ancestry call needs the full 1000 Genomes PCA "
+            "reference (reference/ancestry/). The fallback marker panel is too "
+            "small and several markers are under natural selection, so it cannot "
+            "reliably distinguish ancestry — it is shown as individual trait "
+            "markers instead."),
+        "headline": "Pigmentation & trait markers (not an ancestry call)",
         "n_aims_used": len(used_aims),
         "n_aims_independent": n_independent,
         "n_aims_redundant": n_redundant,
         "n_aims_palindromic": n_palindromic,
         "n_aims_expected": N_INDEPENDENT_AIMS,
-        "proportions": proportions,
+        # Kept for the transparent per-marker table, clearly labelled as affinity
+        # only — NOT a population identity.
+        "marker_best_affinity": primary,
+        "marker_affinity_proportions": proportions,
         "sorted_proportions": sorted_props,
-        "primary_population": primary,
+        "primary_population": None,          # suppressed by design (see above)
         "runner_up_population": runner_up,
         "evidence_margin_nats": round(margin_nats, 2),
         "ambiguous": ambiguous,
-        "confidence": confidence,
+        "confidence": "not applicable — no ancestry call made",
         "confidence_note": confidence_note,
         "used_aims": used_aims,
     }
@@ -586,7 +607,10 @@ def cross_check_ancestry(autosomal: Dict,
     if not pat and not mat:
         return None
 
-    primary = autosomal.get("primary_population")
+    # When the autosomal ancestry call is suppressed (fallback marker panel), the
+    # cross-check falls back to the weak marker affinity, clearly flagged — it is a
+    # sanity check against the haplogroups, not an ancestry determination.
+    primary = autosomal.get("primary_population") or autosomal.get("marker_best_affinity")
     primary_long = SUPERPOP_LONG.get(primary, primary)
 
     lines: List[str] = []

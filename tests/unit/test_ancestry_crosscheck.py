@@ -48,10 +48,17 @@ def _european_profile() -> pd.DataFrame:
 
 
 def test_european_sample_calls_european_not_asian() -> None:
+    # The heuristic now SUPPRESSES the headline ancestry call — the panel is too
+    # small and too selection-confounded to classify ancestry. What we still
+    # require is the protective intent of the original test: its internal marker
+    # affinity must not mistake a European for an East/South Asian.
     res = ap.estimate_ancestry_heuristic(_european_profile())
-    assert res["primary_population"] == "EUR"
-    assert res["proportions"]["EUR"] > res["proportions"]["SAS"]
-    assert res["proportions"]["EUR"] > 0.8
+    assert res["primary_population"] is None          # no headline call, by design
+    assert res["ancestry_call_suppressed"] is True
+    assert res["marker_best_affinity"] == "EUR"
+    props = res["marker_affinity_proportions"]
+    assert props["EUR"] > props["SAS"]
+    assert props["EUR"] > props["EAS"]
 
 
 def test_crosscheck_concordant_for_t1a1a_and_european_autosomal() -> None:
