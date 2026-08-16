@@ -253,6 +253,8 @@ def simulate_cohort(n: int = 10_000, seed: int = 20260803,
         return {"available": False, "reason": "numpy required for cohort simulation"}
     rng = np.random.default_rng(seed)
     lam = float(wtp if wtp is not None else WTP["base"])
+    if n < 1:
+        return {"available": False, "reason": "cohort size must be >= 1"}
 
     personas = []
     totals, wgs_parts, prev_parts = np.zeros(n), np.zeros(n), np.zeros(n)
@@ -331,18 +333,24 @@ def segment_analysis(cohort: Dict) -> Dict:
     # pharmacogenomics dominates every customer's total.
     young = next(x for x in by_age if x["band"] == "30-39")["mean_prevention_qol_value"]
     old = next(x for x in by_age if x["band"] == "60-80")["mean_prevention_qol_value"]
+    gradient = round(young / old, 2) if old else None
+    # Guard the narrative against an empty band (small cohort): only quote the
+    # multiple when both bands are populated, else describe the gradient in words.
+    gradient_phrase = (f"a customer in their thirties gets about {gradient:.1f}x the "
+                       f"prevention benefit of one in their sixties"
+                       if gradient else
+                       "prevention benefit is markedly higher for younger customers")
     return {
         "available": True,
         "by_age_band": by_age,
         "by_family_history": by_fh,
         "by_ancestry": by_anc,
-        "age_gradient_ratio": round(young / old, 2) if old else None,
+        "age_gradient_ratio": gradient,
         "plain_english": (
             f"The two products age very differently. Pharmacogenomic value — how you "
             f"respond to medications — is roughly constant across age, so that "
             f"product sells to everyone. Disease-prevention value, by contrast, "
-            f"falls steadily with age: a customer in their thirties gets about "
-            f"{young / old:.1f}x the prevention benefit of one in their sixties, "
+            f"falls steadily with age: {gradient_phrase}, "
             f"because acting early protects more remaining years of health. So the "
             f"marketing split writes itself — pharmacogenomics to all ages, "
             f"prevention and whole-genome upgrades to younger customers. Family "
@@ -612,6 +620,8 @@ def personalize_for_report(voi_result: Dict, age: float = 40.0,
         return {"available": False}
 
     lam = float(wtp if wtp is not None else WTP["base"])
+    if lam <= 0:                       # willingness-to-pay must be positive (divisor)
+        return {"available": False, "reason": "willingness-to-pay must be > 0"}
     total = float(voi_result.get("voi_expost_mean",
                                  voi_result.get("voi_expost_point", 0.0)))
     wgs_marginal = float(voi_result.get("marginal_chip_to_wgs", 0.0) or 0.0)
@@ -639,12 +649,29 @@ def personalize_for_report(voi_result: Dict, age: float = 40.0,
     ]
     frontier = hf.cost_effectiveness_frontier(strategies, wtp=lam)
     ceac = hf.frontier_psa(strategies, n_mc=3000)
-    ltv = data_asset_ltv(initial_value=max(1.0, total))
+    # The appreciation horizon depends on age: a younger person has more remaining
+    # years over which free re-analysis keeps paying off. Capped at 20y because
+    # knowledge-growth projections beyond that are too speculative to report.
+    ltv_years = max(5, min(20, int(round(85.0 - float(age)))))
+    ltv = data_asset_ltv(initial_value=max(1.0, total), years=ltv_years)
 
     # Percentile placement against the reference population.
     ref = _reference_totals()
     pct = float((ref < total).mean()) * 100.0
 
+    # Report the confidence in the RECOMMENDED strategy (the frontier's choice), not
+    # the CEAC's own argmax — they can disagree (e.g. a genome with no sequencing-only
+    # value makes chip and WGS a coin-flip), and attributing the wrong strategy's
+    # probability would be misleading. Mirrors the renderer's consistency fix.
+    _rec = frontier.get("recommended_strategy")
+    _at100 = next((r for r in (ceac.get("ceac") or [])
+                   if r.get("wtp") == 100_000), None)
+    rec_prob = (_at100 or {}).get("p_optimal", {}).get(_rec,
+                                                       ceac.get("prob_optimal_at_100k", 0.0))
+    # Use the ACTUAL appreciation horizon (age-dependent, 5-20y), and compare against
+    # the correct baseline. appreciation_premium is vs a genome frozen at today's
+    # knowledge — so label it that way, not "than at purchase" (a different quantity).
+    yrs = ltv.get("years", 10)
     return {
         "available": True,
         "expected_value": round(total),
@@ -656,12 +683,12 @@ def personalize_for_report(voi_result: Dict, age: float = 40.0,
         "population_percentile": round(pct),
         "plain_english": (
             f"For this genome specifically: the efficient testing choice is "
-            f"{frontier['recommended_strategy']}, optimal in "
-            f"{ceac['prob_optimal_at_100k']:.0%} of simulations at ${lam:,.0f} per "
+            f"{_rec}, optimal in {rec_prob:.0%} of simulations at ${lam:,.0f} per "
             f"healthy year. The modelled value of ${total:,.0f} sits at about the "
             f"{pct:.0f}th percentile of the population, and — because the data is "
-            f"re-analysed for free as science advances — it is worth roughly "
-            f"{ltv['appreciation_premium']:.0%} more over ten years than at purchase."),
+            f"re-analysed for free as science advances — over the next {yrs} years it "
+            f"is worth roughly {ltv.get('appreciation_premium', 0):.0%} more than a "
+            f"genome frozen at today's knowledge."),
         "caveat": ("Personal decision-analytic estimate on illustrative parameters — "
                    "not medical or financial advice."),
     }

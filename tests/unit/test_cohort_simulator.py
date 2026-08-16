@@ -175,3 +175,51 @@ def test_personalize_excludes_market_level_analyses():
     p = cs.personalize_for_report(_fake_voi(12_000), age=35)
     for market_key in ("demand", "adoption", "distributional", "validation"):
         assert market_key not in p
+
+
+def test_personalize_age_actually_affects_output():
+    # REGRESSION: `age` was an unused parameter — the panel ignored it entirely.
+    # A younger person has more years of free re-analysis, so more appreciation.
+    young = cs.personalize_for_report(_fake_voi(10_000), age=30)
+    old = cs.personalize_for_report(_fake_voi(10_000), age=75)
+    assert young["ltv"]["appreciation_premium"] != old["ltv"]["appreciation_premium"]
+    assert young["ltv"]["appreciation_premium"] > old["ltv"]["appreciation_premium"]
+
+
+def test_segment_analysis_tiny_cohort_no_crash():
+    # REGRESSION: an empty age band made the plain_english f-string divide by zero.
+    for n in (1, 3, 10):
+        s = cs.segment_analysis(cs.simulate_cohort(n=n, seed=n))
+        assert "prevention benefit" in s["plain_english"]   # narrative built safely
+
+
+def test_personalize_appreciation_label_matches_horizon():
+    # REGRESSION: the LTV horizon became age-dependent (5-20y) but the sentence and
+    # renderer tile were hardcoded "ten years" — a silent ~2.4x mislabel on the
+    # default path. And the baseline was wrong ("than at purchase" vs the true
+    # no-growth counterfactual the number actually measures).
+    p = cs.personalize_for_report(_fake_voi(10_000), age=40)
+    yrs = p["ltv"]["years"]
+    assert f"{yrs} years" in p["plain_english"]
+    assert "ten years" not in p["plain_english"]
+    assert "frozen at today" in p["plain_english"]
+    assert "than at purchase" not in p["plain_english"]
+
+
+def test_personalize_prob_is_for_recommended_strategy():
+    # REGRESSION: the sentence paired the frontier's recommendation with the CEAC's
+    # OWN winner's probability — wrong when they disagree (chip coin-flip case).
+    p = cs.personalize_for_report(_fake_voi(16_000, wgs_marginal=0.0), age=40)
+    rec = p["frontier"]["recommended_strategy"]
+    at100 = next(r for r in p["ceac"]["ceac"] if r["wtp"] == 100_000)
+    assert f"{at100['p_optimal'][rec]:.0%}" in p["plain_english"]
+
+
+def test_personalize_zero_wtp_no_crash():
+    # REGRESSION: wtp=0 divided by lam.
+    p = cs.personalize_for_report(_fake_voi(10_000), wtp=0)
+    assert p["available"] is False
+
+
+def test_simulate_cohort_zero_size_no_crash():
+    assert cs.simulate_cohort(n=0)["available"] is False

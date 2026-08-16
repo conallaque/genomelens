@@ -93,6 +93,25 @@ def test_dcea_surfaces_the_benefit_gap():
     assert dc["equity_impact_ratio"] < dc["benefit_gap_ratio"]
 
 
+def test_dcea_zero_benefit_group_does_not_crash():
+    # REGRESSION: a group with ~zero transferable PRS benefit (an infinite gap — the
+    # exact scenario this function exists to display) set benefit_gap_ratio=None,
+    # which then crashed the plain_english f-string.
+    dc = hf.distributional_cea([
+        {"name": "A", "population_share": 0.5, "baseline_health": 68, "qaly_gain": 0.10},
+        {"name": "B", "population_share": 0.5, "baseline_health": 64, "qaly_gain": 0.0}])
+    assert dc["available"] is True
+    assert dc["benefit_gap_ratio"] is None            # infinite gap, reported as None
+    assert "essentially no benefit" in dc["plain_english"]
+
+
+def test_dcea_negative_benefit_group_does_not_crash():
+    dc = hf.distributional_cea([
+        {"name": "A", "population_share": 0.5, "baseline_health": 68, "qaly_gain": 0.10},
+        {"name": "B", "population_share": 0.5, "baseline_health": 64, "qaly_gain": -0.02}])
+    assert dc["available"] is True
+
+
 def test_dcea_more_aversion_weights_harder():
     low = hf.distributional_cea(inequality_aversion=1.0)
     high = hf.distributional_cea(inequality_aversion=4.0)
@@ -135,6 +154,24 @@ def test_validation_reports_its_misses_honestly():
     lynch = next(c for c in val["cases"] if "Lynch" in c["scenario"])
     if not lynch["within_order_of_magnitude"]:
         assert lynch.get("miss_reason"), "a miss must carry an explanation"
+
+
+def test_validation_wrong_direction_not_counted_as_agreement():
+    # REGRESSION: a published cost-saving result the engine calls COSTLY was labeled
+    # "both dominant" and miscounted as direction-correct.
+    val = hf.validate_against_published(
+        [{"name": "X", "published_icer": -5000, "our_icer": 40000,
+          "tolerance_pct": 0.5, "source": "..."}])
+    row = val["cases"][0]
+    assert row["ratio_to_published"] != "both dominant"
+    assert row["direction_correct"] is False
+    assert val["n_direction_correct"] == 0
+
+
+def test_frontier_empty_list_no_crash():
+    # REGRESSION: cost_effectiveness_frontier([]) indexed rows[0] and crashed.
+    f = hf.cost_effectiveness_frontier([])
+    assert f["available"] is False
 
 
 # ── legibility ───────────────────────────────────────────────────────────────

@@ -544,28 +544,58 @@ def _score_trait(snps_df: pd.DataFrame, trait: Dict, sex: Optional[str]) -> Dict
                 "reason": f"0/{len(trait['variants'])} panel SNPs typed",
                 "n_used": 0, "n_total": len(trait['variants'])}
 
+    # TWO DISTINCT numbers — kept separate so neither is overclaimed:
+    #
+    # 1) MARKER-SCORE percentile: where you rank on THIS SNP panel, standardised to
+    #    the panel's own spread. A true fact about your genotype (you carry more/
+    #    fewer of these alleles than X% of people). This is what the tool used to
+    #    print — but it was mislabelled as a trait percentile.
     z = (raw_score - exp_mean) / sqrt(exp_var)
-    percentile = _norm_cdf(z) * 100
+    marker_percentile = _norm_cdf(z) * 100
 
-    # Compute trait-value estimate: trait_value ≈ mean + z * sd
-    val_estimate = trait["mean"] + z * trait["sd"]
-    # Bounded display range
-    if percentile >= 95:
-        tier = "Very high"; tier_cls = "tier-high"
-    elif percentile >= 80:
-        tier = "Above average"; tier_cls = "tier-elevated"
-    elif percentile >= 20:
-        tier = "Average"; tier_cls = "tier-average"
-    elif percentile >= 5:
-        tier = "Below average"; tier_cls = "tier-below"
+    # 2) ACTUAL-TRAIT prediction: because the betas are in the trait's own units,
+    #    the genetic deviation (raw - expected) IS the predicted trait deviation,
+    #    and it regresses toward the mean exactly as far as the panel is weak. The
+    #    variance the panel explains is R² = Var(score)/Var(trait) = exp_var/sd².
+    sd = trait.get("sd", 1.0) or 1.0
+    variance_explained = min(1.0, exp_var / (sd ** 2))     # R² of the ACTUAL trait
+    predicted_deviation = raw_score - exp_mean              # in native trait units
+    val_estimate = trait["mean"] + predicted_deviation
+    trait_percentile = _norm_cdf(predicted_deviation / sd) * 100
+
+    # How much the panel actually resolves the real trait. Even the best panel here
+    # explains ~6%; most explain <1%. Be explicit rather than implying precision.
+    if variance_explained >= 0.05:
+        signal = "modest"          # a real but small fraction of the trait
+    elif variance_explained >= 0.01:
+        signal = "weak"
     else:
-        tier = "Very low"; tier_cls = "tier-low"
+        signal = "negligible"      # marker curiosity, not a trait measurement
+
+    # Tier reflects the MARKER score (a real genotype fact), but the renderer labels
+    # it as a marker-score tier and shows R² so it is never read as the trait itself.
+    if marker_percentile >= 95:
+        tier = "High marker score"; tier_cls = "tier-high"
+    elif marker_percentile >= 80:
+        tier = "Above-average marker score"; tier_cls = "tier-elevated"
+    elif marker_percentile >= 20:
+        tier = "Typical marker score"; tier_cls = "tier-average"
+    elif marker_percentile >= 5:
+        tier = "Below-average marker score"; tier_cls = "tier-below"
+    else:
+        tier = "Low marker score"; tier_cls = "tier-low"
 
     return {
         "status": "ok",
         "z_score": round(z, 3),
-        "percentile": round(percentile, 1),
+        # `percentile` retained for back-compat but now explicitly the MARKER score.
+        "percentile": round(marker_percentile, 1),
+        "marker_percentile": round(marker_percentile, 1),
+        "trait_percentile": round(trait_percentile, 1),
         "predicted_value": round(val_estimate, 2),
+        "variance_explained": round(variance_explained, 4),
+        "variance_explained_pct": round(variance_explained * 100, 2),
+        "signal_strength": signal,
         "tier": tier,
         "tier_class": tier_cls,
         "n_used": n_used,

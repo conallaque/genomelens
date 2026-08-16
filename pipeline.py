@@ -797,6 +797,19 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Trait-genetics module failed: {e}")
 
+    # ── TNRC18 rs117910193 novelty marker (single-variant genotype read-out) ──
+    tnrc18_result: Optional[Dict] = None
+    try:
+        from tnrc18_marker import analyze_tnrc18_marker
+        tnrc18_result = analyze_tnrc18_marker(snps_df)
+        if tnrc18_result.get("available"):
+            log(f"  TNRC18 marker (rs117910193): {tnrc18_result['genotype_oriented']} "
+                f"→ {tnrc18_result['marker']}")
+        else:
+            log("  TNRC18 marker (rs117910193): not typed in this file")
+    except Exception as e:
+        log(f"  WARNING: TNRC18 marker module failed: {e}")
+
     # ── Environmental optimization (light / exercise / vitamin-D × latitude) ──
     environmental_optimization_result: Optional[Dict] = None
     if analyze_environmental_optimization is not None:
@@ -872,8 +885,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 # CEAC, data-asset LTV, population percentile) for this genome.
                 try:
                     import cohort_simulator as _cs
-                    _pa = resolve_age(getattr(args, "age", None), bloodwork_result) \
-                        if 'resolve_age' in dir() else 40.0
+                    from life_stage_playbook import resolve_age as _resolve_age
+                    _pa = _resolve_age(getattr(args, "age", None), bloodwork_result)
                     voi_result["personalized"] = _cs.personalize_for_report(
                         voi_result, age=float(_pa or 40.0))
                     if voi_result["personalized"].get("available"):
@@ -1140,6 +1153,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         addiction_genetics_result=addiction_genetics_result,
         family_planning_result=family_planning_result,
         polygenic_traits_result=polygenic_traits_result,
+        tnrc18_result=tnrc18_result,
         environmental_optimization_result=environmental_optimization_result,
         life_stage_playbook_result=life_stage_playbook_result,
         clinical_variants_result=clinical_variants_result,

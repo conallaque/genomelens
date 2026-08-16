@@ -2076,7 +2076,7 @@ def _build_personalized_voi_html(p: Optional[Dict]) -> str:
       </div>
       <div style="background:#fff;border:1px solid #e3e7ec;border-radius:8px;padding:10px 12px">
         <div style="font-size:1.3em;font-weight:700;color:#22683f">+{(ltv.get('appreciation_premium') or 0):.0%}</div>
-        <div style="font-size:.78em;color:#8a94a3">appreciation over 10y (free re-analysis)</div>
+        <div style="font-size:.78em;color:#8a94a3">appreciation over {ltv.get('years', 10)}y (free re-analysis)</div>
       </div>
     </div>
   </div>
@@ -3654,6 +3654,13 @@ outside Asian populations.
 def build_roh_html(r: Optional[Dict]) -> str:
     if not r:
         return ""
+    # Degrade gracefully if the ROH analysis failed or returned a partial result
+    # (e.g. a degenerate/near-empty genome, or an upstream error). Missing core
+    # stats must not crash the whole report — skip the section instead.
+    if r.get("available") is False or not all(
+            k in r for k in ("n_runs", "total_roh_mb", "f_roh",
+                             "n_short", "n_medium", "n_long")):
+        return ""
     runs = r.get("runs", [])
     ideogram_svg = render_ideogram_svg(runs) if (render_ideogram_svg and runs) else ""
 
@@ -3832,12 +3839,25 @@ def build_phewas_html(p: Optional[Dict]) -> str:
                     f'contributing variants</summary>{"".join(bits)}</details>'
                 )
 
+            # Variance the panel explains of the ACTUAL trait, and the honest
+            # trait-prediction percentile (regresses to the mean as the panel weakens).
+            r2 = res.get("variance_explained_pct", 0.0)
+            signal = res.get("signal_strength", "negligible")
+            trait_pct = res.get("trait_percentile", 50.0)
+            r2_cls = ("sig-modest" if signal == "modest"
+                      else "sig-weak" if signal == "weak" else "sig-negligible")
+            explains_cell = (f'<span class="{r2_cls}">{r2:.2f}%</span>'
+                             + ('' if signal != "negligible"
+                                else '<br><span style="font-size:.8em;color:#a06800">'
+                                     'marker only — not a trait measurement</span>'))
             rows += (
                 f'<tr>'
                 f'<td>{_esc(tname)}{detail}</td>'
                 f'<td><span class="prs-tier {tier_cls}">{_esc(res["tier"])}</span></td>'
                 f'<td>{pct:.0f}th</td>'
-                f'<td class="gt-cell">{val} {_esc(unit)}</td>'
+                f'<td>{explains_cell}</td>'
+                f'<td class="gt-cell">{val} {_esc(unit)} '
+                f'<span style="color:#8a94a3">(~{trait_pct:.0f}th)</span></td>'
                 f'<td>{res["n_used"]}/{res["n_total"]}</td>'
                 f'</tr>'
             )
@@ -3849,7 +3869,9 @@ def build_phewas_html(p: Optional[Dict]) -> str:
     <span class="phewas-cat-count">{len([t for t in trait_names if p['traits'][t]['result']['status']=='ok'])} traits</span></summary>
   <div class="tbl-wrap">
   <table class="snp-tbl">
-    <thead><tr><th>Trait</th><th>Tier</th><th>Percentile</th><th>Predicted value</th><th>Coverage</th></tr></thead>
+    <thead><tr><th>Trait</th><th>Marker-score tier</th><th>Marker-score %ile</th>
+      <th>Explains (of real trait)</th><th>Predicted value (trait %ile)</th>
+      <th>Coverage</th></tr></thead>
     <tbody>{rows}</tbody>
   </table></div>
 </details>
@@ -3857,16 +3879,23 @@ def build_phewas_html(p: Optional[Dict]) -> str:
 
     headline_html = ""
     if p.get("headline"):
-        items = "".join(
-            f'<li><strong>{_esc(h["trait"])}</strong> — '
-            f'<span class="prs-tier tier-{"high" if "high" in h["tier"].lower() else "low"}">{_esc(h["tier"])}</span> '
-            f'({h["percentile"]:.0f}th percentile)</li>'
-            for h in p["headline"][:15]
-        )
+        def _hl_item(h):
+            # Pull R² for this trait so an extreme MARKER score can't read as an
+            # extreme TRAIT value (e.g. "99th percentile brain volume" from a single
+            # SNP explaining 0.1% of it).
+            res = (p.get("traits", {}).get(h["trait"], {}) or {}).get("result", {})
+            r2 = res.get("variance_explained_pct")
+            r2_txt = (f' · explains only {r2:.2f}% of the actual trait'
+                      if r2 is not None and r2 < 5 else '')
+            return (
+                f'<li><strong>{_esc(h["trait"])}</strong> — '
+                f'high genetic-marker score ({h["percentile"]:.0f}th percentile on the '
+                f'marker panel{r2_txt})</li>')
+        items = "".join(_hl_item(h) for h in p["headline"][:15])
         headline_html = (
-            f'<div class="phewas-headline"><strong>Notable extremes:</strong>'
-            f'<ul>{items}</ul></div>'
-        )
+            f'<div class="phewas-headline"><strong>Notable marker-score extremes '
+            f'(genotype ranks, not trait measurements):</strong>'
+            f'<ul>{items}</ul></div>')
 
     return f"""
 <section class="phewas-section" id="phewas">
@@ -3874,10 +3903,21 @@ def build_phewas_html(p: Optional[Dict]) -> str:
 <p class="phewas-intro">
 Phenome-wide scoring across {p['n_traits']} traits using curated GWAS effect
 sizes — biomarkers (lipids, HbA1c, CRP, vitamin D, hormones), anthropometric,
-hematological, behavioural. <strong>Predicted values are genetic-propensity
-estimates against a European reference distribution, not measurements.</strong>
-{p['n_scored']}/{p['n_traits']} traits had sufficient SNP coverage to score.
+hematological, behavioural. {p['n_scored']}/{p['n_traits']} traits had sufficient
+SNP coverage to score.
 </p>
+<div class="phewas-intro" style="background:#fff8e6;border:1px solid #f0e0a8;border-radius:8px;padding:10px 14px;font-size:.88em">
+<strong>How to read this — two different numbers.</strong> The <em>marker-score
+percentile</em> is where your genotype ranks on each small SNP panel — a real fact
+about which alleles you carry. The <em>"Explains"</em> column is how much of the
+<em>actual</em> trait that panel accounts for; here it ranges from ~6% down to under
+0.1%. So a high marker-score percentile does <strong>not</strong> mean a high value of
+the real trait — e.g. a 99th-percentile brain-volume marker score comes from a single
+variant that explains ~0.1% of actual brain size. The predicted-value column shows the
+honest trait estimate (which regresses toward average precisely because these panels
+are weak). These are genetic-propensity signals against a European reference, not
+measurements, and not medical advice.
+</div>
 {headline_html}
 {cats_html}
 </section>
@@ -4594,6 +4634,7 @@ def build_html_report(
     addiction_genetics_result: Optional[Dict] = None,
     family_planning_result: Optional[Dict] = None,
     polygenic_traits_result: Optional[Dict] = None,
+    tnrc18_result: Optional[Dict] = None,
     environmental_optimization_result: Optional[Dict] = None,
     life_stage_playbook_result: Optional[Dict] = None,
     clinical_variants_result: Optional[Dict] = None,
@@ -4883,6 +4924,11 @@ def build_html_report(
     novel_variants_html = build_novel_variants_html(novel_variants_result)
     voi_html = build_voi_html(voi_result)
     polygenic_traits_html = build_polygenic_traits_html(polygenic_traits_result)
+    try:
+        from tnrc18_marker import build_tnrc18_html as _build_tnrc18
+        tnrc18_html = _build_tnrc18(tnrc18_result)
+    except Exception:
+        tnrc18_html = ""
     environmental_optimization_html = build_environmental_optimization_html(environmental_optimization_result)
     life_stage_playbook_html = build_life_stage_playbook_html(life_stage_playbook_result)
     ancestral_story_html = build_ancestral_story_html(ancestral_story_result)
@@ -5987,6 +6033,7 @@ transparency.
 {family_planning_html}
 
 {polygenic_traits_html}
+{tnrc18_html}
 
 {environmental_optimization_html}
 

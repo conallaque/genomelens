@@ -138,8 +138,15 @@ def detect_roh(snps_df: pd.DataFrame,
                max_hets: int = 1) -> Dict:
     """Detect ROH genome-wide. Returns aggregated results with classification."""
     if snps_df.empty or "chrom" not in snps_df.columns:
+        # Schema-consistent empty result: MUST carry the same keys as the full
+        # return below, or downstream (pipeline log line, build_roh_html) hits a
+        # KeyError and takes the whole report down with it.
         return {"runs": [], "f_roh": 0.0, "n_runs": 0, "total_roh_mb": 0.0,
-                "short": [], "medium": [], "long": []}
+                "short": [], "medium": [], "long": [],
+                "n_short": 0, "n_medium": 0, "n_long": 0,
+                "population_context": ("No autosomal genotype data available to scan "
+                                       "for runs of homozygosity."),
+                "context_tier": "unavailable"}
 
     runs_all: List[Dict] = []
     for c in CHROM_LENGTHS_MB.keys():

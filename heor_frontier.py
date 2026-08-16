@@ -108,6 +108,11 @@ def cost_effectiveness_frontier(strategies: Optional[List[Dict]] = None,
             {"name": "Targeted clinical panel", "cost": 900.0, "qaly": 20.09},
             {"name": "Whole-genome sequencing", "cost": 600.0, "qaly": 20.12},
         ]
+    if not strategies:
+        return {"available": False, "reason": "no strategies supplied",
+                "frontier": [], "all_strategies": [], "recommended_strategy": None,
+                "ruled_out": [], "plain_english": "No strategies to compare.",
+                "src": "", "caveat": ""}
     # Sort by cost ascending.
     s = sorted([dict(x) for x in strategies], key=lambda x: x["cost"])
 
@@ -325,6 +330,19 @@ def distributional_cea(groups: Optional[List[Dict]] = None,
     gains = [g["qaly_gain"] for g in groups]
     benefit_gap_ratio = (max(gains) / min(gains)) if min(gains) > 0 else None
     equity_ratio = weighted / unweighted if unweighted else None
+    # Build the narrative with guards: benefit_gap_ratio is None when a group gets
+    # ~zero benefit (an infinite gap — the very portability scenario this exists to
+    # show), and equity_ratio is None when total benefit is zero. Interpolating a
+    # None into an f-string would crash (the same anti-pattern fixed in segment_analysis).
+    gap_phrase = (f"about {benefit_gap_ratio:.0f}x larger for the best-served ancestry "
+                  f"than the least-served" if benefit_gap_ratio else
+                  "so much larger for the best-served ancestry that the least-served "
+                  "group gets essentially no benefit at all")
+    equity_phrase = (f"shifts the total by only a factor of {equity_ratio:.2f}"
+                     if equity_ratio else "cannot meaningfully redistribute a benefit "
+                     "that barely reaches some groups")
+    close_phrase = (f"nowhere near enough to close a {benefit_gap_ratio:.0f}x gap"
+                    if benefit_gap_ratio else "nowhere near enough to close a gap that large")
     return {
         "available": True,
         "inequality_aversion": eps,
@@ -337,15 +355,13 @@ def distributional_cea(groups: Optional[List[Dict]] = None,
         "plain_english": (
             f"Most of the value flows to the {top_unweighted} group — the population "
             f"the underlying science serves best. Here is the honest DCEA finding: "
-            f"the health benefit itself is about {benefit_gap_ratio:.0f}x larger for "
-            f"the best-served ancestry than the least-served, because polygenic "
-            f"scores transfer poorly across populations. Equity-weighting the results "
-            f"(valuing gains to worse-off groups more) shifts the total by only a "
-            f"factor of {equity_ratio:.2f} — nowhere near enough to close a "
-            f"{benefit_gap_ratio:.0f}x gap. The implication is blunt and worth saying "
-            f"to a marketing team: you cannot weight your way out of a portability "
-            f"gap; the fix is more diverse genomic research, and in the meantime the "
-            f"product's value should be represented honestly per group."),
+            f"the health benefit itself is {gap_phrase}, because polygenic scores "
+            f"transfer poorly across populations. Equity-weighting the results "
+            f"(valuing gains to worse-off groups more) {equity_phrase} — "
+            f"{close_phrase}. The implication is blunt and worth saying to a marketing "
+            f"team: you cannot weight your way out of a portability gap; the fix is "
+            f"more diverse genomic research, and in the meantime the product's value "
+            f"should be represented honestly per group."),
         "src": ("Distributional cost-effectiveness analysis: Asaria, Griffin & "
                 "Cookson (2016) Med Decis Making; Atkinson (1970) inequality "
                 "aversion. Ancestry-portability link: Martin et al. (2019) Nat Genet."),
@@ -466,29 +482,36 @@ def validate_against_published(cases: Optional[List[Dict]] = None) -> Dict:
         #  - costly (published positive): engine positive AND within one order of
         #    magnitude (ratio between 0.2x and 5x). This is deliberately a wider,
         #    honest bar than pretending to reproduce the exact ICER.
+        # Direction agreement is tracked explicitly (sign match), separately from the
+        # order-of-magnitude pass — a published cost-saving result that the engine
+        # calls COSTLY is a direction MISMATCH and must not be counted as agreement.
         if pub < 0:
-            ok = ours < 0
+            direction_ok = ours < 0            # both cost-saving?
+            ok = direction_ok                  # for dominant cases, direction IS the bar
             rel_err = None
             ratio = None
+            ratio_label = "both dominant" if direction_ok else "direction mismatch"
         else:
+            direction_ok = ours > 0            # both costly (positive ICER)?
             rel_err = abs(ours - pub) / abs(pub) if pub else None
             ratio = (ours / pub) if pub else None
-            ok = (ours > 0) and (ratio is not None) and (0.2 <= ratio <= 5.0)
+            ok = direction_ok and (ratio is not None) and (0.2 <= ratio <= 5.0)
+            ratio_label = round(ratio, 2) if ratio is not None else "n/a"
         n_pass += int(ok)
         row = {
             "scenario": c["name"],
             "published_icer": round(pub),
             "our_icer": round(ours),
-            "ratio_to_published": round(ratio, 2) if ratio is not None else "both dominant",
+            "ratio_to_published": ratio_label,
             "relative_error": round(rel_err, 3) if rel_err is not None else None,
+            "direction_correct": direction_ok,
             "within_order_of_magnitude": ok,
             "source": c["source"],
         }
         if not ok and c.get("note"):
             row["miss_reason"] = c["note"]
         rows.append(row)
-    n_dir = sum(1 for r in rows if r.get("within_order_of_magnitude")
-                or (isinstance(r.get("ratio_to_published"), str)))
+    n_dir = sum(1 for r in rows if r.get("direction_correct"))
     return {
         "available": True,
         "cases": rows,
