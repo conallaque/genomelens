@@ -1179,6 +1179,20 @@ _RECORDS: list[SNPRecord] = [
                     "bioavailable free testosterone at any given total-T.",
         source="dbSNP; Ohlsson 2011 SHBG / free-T GWAS",
     ),
+    # ── Novelty single-variant marker (tnrc18_marker.py) ─────────────────
+    # Registry entry exists ONLY so a whole-genome VCF back-fills this position
+    # by coordinate (rsID-less VCFs otherwise never reach the TNRC18 lookup).
+    # No validated health/trait association is claimed. GRCh37 position left
+    # unset (not independently verified) — GRCh38 VCFs back-fill; GRCh37 VCFs
+    # degrade gracefully to "not typed".
+    SNPRecord(
+        rsid="rs117910193", gene="TNRC18", chrom="7",
+        pos_grch37=None, pos_grch38=5_401_412,
+        ancestral="G", derived="A",
+        description="TNRC18 rs117910193 (G>A) — novelty single-variant marker; "
+                    "no validated trait or health association.",
+        source="dbSNP (novelty lookup — not a validated association)",
+    ),
 ]
 
 

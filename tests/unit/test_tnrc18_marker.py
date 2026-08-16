@@ -80,3 +80,15 @@ def test_makes_no_health_claim():
     # The disclaimer must be present — this is a novelty lookup, not a trait/health call.
     r = tm.analyze_tnrc18_marker(_rsid("GG"))
     assert "no validated" in r["disclaimer"].lower()
+
+
+def test_registry_entry_enables_wgs_backfill():
+    # REGRESSION: on a whole-genome VCF without rsIDs, snps_df is empty at analysis
+    # time, so the marker is only reachable if its coordinate is in the SNP registry
+    # (which drives the VCF coordinate back-fill). Without this entry the WGS path
+    # silently returned "not typed" even when the variant was in the genome.
+    import snp_registry as reg
+    rec = [r for r in reg._RECORDS if r.rsid == tm.RSID]
+    assert rec, f"{tm.RSID} must be in the registry for WGS coordinate back-fill"
+    assert rec[0].chrom == tm.CHROM
+    assert rec[0].pos_grch38 == tm.POSITION      # the coordinate the back-fill matches
