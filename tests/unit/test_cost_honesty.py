@@ -93,3 +93,38 @@ def test_verdict_is_one_of_the_three_honest_states():
     assert pe["verdict"] in ("cost-saving",
                              "cost-effective (adds cost, worth it per QALY)",
                              "not cost-effective at this threshold")
+
+
+# ── C) cost-consequence analysis (disaggregated, NICE digital-health format) ──
+
+def test_cca_reports_no_summary_ratio():
+    # The defining property of a CCA: costs and consequences stay disaggregated.
+    # No ICER / cost-per-QALY / ROI field may be produced.
+    cca = he.build_cost_consequence_analysis(
+        he.analyze_personal_economics(_fake_econ(30_000, 0.3, 0.5, 250)))
+    assert cca["available"] is True
+    assert not [k for k in cca
+                if any(s in k.lower() for s in ("icer", "per_qaly", "ratio", "roi"))]
+
+
+def test_cca_keeps_qalys_in_their_own_unit():
+    # QALYs must be reported as QALYs, not monetised into the same column as cash.
+    cca = he.build_cost_consequence_analysis(
+        he.analyze_personal_economics(_fake_econ(30_000, 0.3, 0.5, 250)))
+    qrow = next(r for r in cca["rows"] if "life-years" in r["measure"])
+    assert qrow["unit"] == "QALYs"
+    # and no row mixes a dollar value into a QALY unit
+    for r in cca["rows"]:
+        assert not (r["unit"] == "QALYs" and str(r["value"]).startswith("$"))
+
+
+def test_cca_separates_costs_from_consequences():
+    cca = he.build_cost_consequence_analysis(
+        he.analyze_personal_economics(_fake_econ(30_000, 0.3, 0.5, 250)))
+    kinds = {r["kind"] for r in cca["rows"]}
+    assert kinds == {"Cost", "Consequence"}
+
+
+def test_cca_degrades_when_no_items():
+    assert he.build_cost_consequence_analysis(None)["available"] is False
+    assert he.build_cost_consequence_analysis({"available": False})["available"] is False

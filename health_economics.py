@@ -770,6 +770,120 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
     }
 
 
+def build_cost_consequence_analysis(econ: Optional[Dict]) -> Dict:
+    """**Cost-consequence analysis (CCA)** — the disaggregated table.
+
+    *In plain English:* a cost-effectiveness analysis crushes everything into one
+    number (cost per QALY). A cost-consequence analysis deliberately does not: it
+    lays out each cost and each consequence side by side, in its own natural units,
+    and lets the reader weigh them. Nothing is hidden inside a ratio.
+
+    NICE prefers this format for digital health precisely because such tools produce
+    several different kinds of benefit (some monetary, some health, some neither),
+    and collapsing them into a single ICER discards information the decision-maker
+    needs. It is also the honest format when the evidence is too thin to justify a
+    confident single number — which is the case here.
+
+    Deliberately reports NO summary ratio: that is the point of the format.
+    Ref: NICE Evidence Standards Framework for digital health technologies;
+    cost-consequence analysis (health-economics-metrics topic).
+    """
+    if not econ or not econ.get("available"):
+        return {"available": False,
+                "reason": "No modelled economic items — needs actionable findings "
+                          "and/or a blood-work panel."}
+
+    items = econ.get("items", [])
+    # Disaggregated consequences, each in its OWN unit — never summed together.
+    rows = [
+        {"kind": "Cost", "measure": "Testing / analysis cost",
+         "value": econ.get("analysis_cost", 0), "unit": "$ one-off",
+         "note": "What you pay to obtain the information."},
+        {"kind": "Cost", "measure": "Downstream intervention cost",
+         "value": econ.get("total_intervention", 0), "unit": f"$ over {econ.get('horizon_years','—')} yr",
+         "note": "Screening, prophylaxis, lifestyle programmes triggered by findings."},
+        {"kind": "Consequence", "measure": "Medical costs averted (marginal)",
+         "value": econ.get("total_avoided", 0), "unit": f"$ over {econ.get('horizon_years','—')} yr",
+         "note": "Marginal, not average, cost of the cases avoided."},
+        {"kind": "Consequence", "measure": "Quality-adjusted life-years gained",
+         "value": econ.get("total_qaly", 0), "unit": "QALYs",
+         "note": "Health gain in its own unit — deliberately NOT converted here."},
+        {"kind": "Consequence", "measure": "Actionable findings identified",
+         "value": len(items), "unit": "findings",
+         "note": "Count of distinct modelled findings driving the analysis."},
+        {"kind": "Consequence", "measure": "High-confidence findings",
+         "value": sum(1 for i in items if i.get("confidence") == "high"),
+         "unit": "findings",
+         "note": "Subset resting on stronger evidence."},
+    ]
+    # The cash bottom line is reported as a fact, still not blended with QALYs.
+    net_cash = econ.get("net_cash", 0)
+    return {
+        "available": True,
+        "rows": rows,
+        "net_cash": net_cash,
+        "total_qaly": econ.get("total_qaly", 0),
+        "verdict": econ.get("verdict", ""),
+        "horizon_years": econ.get("horizon_years"),
+        "plain_english": (
+            f"Over {econ.get('horizon_years','—')} years this profile models "
+            f"{econ.get('total_qaly', 0)} quality-adjusted life-years gained and a net "
+            f"cash position of {_money(net_cash)}, from {len(items)} findings. Costs and "
+            f"consequences are listed separately, in their own units, rather than "
+            f"collapsed into a single cost-per-QALY figure — so you can weigh them "
+            f"yourself instead of trusting one ratio."),
+        "why_this_format": (
+            "Cost-consequence analysis is NICE's preferred presentation for digital "
+            "health technologies: it keeps monetary and non-monetary consequences "
+            "visible side by side instead of hiding them inside an ICER. It is also "
+            "the appropriate format when the underlying parameters are illustrative."),
+        "caveat": ("No summary ratio is given by design. Figures are modelled on "
+                   "illustrative parameters — not measurements, not medical advice."),
+    }
+
+
+def _render_cca_html(cca: Optional[Dict]) -> str:
+    """Render the cost-consequence table (NICE's preferred digital-health format)."""
+    if not cca or not cca.get("available"):
+        return ""
+    rows = ""
+    for r in cca["rows"]:
+        is_cost = r["kind"] == "Cost"
+        col = "#8a6100" if is_cost else "#1a7f37"
+        val = r["value"]
+        shown = _money(val) if str(r["unit"]).startswith("$") else f"{val}"
+        rows += (
+            f'<tr>'
+            f'<td style="padding:6px 10px;color:{col};font-weight:600">{r["kind"]}</td>'
+            f'<td style="padding:6px 10px">{_esc_econ(r["measure"])}</td>'
+            f'<td style="padding:6px 10px;text-align:right;font-weight:700;'
+            f'font-variant-numeric:tabular-nums">{shown}</td>'
+            f'<td style="padding:6px 10px;color:#8a94a3">{_esc_econ(r["unit"])}</td>'
+            f'<td style="padding:6px 10px;color:#5b6673;font-size:.92em">{_esc_econ(r["note"])}</td>'
+            f'</tr>')
+    return f"""
+    <div style="margin:16px 0;border:1px solid #dbe3ec;border-radius:10px;padding:12px 14px">
+      <div style="font-weight:700;color:#12467a">Cost-consequence analysis
+        <span style="font-weight:400;color:#8a94a3;font-size:.85em">
+        — costs and consequences, disaggregated</span></div>
+      <div style="font-size:.86em;color:#5b6673;margin:4px 0 8px">
+        {_esc_econ(cca['plain_english'])}</div>
+      <table style="width:100%;border-collapse:collapse;font-size:.88em">
+        <thead><tr style="text-align:left;color:#8a94a3;border-bottom:1px solid #dbe3ec">
+          <th style="padding:6px 10px">Type</th><th style="padding:6px 10px">Measure</th>
+          <th style="padding:6px 10px;text-align:right">Value</th>
+          <th style="padding:6px 10px">Unit</th><th style="padding:6px 10px">Note</th>
+        </tr></thead>
+        <tbody>{rows}</tbody>
+      </table>
+      <div style="margin-top:8px;font-size:.82em;color:#6b5a1e;background:#fff8e6;
+                  border:1px solid #f0e0a8;border-radius:6px;padding:8px 10px">
+        <strong>No single cost-per-QALY figure is given, on purpose.</strong>
+        {_esc_econ(cca['why_this_format'])} {_esc_econ(cca['caveat'])}
+      </div>
+    </div>"""
+
+
 def _esc_econ(s) -> str:
     s = "" if s is None else str(s)
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
@@ -872,6 +986,7 @@ def render_economic_analysis_html(econ: Dict, file_label: str = "") -> str:
             two are shown separately so neither is mistaken for the other.
           </div>
         </div>
+        {_render_cca_html(build_cost_consequence_analysis(econ))}
         {top_prev}
         <table style="width:100%;border-collapse:collapse;font-size:.9em;margin-top:8px">
           <thead><tr style="background:#f7f9fb;text-align:right">
