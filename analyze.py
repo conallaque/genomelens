@@ -1238,6 +1238,10 @@ _MODULE_AI_SPECS: Dict[str, Dict[str, str]] = {
 # post-validate the output: any statistic/figure not present in the source data is
 # flagged, and an output riddled with fabricated numbers is dropped entirely so the
 # deterministic section stands alone.
+# Framework: HALLUCINATION RATE AS A HARM RATE WITH A PRICE — a model's error
+# rate in a health context is a safety parameter with an economic cost, not a
+# cosmetic quality metric. Hence a hard post-validator, not just a prompt.
+# See docs/METHODS.md section 22.
 _AI_GUARDRAILS = (
     "STRICT GROUNDING RULES — follow exactly:\n"
     "1. Use ONLY the genes, variants, conditions, and numbers in the DATA block "

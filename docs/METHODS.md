@@ -417,6 +417,51 @@ year's budget. So BIA is short-horizon (1–5 years), scaled to a real plan popu
 instant adoption, and reports **per-member-per-month** — the metric that actually decides
 formulary placement.
 
+**21 · Two costing corrections that keep the dollar figures honest**
+
+*Marginal, not average, cost.* Cost-of-illness figures are **averages** — total system
+spend divided by cases. Averting one case does not free the average cost, because much of
+it is fixed capacity (buildings, salaried staff, overhead) that persists whether or not
+that case occurs. Treating an average as a marginal cost is one of the most common ways a
+health-economic model overstates savings — the "freeing a bed doesn't save its average
+cost" error. The averted-cost side is therefore scaled by an explicit, documented
+marginal-cost fraction, which only ever *reduces* the modelled saving:
+
+```math
+\text{averted cost} = p \times \text{RRR} \times \text{COI}_{\text{avg}} \times m,\qquad 0 < m < 1
+```
+
+*In plain English:* preventing an illness saves real money, but not the full sticker price
+of that illness — the hospital still exists. This scales the claim down to the part that
+is genuinely freed.
+
+*Cost-saving is not the same as cost-effective.* Most prevention **adds** cost while
+buying health cheaply: it is cost-*effective* (good value per healthy year) without being
+cost-*saving* (money back). Net monetary benefit is dominated by monetised QALYs, so
+dividing it by the test price and calling the result "ROI" implies a cash return that
+isn't there. The report therefore separates the **cash** side (averted cost − spend) from
+**monetised health**, and states which of three honest verdicts applies: cost-saving,
+cost-effective but cost-adding, or not cost-effective at this threshold.
+Refs: Drummond et al. (2015); prevention economics — cost-effective ≠ cost-saving.
+
+**22 · Named frameworks behind this tool's honesty mechanisms**
+
+Several guardrails here were derived from first principles; each corresponds to an
+established idea, named below so the reasoning is checkable against the literature rather
+than taken on trust.
+
+| Mechanism in this tool | Established framework |
+|---|---|
+| Demoting single-SNP percentiles (a 99th-percentile marker score is not a 99th-percentile trait) | **PPV collapse at low prevalence** — Wilson & Jungner (1968) screening criteria: predictive value depends on the base rate, not the test alone |
+| Reporting variance-explained (R²) beside every trait percentile | **Prevalence rules the economics** — clinical-AI evaluation: sensitivity and specificity alone overstate usefulness; predictive value must be read against the base rate |
+| The local-LLM grounding guardrail that rejects invented figures | **Hallucination rate as a harm rate with a price** — a model's error rate is a safety parameter with an economic cost, not a cosmetic quality metric |
+| The welfare finding that access dominates the per-person effect | **RE-AIM** (Glasgow et al. 1999) — population impact = reach × effectiveness; an intervention reaching more people can beat a better one reaching fewer |
+| Demoting the ancestry call from a selection-confounded marker panel | The same PPV-collapse logic applied to classification: too few informative markers cannot support a confident population assignment |
+
+*Concepts adapted from the health-economics-metrics reference collection
+(github.com/health-economics-metrics) — screening-economics, clinical-AI-evaluation and
+reach-and-equity topics. Wording and implementation are this project's own.*
+
 **Thresholds & sources.** `λ` = \$50k / \$100k / \$150k per healthy year (Neumann et al.,
 *NEJM* 2014); `r` = 3% (Second Panel on Cost-Effectiveness in Health and Medicine);
 cost-of-illness from the ADA, AHA, and Alzheimer's Association; drug–gene values from

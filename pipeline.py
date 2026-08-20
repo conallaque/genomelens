@@ -1354,7 +1354,10 @@ def run_pipeline(args: argparse.Namespace) -> int:
                     encoding="utf-8",
                 )
                 log(f"  Economic-impact analysis saved: {econ_path} "
-                    f"(modeled net {personal_econ['total_net']:,}, ROI {personal_econ['roi']}x)")
+                    f"(modeled net benefit {personal_econ['total_net']:,} "
+                    f"= {personal_econ['total_qaly_value']:,} health value + "
+                    f"{personal_econ['net_cash']:,} net cash · "
+                    f"{personal_econ['verdict']})")
         except Exception as e:
             log(f"  WARNING: Economic-analysis HTML failed: {e}")
 

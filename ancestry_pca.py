@@ -297,7 +297,9 @@ def estimate_ancestry_heuristic(snps_df: pd.DataFrame) -> Dict:
             "admixture proportions."
         )
 
-    # DEMOTED: this heuristic must NOT emit a headline "you are population X"
+    # DEMOTED: this heuristic must NOT emit a headline "you are population X".
+    # Same PPV-collapse logic as the PheWAS demotion (Wilson & Jungner 1968): too few
+    # informative markers cannot support a confident classification. docs/METHODS.md §22.
     # ancestry call. The panel is ~10 usable markers, several under strong natural
     # selection (pigmentation and diet genes: EDAR, ALDH2, ADH1B, LCT), whose
     # frequencies track local adaptation, not shared descent. A single selected

@@ -603,6 +603,15 @@ _DPP_RRR = 0.58                   # lifestyle-program incidence reduction (DPP)
 _DPP_COST_10YR = 3_000
 _PREDIAB_PROGRESSION_10YR = 0.35  # prediabetes → diabetes over ~10 yr
 
+# Shared with value_of_information: averting a case frees the MARGINAL cost of that
+# case, not its AVERAGE lifetime cost (fixed capacity persists whether or not one
+# case is prevented). Single source of truth, with a fallback so this module stays
+# importable standalone.
+try:
+    from value_of_information import MARGINAL_COST_FRACTION as _MARGINAL_COST_FRACTION
+except Exception:                 # pragma: no cover — standalone import
+    _MARGINAL_COST_FRACTION = 0.60
+
 
 def _money(x) -> str:
     x = round(x)
@@ -617,6 +626,12 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
     items: List[Dict] = []
 
     def add(category, finding, avoided, qaly, intervention, confidence, basis):
+        # MARGINAL vs AVERAGE: the per-condition cost constants here (_MACE_COST,
+        # _T2D_COST, the lifetime COI figures) are AVERAGE costs. Averting one case
+        # frees only the marginal cost — a large share of average cost is fixed
+        # capacity that persists. Scale the cash side down accordingly; this only
+        # ever reduces the claimed saving. See value_of_information.MARGINAL_COST_FRACTION.
+        avoided = avoided * _MARGINAL_COST_FRACTION
         qv = qaly * VALUE_PER_QALY
         items.append({
             "category": category, "finding": finding,
@@ -708,6 +723,24 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
     gross_benefit = total_avoided + total_qaly_value
     roi = round((total_net) / _ANALYSIS_COST, 1) if _ANALYSIS_COST else None
 
+    # COST-SAVING vs COST-EFFECTIVE (honesty split).
+    # total_net is NET MONETARY BENEFIT — dominated by monetised QALYs (health value
+    # you'd pay for), NOT cash returned. Calling total_net/cost "ROI" implies money
+    # back. Separate the two: the CASH side is averted cost minus what you spend;
+    # only if THAT is positive is the analysis genuinely cost-saving. Most prevention
+    # is cost-effective (great value per QALY) but cost-adding (net cash out), and the
+    # report must not blur the two.
+    net_cash = total_avoided - total_intervention          # money only, no QALYs
+    cash_roi = (round(net_cash / _ANALYSIS_COST, 1)
+                if _ANALYSIS_COST else None)
+    value_to_cost_ratio = roi                              # NMB per $ — mostly health
+    if net_cash > 0:
+        verdict = "cost-saving"                            # genuine money back
+    elif total_net > 0:
+        verdict = "cost-effective (adds cost, worth it per QALY)"
+    else:
+        verdict = "not cost-effective at this threshold"
+
     items.sort(key=lambda i: -i["net"])
     return {
         "available": bool(items),
@@ -722,6 +755,12 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
         "net_low": round(total_net * 0.5),          # ±50% sensitivity band
         "net_high": round(total_net * 1.5),
         "gross_benefit": round(gross_benefit),
+        # Cash side, kept explicitly separate from monetised health value.
+        "net_cash": round(net_cash),
+        "cash_roi": cash_roi,
+        "value_to_cost_ratio": value_to_cost_ratio,
+        "is_cost_saving": net_cash > 0,
+        "verdict": verdict,
         "top_preventable": (max(items, key=lambda i: i["avoided"])["finding"]
                             if items else None),
         "analysis_cost": _ANALYSIS_COST,
@@ -816,8 +855,21 @@ def render_economic_analysis_html(econ: Dict, file_label: str = "") -> str:
               <span style="font-size:.55em;color:#8a94a3">({econ['total_qaly']:g} QALYs)</span></div></div>
             <div><div style="font-size:.78em;color:#8a94a3">Intervention cost</div>
               <div style="font-size:1.4em;font-weight:700;color:#8a6100">{_money(econ['total_intervention'])}</div></div>
-            <div><div style="font-size:.78em;color:#8a94a3">ROI vs ~{_money(econ['analysis_cost'])} analysis</div>
+            <div><div style="font-size:.78em;color:#8a94a3">Value per $ of analysis
+              (mostly health, not cash)</div>
               <div style="font-size:1.4em;font-weight:700;color:{net_col}">{roi}×</div></div>
+            <div><div style="font-size:.78em;color:#8a94a3">Net <em>cash</em>
+              (averted cost − spend)</div>
+              <div style="font-size:1.4em;font-weight:700;color:{"#1a7f37" if econ.get('is_cost_saving') else "#8a6100"}">{_money(econ.get('net_cash', 0))}</div></div>
+          </div>
+          <div style="margin-top:10px;padding:8px 12px;background:#fff8e6;
+                      border:1px solid #f0e0a8;border-radius:8px;font-size:.85em;color:#6b5a1e">
+            <strong>Verdict: {_esc_econ(econ.get('verdict', ''))}.</strong>
+            Most of the headline figure is <em>monetised health</em> (quality-adjusted
+            life-years valued at {_money(econ.get('value_per_qaly', 0))}/QALY), not money
+            returned to you. Prevention is typically cost-<em>effective</em> — excellent
+            value per healthy year — while still costing more cash than it saves. The
+            two are shown separately so neither is mistaken for the other.
           </div>
         </div>
         {top_prev}

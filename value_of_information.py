@@ -51,6 +51,25 @@ COI: Dict[str, Dict] = {
     "Pathogenic":     {"cost": 80_000,  "src": "illustrative avg for a pathogenic finding"},
 }
 
+# MARGINAL vs AVERAGE COST (honesty correction).
+# The COI figures above are AVERAGE lifetime cost-of-illness (total system cost ÷
+# cases). Averting ONE case does NOT free the average cost — it frees the *marginal*
+# cost, which is lower, because a large share of average cost is fixed/capacity
+# spending (hospital buildings, salaried staff, overhead) that persists when one
+# case is prevented. Using average-as-marginal systematically OVERSTATES cash savings
+# — the "freeing a bed doesn't save its average cost" error.
+#
+# So the averted-cost side is scaled by a conservative marginal-cost fraction. This is
+# a DOCUMENTED ASSUMPTION, not a fitted value, and it only ever REDUCES the modelled
+# saving (the honest direction). Short-run marginal hospital cost is commonly ~50–70%
+# of average; these lifetime COI figures also contain genuinely per-case-avertable
+# components (long-term care, lost productivity), so 0.60 is a deliberately
+# middle-conservative default. Override per your setting; do not tune it upward to
+# make outputs look better.
+# Ref: marginal-vs-average distinction in health-economic costing
+# (Drummond et al. 2015; health-economics-metrics: marginal-vs-average-cost).
+MARGINAL_COST_FRACTION = 0.60
+
 # Pharmacogenomics cost-effectiveness (averted ADRs), from published CEA.
 # p_rx = P(prescribed over a lifetime); p_adr = P(severe ADR | actionable genotype,
 # standard dosing); rrr = relative risk reduction with genotype-guided care;
@@ -282,7 +301,10 @@ def _finding_nmb(f: Dict, wtp: float, rate: float, rng=None) -> Tuple[float, flo
             p = _beta(rng, p)
             rrr = _beta(rng, rrr)
             coi = _gamma(rng, coi)
-        dcost = p * rrr * coi * disc
+        # Averted cost = expected prevented cases × MARGINAL cost of a case, not the
+        # average lifetime COI (see MARGINAL_COST_FRACTION above — averting one case
+        # frees the marginal, not the average, cost).
+        dcost = p * rrr * coi * MARGINAL_COST_FRACTION * disc
         dqaly = p * rrr * qaly * disc
         interv = f.get("intervention", 500.0)
 
@@ -1064,7 +1086,12 @@ def analyze_welfare_comparison(voi: float, test_cost: float,
 
         E[L_privacy] = L · [1 − (1 − p)^T]   (discounted)
 
-    **Social surplus adds a participation channel.** Disclosure risk deters testing
+    **Social surplus adds a participation channel (RE-AIM).**
+    Framework: RE-AIM (Glasgow et al. 1999) — population impact = reach x
+    effectiveness. An intervention that reaches more people can beat a better
+    one that reaches fewer, which is why the access channel below can dominate
+    the per-person effect. See docs/METHODS.md section 22.
+ Disclosure risk deters testing
     altogether (Akerlof-style unravelling): people who decline forfeit the *entire* VOI.
     Social surplus is therefore participation-weighted, and local analysis can dominate
     on access even where per-person benefit is identical.

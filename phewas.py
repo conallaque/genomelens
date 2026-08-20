@@ -544,7 +544,12 @@ def _score_trait(snps_df: pd.DataFrame, trait: Dict, sex: Optional[str]) -> Dict
                 "reason": f"0/{len(trait['variants'])} panel SNPs typed",
                 "n_used": 0, "n_total": len(trait['variants'])}
 
-    # TWO DISTINCT numbers — kept separate so neither is overclaimed:
+    # TWO DISTINCT numbers — kept separate so neither is overclaimed.
+    # Framework: PPV COLLAPSE AT LOW PREVALENCE (Wilson & Jungner 1968 screening
+    # criteria) — a marker's predictive value depends on the base rate and on how
+    # much variance it explains, not on where you rank among carriers. Reporting R²
+    # beside the percentile is the clinical-AI-evaluation discipline: sensitivity or
+    # rank alone overstates usefulness. See docs/METHODS.md §22.
     #
     # 1) MARKER-SCORE percentile: where you rank on THIS SNP panel, standardised to
     #    the panel's own spread. A true fact about your genotype (you carry more/
