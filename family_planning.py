@@ -489,6 +489,185 @@ _RECESSIVE_CARRIER_FREQ = {
                  "cause ichthyosis vulgaris. Aggressive early emollient use "
                  "in at-risk infants reduces the atopic march."),
     },
+    # ── Remaining recessive conditions detectable by carrier.py ──────────────
+    # Carrier frequencies are the standard published figures used in clinical
+    # carrier screening (ACMG/ACOG panethnic screening guidance and GeneReviews
+    # disease chapters). Ancestry keys match the labels the caller passes; the
+    # European entry is the fallback when a person's ancestry is unknown.
+    # Before these were added, only HFE and FLG had numeric frequencies, so a
+    # CFTR/SMN1/HBB carrier — the conditions carrier screening exists for —
+    # received no offspring-risk figure at all.
+    "CFTR": {
+        "freq": {"European": 0.040, "Ashkenazi Jewish": 0.042,
+                 "Hispanic": 0.022, "African American": 0.016,
+                 "East Asian": 0.011},
+        "penetrance": (0.95, 1.0),
+        "partner_test": "CFTR expanded panel (ACMG-23 minimum) or full-gene sequencing",
+        "note": ("Cystic fibrosis is highly penetrant: a child with two "
+                 "pathogenic copies will have CF, though severity varies by "
+                 "variant combination. Partner screening is standard of care "
+                 "before or early in pregnancy."),
+    },
+    "HBB": {
+        "freq": {"European": 0.008, "Mediterranean": 0.033,
+                 "African American": 0.083, "South Asian": 0.040,
+                 "East Asian": 0.033},
+        "penetrance": (0.95, 1.0),
+        "partner_test": ("Haemoglobinopathy evaluation — CBC with MCV, "
+                         "haemoglobin electrophoresis, HBB sequencing"),
+        "note": ("Two pathogenic HBB copies cause sickle-cell disease or "
+                 "beta-thalassaemia depending on the variants. Carrier "
+                 "(trait) status is largely benign. Newborn screening "
+                 "detects affected infants, and early penicillin "
+                 "prophylaxis plus hydroxyurea substantially improve outcomes."),
+    },
+    "SMN1": {
+        "freq": {"European": 0.021, "Ashkenazi Jewish": 0.020,
+                 "African American": 0.014, "East Asian": 0.017,
+                 "Hispanic": 0.017},
+        "penetrance": (0.95, 1.0),
+        "partner_test": "SMN1 copy-number (dosage) analysis — not a sequencing test",
+        "note": ("Spinal muscular atrophy is highly penetrant, though copy "
+                 "number of the SMN2 modifier gene shifts severity. Note "
+                 "carrier testing is dosage-based: consumer chips do not "
+                 "detect it reliably. Disease-modifying therapy now exists "
+                 "and works best when started pre-symptomatically."),
+    },
+    "HEXA": {
+        "freq": {"European": 0.003, "Ashkenazi Jewish": 0.037,
+                 "French Canadian": 0.028, "African American": 0.003,
+                 "East Asian": 0.003},
+        "penetrance": (0.95, 1.0),
+        "partner_test": ("HEXA enzyme (hexosaminidase A) assay plus targeted "
+                         "variant panel — enzyme testing outperforms genotyping"),
+        "note": ("Infantile Tay-Sachs is uniformly fatal in early childhood "
+                 "and has no disease-modifying treatment, which is why it is "
+                 "on every expanded carrier panel. Enzyme-based partner "
+                 "screening is more sensitive than a variant panel."),
+    },
+    "GBA": {
+        "freq": {"European": 0.010, "Ashkenazi Jewish": 0.067,
+                 "African American": 0.005, "East Asian": 0.005},
+        "penetrance": (0.30, 0.90),
+        "partner_test": "GBA targeted panel (N370S, L444P, 84GG, IVS2+1) or sequencing",
+        "note": ("Gaucher type 1 penetrance and severity vary widely — some "
+                 "homozygotes stay asymptomatic for life. Enzyme replacement "
+                 "therapy is effective. Separately, GBA heterozygosity is a "
+                 "known Parkinson's risk factor for the carrier themself."),
+    },
+    "PAH": {
+        "freq": {"European": 0.020, "Mediterranean": 0.023,
+                 "African American": 0.008, "East Asian": 0.012},
+        "penetrance": (0.95, 1.0),
+        "partner_test": "PAH full-gene sequencing",
+        "note": ("Phenylketonuria is highly penetrant but is the classic "
+                 "treatable inborn error: newborn screening catches it "
+                 "universally in the US, and dietary phenylalanine "
+                 "restriction started early prevents intellectual "
+                 "disability almost entirely."),
+    },
+    "ASPA": {
+        "freq": {"European": 0.003, "Ashkenazi Jewish": 0.018,
+                 "African American": 0.003, "East Asian": 0.003},
+        "penetrance": (0.95, 1.0),
+        "partner_test": "ASPA targeted panel (E285A, Y231X) or sequencing",
+        "note": ("Canavan disease is a severe, untreatable "
+                 "leukodystrophy of infancy. It is part of the standard "
+                 "Ashkenazi Jewish carrier panel."),
+    },
+    "SMPD1": {
+        "freq": {"European": 0.004, "Ashkenazi Jewish": 0.011,
+                 "African American": 0.004, "East Asian": 0.004},
+        "penetrance": (0.90, 1.0),
+        "partner_test": "SMPD1 sequencing",
+        "note": ("Niemann-Pick type A is severe and fatal in early "
+                 "childhood; type B is far milder and compatible with adult "
+                 "life. Which one results depends on the specific variant "
+                 "pair, so partner results need specialist interpretation."),
+    },
+    "ACADM": {
+        "freq": {"European": 0.015, "African American": 0.005,
+                 "East Asian": 0.003},
+        "penetrance": (0.80, 1.0),
+        "partner_test": "ACADM sequencing (K304E is the common European variant)",
+        "note": ("MCAD deficiency is detected by newborn screening and "
+                 "managed simply — avoid prolonged fasting, treat illness "
+                 "aggressively. Outcomes are excellent when known in "
+                 "advance and potentially fatal when it is not."),
+    },
+    "GALT": {
+        "freq": {"European": 0.014, "African American": 0.010,
+                 "East Asian": 0.005},
+        "penetrance": (0.95, 1.0),
+        "partner_test": "GALT enzyme assay plus sequencing",
+        "note": ("Classic galactosemia is caught by newborn screening and "
+                 "treated with a galactose-restricted diet, which prevents "
+                 "the acute neonatal crisis. Some long-term effects can "
+                 "persist despite good dietary control."),
+    },
+    "BTD": {
+        "freq": {"European": 0.008, "African American": 0.008,
+                 "East Asian": 0.008},
+        "penetrance": (0.80, 1.0),
+        "partner_test": "Biotinidase enzyme activity assay plus BTD sequencing",
+        "note": ("Profound biotinidase deficiency is one of the most "
+                 "treatable inborn errors — lifelong oral biotin prevents "
+                 "essentially all sequelae. Newborn screening covers it."),
+    },
+    "ATP7B": {
+        "freq": {"European": 0.011, "East Asian": 0.017,
+                 "African American": 0.008},
+        "penetrance": (0.90, 1.0),
+        "partner_test": "ATP7B full-gene sequencing",
+        "note": ("Wilson disease presents anywhere from childhood to "
+                 "middle age. It is treatable with chelation or zinc, and "
+                 "pre-symptomatic detection substantially changes the "
+                 "hepatic and neurologic course."),
+    },
+    "ALDOB": {
+        "freq": {"European": 0.014, "African American": 0.005,
+                 "East Asian": 0.005},
+        "penetrance": (0.90, 1.0),
+        "partner_test": "ALDOB targeted panel (A149P, A174D, N334K)",
+        "note": ("Hereditary fructose intolerance is managed entirely by "
+                 "dietary fructose/sucrose avoidance. Affected children "
+                 "typically self-restrict, but unrecognised exposure "
+                 "(including some IV fluids and medicines) is dangerous."),
+    },
+    "BCKDHA": {
+        "freq": {"European": 0.007, "Ashkenazi Jewish": 0.008,
+                 "African American": 0.005, "East Asian": 0.005},
+        "penetrance": (0.95, 1.0),
+        "partner_test": "BCKDHA / BCKDHB / DBT sequencing (MSUD is genetically heterogeneous)",
+        "note": ("Maple syrup urine disease needs lifelong branched-chain "
+                 "amino-acid restriction and carries real risk of metabolic "
+                 "crisis during illness. Newborn screening detects it. Note "
+                 "MSUD involves three genes — partner screening should cover "
+                 "all of them, not BCKDHA alone."),
+    },
+    "MEFV": {
+        "freq": {"European": 0.010, "Mediterranean": 0.100,
+                 "Middle Eastern": 0.140, "Ashkenazi Jewish": 0.130,
+                 "African American": 0.005, "East Asian": 0.003},
+        "penetrance": (0.50, 0.80),
+        "partner_test": "MEFV targeted panel (M694V, V726A, M680I, E148Q)",
+        "note": ("Familial Mediterranean fever has notably incomplete "
+                 "penetrance and is treatable — daily colchicine controls "
+                 "attacks and prevents the amyloidosis that drives its "
+                 "long-term morbidity. E148Q in particular is of "
+                 "questionable clinical significance on its own."),
+    },
+    "SERPINA1": {
+        "freq": {"European": 0.040, "Mediterranean": 0.030,
+                 "African American": 0.010, "East Asian": 0.002},
+        "penetrance": (0.30, 0.70),
+        "partner_test": "SERPINA1 genotyping (S and Z alleles) plus A1AT serum level",
+        "note": ("Alpha-1 antitrypsin deficiency is codominant rather than "
+                 "cleanly recessive: ZZ individuals face emphysema and liver "
+                 "disease risk, but penetrance depends heavily on smoking "
+                 "status. Never smoking is by far the largest modifier, and "
+                 "augmentation therapy exists for established disease."),
+    },
 }
 
 

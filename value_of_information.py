@@ -49,6 +49,23 @@ COI: Dict[str, Dict] = {
     "BreastOvarian":  {"cost": 130_000, "src": "hereditary breast/ovarian treatment"},
     "Colorectal":     {"cost": 110_000, "src": "Lynch-spectrum CRC treatment"},
     "Pathogenic":     {"cost": 80_000,  "src": "illustrative avg for a pathogenic finding"},
+    # ── Conditions covered by the modules wired in 2026-08-22 ────────────────
+    # Each entry is a published lifetime or episode cost-of-illness figure for
+    # the condition the module actually speaks to. These exist so those modules
+    # can enter the economic model on a real anchor rather than being dropped
+    # or, worse, mapped onto an unrelated cardiometabolic proxy.
+    "SubstanceUse":   {"cost": 60_000,  "src": "NIDA/NIAAA — lifetime excess medical cost, "
+                                               "alcohol/nicotine use disorder (excludes "
+                                               "criminal-justice and productivity terms)"},
+    "Depression":     {"cost": 55_000,  "src": "Greenberg 2021 PharmacoEconomics — lifetime "
+                                               "direct medical cost, major depressive disorder"},
+    "Autoimmune":     {"cost": 95_000,  "src": "lifetime direct cost, immune-mediated "
+                                               "inflammatory disease (RA/IBD/psoriasis avg)"},
+    "Urologic":       {"cost": 25_000,  "src": "lifetime direct cost, benign urologic disease "
+                                               "(BPH, recurrent nephrolithiasis)"},
+    "IronOverload":   {"cost": 40_000,  "src": "hereditary haemochromatosis — lifetime cost "
+                                               "with organ involvement; phlebotomy is cheap, "
+                                               "late cirrhosis/cardiomyopathy is not"},
 }
 
 # MARGINAL vs AVERAGE COST (honesty correction).
@@ -155,10 +172,18 @@ def _annuity_pv(years: float, rate: float) -> float:
 
 def _collect(economics_result: Optional[Dict],
              clinical_variants_result: Optional[Dict],
-             novel_variants_result: Optional[Dict]) -> List[Dict]:
+             novel_variants_result: Optional[Dict],
+             unvalued: Optional[List[Dict]] = None) -> List[Dict]:
     """Unify findings across sources into explicit economic parameter dicts:
     {label, kind, coi_key/pgx_key, p_event, rrr, qaly, intervention, horizon,
-     wgs_only, haircut, confidence}."""
+     wgs_only, haircut, confidence}.
+
+    ``unvalued`` (optional, mutated in place) collects findings whose category
+    string ``_classify_category`` does not recognise. Those findings carry no
+    economic value here, and without this list they leave no trace at all —
+    ``health_economics.py`` gains new ``source=`` labels regularly, and a label
+    it emits that this module has no mapping for silently disappears from the
+    model while the report still claims a complete computation."""
     out: List[Dict] = []
 
     econ = economics_result or {}
@@ -166,17 +191,28 @@ def _collect(economics_result: Optional[Dict],
         kind, coi_key = _classify_category(f.get("category"), f.get("finding", ""))
         label = f.get("finding", "genetic finding")
         conf = f.get("confidence", "moderate")
+        if kind not in ("pgx", "coi") and unvalued is not None:
+            _cat = f.get("category") or "(none)"
+            _reason = _not_valued_reason(_cat)
+            unvalued.append({"label": label, "category": _cat,
+                             "intentional": bool(_reason),
+                             "reason": _reason or
+                                       "No economic mapping defined for this "
+                                       "category — likely an oversight."})
+        _hc = _evidence_haircut(f.get("category"))
         if kind == "pgx":
             out.append({"label": label, "kind": "pgx",
                         "pgx_key": _match_pgx(label),
                         "intervention": 100.0, "wgs_only": False,
-                        "haircut": 1.0, "confidence": conf})
+                        "haircut": _hc, "confidence": conf,
+                        "source_category": f.get("category") or ""})
         elif kind == "coi":
             out.append({"label": label, "kind": "coi", "coi_key": coi_key,
                         "p_event": 0.15 if coi_key == "Alzheimer" else 0.20,
                         "rrr": 0.30, "qaly": float(f.get("qaly_gain") or 0.5),
                         "intervention": 500.0, "horizon": 25, "wgs_only": False,
-                        "haircut": 1.0, "confidence": conf})
+                        "haircut": _hc, "confidence": conf,
+                        "source_category": f.get("category") or ""})
 
     # Phase-2 clinical variants (WGS-only) — actionable + carrier + affected.
     cvr = clinical_variants_result or {}
@@ -230,29 +266,137 @@ def _classify_category(category: Optional[str], label: str = "") -> Tuple[str, s
     """Map a health-economics finding onto ('pgx'|'coi'|'', coi_key).
 
     ``health_economics.py`` labels findings with human-readable sources
-    ("Pharmacogenomics", "Polygenic Risk", "Genotype" for APOE, "Exercise /
-    Lifestyle", "Longevity"). Matching those with substrings — rather than exact
-    lowercase keys — keeps the chip path working: a mismatch here silently drops
-    every chip-only finding and makes the whole engine report "no findings", which
-    is exactly the bug this replaced. Short internal keys stay supported so either
-    naming convention works.
+    ("Pharmacogenomics", "Polygenic Risk", "Addiction Genetics", ...). Matching
+    those with substrings — rather than exact lowercase keys — keeps the chip
+    path working: a mismatch here silently drops every finding from that source
+    and makes the engine report "no findings", which is exactly the bug this
+    replaced. Short internal keys stay supported so either naming works.
+
+    Every source label emitted by ``health_economics.py`` must resolve here or
+    be registered in :data:`NOT_VALUED`; ``test_voi_no_silent_drops`` enforces
+    that, so a new module cannot quietly fall out of the model.
     """
     cat = (category or "").strip().lower()
     text = f"{cat} {(label or '').lower()}"
     if not cat:
         return ("", "")
-    # Pharmacogenomics
-    if "pharmaco" in cat or cat in ("pgx", "cpic"):
+
+    # ── Pharmacogenomics: anything whose decision is "change or dose-adjust a
+    #    prescription" — including drug-interaction, top-drug and HLA screens,
+    #    and the phase-I/II metabolising-enzyme (detoxification) panel.
+    if ("pharmaco" in cat or "pgx" in cat or cat in ("cpic",)
+            or "compound interaction" in cat or "detox" in cat):
         return ("pgx", "")
-    # APOE / dementia risk is reported under the generic "Genotype" source.
+
+    # ── Monogenic findings: ClinVar-reviewed pathogenic variants and carrier
+    #    results both resolve to the high-consequence COI bucket.
+    if "clinical variant" in cat or "clinvar" in cat or "carrier" in cat:
+        return ("coi", "Pathogenic")
+
+    # ── APOE / dementia is reported under the generic "Genotype" source.
     if "apoe" in text or "alzheim" in text or "dementia" in text:
         return ("coi", "Alzheimer")
-    # Polygenic risk, lifestyle and longevity findings → cardiometabolic proxy.
+
+    # ── Modules wired in 2026-08-22, each onto the condition it speaks to
+    #    rather than onto a cardiometabolic proxy.
+    if "addiction" in cat or "substance" in cat:
+        return ("coi", "SubstanceUse")
+    if "neurochem" in cat or "psychiatric" in cat or "mood" in cat:
+        return ("coi", "Depression")
+    if "immunogenetic" in cat or "autoimmun" in cat:
+        return ("coi", "Autoimmune")
+    if "urolog" in cat or "renal" in cat or "kidney" in cat:
+        return ("coi", "Urologic")
+    if "metal" in cat or "oxidative" in cat:
+        return ("coi", "IronOverload")
+
+    # ── Mendelian randomisation and PheWAS biomarkers are trait-directed: route
+    #    on the trait named in the finding, defaulting to the cardiometabolic
+    #    bucket that dominates both panels. Evidence strength is handled by the
+    #    per-category haircut in _evidence_haircut, not by exclusion.
+    if "mendelian randomization" in cat or "mendelian randomisation" in cat \
+            or "phewas" in cat or "biomarker" in cat:
+        for token, key in (("glucose", "T2D"), ("diabet", "T2D"),
+                           ("hba1c", "T2D"), ("insulin", "T2D"),
+                           ("depress", "Depression"), ("mood", "Depression"),
+                           ("urate", "Urologic"), ("kidney", "Urologic"),
+                           ("creatinine", "Urologic"), ("ferritin", "IronOverload"),
+                           ("iron", "IronOverload")):
+            if token in text:
+                return ("coi", key)
+        return ("coi", "CAD")
+
+    # ── Polygenic risk, lifestyle, wellness and longevity → cardiometabolic.
     for token in ("polygenic", "prs", "genotype", "exercise", "lifestyle",
-                  "longevity", "cardio", "metabolic"):
+                  "longevity", "cardio", "metabolic", "wellness"):
         if token in cat:
             return ("coi", "CAD")
     return ("", "")
+
+
+# How much of a finding's modelled value survives, by evidence strength of the
+# source module. A finding routed onto a real cost-of-illness anchor can still
+# rest on a weak association, and the honest treatment is to keep it in the
+# model at a discount rather than either dropping it silently or letting it
+# count the same as a ClinVar pathogenic variant.
+#
+# These are judgement calls, not published multipliers, and are labelled as such
+# in the report. The ordering is what matters: hypothesis-generating panels
+# (PheWAS, wellness) are worth a fraction of a curated clinical finding.
+EVIDENCE_HAIRCUT: Dict[str, float] = {
+    "phewas biomarker":        0.10,   # typically <1% of trait variance explained
+    "wellness prediction":     0.10,   # lifestyle-adjacent, largely non-clinical
+    "expanded polygenic score": 0.25,  # broad panels, uneven validation
+    "mendelian randomization": 0.30,   # population causal estimate, not personal effect
+    "neurochemistry":          0.30,   # pathway-level, weak clinical anchoring
+    "metal/oxidative":         0.35,
+    "urologic/gu":             0.40,
+    "addiction genetics":      0.40,   # real COI, but small per-variant effects
+    "immunogenetics":          0.40,
+    "detoxification":          0.50,
+    "polygenic risk":          0.50,
+}
+
+
+def _evidence_haircut(category: Optional[str]) -> float:
+    """Fraction of modelled value retained for this source (1.0 = no discount)."""
+    cat = (category or "").strip().lower()
+    if cat in EVIDENCE_HAIRCUT:
+        return EVIDENCE_HAIRCUT[cat]
+    for k, v in EVIDENCE_HAIRCUT.items():
+        if k in cat:
+            return v
+    return 1.0
+
+
+# Categories deliberately given no dollar value, and why. Being explicit
+# matters: an unlisted category is an oversight to fix, whereas one listed here
+# is a decision. Findings from these sources still appear in the report — they
+# are excluded from the economic model only.
+NOT_VALUED: Dict[str, str] = {
+    "Family Planning": (
+        "Reproductive findings are deliberately never monetised. Attaching a "
+        "dollar figure to an affected birth prices a prospective child, and "
+        "importing a population uptake rate would embed one set of "
+        "reproductive preferences as if it were universal. The module's "
+        "offspring-risk figures are reported as information, and the economic "
+        "question it does raise — whether to buy an expanded carrier panel — "
+        "is surfaced as a recommendation rather than a dollar value, because "
+        "no published dose-response supports one."),
+}
+
+
+def _not_valued_reason(category: Optional[str]) -> str:
+    """Return the documented reason this category carries no economic value,
+    or '' if the category is simply unmapped (i.e. an oversight)."""
+    cat = (category or "").strip()
+    if cat in NOT_VALUED:
+        return NOT_VALUED[cat]
+    low = cat.lower()
+    for k, v in NOT_VALUED.items():
+        if k.lower() == low:
+            return v
+    return ""
 
 
 def _match_pgx(label: str) -> str:
@@ -358,8 +502,9 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
     # {"available": False} is exactly how the chip-input bug stayed hidden.
     _degraded: List[Tuple[str, str]] = []
 
+    _unvalued: List[Dict] = []
     findings = _collect(economics_result, clinical_variants_result,
-                        novel_variants_result)
+                        novel_variants_result, unvalued=_unvalued)
     if not findings:
         return {"available": False,
                 "reason": "No economically-modellable findings yet "
@@ -531,10 +676,24 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
 
     # Surface any degradation rather than letting a failed sub-analysis disappear.
     result["degraded_components"] = [{"component": k, "error": e} for k, e in _degraded]
-    result["fully_computed"] = not _degraded
+    # A finding dropped for an unrecognised category is a real gap in the model,
+    # so it counts against fully_computed exactly as a crashed component does.
+    result["unvalued_findings"] = _unvalued
+    result["n_unvalued"] = len(_unvalued)
+    # An intentional exclusion (documented in NOT_VALUED) is a modelling
+    # decision, not an incomplete computation. Only genuinely unmapped
+    # categories count against fully_computed.
+    _oversights = [u for u in _unvalued if not u["intentional"]]
+    result["n_unvalued_intentional"] = len(_unvalued) - len(_oversights)
+    result["unmapped_categories"] = sorted({u["category"] for u in _oversights})
+    result["fully_computed"] = not _degraded and not _oversights
     if _degraded and log:
         for k, e in _degraded:
             log(f"  WARNING: value-of-information component '{k}' failed: {e}")
+    if _oversights and log:
+        log(f"  WARNING: {len(_oversights)} finding(s) dropped from the economic "
+            f"model — unmapped category/categories: "
+            f"{', '.join(result['unmapped_categories'])}")
 
     return result
 

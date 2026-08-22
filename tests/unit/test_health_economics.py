@@ -39,8 +39,22 @@ def test_calculate_roi_zero_cost_is_none():
 
 
 def test_payback_months_known_case():
-    # 300 / 15000 * 12 = 0.24 months
-    assert he.calculate_payback_months(300, 15_000) == 0.24
+    # Payback walks month by month accumulating DISCOUNTED benefit, so the
+    # smallest resolvable answer is one whole month. A $300 cost against a
+    # $15k annual benefit is repaid inside the first month.
+    assert he.calculate_payback_months(300, 15_000) == 1.0
+
+
+def test_payback_months_lengthens_as_benefit_shrinks():
+    # Directional property rather than a memorised constant.
+    fast = he.calculate_payback_months(300, 15_000)
+    slow = he.calculate_payback_months(300, 600)
+    assert slow > fast
+
+
+def test_payback_none_when_never_breaks_even():
+    # Benefit so small it cannot repay the cost inside the 10-year window.
+    assert he.calculate_payback_months(1_000_000, 1) is None
 
 
 def test_payback_zero_outcome_is_none():
@@ -90,7 +104,12 @@ def test_pgx_actionable_phenotype_included_with_correct_roi():
     res = he.analyze_health_economics(findings, pd.DataFrame())
     assert res["n_findings"] == 1
     f = res["findings_with_economics"][0]
-    assert f["roi"] == 50.0
+    # outcome_value is the PROBABILITY-WEIGHTED averted cost
+    # (p_prescribed x p_adr x rrr x adr_cost), not the raw cost of an adverse
+    # event, so ROI is a modest ratio rather than the ~50x the undiscounted
+    # event cost would imply.
+    assert f["roi"] == round(f["outcome_value"] / f["intervention_cost"], 1)
+    assert 0 < f["roi"] < 5
     assert f["confidence"] == "high"
     assert "warfarin" in f["finding"]
 

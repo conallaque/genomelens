@@ -8,21 +8,30 @@ and — at the longest scales — recent parental relatedness (consanguinity).
 
 Algorithm (PLINK-like sliding window):
     1. For each autosome, walk the SNPs in physical order.
-    2. Track current run length: extend when homozygous, allow up to
-       `max_hets` heterozygotes per window.
-    3. Emit a run when it reaches `min_snps` SNPs AND `min_length_mb` Mb.
+    2. Extend the run while a trailing window of `WINDOW_SNPS` SNPs holds no
+       more than `max_hets` heterozygotes. The window is what slides — a het
+       tolerated early does not consume the budget for the rest of the run.
+    3. Break the run across any inter-SNP gap wider than `MAX_GAP_MB`, since an
+       uncalled stretch (centromere, coverage hole) is absence of evidence, not
+       evidence of homozygosity.
+    4. Emit a run when it reaches `min_snps` SNPs AND `min_length_mb` Mb.
 
 Output:
     * Per-run records (chr, start, end, n_snps, length_mb).
     * Classification: short (1-2 Mb), medium (2-8 Mb), long (>8 Mb).
     * F_ROH coefficient = total ROH length / autosomal genome length.
+    * F_ROH_long — the same ratio over long (>8 Mb) runs only.
     * SVG ideogram visualisation of ROH locations.
 
-Population context (illustrative, not used for hard cutoffs):
-    * F_ROH ~ 0.005 — outbred general population
-    * F_ROH 0.01-0.03 — founder populations (Ashkenazi, Finnish, Sardinian)
-    * F_ROH 0.03-0.08 — first/second-cousin parents likely
-    * F_ROH > 0.08 — closer-than-first-cousin parents
+Population context (illustrative, not used for hard cutoffs). Note these tiers
+are keyed on F_ROH_LONG, not total F_ROH: only long ROH track recent pedigree
+relatedness (Kirin et al. 2010, PLoS ONE 5:e13996 — r≈0.87 for sum-of-ROH
+>10 Mb). Short and medium runs largely reflect ancient shared ancestry, so
+including them mislabels founder-population background as consanguinity.
+    * F_ROH_long ~ 0      — no evidence of recent parental relatedness
+    * F_ROH_long to 0.02  — distant relatedness or strong founder background
+    * F_ROH_long to 0.05  — consistent with second-cousin parents
+    * F_ROH_long > 0.05   — consistent with first-cousin or closer
 
 Framing: consanguinity is culturally normal in many populations. This is
 informational, not judgmental. The clinically relevant consequence is
@@ -38,6 +47,17 @@ import numpy as np
 
 # Approximate autosomal genome length in GRCh37/38 (Mb)
 AUTOSOMAL_LENGTH_MB = 2881.0
+# Sliding-window width (SNPs) over which `max_hets` is enforced. PLINK's
+# --homozyg-window-snp default; the het budget applies per window, not per run.
+WINDOW_SNPS = 50
+# Maximum tolerated distance between consecutive genotyped SNPs inside one run.
+# An uncalled stretch wider than this (centromere, assay coverage hole) carries
+# no homozygosity evidence, so a run must not be extended across it. PLINK's
+# --homozyg-gap default is 1 Mb; 1.0 Mb is kept here for the same reason.
+MAX_GAP_MB = 1.0
+# Length (Mb) at or above which a run counts as "long" — the only class that
+# tracks recent pedigree relatedness (Kirin 2010).
+LONG_ROH_MB = 8.0
 # Approximate per-chromosome lengths (Mb) for ideogram rendering
 CHROM_LENGTHS_MB = {
     "1": 249.3, "2": 243.2, "3": 198.0, "4": 191.2, "5": 180.9, "6": 171.1,
@@ -86,41 +106,37 @@ def _is_homozygous(gt: object) -> int:
 
 def _detect_roh_one_chrom(positions: np.ndarray, hom: np.ndarray,
                           min_snps: int, min_length_mb: float,
-                          max_hets: int) -> List[Dict]:
+                          max_hets: int,
+                          window_snps: int = WINDOW_SNPS,
+                          max_gap_mb: float = MAX_GAP_MB) -> List[Dict]:
     """Detect ROH on one chromosome.
 
     positions: SNP positions in bp (int)
     hom: 1=hom, 0=het, -1=uncalled (same length as positions)
+
+    The het budget is enforced over a TRAILING WINDOW of ``window_snps`` called
+    SNPs, so an isolated het early in a long segment does not terminate it — the
+    behaviour the module docstring has always described. A whole-run counter
+    instead fragments genuine IBD segments into several short runs, which both
+    depresses F_ROH and moves length mass out of the long class that
+    consanguinity inference depends on.
+
+    A run also breaks across any inter-SNP gap wider than ``max_gap_mb``: an
+    uncalled stretch is absence of evidence, and bridging it manufactures a
+    single long run out of two unrelated homozygous stretches.
     """
     runs: List[Dict] = []
     n = len(positions)
-    i = 0
-    while i < n:
-        if hom[i] != 1:
-            i += 1
-            continue
-        # Start of a candidate run
-        start_idx = i
-        hets_in_window = 0
-        j = i
-        while j < n:
-            if hom[j] == 1:
-                j += 1
-            elif hom[j] == 0:
-                hets_in_window += 1
-                if hets_in_window > max_hets:
-                    break
-                j += 1
-            else:  # uncalled — skip without counting
-                j += 1
-        end_idx = j - 1
-        # Trim trailing het/uncalled
+    max_gap_bp = max_gap_mb * 1e6
+
+    def _emit(start_idx: int, end_idx: int) -> None:
+        # Trim trailing non-homozygous calls so a run starts and ends on a hom.
         while end_idx > start_idx and hom[end_idx] != 1:
             end_idx -= 1
-
+        if end_idx <= start_idx:
+            return
         n_snps = end_idx - start_idx + 1
-        length_bp = int(positions[end_idx] - positions[start_idx])
-        length_mb = length_bp / 1e6
+        length_mb = int(positions[end_idx] - positions[start_idx]) / 1e6
         if n_snps >= min_snps and length_mb >= min_length_mb:
             runs.append({
                 "start_bp": int(positions[start_idx]),
@@ -128,7 +144,29 @@ def _detect_roh_one_chrom(positions: np.ndarray, hom: np.ndarray,
                 "length_mb": round(length_mb, 3),
                 "n_snps": int(n_snps),
             })
-        i = end_idx + 1
+
+    i = 0
+    while i < n:
+        if hom[i] != 1:
+            i += 1
+            continue
+        start_idx = i
+        het_idx: List[int] = []      # positions of hets inside the current run
+        j = i
+        while j < n:
+            # Gap guard — never extend across an uncalled stretch.
+            if j > start_idx and (positions[j] - positions[j - 1]) > max_gap_bp:
+                break
+            if hom[j] == 0:
+                het_idx.append(j)
+                # Enforce max_hets over the trailing window only.
+                window_start = max(start_idx, j - window_snps + 1)
+                if sum(1 for h in het_idx if h >= window_start) > max_hets:
+                    break
+            j += 1
+        _emit(start_idx, j - 1)
+        # Resume after the run; always advance to guarantee termination.
+        i = max(j, start_idx + 1)
     return runs
 
 
@@ -142,6 +180,7 @@ def detect_roh(snps_df: pd.DataFrame,
         # return below, or downstream (pipeline log line, build_roh_html) hits a
         # KeyError and takes the whole report down with it.
         return {"runs": [], "f_roh": 0.0, "n_runs": 0, "total_roh_mb": 0.0,
+                "long_roh_mb": 0.0, "f_roh_long": 0.0,
                 "short": [], "medium": [], "long": [],
                 "n_short": 0, "n_medium": 0, "n_long": 0,
                 "population_context": ("No autosomal genotype data available to scan "
@@ -165,46 +204,53 @@ def detect_roh(snps_df: pd.DataFrame,
 
     # Classify
     short = [r for r in runs_all if r["length_mb"] < 2.0]
-    medium = [r for r in runs_all if 2.0 <= r["length_mb"] < 8.0]
-    long_ = [r for r in runs_all if r["length_mb"] >= 8.0]
+    medium = [r for r in runs_all if 2.0 <= r["length_mb"] < LONG_ROH_MB]
+    long_ = [r for r in runs_all if r["length_mb"] >= LONG_ROH_MB]
 
     total_mb = sum(r["length_mb"] for r in runs_all)
     f_roh = total_mb / AUTOSOMAL_LENGTH_MB
+    # Only long ROH track recent pedigree relatedness (Kirin 2010): short and
+    # medium runs are dominated by ancient shared ancestry, so blending them in
+    # labels founder-population background as consanguinity.
+    long_mb = sum(r["length_mb"] for r in long_)
+    f_roh_long = long_mb / AUTOSOMAL_LENGTH_MB
 
-    # Population context narrative
-    if f_roh < 0.005:
-        context = ("F_ROH below ~0.005 is typical for an outbred individual with no recent "
-                   "parental relatedness.")
-        context_tier = "outbred"
-    elif f_roh < 0.015:
-        context = ("F_ROH in the 0.005-0.015 range is common in modern populations and may "
-                   "reflect ancient population bottlenecks or founder-population background "
-                   "(e.g. Ashkenazi Jewish, Finnish, Sardinian, French Canadian, Old Order "
-                   "Amish, some Middle Eastern populations).")
-        context_tier = "founder_background"
-    elif f_roh < 0.04:
-        context = ("F_ROH 0.015-0.04 suggests either strong founder-population background or "
-                   "more distant consanguinity (second cousins or beyond). Common in some "
-                   "endogamous communities.")
-        context_tier = "endogamous_or_distant_consanguinity"
-    elif f_roh < 0.08:
-        context = ("F_ROH 0.04-0.08 is consistent with first- or second-cousin parental "
+    # Population context narrative — keyed on F_ROH_LONG, not total F_ROH.
+    _founder_note = (" Total F_ROH here is "
+                     f"{f_roh:.4f}; the short and medium runs making up the "
+                     "difference reflect ancient shared ancestry (common in "
+                     "founder populations such as Ashkenazi Jewish, Finnish, "
+                     "Sardinian, French Canadian or Old Order Amish) rather "
+                     "than recent parental relatedness.")
+    if f_roh_long <= 0.0:
+        context = ("No long (>8 Mb) runs of homozygosity were detected, so there is no "
+                   "evidence of recent parental relatedness." + _founder_note)
+        context_tier = "no_recent_relatedness"
+    elif f_roh_long < 0.02:
+        context = ("A small amount of long-ROH burden can reflect distant relatedness or a "
+                   "strong founder-population background. It is not on its own evidence of "
+                   "close parental relatedness." + _founder_note)
+        context_tier = "distant_or_founder_background"
+    elif f_roh_long < 0.05:
+        context = ("This long-ROH burden is consistent with second-cousin parental "
                    "relatedness. Many cultures practice cousin marriage and this is "
                    "informational, not judgmental. Clinically, offspring of related parents "
                    "have elevated rare-recessive-disease risk; pre-pregnancy expanded carrier "
                    "screening can be valuable.")
-        context_tier = "first_second_cousin"
+        context_tier = "second_cousin"
     else:
-        context = ("F_ROH above 0.08 is consistent with closer-than-first-cousin parental "
+        context = ("This long-ROH burden is consistent with first-cousin or closer parental "
                    "relatedness. Discuss with a genetic counsellor — expanded carrier "
                    "screening is particularly valuable for family-planning decisions.")
-        context_tier = "very_close_relatedness"
+        context_tier = "first_cousin_or_closer"
 
     return {
         "runs": runs_all,
         "n_runs": len(runs_all),
         "total_roh_mb": round(total_mb, 2),
         "f_roh": round(f_roh, 5),
+        "long_roh_mb": round(long_mb, 2),
+        "f_roh_long": round(f_roh_long, 5),
         "short": short,
         "medium": medium,
         "long": long_,
@@ -217,6 +263,8 @@ def detect_roh(snps_df: pd.DataFrame,
             "min_snps": min_snps,
             "min_length_mb": min_length_mb,
             "max_hets": max_hets,
+            "window_snps": WINDOW_SNPS,
+            "max_gap_mb": MAX_GAP_MB,
         },
     }
 

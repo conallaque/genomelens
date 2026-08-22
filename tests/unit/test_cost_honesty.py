@@ -128,3 +128,32 @@ def test_cca_separates_costs_from_consequences():
 def test_cca_degrades_when_no_items():
     assert he.build_cost_consequence_analysis(None)["available"] is False
     assert he.build_cost_consequence_analysis({"available": False})["available"] is False
+
+
+# ── D) the stated horizon must actually enter the arithmetic ─────────────────
+
+def test_horizon_discount_is_applied_not_just_labelled():
+    # PERSONAL_HORIZON_YEARS labelled the output "Over 10 years" while the
+    # figures were undiscounted sums of future dollars. The discount factor must
+    # be a real fraction that reduces the claim.
+    assert 0.0 < he._MIDPOINT_DISCOUNT < 1.0
+
+
+def test_horizon_length_changes_the_discount(monkeypatch):
+    # Directional: a longer horizon discounts harder at the midpoint.
+    import importlib
+    short = 1.0 / (1.0 + he.DISCOUNT_RATE) ** (4 / 2.0)
+    long_ = 1.0 / (1.0 + he.DISCOUNT_RATE) ** (20 / 2.0)
+    assert long_ < short
+
+
+def test_discounting_reduces_reported_value():
+    pe = he.analyze_personal_economics(_fake_econ(100_000, 0.5, 2.0, 500))
+    # Undiscounted counterfactual for the same inputs.
+    undiscounted_avoided = 100_000 * 0.5 * he._MARGINAL_COST_FRACTION
+    assert pe["total_avoided"] < undiscounted_avoided
+
+
+def test_horizon_years_is_still_reported():
+    pe = he.analyze_personal_economics(_fake_econ(30_000, 0.3, 0.5, 250))
+    assert pe["horizon_years"] == he.PERSONAL_HORIZON_YEARS

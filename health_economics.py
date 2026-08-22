@@ -1700,6 +1700,13 @@ def analyze_health_economics(findings: Dict, snps_df: pd.DataFrame,
 
 VALUE_PER_QALY = 100_000          # standard US cost-effectiveness threshold
 PERSONAL_HORIZON_YEARS = 10
+# Expected event costs below are one-time amounts realised at some point inside
+# PERSONAL_HORIZON_YEARS, not annual flows, so they are discounted to present
+# value at the horizon midpoint — the standard simplification when event timing
+# within a window is unmodelled. Without this the report labels its output
+# "Over 10 years" while summing undiscounted future dollars as if they were
+# present dollars, which overstates the benefit.
+_MIDPOINT_DISCOUNT = 1.0 / (1.0 + DISCOUNT_RATE) ** (PERSONAL_HORIZON_YEARS / 2.0)
 _ANALYSIS_COST = 700              # ~$200 genome + ~$500 lab panel, one-time
 
 # Cost-of-illness / intervention assumptions (US, order-of-magnitude, 10-yr).
@@ -1753,7 +1760,10 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
         # capacity that persists. Scale the cash side down accordingly; this only
         # ever reduces the claimed saving. See value_of_information.MARGINAL_COST_FRACTION.
         avoided = avoided * _MARGINAL_COST_FRACTION
-        qv = qaly * VALUE_PER_QALY
+        # Discount to present value over the stated horizon (see
+        # _MIDPOINT_DISCOUNT) so "over N years" describes the arithmetic.
+        avoided = avoided * _MIDPOINT_DISCOUNT
+        qv = qaly * VALUE_PER_QALY * _MIDPOINT_DISCOUNT
         items.append({
             "category": category, "finding": finding,
             "avoided": round(avoided), "qaly": round(qaly, 2),
