@@ -113,3 +113,4 @@ logs/
 # ── Allow the small included test genome and SNP DB only ───────────────────
 !test_genome.txt
 !snp_database.json
+.preview/

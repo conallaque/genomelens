@@ -2142,6 +2142,34 @@ def build_voi_html(voi: Optional[Dict]) -> str:
 </svg>
 <div style="font-size:.8em;color:#8a94a3">Cost-effectiveness acceptability curve — P(net benefit &gt; 0) vs willingness-to-pay.</div>"""
 
+    # ROH -> carrier-panel prior. Rendered as a recommendation card, deliberately
+    # without a dollar figure and visually separated from the valued findings, so
+    # a qualitative judgement cannot be misread as a modelled amount.
+    cp = voi.get("carrier_panel_prior") or {}
+    panel_html = ""
+    if cp.get("available"):
+        _accent = {"none": "#5b6673", "founder": "#2a6df4",
+                   "recent": "#8a5cf6"}.get(cp.get("tier"), "#5b6673")
+        panel_html = f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid {_accent};border-radius:10px;
+            padding:14px 16px;margin:14px 0;background:#fbfcfe">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+    <div style="font-weight:700;color:{_accent}">Carrier-panel prior (from runs of homozygosity)</div>
+    <div style="font-size:.72em;color:#8a94a3;border:1px solid #dfe4ea;border-radius:20px;
+                padding:2px 9px;white-space:nowrap">not monetised &middot; no dollar value</div>
+  </div>
+  <div style="font-size:1.05em;font-weight:600;margin:7px 0 4px">{_esc(cp["recommendation"])}</div>
+  <div style="font-size:.87em;color:#48545f">{_esc(cp["rationale"])}</div>
+  <div style="font-size:.8em;color:#6a7683;margin-top:8px">
+    <strong>Decision this informs:</strong> {_esc(cp["decision"])}</div>
+  <div style="font-size:.78em;color:#8a94a3;margin-top:6px">
+    F<sub>ROH</sub> {cp["f_roh"]:.4f} &middot; long-ROH {cp["f_roh_long"]:.4f}
+    ({cp["n_long_runs"]} long run{"" if cp["n_long_runs"] == 1 else "s"})</div>
+  <div style="font-size:.75em;color:#9aa4b0;margin-top:8px;font-style:italic">
+    {_esc(cp["why_not_monetised"])}</div>
+  <div style="font-size:.72em;color:#9aa4b0;margin-top:5px">{_esc(cp["src"])}</div>
+</div>"""
+
     price = voi.get("price", {})
     methods = "".join(f"<li>{_esc(m)}</li>" for m in (voi.get("methods") or []))
 
@@ -2399,6 +2427,7 @@ pharmacogenomic averted-adverse-reactions — with a Monte-Carlo sensitivity ana
   <tbody>{rows}</tbody>
 </table>
 {ceac_svg}
+{panel_html}
 {_build_personalized_voi_html(voi.get("personalized"))}
 {extended}
 <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px">

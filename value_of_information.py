@@ -399,6 +399,114 @@ def _not_valued_reason(category: Optional[str]) -> str:
     return ""
 
 
+# ── ROH → expanded-carrier-panel prior (CATEGORICAL, never a dollar figure) ──
+#
+# This is the only defensible economic link from runs of homozygosity, and it is
+# deliberately expressed as a recommendation rather than a value.
+#
+# WHY NOT MONETISE IT. A person's own F_ROH describes THEIR PARENTS' relatedness,
+# not their children's. If they partner outside the family their child's
+# inbreeding coefficient is ~0 whatever their own F_ROH is, so the intuitive
+# "high F_ROH -> higher offspring risk -> dollar value" model is simply wrong
+# without partner genotype, which this tool never has.
+#
+# WHAT DOES SURVIVE. Autozygosity is evidence of descent from a small or
+# endogamous population, and standard carrier panels are built around variants
+# common in large outbred (mostly European) populations. So elevated ROH raises
+# the EXPECTED YIELD of an expanded or ancestry-matched panel relative to a
+# minimal one. That is a genuine decision with a genuine cost — but no published
+# study maps F_ROH onto incremental panel yield, so any multiplier would be
+# invented. Hence a tier and a recommendation, and no number.
+#
+# FRAMING. Consanguinity is culturally normal in many populations. Nothing here
+# is a risk score, and nothing here is phrased as a warning.
+# Total-F_ROH threshold above which a founder-background panel conversation is
+# worth raising. CALIBRATED EMPIRICALLY, not taken from the literature: this
+# detector reads systematically higher than published F_ROH because it counts
+# runs from 1 Mb up on dense chips, so a literature cutoff would not transfer.
+#
+# Measured across 11 real, unrelated, openly-consented public genomes
+# (Personal Genome Project Harvard; 0.29-0.32 heterozygosity, 0.56-0.96 M
+# autosomal SNPs): F_ROH ranged 0.0113-0.0161, mean 0.0139, sd 0.0017, and none
+# carried a single long run. An earlier 0.010 cutoff therefore fired on 11 of 11
+# ordinary outbred people — the population norm, not a signal. 0.020 sits above
+# the observed maximum and above mean+2sd (0.0174), so it flags genuinely
+# unusual burden while staying inside the 0.01-0.03 band reported for founder
+# populations.
+ROH_FOUNDER_F_THRESHOLD = 0.020
+
+ROH_PANEL_TIERS = {
+    "none": ("No ROH-driven change to carrier screening",
+             "Standard carrier screening is as informative for you as for "
+             "anyone else; nothing in your homozygosity pattern raises the "
+             "expected yield of a larger panel."),
+    "founder": ("Ancestry-matched or expanded panel worth considering",
+                "Your homozygosity pattern is consistent with descent from a "
+                "smaller or historically endogamous population. Standard "
+                "panels are built around variants common in large outbred "
+                "populations, so a panel matched to your ancestry may detect "
+                "variants a minimal panel would miss. This says nothing about "
+                "your parents being related."),
+    "recent": ("Expanded panel and genetic counselling worth discussing",
+               "Long runs of homozygosity are present, which is what recent "
+               "shared parental ancestry looks like. Two consequences for "
+               "screening: you are more likely than average to be homozygous "
+               "at a rare recessive locus yourself, and any founder variants "
+               "in your background may sit outside a minimal panel. A genetic "
+               "counsellor can size the panel to your family history."),
+}
+
+
+def assess_carrier_panel_prior(roh_result: Optional[Dict] = None) -> Dict:
+    """Translate an ROH profile into a CATEGORICAL carrier-panel recommendation.
+
+    Returns a dict carrying a tier, a recommendation, the reasoning, and an
+    explicit ``monetised: False``. It never returns a cost, value, multiplier or
+    risk score — see the module note above for why a dollar figure here would be
+    fabricated rather than estimated.
+    """
+    base = {"available": False, "monetised": False,
+            "why_not_monetised": (
+                "A person's own F_ROH reflects their parents' relatedness, not "
+                "their children's, and no published study maps F_ROH onto "
+                "incremental carrier-panel yield. A dollar figure here would be "
+                "invented, so the output is a recommendation only.")}
+    r = roh_result or {}
+    if not r or r.get("context_tier") in (None, "unavailable"):
+        base["reason"] = "No ROH scan available for this input."
+        return base
+
+    f_long = float(r.get("f_roh_long") or 0.0)
+    f_tot = float(r.get("f_roh") or 0.0)
+    n_long = int(r.get("n_long") or 0)
+
+    # Long ROH is the recent-ancestry signal; total burden without long runs is
+    # the founder-background signal. They imply different panel conversations.
+    if n_long > 0 or f_long > 0.0:
+        tier = "recent"
+    elif f_tot >= ROH_FOUNDER_F_THRESHOLD:
+        tier = "founder"
+    else:
+        tier = "none"
+
+    rec, rationale = ROH_PANEL_TIERS[tier]
+    base.update({
+        "available": True,
+        "tier": tier,
+        "recommendation": rec,
+        "rationale": rationale,
+        "f_roh": round(f_tot, 5),
+        "f_roh_long": round(f_long, 5),
+        "n_long_runs": n_long,
+        "decision": "Whether to buy an expanded / ancestry-matched carrier "
+                    "panel rather than a minimal one.",
+        "src": ("Kirin et al. 2010 PLoS ONE 5:e13996 (long ROH tracks recent "
+                "pedigree relatedness); ACMG/ACOG expanded carrier-screening "
+                "guidance (panel composition and ancestry matching)"),
+    })
+    return base
+
+
 def _match_pgx(label: str) -> str:
     """Map a free-text PGx finding onto a PGX_CEA gene-drug pair, else the generic
     fallback. Note ``PGx-generic`` has no '/' separator, so drug matching must be
@@ -494,6 +602,7 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
                                  clinical_variants_result: Optional[Dict] = None,
                                  novel_variants_result: Optional[Dict] = None,
                                  genetic_age_result: Optional[Dict] = None,
+                                 roh_result: Optional[Dict] = None,
                                  input_type: str = "chip",
                                  n_mc: int = 5000, seed: int = 12345,
                                  log=None) -> Dict:
@@ -673,6 +782,15 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
                 gene=_tokens[0] if _tokens else "")
     except Exception as _e:
         _degraded.append(("penetrance_correction", repr(_e)))
+
+    # ROH -> carrier-panel prior. Deliberately qualitative: it names a decision
+    # and a direction, contributes nothing to any dollar total, and is kept out
+    # of the NMB table entirely so it cannot be mistaken for a valued finding.
+    try:
+        result["carrier_panel_prior"] = assess_carrier_panel_prior(roh_result)
+    except Exception as _e:
+        result["carrier_panel_prior"] = {"available": False, "monetised": False}
+        _degraded.append(("carrier_panel_prior", repr(_e)))
 
     # Surface any degradation rather than letting a failed sub-analysis disappear.
     result["degraded_components"] = [{"component": k, "error": e} for k, e in _degraded]

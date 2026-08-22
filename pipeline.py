@@ -973,6 +973,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 clinical_variants_result=clinical_variants_result,
                 novel_variants_result=novel_variants_result,
                 genetic_age_result=genetic_age_result,
+                roh_result=roh_result,
                 input_type=_input_type, log=log)
             if voi_result.get("available"):
                 log(f"  Value of Information ({_input_type}): expected genome value ≈ "
@@ -991,6 +992,10 @@ def run_pipeline(args: argparse.Namespace) -> int:
                             f"{_p['population_percentile']}th population percentile")
                 except Exception as _pe:
                     log(f"    (personalized panel skipped: {_pe})")
+                _cp = voi_result.get("carrier_panel_prior") or {}
+                if _cp.get("available"):
+                    log(f"    Carrier-panel prior (ROH, not monetised): "
+                        f"{_cp['recommendation']}")
             else:
                 log(f"  Value of Information: {voi_result.get('reason', 'n/a')}")
         except Exception as e:
