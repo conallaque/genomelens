@@ -183,9 +183,23 @@ def _collect(economics_result: Optional[Dict],
     if cvr.get("available"):
         buckets = cvr.get("buckets", {})
         for f in (buckets.get("actionable") or []):
-            coi_key, p, rrr, qaly = _gene_to_econ(f.get("gene", ""))
+            coi_key, p_lit, rrr, qaly = _gene_to_econ(f.get("gene", ""))
+            # ASCERTAINMENT DE-BIASING, APPLIED (not merely displayed).
+            # _gene_to_econ holds clinically ascertained literature penetrance
+            # (from multi-case families), which overstates risk for an incidentally
+            # identified carrier. Correct it BEFORE it reaches the economics so the
+            # dollar figure does not inherit the bias. Family history is unknown at
+            # this point, so the no-family-history branch is used — the conservative
+            # direction. Previously this correction was computed for display only
+            # while the NMB still ran on the raw ascertained value.
+            _pc = analyze_penetrance_posterior(prior_penetrance=p_lit,
+                                               gene=f.get("gene", ""),
+                                               family_history=False)
+            p = float(_pc.get("posterior_penetrance", p_lit))
             out.append({"label": f"{f.get('gene','?')} pathogenic (ClinVar)",
                         "kind": "coi", "coi_key": coi_key, "p_event": p,
+                        "penetrance_literature": round(p_lit, 4),
+                        "penetrance_corrected": round(p, 4),
                         "rrr": rrr, "qaly": qaly, "intervention": 1_500.0,
                         "horizon": 30, "wgs_only": True, "haircut": 1.0,
                         "confidence": "high"})
@@ -281,14 +295,15 @@ def _finding_nmb(f: Dict, wtp: float, rate: float, rng=None) -> Tuple[float, flo
                                                           f.get("horizon", 20)) \
         if f.get("horizon") else 1.0
     haircut = f.get("haircut", 1.0)
+    conf = f.get("confidence", "moderate")
 
     if f["kind"] == "pgx":
         c = PGX_CEA.get(f.get("pgx_key"), PGX_CEA["PGx-generic"])
         p_rx, p_adr, rrr = c["p_rx"], c["p_adr"], c["rrr"]
         adr_cost, qaly = c["adr_cost"], c["qaly"]
         if rng is not None:
-            p_adr = _beta(rng, p_adr)
-            rrr = _beta(rng, rrr)
+            p_adr = _beta(rng, p_adr, confidence="high")
+            rrr = _beta(rng, rrr, confidence="high")
             adr_cost = _gamma(rng, adr_cost)
         exp_events = p_rx * p_adr * rrr
         dcost = exp_events * adr_cost
@@ -298,12 +313,9 @@ def _finding_nmb(f: Dict, wtp: float, rate: float, rng=None) -> Tuple[float, flo
         coi = COI.get(f.get("coi_key"), COI["Pathogenic"])["cost"]
         p, rrr, qaly = f.get("p_event", 0.2), f.get("rrr", 0.3), f.get("qaly", 0.5)
         if rng is not None:
-            p = _beta(rng, p)
-            rrr = _beta(rng, rrr)
+            p = _beta(rng, p, confidence=conf)
+            rrr = _beta(rng, rrr, confidence=conf)
             coi = _gamma(rng, coi)
-        # Averted cost = expected prevented cases × MARGINAL cost of a case, not the
-        # average lifetime COI (see MARGINAL_COST_FRACTION above — averting one case
-        # frees the marginal, not the average, cost).
         dcost = p * rrr * coi * MARGINAL_COST_FRACTION * disc
         dqaly = p * rrr * qaly * disc
         interv = f.get("intervention", 500.0)
@@ -314,7 +326,12 @@ def _finding_nmb(f: Dict, wtp: float, rate: float, rng=None) -> Tuple[float, flo
     return nmb, dcost, dqaly, interv
 
 
-def _beta(rng, mean: float, conc: float = 25.0) -> float:
+_CONFIDENCE_CONC = {"high": 200.0, "moderate": 50.0, "low": 10.0}
+
+
+def _beta(rng, mean: float, conc: float = 50.0, confidence: str = "") -> float:
+    if confidence:
+        conc = _CONFIDENCE_CONC.get(confidence, conc)
     mean = min(max(mean, 1e-3), 1 - 1e-3)
     a = mean * conc
     b = (1 - mean) * conc
@@ -600,10 +617,17 @@ def _psa(findings: List[Dict], test_cost: float, n: int, seed: int) -> Dict:
     totals = np.zeros(n)     # NMB at λ_base, net of test cost
     dqalys = np.zeros(n)     # ΔQALY
     netcosts = np.zeros(n)   # incremental cost (intervention − averted); neg = saving
+    # Shared cost-environment multiplier per draw: all findings within
+    # one MC iteration share the same cost environment (if hospitalization
+    # is expensive in draw k, it's expensive for all findings in draw k).
+    cost_env = rng.lognormal(0.0, 0.15, n)
     for i in range(n):
         tot = dq = dc = iv = 0.0
         for f in findings:
             nmb, c, q, interv = _finding_nmb(f, base, DISCOUNT_RATE, rng=rng)
+            c *= cost_env[i]
+            interv *= cost_env[i]
+            nmb = q * base + c - interv
             tot += nmb
             dq += q
             dc += c
@@ -1238,8 +1262,11 @@ def analyze_penetrance_posterior(prior_penetrance: float, gene: str = "",
       2. **Bayesian updating on family history** — an unselected carrier *without*
          family history is further down-weighted; *with* it, partially restored.
 
-    The corrected posterior then drives the economic model, so the dollar value never
-    inherits the ascertainment bias. Winner's-curse shrinkage is applied separately to
+    The corrected posterior is applied in ``_collect`` at the point a ClinVar
+    actionable finding's penetrance enters the model, so the NMB is computed on the
+    de-biased value rather than the raw ascertained one. Both figures are retained on
+    the finding (``penetrance_literature`` / ``penetrance_corrected``) so the size of
+    the correction stays auditable. Winner's-curse shrinkage is applied separately to
     polygenic effect sizes (see ``shrink_effect_size``).
     """
     p = max(1e-6, min(0.999, float(prior_penetrance)))
@@ -1263,7 +1290,8 @@ def analyze_penetrance_posterior(prior_penetrance: float, gene: str = "",
         "shrinkage_factor": round(p_post / p, 3),
         "note": ("Literature penetrance from clinically ascertained families "
                  "overstates risk for an incidentally-identified carrier; the "
-                 "economic model uses the corrected posterior."),
+                 "economic model is computed on the corrected posterior (applied in "
+                 "_collect, not display-only)."),
         "src": "Begg (2002) JNCI; Gabai-Kapara (2014) PNAS; ACMG incidental-findings guidance",
     }
 

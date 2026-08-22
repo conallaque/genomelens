@@ -683,6 +683,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
             g: {"phenotype": r["phenotype"], "activity_score": r.get("activity_score")}
             for g, r in (pgx_result or {}).get("per_gene", {}).items()
         } if pgx_result else {},
+        "vo2max_tier": ((exercise_result or {}).get("vo2max") or {}).get("tier"),
+        "longevity_percentile": (((genetic_age_result or {}).get("longevity") or {}).get("percentile")),
         "variants": tier1_results,
     }
     tier1_path = SCRIPT_DIR / "tier1_results.json"
@@ -690,15 +692,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
         json.dump(tier1_summary, f, indent=2)
     log(f"  Tier 1 results saved: {tier1_path}")
 
-    # ── Health economics: clinical & payer ROI for genomic interventions ──
+    # ── Health economics runs AFTER all analysis modules (wired below) ──
     economics_result: Optional[Dict] = None
-    if analyze_health_economics is not None:
-        try:
-            economics_result = analyze_health_economics(tier1_summary, snps_df)
-            log(f"  Health economics: {economics_result.get('n_findings', 0)} findings "
-                f"with modeled ROI")
-        except Exception as e:
-            log(f"  WARNING: Health economics module failed: {e}")
 
     # ── Metal handling / oxidative-defense / neurodegeneration panel ──
     metal_oxidative_result: Optional[Dict] = None
@@ -865,41 +860,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Novel-variants module failed: {e}")
 
-    # ── Value of Information (health economics — runs for chip AND WGS) ──
     voi_result: Optional[Dict] = None
-    if analyze_value_of_information is not None:
-        try:
-            import genome_input as _gi4
-            _input_type = "wgs" if _gi4.looks_like_vcf(args.dna_file) else "chip"
-            voi_result = analyze_value_of_information(
-                economics_result=economics_result,
-                clinical_variants_result=clinical_variants_result,
-                novel_variants_result=novel_variants_result,
-                genetic_age_result=genetic_age_result,
-                input_type=_input_type, log=log)
-            if voi_result.get("available"):
-                log(f"  Value of Information ({_input_type}): expected genome value ≈ "
-                    f"${voi_result.get('voi_expost_mean', 0):,.0f} · chip→WGS marginal ≈ "
-                    f"${voi_result.get('marginal_chip_to_wgs', 0):,.0f}")
-                # Individually-relevant health-economics panels (personal frontier,
-                # CEAC, data-asset LTV, population percentile) for this genome.
-                try:
-                    import cohort_simulator as _cs
-                    from life_stage_playbook import resolve_age as _resolve_age
-                    _pa = _resolve_age(getattr(args, "age", None), bloodwork_result)
-                    voi_result["personalized"] = _cs.personalize_for_report(
-                        voi_result, age=float(_pa or 40.0))
-                    if voi_result["personalized"].get("available"):
-                        _p = voi_result["personalized"]
-                        log(f"    Personalized: efficient choice = "
-                            f"{_p['frontier']['recommended_strategy']} · "
-                            f"{_p['population_percentile']}th population percentile")
-                except Exception as _pe:
-                    log(f"    (personalized panel skipped: {_pe})")
-            else:
-                log(f"  Value of Information: {voi_result.get('reason', 'n/a')}")
-        except Exception as e:
-            log(f"  WARNING: Value-of-Information module failed: {e}")
+    # (VOI + health economics moved below, after all analysis modules)
 
     # ── Family planning (reproductive genetics — needs carrier + mt + sex) ──
     family_planning_result: Optional[Dict] = None
@@ -974,6 +936,65 @@ def run_pipeline(args: argparse.Namespace) -> int:
                     f"{top_drugs_result['n_with_pgx']} with PGx data)")
         except Exception as e:
             log(f"  WARNING: Top-drugs screen failed: {e}")
+
+    # ── Health economics (runs AFTER all analysis modules for maximum coverage) ──
+    if analyze_health_economics is not None:
+        try:
+            economics_result = analyze_health_economics(
+                tier1_summary, snps_df,
+                expanded_pgs_result=expanded_pgs_result,
+                hla_result=hla_result,
+                carrier_result=carrier_result,
+                interactions_result=interactions_result,
+                addiction_result=addiction_genetics_result,
+                metal_oxidative_result=metal_oxidative_result,
+                mr_result=mr_result,
+                neurochemistry_result=neurochemistry_result,
+                urologic_result=urologic_result,
+                clinical_variants_result=clinical_variants_result,
+                phewas_result=phewas_result,
+                immunogenetics_result=immunogenetics_result,
+                wellness_result=wellness_result,
+                detox_result=detox_result,
+                family_planning_result=family_planning_result,
+                top_drugs_result=top_drugs_result)
+            log(f"  Health economics: {economics_result.get('n_findings', 0)} findings "
+                f"with modeled ROI")
+        except Exception as e:
+            log(f"  WARNING: Health economics module failed: {e}")
+
+    # ── Value of Information (health economics — runs for chip AND WGS) ──
+    if analyze_value_of_information is not None:
+        try:
+            import genome_input as _gi4
+            _input_type = "wgs" if _gi4.looks_like_vcf(args.dna_file) else "chip"
+            voi_result = analyze_value_of_information(
+                economics_result=economics_result,
+                clinical_variants_result=clinical_variants_result,
+                novel_variants_result=novel_variants_result,
+                genetic_age_result=genetic_age_result,
+                input_type=_input_type, log=log)
+            if voi_result.get("available"):
+                log(f"  Value of Information ({_input_type}): expected genome value ≈ "
+                    f"${voi_result.get('voi_expost_mean', 0):,.0f} · chip→WGS marginal ≈ "
+                    f"${voi_result.get('marginal_chip_to_wgs', 0):,.0f}")
+                try:
+                    import cohort_simulator as _cs
+                    from life_stage_playbook import resolve_age as _resolve_age
+                    _pa = _resolve_age(getattr(args, "age", None), bloodwork_result)
+                    voi_result["personalized"] = _cs.personalize_for_report(
+                        voi_result, age=float(_pa or 40.0))
+                    if voi_result["personalized"].get("available"):
+                        _p = voi_result["personalized"]
+                        log(f"    Personalized: efficient choice = "
+                            f"{_p['frontier']['recommended_strategy']} · "
+                            f"{_p['population_percentile']}th population percentile")
+                except Exception as _pe:
+                    log(f"    (personalized panel skipped: {_pe})")
+            else:
+                log(f"  Value of Information: {voi_result.get('reason', 'n/a')}")
+        except Exception as e:
+            log(f"  WARNING: Value-of-Information module failed: {e}")
 
     ai_results: Dict[str, str] = {}
     # ── Holistic Synthesis — computed BEFORE the AI block so its Genome
@@ -1346,6 +1367,17 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 bloodwork_result=bloodwork_result,
                 genetic_age_result=genetic_age_result,
                 meta={"sex": (qc_result or {}).get("inferred_sex")},
+                carrier_result=carrier_result,
+                hla_result=hla_result,
+                interactions_result=interactions_result,
+                expanded_pgs_result=expanded_pgs_result,
+                addiction_result=addiction_genetics_result,
+                neurochemistry_result=neurochemistry_result,
+                mr_result=mr_result,
+                clinical_variants_result=clinical_variants_result,
+                family_planning_result=family_planning_result,
+                phewas_result=phewas_result,
+                wellness_result=wellness_result,
             )
             if personal_econ.get("available"):
                 econ_path = output_path.parent / "economic_analysis.html"

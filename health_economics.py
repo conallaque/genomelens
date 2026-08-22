@@ -74,62 +74,72 @@ PGX_ECONOMICS: Dict[str, Dict] = {
     "CYP2C9": {
         "drug": "warfarin",
         "clinical_benefit": "Prevent major bleeding event from warfarin overdosing",
-        "cost": 300, "outcome_value": 15_000,
+        "cost": 300, "p_rx": 0.08, "p_adr": 0.25, "rrr": 0.60, "adr_cost": 15_000,
         "prevalence": 0.35, "qaly_gain": 0.30,
+        "src": "Johnson et al. (2017) Clin Pharmacol Ther — CPIC warfarin guideline",
     },
     "VKORC1": {
         "drug": "warfarin",
         "clinical_benefit": "Improve warfarin dosing accuracy, fewer INR excursions",
-        "cost": 150, "outcome_value": 8_000,
+        "cost": 150, "p_rx": 0.08, "p_adr": 0.20, "rrr": 0.50, "adr_cost": 8_000,
         "prevalence": 0.37, "qaly_gain": 0.15,
+        "src": "Johnson et al. (2017) Clin Pharmacol Ther — CPIC warfarin guideline",
     },
     "CYP2C19": {
         "drug": "clopidogrel",
         "clinical_benefit": "Avoid clopidogrel non-response / stent thrombosis (MACE)",
-        "cost": 250, "outcome_value": 18_000,
+        "cost": 250, "p_rx": 0.10, "p_adr": 0.20, "rrr": 0.50, "adr_cost": 30_000,
         "prevalence": 0.30, "qaly_gain": 0.35,
+        "src": "Kazi et al. (2014) Ann Intern Med — genotype-guided antiplatelet",
     },
     "CYP2D6": {
         "drug": "codeine / antidepressants",
         "clinical_benefit": "Avoid opioid toxicity or ineffective analgesia/SSRI dosing",
-        "cost": 250, "outcome_value": 12_000,
+        "cost": 250, "p_rx": 0.15, "p_adr": 0.15, "rrr": 0.60, "adr_cost": 12_000,
         "prevalence": 0.30, "qaly_gain": 0.20,
+        "src": "Hicks et al. (2015) Clin Pharmacol Ther — CPIC codeine; Bousman (2023) CPIC SSRI",
     },
     "CYP3A5": {
         "drug": "tacrolimus",
         "clinical_benefit": "Hit tacrolimus target faster, avoid rejection/toxicity",
-        "cost": 250, "outcome_value": 10_000,
+        "cost": 250, "p_rx": 0.05, "p_adr": 0.30, "rrr": 0.55, "adr_cost": 10_000,
         "prevalence": 0.40, "qaly_gain": 0.20,
+        "src": "Birdwell et al. (2015) Clin Pharmacol Ther — CPIC tacrolimus",
     },
     "TPMT": {
         "drug": "thiopurines (azathioprine / 6-MP)",
         "clinical_benefit": "Prevent serious myelosuppression from thiopurines",
-        "cost": 200, "outcome_value": 25_000,
+        "cost": 200, "p_rx": 0.03, "p_adr": 0.35, "rrr": 0.70, "adr_cost": 25_000,
         "prevalence": 0.10, "qaly_gain": 0.40,
+        "src": "Relling et al. (2019) Clin Pharmacol Ther — CPIC thiopurines",
     },
     "NUDT15": {
         "drug": "thiopurines (azathioprine / 6-MP)",
         "clinical_benefit": "Prevent thiopurine-induced leukopenia (esp. East Asian ancestry)",
-        "cost": 200, "outcome_value": 25_000,
+        "cost": 200, "p_rx": 0.03, "p_adr": 0.35, "rrr": 0.70, "adr_cost": 25_000,
         "prevalence": 0.10, "qaly_gain": 0.40,
+        "src": "Relling et al. (2019) Clin Pharmacol Ther — CPIC thiopurines",
     },
     "SLCO1B1": {
         "drug": "simvastatin",
         "clinical_benefit": "Prevent statin-induced myopathy / rhabdomyolysis",
-        "cost": 150, "outcome_value": 9_000,
+        "cost": 150, "p_rx": 0.20, "p_adr": 0.10, "rrr": 0.50, "adr_cost": 6_000,
         "prevalence": 0.25, "qaly_gain": 0.15,
+        "src": "Ramsey et al. (2014) Clin Pharmacol Ther — CPIC simvastatin/SLCO1B1",
     },
     "UGT1A1": {
         "drug": "irinotecan",
         "clinical_benefit": "Prevent severe irinotecan neutropenia / diarrhea",
-        "cost": 200, "outcome_value": 14_000,
+        "cost": 200, "p_rx": 0.02, "p_adr": 0.40, "rrr": 0.60, "adr_cost": 14_000,
         "prevalence": 0.15, "qaly_gain": 0.30,
+        "src": "Innocenti et al. (2009) J Clin Oncol — UGT1A1 irinotecan dosing",
     },
     "HLA-B*57:01": {
         "drug": "abacavir",
         "clinical_benefit": "Prevent abacavir hypersensitivity reaction",
-        "cost": 150, "outcome_value": 50_000,
+        "cost": 150, "p_rx": 0.02, "p_adr": 0.55, "rrr": 0.95, "adr_cost": 20_000,
         "prevalence": 0.06, "qaly_gain": 0.50,
+        "src": "Schackman et al. (2008) Ann Intern Med — cost-saving",
     },
 }
 
@@ -154,6 +164,7 @@ PRS_ECONOMICS: Dict[str, Dict] = {
         "intervention": "Intensive statin therapy + lipid monitoring",
         "cost": 500, "outcome_value": 250_000,
         "prevalence": 0.20, "qaly_gain": 1.50, "recurring": True,
+        "src": "Mega et al. (2015) Lancet — PRS-guided statin benefit",
     },
     "Type 2 Diabetes": {
         "finding": "Elevated type-2-diabetes polygenic risk",
@@ -161,6 +172,7 @@ PRS_ECONOMICS: Dict[str, Dict] = {
         "intervention": "CGM + lifestyle coaching",
         "cost": 3_600, "outcome_value": 50_000,
         "prevalence": 0.20, "qaly_gain": 0.80, "recurring": True,
+        "src": "Knowler (2002) NEJM — DPP; Khera (2016) NEJM — PRS × lifestyle",
     },
     "BMI / Obesity Tendency": {
         "finding": "Elevated obesity-tendency polygenic risk",
@@ -168,6 +180,219 @@ PRS_ECONOMICS: Dict[str, Dict] = {
         "intervention": "Structured weight-management program",
         "cost": 1_200, "outcome_value": 30_000,
         "prevalence": 0.20, "qaly_gain": 0.40, "recurring": True,
+        "src": "Locke et al. (2015) Nature — BMI GWAS; NICE CG189 weight management",
+    },
+    "Breast Cancer": {
+        "finding": "Elevated breast-cancer polygenic risk",
+        "clinical_benefit": "Risk-stratified screening (annual MRI + mammography)",
+        "intervention": "Enhanced breast screening program",
+        "cost": 1_200, "outcome_value": 120_000,
+        "prevalence": 0.12, "qaly_gain": 1.80, "recurring": True,
+        "src": "Pashayan et al. (2018) Genet Med — PRS-stratified screening CEA",
+    },
+    "Prostate Cancer": {
+        "finding": "Elevated prostate-cancer polygenic risk",
+        "clinical_benefit": "Risk-stratified PSA screening (earlier, more frequent)",
+        "intervention": "Annual PSA + MRI surveillance",
+        "cost": 800, "outcome_value": 80_000,
+        "prevalence": 0.12, "qaly_gain": 1.20, "recurring": True,
+        "src": "Callender et al. (2019) Ann Intern Med — PRS-informed PSA screening",
+    },
+    "Alzheimer's Disease": {
+        "finding": "Elevated late-onset Alzheimer's polygenic risk",
+        "clinical_benefit": "Intensive vascular risk management + cognitive reserve building",
+        "intervention": "Multi-domain dementia prevention (FINGER-style)",
+        "cost": 2_400, "outcome_value": 200_000,
+        "prevalence": 0.15, "qaly_gain": 2.00, "recurring": True,
+        "src": "Ngandu et al. (2015) Lancet — FINGER trial; Livingston (2020) Lancet — dementia prevention",
+    },
+    "Atrial Fibrillation": {
+        "finding": "Elevated atrial-fibrillation polygenic risk",
+        "clinical_benefit": "Proactive rhythm monitoring + stroke prevention",
+        "intervention": "Annual ECG + pulse oximetry + anticoagulation if detected",
+        "cost": 600, "outcome_value": 150_000,
+        "prevalence": 0.08, "qaly_gain": 1.50, "recurring": True,
+        "src": "Lubitz et al. (2017) Circ — PRS for AF; Hart (2007) Ann Intern Med — anticoagulation NNT",
+    },
+}
+
+# ─── Expanded PGS Catalog economics (conditions beyond the core PRS panels) ──
+# These map to conditions scored by pgs_catalog.py that are NOT already in
+# PRS_ECONOMICS. Keyed by the label string from pgs_catalog.CONDITIONS.
+EXPANDED_PGS_ECONOMICS: Dict[str, Dict] = {
+    "Hypertension / Systolic BP": {
+        "finding": "Elevated hypertension polygenic risk",
+        "clinical_benefit": "Early antihypertensive therapy + lifestyle modification",
+        "intervention": "Home BP monitoring + medication titration",
+        "cost": 400, "outcome_value": 60_000,
+        "prevalence": 0.30, "qaly_gain": 0.80, "recurring": True,
+        "src": "Sun et al. (2021) JAMA Cardiol — PRS × BP treatment benefit",
+    },
+    "Ischemic Stroke": {
+        "finding": "Elevated ischemic-stroke polygenic risk",
+        "clinical_benefit": "Aggressive vascular risk-factor management",
+        "intervention": "Antiplatelet + statin intensification + BP control",
+        "cost": 600, "outcome_value": 180_000,
+        "prevalence": 0.06, "qaly_gain": 2.00, "recurring": True,
+        "src": "Abraham et al. (2019) Stroke — PRS for ischemic stroke",
+    },
+    "Chronic Kidney Disease": {
+        "finding": "Elevated chronic-kidney-disease polygenic risk",
+        "clinical_benefit": "Early nephroprotection (SGLT2i / ACEi) + monitoring",
+        "intervention": "Annual eGFR + uACR screening + SGLT2 inhibitor if indicated",
+        "cost": 1_800, "outcome_value": 100_000,
+        "prevalence": 0.10, "qaly_gain": 1.20, "recurring": True,
+        "src": "Wuttke et al. (2019) Nat Commun — CKD GWAS; Heerspink (2020) NEJM — SGLT2i",
+    },
+    "Major Depressive Disorder": {
+        "finding": "Elevated major-depression polygenic risk",
+        "clinical_benefit": "Proactive mental health screening + early CBT referral",
+        "intervention": "Annual PHQ-9 screening + accessible therapy",
+        "cost": 1_500, "outcome_value": 35_000,
+        "prevalence": 0.15, "qaly_gain": 0.60, "recurring": True,
+        "src": "Howard et al. (2019) Nat Neurosci — MDD GWAS; Chisholm (2016) Lancet Psych — CBT CEA",
+    },
+    "Inflammatory Bowel Disease": {
+        "finding": "Elevated inflammatory-bowel-disease polygenic risk",
+        "clinical_benefit": "Early gastroenterology referral + fecal calprotectin monitoring",
+        "intervention": "Annual calprotectin + symptom surveillance",
+        "cost": 500, "outcome_value": 45_000,
+        "prevalence": 0.02, "qaly_gain": 0.80, "recurring": True,
+        "src": "de Lange et al. (2017) Nat Genet — IBD GWAS; van der Valk (2016) IBD — IBD cost burden",
+    },
+    "Asthma": {
+        "finding": "Elevated asthma polygenic risk",
+        "clinical_benefit": "Environmental trigger reduction + early controller therapy",
+        "intervention": "Allergen avoidance counseling + ICS if symptomatic",
+        "cost": 600, "outcome_value": 25_000,
+        "prevalence": 0.08, "qaly_gain": 0.40, "recurring": True,
+        "src": "Demenais et al. (2018) Nat Genet — asthma GWAS; GINA 2023 guidelines",
+    },
+    "Rheumatoid Arthritis": {
+        "finding": "Elevated rheumatoid-arthritis polygenic risk",
+        "clinical_benefit": "Early rheumatology referral if joint symptoms emerge",
+        "intervention": "Awareness + annual anti-CCP if symptomatic",
+        "cost": 300, "outcome_value": 40_000,
+        "prevalence": 0.02, "qaly_gain": 0.60, "recurring": True,
+        "src": "Okada et al. (2014) Nature — RA GWAS; Finckh (2006) Arthritis Rheum — early DMARD CEA",
+    },
+}
+
+# ─── HLA drug-hypersensitivity economics ────────────────────────────────────
+# Keyed by allele name as it appears in hla_result["carrier_alleles"].
+HLA_ECONOMICS: Dict[str, Dict] = {
+    "HLA-B*58:01": {
+        "finding": "HLA-B*58:01 carrier — allopurinol hypersensitivity risk",
+        "clinical_benefit": "Avoid allopurinol SJS/TEN (use febuxostat instead)",
+        "drug": "allopurinol",
+        "cost": 150, "outcome_value": 45_000,
+        "prevalence": 0.05, "qaly_gain": 0.40,
+        "src": "Stamp et al. (2016) Intern Med J — HLA-B*58:01 CEA; CPIC Level A",
+    },
+    "HLA-A*31:01": {
+        "finding": "HLA-A*31:01 carrier — carbamazepine hypersensitivity risk",
+        "clinical_benefit": "Avoid carbamazepine DRESS/SJS (use alternative anticonvulsant)",
+        "drug": "carbamazepine",
+        "cost": 150, "outcome_value": 35_000,
+        "prevalence": 0.04, "qaly_gain": 0.35,
+        "src": "Plumpton et al. (2015) Epilepsia — HLA-A*31:01 screening CEA; CPIC Level A",
+    },
+    "HLA-B*15:02": {
+        "finding": "HLA-B*15:02 carrier — carbamazepine/phenytoin SJS/TEN risk",
+        "clinical_benefit": "Avoid aromatic anticonvulsants (SJS/TEN risk >1000×)",
+        "drug": "carbamazepine/phenytoin",
+        "cost": 150, "outcome_value": 60_000,
+        "prevalence": 0.01, "qaly_gain": 0.50,
+        "src": "Chen et al. (2011) Pharmacogenomics — HLA-B*15:02 screening CEA; FDA black-box",
+    },
+}
+
+# ─── Carrier-screening economics (per condition affected/carrier) ────────────
+CARRIER_ECONOMICS: Dict[str, Dict] = {
+    "Hereditary Hemochromatosis (HH, type 1)": {
+        "finding_affected": "HFE C282Y homozygous — hemochromatosis monitoring",
+        "finding_carrier": "HFE C282Y carrier — reproductive awareness",
+        "clinical_benefit_affected": "Early phlebotomy prevents organ damage",
+        "clinical_benefit_carrier": "Partner testing for reproductive risk assessment",
+        "cost_affected": 200, "outcome_affected": 60_000, "qaly_affected": 1.50,
+        "cost_carrier": 100, "outcome_carrier": 2_000, "qaly_carrier": 0.10,
+        "prev_affected": 0.005, "prev_carrier": 0.10,
+        "src": "Adams et al. (2005) NEJM — hemochromatosis screening; phlebotomy is curative",
+    },
+    "Venous Thromboembolism (VTE) Susceptibility": {
+        "finding_affected": "Factor V Leiden / Prothrombin homozygous — VTE prevention",
+        "finding_carrier": "Factor V Leiden / Prothrombin carrier — situational anticoagulation",
+        "clinical_benefit_affected": "Avoid estrogen-containing contraceptives; prophylactic anticoagulation perioperatively",
+        "clinical_benefit_carrier": "Awareness for high-risk situations (surgery, pregnancy, long flights)",
+        "cost_affected": 300, "outcome_affected": 35_000, "qaly_affected": 0.80,
+        "cost_carrier": 100, "outcome_carrier": 10_000, "qaly_carrier": 0.30,
+        "prev_affected": 0.002, "prev_carrier": 0.05,
+        "src": "Cohn et al. (2013) J Thromb Haemost — FVL screening; Rosendaal (2005) Lancet",
+    },
+    "Hereditary Breast/Colon/Prostate/Kidney Cancer Susceptibility": {
+        "finding_affected": "CHEK2 I157T homozygous — enhanced cancer surveillance",
+        "finding_carrier": "CHEK2 I157T carrier — moderate cancer risk awareness",
+        "clinical_benefit_affected": "Enhanced screening (mammography, colonoscopy)",
+        "clinical_benefit_carrier": "Risk-aware screening schedule",
+        "cost_affected": 800, "outcome_affected": 80_000, "qaly_affected": 1.20,
+        "cost_carrier": 200, "outcome_carrier": 15_000, "qaly_carrier": 0.30,
+        "prev_affected": 0.001, "prev_carrier": 0.05,
+        "src": "Cybulski et al. (2011) J Clin Oncol — CHEK2 I157T cancer risks",
+    },
+    "Cystic Fibrosis": {
+        "finding_affected": "CFTR homozygous/compound het — CF management",
+        "finding_carrier": "CFTR carrier — reproductive genetic counseling",
+        "clinical_benefit_affected": "Early modulator therapy (Trikafta)",
+        "clinical_benefit_carrier": "Partner screening to assess 25% offspring risk",
+        "cost_affected": 5_000, "outcome_affected": 300_000, "qaly_affected": 5.00,
+        "cost_carrier": 250, "outcome_carrier": 5_000, "qaly_carrier": 0.15,
+        "prev_affected": 0.0004, "prev_carrier": 0.04,
+        "src": "Middleton et al. (2019) NEJM — Trikafta; ACOG — carrier screening CEA",
+    },
+    "Celiac Disease Susceptibility": {
+        "finding_affected": "HLA-DQ2/DQ8 positive — celiac awareness",
+        "finding_carrier": "HLA-DQ2/DQ8 carrier — celiac rule-out capability",
+        "clinical_benefit_affected": "tTG-IgA testing if GI symptoms; early gluten-free diet",
+        "clinical_benefit_carrier": "Negative DQ2/DQ8 rules out celiac",
+        "cost_affected": 200, "outcome_affected": 15_000, "qaly_affected": 0.50,
+        "cost_carrier": 50, "outcome_carrier": 3_000, "qaly_carrier": 0.10,
+        "prev_affected": 0.01, "prev_carrier": 0.30,
+        "src": "Green et al. (2015) Ann Intern Med — celiac screening; NICE NG20",
+    },
+    "Broad Autoimmunity Susceptibility (T1D, RA, lupus, Graves')": {
+        "finding_affected": "PTPN22 R620W — broad autoimmunity awareness",
+        "finding_carrier": "PTPN22 R620W carrier — autoimmune screening awareness",
+        "clinical_benefit_affected": "Anti-inflammatory lifestyle; thyroid + autoimmune panel monitoring",
+        "clinical_benefit_carrier": "Awareness for autoimmune symptom clusters",
+        "cost_affected": 400, "outcome_affected": 25_000, "qaly_affected": 0.60,
+        "cost_carrier": 100, "outcome_carrier": 5_000, "qaly_carrier": 0.10,
+        "prev_affected": 0.005, "prev_carrier": 0.08,
+        "src": "Bottini et al. (2004) Nat Genet — PTPN22; general autoimmune CEA literature",
+    },
+}
+
+# ─── Compound-interaction economics ──────────────────────────────────────────
+INTERACTION_ECONOMICS: Dict[str, Dict] = {
+    "MTHFR C677T Homozygous (T/T)": {
+        "finding": "MTHFR 677TT — methylfolate supplementation",
+        "clinical_benefit": "Prevent hyperhomocysteinemia-driven cardiovascular / fertility risk",
+        "cost": 300, "outcome_value": 20_000,
+        "prevalence": 0.10, "qaly_gain": 0.40,
+        "src": "Hickey et al. (2013) J Inherit Metab Dis — MTHFR; Klerk (2002) JAMA — homocysteine × CVD",
+    },
+    "MTHFR A1298C Homozygous (C/C)": {
+        "finding": "MTHFR 1298CC — methylation support",
+        "clinical_benefit": "BH4 pathway support; neurotransmitter synthesis optimization",
+        "cost": 200, "outcome_value": 8_000,
+        "prevalence": 0.08, "qaly_gain": 0.15,
+        "src": "Weisberg et al. (2001) Mol Genet Metab — A1298C functional impact",
+    },
+    "HFE C282Y Homozygous — Classical Hemochromatosis Risk": {
+        "finding": "HFE C282Y/C282Y — hemochromatosis iron monitoring",
+        "clinical_benefit": "Prevent iron-overload organ damage via therapeutic phlebotomy",
+        "cost": 200, "outcome_value": 60_000,
+        "prevalence": 0.005, "qaly_gain": 1.50,
+        "src": "Adams et al. (2005) NEJM; Allen et al. (2008) NEJM — C282Y penetrance",
     },
 }
 
@@ -194,6 +419,335 @@ VO2MAX_ECONOMICS = {
 LONGEVITY_VALUE_PER_PERCENTILE = 10_000  # $ per 1-percentile longevity gain
 
 
+# ─── Addiction genetics economics (keyed by substance category) ────────────
+ADDICTION_ECONOMICS: Dict[str, Dict] = {
+    "Alcohol": {
+        "finding": "Alcohol-metabolism susceptibility variant",
+        "clinical_benefit": "Personalized AUD risk awareness + naltrexone/acamprosate matching",
+        "cost": 200, "outcome_value": 25_000,
+        "prevalence": 0.10, "qaly_gain": 0.80,
+        "src": "Kranzler & Soyka (2018) JAMA — pharmacogenomics of AUD treatment",
+    },
+    "Opioid": {
+        "finding": "Opioid-response pharmacogenomic variant",
+        "clinical_benefit": "OPRM1-guided opioid dosing + naltrexone response prediction",
+        "cost": 200, "outcome_value": 40_000,
+        "prevalence": 0.05, "qaly_gain": 1.20,
+        "src": "Crist et al. (2018) Mol Psychiatry — OPRM1 mu-opioid receptor PGx",
+    },
+    "Nicotine": {
+        "finding": "Nicotine-dependence susceptibility variant",
+        "clinical_benefit": "CHRNA5-guided smoking cessation (varenicline dosing)",
+        "cost": 500, "outcome_value": 35_000,
+        "prevalence": 0.15, "qaly_gain": 1.50,
+        "src": "Chen et al. (2012) Am J Psychiatry — CHRNA5 × cessation pharmacotherapy",
+    },
+    "Cannabis": {
+        "finding": "Cannabis-sensitivity variant (CNR1/FAAH)",
+        "clinical_benefit": "Endocannabinoid system awareness for pain management",
+        "cost": 100, "outcome_value": 5_000,
+        "prevalence": 0.10, "qaly_gain": 0.10,
+        "src": "Hindocha et al. (2019) Transl Psychiatry — FAAH rs324420",
+    },
+    "Stress": {
+        "finding": "Stress-axis variant (CRHR1/FKBP5)",
+        "clinical_benefit": "Trauma-informed care + HPA-axis-targeted therapy selection",
+        "cost": 200, "outcome_value": 12_000,
+        "prevalence": 0.12, "qaly_gain": 0.40,
+        "src": "Binder et al. (2008) JAMA Psych — FKBP5 × PTSD treatment response",
+    },
+}
+
+# ─── Metal/oxidative stress economics (keyed by gene) ──────────────────────
+METAL_OXIDATIVE_ECONOMICS: Dict[str, Dict] = {
+    "G6PD": {
+        "finding": "G6PD deficiency — oxidative drug avoidance",
+        "clinical_benefit": "Avoid primaquine/dapsone/rasburicase hemolytic crisis",
+        "cost": 150, "outcome_value": 20_000,
+        "prevalence": 0.05, "qaly_gain": 0.40,
+        "src": "WHO G6PD testing guideline (2018); CPIC rasburicase",
+    },
+    "LRRK2": {
+        "finding": "LRRK2 G2019S carrier — Parkinson's early intervention",
+        "clinical_benefit": "Prodromal PD monitoring + neuroprotective trial eligibility",
+        "cost": 500, "outcome_value": 100_000,
+        "prevalence": 0.01, "qaly_gain": 2.00,
+        "src": "Healy et al. (2008) Lancet Neurol — LRRK2 penetrance + PD trials",
+    },
+    "ATP7B": {
+        "finding": "ATP7B variant — Wilson's disease copper monitoring",
+        "clinical_benefit": "Serum copper/ceruloplasmin monitoring + early chelation",
+        "cost": 200, "outcome_value": 50_000,
+        "prevalence": 0.003, "qaly_gain": 1.50,
+        "src": "EASL CPG Wilson's disease (2012); Roberts & Schilsky (2023)",
+    },
+}
+
+# ─── Mendelian randomization outcome costs (maps MR outcome → healthcare cost) ─
+MR_OUTCOME_COSTS: Dict[str, Dict] = {
+    "CAD": {"cost": 85_000, "qaly_loss": 1.50, "baseline_10yr": 0.10,
+            "src": "Heidenreich (2011) Circulation"},
+    "T2D": {"cost": 85_000, "qaly_loss": 2.00, "baseline_10yr": 0.15,
+            "src": "ADA (2018) Diabetes Care"},
+    "Stroke": {"cost": 100_000, "qaly_loss": 2.50, "baseline_10yr": 0.05,
+               "src": "Xu et al. (2019) JAHA"},
+    "AD": {"cost": 200_000, "qaly_loss": 3.00, "baseline_10yr": 0.12,
+           "src": "Hurd et al. (2013) NEJM"},
+    "CKD": {"cost": 100_000, "qaly_loss": 1.20, "baseline_10yr": 0.10,
+            "src": "Honeycutt et al. (2013) JASN"},
+    "Breast Cancer": {"cost": 120_000, "qaly_loss": 1.80, "baseline_10yr": 0.12,
+                      "src": "Blumen et al. (2016) JNCCN"},
+    "Prostate Cancer": {"cost": 80_000, "qaly_loss": 1.20, "baseline_10yr": 0.12,
+                        "src": "Mariotto et al. (2011) JNCI"},
+    "Atrial Fibrillation": {"cost": 50_000, "qaly_loss": 1.00, "baseline_10yr": 0.08,
+                            "src": "Kim et al. (2011) Circ Cardiovasc Qual"},
+}
+
+# ─── Neurochemistry economics (keyed by gene) ─────────────────────────────
+NEUROCHEMISTRY_ECONOMICS: Dict[str, Dict] = {
+    "COMT": {
+        "finding": "COMT Val158Met — psychiatric medication optimization",
+        "clinical_benefit": "COMT-guided SSRI/SNRI selection (catecholamine clearance)",
+        "cost": 200, "outcome_value": 15_000,
+        "prevalence": 0.25, "qaly_gain": 0.30,
+        "src": "Bousman (2023) CPIC antidepressant; Lachman et al. (1996)",
+    },
+    "BDNF": {
+        "finding": "BDNF Val66Met — antidepressant response prediction",
+        "clinical_benefit": "Exercise-first + BDNF-aware therapy selection",
+        "cost": 200, "outcome_value": 10_000,
+        "prevalence": 0.20, "qaly_gain": 0.25,
+        "src": "Niitsu et al. (2013) J Affect Disord — BDNF × antidepressant",
+    },
+    "DRD2": {
+        "finding": "DRD2/ANKK1 Taq1A — reward-pathway variant",
+        "clinical_benefit": "Dopamine-aware addiction treatment + antipsychotic response",
+        "cost": 200, "outcome_value": 18_000,
+        "prevalence": 0.15, "qaly_gain": 0.40,
+        "src": "Blum et al. (2014) J Genet Syndr Gene Ther — DRD2 reward deficiency",
+    },
+    "OPRM1": {
+        "finding": "OPRM1 A118G — opioid/naltrexone response",
+        "clinical_benefit": "OPRM1-guided analgesic dosing + AUD treatment matching",
+        "cost": 200, "outcome_value": 25_000,
+        "prevalence": 0.12, "qaly_gain": 0.60,
+        "src": "Kranzler et al. (2013) Neuropsychopharmacology — OPRM1 × naltrexone",
+    },
+}
+
+# ─── Urologic/genitourinary economics (keyed by category) ─────────────────
+UROLOGIC_ECONOMICS: Dict[str, Dict] = {
+    "BPH/Prostate": {
+        "finding": "Prostate-risk variant — early screening",
+        "clinical_benefit": "PRS-augmented PSA + MRI surveillance",
+        "cost": 600, "outcome_value": 60_000,
+        "prevalence": 0.12, "qaly_gain": 1.00,
+        "src": "Callender et al. (2019) Ann Intern Med — prostate screening",
+    },
+    "Kidney Stones": {
+        "finding": "Kidney-stone susceptibility variant",
+        "clinical_benefit": "Dietary calcium/oxalate optimization + hydration protocol",
+        "cost": 200, "outcome_value": 15_000,
+        "prevalence": 0.10, "qaly_gain": 0.20,
+        "src": "Curhan et al. (2004) JASN — nephrolithiasis prevention",
+    },
+    "OAB/Bladder": {
+        "finding": "Overactive-bladder susceptibility variant",
+        "clinical_benefit": "Anticholinergic PGx + behavioral therapy",
+        "cost": 300, "outcome_value": 8_000,
+        "prevalence": 0.15, "qaly_gain": 0.15,
+        "src": "Irwin et al. (2009) BJU Int — OAB economic burden",
+    },
+    "Testicular": {
+        "finding": "Testicular-cancer risk variant",
+        "clinical_benefit": "Self-exam awareness + early ultrasound if symptomatic",
+        "cost": 100, "outcome_value": 25_000,
+        "prevalence": 0.01, "qaly_gain": 0.80,
+        "src": "McGlynn & Cook (2009) JNCI — testicular cancer screening",
+    },
+}
+
+# ─── ACMG actionable gene economics (ClinVar P/LP → intervention) ─────────
+ACMG_GENE_ECONOMICS: Dict[str, Dict] = {
+    "BRCA1": {"finding": "BRCA1 pathogenic variant", "cost": 2_000, "outcome_value": 150_000,
+              "qaly_gain": 3.00, "clinical_benefit": "Enhanced screening + risk-reducing surgery option",
+              "src": "Manchanda et al. (2015) J Clin Oncol"},
+    "BRCA2": {"finding": "BRCA2 pathogenic variant", "cost": 2_000, "outcome_value": 140_000,
+              "qaly_gain": 2.80, "clinical_benefit": "Enhanced screening + risk-reducing surgery",
+              "src": "Manchanda et al. (2015) J Clin Oncol"},
+    "MLH1": {"finding": "MLH1 Lynch syndrome variant", "cost": 1_500, "outcome_value": 100_000,
+             "qaly_gain": 2.50, "clinical_benefit": "Annual colonoscopy from age 25 + aspirin",
+             "src": "Ladabaum et al. (2011) Ann Intern Med"},
+    "MSH2": {"finding": "MSH2 Lynch syndrome variant", "cost": 1_500, "outcome_value": 100_000,
+             "qaly_gain": 2.50, "clinical_benefit": "Annual colonoscopy + gynecologic surveillance",
+             "src": "Ladabaum et al. (2011) Ann Intern Med"},
+    "MSH6": {"finding": "MSH6 Lynch syndrome variant", "cost": 1_500, "outcome_value": 80_000,
+             "qaly_gain": 2.00, "clinical_benefit": "Enhanced colonoscopy + endometrial screening",
+             "src": "Ladabaum et al. (2011) Ann Intern Med"},
+    "PMS2": {"finding": "PMS2 Lynch syndrome variant", "cost": 1_500, "outcome_value": 60_000,
+             "qaly_gain": 1.50, "clinical_benefit": "Colonoscopy surveillance program",
+             "src": "Ladabaum et al. (2011) Ann Intern Med"},
+    "LDLR": {"finding": "LDLR familial hypercholesterolemia", "cost": 500, "outcome_value": 200_000,
+             "qaly_gain": 3.50, "clinical_benefit": "High-intensity statin + cascade screening",
+             "src": "Nherera et al. (2011) Heart — FH CEA"},
+    "APOB": {"finding": "APOB familial hypercholesterolemia", "cost": 500, "outcome_value": 180_000,
+             "qaly_gain": 3.00, "clinical_benefit": "High-intensity statin therapy",
+             "src": "Nherera et al. (2011) Heart — FH CEA"},
+    "PCSK9": {"finding": "PCSK9 familial hypercholesterolemia", "cost": 3_000, "outcome_value": 200_000,
+              "qaly_gain": 3.50, "clinical_benefit": "PCSK9 inhibitor + cascade screening",
+              "src": "Kazi et al. (2017) JAMA Cardiol"},
+    "SCN5A": {"finding": "SCN5A channelopathy", "cost": 1_000, "outcome_value": 120_000,
+              "qaly_gain": 4.00, "clinical_benefit": "Cardiac monitoring + beta-blocker/ICD",
+              "src": "Kaufman et al. (2014) Circ Cardiovasc Genet"},
+    "KCNQ1": {"finding": "KCNQ1 long-QT syndrome", "cost": 800, "outcome_value": 110_000,
+              "qaly_gain": 3.80, "clinical_benefit": "Beta-blocker + activity restriction",
+              "src": "Kaufman et al. (2014) Circ Cardiovasc Genet"},
+    "KCNH2": {"finding": "KCNH2 long-QT syndrome", "cost": 800, "outcome_value": 110_000,
+              "qaly_gain": 3.80, "clinical_benefit": "Beta-blocker + QT-prolonging drug avoidance",
+              "src": "Kaufman et al. (2014) Circ Cardiovasc Genet"},
+    "RET": {"finding": "RET MEN2 variant", "cost": 5_000, "outcome_value": 250_000,
+            "qaly_gain": 5.00, "clinical_benefit": "Prophylactic thyroidectomy + calcitonin",
+            "src": "Wells et al. (2015) Thyroid; Brandi (2001) JCEM"},
+    "TP53": {"finding": "TP53 Li-Fraumeni variant", "cost": 3_000, "outcome_value": 200_000,
+             "qaly_gain": 4.00, "clinical_benefit": "Annual whole-body MRI (Toronto protocol)",
+             "src": "Villani et al. (2016) Lancet Oncol"},
+    "RB1": {"finding": "RB1 retinoblastoma variant", "cost": 500, "outcome_value": 80_000,
+            "qaly_gain": 3.00, "clinical_benefit": "Pediatric eye exams + family screening",
+            "src": "Soliman et al. (2016) J AAPOS"},
+    "MYH7": {"finding": "MYH7 hypertrophic cardiomyopathy", "cost": 1_200, "outcome_value": 90_000,
+             "qaly_gain": 2.50, "clinical_benefit": "Echo surveillance + exercise restriction",
+             "src": "Maron et al. (2014) Circulation — HCM guidelines"},
+    "MYBPC3": {"finding": "MYBPC3 hypertrophic cardiomyopathy", "cost": 1_200, "outcome_value": 90_000,
+               "qaly_gain": 2.50, "clinical_benefit": "Echo surveillance + cascade screening",
+               "src": "Maron et al. (2014) Circulation"},
+}
+
+# ─── PheWAS extreme-tier category economics ───────────────────────────────
+PHEWAS_CATEGORY_ECONOMICS: Dict[str, Dict] = {
+    "Lipids": {"finding": "Extreme-tier lipid prediction", "cost": 500,
+               "outcome_value": 30_000, "qaly_gain": 0.50,
+               "clinical_benefit": "Lipid-lowering therapy",
+               "src": "CTT Collaboration (2010) Lancet"},
+    "Glucose/Diabetes": {"finding": "Extreme-tier glucose prediction", "cost": 1_200,
+                         "outcome_value": 50_000, "qaly_gain": 0.80,
+                         "clinical_benefit": "Diabetes prevention program",
+                         "src": "DPP Research Group (2002) NEJM"},
+    "Cardiovascular": {"finding": "Extreme-tier cardiovascular prediction", "cost": 800,
+                       "outcome_value": 40_000, "qaly_gain": 0.60,
+                       "clinical_benefit": "Cardiovascular risk management",
+                       "src": "Yusuf et al. (2004) Lancet — INTERHEART"},
+    "Kidney": {"finding": "Extreme-tier kidney prediction", "cost": 600,
+               "outcome_value": 35_000, "qaly_gain": 0.40,
+               "clinical_benefit": "Nephroprotection monitoring",
+               "src": "Wuttke et al. (2019) Nat Commun"},
+    "Inflammation": {"finding": "Extreme-tier inflammatory prediction", "cost": 400,
+                     "outcome_value": 15_000, "qaly_gain": 0.30,
+                     "clinical_benefit": "Anti-inflammatory lifestyle + monitoring",
+                     "src": "Ridker (2003) Circulation — CRP"},
+    "Liver": {"finding": "Extreme-tier liver prediction", "cost": 300,
+              "outcome_value": 25_000, "qaly_gain": 0.40,
+              "clinical_benefit": "Hepatoprotection + NAFLD monitoring",
+              "src": "GBD (2020) J Hepatol"},
+    "Hematology": {"finding": "Extreme-tier hematology prediction", "cost": 200,
+                   "outcome_value": 8_000, "qaly_gain": 0.15,
+                   "clinical_benefit": "Iron/B12/folate monitoring",
+                   "src": "Kassebaum et al. (2014) Blood"},
+    "Body Composition": {"finding": "Extreme-tier body composition prediction", "cost": 800,
+                         "outcome_value": 20_000, "qaly_gain": 0.30,
+                         "clinical_benefit": "Weight management program",
+                         "src": "Locke et al. (2015) Nature — BMI"},
+}
+
+# ─── Immunogenetics economics (keyed by gene) ─────────────────────────────
+IMMUNOGENETICS_ECONOMICS: Dict[str, Dict] = {
+    "CCR5": {
+        "finding": "CCR5-delta32 — HIV resistance",
+        "clinical_benefit": "PrEP decision support (natural HIV resistance factor)",
+        "cost": 100, "outcome_value": 30_000,
+        "prevalence": 0.10, "qaly_gain": 0.50,
+        "src": "Samson et al. (1996) Nature — CCR5-Δ32",
+    },
+    "IL28B": {
+        "finding": "IL28B rs12979860 — HCV treatment response",
+        "clinical_benefit": "IL28B-guided HCV DAA treatment selection",
+        "cost": 200, "outcome_value": 50_000,
+        "prevalence": 0.05, "qaly_gain": 1.00,
+        "src": "Ge et al. (2009) Nature — IL28B × HCV treatment",
+    },
+    "HbS": {
+        "finding": "HbS sickle-cell trait — anesthesia/altitude awareness",
+        "clinical_benefit": "Sickle-trait perioperative management protocol",
+        "cost": 100, "outcome_value": 15_000,
+        "prevalence": 0.08, "qaly_gain": 0.20,
+        "src": "Tsaras et al. (2009) Am J Med — sickle trait complications",
+    },
+}
+
+# ─── Wellness prediction economics (keyed by category) ────────────────────
+WELLNESS_ECONOMICS: Dict[str, Dict] = {
+    "Nutrition": {
+        "finding": "Nutrient-metabolism variant — deficiency prevention",
+        "clinical_benefit": "Targeted supplementation (vitamin D/B12/folate/iron)",
+        "cost": 300, "outcome_value": 8_000,
+        "prevalence": 0.25, "qaly_gain": 0.15,
+        "src": "Holick (2007) NEJM — vitamin D; WHO nutrition guidelines",
+    },
+    "Fitness": {
+        "finding": "Exercise-response variant — training optimization",
+        "clinical_benefit": "Genotype-matched training program (injury prevention)",
+        "cost": 600, "outcome_value": 12_000,
+        "prevalence": 0.20, "qaly_gain": 0.20,
+        "src": "Bouchard et al. (2011) Med Sci Sports Exerc — HERITAGE",
+    },
+    "Sleep": {
+        "finding": "Sleep-architecture variant — chronotherapy",
+        "clinical_benefit": "Chronotype-aligned schedule + sleep hygiene protocol",
+        "cost": 200, "outcome_value": 6_000,
+        "prevalence": 0.30, "qaly_gain": 0.10,
+        "src": "Jones et al. (2019) Nat Commun — chronotype GWAS",
+    },
+}
+
+# ─── Detoxification economics (keyed by gene) ─────────────────────────────
+DETOX_ECONOMICS: Dict[str, Dict] = {
+    "NAT2": {
+        "finding": "NAT2 slow acetylator — occupational cancer risk awareness",
+        "clinical_benefit": "Aromatic amine exposure monitoring + bladder screening",
+        "cost": 400, "outcome_value": 35_000,
+        "prevalence": 0.40, "qaly_gain": 0.60,
+        "src": "Garcia-Closas et al. (2005) Lancet — NAT2 × bladder cancer",
+    },
+    "PON1": {
+        "finding": "PON1 Q192R — organophosphate susceptibility",
+        "clinical_benefit": "Pesticide exposure avoidance + cholinesterase monitoring",
+        "cost": 200, "outcome_value": 15_000,
+        "prevalence": 0.25, "qaly_gain": 0.30,
+        "src": "Costa et al. (2013) Annu Rev Pharmacol Toxicol — PON1",
+    },
+    "GSTT1": {
+        "finding": "GSTT1 null genotype — reduced glutathione conjugation",
+        "clinical_benefit": "Cruciferous vegetable intake + antioxidant monitoring",
+        "cost": 100, "outcome_value": 6_000,
+        "prevalence": 0.20, "qaly_gain": 0.10,
+        "src": "Economopoulos & Sergentanis (2010) Cancer Epidemiol — GST × cancer",
+    },
+}
+
+# ─── Family planning economics (partner testing ROI per gene) ──────────────
+PARTNER_TESTING_COST = 300
+GENETIC_COUNSELING_COST = 400
+_AFFECTED_CHILD_COST = {
+    "Cystic Fibrosis": 300_000,
+    "Sickle Cell Disease": 200_000,
+    "Tay-Sachs Disease": 150_000,
+    "Spinal Muscular Atrophy": 250_000,
+    "Phenylketonuria": 80_000,
+    "Hemochromatosis": 60_000,
+    "Beta-Thalassemia": 180_000,
+    "Congenital Adrenal Hyperplasia": 120_000,
+}
+
+
 DISCLAIMER = (
     "These are estimates based on published pharmacoeconomic literature, not "
     "guarantees. Actual ROI varies by clinic, payer, patient adherence, drug "
@@ -213,12 +767,30 @@ def calculate_roi(cost: float, outcome_value: float) -> Optional[float]:
     return round(outcome_value / cost, 1)
 
 
-def calculate_payback_months(cost: float, outcome_value: float) -> Optional[float]:
-    """Months for the averted-outcome value to repay the intervention cost,
-    treating ``outcome_value`` as an annualized benefit."""
+def calculate_payback_months(cost: float, outcome_value: float,
+                             recurring_cost: bool = False,
+                             rate: float = DISCOUNT_RATE) -> Optional[float]:
+    """Months until cumulative discounted benefit exceeds cumulative cost.
+
+    Walks month-by-month: benefit accrues at ``outcome_value / 12`` per month
+    (discounted), cost is either upfront or spread over months. Returns the
+    first month where cumulative benefit ≥ cumulative cost, or None if it
+    never breaks even within 10 years.
+    """
     if not outcome_value or outcome_value <= 0:
         return None
-    return round((cost / outcome_value) * 12.0, 2)
+    monthly_benefit = outcome_value / 12.0
+    monthly_cost = cost / 12.0 if recurring_cost else 0.0
+    cum_benefit = 0.0
+    cum_cost = cost if not recurring_cost else 0.0
+    monthly_rate = (1.0 + rate) ** (1.0 / 12.0) - 1.0
+    for m in range(1, 121):
+        disc = 1.0 / (1.0 + monthly_rate) ** m
+        cum_benefit += monthly_benefit * disc
+        cum_cost += monthly_cost * disc
+        if cum_benefit >= cum_cost:
+            return float(m)
+    return None
 
 
 def calculate_npv(
@@ -263,7 +835,8 @@ def _econ_record(
         "cost_basis": "annual" if recurring else "one-time",
         "outcome_value": outcome_value,
         "roi": calculate_roi(cost, outcome_value),
-        "payback_months": calculate_payback_months(cost, outcome_value),
+        "payback_months": calculate_payback_months(cost, outcome_value,
+                                                    recurring_cost=recurring),
         "npv_3year": calculate_npv(cost, outcome_value, recurring_cost=recurring),
         "confidence": confidence,
         "category": source,
@@ -288,17 +861,28 @@ def _pgx_findings(pgx_summary: Dict) -> List[Dict]:
     for gene, info in (pgx_summary or {}).items():
         econ = PGX_ECONOMICS.get(gene)
         if econ is None:
-            continue  # no cost data → suppress (graceful)
+            continue
         phenotype = (info or {}).get("phenotype", "")
         if not _is_actionable_pgx(phenotype):
             continue
+        # Decomposed PGx valuation aligned with PGX_CEA in value_of_information:
+        #   expected_benefit = p_rx × p_adr × rrr × adr_cost
+        # where p_rx = probability patient is ever prescribed this drug,
+        # p_adr = probability of ADR given Rx + actionable genotype,
+        # rrr = relative risk reduction from genotype-guided prescribing.
+        p_rx = econ.get("p_rx", 0.10)
+        p_adr = econ.get("p_adr", 0.15)
+        rrr = econ.get("rrr", 0.50)
+        adr_cost = econ.get("adr_cost", 10_000)
+        conditional_value = round(p_rx * p_adr * rrr * adr_cost)
         out.append(_econ_record(
             finding=f"{gene} {phenotype} ({econ['drug']})",
             clinical_benefit=econ["clinical_benefit"],
-            cost=econ["cost"], outcome_value=econ["outcome_value"],
+            cost=econ["cost"], outcome_value=conditional_value,
             confidence="high", source="Pharmacogenomics",
             prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
-            evidence=f"{gene} phenotype: {phenotype}",
+            evidence=(f"{gene} phenotype: {phenotype} — "
+                      f"p_rx={p_rx} × p_adr={p_adr} × rrr={rrr} × ${adr_cost:,}"),
         ))
     return out
 
@@ -396,20 +980,505 @@ def _exercise_longevity_findings(findings: Dict) -> List[Dict]:
     return out
 
 
+def _expanded_pgs_findings(expanded_pgs_result: Optional[Dict]) -> List[Dict]:
+    """Findings from expanded PGS catalog conditions not already in PRS_ECONOMICS."""
+    out: List[Dict] = []
+    if not expanded_pgs_result or not expanded_pgs_result.get("panels"):
+        return out
+    already_keyed = set(PRS_ECONOMICS.keys())
+    for panel_name, info in expanded_pgs_result["panels"].items():
+        if panel_name in already_keyed:
+            continue
+        econ = EXPANDED_PGS_ECONOMICS.get(panel_name)
+        if econ is None:
+            continue
+        tier = (info.get("result") or info).get("tier")
+        if tier not in ("Elevated", "High"):
+            continue
+        pct = (info.get("result") or info).get("percentile")
+        ev = f"{panel_name} expanded PGS tier: {tier}"
+        if pct is not None:
+            ev += f" ({pct:g}th percentile)"
+        out.append(_econ_record(
+            finding=econ["finding"],
+            clinical_benefit=f"{econ['clinical_benefit']} — {econ['intervention']}",
+            cost=econ["cost"], outcome_value=econ["outcome_value"],
+            confidence="low", source="Expanded Polygenic Score",
+            recurring=econ["recurring"], prevalence=econ["prevalence"],
+            qaly_gain=econ["qaly_gain"], evidence=ev,
+        ))
+    return out
+
+
+def _hla_findings(hla_result: Optional[Dict]) -> List[Dict]:
+    """Drug-hypersensitivity economics from HLA typing (beyond HLA-B*57:01
+    which is already in PGX_ECONOMICS via the PGx pathway)."""
+    out: List[Dict] = []
+    if not hla_result:
+        return out
+    carrier_alleles = hla_result.get("carrier_alleles", [])
+    for allele in carrier_alleles:
+        econ = HLA_ECONOMICS.get(allele)
+        if econ is None:
+            continue
+        out.append(_econ_record(
+            finding=econ["finding"],
+            clinical_benefit=econ["clinical_benefit"],
+            cost=econ["cost"], outcome_value=econ["outcome_value"],
+            confidence="high", source="HLA Pharmacogenomics",
+            prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
+            evidence=f"{allele} carrier — avoid {econ['drug']}",
+        ))
+    return out
+
+
+def _carrier_findings(carrier_result: Optional[Dict]) -> List[Dict]:
+    """Economic findings from carrier screening — both affected (homozygous)
+    and carrier (heterozygous) states with distinct valuations."""
+    out: List[Dict] = []
+    if not carrier_result:
+        return out
+    for record in (carrier_result.get("affected") or []):
+        disease = record.get("disease", "")
+        econ = CARRIER_ECONOMICS.get(disease)
+        if econ is None:
+            continue
+        out.append(_econ_record(
+            finding=econ["finding_affected"],
+            clinical_benefit=econ["clinical_benefit_affected"],
+            cost=econ["cost_affected"], outcome_value=econ["outcome_affected"],
+            confidence="high", source="Carrier Screening",
+            prevalence=econ.get("prev_affected", 0.005),
+            qaly_gain=econ["qaly_affected"],
+            evidence=f"{record.get('gene', '?')} {record.get('variant', '')} — homozygous affected",
+        ))
+    for record in (carrier_result.get("carriers") or []):
+        disease = record.get("disease", "")
+        econ = CARRIER_ECONOMICS.get(disease)
+        if econ is None:
+            continue
+        out.append(_econ_record(
+            finding=econ["finding_carrier"],
+            clinical_benefit=econ["clinical_benefit_carrier"],
+            cost=econ["cost_carrier"], outcome_value=econ["outcome_carrier"],
+            confidence="moderate", source="Carrier Screening",
+            prevalence=econ.get("prev_carrier", 0.04),
+            qaly_gain=econ["qaly_carrier"],
+            evidence=f"{record.get('gene', '?')} {record.get('variant', '')} — heterozygous carrier",
+        ))
+    return out
+
+
+def _interaction_findings(interactions_result: Optional[Dict]) -> List[Dict]:
+    """Economic findings from compound multi-variant interactions."""
+    out: List[Dict] = []
+    if not interactions_result:
+        return out
+    for finding in (interactions_result.get("findings") or []):
+        title = finding.get("title", "")
+        econ = INTERACTION_ECONOMICS.get(title)
+        if econ is None:
+            continue
+        out.append(_econ_record(
+            finding=econ["finding"],
+            clinical_benefit=econ["clinical_benefit"],
+            cost=econ["cost"], outcome_value=econ["outcome_value"],
+            confidence="moderate" if finding.get("severity") == "high" else "low",
+            source="Compound Interaction",
+            prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
+            evidence=f"{title} (severity: {finding.get('severity', 'unknown')})",
+        ))
+    return out
+
+
+def _addiction_findings(addiction_result: Optional[Dict]) -> List[Dict]:
+    out: List[Dict] = []
+    if not addiction_result or not addiction_result.get("available"):
+        return out
+    seen_cats: set = set()
+    for finding in (addiction_result.get("findings") or []):
+        if finding.get("impact") not in ("susceptible", "clinically_useful"):
+            continue
+        cat = finding.get("category", "")
+        if not cat or cat in seen_cats:
+            continue
+        econ = ADDICTION_ECONOMICS.get(cat)
+        if econ is None:
+            continue
+        seen_cats.add(cat)
+        gene = finding.get("gene", "")
+        out.append(_econ_record(
+            finding=f"{gene} — {econ['finding']}",
+            clinical_benefit=econ["clinical_benefit"],
+            cost=econ["cost"], outcome_value=econ["outcome_value"],
+            confidence="moderate" if finding.get("confidence") == "high" else "low",
+            source="Addiction Genetics",
+            prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
+            evidence=f"{gene} {finding.get('genotype', '')} — {finding.get('verdict', '')}",
+        ))
+    return out
+
+
+def _metal_oxidative_findings(metal_oxidative_result: Optional[Dict]) -> List[Dict]:
+    out: List[Dict] = []
+    if not metal_oxidative_result:
+        return out
+    seen_genes: set = set()
+    for pred in (metal_oxidative_result.get("predictions") or []):
+        gene = ""
+        cv = pred.get("clinical_variant")
+        if cv:
+            gene = cv.get("gene", "")
+        if not gene:
+            trait = pred.get("trait", "")
+            for g in METAL_OXIDATIVE_ECONOMICS:
+                if g.lower() in trait.lower():
+                    gene = g
+                    break
+        if not gene or gene in seen_genes:
+            continue
+        econ = METAL_OXIDATIVE_ECONOMICS.get(gene)
+        if econ is None:
+            continue
+        seen_genes.add(gene)
+        out.append(_econ_record(
+            finding=econ["finding"],
+            clinical_benefit=econ["clinical_benefit"],
+            cost=econ["cost"], outcome_value=econ["outcome_value"],
+            confidence="moderate" if pred.get("confidence") == "high" else "low",
+            source="Metal/Oxidative",
+            prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
+            evidence=f"{pred.get('trait', '')} — {pred.get('result', '')}",
+        ))
+    return out
+
+
+def _mr_findings(mr_result: Optional[Dict]) -> List[Dict]:
+    """Economic findings from Mendelian randomization: causal risk → cost."""
+    out: List[Dict] = []
+    if not mr_result:
+        return out
+    seen: set = set()
+    for f in (mr_result.get("findings") or []):
+        if f.get("status") != "computed":
+            continue
+        outcome = f.get("outcome", "")
+        if outcome in seen:
+            continue
+        rr = f.get("outcome_relative_risk")
+        if rr is None or rr <= 1.0:
+            continue
+        oc = None
+        for key, val in MR_OUTCOME_COSTS.items():
+            if key.lower() in outcome.lower() or outcome.lower() in key.lower():
+                oc = val
+                break
+        if oc is None:
+            continue
+        seen.add(outcome)
+        excess_risk = (rr - 1.0) * oc["baseline_10yr"]
+        avoidable_cost = round(excess_risk * oc["cost"])
+        qaly = round(excess_risk * oc["qaly_loss"], 2)
+        if avoidable_cost < 100:
+            continue
+        exposure = f.get("exposure", "")
+        out.append(_econ_record(
+            finding=f"MR: elevated {exposure} → {outcome} (RR {rr:.2f})",
+            clinical_benefit=f"Reduce {exposure} exposure to lower {outcome} risk",
+            cost=500, outcome_value=avoidable_cost,
+            confidence="moderate", source="Mendelian Randomization",
+            prevalence=oc["baseline_10yr"], qaly_gain=qaly,
+            evidence=(f"{exposure} → {outcome}: RR {rr:.2f}, "
+                      f"excess 10yr risk {excess_risk:.3f} ({f.get('n_used', 0)} instruments)"),
+        ))
+    return out
+
+
+def _neurochemistry_findings(neurochemistry_result: Optional[Dict]) -> List[Dict]:
+    out: List[Dict] = []
+    if not neurochemistry_result or not neurochemistry_result.get("available"):
+        return out
+    seen: set = set()
+    for finding in (neurochemistry_result.get("findings") or []):
+        if finding.get("impact") in ("neutral",):
+            continue
+        gene = finding.get("gene", "")
+        if not gene or gene in seen:
+            continue
+        econ = NEUROCHEMISTRY_ECONOMICS.get(gene)
+        if econ is None:
+            continue
+        seen.add(gene)
+        out.append(_econ_record(
+            finding=f"{gene} {finding.get('name', '')} — {econ['finding']}",
+            clinical_benefit=econ["clinical_benefit"],
+            cost=econ["cost"], outcome_value=econ["outcome_value"],
+            confidence="low", source="Neurochemistry",
+            prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
+            evidence=f"{gene} {finding.get('genotype', '')} — {finding.get('verdict', '')}",
+        ))
+    return out
+
+
+def _urologic_findings(urologic_result: Optional[Dict]) -> List[Dict]:
+    out: List[Dict] = []
+    if not urologic_result or not urologic_result.get("available"):
+        return out
+    seen_cats: set = set()
+    for finding in (urologic_result.get("findings") or []):
+        if finding.get("impact") in ("normal", "typical"):
+            continue
+        cat = finding.get("category", "")
+        if not cat or cat in seen_cats:
+            continue
+        econ = UROLOGIC_ECONOMICS.get(cat)
+        if econ is None:
+            continue
+        seen_cats.add(cat)
+        out.append(_econ_record(
+            finding=f"{finding.get('gene', '')} — {econ['finding']}",
+            clinical_benefit=econ["clinical_benefit"],
+            cost=econ["cost"], outcome_value=econ["outcome_value"],
+            confidence="low" if finding.get("confidence") != "high" else "moderate",
+            source="Urologic/GU",
+            prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
+            evidence=f"{finding.get('trait', '')} — {finding.get('result', '')}",
+        ))
+    return out
+
+
+def _clinical_variant_findings(clinical_variants_result: Optional[Dict]) -> List[Dict]:
+    """Economics for ClinVar P/LP variants in ACMG actionable genes."""
+    out: List[Dict] = []
+    if not clinical_variants_result or not clinical_variants_result.get("available"):
+        return out
+    seen_genes: set = set()
+    for v in (clinical_variants_result.get("findings") or []):
+        sig = (v.get("significance") or "").lower()
+        if "pathogenic" not in sig:
+            continue
+        gene = v.get("gene", "")
+        if not gene or gene in seen_genes:
+            continue
+        econ = ACMG_GENE_ECONOMICS.get(gene)
+        if econ is None:
+            continue
+        seen_genes.add(gene)
+        zyg = v.get("zygosity", "heterozygous")
+        out.append(_econ_record(
+            finding=f"{econ['finding']} ({zyg})",
+            clinical_benefit=econ["clinical_benefit"],
+            cost=econ["cost"], outcome_value=econ["outcome_value"],
+            confidence="high", source="Clinical Variant (ClinVar)",
+            prevalence=0.005, qaly_gain=econ["qaly_gain"],
+            evidence=f"{gene} {v.get('ref', '')}{v.get('pos', '')} → ClinVar {sig}",
+        ))
+    return out
+
+
+def _phewas_findings(phewas_result: Optional[Dict]) -> List[Dict]:
+    """Economics for extreme-tier PheWAS biomarker predictions."""
+    out: List[Dict] = []
+    if not phewas_result:
+        return out
+    seen_cats: set = set()
+    for h in (phewas_result.get("headline") or []):
+        cat = h.get("category", "")
+        if not cat or cat in seen_cats:
+            continue
+        econ = PHEWAS_CATEGORY_ECONOMICS.get(cat)
+        if econ is None:
+            continue
+        tier = h.get("tier", "")
+        if tier not in ("Very High", "Very Low", "High", "Low"):
+            continue
+        seen_cats.add(cat)
+        out.append(_econ_record(
+            finding=f"{h.get('trait', cat)} — {econ['finding']}",
+            clinical_benefit=econ["clinical_benefit"],
+            cost=econ["cost"], outcome_value=econ["outcome_value"],
+            confidence="low", source="PheWAS Biomarker",
+            prevalence=0.10, qaly_gain=econ["qaly_gain"],
+            evidence=(f"{h.get('trait', '')} predicted {h.get('predicted_value', '')} "
+                      f"{h.get('unit', '')} (p{h.get('percentile', '')} — {tier})"),
+        ))
+    return out
+
+
+def _immunogenetics_findings(immunogenetics_result: Optional[Dict]) -> List[Dict]:
+    out: List[Dict] = []
+    if not immunogenetics_result or not immunogenetics_result.get("available"):
+        return out
+    seen: set = set()
+    for finding in (immunogenetics_result.get("findings") or []):
+        if finding.get("impact") in ("intermediate", "neutral"):
+            continue
+        gene = finding.get("gene", "")
+        if not gene or gene in seen:
+            continue
+        econ = IMMUNOGENETICS_ECONOMICS.get(gene)
+        if econ is None:
+            continue
+        seen.add(gene)
+        out.append(_econ_record(
+            finding=f"{gene} — {econ['finding']}",
+            clinical_benefit=econ["clinical_benefit"],
+            cost=econ["cost"], outcome_value=econ["outcome_value"],
+            confidence="moderate" if finding.get("confidence") == "high" else "low",
+            source="Immunogenetics",
+            prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
+            evidence=f"{gene} {finding.get('genotype', '')} — {finding.get('verdict', '')}",
+        ))
+    return out
+
+
+def _wellness_findings(wellness_result: Optional[Dict]) -> List[Dict]:
+    out: List[Dict] = []
+    if not wellness_result:
+        return out
+    seen_cats: set = set()
+    for pred in (wellness_result.get("predictions") or []):
+        cat = pred.get("category", "")
+        if not cat or cat in seen_cats:
+            continue
+        econ = WELLNESS_ECONOMICS.get(cat)
+        if econ is None:
+            continue
+        result_text = (pred.get("result") or "").lower()
+        if any(k in result_text for k in ("reduced", "impaired", "low", "poor",
+                                           "slow", "deficien", "elevated risk")):
+            seen_cats.add(cat)
+            out.append(_econ_record(
+                finding=f"{pred.get('trait', cat)} — {econ['finding']}",
+                clinical_benefit=econ["clinical_benefit"],
+                cost=econ["cost"], outcome_value=econ["outcome_value"],
+                confidence="low", source="Wellness Prediction",
+                prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
+                evidence=f"{pred.get('trait', '')} — {pred.get('result', '')}",
+            ))
+    return out
+
+
+def _detox_findings(detox_result: Optional[Dict]) -> List[Dict]:
+    out: List[Dict] = []
+    if not detox_result or not detox_result.get("available"):
+        return out
+    seen: set = set()
+    for finding in (detox_result.get("findings") or []):
+        gene = finding.get("gene", "")
+        if not gene or gene in seen:
+            continue
+        econ = DETOX_ECONOMICS.get(gene)
+        if econ is None:
+            continue
+        result_text = (finding.get("result") or "").lower()
+        if any(k in result_text for k in ("reduced", "slow", "null", "deficien",
+                                           "impaired", "absent")):
+            seen.add(gene)
+            out.append(_econ_record(
+                finding=f"{gene} — {econ['finding']}",
+                clinical_benefit=econ["clinical_benefit"],
+                cost=econ["cost"], outcome_value=econ["outcome_value"],
+                confidence="low" if finding.get("confidence") != "high" else "moderate",
+                source="Detoxification",
+                prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
+                evidence=f"{finding.get('trait', '')} — {finding.get('result', '')}",
+            ))
+    return out
+
+
+def _family_planning_findings(family_planning_result: Optional[Dict]) -> List[Dict]:
+    """Partner testing ROI from reproductive genetics — cost of test vs
+    expected cost of affected offspring."""
+    out: List[Dict] = []
+    if not family_planning_result or not family_planning_result.get("available"):
+        return out
+    for item in (family_planning_result.get("recessive_items") or []):
+        disease = item.get("disease", "")
+        p_carrier = item.get("partner_carrier_freq")
+        p_child = item.get("child_clinical_risk")
+        if not p_carrier or not p_child:
+            continue
+        try:
+            p_carrier = float(str(p_carrier).rstrip("%")) / (
+                100.0 if "%" in str(item.get("partner_carrier_freq", "")) else 1.0)
+        except (ValueError, TypeError):
+            continue
+        try:
+            p_child = float(str(p_child).rstrip("%")) / (
+                100.0 if "%" in str(item.get("child_clinical_risk", "")) else 1.0)
+        except (ValueError, TypeError):
+            continue
+        affected_cost = _AFFECTED_CHILD_COST.get(disease, 150_000)
+        expected_avoidable = round(p_carrier * p_child * affected_cost)
+        if expected_avoidable < 50:
+            continue
+        test_cost = PARTNER_TESTING_COST + GENETIC_COUNSELING_COST
+        out.append(_econ_record(
+            finding=f"{disease} carrier — partner testing value",
+            clinical_benefit=f"Partner carrier testing for {disease} reproductive planning",
+            cost=test_cost, outcome_value=expected_avoidable,
+            confidence="moderate", source="Family Planning",
+            prevalence=p_carrier, qaly_gain=round(p_child * 2.0, 2),
+            evidence=(f"{item.get('gene', '')} carrier × partner freq {p_carrier:.3f} "
+                      f"× child risk {p_child:.3f} × ${affected_cost:,}"),
+        ))
+    return out
+
+
+def _top_drugs_findings(top_drugs_result: Optional[Dict]) -> List[Dict]:
+    """High-value PGx findings from the top-prescribed-drugs screen:
+    for drugs that are genotype-actionable, the p_rx is effectively 1.0
+    because these are commonly prescribed medications the patient is
+    likely to encounter."""
+    out: List[Dict] = []
+    if not top_drugs_result or not top_drugs_result.get("available"):
+        return out
+    seen_genes: set = set()
+    for drug_info in (top_drugs_result.get("actionable") or []):
+        gene = drug_info.get("gene", "")
+        if not gene or gene in seen_genes:
+            continue
+        econ = PGX_ECONOMICS.get(gene)
+        if econ is None:
+            continue
+        seen_genes.add(gene)
+        p_adr = econ.get("p_adr", 0.15)
+        rrr = econ.get("rrr", 0.50)
+        adr_cost = econ.get("adr_cost", 10_000)
+        boosted_value = round(0.50 * p_adr * rrr * adr_cost)
+        if boosted_value <= econ.get("outcome_value", 0):
+            continue
+        out.append(_econ_record(
+            finding=f"{gene} — top-drug actionable ({drug_info.get('drug', '')})",
+            clinical_benefit=econ["clinical_benefit"],
+            cost=econ["cost"], outcome_value=boosted_value,
+            confidence="high", source="Top-Drugs PGx Screen",
+            prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
+            evidence=(f"High-prevalence drug {drug_info.get('drug', '')} × "
+                      f"{gene} actionable phenotype (boosted p_rx ≈ 0.50)"),
+        ))
+    return out
+
+
 # ─── Scaling ───────────────────────────────────────────────────────────────
 
 def scale_to_clinic(findings_econ: Dict, patient_count: int = DEFAULT_CLINIC_PATIENTS) -> Dict:
-    """Scale per-finding economics to a clinic population and overlay a
-    subscription revenue model."""
+    """Scale per-finding economics to a clinic population, weighting each
+    finding by the fraction of patients who actually have it (prevalence)."""
     findings = findings_econ.get("findings_with_economics", [])
     if not findings:
         return {"patient_count": patient_count, "n_findings": 0,
                 "note": "No actionable findings with economics for this profile."}
 
-    costs = [f["intervention_cost"] for f in findings]
-    benefits = [f["outcome_value"] for f in findings]
-    avg_cost = round(sum(costs) / len(costs), 2)
-    avg_benefit = round(sum(benefits) / len(benefits), 2)
+    # Prevalence-weighted cost and benefit per patient: each finding
+    # contributes its cost × prevalence (fraction of patients who have it).
+    weighted_cost = sum(f["intervention_cost"] * f.get("prevalence", 0.10)
+                        for f in findings)
+    weighted_benefit = sum(f["outcome_value"] * f.get("prevalence", 0.10)
+                          for f in findings)
+    avg_cost = round(weighted_cost, 2)
+    avg_benefit = round(weighted_benefit, 2)
 
     monthly_margin = CLINIC_REVENUE_MONTHLY * CLINIC_GROSS_MARGIN
     payback = round(avg_cost / monthly_margin, 1) if monthly_margin else None
@@ -427,7 +1496,7 @@ def scale_to_clinic(findings_econ: Dict, patient_count: int = DEFAULT_CLINIC_PAT
         "payback_period_months": payback,
         "summary": (
             f"Applied to {patient_count} patients: "
-            f"cost ${round(avg_cost * patient_count):,}, "
+            f"prevalence-weighted cost ${round(avg_cost * patient_count):,}, "
             f"modeled benefit ${round(avg_benefit * patient_count):,}, "
             f"ROI {calculate_roi(avg_cost, avg_benefit)}:1"
         ),
@@ -461,10 +1530,15 @@ def scale_to_payer(findings_econ: Dict, member_population: int = DEFAULT_PAYER_M
             "total_cost": round(cost), "total_benefit": round(benefit),
         })
 
+    # Cap affected_total at plan size — independent prevalence sums
+    # double-count members who qualify for multiple interventions.
+    unique_affected = min(affected_total, member_population)
+
     cost_per_qaly = round(total_cost / total_qalys) if total_qalys else None
     return {
         "member_population": member_population,
-        "affected_members": affected_total,
+        "affected_members": unique_affected,
+        "affected_member_interventions": affected_total,
         "total_cost": round(total_cost),
         "total_benefit": round(total_benefit),
         "roi": calculate_roi(total_cost, total_benefit),
@@ -473,7 +1547,8 @@ def scale_to_payer(findings_econ: Dict, member_population: int = DEFAULT_PAYER_M
         "per_finding": per_finding,
         "summary": (
             f"Applied to {member_population:,} members: "
-            f"{affected_total:,} interventions, cost ${round(total_cost):,}, "
+            f"{unique_affected:,} unique members affected, "
+            f"{affected_total:,} intervention-events, cost ${round(total_cost):,}, "
             f"modeled savings ${round(total_benefit):,}, "
             f"ROI {calculate_roi(total_cost, total_benefit)}:1"
         ),
@@ -533,23 +1608,27 @@ def generate_economics_summary(findings_econ: Dict) -> str:
 
 # ─── Master analyzer ───────────────────────────────────────────────────────
 
-def analyze_health_economics(findings: Dict, snps_df: pd.DataFrame) -> Dict:
+def analyze_health_economics(findings: Dict, snps_df: pd.DataFrame,
+                             expanded_pgs_result: Optional[Dict] = None,
+                             hla_result: Optional[Dict] = None,
+                             carrier_result: Optional[Dict] = None,
+                             interactions_result: Optional[Dict] = None,
+                             addiction_result: Optional[Dict] = None,
+                             metal_oxidative_result: Optional[Dict] = None,
+                             mr_result: Optional[Dict] = None,
+                             neurochemistry_result: Optional[Dict] = None,
+                             urologic_result: Optional[Dict] = None,
+                             clinical_variants_result: Optional[Dict] = None,
+                             phewas_result: Optional[Dict] = None,
+                             immunogenetics_result: Optional[Dict] = None,
+                             wellness_result: Optional[Dict] = None,
+                             detox_result: Optional[Dict] = None,
+                             family_planning_result: Optional[Dict] = None,
+                             top_drugs_result: Optional[Dict] = None) -> Dict:
     """Compute clinical & payer ROI for genomic interventions.
 
-    Parameters
-    ----------
-    findings : dict
-        Pipeline findings in ``tier1_results.json`` shape — uses
-        ``pgx_summary``, ``prs_summary``, ``apoe_genotype`` and optionally
-        ``vo2max_tier`` / ``longevity_percentile``.
-    snps_df : DataFrame
-        Genotypes indexed by rsID (for optional APOE confirmation).
-
-    Returns
-    -------
-    dict with ``status``, ``findings_with_economics`` (ranked by ROI),
-    ``clinic_dashboard``, ``payer_impact``, ``high_confidence`` and
-    ``disclaimer``.
+    Accepts results from all pipeline analysis modules and produces
+    economic findings for every data source that has a valuation pathway.
     """
     findings = findings or {}
     econ_findings: List[Dict] = []
@@ -558,9 +1637,40 @@ def analyze_health_economics(findings: Dict, snps_df: pd.DataFrame) -> Dict:
         econ_findings += _prs_findings(findings.get("prs_summary", {}))
         econ_findings += _apoe_findings(findings.get("apoe_genotype"), snps_df)
         econ_findings += _exercise_longevity_findings(findings)
+        econ_findings += _expanded_pgs_findings(expanded_pgs_result)
+        econ_findings += _hla_findings(hla_result)
+        econ_findings += _carrier_findings(carrier_result)
+        econ_findings += _interaction_findings(interactions_result)
+        econ_findings += _addiction_findings(addiction_result)
+        econ_findings += _metal_oxidative_findings(metal_oxidative_result)
+        econ_findings += _mr_findings(mr_result)
+        econ_findings += _neurochemistry_findings(neurochemistry_result)
+        econ_findings += _urologic_findings(urologic_result)
+        econ_findings += _clinical_variant_findings(clinical_variants_result)
+        econ_findings += _phewas_findings(phewas_result)
+        econ_findings += _immunogenetics_findings(immunogenetics_result)
+        econ_findings += _wellness_findings(wellness_result)
+        econ_findings += _detox_findings(detox_result)
+        econ_findings += _family_planning_findings(family_planning_result)
+        econ_findings += _top_drugs_findings(top_drugs_result)
     except Exception as e:  # never raise from the pipeline
         return {"status": "error", "error": str(e),
                 "findings_with_economics": [], "disclaimer": DISCLAIMER}
+
+    # Deduplicate: when the same condition appears from both carrier and
+    # interaction extractors (e.g. HFE C282Y), keep the higher-value one.
+    seen_conditions: Dict[str, int] = {}
+    deduped: List[Dict] = []
+    for f in econ_findings:
+        key = f["finding"].lower().split("—")[0].strip()
+        if key in seen_conditions:
+            existing_idx = seen_conditions[key]
+            if f["outcome_value"] > deduped[existing_idx]["outcome_value"]:
+                deduped[existing_idx] = f
+            continue
+        seen_conditions[key] = len(deduped)
+        deduped.append(f)
+    econ_findings = deduped
 
     # Rank by ROI (highest first); keep None ROIs last.
     econ_findings.sort(key=lambda f: (f.get("roi") or 0), reverse=True)
@@ -621,7 +1731,18 @@ def _money(x) -> str:
 def analyze_personal_economics(economics_result: Optional[Dict] = None,
                                bloodwork_result: Optional[Dict] = None,
                                genetic_age_result: Optional[Dict] = None,
-                               meta: Optional[Dict] = None) -> Dict:
+                               meta: Optional[Dict] = None,
+                               carrier_result: Optional[Dict] = None,
+                               hla_result: Optional[Dict] = None,
+                               interactions_result: Optional[Dict] = None,
+                               expanded_pgs_result: Optional[Dict] = None,
+                               addiction_result: Optional[Dict] = None,
+                               neurochemistry_result: Optional[Dict] = None,
+                               mr_result: Optional[Dict] = None,
+                               clinical_variants_result: Optional[Dict] = None,
+                               family_planning_result: Optional[Dict] = None,
+                               phewas_result: Optional[Dict] = None,
+                               wellness_result: Optional[Dict] = None) -> Dict:
     """Build the personal 10-year economic-impact model from the run's results."""
     items: List[Dict] = []
 
@@ -642,13 +1763,16 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
         })
 
     # ── Genomic actionable findings (reuse the curated per-condition econ) ──
+    # outcome_value from _pgx_findings is already conditional (p_rx × p_adr ×
+    # rrr × adr_cost), so we do NOT apply an additional 0.30 discount — that
+    # was a bare constant standing in for the decomposition that is now explicit.
     if economics_result:
         for f in economics_result.get("findings_with_economics", []):
             outcome = f.get("outcome_value") or f.get("benefit") or 0
             prev = f.get("prevalence", 0.15)
             qaly = (f.get("qaly_gain") or f.get("qaly") or 0) * prev
             cost = f.get("cost", 200)
-            avoided = outcome * prev * 0.30          # modeled realised benefit
+            avoided = outcome * prev
             label = (f.get("clinical_benefit") or f.get("finding")
                      or f.get("drug") or "Genomic finding")
             if avoided <= 0 and qaly <= 0:
@@ -684,6 +1808,74 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
             f"~{_PREDIAB_PROGRESSION_10YR:.0%} 10-yr progression risk × ${_T2D_COST:,} lifetime "
             f"T2D cost × {_DPP_RRR:.0%} reduction from a diabetes-prevention program.")
 
+    # ── HLA drug-hypersensitivity (personal) ──
+    if hla_result:
+        for allele in (hla_result.get("carrier_alleles") or []):
+            econ = HLA_ECONOMICS.get(allele)
+            if econ is None:
+                continue
+            avoided = econ["outcome_value"] * 0.15
+            qaly = econ["qaly_gain"]
+            add("HLA Pharmacogenomics", econ["finding"],
+                avoided, qaly, econ["cost"], "high",
+                f"{allele} carrier — published cost-effectiveness for pre-prescription testing "
+                f"({econ.get('src', 'CPIC')}).")
+
+    # ── Carrier screening (personal) ──
+    if carrier_result:
+        for record in (carrier_result.get("affected") or []):
+            disease = record.get("disease", "")
+            econ = CARRIER_ECONOMICS.get(disease)
+            if econ is None:
+                continue
+            add("Carrier Screening", econ["finding_affected"],
+                econ["outcome_affected"] * 0.30, econ["qaly_affected"],
+                econ["cost_affected"], "high",
+                f"{record.get('gene', '?')} homozygous — {econ['clinical_benefit_affected']} "
+                f"({econ.get('src', '')}).")
+        for record in (carrier_result.get("carriers") or []):
+            disease = record.get("disease", "")
+            econ = CARRIER_ECONOMICS.get(disease)
+            if econ is None:
+                continue
+            add("Carrier Screening", econ["finding_carrier"],
+                econ["outcome_carrier"] * 0.05, econ["qaly_carrier"],
+                econ["cost_carrier"], "moderate",
+                f"{record.get('gene', '?')} heterozygous carrier — "
+                f"{econ['clinical_benefit_carrier']}.")
+
+    # ── Compound interactions (personal) ──
+    if interactions_result:
+        for finding in (interactions_result.get("findings") or []):
+            title = finding.get("title", "")
+            econ = INTERACTION_ECONOMICS.get(title)
+            if econ is None:
+                continue
+            avoided = econ["outcome_value"] * 0.25
+            add("Compound Interaction", econ["finding"],
+                avoided, econ["qaly_gain"], econ["cost"],
+                "moderate" if finding.get("severity") == "high" else "low",
+                f"{title} — {econ['clinical_benefit']} ({econ.get('src', '')}).")
+
+    # ── Expanded PGS (personal) ──
+    if expanded_pgs_result:
+        already_seen = set()
+        for panel_name, info in (expanded_pgs_result.get("panels") or {}).items():
+            if panel_name in PRS_ECONOMICS:
+                continue
+            econ = EXPANDED_PGS_ECONOMICS.get(panel_name)
+            if econ is None or panel_name in already_seen:
+                continue
+            tier = (info.get("result") or info).get("tier")
+            if tier not in ("Elevated", "High"):
+                continue
+            already_seen.add(panel_name)
+            avoided = econ["outcome_value"] * 0.10
+            add("Expanded Polygenic Score", econ["finding"],
+                avoided, econ["qaly_gain"] * 0.5, econ["cost"], "low",
+                f"{panel_name} PGS tier {tier} — {econ['clinical_benefit']} "
+                f"({econ.get('src', '')}).")
+
     # Biological aging — grounded in the PhenoAge clock's own validated 10-year
     # mortality output (mortality-calibrated; each year of acceleration ≈ 9%
     # higher all-cause mortality, HR 1.09/yr, Levine 2018). We compare the
@@ -714,6 +1906,135 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
                 "Derived from your PhenoAge 10-year mortality risk vs the baseline for your "
                 "chronological age. PhenoAge is a mortality-calibrated clock — each year of "
                 "acceleration ≈ 9% higher all-cause mortality (HR 1.09/yr; Levine, Aging 2018).")
+
+    # ── Addiction genetics (personal) ──
+    if addiction_result and addiction_result.get("available"):
+        composite = addiction_result.get("composite", {})
+        for cat_name, econ in ADDICTION_ECONOMICS.items():
+            tier = composite.get(f"{cat_name.lower()}_tier",
+                                composite.get("overall_tier", ""))
+            if tier in ("elevated", "high", "Elevated", "High"):
+                avoided = econ["outcome_value"] * 0.12
+                add("Addiction Genetics", f"{cat_name} susceptibility — {econ['finding']}",
+                    avoided, econ["qaly_gain"] * 0.3, econ["cost"], "low",
+                    f"{cat_name} tier {tier} — {econ['clinical_benefit']} "
+                    f"({econ.get('src', '')}).")
+                break
+
+    # ── Neurochemistry (personal) ──
+    if neurochemistry_result and neurochemistry_result.get("available"):
+        composite = neurochemistry_result.get("composite", {})
+        comt = composite.get("comt_class", "")
+        if comt and comt != "normal":
+            econ = NEUROCHEMISTRY_ECONOMICS.get("COMT", {})
+            if econ:
+                avoided = econ["outcome_value"] * 0.10
+                add("Neurochemistry", f"COMT {comt} — {econ['finding']}",
+                    avoided, econ["qaly_gain"] * 0.3, econ["cost"], "low",
+                    f"COMT class {comt} — {econ['clinical_benefit']} ({econ.get('src', '')}).")
+
+    # ── Mendelian randomization (personal) ──
+    if mr_result:
+        for f in (mr_result.get("findings") or [])[:3]:
+            if f.get("status") != "computed":
+                continue
+            rr = f.get("outcome_relative_risk")
+            if rr is None or rr <= 1.05:
+                continue
+            outcome = f.get("outcome", "")
+            exposure = f.get("exposure", "")
+            oc = None
+            for key, val in MR_OUTCOME_COSTS.items():
+                if key.lower() in outcome.lower():
+                    oc = val
+                    break
+            if oc is None:
+                continue
+            excess_risk = (rr - 1.0) * oc["baseline_10yr"]
+            avoided = round(excess_risk * oc["cost"] * 0.3)
+            qaly = round(excess_risk * oc["qaly_loss"] * 0.3, 2)
+            if avoided > 100:
+                add("Mendelian Randomization",
+                    f"MR: {exposure} → {outcome} (RR {rr:.2f})",
+                    avoided, qaly, 500, "moderate",
+                    f"Causal projection: reducing {exposure} lowers {outcome} risk "
+                    f"(MR RR {rr:.2f}, {f.get('n_used', 0)} instruments).")
+
+    # ── Clinical variants (personal) ──
+    if clinical_variants_result and clinical_variants_result.get("available"):
+        for v in (clinical_variants_result.get("findings") or []):
+            sig = (v.get("significance") or "").lower()
+            if "pathogenic" not in sig:
+                continue
+            gene = v.get("gene", "")
+            econ = ACMG_GENE_ECONOMICS.get(gene)
+            if econ is None:
+                continue
+            zyg = v.get("zygosity", "het")
+            avoided = econ["outcome_value"] * (0.50 if "homo" in zyg else 0.25)
+            add("Clinical Variant", f"{econ['finding']} ({zyg})",
+                avoided, econ["qaly_gain"], econ["cost"], "high",
+                f"ClinVar {sig} in {gene} — {econ['clinical_benefit']} "
+                f"({econ.get('src', '')}).")
+
+    # ── Family planning (personal) ──
+    if family_planning_result and family_planning_result.get("available"):
+        n_actionable = family_planning_result.get("n_actionable", 0)
+        if n_actionable > 0:
+            test_cost = PARTNER_TESTING_COST + GENETIC_COUNSELING_COST
+            expected_benefit = n_actionable * 5_000
+            add("Family Planning",
+                f"Reproductive genetics — {n_actionable} carrier condition(s) for partner testing",
+                expected_benefit, 0.10 * n_actionable, test_cost, "moderate",
+                "Partner carrier testing ROI: cost of testing vs expected "
+                "value of informed reproductive decisions.")
+
+    # ── PheWAS extreme predictions (personal) ──
+    if phewas_result:
+        n_extreme = len(phewas_result.get("headline") or [])
+        if n_extreme > 0:
+            for h in (phewas_result.get("headline") or [])[:3]:
+                cat = h.get("category", "")
+                econ = PHEWAS_CATEGORY_ECONOMICS.get(cat)
+                if econ is None:
+                    continue
+                avoided = econ["outcome_value"] * 0.08
+                add("PheWAS Biomarker",
+                    f"{h.get('trait', cat)} extreme prediction ({h.get('tier', '')})",
+                    avoided, econ["qaly_gain"] * 0.3, econ["cost"], "low",
+                    f"Genetically predicted {h.get('trait', '')} at "
+                    f"p{h.get('percentile', '')} — {econ['clinical_benefit']} "
+                    f"({econ.get('src', '')}).")
+
+    # ── Wellness predictions (personal) ──
+    if wellness_result:
+        n_actionable_wellness = 0
+        for pred in (wellness_result.get("predictions") or []):
+            result_text = (pred.get("result") or "").lower()
+            if any(k in result_text for k in ("reduced", "impaired", "low",
+                                               "poor", "deficien")):
+                n_actionable_wellness += 1
+        if n_actionable_wellness > 0:
+            avoided = n_actionable_wellness * 2_000
+            add("Wellness Genetics",
+                f"{n_actionable_wellness} actionable wellness variant(s)",
+                avoided, 0.05 * n_actionable_wellness, 300, "low",
+                "Nutrient metabolism, sleep, and fitness optimization variants "
+                "with published intervention economics.")
+
+    # ── Deduplicate personal items: same condition from multiple sections ──
+    seen_keys: Dict[str, int] = {}
+    deduped_items: List[Dict] = []
+    for item in items:
+        key = item["finding"].lower().split("—")[0].strip()
+        if key in seen_keys:
+            idx = seen_keys[key]
+            if item["net"] > deduped_items[idx]["net"]:
+                deduped_items[idx] = item
+            continue
+        seen_keys[key] = len(deduped_items)
+        deduped_items.append(item)
+    items = deduped_items
 
     total_avoided = sum(i["avoided"] for i in items)
     total_qaly = sum(i["qaly"] for i in items)

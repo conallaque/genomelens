@@ -217,8 +217,13 @@ def frontier_psa(strategies: Optional[List[Dict]] = None,
     rng = np.random.default_rng(seed)
     names = [s["name"] for s in strategies]
 
-    # Draw correlated-free samples: Gamma on cost (non-negative, right-skewed),
-    # Normal on QALYs. SDs default to a moderate fraction of the mean.
+    # Correlated QALY sampling: strategies describe the same population, so
+    # their baseline QALY is shared. Sample a common baseline per draw,
+    # then add strategy-specific incremental effects.
+    base_q = float(strategies[0]["qaly"]) if strategies else 20.0
+    base_sd = float(strategies[0].get("qaly_sd", 0.04)) if strategies else 0.04
+    baseline_draws = rng.normal(base_q, base_sd, n_mc)
+
     samples_cost, samples_qaly = [], []
     for s in strategies:
         c_mean = max(1e-6, float(s["cost"]))
@@ -226,9 +231,12 @@ def frontier_psa(strategies: Optional[List[Dict]] = None,
         shape = (c_mean / c_sd) ** 2 if c_sd > 0 else 1e6
         scale = c_mean / shape if shape > 0 else c_mean
         samples_cost.append(rng.gamma(shape, scale, n_mc))
-        q_mean = float(s["qaly"])
-        q_sd = float(s.get("qaly_sd", 0.04))
-        samples_qaly.append(rng.normal(q_mean, q_sd, n_mc))
+        # Incremental QALY = strategy mean minus baseline mean
+        incr = float(s["qaly"]) - base_q
+        incr_sd = float(s.get("qaly_sd", 0.04))
+        # Sample the increment independently, add to the shared baseline
+        incr_draws = rng.normal(incr, incr_sd, n_mc) if abs(incr) > 1e-9 else np.zeros(n_mc)
+        samples_qaly.append(baseline_draws + incr_draws)
     cost = np.array(samples_cost)          # shape (n_strategies, n_mc)
     qaly = np.array(samples_qaly)
 
@@ -305,7 +313,11 @@ def distributional_cea(groups: Optional[List[Dict]] = None,
              "baseline_health": 67.0, "qaly_gain": 0.078},
         ]
     eps = float(inequality_aversion)
-    # Atkinson-style equity weight: worse-off (lower baseline) get a higher weight.
+    # Power-law equity weight (social welfare function): worse-off groups
+    # (lower baseline health) receive higher weight. This is an inequality-
+    # aversion weighting inspired by the Atkinson index, not the full
+    # Asaria et al. (2016) DCEA framework which computes an equally-
+    # distributed-equivalent (EDE) before and after intervention.
     ref = float(np.mean([g["baseline_health"] for g in groups]))
     rows = []
     unweighted = weighted = 0.0
@@ -362,9 +374,11 @@ def distributional_cea(groups: Optional[List[Dict]] = None,
             f"team: you cannot weight your way out of a portability gap; the fix is "
             f"more diverse genomic research, and in the meantime the product's value "
             f"should be represented honestly per group."),
-        "src": ("Distributional cost-effectiveness analysis: Asaria, Griffin & "
-                "Cookson (2016) Med Decis Making; Atkinson (1970) inequality "
-                "aversion. Ancestry-portability link: Martin et al. (2019) Nat Genet."),
+        "methodology": "power-law equity weighting (social welfare function)",
+        "src": ("Power-law equity weighting inspired by the Atkinson inequality "
+                "index. For the full EDE-based DCEA framework, see Asaria, Griffin "
+                "& Cookson (2016) Med Decis Making. Ancestry-portability: Martin "
+                "et al. (2019) Nat Genet."),
         "caveat": "Baseline-health and QALY-gain inputs are illustrative; the "
                   "framework, not the values, is what transfers.",
     }
@@ -518,7 +532,8 @@ def validate_against_published(cases: Optional[List[Dict]] = None) -> Dict:
         "n_cases": len(rows),
         "n_within_order_of_magnitude": n_pass,
         "n_direction_correct": n_dir,
-        "all_validated": n_pass == len(rows),
+        "validation_strength": "face validity (direction + order of magnitude)",
+        "all_passed": n_pass == len(rows),
         "plain_english": (
             f"Fed the published clinical inputs, this engine computes an ICER that "
             f"agrees on DIRECTION (cost-saving vs costly) in {n_dir} of {len(rows)} "
