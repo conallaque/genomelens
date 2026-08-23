@@ -787,7 +787,7 @@ def run_markov(*, start_age: float, annual_incidence: float,
     dw = discount_weights(n, rate)
     tc = sum(c * w * d for c, w, d in zip(costs, wcc, dw, strict=False))
     tq = sum(u * w * d for u, w, d in zip(utils, wcc, dw, strict=False))
-    tl = sum(l * w * d for l, w, d in zip(lys, wcc, dw, strict=False))
+    tl = sum(ly * w * d for ly, w, d in zip(lys, wcc, dw, strict=False))
     return MarkovResult(tc, tq, tl, trace, n, float(a0))
 
 

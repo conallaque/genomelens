@@ -1270,11 +1270,11 @@ def _render_exercise_protocols(result: dict) -> str:
     lc = p.get("lifting_cues")
     if lc:
         cards = ""
-        for l in lc:
-            cues = "".join(f"<li>{_esc(c)}</li>" for c in l["cues"])
-            faults = "".join(f"<li>{_esc(c)}</li>" for c in l["common_faults"])
-            cards += (f"<div class='ex-card'><strong>{_esc(l['lift'])}</strong>"
-                      f"<p><em>Setup:</em> {_esc(l['setup'])}</p>"
+        for card in lc:
+            cues = "".join(f"<li>{_esc(c)}</li>" for c in card["cues"])
+            faults = "".join(f"<li>{_esc(c)}</li>" for c in card["common_faults"])
+            cards += (f"<div class='ex-card'><strong>{_esc(card['lift'])}</strong>"
+                      f"<p><em>Setup:</em> {_esc(card['setup'])}</p>"
                       f"<strong>Cues</strong><ul>{cues}</ul>"
                       f"<strong>Common faults</strong><ul>{faults}</ul></div>")
         out += f"<h2>Lifting Cue Library</h2>{cards}"

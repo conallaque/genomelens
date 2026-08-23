@@ -236,7 +236,10 @@ def parse_imputed_vcf(vcf_gz: Path, min_r2: float = 0.0) -> pd.DataFrame:
             except ValueError:
                 continue
             alts = alt.split(",")
-            def _allele(idx: int) -> str:
+            # ref/alts bound as defaults, not closed over: the closure is
+            # called in the same iteration today, so late binding never bites,
+            # but it would the moment this is deferred.
+            def _allele(idx: int, ref: str = ref, alts: list = alts) -> str:
                 if idx == 0:
                     return ref
                 if 1 <= idx <= len(alts):

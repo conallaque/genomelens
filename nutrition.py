@@ -1352,8 +1352,8 @@ Peak ≥140 mg/dL = caution; ≥180 = restructure.</p>
             for i in md["include_weekly"]
         )
         lim = "".join(
-            f"<tr><td>{_esc(l['food'])}</td><td>{_esc(l['limit'])}</td></tr>"
-            for l in md["limit_strictly"]
+            f"<tr><td>{_esc(row['food'])}</td><td>{_esc(row['limit'])}</td></tr>"
+            for row in md["limit_strictly"]
         )
         leverage = "".join(f"<li>{_esc(x)}</li>" for x in md["high_leverage_actions"])
         e4spec = "".join(f"<li>{_esc(x)}</li>" for x in md.get("additional_ε4_specific", []))

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dna-analysis-tool"
-version = "7.0.0-consolidation"
+version = "7.0.0+consolidation"   # PEP 440 local-version segment
 description = "Local, privacy-first DNA analysis pipeline for consumer raw-chip data"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -127,6 +127,13 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["E501", "B011"]   # tests favour readability over line-length / assertion strictness
+# analyze.py is the facade the orchestrator imports through: pipeline.py pulls
+# ~80 names out of it, most of which analyze.py itself never calls. They are
+# re-exports, not dead imports. An unused-import autofix deleted one of them
+# and the pipeline stopped starting while all 749 tests still passed, because
+# the suite imports the analysis modules directly and never exercises the
+# facade. Scoped to this one file rather than disabled globally.
+"analyze.py" = ["F401"]
 
 # ── mypy ──────────────────────────────────────────────────────────────────
 [tool.mypy]

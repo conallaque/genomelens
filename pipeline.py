@@ -154,10 +154,10 @@ def _render_longevity_html(integrated: dict, file_label: str = "") -> str:
     )
 
     lever_rows = "".join(
-        f"<tr><td><strong>{esc(l['lever'])}</strong></td>"
-        f"<td>{l['current_score']}</td>"
-        f"<td>{esc(l['improvement_action'])}</td></tr>"
-        for l in lon["biggest_levers"]
+        f"<tr><td><strong>{esc(lev['lever'])}</strong></td>"
+        f"<td>{lev['current_score']}</td>"
+        f"<td>{esc(lev['improvement_action'])}</td></tr>"
+        for lev in lon["biggest_levers"]
     )
 
     plan_rows = "".join(

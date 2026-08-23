@@ -598,7 +598,7 @@ def _reference_totals():
 
 
 def personalize_for_report(voi_result: dict, age: float = 40.0,
-                           wtp: float = None) -> dict:
+                           wtp: float | None = None) -> dict:
     """Turn ONE person's value-of-information result into the individually-relevant
     health-economics panels for their personal report.
 

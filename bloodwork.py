@@ -1993,17 +1993,17 @@ def _render_advanced_section(advanced: dict | None) -> str:
         levers = bio.get("levers") or []
         levers_html = ""
         if levers:
-            maxc = max(l["years_cost"] for l in levers) or 1
+            maxc = max(v["years_cost"] for v in levers) or 1
             rows = ""
-            for l in levers[:6]:
-                w = 100 * l["years_cost"] / maxc
+            for lev in levers[:6]:
+                w = 100 * lev["years_cost"] / maxc
                 rows += (
                     f'<div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:.86em">'
-                    f'<div style="width:150px;color:#33404d">{_esc(l["marker"])} '
-                    f'<span style="color:#9aa4b0">{l["current"]}→{l["ideal"]}</span></div>'
+                    f'<div style="width:150px;color:#33404d">{_esc(lev["marker"])} '
+                    f'<span style="color:#9aa4b0">{lev["current"]}→{lev["ideal"]}</span></div>'
                     f'<div style="flex:1;background:#eef1f4;border-radius:4px;height:12px;overflow:hidden">'
                     f'<div style="width:{w:.0f}%;height:100%;background:#b3261e;opacity:.75"></div></div>'
-                    f'<div style="width:52px;text-align:right;font-weight:700;color:#b3261e">−{l["years_cost"]:.1f} yr</div>'
+                    f'<div style="width:52px;text-align:right;font-weight:700;color:#b3261e">−{lev["years_cost"]:.1f} yr</div>'
                     f'</div>')
             rec = bio.get("recoverable_years", 0)
             levers_html = (

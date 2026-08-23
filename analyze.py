@@ -694,21 +694,22 @@ def call_ollama(prompt: str, model: str, timeout: int = 1800,
     for attempt in range(retries + 1):
         try:
             return _attempt()
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.ConnectionError as e:
             raise ConnectionError(
                 "Cannot connect to Ollama at localhost:11434. "
-                "Start it with: ollama serve")
+                "Start it with: ollama serve") from e
         except requests.exceptions.HTTPError as e:
             status = getattr(getattr(e, "response", None), "status_code", None)
             last_err = e
             if status and 500 <= status < 600 and attempt < retries:
                 time.sleep(3 * (attempt + 1))   # brief backoff, then retry
                 continue
-            raise RuntimeError(f"Ollama error: {e}")
-        except (requests.exceptions.Timeout, requests.exceptions.ReadTimeout):
-            raise TimeoutError("Ollama request timed out.")
+            raise RuntimeError(f"Ollama error: {e}") from e
+        except (requests.exceptions.Timeout,
+                requests.exceptions.ReadTimeout) as e:
+            raise TimeoutError("Ollama request timed out.") from e
         except Exception as e:
-            raise RuntimeError(f"Ollama error: {e}")
+            raise RuntimeError(f"Ollama error: {e}") from e
     raise RuntimeError(f"Ollama error after retries: {last_err}")
 
 

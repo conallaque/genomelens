@@ -318,7 +318,7 @@ def test_phenoage_levers_and_mortality() -> None:
     # RDW (largest CBC coefficient) should be a top lever here
     assert lev["levers"] and lev["levers"][0]["marker"] in ("RDW", "Fasting glucose", "hs-CRP")
     # each lever quantifies years recovered by optimizing that marker
-    assert all(l["years_cost"] > 0 for l in lev["levers"])
+    assert all(v["years_cost"] > 0 for v in lev["levers"])
 
 
 def test_genetic_longevity_reads_variants() -> None:

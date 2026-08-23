@@ -186,8 +186,10 @@ def analyze_life_stage_playbook(
         base = _DECADE_BASE[key]
         genome_items: list[dict] = []
 
-        def add(text, source):
-            genome_items.append({"text": text, "source": source})
+        # items bound as a default rather than closed over: genome_items is
+        # rebound every iteration of the enclosing loop.
+        def add(text, source, items=genome_items):
+            items.append({"text": text, "source": source})
 
         # Leverage framing appears in every decade at/after the current one
         if leverage_tier in ("Very favorable", "Favorable") and key in ("20s", "30s"):

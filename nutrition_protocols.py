@@ -221,7 +221,7 @@ def thirty_day_meal_plan(macros: dict, gluten: bool, lactose: bool,
     plan: list[dict] = []
     for day in range(1, 31):
         b = adapt(breakfasts[(day - 1) % len(breakfasts)])
-        l = adapt(lunches[(day - 1) % len(lunches)])
+        lunch = adapt(lunches[(day - 1) % len(lunches)])
         d = adapt(dinners[(day - 1) % len(dinners)])
         s1 = _SNACKS[(day - 1) % len(_SNACKS)]
         s2 = _SNACKS[(day + 3) % len(_SNACKS)]
@@ -232,7 +232,7 @@ def thirty_day_meal_plan(macros: dict, gluten: bool, lactose: bool,
             "day": day,
             "breakfast": b,
             "snack_am": s1,
-            "lunch": l,
+            "lunch": lunch,
             "snack_pm": s2,
             "dinner": d,
         })
