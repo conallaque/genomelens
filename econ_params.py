@@ -493,6 +493,62 @@ _REGISTRY: List[Param] = [
        citation="PMID:16855125 doi:10.1177/0272989X06290495", year=2006,
        dist="gamma", low=0.5, high=6.0),
 
+    # ── Prospective yield of sequencing over a genotyping chip ────────────
+    # These answer "what is sequencing likely to find that my chip did not",
+    # which is a different question from "what did sequencing find" and the
+    # only one that can be answered before buying it.
+    _p("wgs_yield_acmg_secondary", 0.020, "probability", "derived",
+       note="Probability that an unselected adult carries a reportable "
+            "pathogenic variant in an ACMG secondary-findings gene. "
+            "Population screening cohorts report roughly 1–3% depending on "
+            "how many genes are returned; 2% sits in the middle of that "
+            "range. Genotyping arrays detect almost none of these, because "
+            "they type specific known positions rather than reading the gene.",
+       source="Grzymski JJ, Elhanan G, Morales Rosado JA, et al. Population "
+              "genetic screening efficiently identifies carriers of "
+              "autosomal dominant diseases. Nat Med",
+       citation="PMID:33020650 doi:10.1038/s41591-020-1093-z", year=2020,
+       dist="beta", low=0.008, high=0.040),
+
+    _p("chip_detection_share_monogenic", 0.10, "fraction", "derived",
+       note="Share of pathogenic variants in a given actionable gene that a "
+            "consumer genotyping array actually detects. Arrays type a fixed "
+            "set of positions — the authorised consumer BRCA report covers "
+            "three founder variants out of thousands of known pathogenic "
+            "ones — so a negative chip result is close to uninformative for "
+            "monogenic disease. This is the single biggest reason sequencing "
+            "adds anything.",
+       source="US Food and Drug Administration. FDA authorises, with special "
+              "controls, direct-to-consumer test for three BRCA1/BRCA2 "
+              "breast cancer mutations (limitations of array-based reporting)",
+       citation="https://www.fda.gov/news-events/press-announcements/"
+                "fda-authorizes-special-controls-direct-consumer-test-"
+                "reporting-three-mutations-brca-breast-cancer", year=2018,
+       dist="beta", low=0.02, high=0.35),
+
+    _p("chip_pgx_coverage", 0.85, "fraction", "assumption",
+       note="Share of the clinically actionable pharmacogenomic variation a "
+            "consumer array already captures. The main CPIC star alleles sit "
+            "at common typed positions, so sequencing adds comparatively "
+            "little here — which matters, because pharmacogenomics is the "
+            "highest-prevalence category and would otherwise dominate a "
+            "prospective estimate of what sequencing is worth. Judgement: "
+            "coverage varies by array and by gene, and CYP2D6 in particular "
+            "is poorly resolved by both technologies.",
+       dist="beta", low=0.50, high=0.98),
+
+    _p("wgs_yield_carrier_expanded", 0.60, "probability", "derived",
+       note="Probability that an individual carries at least one recessive "
+            "condition on an expanded carrier panel. Reported for "
+            "completeness only — reproductive findings are deliberately not "
+            "monetised anywhere in this model, so this contributes nothing "
+            "to the dollar figure.",
+       source="Haque IS, Lazarin GA, Kang HP, Evans EA, Goldberg JD, Wapner "
+              "RJ. Modeled Fetal Risk of Genetic Diseases Identified by "
+              "Expanded Carrier Screening. JAMA",
+       citation="PMID:27532916 doi:10.1001/jama.2016.11139", year=2016,
+       dist="beta", low=0.30, high=0.90),
+
     # ── Decision-layer parameters ─────────────────────────────────────────
     # These sat as default arguments in econ_decision.py, where each one
     # decided the sign or the substance of a reported result while being

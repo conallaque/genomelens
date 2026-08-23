@@ -2017,6 +2017,77 @@ variants queried. <strong>Predictors used:</strong> {_esc(pred_line)}.
 """
 
 
+def _render_wgs_decision(w: Optional[Dict]) -> str:
+    """Whether sequencing is worth buying, and why the other figure says $0.
+
+    The report shows a chip-to-sequencing marginal value that is structurally
+    zero for anyone with array data. Left unexplained it reads as "sequencing
+    would add nothing", which is not what it means and is not true.
+    """
+    if not w or not w.get("available"):
+        return ""
+
+    def money(v):
+        try:
+            v = round(float(v))
+        except (TypeError, ValueError):
+            return "&mdash;"
+        return f"-${abs(v):,}" if v < 0 else f"${v:,}"
+
+    accent = "#177a54" if w.get("worth_it") else "#b06a00"
+    zero_note = ""
+    if w.get("why_retrospective_is_zero"):
+        zero_note = f"""
+  <div style="border:1px solid #f0dcc0;background:#fffaf2;border-radius:8px;
+              padding:10px 12px;margin:10px 0;font-size:.87em;color:#6b5330">
+    <strong>Why the other sequencing figure on this page reads
+    {money(w.get('retrospective_value'))}.</strong>
+    {_esc(w['why_retrospective_is_zero'])}</div>"""
+
+    return f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid {accent};
+            border-radius:10px;padding:14px 16px;margin:14px 0;background:#fbfcfe">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;
+              gap:12px;flex-wrap:wrap">
+    <div style="font-weight:700;color:{accent}">
+      Is whole-genome sequencing worth buying?</div>
+    <div style="font-size:.72em;color:#8a94a3;border:1px solid #dfe4ea;
+                border-radius:20px;padding:2px 9px;white-space:nowrap">
+      prospective &middot; before testing</div>
+  </div>
+  <div style="font-size:.95em;color:#2b3440;margin-top:8px">
+    {_esc(w.get('plain',''))}</div>
+  {zero_note}
+  <table style="width:100%;border-collapse:collapse;font-size:.87em;margin-top:8px">
+    <tr style="border-bottom:1px solid #f0f2f5">
+      <td style="padding:4px">Chance of a serious actionable finding your array missed</td>
+      <td style="text-align:right;padding:4px"><strong>1 in
+        {w.get('number_needed_to_sequence') or '&mdash;'}</strong></td></tr>
+    <tr style="border-bottom:1px solid #f0f2f5">
+      <td style="padding:4px">Value if you are that person</td>
+      <td style="text-align:right;padding:4px">{money(w.get('value_per_finding'))}</td></tr>
+    <tr style="border-bottom:1px solid #f0f2f5">
+      <td style="padding:4px">Expected value, averaged over everyone</td>
+      <td style="text-align:right;padding:4px">{money(w.get('gross_expected_value'))}</td></tr>
+    <tr style="border-bottom:1px solid #f0f2f5">
+      <td style="padding:4px">&nbsp;&nbsp;of which pharmacogenomics
+        <span style="color:#8a94a3">(mostly already on your array)</span></td>
+      <td style="text-align:right;padding:4px;color:#8a94a3">
+        {money(w.get('pgx_incremental_value'))}</td></tr>
+    <tr style="border-bottom:1px solid #f0f2f5">
+      <td style="padding:4px">Extra cost over an array</td>
+      <td style="text-align:right;padding:4px">{money(w.get('incremental_cost'))}</td></tr>
+    <tr><td style="padding:4px"><strong>Net expected value</strong></td>
+      <td style="text-align:right;padding:4px;color:{accent}">
+        <strong>{money(w.get('net_expected_value'))}</strong></td></tr>
+  </table>
+  <div style="font-size:.85em;color:#48545f;margin-top:9px">
+    <strong>Where the value comes from.</strong> {_esc(w.get('biggest_driver',''))}</div>
+  <div style="font-size:.84em;color:#8a94a3;margin-top:7px;font-style:italic">
+    {_esc(w.get('caveat',''))}</div>
+</div>"""
+
+
 def _render_plain_summary(pl: Optional[Dict]) -> str:
     """The plain-English answer, placed before any of the technical output.
 
@@ -2487,6 +2558,7 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
 
     dec_html = _render_decision_layer(p.get("decision") or {})
     plain_html = _render_plain_summary(p.get("plain") or {})
+    wgs_html = _render_wgs_decision(p.get("wgs_decision") or {})
 
     # ── Dual perspective ──
     dp = p.get("dual_perspective") or {}
@@ -2662,7 +2734,7 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
       <th style="text-align:right">NMB</th></tr></thead>
     <tbody>{rows}</tbody>
   </table>
-  {unc_html}{dec_html}{struct_html}{dp_html}{inv_html}{val_html}{prov_html}{cheers_html}
+  {wgs_html}{unc_html}{dec_html}{struct_html}{dp_html}{inv_html}{val_html}{prov_html}{cheers_html}
 </div>"""
 
 

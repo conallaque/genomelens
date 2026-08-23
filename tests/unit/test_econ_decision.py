@@ -535,3 +535,98 @@ def test_summary_carries_a_disclaimer():
 def test_summary_degrades_when_there_is_nothing_to_summarise():
     assert epl.build_plain_summary(None)["available"] is False
     assert epl.build_plain_summary({"available": False})["available"] is False
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Is sequencing worth buying?
+# ══════════════════════════════════════════════════════════════════════════
+
+def test_prospective_sequencing_value_is_not_structurally_zero():
+    # THE BUG THIS ADDRESSES. `marginal_chip_to_wgs` sums findings tagged
+    # wgs_only, which only exist in a VCF — so on array input it is $0 for
+    # everybody, every time, and reads as "sequencing would add nothing".
+    # A prospective estimate must not inherit that property.
+    w = ed.wgs_marginal_value(n_wgs_only_findings=0)
+    assert w["available"]
+    assert w["gross_expected_value"] > 0, (
+        "the prospective estimate must not be zero just because the input "
+        "file was an array")
+    assert w["number_needed_to_sequence"] and w["number_needed_to_sequence"] > 1
+
+
+def test_the_zero_is_explained_when_there_are_no_sequencing_findings():
+    w = ed.wgs_marginal_value(n_wgs_only_findings=0, wgs_only_findings_value=0)
+    assert "statement about the input file" in w["why_retrospective_is_zero"]
+
+
+def test_no_spurious_explanation_when_sequencing_findings_exist():
+    w = ed.wgs_marginal_value(n_wgs_only_findings=3,
+                              wgs_only_findings_value=12_000)
+    assert w["why_retrospective_is_zero"] == ""
+    assert w["retrospective_value"] == 12_000
+
+
+def test_array_blindness_to_monogenic_disease_drives_the_value():
+    # If arrays detected monogenic variants well, sequencing would add little.
+    # This is the mechanism, and it should be visible in the arithmetic.
+    with ep.overridden({"chip_detection_share_monogenic": 0.95}):
+        good_chip = ed.wgs_marginal_value()
+    with ep.overridden({"chip_detection_share_monogenic": 0.05}):
+        blind_chip = ed.wgs_marginal_value()
+    assert blind_chip["secondary_findings_value"] > \
+        good_chip["secondary_findings_value"] * 5
+
+
+def test_pharmacogenomics_does_not_dominate_the_prospective_estimate():
+    # PGx has by far the highest prevalence of any category. Counting it
+    # undiscounted would make sequencing look far more valuable than it is,
+    # because consumer arrays already type the main CPIC star alleles.
+    w = ed.wgs_marginal_value()
+    assert w["pgx_incremental_value"] < w["secondary_findings_value"], (
+        "pharmacogenomics is mostly already covered by an array and must not "
+        "dominate the case for sequencing")
+
+
+def test_higher_yield_raises_the_value_and_lowers_the_number_needed():
+    low = ed.wgs_marginal_value()
+    with ep.overridden({"wgs_yield_acmg_secondary": 0.04}):
+        high = ed.wgs_marginal_value()
+    assert high["gross_expected_value"] > low["gross_expected_value"]
+    assert high["number_needed_to_sequence"] < low["number_needed_to_sequence"]
+
+
+def test_sequencing_stops_being_worth_it_if_it_costs_enough():
+    cheap = ed.wgs_marginal_value(chip_cost=100, wgs_cost=300)
+    dear = ed.wgs_marginal_value(chip_cost=100, wgs_cost=5_000)
+    assert cheap["worth_it"] is True
+    assert dear["worth_it"] is False
+    assert "is not worth it" in dear["plain"]
+
+
+def test_yield_parameters_are_registered_with_provenance():
+    for key in ("wgs_yield_acmg_secondary", "chip_detection_share_monogenic",
+                "chip_pgx_coverage", "wgs_yield_carrier_expanded"):
+        p = ep.get(key)
+        assert p.tier in ep.TIERS
+        if p.tier != "assumption":
+            assert p.citation, f"{key} needs a citation"
+
+
+def test_prospective_estimate_warns_that_the_average_hides_the_distribution():
+    # An expected value is the right basis for a policy decision and a poor
+    # guide to a personal one. Saying so is the difference between an honest
+    # number and a misleading one.
+    w = ed.wgs_marginal_value()
+    assert "skewed" in w["caveat"]
+    assert "policy decision" in w["caveat"]
+
+
+def test_penetrance_used_is_ascertainment_corrected():
+    # Using family-series penetrance here would inflate the value of every
+    # secondary finding, which is the error this project already fixed once.
+    w = ed.wgs_marginal_value()
+    raw = (ep.value("brca2_penetrance_population")
+           * ep.value("coi_pathogenic_generic")
+           * ep.value("marginal_cost_fraction") * 0.45)
+    assert w["value_per_finding"] < raw * 2, (
+        "value per finding looks too high for a shrunk penetrance")

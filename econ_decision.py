@@ -560,3 +560,123 @@ def analyze_decision_layer(rebuild: Callable[[], Dict], *,
         out["distributional"] = distributional_cea(by_age, gains)
 
     return out
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Is sequencing worth buying? (prospective, not retrospective)
+# ══════════════════════════════════════════════════════════════════════════
+
+def wgs_marginal_value(*, chip_findings_present: bool = True,
+                       wgs_only_findings_value: float = 0.0,
+                       n_wgs_only_findings: int = 0,
+                       wtp: Optional[float] = None,
+                       chip_cost: Optional[float] = None,
+                       wgs_cost: Optional[float] = None) -> Dict:
+    """Expected value of sequencing over a genotyping array, before buying it.
+
+    THE PROBLEM THIS SOLVES. The report's ``marginal_chip_to_wgs`` figure sums
+    the modelled value of findings tagged ``wgs_only``. Those findings come
+    only from a VCF, so on chip input there are none and the figure is $0 —
+    every time, for everybody. That is not the finding it looks like. It says
+    "your array data contains no sequencing-only findings", which is true by
+    construction and answers a question nobody asked.
+
+    The question someone actually asks before paying for sequencing is
+    prospective: *what is it likely to find that my array did not?* That
+    cannot be answered by counting findings in data that does not exist. It
+    can be answered from published yields, which is what this does.
+
+    Three things drive the answer, and the second is the one people miss:
+
+    1. **Secondary findings.** Around 2% of unselected adults carry a
+       reportable pathogenic variant in an ACMG actionable gene.
+    2. **Arrays barely detect monogenic disease at all.** They type fixed
+       positions — the authorised consumer BRCA report covers three founder
+       variants out of thousands known — so a reassuring array result is
+       close to uninformative. Most of sequencing's value is here, not in
+       finding something new about a gene the array already "covered".
+    3. **Pharmacogenomics is mostly already covered.** It has by far the
+       highest prevalence, so leaving it in undiscounted would make
+       sequencing look far more valuable than it is.
+    """
+    wtp = ep.value("wtp_per_qaly") if wtp is None else float(wtp)
+    chip_cost = ep.value("cost_chip") if chip_cost is None else float(chip_cost)
+    wgs_cost = ep.value("cost_wgs") if wgs_cost is None else float(wgs_cost)
+
+    yield_acmg = ep.value("wgs_yield_acmg_secondary")
+    chip_share = ep.value("chip_detection_share_monogenic")
+    pgx_cov = ep.value("chip_pgx_coverage")
+    mcf = ep.value("marginal_cost_fraction")
+
+    # Value of ONE actionable monogenic finding, acted on. Penetrance is the
+    # ascertainment-corrected figure, not the family-series one.
+    penetrance = (ep.value("brca2_penetrance_population")
+                  * ep.value("ascertainment_shrinkage"))
+    rrr = 0.45
+    coi = ep.value("coi_pathogenic_generic") * mcf
+    qaly = ep.value("qaly_loss_pathogenic_generic")
+    horizon = 30.0
+    disc = 1.0 / (1.0 + ep.value("discount_rate")) ** (horizon / 2.0)
+    value_per_finding = ((penetrance * rrr * coi * disc)
+                         + (penetrance * rrr * qaly * wtp * disc)
+                         - ep.value("intervention_cost_monogenic"))
+
+    # Incremental detection: the share of pathogenic variants the array misses.
+    incremental_yield = yield_acmg * (1.0 - chip_share)
+    secondary_value = incremental_yield * max(0.0, value_per_finding)
+
+    # Pharmacogenomics: high prevalence, but mostly already on the array.
+    pgx_value_per_person = 250.0        # modest, and mostly captured already
+    pgx_incremental = pgx_value_per_person * (1.0 - pgx_cov)
+
+    gross = secondary_value + pgx_incremental
+    incremental_cost = wgs_cost - chip_cost
+    net = gross - incremental_cost
+
+    nns = (1.0 / incremental_yield) if incremental_yield > 0 else None
+    return {
+        "available": True,
+        "basis": "prospective",
+        "expected_incremental_yield": round(incremental_yield, 5),
+        "number_needed_to_sequence": (int(round(nns)) if nns else None),
+        "value_per_finding": round(value_per_finding),
+        "secondary_findings_value": round(secondary_value),
+        "pgx_incremental_value": round(pgx_incremental),
+        "gross_expected_value": round(gross),
+        "incremental_cost": round(incremental_cost),
+        "net_expected_value": round(net),
+        "worth_it": net > 0,
+        "wtp": round(wtp),
+        "retrospective_value": round(wgs_only_findings_value),
+        "n_wgs_only_findings": int(n_wgs_only_findings),
+        "why_retrospective_is_zero": (
+            "The report's other sequencing figure counts the value of "
+            "findings your data actually contains that only sequencing can "
+            "produce. Array data contains none by construction, so that "
+            "figure is $0 for everyone with an array — it is a statement "
+            "about the input file, not about whether sequencing is worth "
+            "buying."
+            if n_wgs_only_findings == 0 else ""),
+        "plain": (
+            f"Sequencing is expected to turn up a serious, actionable "
+            f"inherited finding that your array missed in roughly 1 person in "
+            f"{int(round(nns)):,}. Averaged over everyone, that is worth about "
+            f"${round(gross):,} against an extra "
+            f"${round(incremental_cost):,} to buy — so on these numbers it "
+            f"{'is' if net > 0 else 'is not'} worth it, "
+            f"{'by about $' + format(round(abs(net)), ',') + ' per person.' if net > 0 else 'falling short by about $' + format(round(abs(net)), ',') + ' per person.'}"
+            if nns else "Not estimable."),
+        "caveat": (
+            "This is an average over a population, and the distribution is "
+            "extremely skewed: the great majority of people get nothing, and "
+            "a small number get something that changes their care "
+            "substantially. An expected value is the right basis for a "
+            "policy decision and a poor guide to a personal one — if you "
+            "would want to know, the average does not capture that."),
+        "biggest_driver": (
+            "Most of this comes from arrays being nearly blind to monogenic "
+            "disease rather than from sequencing finding exotic things. An "
+            "array types a fixed list of positions; a normal result for a "
+            "gene it 'covers' rules out only the specific variants it looks "
+            "at."),
+    }

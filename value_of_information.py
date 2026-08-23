@@ -955,6 +955,19 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
             _pooled["decision"] = {"available": False, "reason": repr(_de)}
             _degraded.append(("decision_layer", repr(_de)))
 
+        # Is sequencing worth buying? The `marginal_chip_to_wgs` figure above
+        # counts sequencing-only findings PRESENT IN THIS FILE, which for
+        # array input is structurally zero and says nothing about whether
+        # sequencing is worth buying. This answers that prospectively.
+        try:
+            _n_wgs = sum(1 for f in findings if f.get("wgs_only"))
+            _pooled["wgs_decision"] = _ed.wgs_marginal_value(
+                wgs_only_findings_value=wgs_only_value,
+                n_wgs_only_findings=_n_wgs, wtp=wtp)
+        except Exception as _we:
+            _pooled["wgs_decision"] = {"available": False, "reason": repr(_we)}
+            _degraded.append(("wgs_decision", repr(_we)))
+
         # Plain-language layer. Everything above is defensible and unreadable
         # to anyone who has not done a health-economics course; a result
         # nobody can read is not a result.
