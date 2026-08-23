@@ -2427,17 +2427,25 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
 
     cea = p.get("cea") or {}
     dc = p.get("double_counting") or {}
+    adh = p.get("adherence") or {}
     prov = p.get("provenance") or {}
 
     # ── Per-condition table, with the correction made visible ──
     rows = ""
     for c in sorted(p.get("conditions") or [],
                     key=lambda r: r.get("inmb", 0), reverse=True):
-        naive, pooled = c.get("naive_additive_rrr", 0), c.get("combined_rrr", 0)
+        # Three tiers, in the order the corrections are applied: what naive
+        # addition would have claimed, what the pooled trial evidence supports,
+        # and what this cohort would actually realise. Showing only the last
+        # would hide two judgement calls behind one number.
+        naive = c.get("naive_additive_rrr", 0)
+        eff = c.get("pooled_efficacy_rrr", c.get("combined_rrr", 0))
+        pooled = c.get("combined_rrr", 0)
         stacked = c.get("n_findings", 0) > 1
-        corr = (f'<span style="color:#b06a00">{naive:.0%} &rarr; '
-                f'<strong>{pooled:.0%}</strong></span>' if stacked
-                else f"{pooled:.0%}")
+        steps = ([f"{naive:.0%}"] if stacked else []) + [f"{eff:.0%}"]
+        corr = (f'<span style="color:#b06a00">{" &rarr; ".join(steps)} &rarr; '
+                f'<strong>{pooled:.0%}</strong></span>'
+                if stacked or eff > pooled else f"{pooled:.0%}")
         srcs = ", ".join(c.get("sources") or []) or "&mdash;"
         rows += f"""
 <tr style="border-bottom:1px solid #f0f2f5">
@@ -2446,6 +2454,9 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
   <td style="text-align:right;padding:5px 4px">{c.get('n_findings',0)}</td>
   <td style="text-align:right;padding:5px 4px">{c.get('baseline_risk',0):.1%}</td>
   <td style="text-align:right;padding:5px 4px">{corr}</td>
+  <td style="text-align:right;padding:5px 4px">{c.get('adherence', 1):.0%}
+    <div style="font-size:.72em;color:#8a94a3">{_esc(
+      (c.get('adherence_archetype') or '').replace('adherence_', ''))}</div></td>
   <td style="text-align:right;padding:5px 4px">{money(c.get('cost_averted'))}</td>
   <td style="text-align:right;padding:5px 4px">{c.get('qaly_gained',0):.3f}</td>
   <td style="text-align:right;padding:5px 4px">{money(c.get('inmb'))}</td>
@@ -2468,6 +2479,29 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
     <strong>{money(dc.get('pooled_cost_averted'))}</strong>, removing
     <strong>{money(dc.get('inflation_removed'))}</strong>
     ({dc.get('pct_removed', 0)}%).</div>
+</div>"""
+
+    # ── Efficacy vs. effectiveness ──
+    if adh.get("qaly_lost_to_non_adherence", 0) > 0:
+        corr_html += f"""
+<div style="border:1px solid #d8e2ee;background:#f7fafd;border-radius:10px;
+            padding:12px 14px;margin:12px 0">
+  <div style="font-weight:700;color:#2f5d8a">Adherence: trial efficacy vs. real-world
+    effectiveness</div>
+  <div style="font-size:.87em;color:#425468;margin-top:5px">
+    Every effect size above is measured in people who followed a protocol. Roughly half
+    of people stop long-term preventive medication, and sustained behaviour change fares
+    worse than that. Charged against the benefit, that gap costs
+    <strong>{adh.get('qaly_lost_to_non_adherence', 0):.3f} QALYs</strong> and
+    <strong>{money(adh.get('value_lost_to_non_adherence'))}</strong> of avoided cost
+    &mdash; <strong>{adh.get('pct_of_benefit_lost', 0)}%</strong> of what the trials
+    promise. The ongoing intervention cost is discounted by the same factor, because
+    someone who stops taking a statin stops paying for it; the one-off
+    {money(adh.get('fixed_test_cost'))} test cost is not, which is why the cost per QALY
+    worsens even though the intervention's own value for money barely moves.</div>
+  <div style="font-size:.78em;color:#7b8794;margin-top:6px">
+    {_esc(adh.get('src', ''))}. Screening uptake and behavioural maintenance are
+    declared assumptions, varied in the sensitivity analysis.</div>
 </div>"""
 
     # ── Disaggregated headline: cost and health kept apart ──
@@ -2769,6 +2803,7 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
       <th style="text-align:right">Findings</th>
       <th style="text-align:right">Baseline risk</th>
       <th style="text-align:right">Risk reduction</th>
+      <th style="text-align:right">Adherence</th>
       <th style="text-align:right">Cost averted</th>
       <th style="text-align:right">QALYs</th>
       <th style="text-align:right">NMB</th></tr></thead>

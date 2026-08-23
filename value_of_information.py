@@ -843,22 +843,33 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
     try:
         import econ_engine as _ee
         _age = _resolve_age(genetic_age_result)
-        _ee_findings = [
-            _ee.Finding(label=f["label"], coi_key=f.get("coi_key", ""),
-                        p_event=float(f.get("p_event", 0.0) or 0.0),
-                        rrr=float(f.get("rrr", 0.0) or 0.0),
-                        haircut=float(f.get("haircut", 1.0) or 1.0),
-                        intervention_cost=float(f.get("intervention", 0.0) or 0.0),
-                        confidence=f.get("confidence", "moderate"),
-                        source_category=f.get("source_category", ""),
-                        # Only a QALY figure the source actually stated may
-                        # override the registry's per-condition anchor.
-                        qaly_override=(float(f["qaly"])
-                                       if f.get("qaly_explicit")
-                                       and f.get("qaly") is not None
-                                       else None))
-            for f in findings if f.get("kind") == "coi" and f.get("coi_key")
-        ]
+        # One constructor, used by the base case and by every PSA draw. These
+        # were two copies of the same argument list, and the last time they
+        # drifted the sampled parameters stayed pinned at their base values and
+        # the model reported an interval far narrower than the real one.
+        def _mk(f):
+            return _ee.Finding(
+                label=f["label"], coi_key=f.get("coi_key", ""),
+                p_event=float(f.get("p_event", 0.0) or 0.0),
+                rrr=float(f.get("rrr", 0.0) or 0.0),
+                haircut=float(f.get("haircut", 1.0) or 1.0),
+                intervention_cost=float(f.get("intervention", 0.0) or 0.0),
+                confidence=f.get("confidence", "moderate"),
+                source_category=f.get("source_category", ""),
+                # Trial efficacy becomes real-world effectiveness here.
+                adherence=_ee.adherence_for(f.get("coi_key", "")),
+                # Only a QALY figure the source actually stated may
+                # override the registry's per-condition anchor.
+                qaly_override=(float(f["qaly"])
+                               if f.get("qaly_explicit")
+                               and f.get("qaly") is not None
+                               else None))
+
+        def _mk_all(fs):
+            return [_mk(f) for f in fs
+                    if f.get("kind") == "coi" and f.get("coi_key")]
+
+        _ee_findings = _mk_all(findings)
         _pools = _ee.pool_findings(_ee_findings)
         _pooled = _ee.evaluate_pools(_pools, wtp=wtp, test_cost=test_cost)
         _pooled["validation"] = _ee.validate_model(_pools, _pooled)
@@ -879,19 +890,7 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
         def _rebuild():
             _fs = _collect(economics_result, clinical_variants_result,
                            novel_variants_result, unvalued=None)
-            return _ee.pool_findings([
-                _ee.Finding(label=f["label"], coi_key=f.get("coi_key", ""),
-                            p_event=float(f.get("p_event", 0.0) or 0.0),
-                            rrr=float(f.get("rrr", 0.0) or 0.0),
-                            haircut=float(f.get("haircut", 1.0) or 1.0),
-                            intervention_cost=float(f.get("intervention", 0.0) or 0.0),
-                            confidence=f.get("confidence", "moderate"),
-                            source_category=f.get("source_category", ""),
-                            qaly_override=(float(f["qaly"])
-                                           if f.get("qaly_explicit")
-                                           and f.get("qaly") is not None
-                                           else None))
-                for f in _fs if f.get("kind") == "coi" and f.get("coi_key")])
+            return _ee.pool_findings(_mk_all(_fs))
 
         _pooled["psa"] = _ee.run_psa(_pools, n=1500, test_cost=test_cost,
                                      wtp=wtp, rebuild=_rebuild)

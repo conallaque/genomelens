@@ -104,7 +104,15 @@ def test_most_of_the_model_is_sourced():
     # assumption is the point. What must stay true is that each one is
     # individually justified and that they remain a small minority of the
     # model — both checked below and in test_whole_model_provenance.
-    assert burden["n_assumption"] <= 12, (
+    #
+    # Then the adherence archetypes took it to 13. Only the pharmacological
+    # figure has a source worth naming; screening uptake and behavioural
+    # maintenance are anchored on ranges rather than on a study, and inventing
+    # a PMID to move them into the sourced column is exactly the failure this
+    # registry exists to prevent. The proportional bound above is the one that
+    # matters and it did not move — this count is a ratchet on carelessness,
+    # not a budget to spend.
+    assert burden["n_assumption"] <= 13, (
         "declared assumptions are allowed but should stay few and "
         "individually justified")
     for p in ep.assumptions():

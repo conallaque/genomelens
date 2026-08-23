@@ -52,6 +52,7 @@ __all__ = [
     "pool_findings", "evaluate_pools", "run_markov", "life_table",
     "incremental_analysis", "dual_perspective", "impact_inventory",
     "cheers_checklist", "validate_model", "COI_KEY_TO_PARAM",
+    "ADHERENCE_BY_COI_KEY", "adherence_for",
     "simpson_weights", "discount_weights",
     "deduplicate_by_target", "DEFAULT_GENE_VOCABULARY",
     "run_psa", "ceac", "tornado",
@@ -88,6 +89,41 @@ COI_KEY_TO_PARAM: Dict[str, Tuple[str, str]] = {
 }
 
 
+# Every relative risk reduction in this model is trial efficacy — the effect
+# when the protocol is followed. Real cohorts do not follow protocols: roughly
+# half of people stop long-term preventive medication. Until this map existed
+# the model ran at implicit 100% adherence, which is not a conservative
+# simplification but a systematic overstatement of every benefit it reports.
+#
+# Conditions are assigned to one of three archetypes by what acting on the
+# finding actually requires of the person, since that — not the disease — is
+# what predicts whether they keep doing it.
+ADHERENCE_BY_COI_KEY: Dict[str, str] = {
+    # coi_key            registry key           what acting requires
+    "CAD":               "adherence_pharmacological",   # statin, daily
+    "T2D":               "adherence_lifestyle",         # diet and exercise
+    "Alzheimer":         "adherence_lifestyle",         # activity, hearing, BP
+    "Depression":        "adherence_pharmacological",   # SSRI, daily
+    "SubstanceUse":      "adherence_lifestyle",         # sustained abstinence
+    "Autoimmune":        "adherence_screening",         # periodic monitoring
+    "Urologic":          "adherence_lifestyle",         # hydration, diet
+    "IronOverload":      "adherence_screening",         # ferritin surveillance
+    "Colorectal":        "adherence_screening",         # colonoscopy programme
+    "BreastOvarian":     "adherence_screening",         # imaging surveillance
+    "Pathogenic":        "adherence_screening",         # specialist follow-up
+}
+
+
+def adherence_for(coi_key: str) -> float:
+    """Real-world adherence multiplier for a condition's intervention.
+
+    Falls back to ``adherence_default`` rather than to 1.0: an unmapped
+    condition is a gap in the map, and defaulting it to perfect adherence
+    would make the gap invisible by making it flattering.
+    """
+    return float(ep.value(ADHERENCE_BY_COI_KEY.get(coi_key, "adherence_default")))
+
+
 # ══════════════════════════════════════════════════════════════════════════
 # Inputs
 # ══════════════════════════════════════════════════════════════════════════
@@ -102,6 +138,11 @@ class Finding:
     distinction between ``haircut`` (how much to believe the source) and
     ``rrr`` (how much acting helps) is deliberate: they were previously
     entangled in one multiplier.
+
+    ``adherence`` is the third and last term, and it answers a different
+    question again: not whether the evidence is good or the effect is large,
+    but whether the person keeps doing the thing. Efficacy times adherence is
+    effectiveness, and effectiveness is what a payer buys.
     """
 
     label: str
@@ -113,12 +154,23 @@ class Finding:
     confidence: str = "moderate"
     source_category: str = ""
     qaly_override: Optional[float] = None
+    adherence: float = 1.0
+
+    @property
+    def efficacy_rrr(self) -> float:
+        """Risk reduction under the trial protocol, once the source's evidence
+        strength is applied but before real-world adherence. Bounded to [0, 1).
+
+        Kept separate from :attr:`effective_rrr` so the report can show the
+        efficacy-to-effectiveness gap as its own line rather than folding it
+        into the pooling correction, where it would be invisible.
+        """
+        return max(0.0, min(0.999, float(self.rrr) * float(self.haircut)))
 
     @property
     def effective_rrr(self) -> float:
-        """Risk reduction this finding supports once the source's evidence
-        strength is applied. Bounded to [0, 1)."""
-        return max(0.0, min(0.999, float(self.rrr) * float(self.haircut)))
+        """Risk reduction expected in a real cohort: efficacy times adherence."""
+        return max(0.0, min(0.999, self.efficacy_rrr * float(self.adherence)))
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -146,16 +198,50 @@ class ConditionPool:
     findings: List[Finding] = field(default_factory=list)
 
     # ── combination ─────────────────────────────────────────────────────
-    def combined_rrr(self) -> float:
-        if not self.findings:
+    @staticmethod
+    def _combine(values: List[float]) -> float:
+        """Complement-of-products with the correlated-signal penalty and cap.
+
+        Factored out so the same rule can be applied to efficacy and to
+        effectiveness. Scaling the pooled result by adherence afterwards would
+        not give the same answer — the combination is non-linear — so the
+        discount has to enter before the product, not after it.
+        """
+        if not values:
             return 0.0
         penalty = ep.value("correlated_signal_penalty")
         cap = ep.value("max_combined_rrr")
-        ranked = sorted(self.findings, key=lambda f: f.effective_rrr, reverse=True)
         surviving = 1.0
-        for i, f in enumerate(ranked):
-            surviving *= (1.0 - f.effective_rrr * (penalty ** i))
+        for i, v in enumerate(sorted(values, reverse=True)):
+            surviving *= (1.0 - v * (penalty ** i))
         return min(cap, 1.0 - surviving)
+
+    def combined_rrr(self) -> float:
+        """Pooled risk reduction as a real cohort would realise it."""
+        return self._combine([f.effective_rrr for f in self.findings])
+
+    def pooled_efficacy_rrr(self) -> float:
+        """Pooled risk reduction if everyone followed the protocol.
+
+        The difference between this and :meth:`combined_rrr` is the whole cost
+        of imperfect adherence, isolated from every other correction.
+        """
+        return self._combine([f.efficacy_rrr for f in self.findings])
+
+    def adherence(self) -> float:
+        """The pool's adherence multiplier.
+
+        Adherence is assigned per condition, so every finding in a pool shares
+        one value and scaling the pool's cost by it is well defined. The
+        assertion records that invariant: if adherence ever becomes per-finding,
+        ``intervention_cost`` below has to change with it.
+        """
+        if not self.findings:
+            return 1.0
+        vals = {round(float(f.adherence), 6) for f in self.findings}
+        assert len(vals) == 1, (
+            f"{self.coi_key}: adherence must be uniform within a pool, got {vals}")
+        return vals.pop()
 
     def baseline_risk(self) -> float:
         """One baseline probability for the condition, not one per finding.
@@ -179,7 +265,12 @@ class ConditionPool:
         """
         if not self.findings:
             return 0.0
-        return max(float(f.intervention_cost or 0.0) for f in self.findings)
+        raw = max(float(f.intervention_cost or 0.0) for f in self.findings)
+        # Scaled by adherence for the same reason the benefit is: someone who
+        # stops taking the statin at month six stops paying for it. Costing the
+        # full course while crediting only the adhered fraction of the benefit
+        # would be the mirror-image error of the one this model set out to fix.
+        return raw * self.adherence()
 
     def qaly_loss(self) -> float:
         overrides = [f.qaly_override for f in self.findings
@@ -200,7 +291,7 @@ class ConditionPool:
         Kept so the report can show the size of the correction rather than
         quietly banking it.
         """
-        return sum(f.effective_rrr for f in self.findings)
+        return sum(f.efficacy_rrr for f in self.findings)
 
     def to_dict(self) -> Dict:
         return {
@@ -210,9 +301,18 @@ class ConditionPool:
             "sources": sorted({f.source_category for f in self.findings if f.source_category}),
             "baseline_risk": round(self.baseline_risk(), 4),
             "combined_rrr": round(self.combined_rrr(), 4),
+            "pooled_efficacy_rrr": round(self.pooled_efficacy_rrr(), 4),
             "naive_additive_rrr": round(self.naive_sum_rrr(), 4),
+            # Two corrections, two numbers. Pooling is measured at full
+            # adherence and adherence is measured after pooling, so neither
+            # absorbs the other and the pair sums to the total correction.
             "double_count_avoided": round(
-                max(0.0, self.naive_sum_rrr() - self.combined_rrr()), 4),
+                max(0.0, self.naive_sum_rrr() - self.pooled_efficacy_rrr()), 4),
+            "adherence": round(self.adherence(), 4),
+            "adherence_archetype": ADHERENCE_BY_COI_KEY.get(
+                self.coi_key, "adherence_default"),
+            "adherence_drag_rrr": round(
+                max(0.0, self.pooled_efficacy_rrr() - self.combined_rrr()), 4),
             "coi_cost": round(self.coi_cost()),
             "qaly_loss": round(self.qaly_loss(), 3),
             "intervention_cost": round(self.intervention_cost()),
@@ -437,6 +537,7 @@ def evaluate_pools(pools: Dict[str, ConditionPool],
     rows: List[Dict] = []
     tot_cost_averted = tot_qaly = tot_intervention = 0.0
     tot_naive_cost_averted = 0.0
+    tot_efficacy_cost_averted = tot_efficacy_qaly = 0.0
 
     for key in sorted(pools):
         pool = pools[key]
@@ -452,10 +553,17 @@ def evaluate_pools(pools: Dict[str, ConditionPool],
 
         naive_cases = p0 * min(1.0, pool.naive_sum_rrr())
         naive_cost_averted = naive_cases * coi * mcf * disc
+        # The same arithmetic at full adherence, so the report can separate the
+        # two corrections instead of showing one combined shrinkage.
+        eff_cases = p0 * pool.pooled_efficacy_rrr()
+        efficacy_cost_averted = eff_cases * coi * mcf * disc
+        efficacy_qaly = eff_cases * qloss * disc
 
         tot_cost_averted += cost_averted
         tot_qaly += qaly_gained
         tot_intervention += intervention
+        tot_efficacy_cost_averted += efficacy_cost_averted
+        tot_efficacy_qaly += efficacy_qaly
         tot_naive_cost_averted += naive_cost_averted
 
         d = pool.to_dict()
@@ -465,6 +573,8 @@ def evaluate_pools(pools: Dict[str, ConditionPool],
             "qaly_gained": round(qaly_gained, 4),
             "inmb": round(qaly_gained * wtp + cost_averted - intervention),
             "naive_cost_averted": round(naive_cost_averted),
+            "efficacy_cost_averted": round(efficacy_cost_averted),
+            "efficacy_qaly_gained": round(efficacy_qaly, 4),
             "inflation_removed": round(naive_cost_averted - cost_averted),
         })
         rows.append(d)
@@ -487,6 +597,35 @@ def evaluate_pools(pools: Dict[str, ConditionPool],
         "available": bool(rows),
         "conditions": rows,
         "cea": result.to_dict(),
+        # Efficacy is what the trials measured; effectiveness is what this
+        # cohort would actually get. Reporting only the second hides the size
+        # of the assumption; reporting only the first is the overstatement the
+        # model previously shipped.
+        "adherence": {
+            "efficacy_cost_averted": round(tot_efficacy_cost_averted),
+            "effectiveness_cost_averted": round(tot_cost_averted),
+            "efficacy_qaly": round(tot_efficacy_qaly, 4),
+            "effectiveness_qaly": round(tot_qaly, 4),
+            "value_lost_to_non_adherence": round(
+                tot_efficacy_cost_averted - tot_cost_averted),
+            "qaly_lost_to_non_adherence": round(
+                tot_efficacy_qaly - tot_qaly, 4),
+            "pct_of_benefit_lost": (
+                round(100.0 * (tot_efficacy_qaly - tot_qaly) / tot_efficacy_qaly, 1)
+                if tot_efficacy_qaly > 0 else 0.0),
+            # The fixed test cost does not shrink with adherence, so it is
+            # spread over fewer realised QALYs. That, not the intervention's
+            # own cost per QALY, is why the ICER moves.
+            "fixed_test_cost": round(test_cost),
+            "archetypes": sorted({
+                ADHERENCE_BY_COI_KEY.get(r["condition"], "adherence_default")
+                for r in rows}),
+            "note": ("Effect sizes are trial efficacy; this cohort is charged "
+                     "real-world adherence on both the benefit and the ongoing "
+                     "intervention cost. The one-off test cost is not scaled."),
+            "src": ("WHO (2003), Adherence to Long-Term Therapies: Evidence "
+                    "for Action"),
+        },
         "double_counting": {
             "naive_cost_averted": round(tot_naive_cost_averted),
             "pooled_cost_averted": round(tot_cost_averted),

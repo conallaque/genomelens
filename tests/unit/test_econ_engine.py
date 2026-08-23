@@ -590,3 +590,144 @@ def test_dementia_costs_more_quality_of_life_than_kidney_stones():
     urologic = ep.value(ee.COI_KEY_TO_PARAM["Urologic"][1])
     assert dementia > urologic * 3, (
         f"dementia decrement {dementia} vs urologic {urologic} — implausible")
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Adherence — efficacy vs. effectiveness
+# ══════════════════════════════════════════════════════════════════════════
+
+def _adh_findings(adherence, coi_key="CAD"):
+    """Two CAD findings differing only in the adherence multiplier."""
+    return [
+        ee.Finding(label="statin", coi_key=coi_key, p_event=0.20, rrr=0.27,
+                   haircut=1.0, intervention_cost=400.0, adherence=adherence),
+        ee.Finding(label="prs", coi_key=coi_key, p_event=0.15, rrr=0.20,
+                   haircut=0.8, intervention_cost=200.0, adherence=adherence),
+    ]
+
+
+def test_perfect_adherence_reproduces_the_pre_adherence_model():
+    # The regression guard. Adherence must be a multiplier that vanishes at
+    # 1.0, not a re-derivation that shifts the answer even when nobody stops.
+    # Note this constructs Findings explicitly rather than wrapping a
+    # pre-built pool in ep.overridden — adherence is fixed on the instance at
+    # construction, so an override around an existing pool reaches nothing and
+    # the test would pass without testing anything.
+    pool = ee.pool_findings(_adh_findings(1.0))["CAD"]
+    assert pool.combined_rrr() == pytest.approx(pool.pooled_efficacy_rrr())
+    assert pool.adherence() == 1.0
+    for f in pool.findings:
+        assert f.effective_rrr == pytest.approx(f.efficacy_rrr)
+
+
+def test_adherence_reduces_the_realised_benefit():
+    half = ee.pool_findings(_adh_findings(0.5))["CAD"]
+    full = ee.pool_findings(_adh_findings(1.0))["CAD"]
+    assert half.combined_rrr() < full.combined_rrr()
+    assert half.pooled_efficacy_rrr() == pytest.approx(full.pooled_efficacy_rrr()), \
+        "efficacy is a property of the evidence and must not move with adherence"
+
+
+def test_adherence_is_applied_before_the_product_not_after():
+    # Adherence attenuates each intervention's own effect, and the attenuated
+    # effects then combine — so the discount belongs inside the product. The
+    # combination rule is concave, which means the two orderings genuinely
+    # differ and the correct one is the slightly LESS conservative of the two.
+    # Pinning the direction here so nobody "fixes" it toward the smaller
+    # number on the assumption that smaller means safer.
+    half = ee.pool_findings(_adh_findings(0.5))["CAD"]
+    post_scaling = 0.5 * half.pooled_efficacy_rrr()
+    assert half.combined_rrr() > post_scaling
+    assert half.combined_rrr() == pytest.approx(post_scaling, rel=0.05), \
+        "the two orderings should differ modestly, not by an order of magnitude"
+
+
+def test_the_pooling_correction_does_not_absorb_the_adherence_discount():
+    # Both are shrinkages of the same headline. If double_count_avoided were
+    # measured against the adherence-discounted figure it would silently grow,
+    # and the report's "size of the double-counting correction" banner would
+    # be reporting two different things under one label.
+    half = ee.pool_findings(_adh_findings(0.5))["CAD"]
+    full = ee.pool_findings(_adh_findings(1.0))["CAD"]
+    assert half.to_dict()["double_count_avoided"] == \
+        pytest.approx(full.to_dict()["double_count_avoided"])
+    assert half.to_dict()["adherence_drag_rrr"] > 0
+    assert full.to_dict()["adherence_drag_rrr"] == pytest.approx(0.0)
+
+
+def test_the_two_corrections_sum_to_the_total_shrinkage():
+    d = ee.pool_findings(_adh_findings(0.5))["CAD"].to_dict()
+    total = d["naive_additive_rrr"] - d["combined_rrr"]
+    assert d["double_count_avoided"] + d["adherence_drag_rrr"] == \
+        pytest.approx(total, abs=1e-4)
+
+
+def test_intervention_cost_scales_with_adherence():
+    # The cost side has to move with the benefit side. Charging the full
+    # course while crediting half the effect is the mirror image of the
+    # double-count this model was built to remove.
+    half = ee.pool_findings(_adh_findings(0.5))["CAD"]
+    full = ee.pool_findings(_adh_findings(1.0))["CAD"]
+    assert half.intervention_cost() == pytest.approx(0.5 * full.intervention_cost())
+
+
+def test_mixed_adherence_within_a_pool_is_rejected():
+    # intervention_cost() scales the pool by one multiplier. If adherence ever
+    # becomes per-finding that arithmetic is wrong, and this assertion is what
+    # makes the change fail loudly instead of quietly mis-costing.
+    fs = _adh_findings(0.5)
+    fs[1].adherence = 0.9
+    with pytest.raises(AssertionError):
+        ee.pool_findings(fs)["CAD"].intervention_cost()
+
+
+def test_every_valued_condition_has_an_adherence_archetype():
+    # An unmapped condition falls back to adherence_default. That fallback
+    # exists for safety, not as a resting place.
+    missing = set(ee.COI_KEY_TO_PARAM) - set(ee.ADHERENCE_BY_COI_KEY)
+    assert not missing, f"conditions with no adherence archetype: {sorted(missing)}"
+
+
+def test_unmapped_conditions_do_not_default_to_perfect_adherence():
+    assert ee.adherence_for("NotAConditionKey") == pytest.approx(
+        ep.value("adherence_default"))
+    assert ee.adherence_for("NotAConditionKey") < 1.0
+
+
+def test_adherence_archetypes_all_resolve_to_registered_parameters():
+    for key in set(ee.ADHERENCE_BY_COI_KEY.values()) | {"adherence_default"}:
+        assert key in ep.PARAMS, f"{key} is mapped but not registered"
+        assert 0.0 < ep.value(key) <= 1.0
+
+
+def test_report_separates_efficacy_from_effectiveness():
+    ev = ee.evaluate_pools(ee.pool_findings(_adh_findings(0.5)), test_cost=300.0)
+    a = ev["adherence"]
+    assert a["efficacy_qaly"] > a["effectiveness_qaly"] > 0
+    assert a["value_lost_to_non_adherence"] > 0
+    assert 0 < a["pct_of_benefit_lost"] < 100
+
+
+def test_the_fixed_test_cost_is_what_moves_the_icer():
+    # Adherence scales benefit and ongoing cost together, so on its own it
+    # leaves cost-per-QALY roughly alone. The one-off test cost does not
+    # scale, so it amortises over fewer realised QALYs. With no test cost the
+    # ratio should barely move; with one it should get materially worse.
+    def ratio(adh, test_cost):
+        ev = ee.evaluate_pools(ee.pool_findings(_adh_findings(adh)),
+                               test_cost=test_cost)
+        c = ev["cea"]
+        return c["incremental_cost"] / c["incremental_qaly"]
+
+    free_gap = abs(ratio(0.5, 0.0) - ratio(1.0, 0.0))
+    paid_gap = abs(ratio(0.5, 300.0) - ratio(1.0, 300.0))
+    assert paid_gap > free_gap * 5, (
+        "the adherence penalty to cost-effectiveness should come from the "
+        "unscaled fixed test cost, not from the intervention itself")
+
+
+def test_adherence_parameters_are_varied_in_sensitivity_analysis():
+    # A parameter this influential cannot be a pinned point estimate.
+    sampleable = {p.key for p in ep.sampleable()}
+    for key in set(ee.ADHERENCE_BY_COI_KEY.values()):
+        assert key in sampleable, f"{key} is held fixed in PSA"

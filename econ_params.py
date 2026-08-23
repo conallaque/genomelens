@@ -721,6 +721,54 @@ _REGISTRY: List[Param] = [
               "Wage Statistics, home health and personal care aides (31-1120)",
        citation="https://www.bls.gov/oes/current/oes311120.htm", year=2024,
        dist="gamma", low=12.0, high=28.0),
+
+    # ── Adherence (efficacy → effectiveness) ─────────────────────────────
+    # Every effect size in this model is trial efficacy: what happens when a
+    # protocol is followed. What a payer buys is effectiveness: what happens
+    # in a population where roughly half of people stop. Running the model at
+    # implicit 100% adherence overstated every benefit by the size of that gap.
+    #
+    # These scale BOTH the effect and the ongoing intervention cost (real-world
+    # effectiveness framing), not the effect alone (intention-to-treat). People
+    # who stop taking a statin stop paying for it. The consequence is the
+    # interesting one: the fixed test cost does NOT scale, so it amortises over
+    # fewer realised QALYs and the ICER worsens even though the intervention's
+    # own cost per unit of benefit is roughly unchanged.
+
+    _p("adherence_pharmacological", 0.50, "proportion", "published",
+       note="Long-term persistence with preventive medication. Applied to "
+            "conditions whose modelled intervention is chronic drug therapy "
+            "(statins, metformin, antidepressants). The 50% figure is the "
+            "headline finding of the WHO review and is consistent with the "
+            "statin discontinuation literature; varied 0.35-0.70.",
+       source="World Health Organization. Adherence to Long-Term Therapies: "
+              "Evidence for Action. Geneva: WHO",
+       citation="https://iris.who.int/handle/10665/42682", year=2003,
+       dist="beta", low=0.35, high=0.70),
+
+    _p("adherence_screening", 0.65, "proportion", "assumption",
+       note="Uptake of a recommended screening or surveillance programme "
+            "(colonoscopy, mammography, ferritin monitoring). Higher than "
+            "chronic drug therapy because the ask is episodic rather than "
+            "daily, but well short of complete: US population screening "
+            "uptake sits in the 60-70% band. Anchored on that band rather "
+            "than on a single study, so it is declared as judgement.",
+       dist="beta", low=0.45, high=0.85),
+
+    _p("adherence_lifestyle", 0.35, "proportion", "assumption",
+       note="Sustained behaviour change — diet, exercise, alcohol reduction — "
+            "maintained over the horizon. The lowest of the three archetypes "
+            "because maintenance, not initiation, is what the model needs, "
+            "and maintenance attrition in behavioural trials is severe. "
+            "Judgement; varied 0.20-0.55.",
+       dist="beta", low=0.20, high=0.55),
+
+    _p("adherence_default", 0.50, "proportion", "assumption",
+       note="Fallback for a condition with no archetype assigned. Set equal "
+            "to the pharmacological figure so an unmapped condition is "
+            "treated no more optimistically than a mapped one. A condition "
+            "reaching this parameter is a gap in the mapping, not a finding.",
+       dist="beta", low=0.30, high=0.75),
 ]
 
 PARAMS: Dict[str, Param] = {p.key: p for p in _REGISTRY}
