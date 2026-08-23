@@ -2331,28 +2331,20 @@ def _render_decision_layer(d: Optional[Dict]) -> str:
    if fr.get('wgs_not_estimable') else ""}</div></div>"""
 
     # ── Budget impact ──
+    # Deliberately NOT rendered here. The payer budget-impact analysis with
+    # its per-member-per-month figures is already reported in the HEOR
+    # deliverables block below, computed by markov_model under ISPOR
+    # conventions. Showing a second one here gave the reader two answers to
+    # one affordability question.
     bi = d.get("budget_impact") or {}
     if bi.get("available"):
-        brows = "".join(f"""
-<tr><td style="padding:3px 4px">Year {r['year']}</td>
-  <td style="text-align:right;padding:3px 4px">{r['n_tested']:,}</td>
-  <td style="text-align:right;padding:3px 4px">{money(r['programme_cost'])}</td>
-  <td style="text-align:right;padding:3px 4px">{money(r['cost_offset'])}</td>
-  <td style="text-align:right;padding:3px 4px">
-    <strong>{money(r['net_budget_impact'])}</strong></td></tr>"""
-            for r in bi.get("rows", []))
         blocks += f"""
-<div style="margin-top:12px"><div style="font-weight:600;color:#5b6673">
-  Budget impact &mdash; affordability, not value for money</div>
-<table style="width:100%;border-collapse:collapse;font-size:.85em;margin-top:4px">
-  <thead><tr style="text-align:left;color:#5b6673;border-bottom:1px solid #e3e7ec">
-    <th style="padding:4px">Year</th><th style="text-align:right">Tested</th>
-    <th style="text-align:right">Programme cost</th>
-    <th style="text-align:right">Offset</th>
-    <th style="text-align:right">Net</th></tr></thead><tbody>{brows}</tbody></table>
-<div style="font-size:.8em;color:#8a94a3;margin-top:4px">
-  Five-year total <strong>{money(bi.get('total_net'))}</strong> for
-  {bi.get('population', 0):,} members. {_esc(bi.get('note',''))}</div></div>"""
+<div style="margin-top:12px;font-size:.85em;color:#5b6673">
+  <strong>Affordability</strong> is reported separately, under the payer
+  budget-impact analysis further down &mdash; peak
+  <strong>${bi.get('peak_pmpm', 0):.4f}</strong> per member per month in year
+  {bi.get('peak_year', '&mdash;')}. Cost-effectiveness and affordability are
+  different questions and the conventions differ, so they are not merged.</div>"""
 
     # ── Subgroups + equity ──
     sub = d.get("subgroups") or {}

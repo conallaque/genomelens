@@ -318,60 +318,28 @@ def efficiency_frontier(strategies: Sequence[Dict],
 # Budget impact
 # ══════════════════════════════════════════════════════════════════════════
 
-def budget_impact(*, per_person_cost: float, per_person_offset: float,
-                  population: int = 10_000,
-                  uptake: Sequence[float] = (0.05, 0.10, 0.15, 0.20, 0.25),
-                  years: int = 5,
-                  offset_realised_in_horizon: Optional[float] = None) -> Dict:
-    """Undiscounted cash flow to a payer over a short horizon.
+def budget_impact(*, per_person_cost: float = 0.0,
+                  per_person_offset: float = 0.0,
+                  population: int = 1_000_000,
+                  years: int = 5, **kwargs) -> Dict:
+    """Payer affordability — delegates to :mod:`markov_model`.
 
-    Deliberately not a cost-effectiveness analysis. Budget impact asks
-    "can we afford this", answers in nominal dollars without discounting, and
-    over the planning horizon a budget actually uses. A programme can be
-    excellent value per QALY and still be unaffordable this year, and
-    presenting only the first number is how that gets missed.
+    This module briefly carried its own budget-impact implementation, which
+    was a weaker duplicate of one that already existed: ``markov_model``
+    follows the ISPOR BIA conventions properly, ramps offsets as the
+    intervention takes effect rather than applying a flat haircut, and reports
+    per-member-per-month — the metric coverage decisions are actually argued
+    on. Two budget-impact analyses in one report would give a payer two
+    answers to one question, which is the defect this codebase has spent the
+    last several passes removing elsewhere.
 
-    ``offset_realised_in_horizon`` is the fraction of modelled averted cost
-    that actually lands inside the budget window, and it defaults low on
-    purpose. The pooled model's savings accrue over decades; crediting them in
-    full against a five-year budget turns a programme that costs money now
-    into one that appears to save tens of millions. An earlier version of this
-    function did exactly that.
+    Kept as a named entry point so callers here do not have to know which
+    module owns the calculation.
     """
-    if offset_realised_in_horizon is None:
-        offset_realised_in_horizon = ep.value("budget_offset_realised_in_horizon")
-    offset_share = max(0.0, min(1.0, float(offset_realised_in_horizon)))
-    rows: List[Dict] = []
-    cumulative = 0.0
-    for y in range(max(1, int(years))):
-        take = float(uptake[min(y, len(uptake) - 1)]) if uptake else 0.0
-        n = population * take
-        cost = n * per_person_cost
-        offset = n * per_person_offset * offset_share
-        net = cost - offset
-        cumulative += net
-        rows.append({
-            "year": y + 1, "uptake": round(take, 4), "n_tested": round(n),
-            "programme_cost": round(cost), "cost_offset": round(offset),
-            "net_budget_impact": round(net), "cumulative": round(cumulative),
-        })
-    return {
-        "available": True,
-        "population": population,
-        "years": years,
-        "rows": rows,
-        "total_net": round(cumulative),
-        "peak_year_impact": round(max((r["net_budget_impact"] for r in rows),
-                                      default=0)),
-        "offset_realised_in_horizon": offset_share,
-        "note": (f"Nominal dollars, undiscounted, by design — this answers "
-                 f"affordability, not value for money. Uptake is a stated "
-                 f"input. Only {offset_share:.0%} of modelled averted cost is "
-                 f"credited here, because prevention savings accrue over "
-                 f"decades and most fall outside a five-year budget window; "
-                 f"crediting them in full would make the programme look "
-                 f"self-financing when it is not."),
-    }
+    import markov_model as _mk
+    return _mk.budget_impact(plan_members=population,
+                             test_cost=max(0.0, float(per_person_cost)),
+                             horizon_years=int(years))
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -545,8 +513,7 @@ def analyze_decision_layer(rebuild: Callable[[], Dict], *,
     # and the pooled cost offset per person.
     base = ee.evaluate_pools(rebuild(), wtp=wtp, test_cost=test_cost)["cea"]
     out["budget_impact"] = budget_impact(
-        per_person_cost=float(test_cost) + float(base["intervention_cost"]),
-        per_person_offset=float(base["cost_averted"]))
+        per_person_cost=float(test_cost) + float(base["intervention_cost"]))
 
     # Distributional analysis across the age strata the subgroup model just
     # produced: younger groups start with more remaining health, so gains that

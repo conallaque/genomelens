@@ -554,16 +554,6 @@ _REGISTRY: List[Param] = [
     # decided the sign or the substance of a reported result while being
     # invisible to the provenance count, the tornado and EVPPI. By the standard
     # applied to the rest of the model they belong here.
-    _p("budget_offset_realised_in_horizon", 0.15, "fraction", "assumption",
-       note="Share of modelled averted cost that lands inside a five-year "
-            "budget window. Prevention savings accrue over decades, so most "
-            "fall outside it; crediting them in full turns a programme that "
-            "costs a payer money into one that appears self-financing. Set "
-            "low deliberately. Judgement — no published schedule of when "
-            "genomic-prevention savings are realised covers this model's mix "
-            "of conditions.",
-       dist="beta", low=0.02, high=0.50),
-
     _p("inequality_aversion", 11.0, "Atkinson parameter", "assumption",
        note="Strength of preference for reducing health inequality in the "
             "distributional analysis. Values around this magnitude appear in "

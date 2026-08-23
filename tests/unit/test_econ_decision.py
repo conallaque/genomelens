@@ -184,33 +184,47 @@ def test_frontier_recommends_the_highest_net_benefit_option():
 # Budget impact
 # ══════════════════════════════════════════════════════════════════════════
 
-def test_budget_impact_does_not_credit_a_lifetime_of_savings_to_five_years():
-    # An early version credited the full modelled offset inside the budget
-    # window and reported a programme saving $65m, which would have been read
-    # as self-financing. Prevention savings accrue over decades.
-    bi = ed.budget_impact(per_person_cost=2_100, per_person_offset=10_795,
-                          population=10_000)
-    assert bi["offset_realised_in_horizon"] < 0.5
-    assert bi["total_net"] > 0, (
-        "a prevention programme should cost a payer money over five years")
+def test_budget_impact_delegates_rather_than_duplicating():
+    # This module briefly carried its own budget-impact implementation
+    # alongside the one in markov_model, so the report contained two
+    # affordability analyses with different conventions and different answers.
+    # One question, one calculation.
+    import markov_model as mk
+    mine = ed.budget_impact(per_person_cost=300, population=1_000_000)
+    theirs = mk.budget_impact(plan_members=1_000_000, test_cost=300)
+    assert mine["rows"] == theirs["rows"]
+    assert mine["peak_pmpm"] == theirs["peak_pmpm"]
 
 
-def test_budget_impact_is_undiscounted_and_cumulative():
-    bi = ed.budget_impact(per_person_cost=100, per_person_offset=0,
-                          population=1_000, uptake=(0.1, 0.1), years=2)
-    rows = bi["rows"]
-    assert rows[0]["net_budget_impact"] == rows[1]["net_budget_impact"], (
-        "equal uptake in equal years must give equal nominal impact — any "
-        "difference means discounting crept into a budget-impact analysis")
-    assert rows[1]["cumulative"] == rows[0]["cumulative"] * 2
+def test_budget_impact_reports_per_member_per_month():
+    # PMPM is the metric coverage decisions are actually argued on, and the
+    # duplicate implementation did not produce it.
+    bi = ed.budget_impact(per_person_cost=300, population=1_000_000)
+    assert "peak_pmpm" in bi and bi["peak_pmpm"] > 0
+    assert all("pmpm" in r for r in bi["rows"])
 
 
-def test_budget_impact_scales_with_population():
-    small = ed.budget_impact(per_person_cost=100, per_person_offset=10,
-                             population=1_000)
-    big = ed.budget_impact(per_person_cost=100, per_person_offset=10,
-                           population=10_000)
-    assert big["total_net"] == pytest.approx(small["total_net"] * 10, rel=1e-6)
+def test_budget_impact_is_undiscounted():
+    # BIA answers affordability in nominal cash. Discounting it would silently
+    # turn it into a small, wrong cost-effectiveness analysis.
+    bi = ed.budget_impact(per_person_cost=300, population=1_000_000)
+    for r in bi["rows"]:
+        assert r["net_budget_impact"] == (
+            r["cost_testing"] + r["cost_intervention"] - r["offsets"])
+
+
+def test_budget_impact_scales_with_plan_size():
+    small = ed.budget_impact(per_person_cost=300, population=100_000)
+    big = ed.budget_impact(per_person_cost=300, population=1_000_000)
+    assert big["cumulative_net"] == pytest.approx(small["cumulative_net"] * 10,
+                                                  rel=1e-6)
+
+
+def test_prevention_costs_a_payer_money_before_it_saves_any():
+    # Offsets ramp as the intervention takes effect, so year one is pure spend.
+    bi = ed.budget_impact(per_person_cost=300, population=1_000_000)
+    assert bi["rows"][0]["offsets"] == 0
+    assert bi["rows"][0]["net_budget_impact"] > 0
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -348,7 +362,7 @@ def test_every_decision_layer_constant_is_registered():
     # A default argument that decides the sign of a reported result is a
     # parameter, and belongs in the registry with the rest of them.
     import inspect
-    for fn in (ed.budget_impact, ed.distributional_cea, ed.subgroup_analysis):
+    for fn in (ed.distributional_cea, ed.subgroup_analysis):
         for name, prm in inspect.signature(fn).parameters.items():
             if name in ("offset_realised_in_horizon", "inequality_aversion",
                         "annual_incidence"):
@@ -359,13 +373,15 @@ def test_every_decision_layer_constant_is_registered():
 
 
 def test_registered_decision_parameters_drive_the_functions():
-    with ep.overridden({"budget_offset_realised_in_horizon": 0.9}):
-        generous = ed.budget_impact(per_person_cost=100,
-                                    per_person_offset=1_000, population=1_000)
-    with ep.overridden({"budget_offset_realised_in_horizon": 0.01}):
-        stingy = ed.budget_impact(per_person_cost=100,
-                                  per_person_offset=1_000, population=1_000)
-    assert generous["total_net"] < stingy["total_net"]
+    with ep.overridden({"inequality_aversion": 0.0}):
+        neutral = ed.distributional_cea({"a": 5.0, "b": 15.0},
+                                        {"a": 1.0, "b": 0.0})
+    with ep.overridden({"inequality_aversion": 20.0}):
+        averse = ed.distributional_cea({"a": 5.0, "b": 15.0},
+                                       {"a": 1.0, "b": 0.0})
+    assert averse["ede_gain"] != neutral["ede_gain"], (
+        "the registered inequality-aversion parameter must reach the "
+        "calculation, or the provenance table is decorative")
 
 
 def test_subgroup_table_follows_the_dominant_condition():

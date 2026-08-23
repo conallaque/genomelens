@@ -171,13 +171,24 @@ def markov_cost_effectiveness(wtp: float = 100_000.0, **kwargs) -> Dict:
     d_cost = gg["total_cost"] - sc["total_cost"]
     d_qaly = gg["total_qaly"] - sc["total_qaly"]
     d_ly = gg["total_life_years"] - sc["total_life_years"]
+    # An ICER is only meaningful when cost and effect move in the SAME
+    # direction. In the dominance quadrants the ratio is negative, and a
+    # negative ICER is ambiguous by construction — "-$6,054/QALY" reads as a
+    # bargain whether the strategy saves money and adds health or costs money
+    # and destroys it. HTA reporting convention is to state dominance and
+    # suppress the ratio. The verdict below already did this correctly; the
+    # ratio was reported alongside it anyway.
     icer = (d_cost / d_qaly) if abs(d_qaly) > 1e-9 else None
+    dominant = d_cost < 0 and d_qaly > 0
+    dominated = d_cost > 0 and d_qaly < 0
+    if dominant or dominated:
+        icer = None
     nmb = wtp * d_qaly - d_cost
 
     # Dominance language matters in HTA reporting.
-    if d_cost < 0 and d_qaly > 0:
+    if dominant:
         verdict = "dominant (cheaper and more effective)"
-    elif d_cost > 0 and d_qaly < 0:
+    elif dominated:
         verdict = "dominated (costlier and less effective)"
     elif icer is not None and icer <= wtp:
         verdict = f"cost-effective at ${wtp:,.0f}/QALY"
@@ -186,6 +197,14 @@ def markov_cost_effectiveness(wtp: float = 100_000.0, **kwargs) -> Dict:
 
     return {
         "available": True,
+        # Dominance is exposed as a flag, not left to be read off the sign of
+        # a suppressed ratio. Downstream validation used to infer "cost-saving"
+        # from a negative ICER; once the ratio is correctly withheld in the
+        # dominance quadrants that inference has nothing to read, so the fact
+        # has to be stated directly.
+        "dominant": dominant,
+        "dominated": dominated,
+        "cost_saving": d_cost < 0,
         "standard_care": sc, "genomic_guided": gg,
         "incremental_cost": round(d_cost, 2),
         "incremental_qaly": round(d_qaly, 4),

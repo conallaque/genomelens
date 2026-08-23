@@ -428,7 +428,18 @@ def _lynch_icer() -> Optional[float]:
         start_age=50, cycles=35, incidence_rate=0.010,
         rrr_intervention=0.10, cost_intervention_annual=140.0,
         cost_disease_annual=18_000.0, wtp=100_000.0)
-    return r.get("icer")
+    icer = r.get("icer")
+    if icer is not None:
+        return icer
+    # The engine withholds the ratio in the dominance quadrants, because a
+    # negative ICER is ambiguous to a reader. This validation is not a reader:
+    # it compares against a PUBLISHED signed ICER, and the published set
+    # includes cost-saving results recorded as negative. So reconstruct the
+    # signed ratio here, for comparison only — it is never reported.
+    dq = r.get("incremental_qaly") or 0.0
+    if abs(dq) < 1e-9:
+        return None
+    return (r.get("incremental_cost") or 0.0) / dq
 
 
 def validate_against_published(cases: Optional[List[Dict]] = None) -> Dict:
@@ -487,8 +498,14 @@ def validate_against_published(cases: Optional[List[Dict]] = None) -> Dict:
     for c in cases:
         pub, ours, tol = c["published_icer"], c["our_icer"], c["tolerance_pct"]
         if ours is None:
+            # Key-complete even on the not-computed path. Emitting a row with
+            # a different shape from every other row makes any consumer that
+            # indexes the normal keys crash on exactly the case that was
+            # already going least well.
             rows.append({"scenario": c["name"], "published_icer": round(pub),
-                         "our_icer": None, "relative_error": "not computed",
+                         "our_icer": None, "ratio_to_published": "not computed",
+                         "relative_error": None, "direction_correct": False,
+                         "within_order_of_magnitude": False,
                          "within_tolerance": False, "source": c["source"]})
             continue
         # Face-validity bar: agree on DIRECTION and ORDER OF MAGNITUDE.

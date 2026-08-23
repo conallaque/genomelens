@@ -67,11 +67,33 @@ def test_half_cycle_correction_changes_result():
 
 
 def test_icer_rises_with_intervention_cost():
-    icers = []
-    for c in (250, 500, 1000, 2000):
+    # The ratio is withheld in the dominance quadrants (a negative ICER reads
+    # as a bargain whether the strategy is excellent or terrible), so compare
+    # only the scenarios where a ratio is defined, and require the dominant
+    # ones to come first — cheap interventions dominate, dear ones do not.
+    results = [mk.markov_cost_effectiveness(cost_intervention_annual=c)
+               for c in (250, 500, 1000, 2000)]
+    defined = [r["icer"] for r in results if r["icer"] is not None]
+    assert defined == sorted(defined), (
+        f"costlier intervention should worsen the ICER: {defined}")
+    dominant_flags = [r["dominant"] for r in results]
+    assert dominant_flags == sorted(dominant_flags, reverse=True), (
+        "dominance should be lost as the intervention gets more expensive, "
+        "not regained")
+
+
+def test_no_negative_icer_is_ever_reported():
+    # A negative ratio is ambiguous by construction and HTA convention is to
+    # state dominance instead. The verdict already said "dominant"; the ratio
+    # was printed next to it anyway.
+    for c in (0, 100, 250, 1000, 100_000):
         r = mk.markov_cost_effectiveness(cost_intervention_annual=c)
-        icers.append(r["icer"])
-    assert icers == sorted(icers)          # costlier intervention → worse ICER
+        assert r["icer"] is None or r["icer"] >= 0, (
+            f"reported ICER {r['icer']} at intervention cost {c}")
+        if r["icer"] is None:
+            assert r["dominant"] or r["dominated"] or \
+                abs(r["incremental_qaly"]) < 1e-9, (
+                "ICER withheld without a dominance reason")
 
 
 def test_verdict_flips_when_intervention_is_expensive_enough():
