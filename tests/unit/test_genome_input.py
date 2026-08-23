@@ -42,7 +42,8 @@ def test_looks_like_vcf_by_extension():
 
 
 def test_looks_like_vcf_by_header():
-    f = tempfile.NamedTemporaryFile("w", suffix=".dat", delete=False)
+    f = tempfile.NamedTemporaryFile(  # noqa: SIM115  (closed below; path outlives the handle)
+        "w", suffix=".dat", delete=False)
     f.write("##fileformat=VCFv4.2\n#CHROM\tPOS\tID\n")
     f.close()
     try:
@@ -61,7 +62,8 @@ def _write_vcf(records_with_rsid, records_position_only, extra_lines=()):
     for r, gt in records_position_only:
         lines.append(f"{r.chrom}\t{r.pos_grch37}\t.\t{r.ancestral}\t{r.derived}\t.\t.\t.\tGT\t{gt}")
     lines.extend(extra_lines)
-    f = tempfile.NamedTemporaryFile("w", suffix=".vcf", delete=False)
+    f = tempfile.NamedTemporaryFile(  # noqa: SIM115  (closed below; path outlives the handle)
+        "w", suffix=".vcf", delete=False)
     f.write("\n".join(lines) + "\n")
     f.close()
     return f.name

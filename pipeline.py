@@ -136,7 +136,8 @@ except ImportError:
 
 def _render_longevity_html(integrated: dict, file_label: str = "") -> str:
     import html as _h
-    esc = lambda s: _h.escape(str(s) if s is not None else "")
+    def esc(s) -> str:
+        return _h.escape(str(s) if s is not None else "")
     summary = integrated["executive_summary"]
     lon = integrated["longevity_composite"]
     plan = integrated["year_long_plan"]

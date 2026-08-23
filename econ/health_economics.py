@@ -810,10 +810,10 @@ def calculate_npv(
     recurring annual spend discounted over the horizon (lifestyle programs).
     """
     benefit = sum(outcome_value / (1 + rate) ** t for t in range(1, horizon + 1))
-    if recurring_cost:
-        spend = sum(cost / (1 + rate) ** t for t in range(1, horizon + 1))
-    else:
-        spend = cost  # upfront, undiscounted at t=0
+    # Recurring spend is discounted over the horizon; a one-off cost lands at
+    # t=0 and is undiscounted.
+    spend = (sum(cost / (1 + rate) ** t for t in range(1, horizon + 1))
+             if recurring_cost else cost)
     return round(benefit - spend, 2)
 
 

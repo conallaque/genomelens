@@ -97,7 +97,7 @@ def analyze_abo(snps_df: pd.DataFrame) -> dict:
         if len(gt) < 2:
             n_deletion = None
         else:
-            n_deletion = gt.count("D") + (0 if "I" in gt or "G" in gt else 0)
+            n_deletion = gt.count("D")
             # Fallback for chips reporting G/-:
             if "-" in o_gt:
                 n_deletion = o_gt.count("-")
@@ -233,7 +233,7 @@ def analyze_rhd(snps_df: pd.DataFrame) -> dict:
 
     # ── Preferred: dedicated tag SNPs ────
     tag_hits: list[dict] = []
-    for rsid, (desc, rh_neg, rh_pos) in _RHD_TAG_SNPS.items():
+    for rsid, (desc, rh_neg, _rh_pos) in _RHD_TAG_SNPS.items():
         gt = _gt(snps_df, rsid)
         if gt:
             n_neg = gt.count(rh_neg)

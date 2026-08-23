@@ -23,7 +23,11 @@ from pathlib import Path
 
 def weasyprint_available() -> bool:
     try:
-        import weasyprint
+        # The import IS the probe — it is not an unused import. An
+        # unused-import autofix deleted this line, which made the function
+        # return True unconditionally and turned a graceful "PDF export
+        # unavailable" into a crash.
+        import weasyprint  # noqa: F401
         return True
     except Exception:
         return False

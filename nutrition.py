@@ -73,16 +73,14 @@ def _analyze_macros(snps_df) -> dict:
         else:
             factors.append(f"rs9939609 (FTO) {fto} — favourable FTO; carb-tolerant")
 
-    if tcf7l2:
-        if "T" in tcf7l2:
-            carb_pressure -= 2
-            factors.append(f"rs7903146 (TCF7L2) {tcf7l2} — reduced glucose tolerance; minimise refined carbs")
+    if tcf7l2 and "T" in tcf7l2:
+        carb_pressure -= 2
+        factors.append(f"rs7903146 (TCF7L2) {tcf7l2} — reduced glucose tolerance; minimise refined carbs")
 
-    if apoe1 and apoe2:
-        # rs429358 C + rs7412 C = ε4 carrier — saturated-fat sensitive
-        if "C" in apoe1 and "C" in apoe2:
-            fat_pressure -= 1
-            factors.append("APOE ε4 carrier — lower saturated fat, prefer mono/poly")
+    # rs429358 C + rs7412 C = ε4 carrier — saturated-fat sensitive
+    if apoe1 and apoe2 and "C" in apoe1 and "C" in apoe2:
+        fat_pressure -= 1
+        factors.append("APOE ε4 carrier — lower saturated fat, prefer mono/poly")
 
     if fads and "T" in fads:
         factors.append(f"rs174547 (FADS1) {fads} — favour direct EPA/DHA from fish, not ALA")

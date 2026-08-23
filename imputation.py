@@ -26,6 +26,7 @@ Notes:
 
 from __future__ import annotations
 
+import contextlib
 import gzip
 import hashlib
 import shutil
@@ -35,7 +36,6 @@ import time
 from pathlib import Path
 
 import pandas as pd
-import contextlib
 
 SCRIPT_DIR = Path(__file__).parent
 REF_DIR = SCRIPT_DIR / "reference"
@@ -148,7 +148,10 @@ def _split_vcf_by_chrom(vcf_path: Path, out_dir: Path) -> dict[str, Path]:
             if chrom not in handles:
                 p = out_dir / f"chr{chrom}.vcf"
                 paths[chrom] = p
-                handles[chrom] = open(p, "w")
+                # One handle per chromosome, held open across the whole
+                # scan and closed in the finally below — a with-block
+                # cannot express a pool whose lifetime spans the loop.
+                handles[chrom] = open(p, "w")  # noqa: SIM115
                 for h in header_lines:
                     handles[chrom].write(h)
             handles[chrom].write(line)

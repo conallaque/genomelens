@@ -38,8 +38,9 @@ Holick 2007; Engelsen 2010 (latitude & cutaneous vitamin-D synthesis).
 
 from __future__ import annotations
 
-import pandas as pd
 import contextlib
+
+import pandas as pd
 
 
 def _gt(df, rsid) -> str | None:

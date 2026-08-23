@@ -565,10 +565,11 @@ def audit_against_registry() -> dict[str, list[str]]:
         # Gene-symbol cross-check (HFE / HLA-DQA1 etc. — strict, raise on mismatch)
         local_gene = entry["gene"].upper().strip()
         reg_gene = rec.gene.upper().strip()
-        if local_gene != reg_gene:
-            # Tolerate "HLA-B*27 region" vs "HLA-B" etc. (qualifiers added in
-            # carrier.py panel labels). Real conflicts are bare-symbol drift.
-            if local_gene.split("*")[0].split(" ")[0] != reg_gene.split("*")[0]:
+        # Tolerate "HLA-B*27 region" vs "HLA-B" etc. (qualifiers added in
+        # carrier.py panel labels). Real conflicts are bare-symbol drift.
+        if (local_gene != reg_gene
+                and local_gene.split("*")[0].split(" ")[0]
+                != reg_gene.split("*")[0]):
                 disagreed.append(
                     f"{entry['rsid']}: gene local={entry['gene']!r} "
                     f"registry={rec.gene!r}"

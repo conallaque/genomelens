@@ -22,6 +22,7 @@ core report works without them. Run this script when you want to enable:
 """
 
 import argparse
+import contextlib
 import json
 import shutil
 import subprocess
@@ -379,10 +380,8 @@ def setup_clinvar(force: bool = False) -> None:
             "distilled": _dt.datetime.now().isoformat(timespec="seconds"),
             "rows": n, "source_url": url,
         }, indent=2))
-        try:
+        with contextlib.suppress(Exception):
             raw.unlink()   # reclaim ~190 MB; keep only the compact table
-        except Exception:
-            pass
     log("ClinVar setup complete.")
 
 

@@ -475,7 +475,7 @@ def _build_interpretation(
 # Reference ranges are typical adult US-lab values and are approximate — real
 # ranges vary by lab, assay, age and sex. This is educational, not diagnostic.
 
-import math as _math
+import math as _math  # noqa: E402  (kept under the reference-range banner above)
 
 
 def _bm(id, name, unit, system, direction, clinical, optimal, desc,
@@ -1110,7 +1110,8 @@ def prevent_ascvd_10yr(sex, age, total_chol, hdl, sbp, egfr,
     c = _PREVENT_ASCVD_10YR.get((sex or "").upper()[:1])
     if c is None:
         return None
-    to_mmol = lambda mg: mg / 38.67
+    def to_mmol(mg: float) -> float:
+        return mg / 38.67
     a = (age - 55) / 10.0
     nh = to_mmol(total_chol - hdl) - 3.5
     hd = (to_mmol(hdl) - 1.3) / 0.3

@@ -36,12 +36,12 @@ equity weights — closing a gap this project's own CHEERS checklist declares.
 
 from __future__ import annotations
 
+import itertools
 import random
 from collections.abc import Callable, Sequence
 
 from . import engine as ee
 from . import params as ep
-import itertools
 
 __all__ = [
     "analyze_decision_layer",

@@ -115,7 +115,8 @@ def race_time_predictor(known_distance_km: float, known_time_min: float,
 
 def cycling_ftp_zones(ftp_watts: int) -> dict:
     """Coggan power zones from FTP."""
-    z = lambda lo, hi: f"{int(ftp_watts*lo)}-{int(ftp_watts*hi)} W"
+    def z(lo: float, hi: float) -> str:
+        return f"{int(ftp_watts*lo)}-{int(ftp_watts*hi)} W"
     return {
         "ftp_watts": ftp_watts,
         "zones": [

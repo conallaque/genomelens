@@ -405,7 +405,7 @@ def test_subgroup_table_declares_itself_illustrative():
 # confident English sentence on top of a hedged technical result. These tests
 # check the translation stays as honest as the thing it translates.
 
-from econ import plain as epl
+from econ import plain as epl  # noqa: E402  (kept under its section banner)
 
 
 def test_number_needed_to_screen_inverts_absolute_risk_reduction():

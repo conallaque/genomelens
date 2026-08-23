@@ -7,14 +7,15 @@ arithmetic conventions (within-cycle correction, discounting, ICER quadrants)
 against the published definitions rather than against the engine's own output.
 """
 
+import itertools
 import os
 import sys
+from pathlib import Path
 
 import pytest
 
 from econ import engine as ee
 from econ import params as ep
-import itertools
 
 
 def _f(label="f", coi="CAD", p=0.20, rrr=0.30, hc=1.0, cost=500.0, src=""):
@@ -752,7 +753,7 @@ def test_every_personal_economics_category_is_mapped():
     import re
 
     from econ import health_economics as he
-    src = open(he.__file__).read()
+    src = Path(he.__file__).read_text(encoding="utf-8")
     used = set(re.findall(r'^\s+add\("([^"]+)"', src, re.M))
     assert used, "could not find the add() call sites to check"
     missing = used - set(he._CATEGORY_ADHERENCE)
@@ -815,7 +816,7 @@ def test_the_life_table_stays_at_the_repository_root():
     gitignore = os.path.join(os.path.dirname(os.path.dirname(
         os.path.abspath(ee.__file__))), ".gitignore")
     if os.path.exists(gitignore):
-        rules = open(gitignore).read()
+        rules = Path(gitignore).read_text(encoding="utf-8")
         assert "*.csv" in rules, "the blanket DNA guard is gone"
         assert "!data/LifeTable_USA_Mx_2015.csv" in rules
         assert ee._LIFE_TABLE_PATH.endswith(

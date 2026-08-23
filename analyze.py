@@ -57,7 +57,8 @@ try:
     from pdf_export import html_to_pdf, weasyprint_available
 except ImportError:
     html_to_pdf = None
-    weasyprint_available = lambda: False
+    def weasyprint_available() -> bool:
+        return False
 try:
     from medications import analyze_medications
 except ImportError:
@@ -568,10 +569,9 @@ def tier1_lookup(
         risk_allele = entry["risk_allele"].upper()
 
         # Handle insertion/deletion markers
-        if risk_allele in ("INS", "DEL", "I", "D"):
-            risk_copies = 0  # Can't reliably count from raw genotype string
-        else:
-            risk_copies = genotype.count(risk_allele)
+        # INS/DEL cannot be reliably counted from a raw genotype string.
+        risk_copies = (0 if risk_allele in ("INS", "DEL", "I", "D")
+                       else genotype.count(risk_allele))
 
         # Provenance: distinguish a directly-typed call from a statistically
         # imputed one. When --impute is used, snps_df carries `source`

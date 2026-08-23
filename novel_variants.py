@@ -299,10 +299,9 @@ def analyze_novel_variants(vcf_path: str, build: str,
             continue
         pdir = REFERENCE_DIR / p.subdir
         local_exists = pdir.is_dir() and any(pdir.glob(p.glob))
-        if not local_exists:
-            # Only fall back to a remote table (CADD demo) when explicitly allowed.
-            if not (p.remote_url and allow_remote):
-                continue
+        # Only fall back to a remote table (CADD demo) when explicitly allowed.
+        if not local_exists and not (p.remote_url and allow_remote):
+            continue
         if p.resolve():
             predictors.append(p)
             _log(f"  Predictor ready: {p.name} ({p.license})")

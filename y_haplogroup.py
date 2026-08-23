@@ -26,8 +26,9 @@ defined by non-ambiguous co-markers instead.
 """
 
 
-import pandas as pd
 import contextlib
+
+import pandas as pd
 
 # ── Complement helper ──────────────────────────────────────────────────────────
 _COMP = str.maketrans("ACGT", "TGCA")

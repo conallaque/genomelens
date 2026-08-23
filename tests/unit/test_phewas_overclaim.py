@@ -43,7 +43,7 @@ def test_every_trait_reports_variance_explained():
     g = {rsid: ea + ea for t in phewas.PHEWAS_TRAITS.values()
          for rsid, ea, _, _ in t["variants"]}
     df = pd.DataFrame({"genotype": g})
-    for name, t in phewas.PHEWAS_TRAITS.items():
+    for t in phewas.PHEWAS_TRAITS.values():
         r = phewas._score_trait(df, t, None)
         if r["status"] == "ok":
             assert "variance_explained_pct" in r

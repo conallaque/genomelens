@@ -125,7 +125,7 @@ def fixture_chip_path(tmp_path_factory) -> Path:
 SNAPSHOT_DIR = Path(__file__).parent / "snapshots"
 
 
-import re as _re
+import re as _re  # noqa: E402  (kept beside the pattern it serves)
 
 # Pattern matches FHIR cross-resource references like "Observation/a7c39…"
 # (where the trailing component is a generated UUID hex). The resource type is
