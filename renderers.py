@@ -438,6 +438,7 @@ def build_mtdna_html(mt_result: Dict) -> str:
     ancient_dna = mt_result.get("ancient_dna", "")
     further = mt_result.get("further_testing", "")
     n_mt_snps = mt_result.get("mt_snp_count", 0)
+    path = mt_result.get("path", [])
 
     if status == "no_data":
         return (
@@ -506,12 +507,59 @@ def build_mtdna_html(mt_result: Dict) -> str:
 
     mt_count_note = f" &nbsp;·&nbsp; {n_mt_snps:,} mtDNA SNPs available on this chip" if n_mt_snps else ""
 
+    # ── Maternal lineage chain ──
+    # A haplogroup is the end of a chain of branch points, not a bare label.
+    # The Y-DNA section has always shown that chain; this shows the maternal
+    # one on the same terms, including which links are confirmed by a marker
+    # on the chip and which are inferred because no marker for them was typed.
+    crumbs = ""
+    for i, node in enumerate(path):
+        confirmed = node.get("snp_status") == "confirmed"
+        ev = "; ".join(node.get("evidence") or []) or "no marker for this branch on this chip"
+        tip = f"{node.get('snp_name','')}: {ev}"
+        cls = "crumb-ok" if confirmed else "crumb-gap"
+        arrow = "" if i == 0 else '<span class="crumb-arrow">&rsaquo;</span>'
+        snp = (f'<span class="crumb-snp">{_esc(node["snp_name"])}</span>'
+               if node.get("markers") is not False and node.get("snp_name")
+               and node["snp_name"] != node["haplogroup"] else "")
+        crumbs += (f'{arrow}<span class="{cls}" title="{_esc(tip)}">'
+                   f'{_esc(node["haplogroup"])}{snp}</span>')
+    n_conf = mt_result.get("n_confirmed_branch_points", 0)
+    n_bp = mt_result.get("n_branch_points", 0)
+    gaps = mt_result.get("chip_gaps") or []
+    contradictions = mt_result.get("contradictions") or []
+    mt_crumbs = ""
+    if crumbs:
+        gap_note = ""
+        if gaps:
+            gap_note = (f'<div class="mtdna-evidence" style="margin-top:5px">'
+                        f'Greyed links ({", ".join(_esc(g) for g in gaps)}) are '
+                        f'inferred rather than observed — no marker defining '
+                        f'them is typed on this chip, so they are implied by a '
+                        f'confirmed branch further down.</div>')
+        contra_note = ""
+        if contradictions:
+            c = contradictions[0]
+            contra_note = (f'<div class="mtdna-evidence" style="margin-top:5px;'
+                           f'color:#b03a2e"><strong>Conflicting markers at '
+                           f'{_esc(c["at"])}:</strong> '
+                           f'{", ".join(_esc(b) for b in c["branches"])} are '
+                           f'mutually exclusive branches and cannot both be '
+                           f'yours. This usually means a mis-called genotype '
+                           f'rather than an interesting result.</div>')
+        mt_crumbs = (f'<div class="crumbs" style="margin:8px 0">{crumbs}</div>'
+                     f'<div class="mtdna-evidence">Your maternal line, root to '
+                     f'branch tip &mdash; {n_conf} of {n_bp} branch points '
+                     f'confirmed by a marker on this chip.</div>'
+                     f'{gap_note}{contra_note}')
+
     return f"""
 <section class="mtdna-section" id="mt-haplogroup">
 <h2>mtDNA Haplogroup <span class="mtdna-badge {conf_badge_cls}">{conf_label}</span></h2>
 
 <div class="mtdna-result">
   <div class="mtdna-call">{haplogroup}</div>
+  {mt_crumbs}
   <div class="mtdna-evidence">
     Based on {mt_result.get('n_markers_derived', 0)} derived /
     {mt_result.get('n_markers_matched', len(matched))} matched markers

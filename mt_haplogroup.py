@@ -40,9 +40,15 @@ import pandas as pd
 MTDNA_MARKERS: List[Dict] = [
     # ── Macro-haplogroups ─────────────────────────────────────────────────────
     {
+        # Recorded from the non-R side until 2026-08-23 ("derived" T meaning
+        # "retains the ancestral state, therefore not R"). That framing is
+        # defensible in isolation but put this row in literal contradiction
+        # with the 12705 row, which discriminates the same branch point. Both
+        # now describe R in the same direction, so the marker table and the
+        # lineage chain cannot disagree.
         "name": "T16223C", "pos": 16223, "rsids": ["rs41323649"],
-        "derived": "T", "ancestral": "C",
-        "defines": "L/M/N (ancestral state)", "level": "macro",
+        "derived": "C", "ancestral": "T",
+        "defines": "R (and descendants)", "level": "macro",
         "description": "Position 16223 ancestral T is associated with non-R lineages "
                        "(L, M, N); derived C is the R-and-descendant state.",
     },
@@ -86,8 +92,13 @@ MTDNA_MARKERS: List[Dict] = [
         "description": "Defines haplogroup T (when combined with JT marker 4216).",
     },
     {
+        # INVERTED UNTIL 2026-08-23. This read derived="T", which claims
+        # haplogroup R carries T at 12705. The rCRS is itself a haplogroup H
+        # sequence — H sits inside R — and rCRS has C here, so R carries C and
+        # the entry contradicted both reality and the 16223 marker four rows
+        # up, which correctly treats T as the non-R ancestral state.
         "name": "C12705T", "pos": 12705, "rsids": ["rs28358580"],
-        "derived": "T", "ancestral": "C",
+        "derived": "C", "ancestral": "T",
         "defines": "R (and descendants)", "level": "macro",
         "description": "Defines macro-haplogroup R — ancestor of HV, JT, U, B, F.",
     },
@@ -426,6 +437,268 @@ def _find_marker(snps_df: pd.DataFrame, marker: Dict) -> Optional[Dict]:
     return None
 
 
+# ─── Phylogenetic tree ────────────────────────────────────────────────────────
+#
+# WHY THIS EXISTS. The flat marker list above answers "which haplogroup?" by
+# scanning for derived markers and picking the most specific one off a fixed
+# priority list. That returns a single label — "H" — and throws away the thing
+# a maternal lineage actually is: a chain of branch points, each with its own
+# marker, its own evidence, and its own date. The Y-DNA module has always
+# reported that chain; mtDNA reported only the endpoint.
+#
+# The tree below is the same phylogeny the flat list encodes, written as the
+# nested structure it always implicitly was, so it can be walked into a path:
+#
+#     mt-MRCA › N › R › HV › H
+#
+# Topology follows PhyloTree mtDNA build 17. Note that I, W and X hang off N
+# directly, NOT off R — a detail the priority-list classifier could not
+# express, and got wrong whenever someone carried both an R marker and an
+# X marker.
+#
+# A NOTE ON READING rCRS COORDINATES. The revised Cambridge Reference Sequence
+# is itself a haplogroup H2a2a1 sequence. So for any clade H belongs to
+# (R, HV, H) the DERIVED allele is the rCRS allele, while for clades H does not
+# belong to the derived allele differs from rCRS. Getting this backwards
+# inverts a marker, and an inverted marker at a backbone node misroutes every
+# sample that passes through it. ``test_mt_haplogroup.py`` pins the rule.
+
+
+def _mt_node(haplogroup: str, markers: List[tuple], description: str = "",
+             migration: str = "", further: str = "",
+             children: Optional[List[Dict]] = None) -> Dict:
+    """One branch point. ``markers`` are (name, rsids, pos, derived, ancestral)."""
+    return {
+        "haplogroup": haplogroup,
+        "snp_name": markers[0][0] if markers else haplogroup,
+        "rsids": markers[0][1] if markers else [],
+        "pos": markers[0][2] if markers else None,
+        "markers": markers,
+        "description": description,
+        "migration": migration,
+        "further": further,
+        "children": children or [],
+    }
+
+
+MT_TREE: Dict = _mt_node(
+    "mt-MRCA", [],
+    description="Mitochondrial Eve — the most recent common maternal ancestor "
+                "of every living person.",
+    migration="All maternal lineages alive today descend from one woman in "
+              "Africa roughly 150,000-200,000 years ago. She was not the only "
+              "woman alive; she is simply the one whose maternal line never "
+              "died out.",
+    children=[
+        _mt_node(
+            "M", [("T489C", [], 489, "C", "T"),
+                  ("A10400G", ["rs28358279"], 10400, "G", "A")],
+            description="Macro-haplogroup M — the great Asian maternal branch.",
+            migration="M left Africa with the southern coastal migration around "
+                      "60,000 years ago and became the dominant maternal lineage "
+                      "of South, East and Southeast Asia, and of Native America "
+                      "via C and D.",
+            further="Full mtDNA sequencing resolves M into C, D, E, G, Q and Z."),
+        _mt_node(
+            "N", [],
+            description="Macro-haplogroup N — the branch behind almost every "
+                        "European and West Eurasian maternal line.",
+            migration="N is the other great out-of-Africa maternal branch, "
+                      "arising around 60,000 years ago. Nearly all indigenous "
+                      "European maternal lineages sit inside it.",
+            further="No single N-defining marker sits on consumer arrays, so N "
+                    "is normally inferred from a confirmed descendant rather "
+                    "than observed directly.",
+            children=[
+                _mt_node(
+                    "I", [("T4529A", ["rs3928306"], 4529, "A", "T")],
+                    description="Haplogroup I — a small, old northern European "
+                                "lineage.",
+                    migration="I is found at low frequency across northern and "
+                              "eastern Europe and is associated with early "
+                              "post-glacial resettlement."),
+                _mt_node(
+                    "W", [("G8994A", ["rs41544112"], 8994, "A", "G")],
+                    description="Haplogroup W — eastern European and South Asian.",
+                    migration="W spread from the Near East into eastern Europe "
+                              "and South Asia after the last glacial maximum."),
+                _mt_node(
+                    "X", [("T6221C", [], 6221, "C", "T")],
+                    description="Haplogroup X — unusually scattered.",
+                    migration="X is one of the few maternal lineages found on "
+                              "both sides of the Atlantic, present in Europe, "
+                              "the Near East and among some Native American "
+                              "populations — a distribution long argued over."),
+                _mt_node(
+                    "R", [("C12705T", ["rs28358580"], 12705, "C", "T"),
+                          ("T16223C", ["rs41323649"], 16223, "C", "T")],
+                    description="Haplogroup R — the branch of N containing most "
+                                "European maternal lineages.",
+                    migration="R arose within N around 55,000 years ago and gave "
+                              "rise to H, V, J, T, U and K, which together cover "
+                              "the great majority of European maternal lines.",
+                    children=[
+                        _mt_node(
+                            "HV", [("T14766C", ["rs193302980"], 14766, "C", "T")],
+                            description="Haplogroup HV — parent of H and V.",
+                            migration="HV emerged in the Near East and moved into "
+                                      "Europe before the last glacial maximum.",
+                            children=[
+                                _mt_node(
+                                    "H", [("C7028T", ["rs2854122", "rs3937033"],
+                                           7028, "C", "T")],
+                                    description="Haplogroup H — the most common "
+                                                "European maternal lineage, "
+                                                "around 40% of Europeans.",
+                                    migration="H expanded out of the Franco-"
+                                              "Cantabrian refuge as the ice "
+                                              "retreated roughly 15,000 years "
+                                              "ago and repopulated Europe.",
+                                    further="H is enormous and highly "
+                                            "substructured. Full mtDNA "
+                                            "sequencing is the only way to "
+                                            "resolve H1 from H3 from H5."),
+                                _mt_node(
+                                    "V", [("C4580T", ["rs2032658"], 4580, "T", "C")],
+                                    description="Haplogroup V — western European, "
+                                                "notably Saami and Basque.",
+                                    migration="V shares H's post-glacial "
+                                              "expansion but stayed far rarer, "
+                                              "peaking in northern Scandinavia "
+                                              "and the Basque country."),
+                            ]),
+                        _mt_node(
+                            "JT", [("A4216G", ["rs3088309"], 4216, "G", "A")],
+                            description="Haplogroup JT — parent of J and T.",
+                            migration="JT arose in the Near East and entered "
+                                      "Europe with the spread of farming.",
+                            children=[
+                                _mt_node(
+                                    "J", [("A10398G", ["rs2853826"], 10398, "G", "A")],
+                                    description="Haplogroup J — Near Eastern origin, "
+                                                "widespread in Europe.",
+                                    migration="J is strongly associated with the "
+                                              "Neolithic expansion of agriculture "
+                                              "out of the Fertile Crescent."),
+                                _mt_node(
+                                    "T", [("A11251G", ["rs28359178"], 11251, "G", "A")],
+                                    description="Haplogroup T — Near Eastern origin.",
+                                    migration="T accompanied J into Europe with "
+                                              "early farming communities."),
+                            ]),
+                        _mt_node(
+                            "U", [("A12308G", ["rs28359175"], 12308, "G", "A")],
+                            description="Haplogroup U — one of the oldest European "
+                                        "maternal lineages.",
+                            migration="U is old enough to predate the last glacial "
+                                      "maximum in Europe and is found in some of "
+                                      "the earliest European hunter-gatherer "
+                                      "remains.",
+                            children=[
+                                _mt_node(
+                                    "K", [("T9055A", ["rs28358571"], 9055, "A", "T")],
+                                    description="Haplogroup K — a major subclade of "
+                                                "U8.",
+                                    migration="K is common in Europe and reaches "
+                                              "high frequency in Ashkenazi Jewish "
+                                              "populations, where a few founder "
+                                              "lineages dominate."),
+                            ]),
+                    ]),
+            ]),
+    ])
+
+
+def _mt_lookup(node: Dict, snps_df) -> tuple:
+    """Resolve one node's markers. Returns (status, n_derived, n_ancestral,
+    evidence) using the same vocabulary as the Y module."""
+    n_der = n_anc = 0
+    evidence: List[str] = []
+    for (name, rsids, pos, derived, ancestral) in node.get("markers", []):
+        hit = _find_marker(snps_df, {"name": name, "rsids": rsids, "pos": pos,
+                                     "derived": derived, "ancestral": ancestral})
+        if hit is None:
+            continue
+        if hit["is_derived"]:
+            n_der += 1
+            evidence.append(f"{name}={hit['genotype']} (derived)")
+        else:
+            n_anc += 1
+            evidence.append(f"{name}={hit['genotype']} (ancestral)")
+    if n_der:
+        return "derived", n_der, n_anc, evidence
+    if n_anc:
+        return "ancestral", n_der, n_anc, evidence
+    return "not_found", 0, 0, evidence
+
+
+def _mt_entry(node: Dict, status: str, n_der: int, evidence: List[str]) -> Dict:
+    return {
+        "haplogroup": node["haplogroup"],
+        "snp_name": node["snp_name"],
+        "rsids": node.get("rsids", []),
+        "pos": node.get("pos"),
+        "snp_status": "confirmed" if status == "derived" else "inferred",
+        "n_derived": n_der,
+        "found_genotype": (evidence[0].split("=", 1)[1].split(" ")[0]
+                           if evidence else ""),
+        "evidence": evidence,
+        "description": node.get("description", ""),
+        "migration": node.get("migration", ""),
+        "further": node.get("further", ""),
+    }
+
+
+def _mt_walk(node: Dict, snps_df, prefix: List[Dict], depth: int = 0):
+    """Walk the maternal tree, returning (path, status).
+
+    Mirrors the Y-DNA walker deliberately, including its central rule: never
+    descend past a node unless a marker below it is genuinely confirmed, so
+    the reported lineage can never run deeper than the evidence. Returns None
+    when a node is excluded by an ancestral call.
+    """
+    if depth > 20:
+        return prefix, "max_depth"
+    status, n_der, _n_anc, evidence = _mt_lookup(node, snps_df)
+    if status == "ancestral" and node.get("markers"):
+        return None
+    entry = _mt_entry(node, status, n_der, evidence)
+    path = prefix + [entry]
+    children = node.get("children", [])
+    if not children:
+        return path, ("resolved" if status == "derived" else "chip_gap")
+
+    confirmed, gaps = [], []
+    for child in children:
+        cs, cder, _ca, _ce = _mt_lookup(child, snps_df)
+        if cs == "derived":
+            confirmed.append((child, cder))
+        elif cs == "not_found":
+            gaps.append(child)
+
+    if confirmed:
+        confirmed.sort(key=lambda x: -x[1])
+        if len(confirmed) > 1:
+            # One person, one maternal line. Two confirmed sibling branches
+            # cannot both be true, and silently picking one would hide a real
+            # data problem.
+            entry["contradiction"] = [c["haplogroup"] for c, _ in confirmed]
+        res = _mt_walk(confirmed[0][0], snps_df, path, depth + 1)
+        return res if res else (path, "resolved")
+
+    best, best_below = None, 0
+    for child in gaps:
+        res = _mt_walk(child, snps_df, path, depth + 1)
+        if not res:
+            continue
+        below = sum(1 for n in res[0][len(path):] if n["snp_status"] == "confirmed")
+        if below > best_below:
+            best_below, best = below, res
+    if best and best_below:
+        return best
+    return path, ("resolved" if status == "derived" else "chip_gap")
+
+
 def _classify(matched: List[Dict]) -> tuple:
     """From the set of confirmed-derived markers, pick the most-specific
     haplogroup call. Returns (haplogroup, confidence)."""
@@ -479,6 +752,14 @@ def analyze_mt_haplogroup(snps_df: pd.DataFrame) -> Dict:
             "haplogroup": "Unknown",
             "confidence": "low",
             "matched_markers": [],
+            "path": [],
+            "haplogroup_path": "Unknown",
+            "terminal_haplogroup": "Unknown",
+            "walk_status": "no_data",
+            "chip_gaps": [],
+            "contradictions": [],
+            "n_branch_points": 0,
+            "n_confirmed_branch_points": 0,
             "mt_snp_count": 0,
             "migration": HAPLOGROUP_INFO["Unknown"]["migration"],
             "ancient_dna": "",
@@ -489,7 +770,26 @@ def analyze_mt_haplogroup(snps_df: pd.DataFrame) -> Dict:
             ),
         }
 
+    # Walk the phylogeny for the full maternal chain. The flat classifier
+    # below still produces the terminal label, so every existing consumer of
+    # this result keeps working; the tree adds the branch points that label
+    # was hiding.
+    walk = _mt_walk(MT_TREE, snps_df, [])
+    path, walk_status = walk if walk else ([], "chip_gap")
+    haplogroup_path = " > ".join(n["haplogroup"] for n in path) or "Unknown"
+    terminal = path[-1]["haplogroup"] if path else "Unknown"
+    chip_gaps = [n["haplogroup"] for n in path
+                 if n["snp_status"] != "confirmed" and n["haplogroup"] != "mt-MRCA"]
+    contradictions = [{"at": n["haplogroup"], "branches": n["contradiction"]}
+                      for n in path if n.get("contradiction")]
+
     haplogroup, _ = _classify(matched_markers)
+    # Prefer the tree's terminal call when the walk actually confirmed
+    # something: it respects the phylogeny, whereas the flat classifier picks
+    # off a fixed priority list and cannot tell an R lineage from an X one.
+    if terminal not in ("Unknown", "mt-MRCA") and any(
+            n["snp_status"] == "confirmed" for n in path):
+        haplogroup = terminal
     info = HAPLOGROUP_INFO.get(haplogroup, HAPLOGROUP_INFO["Unknown"])
 
     # Coverage / confidence. Confidence in a *called* haplogroup is driven by
@@ -517,6 +817,17 @@ def analyze_mt_haplogroup(snps_df: pd.DataFrame) -> Dict:
             "mtDNA calls from autosomal-chip data are coarse — full mtDNA "
             "sequencing is the gold standard."
         ),
+        # Full maternal lineage, root to terminal — the chain the Y-DNA
+        # section has always shown and this one did not.
+        "path": path,
+        "haplogroup_path": haplogroup_path,
+        "terminal_haplogroup": terminal,
+        "walk_status": walk_status,
+        "chip_gaps": chip_gaps,
+        "contradictions": contradictions,
+        "n_branch_points": len([n for n in path if n["haplogroup"] != "mt-MRCA"]),
+        "n_confirmed_branch_points": len(
+            [n for n in path if n["snp_status"] == "confirmed"]),
         "matched_markers": matched_markers,
         "n_markers_matched": len(matched_markers),
         "n_markers_derived": n_derived,
