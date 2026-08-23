@@ -2017,6 +2017,35 @@ variants queried. <strong>Predictors used:</strong> {_esc(pred_line)}.
 """
 
 
+def _assumption_dominance_note(tornado: List[Dict]) -> str:
+    """Say plainly when judgement calls, not evidence, drive the conclusion.
+
+    A reader can work this out from the tornado table, but only by noticing
+    the tier tags and doing the arithmetic. If most of the swing comes from
+    declared assumptions, that is the single most important thing to know
+    about the result and it should not be left as an exercise.
+    """
+    if not tornado:
+        return ""
+    total = sum(r.get("swing", 0) for r in tornado) or 1
+    assumed = sum(r.get("swing", 0) for r in tornado
+                  if r.get("tier") == "assumption")
+    share = 100.0 * assumed / total
+    if share < 25.0:
+        return ""
+    top = [r["parameter"] for r in tornado[:3] if r.get("tier") == "assumption"]
+    named = ", ".join(f"<code>{_esc(t)}</code>" for t in top)
+    return f"""
+<div style="border:1px solid #f0dcc0;background:#fffaf2;border-radius:8px;
+            padding:10px 12px;margin-top:8px;font-size:.85em;color:#6b5330">
+  <strong>Judgement, not evidence, is driving this result.</strong>
+  {share:.0f}% of the total swing in net benefit comes from parameters with no
+  published anchor{f" &mdash; chiefly {named}" if named else ""}. The
+  conclusion is therefore about as reliable as those judgements are, and a
+  reader who disagrees with them should expect a materially different number.
+  They are stated in full under parameter provenance below.</div>"""
+
+
 def _render_pooled_economics(p: Optional[Dict]) -> str:
     """Render the pooled cost-effectiveness result.
 
@@ -2205,7 +2234,8 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
 <div style="font-size:.8em;color:#8a94a3;margin-top:5px">
   A parameter high on this list is one the conclusion depends on. Anything
   tagged <span style="color:#b06a00">[assumption]</span> is a judgement call
-  carrying real weight &mdash; worth disagreeing with first.</div></div></details>"""
+  carrying real weight &mdash; worth disagreeing with first.</div>
+{_assumption_dominance_note(p.get("tornado") or [])}</div></details>"""
 
     # ── Dual perspective ──
     dp = p.get("dual_perspective") or {}

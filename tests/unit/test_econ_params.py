@@ -88,9 +88,18 @@ def test_most_of_the_model_is_sourced():
     assert burden["pct_sourced"] >= 85.0, (
         f"only {burden['pct_sourced']}% of parameters carry a citation; "
         f"the registry exists to keep this high")
-    assert burden["n_assumption"] <= 6, (
+    # NOTE ON THE BOUND. This was 6 while the count was 3, then registering
+    # the baseline-risk and effect-size literals out of _collect pushed it to
+    # 7. That is not a regression: those numbers were always judgement calls,
+    # they were merely invisible ones. Counting a hidden assumption as an
+    # assumption is the point. What must stay true is that each one is
+    # individually justified and that they remain a small minority of the
+    # model — both checked below and in test_whole_model_provenance.
+    assert burden["n_assumption"] <= 12, (
         "declared assumptions are allowed but should stay few and "
         "individually justified")
+    for p in ep.assumptions():
+        assert len(p.note) > 60, f"{p.key}: assumption not justified"
 
 
 def test_assumption_burden_arithmetic_is_consistent():

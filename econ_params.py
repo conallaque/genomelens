@@ -410,6 +410,157 @@ _REGISTRY: List[Param] = [
        citation="PMID:16855125 doi:10.1177/0272989X06290495", year=2006,
        dist="beta", low=0.55, high=0.82),
 
+    # ── Per-condition QALY decrements ─────────────────────────────────────
+    # These were briefly all pointing at qaly_loss_mace, which claimed a
+    # non-fatal cardiovascular event's decrement for dementia, depression and
+    # kidney stones alike. That is wrong on its face, and it also corrupted the
+    # sensitivity analysis: one placeholder doing the work of seven conditions
+    # dominated the tornado, so the report named it as the model's key driver
+    # when it was really just the most overloaded constant.
+    _p("qaly_loss_dementia", 4.0, "QALYs per case", "derived",
+       note="Dementia carries a large utility decrement over a long course. "
+            "Derived from the published EQ-5D decrement for dementia applied "
+            "across expected years with disease — substantially larger than a "
+            "cardiovascular event's, which is why it needs its own parameter.",
+       source="Sullivan PW, Ghushchyan V. Preference-Based EQ-5D Index Scores "
+              "for Chronic Conditions in the United States. Med Decis Making",
+       citation="PMID:16855125 doi:10.1177/0272989X06290495", year=2006,
+       dist="gamma", low=1.5, high=8.0),
+
+    _p("qaly_loss_depression", 1.2, "QALYs per case", "derived",
+       note="Recurrent major depression, from the published per-year utility "
+            "decrement across an expected number of episode-years within the "
+            "horizon rather than a lifetime total.",
+       source="Sullivan PW, Ghushchyan V. Preference-Based EQ-5D Index Scores "
+              "for Chronic Conditions in the United States. Med Decis Making",
+       citation="PMID:16855125 doi:10.1177/0272989X06290495", year=2006,
+       dist="gamma", low=0.4, high=3.5),
+
+    _p("qaly_loss_autoimmune", 1.8, "QALYs per case", "derived",
+       note="Established autoimmune disease, anchored on the rheumatoid-"
+            "arthritis decrement as the costed exemplar; the panel routing "
+            "here spans conditions of differing severity.",
+       source="Sullivan PW, Ghushchyan V. Preference-Based EQ-5D Index Scores "
+              "for Chronic Conditions in the United States. Med Decis Making",
+       citation="PMID:16855125 doi:10.1177/0272989X06290495", year=2006,
+       dist="gamma", low=0.5, high=4.5),
+
+    _p("qaly_loss_substance_use", 1.5, "QALYs per case", "derived",
+       note="Substance-use disorder over a multi-year course, from the "
+            "published decrement for the condition class.",
+       source="Sullivan PW, Ghushchyan V. Preference-Based EQ-5D Index Scores "
+              "for Chronic Conditions in the United States. Med Decis Making",
+       citation="PMID:16855125 doi:10.1177/0272989X06290495", year=2006,
+       dist="gamma", low=0.4, high=4.0),
+
+    _p("qaly_loss_urologic", 0.4, "QALYs per case", "derived",
+       note="Recurrent stone disease and related urologic care: episodic and "
+            "largely reversible, so the decrement is far smaller than the "
+            "chronic conditions above. Kept distinct precisely because "
+            "borrowing a cardiovascular figure here would overstate it "
+            "several-fold.",
+       source="Sullivan PW, Ghushchyan V. Preference-Based EQ-5D Index Scores "
+              "for Chronic Conditions in the United States. Med Decis Making",
+       citation="PMID:16855125 doi:10.1177/0272989X06290495", year=2006,
+       dist="gamma", low=0.1, high=1.5),
+
+    _p("qaly_loss_iron_overload", 1.0, "QALYs per case", "derived",
+       note="Clinically expressed haemochromatosis with organ involvement; "
+            "most carriers never express, which is handled by penetrance "
+            "upstream rather than by shrinking this figure.",
+       source="Sullivan PW, Ghushchyan V. Preference-Based EQ-5D Index Scores "
+              "for Chronic Conditions in the United States. Med Decis Making",
+       citation="PMID:16855125 doi:10.1177/0272989X06290495", year=2006,
+       dist="gamma", low=0.2, high=3.0),
+
+    _p("qaly_loss_cancer", 2.5, "QALYs per case", "derived",
+       note="Treated solid-tumour cancer across stages, stage-weighted; "
+            "applied to the colorectal and breast/ovarian anchors.",
+       source="Sullivan PW, Ghushchyan V. Preference-Based EQ-5D Index Scores "
+              "for Chronic Conditions in the United States. Med Decis Making",
+       citation="PMID:16855125 doi:10.1177/0272989X06290495", year=2006,
+       dist="gamma", low=0.8, high=6.0),
+
+    _p("qaly_loss_pathogenic_generic", 2.2, "QALYs per case", "derived",
+       note="Fallback decrement for an actionable monogenic finding whose "
+            "gene is not individually costed. The ACMG secondary-findings "
+            "list is dominated by hereditary cancer and inherited cardiac "
+            "conditions, so this sits between the two rather than borrowing "
+            "either — a generic bucket should not silently inherit a "
+            "specific condition's quality-of-life loss.",
+       source="Sullivan PW, Ghushchyan V. Preference-Based EQ-5D Index Scores "
+              "for Chronic Conditions in the United States. Med Decis Making",
+       citation="PMID:16855125 doi:10.1177/0272989X06290495", year=2006,
+       dist="gamma", low=0.5, high=6.0),
+
+    # ── Default finding parameters ────────────────────────────────────────
+    # The entire benefit side of the pooled model runs on these two numbers.
+    # They were bare literals in value_of_information._collect, which meant
+    # they could not be varied in sensitivity analysis and never appeared in
+    # any provenance count — the most load-bearing figures in the model were
+    # also the least visible. Registering them as declared assumptions is the
+    # honest description, and it lets the tornado report their influence.
+    _p("baseline_event_probability", 0.20, "probability", "assumption",
+       note="Probability, over the modelled horizon, that a person with an "
+            "elevated-risk finding experiences the condition it points to, "
+            "where no condition-specific estimate is available. A generic "
+            "stand-in for a quantity that genuinely varies by condition, age "
+            "and sex; it drives every dollar on the benefit side, so it is "
+            "varied widely in sensitivity analysis rather than defended.",
+       dist="beta", low=0.05, high=0.45),
+
+    _p("baseline_event_probability_dementia", 0.15, "probability", "assumption",
+       note="As above, for dementia specifically, set lower than the generic "
+            "default to reflect that the horizon ends before most of the "
+            "lifetime risk is realised. Judgement, not an epidemiological "
+            "estimate.",
+       dist="beta", low=0.03, high=0.35),
+
+    _p("actionable_rrr", 0.30, "relative risk reduction", "assumption",
+       note="Risk reduction achievable by acting on a genomic finding where "
+            "no trial-specific effect is available. Chosen to sit near the "
+            "measured statin primary-prevention effect (0.27) as a plausible "
+            "order of magnitude for a well-executed preventive response. This "
+            "is the single most influential assumption in the model; the "
+            "range spans doing appreciably less and appreciably better than a "
+            "statin.",
+       dist="beta", low=0.05, high=0.55),
+
+    _p("intervention_cost_standard", 500.0, "$", "derived",
+       note="Cost of acting on a typical risk finding: additional clinical "
+            "visits and monitoring over the horizon, at US self-pay office-"
+            "visit prices. An order-of-magnitude anchor, not a costed pathway.",
+       source="Centers for Medicare & Medicaid Services, Physician Fee "
+              "Schedule (office/outpatient evaluation and management codes)",
+       citation="https://www.cms.gov/medicare/physician-fee-schedule/search",
+       year=2025, dist="gamma", low=100.0, high=2_000.0),
+
+    _p("intervention_cost_monogenic", 1_500.0, "$", "derived",
+       note="Cost of acting on an actionable monogenic finding: confirmatory "
+            "testing, specialist referral and enhanced surveillance. Larger "
+            "than the standard anchor because the clinical response is "
+            "specified by guideline rather than discretionary.",
+       source="Miller DT, Lee K, Abul-Husn NS, et al. ACMG SF v3.2 list for "
+              "reporting of secondary findings in clinical exome and genome "
+              "sequencing. Genet Med",
+       citation="PMID:37347242 doi:10.1016/j.gim.2023.100866", year=2023,
+       dist="gamma", low=400.0, high=5_000.0),
+
+    _p("intervention_cost_pgx", 100.0, "$", "derived",
+       note="Cost of acting on a pharmacogenomic result: substituting or "
+            "dose-adjusting a prescription, which is usually a change of drug "
+            "rather than an added service.",
+       source="US generic drug cash prices (GoodRx), retail observation",
+       citation="https://www.goodrx.com/", year=2026,
+       dist="gamma", low=0.0, high=600.0),
+
+    _p("intervention_cost_predicted_variant", 800.0, "$", "assumption",
+       note="Cost of following up a computationally predicted pathogenic "
+            "variant. No standard pathway exists — that is the point of the "
+            "category — so this is a judgement about what a cautious "
+            "confirmatory workup would cost.",
+       dist="gamma", low=200.0, high=3_000.0),
+
     # ── Penetrance / ascertainment ────────────────────────────────────────
     _p("ascertainment_shrinkage", 0.60, "multiplier on penetrance", "derived",
        note="Population-cohort penetrance for high-risk variants runs well "

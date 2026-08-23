@@ -526,3 +526,67 @@ def test_override_context_manager_restores_on_exception():
     except RuntimeError:
         pass
     assert ep.value("discount_rate") == base
+
+
+def test_psa_without_rebuild_understates_uncertainty():
+    # REGRESSION GUARD. Baseline risk, effect size and intervention cost are
+    # read when a Finding is constructed. An earlier version ran PSA over
+    # pools built from the base case, so those parameters stayed pinned while
+    # only the cost-of-illness terms varied. The result was a strategy that
+    # could not lose: cost-saving in 100% of simulations and a CEAC reading
+    # 100% at every threshold, including $0/QALY.
+    def build():
+        return ee.pool_findings([
+            ee.Finding(label="f", coi_key="CAD",
+                       p_event=ep.value("baseline_event_probability"),
+                       rrr=ep.value("actionable_rrr"),
+                       intervention_cost=ep.value("intervention_cost_standard"))])
+
+    pinned = ee.run_psa(build(), n=400, test_cost=100)
+    live = ee.run_psa(build(), n=400, test_cost=100, rebuild=build)
+    span_pinned = pinned["inmb_ci_high"] - pinned["inmb_ci_low"]
+    span_live = live["inmb_ci_high"] - live["inmb_ci_low"]
+    assert span_live > span_pinned, (
+        "rebuilding pools inside each draw must widen the interval; if it "
+        "does not, the finding-level parameters are still pinned")
+
+
+def test_finding_defaults_are_registry_backed_not_literals():
+    # The two numbers the whole benefit side rests on must be varyable.
+    import value_of_information as voi
+    econ = {"findings_with_economics": [
+        {"finding": "x", "category": "Polygenic Risk", "qaly_gain": 0.5}]}
+    base = voi._collect(econ, None, None, [])[0]
+    assert base["p_event"] == ep.value("baseline_event_probability")
+    assert base["rrr"] == ep.value("actionable_rrr")
+    with ep.overridden({"actionable_rrr": 0.05,
+                        "baseline_event_probability": 0.4}):
+        drawn = voi._collect(econ, None, None, [])[0]
+    assert drawn["rrr"] == 0.05 and drawn["p_event"] == 0.4
+
+
+def test_each_condition_has_its_own_quality_of_life_decrement():
+    # Seven conditions once shared qaly_loss_mace — a cardiovascular event's
+    # decrement standing in for dementia, depression and kidney stones. That
+    # is wrong on its face, and it made the shared placeholder dominate the
+    # tornado, so the report named it the key driver when it was really the
+    # most overloaded constant.
+    qaly_params = [q for _, q in ee.COI_KEY_TO_PARAM.values()]
+    from collections import Counter
+    overloaded = [k for k, n in Counter(qaly_params).items() if n > 2]
+    assert not overloaded, (
+        f"QALY anchors reused across more than two conditions: {overloaded}")
+    # Conditions with genuinely different decrements must not share one.
+    distinct = {ee.COI_KEY_TO_PARAM[c][1]
+                for c in ("CAD", "Alzheimer", "Depression", "Urologic")}
+    assert len(distinct) == 4, (
+        "dementia, depression, kidney stones and heart attacks do not have "
+        "the same quality-of-life decrement")
+
+
+def test_dementia_costs_more_quality_of_life_than_kidney_stones():
+    # A cheap ordering check that would have caught the shared-anchor bug.
+    dementia = ep.value(ee.COI_KEY_TO_PARAM["Alzheimer"][1])
+    urologic = ep.value(ee.COI_KEY_TO_PARAM["Urologic"][1])
+    assert dementia > urologic * 3, (
+        f"dementia decrement {dementia} vs urologic {urologic} — implausible")

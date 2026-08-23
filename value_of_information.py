@@ -205,20 +205,33 @@ def _collect(economics_result: Optional[Dict],
         if kind == "pgx":
             out.append({"label": label, "kind": "pgx",
                         "pgx_key": _match_pgx(label),
-                        "intervention": 100.0, "wgs_only": False,
+                        "intervention": _econ_params.value(
+                            "intervention_cost_pgx"), "wgs_only": False,
                         "haircut": _hc, "confidence": conf,
                         "source_category": f.get("category") or ""})
         elif kind == "coi":
+            # Baseline risk, effect size and intervention cost come from the
+            # registry rather than from literals here. They are the two or
+            # three numbers the entire benefit side rests on; as bare
+            # constants they could not be varied in sensitivity analysis and
+            # never appeared in any provenance count, which made the most
+            # load-bearing figures in the model also the least visible.
             out.append({"label": label, "kind": "coi", "coi_key": coi_key,
-                        "p_event": 0.15 if coi_key == "Alzheimer" else 0.20,
-                        "rrr": 0.30, "qaly": float(f.get("qaly_gain") or 0.5),
+                        "p_event": _econ_params.value(
+                            "baseline_event_probability_dementia"
+                            if coi_key == "Alzheimer"
+                            else "baseline_event_probability"),
+                        "rrr": _econ_params.value("actionable_rrr"),
+                        "qaly": float(f.get("qaly_gain") or 0.5),
                         # Whether the SOURCE supplied a QALY figure or this is
                         # the 0.5 fallback. The pooling engine needs to tell
                         # them apart: passing the fallback through as an
                         # override would shadow the registry's per-condition
                         # QALY anchors on every finding, leaving them dead.
                         "qaly_explicit": f.get("qaly_gain") is not None,
-                        "intervention": 500.0, "horizon": 25, "wgs_only": False,
+                        "intervention": _econ_params.value(
+                            "intervention_cost_standard"),
+                        "horizon": 25, "wgs_only": False,
                         "haircut": _hc, "confidence": conf,
                         "source_category": f.get("category") or ""})
 
@@ -245,7 +258,8 @@ def _collect(economics_result: Optional[Dict],
                         "penetrance_literature": round(p_lit, 4),
                         "penetrance_corrected": round(p, 4),
                         "rrr": rrr, "qaly": qaly, "qaly_explicit": True,
-                        "intervention": 1_500.0,
+                        "intervention": _econ_params.value(
+                            "intervention_cost_monogenic"),
                         "horizon": 30, "wgs_only": True, "haircut": 1.0,
                         "confidence": "high"})
         # carriers: reproductive value (small direct health value to self)
@@ -253,7 +267,8 @@ def _collect(economics_result: Optional[Dict],
             out.append({"label": f"{f.get('gene','?')} carrier (reproductive)",
                         "kind": "coi", "coi_key": "Pathogenic", "p_event": 0.04,
                         "rrr": 0.5, "qaly": 0.2, "qaly_explicit": True,
-                        "intervention": 400.0,
+                        "intervention": _econ_params.value(
+                            "cost_genetic_counseling"),
                         "horizon": 5, "wgs_only": True, "haircut": 1.0,
                         "confidence": "moderate"})
 
@@ -266,7 +281,9 @@ def _collect(economics_result: Optional[Dict],
                                   f"{f.get('pos','?')}", "kind": "coi",
                         "coi_key": "Pathogenic", "p_event": 0.10, "rrr": 0.4,
                         "qaly": 0.5, "qaly_explicit": True,
-                        "intervention": 800.0, "horizon": 25,
+                        "intervention": _econ_params.value(
+                            "intervention_cost_predicted_variant"),
+                        "horizon": 25,
                         "wgs_only": True,
                         "haircut": max(0.1, float(am)),   # scale value by AM confidence
                         "confidence": f.get("confidence", "low")})
@@ -855,9 +872,33 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
         # Propagate the registry's documented uncertainty. Until this ran,
         # the distribution and range fields were documentation only and the
         # model reported a point estimate as if it were precise.
-        _pooled["psa"] = _ee.run_psa(_pools, n=1500, test_cost=test_cost, wtp=wtp)
-        _pooled["ceac"] = _ee.ceac(_pools, n=600, test_cost=test_cost)
-        _pooled["tornado"] = _ee.tornado(_pools, test_cost=test_cost, wtp=wtp)
+        # Rebuild the pools inside every draw. Baseline risk, effect size and
+        # intervention cost are read when a Finding is constructed, so reusing
+        # pools built from the base case would leave those parameters pinned
+        # and report an interval far narrower than the real one.
+        def _rebuild():
+            _fs = _collect(economics_result, clinical_variants_result,
+                           novel_variants_result, unvalued=None)
+            return _ee.pool_findings([
+                _ee.Finding(label=f["label"], coi_key=f.get("coi_key", ""),
+                            p_event=float(f.get("p_event", 0.0) or 0.0),
+                            rrr=float(f.get("rrr", 0.0) or 0.0),
+                            haircut=float(f.get("haircut", 1.0) or 1.0),
+                            intervention_cost=float(f.get("intervention", 0.0) or 0.0),
+                            confidence=f.get("confidence", "moderate"),
+                            source_category=f.get("source_category", ""),
+                            qaly_override=(float(f["qaly"])
+                                           if f.get("qaly_explicit")
+                                           and f.get("qaly") is not None
+                                           else None))
+                for f in _fs if f.get("kind") == "coi" and f.get("coi_key")])
+
+        _pooled["psa"] = _ee.run_psa(_pools, n=1500, test_cost=test_cost,
+                                     wtp=wtp, rebuild=_rebuild)
+        _pooled["ceac"] = _ee.ceac(_pools, n=600, test_cost=test_cost,
+                                   rebuild=_rebuild)
+        _pooled["tornado"] = _ee.tornado(_pools, test_cost=test_cost, wtp=wtp,
+                                         rebuild=_rebuild)
         _pooled["provenance"] = _econ_params.assumption_burden()
         _pooled["declared_assumptions"] = [
             {"key": p.key, "value": p.value, "units": p.units, "note": p.note}

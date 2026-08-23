@@ -64,19 +64,27 @@ _LIFE_TABLE_PATH = os.path.join(_DATA_DIR, "LifeTable_USA_Mx_2015.csv")
 # the registry keys that cost them. A condition with no entry here cannot be
 # valued — which is the intended behaviour, since the alternative is inventing
 # a cost for it.
+#
+# Each condition must name its OWN quality-of-life decrement. For a while
+# seven of these pointed at ``qaly_loss_mace`` — a non-fatal cardiovascular
+# event's decrement — which claimed the same quality-of-life loss for dementia,
+# depression and kidney stones. Beyond being wrong, it corrupted the
+# sensitivity analysis: one constant carrying seven conditions dominated the
+# tornado, so the report named it the model's key driver when it was really
+# just the most overloaded placeholder.
 COI_KEY_TO_PARAM: Dict[str, Tuple[str, str]] = {
     # coi_key            (cost param,               qaly-loss param)
     "CAD":               ("coi_mace",               "qaly_loss_mace"),
     "T2D":               ("coi_t2d",                "qaly_loss_t2d"),
-    "Alzheimer":         ("coi_alzheimer",          "qaly_loss_mace"),
-    "Depression":        ("coi_depression",         "qaly_loss_mace"),
-    "SubstanceUse":      ("coi_substance_use",      "qaly_loss_mace"),
-    "Autoimmune":        ("coi_autoimmune",         "qaly_loss_mace"),
-    "Urologic":          ("coi_urologic",           "qaly_loss_mace"),
-    "IronOverload":      ("coi_iron_overload",      "qaly_loss_mace"),
-    "Colorectal":        ("coi_colorectal",         "qaly_loss_t2d"),
-    "BreastOvarian":     ("coi_breast_ovarian",     "qaly_loss_t2d"),
-    "Pathogenic":        ("coi_pathogenic_generic", "qaly_loss_t2d"),
+    "Alzheimer":         ("coi_alzheimer",          "qaly_loss_dementia"),
+    "Depression":        ("coi_depression",         "qaly_loss_depression"),
+    "SubstanceUse":      ("coi_substance_use",      "qaly_loss_substance_use"),
+    "Autoimmune":        ("coi_autoimmune",         "qaly_loss_autoimmune"),
+    "Urologic":          ("coi_urologic",           "qaly_loss_urologic"),
+    "IronOverload":      ("coi_iron_overload",      "qaly_loss_iron_overload"),
+    "Colorectal":        ("coi_colorectal",         "qaly_loss_cancer"),
+    "BreastOvarian":     ("coi_breast_ovarian",     "qaly_loss_cancer"),
+    "Pathogenic":        ("coi_pathogenic_generic", "qaly_loss_pathogenic_generic"),
 }
 
 
@@ -895,13 +903,21 @@ def validate_model(pools: Dict[str, ConditionPool], evaluated: Dict) -> List[Dic
 
 def run_psa(pools: Dict[str, "ConditionPool"], *, n: int = 2000,
             seed: int = 20260822, test_cost: float = 0.0,
-            wtp: Optional[float] = None) -> Dict:
+            wtp: Optional[float] = None, rebuild=None) -> Dict:
     """Probabilistic sensitivity analysis over the registry's distributions.
 
     Each iteration draws every sampleable parameter from its documented
     distribution, re-runs the pooled evaluation with those values in place,
     and records incremental cost and QALYs. Parameters with no published
     spread are held fixed rather than given invented uncertainty.
+
+    ``rebuild`` is a zero-argument callable returning freshly-built pools. It
+    matters more than it looks: baseline risk, effect size and intervention
+    cost are read when a Finding is CONSTRUCTED, so pools built before
+    sampling carry base-case values no matter what the draw says. Without a
+    rebuild, only the cost-of-illness terms vary — which is exactly the
+    one-sided uncertainty that made an earlier version of this report claim a
+    strategy was cost-saving in 100% of simulations.
     """
     import random
     wtp = ep.value("wtp_per_qaly") if wtp is None else float(wtp)
@@ -911,7 +927,8 @@ def run_psa(pools: Dict[str, "ConditionPool"], *, n: int = 2000,
     inmbs: List[float] = []
     for _ in range(max(1, int(n))):
         with ep.overridden(ep.sample_all(rng)):
-            ev = evaluate_pools(pools, wtp=wtp, test_cost=test_cost)
+            iter_pools = rebuild() if rebuild is not None else pools
+            ev = evaluate_pools(iter_pools, wtp=wtp, test_cost=test_cost)
             cea = ev["cea"]
         costs.append(float(cea["incremental_cost"]))
         qalys.append(float(cea["incremental_qaly"]))
@@ -951,7 +968,7 @@ def ceac(pools: Dict[str, "ConditionPool"], *,
          thresholds: Sequence[float] = (0, 25_000, 50_000, 75_000, 100_000,
                                         150_000, 200_000),
          n: int = 800, seed: int = 20260822,
-         test_cost: float = 0.0) -> List[Dict]:
+         test_cost: float = 0.0, rebuild=None) -> List[Dict]:
     """Cost-effectiveness acceptability curve from the pooled model.
 
     Reuses one set of draws across all thresholds — resampling per threshold
@@ -963,7 +980,8 @@ def ceac(pools: Dict[str, "ConditionPool"], *,
     draws: List[Tuple[float, float]] = []
     for _ in range(max(1, int(n))):
         with ep.overridden(ep.sample_all(rng)):
-            cea = evaluate_pools(pools, test_cost=test_cost)["cea"]
+            iter_pools = rebuild() if rebuild is not None else pools
+            cea = evaluate_pools(iter_pools, test_cost=test_cost)["cea"]
         draws.append((float(cea["incremental_cost"]),
                       float(cea["incremental_qaly"])))
     out: List[Dict] = []
@@ -975,7 +993,7 @@ def ceac(pools: Dict[str, "ConditionPool"], *,
 
 def tornado(pools: Dict[str, "ConditionPool"], *,
             test_cost: float = 0.0, wtp: Optional[float] = None,
-            top: int = 10) -> List[Dict]:
+            top: int = 10, rebuild=None) -> List[Dict]:
     """One-way sensitivity: swing in net monetary benefit across each
     parameter's documented range.
 
@@ -990,9 +1008,11 @@ def tornado(pools: Dict[str, "ConditionPool"], *,
         if p.low is None or p.high is None or p.low == p.high:
             continue
         with ep.overridden({p.key: p.low}):
-            lo = evaluate_pools(pools, wtp=wtp, test_cost=test_cost)["cea"]["inmb"]
+            lo = evaluate_pools(rebuild() if rebuild else pools,
+                                wtp=wtp, test_cost=test_cost)["cea"]["inmb"]
         with ep.overridden({p.key: p.high}):
-            hi = evaluate_pools(pools, wtp=wtp, test_cost=test_cost)["cea"]["inmb"]
+            hi = evaluate_pools(rebuild() if rebuild else pools,
+                                wtp=wtp, test_cost=test_cost)["cea"]["inmb"]
         swing = abs(hi - lo)
         if swing < 1:
             continue
