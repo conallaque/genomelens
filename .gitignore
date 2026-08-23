@@ -120,4 +120,12 @@ logs/
 # ── Allow the small included test genome and SNP DB only ───────────────────
 !test_genome.txt
 !snp_database.json
+
+# Same one-file-at-a-time rule as the LifeTable exception above. The blanket
+# *.txt rule is what keeps raw genome files out; these two are dependency
+# manifests that happen to share the extension. Without them nobody who clones
+# the repo can install anything, and CI cannot run at all — both were silently
+# untracked until the CI workflow tried to read them.
+!requirements.txt
+!requirements-dev.txt
 .preview/

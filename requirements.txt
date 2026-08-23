@@ -1,0 +1,18 @@
+# Runtime dependencies — pinned to known-working versions.
+# Strict-equal pins are used so a fresh `pip install -r requirements.txt`
+# always reproduces the environment in which the test suite was last green.
+
+pandas==2.2.3
+numpy==2.0.2
+scipy==1.13.1
+scikit-learn==1.5.2
+snps==2.10.0
+requests==2.32.3
+pydantic==2.9.2
+matplotlib==3.9.2
+
+# Optional — only needed for `--pdf` export
+# weasyprint==62.3
+
+# Optional — Phase-3 WGS predictor screen (novel_variants.py); install via `pip install .[wgs]`
+pysam>=0.22
