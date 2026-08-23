@@ -20,7 +20,7 @@ East Asian populations.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 
 # Per-condition severity + carrier frequency context. "severity" ranks:
@@ -739,7 +739,14 @@ def _dosage_of(entry: Dict) -> int:
 
 
 def analyze_family_planning(carrier_result: Optional[Dict] = None,
-                            tier1_results: Optional[Dict] = None,
+                            # Accepted and ignored. The pipeline passes the
+                            # tier-1 result LIST here against a Dict
+                            # annotation; nothing in this function ever read
+                            # it, so the mismatch was silent. Kept in the
+                            # signature because callers pass it by keyword,
+                            # but annotated honestly rather than removed in a
+                            # cleanup commit.
+                            tier1_results: Optional[Any] = None,
                             mt_result: Optional[Dict] = None,
                             snps_df=None,
                             inferred_sex: Optional[str] = None,
