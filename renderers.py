@@ -2243,18 +2243,31 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
   judgement calls with no published anchor. The last group is listed in full
   rather than blended in with the others &mdash; they are the parts of this model
   most worth arguing with.</div>
-<div style="border:1px solid #f0dcc0;background:#fffaf2;border-radius:8px;
-            padding:10px 12px;margin:8px 0;font-size:.85em;color:#6b5330">
-  <strong>Coverage is partial, and the percentage above is not a claim about the
-  whole model.</strong> A further
-  <strong>{prov.get('n_unregistered', 0)}</strong> load-bearing numbers &mdash; the
-  per-finding cost, outcome-value, prevalence and QALY fields in the curated
-  module tables &mdash; are not registered yet and reach the model without a
-  provenance tier. Registered parameters are
-  <strong>{prov.get('pct_of_model_registered', 0)}%</strong> of the
-  {prov.get('n_total_known', 0)} identified so far. Registering the rest is the
-  remaining work; until then, treat the per-finding figures as
-  order-of-magnitude.</div>
+<div style="border:1px solid #dfe7f0;background:#f7fafd;border-radius:8px;
+            padding:10px 12px;margin:8px 0;font-size:.85em;color:#3f5266">
+  <strong>Whole-model provenance.</strong> The percentage above describes the
+  registry only. Counting the
+  <strong>{prov.get('n_unregistered', 0)}</strong> per-finding figures in the
+  curated module tables as well &mdash; cost, outcome value, prevalence and QALY
+  fields &mdash; gives {prov.get('n_total_known', 0)} parameters in total, of which
+  <strong>{prov.get('model_pct_resolvable', 0)}%</strong> carry a citation you can
+  follow directly (PMID or DOI) and
+  <strong>{prov.get('model_pct_attributed_or_better', 0)}%</strong> carry at least a
+  named literature attribution. Only
+  <strong>{prov.get('model_pct_unsourced', 0)}%</strong> rest on judgement alone,
+  and those are the declared assumptions listed below.
+  <div style="margin-top:6px">The remaining gap is
+  <strong>{prov.get('n_curated_attributed', 0)}</strong> figures whose source is
+  named but whose identifier has not been verified, across
+  {prov.get('n_unresolved_sources', 0)} distinct sources. They are real citations,
+  not invented numbers &mdash; they just cannot be resolved automatically yet.</div></div>
+<details style="margin-top:6px"><summary style="cursor:pointer;color:#8a94a3;
+    font-size:.84em">Unverified sources, largest first &mdash; the work queue</summary>
+<ul style="font-size:.82em;color:#6a7683;margin:5px 0 0 18px">{
+  "".join(f"<li>{_esc(u.get('source',''))} "
+          f"<span style='color:#b0b7c0'>&mdash; {u.get('n_params',0)} figures</span></li>"
+          for u in (prov.get('unresolved_sources') or []))
+}</ul></details>
 <div style="font-weight:600;color:#5b6673;margin-top:8px">Declared assumptions</div>
 <ul style="font-size:.85em;color:#5b6673;margin:5px 0 0 18px">{assums}</ul>
 <div style="font-weight:600;color:#5b6673;margin-top:10px">References</div>

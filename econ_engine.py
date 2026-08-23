@@ -793,14 +793,16 @@ def cheers_checklist(*, wtp: float, rate: float, horizon: float,
                      "life-table background mortality and Simpson's 1/3 "
                      "within-cycle correction."},
         {"item": "Analytics and assumptions",
-         "response": f"Of {burden['n_parameters']} registered parameters "
-                     f"(method conventions, cost-of-illness anchors, effect "
-                     f"sizes, utilities), {burden['pct_sourced']:.0f}% carry a "
-                     f"literature citation and {burden['n_assumption']} are "
-                     f"declared assumptions. A further "
-                     f"{burden.get('n_unregistered', 0)} per-finding figures in "
-                     f"the curated module tables are not yet registered and "
-                     f"carry no provenance tier — a stated limitation."},
+         "response": f"Across {burden.get('n_total_known', 0)} model "
+                     f"parameters, {burden.get('model_pct_resolvable', 0):.0f}% "
+                     f"carry a resolvable citation (PMID/DOI) and "
+                     f"{burden.get('model_pct_attributed_or_better', 0):.0f}% "
+                     f"carry at least a named attribution; "
+                     f"{burden.get('model_pct_unsourced', 0):.1f}% are declared "
+                     f"assumptions, listed individually. "
+                     f"{burden.get('n_curated_attributed', 0)} figures have a "
+                     f"named source whose identifier is not yet verified — a "
+                     f"stated limitation."},
         {"item": "Characterising heterogeneity",
          "response": f"Willingness to pay varied ${ep.get('wtp_per_qaly').low:,.0f}"
                      f"–${ep.get('wtp_per_qaly').high:,.0f}/QALY; age and sex "

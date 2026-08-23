@@ -183,4 +183,81 @@ def test_unregistered_counter_sees_the_curated_tables():
 
 
 def test_burden_scope_names_what_is_not_covered():
-    assert "not yet registered" in ep.assumption_burden()["scope"]
+    scope = ep.assumption_burden()["scope"]
+    assert "not in the registry" in scope, (
+        "the scope note must say plainly which parts of the model the "
+        "registry does not cover")
+
+
+# ── Curated-table provenance ──────────────────────────────────────────────
+
+def test_every_curated_table_figure_carries_an_attribution():
+    # The strongest claim this project can make about the curated tables: no
+    # number in them is anonymous. A new entry without a src breaks this.
+    a = ep.audit_curated_tables()
+    assert a["available"]
+    assert a["n_missing"] == 0, (
+        f"{a['n_missing']} curated figures have no literature attribution at "
+        f"all; every entry needs a src")
+
+
+def test_a_meaningful_share_of_curated_sources_resolve():
+    a = ep.audit_curated_tables()
+    assert a["pct_resolvable"] >= 35.0, (
+        f"only {a['pct_resolvable']}% of curated figures carry a resolvable "
+        f"identifier; CURATED_SOURCE_IDS exists to raise this")
+
+
+def test_resolution_map_entries_are_well_formed():
+    # A wrong identifier is worse than none — it sends a reader to the wrong
+    # paper while looking more rigorous. Enforce the shape at least.
+    pattern = re.compile(r"(PMID:\d+|doi:10\.\S+)", re.I)
+    for src, ident in ep.CURATED_SOURCE_IDS.items():
+        assert pattern.search(ident), f"{src!r} -> {ident!r} has no PMID/DOI"
+        assert src.strip() == src, f"{src!r} has stray whitespace"
+
+
+def test_resolution_map_keys_match_real_source_strings():
+    # A key that matches nothing is a silent no-op — usually a typo made while
+    # transcribing the src string.
+    import health_economics as he
+    live = set()
+    for name in dir(he):
+        if not (name.endswith("_ECONOMICS") or name.endswith("_COSTS")):
+            continue
+        table = getattr(he, name, None)
+        if isinstance(table, dict):
+            for entry in table.values():
+                if isinstance(entry, dict) and entry.get("src"):
+                    live.add(entry["src"])
+    orphans = [k for k in ep.CURATED_SOURCE_IDS if k not in live]
+    assert not orphans, f"resolution-map keys matching no table entry: {orphans}"
+
+
+def test_source_states_are_classified_correctly():
+    assert ep.resolve_curated_source("")["state"] == "missing"
+    assert ep.resolve_curated_source("Smith et al. (2020) Lancet")["state"] \
+        == "attributed"
+    assert ep.resolve_curated_source("Smith 2020 PMID:12345678")["state"] \
+        == "resolvable"
+    known = next(iter(ep.CURATED_SOURCE_IDS))
+    r = ep.resolve_curated_source(known)
+    assert r["state"] == "resolvable" and r["identifier"]
+
+
+def test_whole_model_provenance_is_reported_not_just_the_registry():
+    b = ep.assumption_burden()
+    assert b["model_pct_attributed_or_better"] >= 95.0, (
+        "nearly every figure in the model should carry at least a named "
+        "source; if this drops, an anonymous constant has appeared")
+    assert b["model_pct_unsourced"] <= 5.0
+    # The whole-model resolvable share must not be confused with the
+    # registry-only share — they answer different questions.
+    assert b["model_pct_resolvable"] != b["pct_sourced"]
+
+
+def test_unresolved_work_queue_is_ordered_by_impact():
+    a = ep.audit_curated_tables()
+    counts = [u["n_params"] for u in a["unresolved_sources"]]
+    assert counts == sorted(counts, reverse=True), (
+        "the work queue should name the highest-leverage source first")

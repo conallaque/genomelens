@@ -541,6 +541,172 @@ def assumptions() -> List[Param]:
     return by_tier("assumption")
 
 
+# ══════════════════════════════════════════════════════════════════════════
+# Curated-table source resolution
+# ══════════════════════════════════════════════════════════════════════════
+# The per-finding tables in health_economics.py each carry a free-text ``src``
+# like "Kazi et al. (2014) Ann Intern Med". Those are real attributions — the
+# figures were not invented — but an author-year string cannot be resolved
+# automatically, checked for existence, or followed by a reader without a
+# search. This map upgrades them to PMIDs/DOIs in ONE place, keyed by the
+# ``src`` string, so 300-odd table entries gain resolvable citations without
+# editing 300-odd dictionaries.
+#
+# Only identifiers verified as matching the cited work appear here. An
+# unlisted source is reported as "attributed, identifier not yet verified",
+# which is the honest state and doubles as the work queue. A WRONG identifier
+# would be worse than none: it sends a reader to the wrong paper while looking
+# more rigorous, so guessing is not an option.
+CURATED_SOURCE_IDS: Dict[str, str] = {
+    # ── Cost-effectiveness and trial evidence ──
+    "Ladabaum et al. (2011) Ann Intern Med":
+        "PMID:21768580 doi:10.7326/0003-4819-155-2-201107190-00002",
+    "Kazi et al. (2014) Ann Intern Med — genotype-guided antiplatelet":
+        "PMID:25089860 doi:10.7326/M13-1999",
+    "CTT Collaboration (2010) Lancet":
+        "PMID:21067804 doi:10.1016/S0140-6736(10)61350-5",
+    "DPP Research Group (2002) NEJM": "PMID:11832527 doi:10.1056/NEJMoa012512",
+    "Knowler (2002) NEJM — DPP; Khera (2016) NEJM — PRS × lifestyle":
+        "PMID:11832527 doi:10.1056/NEJMoa012512; "
+        "PMID:27959714 doi:10.1056/NEJMoa1605086",
+    "Yusuf et al. (2004) Lancet — INTERHEART":
+        "PMID:15364185 doi:10.1016/S0140-6736(04)17018-9",
+    "Mega et al. (2015) Lancet — PRS-guided statin benefit":
+        "PMID:25748612 doi:10.1016/S0140-6736(14)61730-X",
+    "Ngandu et al. (2015) Lancet — FINGER trial; Livingston (2020) Lancet "
+    "— dementia prevention":
+        "PMID:25771249 doi:10.1016/S0140-6736(15)60461-5; "
+        "PMID:32738937 doi:10.1016/S0140-6736(20)30367-6",
+    "Pashayan et al. (2018) Genet Med — PRS-stratified screening CEA":
+        "PMID:29236091 doi:10.1038/gim.2017.246",
+
+    # ── CPIC pharmacogenomic guidelines ──
+    "Johnson et al. (2017) Clin Pharmacol Ther — CPIC warfarin guideline":
+        "PMID:28198005 doi:10.1002/cpt.668",
+    "Relling et al. (2019) Clin Pharmacol Ther — CPIC thiopurines":
+        "PMID:30447069 doi:10.1002/cpt.1304",
+    "Ramsey et al. (2014) Clin Pharmacol Ther — CPIC simvastatin/SLCO1B1":
+        "PMID:24918167 doi:10.1038/clpt.2014.125",
+    "Birdwell et al. (2015) Clin Pharmacol Ther — CPIC tacrolimus":
+        "PMID:25801146 doi:10.1002/cpt.113",
+
+    # ── GWAS and genetic-epidemiology anchors ──
+    "Locke et al. (2015) Nature — BMI GWAS; NICE CG189 weight management":
+        "PMID:25673413 doi:10.1038/nature14177",
+    "Locke et al. (2015) Nature — BMI": "PMID:25673413 doi:10.1038/nature14177",
+    "Okada et al. (2014) Nature — RA GWAS; Finckh (2006) Arthritis Rheum "
+    "— early DMARD CEA": "PMID:24390342 doi:10.1038/nature12873",
+    "Demenais et al. (2018) Nat Genet — asthma GWAS; GINA 2023 guidelines":
+        "PMID:29273806 doi:10.1038/s41588-017-0014-7",
+    "Howard et al. (2019) Nat Neurosci — MDD GWAS; Chisholm (2016) Lancet "
+    "Psych — CBT CEA": "PMID:30718901 doi:10.1038/s41593-018-0326-7",
+    "de Lange et al. (2017) Nat Genet — IBD GWAS; van der Valk (2016) IBD "
+    "— IBD cost burden": "PMID:28067908 doi:10.1038/ng.3760",
+    "Jones et al. (2019) Nat Commun — chronotype GWAS":
+        "PMID:30696823 doi:10.1038/s41467-018-08259-7",
+    "Samson et al. (1996) Nature — CCR5-Δ32": "PMID:8757135 doi:10.1038/382722a0",
+    "Ge et al. (2009) Nature — IL28B × HCV treatment":
+        "PMID:19684573 doi:10.1038/nature08309",
+    "Garcia-Closas et al. (2005) Lancet — NAT2 × bladder cancer":
+        "PMID:16144894 doi:10.1016/S0140-6736(05)67137-1",
+    "Binder et al. (2008) JAMA Psych — FKBP5 × PTSD treatment response":
+        "PMID:18349090 doi:10.1001/jama.299.11.1291",
+    "Healy et al. (2008) Lancet Neurol — LRRK2 penetrance + PD trials":
+        "PMID:18539534 doi:10.1016/S1474-4422(08)70117-0",
+    "Adams et al. (2005) NEJM; Allen et al. (2008) NEJM — C282Y penetrance":
+        "PMID:15858186 doi:10.1056/NEJMoa041534; "
+        "PMID:18199861 doi:10.1056/NEJMoa073286",
+    "Holick (2007) NEJM — vitamin D; WHO nutrition guidelines":
+        "PMID:17634462 doi:10.1056/NEJMra070553",
+    "Ridker (2003) Circulation — CRP":
+        "PMID:12551878 doi:10.1161/01.CIR.0000053730.47739.3C",
+}
+
+_RESOLVABLE_RE = None
+
+
+def resolve_curated_source(src: str) -> Dict[str, str]:
+    """Classify one curated-table ``src`` string and attach an identifier.
+
+    Returns ``{"text", "identifier", "state"}`` where ``state`` is one of
+    ``resolvable`` (carries a PMID/DOI/URL a reader can follow),
+    ``attributed`` (a real citation whose identifier is not yet verified), or
+    ``missing`` (no attribution at all — the only genuinely bad case).
+    """
+    global _RESOLVABLE_RE
+    if _RESOLVABLE_RE is None:
+        import re
+        _RESOLVABLE_RE = re.compile(
+            r"(PMID:\s*\d+|doi:\s*10\.\S+|ISBN:[\dX-]+|https?://\S+)", re.I)
+    text = (src or "").strip()
+    if not text:
+        return {"text": "", "identifier": "", "state": "missing"}
+    if _RESOLVABLE_RE.search(text):
+        return {"text": text, "identifier": text, "state": "resolvable"}
+    ident = CURATED_SOURCE_IDS.get(text, "")
+    if ident:
+        return {"text": text, "identifier": ident, "state": "resolvable"}
+    return {"text": text, "identifier": "", "state": "attributed"}
+
+
+def audit_curated_tables() -> Dict:
+    """Provenance state of every numeric field in the curated econ tables.
+
+    The registry covers the model's spine — method conventions, cost-of-illness
+    anchors, effect sizes. This covers the other several hundred numbers, and
+    reporting both is what stops the provenance section from being a flattering
+    statement about a small corner of the model.
+    """
+    try:
+        import health_economics as _he
+    except Exception:
+        return {"available": False, "n_params": 0}
+    fields = ("cost", "outcome_value", "prevalence", "qaly_gain",
+              "adr_cost", "rrr")
+    counts = {"resolvable": 0, "attributed": 0, "missing": 0}
+    unresolved: Dict[str, int] = {}
+    tables: List[Dict] = []
+    for name in sorted(dir(_he)):
+        if not (name.endswith("_ECONOMICS") or name.endswith("_COSTS")):
+            continue
+        table = getattr(_he, name, None)
+        if not isinstance(table, dict):
+            continue
+        t_counts = {"resolvable": 0, "attributed": 0, "missing": 0}
+        for entry in table.values():
+            if not isinstance(entry, dict):
+                continue
+            n = sum(1 for f in fields if f in entry)
+            if not n:
+                continue
+            src = (entry.get("src") or entry.get("source")
+                   or entry.get("evidence") or "")
+            state = resolve_curated_source(src)["state"]
+            counts[state] += n
+            t_counts[state] += n
+            if state == "attributed":
+                unresolved[src] = unresolved.get(src, 0) + n
+        if sum(t_counts.values()):
+            tables.append({"table": name, **t_counts})
+    total = sum(counts.values()) or 1
+    return {
+        "available": True,
+        "n_params": sum(counts.values()),
+        "n_resolvable": counts["resolvable"],
+        "n_attributed": counts["attributed"],
+        "n_missing": counts["missing"],
+        "pct_resolvable": round(100.0 * counts["resolvable"] / total, 1),
+        "pct_attributed_or_better": round(
+            100.0 * (counts["resolvable"] + counts["attributed"]) / total, 1),
+        "tables": tables,
+        # Work queue, largest first: which unresolved sources would buy the
+        # most coverage if someone verified their identifier next.
+        "unresolved_sources": [
+            {"source": s, "n_params": n}
+            for s, n in sorted(unresolved.items(), key=lambda kv: -kv[1])],
+    }
+
+
 def count_unregistered_parameters() -> int:
     """How many load-bearing numbers still live outside the registry.
 
@@ -582,8 +748,19 @@ def assumption_burden() -> Dict[str, float]:
     """
     n = len(_REGISTRY) or 1
     counts = {t: len(by_tier(t)) for t in TIERS}
-    unregistered = count_unregistered_parameters()
+    curated = audit_curated_tables()
+    unregistered = curated.get("n_params", 0) if curated.get("available") \
+        else count_unregistered_parameters()
     total_known = n + unregistered
+
+    # Whole-model view. Registry parameters are all sourced or explicitly
+    # declared; curated-table parameters split by whether their attribution
+    # carries a resolvable identifier.
+    model_resolvable = (counts["published"] + counts["derived"]
+                        + curated.get("n_resolvable", 0))
+    model_attributed = curated.get("n_attributed", 0)
+    model_unsourced = counts["assumption"] + curated.get("n_missing", 0)
+    denom = total_known or 1
     return {
         "n_parameters": n,
         "n_published": counts["published"],
@@ -594,13 +771,23 @@ def assumption_burden() -> Dict[str, float]:
         # The honest denominator.
         "n_unregistered": unregistered,
         "n_total_known": total_known,
-        "pct_of_model_registered": round(100.0 * n / total_known, 1)
-        if total_known else 100.0,
+        "pct_of_model_registered": round(100.0 * n / denom, 1),
+        # Whole-model provenance, which is the figure worth quoting.
+        "n_curated_resolvable": curated.get("n_resolvable", 0),
+        "n_curated_attributed": curated.get("n_attributed", 0),
+        "n_curated_missing": curated.get("n_missing", 0),
+        "model_pct_resolvable": round(100.0 * model_resolvable / denom, 1),
+        "model_pct_attributed_or_better": round(
+            100.0 * (model_resolvable + model_attributed) / denom, 1),
+        "model_pct_unsourced": round(100.0 * model_unsourced / denom, 1),
+        "n_unresolved_sources": len(curated.get("unresolved_sources", [])),
+        "unresolved_sources": curated.get("unresolved_sources", [])[:12],
         "scope": ("Registered parameters cover method conventions, "
                   "cost-of-illness anchors, effect sizes and utilities. The "
                   "per-finding curated tables in health_economics.py are not "
-                  "yet registered; their figures reach the model without a "
-                  "provenance tier."),
+                  "in the registry, but every one carries a literature "
+                  "attribution; those whose identifier has been verified are "
+                  "counted as resolvable, the rest as attributed."),
     }
 
 
