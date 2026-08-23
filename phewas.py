@@ -580,15 +580,20 @@ def _score_trait(snps_df: pd.DataFrame, trait: dict, sex: str | None) -> dict:
     # Tier reflects the MARKER score (a real genotype fact), but the renderer labels
     # it as a marker-score tier and shows R² so it is never read as the trait itself.
     if marker_percentile >= 95:
-        tier = "High marker score"; tier_cls = "tier-high"
+        tier = "High marker score"
+        tier_cls = "tier-high"
     elif marker_percentile >= 80:
-        tier = "Above-average marker score"; tier_cls = "tier-elevated"
+        tier = "Above-average marker score"
+        tier_cls = "tier-elevated"
     elif marker_percentile >= 20:
-        tier = "Typical marker score"; tier_cls = "tier-average"
+        tier = "Typical marker score"
+        tier_cls = "tier-average"
     elif marker_percentile >= 5:
-        tier = "Below-average marker score"; tier_cls = "tier-below"
+        tier = "Below-average marker score"
+        tier_cls = "tier-below"
     else:
-        tier = "Low marker score"; tier_cls = "tier-low"
+        tier = "Low marker score"
+        tier_cls = "tier-low"
 
     return {
         "status": "ok",

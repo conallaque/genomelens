@@ -192,7 +192,8 @@ def render_diff_text(diff: dict) -> str:
         for c in diff["prs_changes"]:
             a = c["from"] or "—"
             b = c["to"] or "—"
-            pa = c.get("prev_pct"); pb = c.get("curr_pct")
+            pa = c.get("prev_pct")
+            pb = c.get("curr_pct")
             extra = f" ({pa}th -> {pb}th)" if pa is not None and pb is not None else ""
             out.append(f"  ~ {c['name']:34s}  {a:14s} -> {b:14s}{extra}")
 

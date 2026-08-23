@@ -116,7 +116,8 @@ def analyze_abo(snps_df: pd.DataFrame) -> dict:
         if not gt:
             _record(rsid, "not on chip")
             continue
-        a_al = info.get("A"); b_al = info.get("B")
+        a_al = info.get("A")
+        b_al = info.get("B")
         n_a = gt.count(a_al) if a_al else 0
         n_b = gt.count(b_al) if b_al else 0
         interp = f"{gt} → {n_a}× A-backbone / {n_b}× B-backbone"
@@ -136,15 +137,23 @@ def analyze_abo(snps_df: pd.DataFrame) -> dict:
 
     if n_deletion == 2:
         # Homozygous O → phenotype O regardless of A/B tags
-        phenotype = "O"; genotype = "O/O"; confidence = "high"
+        phenotype = "O"
+        genotype = "O/O"
+        confidence = "high"
     elif n_deletion is None:
         # No O info; if we have decisive A vs B, we can still give a partial call
         if a_b_calls == ["A", "A", "A"] or (a_b_calls and set(a_b_calls) == {"A"}):
-            phenotype = "A (probably)"; genotype = "A/?"; confidence = "moderate"
+            phenotype = "A (probably)"
+            genotype = "A/?"
+            confidence = "moderate"
         elif a_b_calls and set(a_b_calls) == {"B"}:
-            phenotype = "B (probably)"; genotype = "B/?"; confidence = "moderate"
+            phenotype = "B (probably)"
+            genotype = "B/?"
+            confidence = "moderate"
         elif "AB_evidence" in a_b_calls:
-            phenotype = "AB (probably)"; genotype = "A/B"; confidence = "moderate"
+            phenotype = "AB (probably)"
+            genotype = "A/B"
+            confidence = "moderate"
     else:
         # We know O-deletion dose. Combine with A/B info.
         has_A = any(c == "A" for c in a_b_calls)
@@ -154,24 +163,40 @@ def analyze_abo(snps_df: pd.DataFrame) -> dict:
         if n_deletion == 0:
             # Both non-O — must be A/A, B/B, or A/B
             if both:
-                phenotype = "AB"; genotype = "A/B"; confidence = "high"
+                phenotype = "AB"
+                genotype = "A/B"
+                confidence = "high"
             elif has_A and not has_B:
-                phenotype = "A"; genotype = "A/A"; confidence = "high"
+                phenotype = "A"
+                genotype = "A/A"
+                confidence = "high"
             elif has_B and not has_A:
-                phenotype = "B"; genotype = "B/B"; confidence = "high"
+                phenotype = "B"
+                genotype = "B/B"
+                confidence = "high"
             else:
-                phenotype = "A, B, or AB"; genotype = "?/?"; confidence = "low"
+                phenotype = "A, B, or AB"
+                genotype = "?/?"
+                confidence = "low"
         elif n_deletion == 1:
             carries_hidden_O = True
             # One non-O + one O
             if both:
-                phenotype = "AB (rare)"; genotype = "A/B (with O?)"; confidence = "low"
+                phenotype = "AB (rare)"
+                genotype = "A/B (with O?)"
+                confidence = "low"
             elif has_A and not has_B:
-                phenotype = "A"; genotype = "A/O"; confidence = "high"
+                phenotype = "A"
+                genotype = "A/O"
+                confidence = "high"
             elif has_B and not has_A:
-                phenotype = "B"; genotype = "B/O"; confidence = "high"
+                phenotype = "B"
+                genotype = "B/O"
+                confidence = "high"
             else:
-                phenotype = "A or B"; genotype = "?/O"; confidence = "moderate"
+                phenotype = "A or B"
+                genotype = "?/O"
+                confidence = "moderate"
 
     return {
         "available": phenotype != "inconclusive" or ev,
@@ -288,15 +313,18 @@ def analyze_secretor_bombay(snps_df: pd.DataFrame) -> dict:
     if fut2:
         n_A = fut2.count("A")
         if n_A == 2:
-            secretor = "Non-secretor"; note = ("Homozygous FUT2 W143X (rs601338 AA) — "
+            secretor = "Non-secretor"
+            note = ("Homozygous FUT2 W143X (rs601338 AA) — "
                                                "non-secretor. ABO antigens are not expressed "
                                                "in saliva or body fluids. Protective against "
                                                "norovirus (H. pylori susceptibility slightly higher).")
         elif n_A == 1:
-            secretor = "Secretor (heterozygous carrier)"; note = ("Heterozygous FUT2 W143X — "
+            secretor = "Secretor (heterozygous carrier)"
+            note = ("Heterozygous FUT2 W143X — "
                                                "phenotypically a secretor.")
         else:
-            secretor = "Secretor"; note = "Normal FUT2 — you secrete ABO antigens in body fluids."
+            secretor = "Secretor"
+            note = "Normal FUT2 — you secrete ABO antigens in body fluids."
         ev.append({"rsid": "rs601338", "gt": fut2, "interpretation": note})
 
     return {
@@ -319,7 +347,8 @@ def analyze_blood_type(snps_df: pd.DataFrame) -> dict:
     ph = abo.get("phenotype", "")
     for tok in ("AB", "A", "B", "O"):
         if ph.startswith(tok):
-            letter = tok; break
+            letter = tok
+            break
     rh_sign = None
     st = rhd.get("status", "")
     if st.startswith("Rh-positive"): rh_sign = "+"

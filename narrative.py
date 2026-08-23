@@ -368,29 +368,37 @@ def _md_to_html(text: str) -> str:
         stripped = line.strip()
         if not stripped:
             if in_ol:
-                html_lines.append("</ol>"); in_ol = False
+                html_lines.append("</ol>")
+                in_ol = False
             if in_ul:
-                html_lines.append("</ul>"); in_ul = False
+                html_lines.append("</ul>")
+                in_ul = False
             continue
         m_ol = re.match(r"^\d+\.\s+(.+)$", stripped)
         m_ul = re.match(r"^[-*•]\s+(.+)$", stripped)
         if m_ol:
             if in_ul:
-                html_lines.append("</ul>"); in_ul = False
+                html_lines.append("</ul>")
+                in_ul = False
             if not in_ol:
-                html_lines.append("<ol>"); in_ol = True
+                html_lines.append("<ol>")
+                in_ol = True
             html_lines.append(f"<li>{m_ol.group(1)}</li>")
         elif m_ul:
             if in_ol:
-                html_lines.append("</ol>"); in_ol = False
+                html_lines.append("</ol>")
+                in_ol = False
             if not in_ul:
-                html_lines.append("<ul>"); in_ul = True
+                html_lines.append("<ul>")
+                in_ul = True
             html_lines.append(f"<li>{m_ul.group(1)}</li>")
         else:
             if in_ol:
-                html_lines.append("</ol>"); in_ol = False
+                html_lines.append("</ol>")
+                in_ol = False
             if in_ul:
-                html_lines.append("</ul>"); in_ul = False
+                html_lines.append("</ul>")
+                in_ul = False
             # Heading already converted
             if stripped.startswith("<h"):
                 html_lines.append(stripped)

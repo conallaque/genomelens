@@ -3757,7 +3757,9 @@ def build_blood_type_html(bt: dict | None) -> str:
     if not bt or not bt.get("available"):
         return ""
     combined = bt.get("combined") or "—"
-    a = bt["abo"]; d = bt["rhd"]; s = bt["secretor"]
+    a = bt["abo"]
+    d = bt["rhd"]
+    s = bt["secretor"]
 
     # Pick a colour by rarity
     rarity = {"O+": "#3fb950", "A+": "#3fb950", "B+": "#d29922", "AB+": "#d29922",

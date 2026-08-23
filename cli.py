@@ -176,12 +176,23 @@ def build_parser() -> argparse.ArgumentParser:
               "generate a warmly-written 'genetic counsellor explaining results' "
               "narrative_report.html. Requires Ollama running."),
     )
+    # Opt-OUT, not opt-in. Every other companion page (supplements, exercise,
+    # nutrition, economic analysis, longevity, master plan) is written on every
+    # run; the emergency card was the only one gated behind a flag, so a normal
+    # run produced no card and it looked like the feature had been dropped.
     parser.add_argument(
         "--emergency-card",
         action="store_true",
-        help=("Generate a standalone one-page emergency_card.html showing only "
-              "clinically actionable genetic findings (drug hypersensitivities, "
-              "clotting disorders, PGx extremes, etc.) for emergency clinicians."),
+        default=True,
+        help=("Write the one-page emergency_card.html — clinically actionable "
+              "findings only (drug hypersensitivities, clotting disorders, PGx "
+              "extremes) for emergency clinicians. On by default."),
+    )
+    parser.add_argument(
+        "--no-emergency-card",
+        dest="emergency_card",
+        action="store_false",
+        help="Skip the emergency card.",
     )
     parser.add_argument(
         "--retry-failed",

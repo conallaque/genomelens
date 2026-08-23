@@ -43,7 +43,8 @@ def test_looks_like_vcf_by_extension():
 
 def test_looks_like_vcf_by_header():
     f = tempfile.NamedTemporaryFile("w", suffix=".dat", delete=False)
-    f.write("##fileformat=VCFv4.2\n#CHROM\tPOS\tID\n"); f.close()
+    f.write("##fileformat=VCFv4.2\n#CHROM\tPOS\tID\n")
+    f.close()
     try:
         assert gi.looks_like_vcf(f.name)
     finally:
@@ -61,7 +62,8 @@ def _write_vcf(records_with_rsid, records_position_only, extra_lines=()):
         lines.append(f"{r.chrom}\t{r.pos_grch37}\t.\t{r.ancestral}\t{r.derived}\t.\t.\t.\tGT\t{gt}")
     lines.extend(extra_lines)
     f = tempfile.NamedTemporaryFile("w", suffix=".vcf", delete=False)
-    f.write("\n".join(lines) + "\n"); f.close()
+    f.write("\n".join(lines) + "\n")
+    f.close()
     return f.name
 
 
@@ -103,7 +105,8 @@ def test_profile_counts_total_and_acmg():
         "7\t123\t.\tA\tG\t.\t.\t.\tGT\t0/1",         # non-ACMG, no rsID
         "1\t456\trs999999\tA\tG\t.\t.\t.\tGT\t0/1",  # has rsID
     ])
-    base = pd.DataFrame(columns=["chrom", "pos", "genotype", "source"]); base.index.name = "rsid"
+    base = pd.DataFrame(columns=["chrom", "pos", "genotype", "source"])
+    base.index.name = "rsid"
     try:
         _, prof = gi.enrich_and_profile_vcf(base, vcf, "grch37")
         assert prof["total_variants"] == 3

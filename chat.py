@@ -100,7 +100,8 @@ def _summarise_context(
             if prs_summary:
                 lines.append("\nPolygenic Risk Score tiers:")
                 for name, p in prs_summary.items():
-                    tier = (p or {}).get("tier"); pct = (p or {}).get("percentile")
+                    tier = (p or {}).get("tier")
+                    pct = (p or {}).get("percentile")
                     if tier:
                         lines.append(f"  - {name}: {tier} ({pct}th percentile)")
 
@@ -182,7 +183,8 @@ def _summarise_context(
 
         gl = adv.get("genetic_longevity") or {}
         if gl.get("variants"):
-            fav = gl.get("n_favorable", 0); adv_ct = gl.get("n_adverse", 0)
+            fav = gl.get("n_favorable", 0)
+            adv_ct = gl.get("n_adverse", 0)
             lines.append(f"  Longevity variants: {fav} favorable / {adv_ct} adverse")
             for v in gl["variants"][:8]:
                 tag = "FAV" if v["favorable"] else "adv"
@@ -588,19 +590,26 @@ def run_chat(
             print("Goodbye.")
             break
         if low in ("help", "/help", "?"):
-            print(_HELP_TEXT); continue
+            print(_HELP_TEXT)
+            continue
         if low in ("suggest", "/suggest", "suggestions"):
             print("\033[2mSuggested questions:\033[0m")
             for q in SUGGESTED_QUESTIONS: print(f"  · {q}")
-            print(); continue
+            print()
+            continue
         if low in ("/context", "context"):
-            print(context); continue
+            print(context)
+            continue
         if low in ("/deep",):
-            mode = "deep"; history[0] = _system_msg()
-            print("\033[2m(deep mode)\033[0m"); continue
+            mode = "deep"
+            history[0] = _system_msg()
+            print("\033[2m(deep mode)\033[0m")
+            continue
         if low in ("/brief",):
-            mode = "brief"; history[0] = _system_msg()
-            print("\033[2m(brief mode)\033[0m"); continue
+            mode = "brief"
+            history[0] = _system_msg()
+            print("\033[2m(brief mode)\033[0m")
+            continue
         if low.startswith("/model"):
             parts = user_in.split(maxsplit=1)
             if len(parts) == 2:
@@ -613,15 +622,18 @@ def run_chat(
             parts = user_in.split(maxsplit=1)
             topic_bias = parts[1].strip() if len(parts) == 2 else None
             history[0] = _system_msg()
-            print(f"\033[2m(topic → {topic_bias or 'cleared'})\033[0m"); continue
+            print(f"\033[2m(topic → {topic_bias or 'cleared'})\033[0m")
+            continue
         if low.startswith("/save"):
             parts = user_in.split(maxsplit=1)
             path = Path(parts[1] if len(parts) == 2 else "dna_chat.md").expanduser()
             _save_transcript(history, path, model)
-            print(f"\033[2m(saved → {path})\033[0m"); continue
+            print(f"\033[2m(saved → {path})\033[0m")
+            continue
         if low in ("/reset", "/new"):
             history = [_system_msg()]
-            print("\033[2m(conversation reset)\033[0m"); continue
+            print("\033[2m(conversation reset)\033[0m")
+            continue
 
         history.append({"role": "user", "content": user_in})
 

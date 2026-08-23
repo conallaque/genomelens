@@ -82,7 +82,8 @@ def _detect_fut2_crp_baseline(immuno, bloodwork):
     fut2 = None
     for f in _get(immuno, "findings", default=[]) or []:
         if f.get("gene") == "FUT2":
-            fut2 = f; break
+            fut2 = f
+            break
     if not fut2 or ("non-secretor" not in fut2.get("phenotype", "").lower() \
        and "non-secretor" not in fut2.get("verdict", "").lower()):
         return None
@@ -184,7 +185,8 @@ def _detect_chrna5_prevention_success(neurochem, meta):
     chrna5 = None
     for f in neurochem.get("findings", []):
         if f.get("gene") == "CHRNA5":
-            chrna5 = f; break
+            chrna5 = f
+            break
     if not chrna5 or "A-carrier" not in chrna5.get("phenotype", ""):
         return None
     # Detect via meta or via absence of a smoker flag
@@ -220,9 +222,11 @@ def _detect_ancestral_diet_fit(deep_ancestry, immuno):
     lct = False
     for m in ax.get("used", []):
         if m.get("rsid") == "rs4988235" and m.get("dose", 0) >= 1:
-            lct = True; break
+            lct = True
+            break
     ap = deep_ancestry.get("ancient_populations") or {}
-    yamnaya = 0.0; eef = 0.0
+    yamnaya = 0.0
+    eef = 0.0
     for p in ap.get("populations", []):
         if p["short"] == "Yamnaya":
             yamnaya = p["affinity"]
@@ -267,45 +271,55 @@ def _detect_favorable_genome_leverage(tier1, prs_result, immuno, neurochem,
     # APOE ε4 status (a big single lever)
     apoe = (tier1 or {}).get("apoe_genotype", "") or ""
     if apoe and "4" not in apoe:
-        score += 8; reasons_up.append(f"no APOE ε4 ({apoe})")
+        score += 8
+        reasons_up.append(f"no APOE ε4 ({apoe})")
     elif apoe and "4" in apoe:
-        score -= 8; reasons_down.append(f"APOE ε4 carrier ({apoe})")
+        score -= 8
+        reasons_down.append(f"APOE ε4 carrier ({apoe})")
 
     # PRS panels — count how many are elevated/high
-    n_prs_high = 0; n_prs_low = 0
+    n_prs_high = 0
+    n_prs_low = 0
     prs = ((tier1 or {}).get("prs_summary") or {}) if isinstance(tier1, dict) else {}
     for _, p in (prs or {}).items():
         tier = ((p or {}).get("tier") or "").lower()
         if "high" in tier or "elevated" in tier: n_prs_high += 1
         elif "below" in tier or "low" in tier: n_prs_low += 1
     if n_prs_high == 0 and n_prs_low >= 2:
-        score += 6; reasons_up.append(f"{n_prs_low} PRS panels in below-average tier, none elevated")
+        score += 6
+        reasons_up.append(f"{n_prs_low} PRS panels in below-average tier, none elevated")
     elif n_prs_high >= 3:
-        score -= 8; reasons_down.append(f"{n_prs_high} PRS panels in elevated/high tier")
+        score -= 8
+        reasons_down.append(f"{n_prs_high} PRS panels in elevated/high tier")
 
     # Longevity variants live in deep_ancestry.genetic_longevity or in immuno.
     gl_variants = _get(deep_ancestry, "genetic_longevity", default={}) or {}
     if gl_variants.get("lean") == "favorable" or gl_variants.get("n_favorable", 0) >= 2:
-        score += 6; reasons_up.append(f"{gl_variants.get('n_favorable',0)} favorable longevity variants (FOXO3/CETP/IL6/APOE ε2)")
+        score += 6
+        reasons_up.append(f"{gl_variants.get('n_favorable',0)} favorable longevity variants (FOXO3/CETP/IL6/APOE ε2)")
 
     # Immunogenetics headlines
     im_headlines = (immuno or {}).get("headlines", [])
     if len(im_headlines) >= 2:
-        score += 4; reasons_up.append(f"{len(im_headlines)} major viral-resistance headlines")
+        score += 4
+        reasons_up.append(f"{len(im_headlines)} major viral-resistance headlines")
 
     # Neurochemistry
     nc_c = _get(neurochem, "composite", default={}) or {}
     if nc_c.get("comt_class") == "middle" and nc_c.get("bdnf_class", "").startswith("Val/Val"):
-        score += 4; reasons_up.append("adaptive-middle COMT + full BDNF plasticity")
+        score += 4
+        reasons_up.append("adaptive-middle COMT + full BDNF plasticity")
 
     # PhenoAge
     bio = _get(bloodwork, "clinical", "advanced", "biological_age", default={}) or {}
     accel = bio.get("accel")
     if accel is not None:
         if accel <= -2:
-            score += 8; reasons_up.append(f"PhenoAge {accel:+.1f} yr (biologically younger)")
+            score += 8
+            reasons_up.append(f"PhenoAge {accel:+.1f} yr (biologically younger)")
         elif accel >= 3:
-            score -= 8; reasons_down.append(f"PhenoAge {accel:+.1f} yr (biologically older)")
+            score -= 8
+            reasons_down.append(f"PhenoAge {accel:+.1f} yr (biologically older)")
 
     # Flagged high-severity clinical markers
     n_critical = len([f for f in (_get(bloodwork, "clinical", "flags", default=[]) or [])
@@ -401,7 +415,8 @@ def _detect_iron_stress_pattern(bloodwork, immuno, tier1):
     hfe_variant = False
     for f in (tier1 or {}).get("variants", []) or []:
         if f.get("gene") == "HFE" and f.get("risk_copies", 0) >= 1:
-            hfe_variant = True; break
+            hfe_variant = True
+            break
     if hfe_variant:
         return None
     crp = _bloodwork_marker(bloodwork, "hs-CRP")
@@ -439,7 +454,8 @@ def _detect_coffee_synthesis(neurochem, pgx_result):
     if pgx_result and isinstance(pgx_result, dict):
         for gene, phen in (pgx_result.get("phenotypes") or {}).items():
             if "CYP1A2" in gene:
-                cyp1a2 = phen; break
+                cyp1a2 = phen
+                break
     return _insight(
         "coffee_protocol",
         "Your personalised coffee protocol (COMT × CYP1A2 × MAOA)",

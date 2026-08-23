@@ -105,8 +105,10 @@ def king_kinship(df_a: pd.DataFrame, df_b: pd.DataFrame) -> dict:
                 "ibs0_rate": None, "n_het_a": 0, "n_het_b": 0,
                 "kinship": None, "concordance": None}
 
-    a0 = ga.str[0].to_numpy(); a1 = ga.str[1].to_numpy()
-    b0 = gb.str[0].to_numpy(); b1 = gb.str[1].to_numpy()
+    a0 = ga.str[0].to_numpy()
+    a1 = ga.str[1].to_numpy()
+    b0 = gb.str[0].to_numpy()
+    b1 = gb.str[1].to_numpy()
 
     het_a = a0 != a1
     het_b = b0 != b1

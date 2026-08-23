@@ -126,7 +126,8 @@ def analyze_exercise_modality(df) -> dict | None:
             power_score += 1.0
             a_call = "ACTN3 R/R — functional α-actinin-3; fast-twitch/power favoured"
         elif n_r == 1:
-            power_score += 0.5; endurance_score += 0.5
+            power_score += 0.5
+            endurance_score += 0.5
             a_call = "ACTN3 R/X — mixed fast/slow-twitch profile"
         else:
             endurance_score += 1.0
@@ -139,7 +140,8 @@ def analyze_exercise_modality(df) -> dict | None:
             power_score += 0.6
             e_call = "ACE D/D (proxy) — associated with power/strength & hypertrophy response"
         elif n_d == 1:
-            power_score += 0.3; endurance_score += 0.3
+            power_score += 0.3
+            endurance_score += 0.3
             e_call = "ACE I/D (proxy) — mixed"
         else:
             endurance_score += 0.6

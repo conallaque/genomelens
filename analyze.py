@@ -869,7 +869,8 @@ def _run_category_ai_with_batching(
             any_fail = False
             for j, sb in enumerate(sub, start=1):
                 t, f = _try_one(sb, j, len(sub))
-                sub_parts.append(t); any_fail |= f
+                sub_parts.append(t)
+                any_fail |= f
             return "\n\n".join(sub_parts), any_fail
         except Exception as e:
             log(f"    WARNING: AI call failed for {category}: {e}")
