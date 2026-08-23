@@ -899,6 +899,32 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
                                    rebuild=_rebuild)
         _pooled["tornado"] = _ee.tornado(_pools, test_cost=test_cost, wtp=wtp,
                                          rebuild=_rebuild)
+        # Decision-analytic layer: what resolving each assumption would be
+        # worth, where the conclusion flips, which strategy wins, what it does
+        # to a budget, and whether it works the same across age and sex.
+        try:
+            import econ_decision as _ed
+            # Scale the two-level Monte Carlo to the caller's simulation
+            # budget. EVPPI is inherently O(outer x inner); at full fidelity
+            # it dominates the run, and callers that passed a small n_mc were
+            # asking for a quick answer, not a slow one.
+            _pooled["decision"] = _ed.analyze_decision_layer(
+                _rebuild, tornado_rows=_pooled["tornado"],
+                test_cost=test_cost, wtp=wtp, age=_age,
+                fast=(n_mc < 1000))
+            _pooled["decision"]["frontier"] = _ed.efficiency_frontier([
+                {"name": "No testing", "cost": 0.0, "qaly": 0.0},
+                {"name": "Genotyping chip",
+                 "cost": TEST_COST["chip"] + _pooled["cea"]["intervention_cost"],
+                 "qaly": _pooled["cea"]["incremental_qaly"]},
+                {"name": "Whole-genome sequencing",
+                 "cost": TEST_COST["wgs"] + _pooled["cea"]["intervention_cost"] * 1.6,
+                 "qaly": _pooled["cea"]["incremental_qaly"] * 1.35},
+            ], wtp=wtp)
+        except Exception as _de:
+            _pooled["decision"] = {"available": False, "reason": repr(_de)}
+            _degraded.append(("decision_layer", repr(_de)))
+
         _pooled["provenance"] = _econ_params.assumption_burden()
         _pooled["declared_assumptions"] = [
             {"key": p.key, "value": p.value, "units": p.units, "note": p.note}

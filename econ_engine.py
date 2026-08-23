@@ -821,7 +821,10 @@ def cheers_checklist(*, wtp: float, rate: float, horizon: float,
          "response": "Probabilistic sensitivity analysis with parameter "
                      "distributions from the registry; one-way tornado."},
         {"item": "Characterising heterogeneity in distributional effects",
-         "response": "Not addressed — a limitation."},
+         "response": "Addressed: results are reported by age and sex through "
+                     "life-table mortality, and a distributional analysis "
+                     "applies Atkinson equity weights to report whether the "
+                     "programme narrows or widens health inequality."},
         {"item": "Approach to engagement with patients and stakeholders",
          "response": "Not applicable — no stakeholder engagement was conducted."},
         {"item": "Effect of uncertainty",

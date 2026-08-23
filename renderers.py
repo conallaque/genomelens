@@ -2017,6 +2017,152 @@ variants queried. <strong>Predictors used:</strong> {_esc(pred_line)}.
 """
 
 
+def _render_decision_layer(d: Optional[Dict]) -> str:
+    """Render value of information, breakeven, frontier, budget and equity.
+
+    These answer the questions that follow a cost-effectiveness result rather
+    than restating it: what is it worth to resolve the guesswork, how far can
+    an assumption move before the recommendation changes, which option wins
+    once dominance is applied properly, what it does to a budget, and whether
+    the benefit lands evenly.
+    """
+    if not d or not d.get("available"):
+        return ""
+
+    def money(v):
+        try:
+            v = round(float(v))
+        except (TypeError, ValueError):
+            return "—"
+        return f"-${abs(v):,}" if v < 0 else f"${v:,}"
+
+    blocks = ""
+
+    # ── Value of information ──
+    v = d.get("evpi") or {}
+    pop = d.get("population_evpi") or {}
+    if v.get("available"):
+        rows = "".join(f"""
+<tr style="border-bottom:1px solid #f5f6f8">
+  <td style="padding:3px 4px">{_esc(r['parameter'])}
+    <span style="color:{'#b06a00' if r.get('tier') == 'assumption' else '#9aa4b0'};
+                 font-size:.85em"> [{_esc(r.get('tier',''))}]</span></td>
+  <td style="text-align:right;padding:3px 4px">{money(r['evppi_per_person'])}</td>
+</tr>""" for r in (d.get("evppi") or []))
+        near_zero = (v.get("evpi_per_person") or 0) < 50
+        blocks += f"""
+<div style="margin-top:10px"><div style="font-weight:600;color:#5b6673">
+  What is it worth to stop guessing?</div>
+<div style="font-size:.85em;color:#5b6673;margin:5px 0">
+  Perfect information about every parameter would be worth
+  <strong>{money(v.get('evpi_per_person'))}</strong> per person
+  ({money(pop.get('population_evpi'))} across
+  {pop.get('population', 0):,} people over {pop.get('years', 0)} years). The
+  current recommendation is wrong in
+  <strong>{v.get('p_current_choice_wrong', 0):.1%}</strong> of simulations.
+  {"A figure this small does not mean the model is precise — it means the "
+   "uncertainty does not straddle the decision. You would act the same way "
+   "either way, so resolving it changes nothing you would do."
+   if near_zero else ""}</div>
+{f'''<table style="width:100%;border-collapse:collapse;font-size:.85em">
+  <thead><tr style="text-align:left;color:#5b6673;border-bottom:1px solid #e3e7ec">
+    <th style="padding:4px">Value of resolving this parameter alone</th>
+    <th style="text-align:right">Per person</th></tr></thead>
+  <tbody>{rows}</tbody></table>''' if rows else ""}</div>"""
+
+    # ── Breakeven ──
+    be = [b for b in (d.get("breakeven") or []) if b.get("available")]
+    if be:
+        items = "".join(f"""
+<li style="margin-bottom:4px"><strong>{_esc(b['parameter'])}</strong>
+  <span style="color:{'#b06a00' if b.get('tier') == 'assumption' else '#9aa4b0'};
+               font-size:.85em">[{_esc(b.get('tier',''))}]</span> &mdash;
+  <span style="color:{'#b03a2e' if b.get('crosses_within_range') else '#177a54'}">
+  {_esc(b.get('interpretation',''))}</span></li>""" for b in be)
+        blocks += f"""
+<div style="margin-top:12px"><div style="font-weight:600;color:#5b6673">
+  How wrong could each assumption be before the answer changes?</div>
+<ul style="font-size:.85em;color:#5b6673;margin:5px 0 0 18px">{items}</ul></div>"""
+
+    # ── Efficiency frontier ──
+    fr = d.get("frontier") or {}
+    if fr.get("available"):
+        srows = "".join(f"""
+<tr style="border-bottom:1px solid #f5f6f8;
+           color:{'#9aa4b0' if s['status'] != 'on frontier' else '#2b3440'}">
+  <td style="padding:3px 4px">{_esc(s['name'])}</td>
+  <td style="text-align:right;padding:3px 4px">{money(s['cost'])}</td>
+  <td style="text-align:right;padding:3px 4px">{s['qaly']:.3f}</td>
+  <td style="text-align:right;padding:3px 4px">{
+      money(s['icer']) + '/QALY' if s.get('icer') is not None else '&mdash;'}</td>
+  <td style="padding:3px 4px;font-size:.9em">{_esc(s['status'])}</td>
+</tr>""" for s in fr.get("strategies", []))
+        blocks += f"""
+<div style="margin-top:12px"><div style="font-weight:600;color:#5b6673">
+  Which strategy, not just whether to act</div>
+<table style="width:100%;border-collapse:collapse;font-size:.85em;margin-top:4px">
+  <thead><tr style="text-align:left;color:#5b6673;border-bottom:1px solid #e3e7ec">
+    <th style="padding:4px">Strategy</th><th style="text-align:right">Cost</th>
+    <th style="text-align:right">QALYs</th><th style="text-align:right">ICER</th>
+    <th>Status</th></tr></thead><tbody>{srows}</tbody></table>
+<div style="font-size:.8em;color:#8a94a3;margin-top:4px">
+  Recommended at this threshold: <strong>{_esc(fr.get('recommended',''))}</strong>.
+  {_esc(fr.get('note',''))}</div></div>"""
+
+    # ── Budget impact ──
+    bi = d.get("budget_impact") or {}
+    if bi.get("available"):
+        brows = "".join(f"""
+<tr><td style="padding:3px 4px">Year {r['year']}</td>
+  <td style="text-align:right;padding:3px 4px">{r['n_tested']:,}</td>
+  <td style="text-align:right;padding:3px 4px">{money(r['programme_cost'])}</td>
+  <td style="text-align:right;padding:3px 4px">{money(r['cost_offset'])}</td>
+  <td style="text-align:right;padding:3px 4px">
+    <strong>{money(r['net_budget_impact'])}</strong></td></tr>"""
+            for r in bi.get("rows", []))
+        blocks += f"""
+<div style="margin-top:12px"><div style="font-weight:600;color:#5b6673">
+  Budget impact &mdash; affordability, not value for money</div>
+<table style="width:100%;border-collapse:collapse;font-size:.85em;margin-top:4px">
+  <thead><tr style="text-align:left;color:#5b6673;border-bottom:1px solid #e3e7ec">
+    <th style="padding:4px">Year</th><th style="text-align:right">Tested</th>
+    <th style="text-align:right">Programme cost</th>
+    <th style="text-align:right">Offset</th>
+    <th style="text-align:right">Net</th></tr></thead><tbody>{brows}</tbody></table>
+<div style="font-size:.8em;color:#8a94a3;margin-top:4px">
+  Five-year total <strong>{money(bi.get('total_net'))}</strong> for
+  {bi.get('population', 0):,} members. {_esc(bi.get('note',''))}</div></div>"""
+
+    # ── Subgroups + equity ──
+    sub = d.get("subgroups") or {}
+    dist = d.get("distributional") or {}
+    if sub.get("available"):
+        best, worst = sub.get("best") or {}, sub.get("worst") or {}
+        eq = ""
+        if dist.get("available"):
+            eq = (f" Equity: the Gini coefficient of remaining health moves "
+                  f"from {dist.get('gini_before')} to {dist.get('gini_after')}, "
+                  f"so the programme "
+                  f"<strong>{'narrows' if dist.get('reduces_inequality') else 'slightly widens'}"
+                  f"</strong> the gap.")
+        blocks += f"""
+<div style="margin-top:12px"><div style="font-weight:600;color:#5b6673">
+  Does it work the same for everyone?</div>
+<div style="font-size:.85em;color:#5b6673;margin:5px 0">
+  Net benefit for {_esc(sub.get('condition',''))} ranges from
+  <strong>{money(best.get('inmb'))}</strong> ({_esc(str(best.get('sex','')))},
+  age {best.get('age','')}) down to <strong>{money(worst.get('inmb'))}</strong>
+  ({_esc(str(worst.get('sex','')))}, age {worst.get('age','')}) &mdash; a spread of
+  {money(sub.get('spread'))}. {_esc(sub.get('note',''))}{eq}</div></div>"""
+
+    if not blocks:
+        return ""
+    return f"""
+<details style="margin-top:10px"><summary style="cursor:pointer;color:#5b6673;font-weight:600">
+  Decision analysis &mdash; what to resolve, what to choose, what it costs</summary>
+{blocks}</details>"""
+
+
 def _assumption_dominance_note(tornado: List[Dict]) -> str:
     """Say plainly when judgement calls, not evidence, drive the conclusion.
 
@@ -2237,6 +2383,8 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
   carrying real weight &mdash; worth disagreeing with first.</div>
 {_assumption_dominance_note(p.get("tornado") or [])}</div></details>"""
 
+    dec_html = _render_decision_layer(p.get("decision") or {})
+
     # ── Dual perspective ──
     dp = p.get("dual_perspective") or {}
     dp_html = ""
@@ -2410,7 +2558,7 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
       <th style="text-align:right">NMB</th></tr></thead>
     <tbody>{rows}</tbody>
   </table>
-  {unc_html}{struct_html}{dp_html}{inv_html}{val_html}{prov_html}{cheers_html}
+  {unc_html}{dec_html}{struct_html}{dp_html}{inv_html}{val_html}{prov_html}{cheers_html}
 </div>"""
 
 
