@@ -2483,6 +2483,15 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
 
     # ── Efficacy vs. effectiveness ──
     if adh.get("qaly_lost_to_non_adherence", 0) > 0:
+        # Only claim the cost per QALY moves when a ratio is actually being
+        # reported. In the dominance quadrants the ICER is suppressed, and a
+        # card explaining why a withheld number got worse is nonsense.
+        _icer_clause = (
+            " That is why the cost per QALY worsens even though the "
+            "intervention's own value for money barely moves."
+            if (p.get("cea") or {}).get("icer") is not None else
+            " Because it is spread over fewer realised QALYs, it is the part "
+            "of this analysis most sensitive to how many people follow through.")
         corr_html += f"""
 <div style="border:1px solid #d8e2ee;background:#f7fafd;border-radius:10px;
             padding:12px 14px;margin:12px 0">
@@ -2494,11 +2503,10 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
     worse than that. Charged against the benefit, that gap costs
     <strong>{adh.get('qaly_lost_to_non_adherence', 0):.3f} QALYs</strong> and
     <strong>{money(adh.get('value_lost_to_non_adherence'))}</strong> of avoided cost
-    &mdash; <strong>{adh.get('pct_of_benefit_lost', 0)}%</strong> of what the trials
-    promise. The ongoing intervention cost is discounted by the same factor, because
-    someone who stops taking a statin stops paying for it; the one-off
-    {money(adh.get('fixed_test_cost'))} test cost is not, which is why the cost per QALY
-    worsens even though the intervention's own value for money barely moves.</div>
+    &mdash; <strong>{adh.get('pct_of_benefit_lost', 0)}%</strong> of the health benefit
+    the trials promise. The ongoing intervention cost is discounted by the same factor,
+    because someone who stops taking a statin stops paying for it; the one-off
+    {money(adh.get('fixed_test_cost'))} test cost is not.{_icer_clause}</div>
   <div style="font-size:.78em;color:#7b8794;margin-top:6px">
     {_esc(adh.get('src', ''))}. Screening uptake and behavioural maintenance are
     declared assumptions, varied in the sensitivity analysis.</div>

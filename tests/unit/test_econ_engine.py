@@ -731,3 +731,60 @@ def test_adherence_parameters_are_varied_in_sensitivity_analysis():
     sampleable = {p.key for p in ep.sampleable()}
     for key in set(ee.ADHERENCE_BY_COI_KEY.values()):
         assert key in sampleable, f"{key} is held fixed in PSA"
+
+
+def test_personal_economics_uses_the_same_adherence_archetypes():
+    # The two economic pages describe one genome. When the pooled payer
+    # analysis charged adherence and this one did not, the report said 62% of
+    # the benefit was lost on one page and reported the undiscounted total as
+    # the headline dollar figure on the other.
+    import health_economics as he
+    assert set(he._CATEGORY_ADHERENCE.values()) <= (
+        set(ee.ADHERENCE_BY_COI_KEY.values()) | {"adherence_default"}), \
+        "the two pages must draw on one set of adherence parameters"
+    for key in he._CATEGORY_ADHERENCE.values():
+        assert key in ep.PARAMS
+
+
+def test_every_personal_economics_category_is_mapped():
+    # An unmapped category silently falls back to adherence_default. That is a
+    # safe fallback, not a place to leave real categories sitting.
+    import re
+    import health_economics as he
+    src = open(he.__file__).read()
+    used = set(re.findall(r'^\s+add\("([^"]+)"', src, re.M))
+    assert used, "could not find the add() call sites to check"
+    missing = used - set(he._CATEGORY_ADHERENCE)
+    assert not missing, f"categories with no adherence archetype: {sorted(missing)}"
+
+
+def test_personal_economics_categories_do_not_default_to_perfect_adherence():
+    import health_economics as he
+    for cat in list(he._CATEGORY_ADHERENCE) + ["NoSuchCategory"]:
+        assert he._adherence_for_category(cat) < 1.0
+
+
+def test_the_efficacy_counterfactual_reconciles_with_the_discounted_total():
+    # "At full adherence these findings would total X" has to be the same
+    # findings pooled the same way, not a figure captured before the
+    # correlated-target discount. Captured pre-pooling it overstated the
+    # counterfactual by ~$4k and made the adherence drag look bigger than it is.
+    import health_economics as he
+    items = [{"net": 1000, "adherence": 0.5}, {"net": 300, "adherence": 0.35}]
+    eff = sum(i["net"] / i["adherence"] for i in items)
+    assert eff == pytest.approx(2000 + 857.142857)
+    assert hasattr(he, "_render_adherence_basis_html")
+    html = he._render_adherence_basis_html({
+        "adherence_applied": True, "efficacy_net": round(eff),
+        "adherence_drag": round(eff - 1300), "mean_adherence": 0.425})
+    assert "At full adherence" in html and "$2,857" in html
+
+
+def test_the_adherence_basis_is_stated_whenever_it_is_applied():
+    # A page that silently reports a smaller number than it used to is its own
+    # kind of dishonesty.
+    import health_economics as he
+    assert he._render_adherence_basis_html({"adherence_applied": False}) == ""
+    assert "real-world figures" in he._render_adherence_basis_html({
+        "adherence_applied": True, "efficacy_net": 100, "adherence_drag": 50,
+        "mean_adherence": 0.5})

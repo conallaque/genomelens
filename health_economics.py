@@ -1753,6 +1753,45 @@ def _money(x) -> str:
     return f"-${abs(x):,}" if x < 0 else f"${x:,}"
 
 
+
+# Personal-economics categories mapped to the same three adherence archetypes
+# the pooled engine uses. Keyed on what acting on the finding asks of the
+# person — a daily tablet, an appointment you attend, or a habit you keep —
+# because that, not the disease, is what predicts whether they keep doing it.
+# Anything unmapped falls back to ``adherence_default`` rather than to 1.0, so
+# a gap in this table shows up as a discount rather than as a flattering
+# silence.
+_CATEGORY_ADHERENCE: Dict[str, str] = {
+    "Pharmacogenomic / genomic": "adherence_pharmacological",
+    "HLA Pharmacogenomics":      "adherence_pharmacological",
+    "Neurochemistry":            "adherence_pharmacological",
+    "Cardiovascular":            "adherence_pharmacological",
+    "Clinical Variant":          "adherence_screening",
+    "Carrier Screening":         "adherence_screening",
+    "PheWAS Biomarker":          "adherence_screening",
+    "Expanded Polygenic Score":  "adherence_screening",
+    "Mendelian Randomization":   "adherence_screening",
+    "Compound Interaction":      "adherence_screening",
+    "Metabolic":                 "adherence_lifestyle",
+    "Addiction Genetics":        "adherence_lifestyle",
+    "Wellness Genetics":         "adherence_lifestyle",
+    "Biological aging":          "adherence_lifestyle",
+}
+
+
+def _adherence_for_category(category: str) -> float:
+    """Real-world adherence multiplier for a personal-economics category."""
+    try:
+        import econ_params as _ep
+        return float(_ep.value(
+            _CATEGORY_ADHERENCE.get(category, "adherence_default")))
+    except Exception:
+        # The page must still produce a number if the registry is missing. It
+        # then produces the older, undiscounted one — which is the reason the
+        # item carries its adherence factor, so the report can say which.
+        return 1.0
+
+
 def analyze_personal_economics(economics_result: Optional[Dict] = None,
                                bloodwork_result: Optional[Dict] = None,
                                genetic_age_result: Optional[Dict] = None,
@@ -1776,6 +1815,13 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
     not_monetised: List[Dict] = []
 
     def add(category, finding, avoided, qaly, intervention, confidence, basis):
+        # REAL-WORLD ADHERENCE. Everything below is trial efficacy: the benefit
+        # if the person does the thing. The pooled payer analysis in
+        # value_of_information already charges the efficacy-to-effectiveness
+        # gap; this page was still reporting the undiscounted figure, so one
+        # report described the same genome two ways. Same three archetypes,
+        # keyed on what acting actually asks of the person.
+        _adh = _adherence_for_category(category)
         # MARGINAL vs AVERAGE: the per-condition cost constants here (_MACE_COST,
         # _T2D_COST, the lifetime COI figures) are AVERAGE costs. Averting one case
         # frees only the marginal cost — a large share of average cost is fixed
@@ -1786,12 +1832,18 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
         # _MIDPOINT_DISCOUNT) so "over N years" describes the arithmetic.
         avoided = avoided * _MIDPOINT_DISCOUNT
         qv = qaly * VALUE_PER_QALY * _MIDPOINT_DISCOUNT
+        # Benefit and ongoing cost are scaled by the same factor: someone who
+        # stops taking the statin stops paying for it. Scaling only the benefit
+        # would be as wrong in the other direction.
+        avoided, qv = avoided * _adh, qv * _adh
+        qaly, intervention = qaly * _adh, intervention * _adh
         items.append({
             "category": category, "finding": finding,
             "avoided": round(avoided), "qaly": round(qaly, 2),
             "qaly_value": round(qv), "intervention": round(intervention),
             "net": round(avoided + qv - intervention),
             "confidence": confidence, "basis": basis,
+            "adherence": round(_adh, 3),
         })
 
     # ── Genomic actionable findings (reuse the curated per-condition econ) ──
@@ -2152,6 +2204,12 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
     else:
         verdict = "not cost-effective at this threshold"
 
+    # The counterfactual is "these findings, pooled the same way, with everyone
+    # following through" — so it is derived from the post-pooling net rather
+    # than from a figure captured before the correlated-target discount, which
+    # would fold the pooling correction into the adherence one.
+    _efficacy_net = sum(i["net"] / (i.get("adherence") or 1.0) for i in items)
+
     items.sort(key=lambda i: -i["net"])
     return {
         "available": bool(items),
@@ -2160,6 +2218,16 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
         "items": items,
         "not_monetised": not_monetised,
         "n_not_monetised": len(not_monetised),
+        # Real-world adherence, reported rather than applied invisibly. The
+        # efficacy figure is what this page used to headline; keeping both
+        # means the discount is visible instead of just making the number
+        # smaller for no stated reason.
+        "adherence_applied": any(i.get("adherence", 1.0) < 1.0 for i in items),
+        "efficacy_net": round(_efficacy_net),
+        "adherence_drag": round(_efficacy_net - total_net),
+        "mean_adherence": (
+            round(sum(i.get("adherence", 1.0) for i in items) / len(items), 3)
+            if items else 1.0),
         # Correlated-target pooling, reported rather than applied invisibly.
         "pooling_applied": _pooling_applied,
         "pooled_targets": pooled_targets,
@@ -2343,6 +2411,39 @@ def _render_not_monetised_html(rows: Optional[List[Dict]]) -> str:
     </div>"""
 
 
+def _render_adherence_basis_html(econ: Dict) -> str:
+    """State that the totals above are effectiveness, not efficacy.
+
+    Without this the page reports a smaller number than it used to with no
+    stated reason, which is its own kind of dishonesty — and the pooled payer
+    analysis elsewhere in the report would be describing the same genome on a
+    different basis.
+    """
+    if not econ.get("adherence_applied"):
+        return ""
+    drag = econ.get("adherence_drag", 0)
+    eff = econ.get("efficacy_net", 0)
+    pct = round(100.0 * drag / eff, 1) if eff else 0.0
+    return f"""
+    <div style="margin-top:10px;padding:9px 12px;background:#f7fafd;
+                border:1px solid #d8e2ee;border-radius:8px;font-size:.85em;
+                color:#42566b">
+      <strong>These are real-world figures, not trial figures.</strong>
+      Every benefit above has been multiplied by the share of people who
+      actually keep doing the thing — roughly half for daily preventive
+      medication, less for sustained behaviour change, more for a screening
+      appointment you attend once. Ongoing intervention costs are discounted by
+      the same factor, because someone who stops taking a statin stops paying
+      for it. At full adherence these findings would total
+      <strong>{_money(eff)}</strong>; charging realistic adherence
+      (mean {econ.get('mean_adherence', 1.0):.0%}) removes
+      <strong>{_money(drag)}</strong> ({pct}%).
+      <div style="font-size:.92em;color:#7b8794;margin-top:4px">
+        WHO (2003), Adherence to Long-Term Therapies. Screening uptake and
+        behavioural maintenance are declared assumptions.</div>
+    </div>"""
+
+
 def render_economic_analysis_html(econ: Dict, file_label: str = "") -> str:
     """Standalone economic-impact sheet (economic_analysis.html)."""
     if not econ or not econ.get("available"):
@@ -2440,6 +2541,7 @@ def render_economic_analysis_html(econ: Dict, file_label: str = "") -> str:
             two are shown separately so neither is mistaken for the other.
           </div>
         </div>
+        {_render_adherence_basis_html(econ)}
         {_render_cca_html(build_cost_consequence_analysis(econ))}
         {_render_not_monetised_html(econ.get("not_monetised"))}
         {top_prev}
