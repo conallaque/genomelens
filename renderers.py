@@ -5253,13 +5253,19 @@ def build_economics_html(economics_result: dict | None) -> str:
   <div class="econ-cards">
     <div class="econ-card"><div class="econ-card-v">{_money(clinic.get('avg_cost_per_patient'))}</div><div class="econ-card-l">Avg cost / patient</div></div>
     <div class="econ-card"><div class="econ-card-v">{_money(clinic.get('avg_benefit_per_patient'))}</div><div class="econ-card-l">Avg benefit / patient</div></div>
-    <div class="econ-card"><div class="econ-card-v">{clinic.get('avg_roi')}:1</div><div class="econ-card-l">Average ROI</div></div>
-    <div class="econ-card"><div class="econ-card-v">{clinic.get('payback_period_months')} mo</div><div class="econ-card-l">Payback period</div></div>
+    <div class="econ-card"><div class="econ-card-v">{clinic.get('value_to_cost_ratio')}:1</div><div class="econ-card-l">Health value per $ spent</div></div>
+    <div class="econ-card"><div class="econ-card-v">{clinic.get('total_qalys')}</div><div class="econ-card-l">QALYs across cohort</div></div>
   </div>
-  <p class="econ-model">Subscription model: {_money(clinic.get('revenue_model_monthly'))}/patient/month
-  at {int(float(clinic.get('gross_margin', 0)) * 100)}% gross margin.
-  Across {clinic.get('patient_count')} patients — cost {_money(clinic.get('total_cost'))},
-  modeled benefit {_money(clinic.get('total_benefit'))}.</p>
+  <p class="econ-model">Across {clinic.get('patient_count')} patients — intervention cost
+  {_money(clinic.get('total_cost'))}, cost averted {_money(clinic.get('total_benefit'))}.</p>
+  <p class="econ-model" style="color:#8a94a3">
+  <strong>Business model, reported separately:</strong>
+  {_money(clinic.get('revenue_model_monthly'))}/patient/month at
+  {int(float(clinic.get('gross_margin', 0)) * 100)}% gross margin
+  ({clinic.get('payback_period_months')} months to recover the intervention cost
+  from that margin). This is a commercial assumption, not a health-economic
+  result &mdash; it has a different numerator from the figures above, and the
+  earlier version combined the two into one &ldquo;ROI&rdquo;.</p>
 </div>"""
 
     # ── Payer impact ──
@@ -5267,7 +5273,34 @@ def build_economics_html(economics_result: dict | None) -> str:
     payer_html = ""
     if payer.get("affected_members"):
         cpq = payer.get("cost_per_qaly")
-        cpq_txt = _money(cpq) if cpq is not None else "n/a"
+        cpq_txt = (_money(cpq) if cpq is not None
+                   else "withheld &mdash; dominant")
+        _lg = payer.get("legacy") or {}
+        _corr = payer.get("correction") or {}
+        _red = payer.get("benefit_reduction") or 0
+        corr_html = ""
+        if _red > 0:
+            corr_html = f"""
+  <div class="econ-correction" style="border:1px solid #f0dcc0;background:#fffaf2;
+       border-radius:10px;padding:11px 13px;margin-top:10px;font-size:.87em;
+       color:#6b5330">
+    <strong style="color:#8a5a00">Cohort corrections applied</strong><br>
+    This block used to report the raw curated per-finding figures: every finding
+    counted separately, no pooling of findings that act on one condition, no
+    real-world adherence, no discounting, and average rather than marginal cost
+    of illness. It claimed <strong>{_money(_lg.get('total_benefit'))}</strong>
+    of savings and <strong>{_lg.get('total_qalys')}</strong> QALYs. Applying the
+    same corrections the individual sheet already applies &mdash; marginal cost
+    fraction {_corr.get('marginal_cost_fraction')}, midpoint discount
+    {_corr.get('midpoint_discount')}, mean adherence
+    {_corr.get('mean_adherence')}, and correlated-target pooling &mdash; gives
+    <strong>{_money(payer.get('total_cost_averted'))}</strong>, removing
+    <strong>{_money(_red)}</strong> ({payer.get('benefit_reduction_pct')}%).<br>
+    The old &ldquo;cost per QALY&rdquo; of {_money(_lg.get('cost_per_qaly'))} was
+    gross intervention spend divided by QALYs &mdash; no cost offsets and no
+    comparator, so not an ICER despite the label. It sat beside a claim of
+    multi-billion savings, which cannot both be true.
+  </div>"""
         payer_html = f"""
 <div class="econ-panel">
   <h3>Payer Impact <span class="econ-pop">{payer.get('member_population'):,} members</span></h3>
@@ -5277,8 +5310,10 @@ def build_economics_html(economics_result: dict | None) -> str:
     <div class="econ-card"><div class="econ-card-v">{_money(payer.get('total_benefit'))}</div><div class="econ-card-l">Modeled savings</div></div>
     <div class="econ-card"><div class="econ-card-v">{payer.get('roi')}:1</div><div class="econ-card-l">Aggregate ROI</div></div>
     <div class="econ-card"><div class="econ-card-v">{cpq_txt}</div><div class="econ-card-l">Cost per QALY</div></div>
-    <div class="econ-card"><div class="econ-card-v">{_money(payer.get('net_savings'))}</div><div class="econ-card-l">Net savings</div></div>
+    <div class="econ-card"><div class="econ-card-v">{_money(payer.get('net_savings'))}</div><div class="econ-card-l">Net cash</div></div>
+    <div class="econ-card"><div class="econ-card-v">{payer.get('intervention_events', 0):,}</div><div class="econ-card-l">Intervention-events</div></div>
   </div>
+  {corr_html}
 </div>"""
 
     disclaimer = _esc(economics_result.get("disclaimer", ""))
@@ -5289,7 +5324,10 @@ def build_economics_html(economics_result: dict | None) -> str:
 <p class="econ-intro">
 Clinical and payer return-on-investment for acting on your genomic findings.
 Each intervention's cost is weighed against the modeled value of the adverse
-outcome it averts, with payback period and 3-year NPV (discounted at 3%).
+outcome it averts, with payback period and 3-year NPV (discounted at 3%). The
+outcome value is credited <em>once</em>, at the horizon midpoint: it is the value
+of preventing one event, and an earlier version accrued it every year, which
+tripled it.
 </p>
 {headline_html}
 <div class="tbl-wrap">

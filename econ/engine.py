@@ -423,6 +423,7 @@ def deduplicate_by_target(items: Sequence[dict], *,
                           value_key: str = "net",
                           text_key: str = "finding",
                           fallback_key: str = "category",
+                          target_key: str = "pool_hint",
                           vocabulary: frozenset | None = None,
                           penalty: float | None = None) -> list[dict]:
     """Down-weight repeated claims on the same underlying genotype.
@@ -445,7 +446,13 @@ def deduplicate_by_target(items: Sequence[dict], *,
         # A line naming no shared target gets a unique key, so it is never
         # pooled with anything. Grouping unmatched lines together by category
         # would discount independent findings for no reason.
-        target = (_extract_target(str(it.get(text_key, "")), vocabulary)
+        # An explicit hint wins over text extraction. Two records can describe
+        # one course of action without sharing a gene symbol — a carrier line
+        # named by gene and a partner-testing line named by disease are the
+        # same reproductive decision, and no vocabulary match will ever join
+        # them. The producing code knows they belong together; this lets it say so.
+        target = (str(it.get(target_key) or "").strip()
+                  or _extract_target(str(it.get(text_key, "")), vocabulary)
                   or f"unique:{i}")
         grouped.setdefault(target, []).append(it)
 

@@ -66,17 +66,32 @@ def test_npv_one_time_cost_is_discounted_not_naive():
     # Σ 15000/1.03^t (t=1..3) = 42429.17 ; − 300 = 42129.17.
     # Explicitly NOT the undiscounted 3*15000-300 = 44700.
     npv = he.calculate_npv(300, 15_000, recurring_cost=False)
-    assert npv == pytest.approx(42129.17, abs=0.5)
+    # Benefit accrues ONCE at the horizon midpoint, not once per year.
+    # This assertion previously pinned the annualised figure.
+    assert npv == pytest.approx(14049.46, abs=0.5)
     assert npv != 44_700
 
 
-def test_npv_recurring_cost_discounts_both_streams():
-    # Statin: 500/yr cost AND 250k/yr benefit, both discounted over 3 yrs.
-    benefit = sum(250_000 / 1.03 ** t for t in range(1, 4))
-    spend = sum(500 / 1.03 ** t for t in range(1, 4))
+def test_npv_recurring_cost_discounts_the_cost_stream_only():
+    # THE BUG THIS GUARDS. `recurring` describes the COST: a statin is $500 a
+    # year. It never described the benefit — $250,000 is the value of
+    # preventing one event, not of preventing one every year. This test used to
+    # assert the annualised benefit, which is how a $250,000 prevented MI
+    # became a $705,739 three-year NPV.
+    benefit = 250_000 / 1.03 ** (3 / 2.0)          # once, at the midpoint
+    spend = sum(500 / 1.03 ** t for t in range(1, 4))   # each year
     assert he.calculate_npv(500, 250_000, recurring_cost=True) == pytest.approx(
         round(benefit - spend, 2), abs=0.5
     )
+
+
+def test_npv_never_credits_one_prevented_event_more_than_once():
+    # Directional guard that survives any horizon change: the benefit side can
+    # never exceed the undiscounted value of the single event it represents.
+    for horizon in (1, 3, 5, 10):
+        npv = he.calculate_npv(0, 100_000, recurring_cost=False, horizon=horizon)
+        assert npv <= 100_000 + 1e-6, (
+            f"horizon={horizon} credited more than the event is worth")
 
 
 # ── Finding extraction ─────────────────────────────────────────────────────
@@ -180,7 +195,16 @@ def test_scale_to_payer_100k_members():
     assert payer["affected_members"] > 0
     assert payer["total_benefit"] > payer["total_cost"]
     assert payer["roi"] > 0
-    assert payer["cost_per_qaly"] is not None and payer["cost_per_qaly"] > 0
+    # A ratio is only meaningful when cost and effect move the same way. This
+    # cohort is modelled as dominant, so the ICER is withheld and the fact is
+    # stated as a flag — the same convention markov.py and CEAResult use. The
+    # old assertion required a number here, which is what let a $616/QALY
+    # figure sit beside a claim of $8bn in savings.
+    if payer["dominant"]:
+        assert payer["cost_per_qaly"] is None
+        assert "dominant" in payer["cost_per_qaly_note"]
+    else:
+        assert payer["cost_per_qaly"] > 0
     # per-finding rows sum to the aggregate cost
     assert sum(p["total_cost"] for p in payer["per_finding"]) == pytest.approx(
         payer["total_cost"], abs=1
@@ -345,3 +369,69 @@ def test_biological_aging_high_confidence_grounded() -> None:
     assert b["confidence"] == "high"                     # grounded in the clock, not hand-waved
     assert "mortality" in b["basis"].lower() and "Levine" in b["basis"]
     assert b["net"] > 0
+
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Cohort views must agree with the individual sheet
+# ══════════════════════════════════════════════════════════════════════════
+
+def test_cohort_corrections_only_ever_reduce_the_claimed_benefit():
+    # THE CONSTRAINT, AS A GUARDRAIL. The cohort views used to report the raw
+    # curated figures: no pooling, no adherence, no discounting, no
+    # marginal-cost fraction. Every one of those corrections must move the
+    # number down. If a future change makes a cohort figure larger than the
+    # uncorrected sum, it is a bug in the correction, not a discovery.
+    res = he.analyze_health_economics(_five_finding_profile(), pd.DataFrame())
+    payer = he.scale_to_payer(res, member_population=100_000)
+    assert payer["total_cost_averted"] < payer["legacy"]["total_benefit"]
+    assert payer["total_qalys"] < payer["legacy"]["total_qalys"]
+    assert payer["benefit_reduction"] > 0
+    assert 0 < payer["benefit_reduction_pct"] < 100
+
+
+def test_cohort_views_apply_the_same_corrections_as_the_individual_sheet():
+    res = he.analyze_health_economics(_five_finding_profile(), pd.DataFrame())
+    _items, corr = he._corrected_cohort_items(res)
+    assert corr["marginal_cost_fraction"] < 1.0
+    assert corr["midpoint_discount"] < 1.0
+    assert corr["mean_adherence"] < 1.0
+    assert corr["pooling_applied"], "cohort views must pool correlated targets"
+
+
+def test_the_cohort_headcount_and_the_money_are_capped_together():
+    # The old code capped the displayed member count at plan size while leaving
+    # the benefit summed over every finding independently — so the report said
+    # "100,000 of 100,000 members affected" and still added up the dollars as
+    # though they were different people.
+    res = he.analyze_health_economics(_five_finding_profile(), pd.DataFrame())
+    p = he.scale_to_payer(res, member_population=100_000)
+    assert p["unique_members_affected"] <= p["member_population"]
+    assert "intervention_events" in p, "event count must be stated, not hidden"
+    if p["prevalence_sum_exceeds_cohort"]:
+        assert p["intervention_events"] > p["unique_members_affected"]
+
+
+def test_the_subscription_model_is_not_mixed_into_the_health_value_ratio():
+    res = he.analyze_health_economics(_five_finding_profile(), pd.DataFrame())
+    c = he.scale_to_clinic(res, patient_count=100)
+    rm = c["revenue_model"]
+    assert rm["monthly_per_patient"] and rm["gross_margin"]
+    assert "not a clinical or economic result" in rm["note"]
+    # The health-value ratio must be benefit over cost, with no revenue term.
+    expected = he.calculate_roi(c["avg_cost_per_patient"],
+                                c["avg_benefit_per_patient"])
+    assert c["value_to_cost_ratio"] == expected
+
+
+def test_family_planning_is_pooled_against_carrier_screening_not_dropped():
+    # Both price the same reproductive decision — the carrier line at a flat
+    # $2,000, the family-planning line decomposed as partner-carrier frequency
+    # x child clinical risk x cost of an affected child. Dropping the second
+    # lost real value; counting both double-counted one decision.
+    assert "Family Planning" not in he.COHORT_NOT_VALUED
+    assert he.COHORT_NOT_VALUED == ("Longevity",)
+
+
+def test_longevity_stays_out_because_it_re_aggregates_priced_variants():
+    assert "Longevity" in he.COHORT_NOT_VALUED

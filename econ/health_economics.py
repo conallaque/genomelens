@@ -809,7 +809,14 @@ def calculate_npv(
     either a one-time upfront spend at t=0 (pharmacogenomic tests) or a
     recurring annual spend discounted over the horizon (lifestyle programs).
     """
-    benefit = sum(outcome_value / (1 + rate) ** t for t in range(1, horizon + 1))
+    # Benefit accrues ONCE, discounted to the horizon midpoint — not once per
+    # year. ``outcome_value`` is the value of preventing one event over a
+    # lifetime, and accruing it annually claimed the event was prevented again
+    # every year: for APOE it turned a $250,000 prevented MI into a $705,739
+    # three-year NPV. The ``recurring`` flag below was already applied to the
+    # cost side only, which is what made the asymmetry hard to see. This is the
+    # same midpoint treatment the individual sheet uses, so the two agree.
+    benefit = outcome_value / (1 + rate) ** (horizon / 2.0)
     # Recurring spend is discounted over the horizon; a one-off cost lands at
     # t=0 and is undiscounted.
     spend = (sum(cost / (1 + rate) ** t for t in range(1, horizon + 1))
@@ -826,6 +833,7 @@ def _econ_record(
     *,
     recurring: bool = False,
     source: str = "",
+    pool_hint: str = "",
     prevalence: float = 0.0,
     qaly_gain: float = 0.0,
     evidence: str = "",
@@ -843,6 +851,9 @@ def _econ_record(
         "npv_3year": calculate_npv(cost, outcome_value, recurring_cost=recurring),
         "confidence": confidence,
         "category": source,
+        # Explicit pooling target, when the producing code knows two records
+        # describe one course of action.
+        "pool_hint": pool_hint,
         "prevalence": prevalence,
         "qaly_gain": qaly_gain,
         "evidence": evidence,
@@ -1079,6 +1090,9 @@ def _carrier_findings(carrier_result: dict | None) -> list[dict]:
             clinical_benefit=econ["clinical_benefit_carrier"],
             cost=econ["cost_carrier"], outcome_value=econ["outcome_carrier"],
             confidence="moderate", source="Carrier Screening",
+            # Same reproductive decision the Family Planning record prices,
+            # from the other side. Pooled so it is valued once.
+            pool_hint=f"reproductive:{disease}",
             prevalence=econ.get("prev_carrier", 0.04),
             qaly_gain=econ["qaly_carrier"],
             evidence=f"{record.get('gene', '?')} {record.get('variant', '')} — heterozygous carrier",
@@ -1436,6 +1450,7 @@ def _family_planning_findings(family_planning_result: dict | None) -> list[dict]
             clinical_benefit=f"Partner carrier testing for {disease} reproductive planning",
             cost=test_cost, outcome_value=expected_avoidable,
             confidence="moderate", source="Family Planning",
+            pool_hint=f"reproductive:{disease}",
             prevalence=p_carrier, qaly_gain=round(p_child * 2.0, 2),
             evidence=(f"{item.get('gene', '')} carrier × partner freq {p_carrier:.3f} "
                       f"× child risk {p_child:.3f} × ${affected_cost:,}"),
@@ -1480,94 +1495,267 @@ def _top_drugs_findings(top_drugs_result: dict | None) -> list[dict]:
 
 # ─── Scaling ───────────────────────────────────────────────────────────────
 
-def scale_to_clinic(findings_econ: dict, patient_count: int = DEFAULT_CLINIC_PATIENTS) -> dict:
-    """Scale per-finding economics to a clinic population, weighting each
-    finding by the fraction of patients who actually have it (prevalence)."""
-    findings = findings_econ.get("findings_with_economics", [])
-    if not findings:
-        return {"patient_count": patient_count, "n_findings": 0,
-                "note": "No actionable findings with economics for this profile."}
+def _corrected_cohort_items(findings_econ: dict) -> tuple[list[dict], dict]:
+    """Put the raw curated finding list through the same corrections the
+    individual sheet applies, so the cohort views are a *view* of one
+    computation rather than a second, larger one.
 
-    # Prevalence-weighted cost and benefit per patient: each finding
-    # contributes its cost × prevalence (fraction of patients who have it).
-    weighted_cost = sum(f["intervention_cost"] * f.get("prevalence", 0.10)
-                        for f in findings)
-    weighted_benefit = sum(f["outcome_value"] * f.get("prevalence", 0.10)
-                          for f in findings)
-    avg_cost = round(weighted_cost, 2)
-    avg_benefit = round(weighted_benefit, 2)
+    The raw list is the un-corrected upstream of the individual sheet, not a
+    parallel model. Section 2 applies four things to it and the cohort views
+    applied none: the marginal-cost fraction, midpoint discounting, real-world
+    adherence, and correlated-target pooling. Reported as before-and-after so
+    the size of the correction is visible rather than banked.
 
-    monthly_margin = CLINIC_REVENUE_MONTHLY * CLINIC_GROSS_MARGIN
-    payback = round(avg_cost / monthly_margin, 1) if monthly_margin else None
+    Returns ``(items, correction)``.
+    """
+    raw = findings_econ.get("findings_with_economics") or []
+
+    items: list[dict] = []
+    for f in raw:
+        cat = f.get("category", "")
+        if cat in COHORT_NOT_VALUED:
+            # Declined a price elsewhere in the same document; scaling it here
+            # would monetise by the back door.
+            continue
+        adh = _adherence_for_category(cat)
+        prev = max(0.0, min(1.0, float(f.get("prevalence") or 0.0)))
+        if prev <= 0.0:
+            continue
+        # Cash side: only the marginal share of an average cost is freed, and
+        # the event lands at an unmodelled point inside the horizon.
+        avoided = (float(f.get("outcome_value") or 0.0)
+                   * _MARGINAL_COST_FRACTION * _MIDPOINT_DISCOUNT * adh)
+        qaly = float(f.get("qaly_gain") or 0.0) * _MIDPOINT_DISCOUNT * adh
+        spend = float(f.get("intervention_cost") or 0.0) * adh
+        items.append({
+            "finding": f.get("finding", ""),
+            "category": cat,
+            "prevalence": prev,
+            "adherence": round(adh, 3),
+            "avoided": avoided,
+            "qaly": qaly,
+            "qaly_value": qaly * VALUE_PER_QALY,
+            "intervention": spend,
+            "net": avoided + qaly * VALUE_PER_QALY - spend,
+            "confidence": f.get("confidence", "moderate"),
+            "pool_hint": f.get("pool_hint", ""),
+        })
+
+    # Correlated-target pooling: the same gene surfacing through two panels is
+    # one course of action. Same vocabulary the individual sheet uses.
+    n_before = len(items)
+    pooled_targets: list[str] = []
+    try:
+        from . import engine as _ee
+        _vocab = frozenset(_ee.DEFAULT_GENE_VOCABULARY) | frozenset(
+            k.split("*")[0].split(":")[0].upper()
+            for d in (ACMG_GENE_ECONOMICS, PGX_ECONOMICS, HLA_ECONOMICS,
+                      NEUROCHEMISTRY_ECONOMICS, METAL_OXIDATIVE_ECONOMICS,
+                      IMMUNOGENETICS_ECONOMICS, DETOX_ECONOMICS)
+            for k in d
+            if k.replace("-", "").replace("*", "").replace(":", "").isalnum())
+        items = _ee.deduplicate_by_target(items, value_key="net",
+                                         text_key="finding",
+                                         fallback_key="category",
+                                         vocabulary=_vocab)
+        pooled_targets = sorted({i["pool_target"] for i in items
+                                 if i.get("pool_rank", 0) > 0})
+        pooling_applied = True
+    except Exception:
+        pooling_applied = False
+
+    correction = {
+        "marginal_cost_fraction": _MARGINAL_COST_FRACTION,
+        "midpoint_discount": round(_MIDPOINT_DISCOUNT, 4),
+        "mean_adherence": (round(sum(i["adherence"] for i in items) / len(items), 3)
+                           if items else 1.0),
+        "n_excluded_not_valued": sum(
+            1 for f in raw if f.get("category") in COHORT_NOT_VALUED),
+        "pooling_applied": pooling_applied,
+        "n_pooled_targets": len(pooled_targets),
+        "pooled_targets": pooled_targets,
+        "n_findings_before_pooling": n_before,
+        "note": ("Cohort figures apply the marginal-cost fraction, midpoint "
+                 "discounting, real-world adherence and correlated-target "
+                 "pooling that the individual sheet applies. Earlier versions "
+                 "of this block applied none of them and reported an "
+                 "undiscounted, unpooled, full-adherence sum."),
+    }
+    return items, correction
+
+
+def _cohort_totals(findings_econ: dict, n: int) -> dict:
+    """Legacy and corrected cohort aggregates, on one basis, side by side.
+
+    Both are computed the same way — per-affected value times the number of
+    members who carry the finding — so the only difference between them is the
+    corrections. Reported together because a number that quietly got smaller
+    is as hard to trust as one that was quietly too big.
+    """
+    raw = findings_econ.get("findings_with_economics") or []
+    items, correction = _corrected_cohort_items(findings_econ)
+
+    # LEGACY: raw outcome_value per affected member, summed across every
+    # finding independently. No pooling, no adherence, no discounting, and
+    # nothing excluded.
+    legacy_cost = legacy_benefit = legacy_qalys = 0.0
+    legacy_events = 0
+    for f in raw:
+        affected = n * float(f.get("prevalence") or 0.0)
+        legacy_events += round(affected)
+        legacy_cost += affected * float(f.get("intervention_cost") or 0.0)
+        legacy_benefit += affected * float(f.get("outcome_value") or 0.0)
+        legacy_qalys += affected * float(f.get("qaly_gain") or 0.0)
+
+    # CORRECTED: same structure, corrected per-affected values.
+    cost = benefit = qalys = 0.0
+    events = 0
+    per_finding: list[dict] = []
+    for i in items:
+        affected = n * i["prevalence"]
+        events += round(affected)
+        c = affected * i["intervention"]
+        b = affected * i["avoided"]
+        q = affected * i["qaly"]
+        cost += c
+        benefit += b
+        qalys += q
+        per_finding.append({
+            "finding": i["finding"], "affected_members": round(affected),
+            "adherence": i["adherence"],
+            "total_cost": round(c), "total_benefit": round(b),
+            "total_qalys": round(q, 2),
+        })
+
+    # Members, not intervention-events. Independent prevalences sum past 1.0,
+    # so the event count is not a headcount. The previous version capped the
+    # COUNT at plan size and left the MONEY uncapped — which is why the report
+    # said "100,000 of 100,000 members affected" while still summing benefit
+    # over every finding as though they were different people.
+    unique_members = min(events, n)
+
+    # Incremental cost, not gross spend: the cash the interventions free off
+    # sets what they cost. Only then is a cost-per-QALY meaningful.
+    inc_cost = cost - benefit
+    dominant = inc_cost < 0 and qalys > 0
+    cost_per_qaly = (round(inc_cost / qalys) if qalys > 0 and not dominant
+                     else None)
+    legacy_cost_per_qaly = (round(legacy_cost / legacy_qalys)
+                            if legacy_qalys else None)
 
     return {
+        "cohort_size": n,
+        "n_findings": len(items),
+        "intervention_events": events,
+        "unique_members_affected": unique_members,
+        "prevalence_sum_exceeds_cohort": events > n,
+        "total_intervention_cost": round(cost),
+        "total_cost_averted": round(benefit),
+        "total_qalys": round(qalys, 1),
+        "incremental_cost": round(inc_cost),
+        "dominant": dominant,
+        "cost_per_qaly": cost_per_qaly,
+        "cost_per_qaly_note": (
+            "suppressed — the strategy is modelled as dominant (frees more "
+            "cash than it costs), and a ratio in that quadrant is ambiguous"
+            if dominant else "incremental cost per QALY gained"),
+        "net_cash": round(benefit - cost),
+        "per_finding": sorted(per_finding,
+                              key=lambda r: -r["total_benefit"])[:20],
+        # ── the figure this replaced ──
+        "legacy": {
+            "total_intervention_cost": round(legacy_cost),
+            "total_benefit": round(legacy_benefit),
+            "total_qalys": round(legacy_qalys, 1),
+            "intervention_events": legacy_events,
+            "cost_per_qaly": legacy_cost_per_qaly,
+            "cost_per_qaly_was": ("gross intervention spend divided by QALYs — "
+                                  "no cost offsets and no comparator, so not "
+                                  "an ICER despite being labelled one"),
+        },
+        "benefit_reduction": round(legacy_benefit - benefit),
+        "benefit_reduction_pct": (
+            round(100.0 * (legacy_benefit - benefit) / legacy_benefit, 1)
+            if legacy_benefit > 0 else 0.0),
+        "correction": correction,
+    }
+
+
+def scale_to_clinic(findings_econ: dict,
+                    patient_count: int = DEFAULT_CLINIC_PATIENTS) -> dict:
+    """Cohort view at clinic scale, on the corrected per-person economics."""
+    if not (findings_econ.get("findings_with_economics") or []):
+        return {"patient_count": patient_count, "n_findings": 0,
+                "note": "No actionable findings with economics for this profile."}
+    t = _cohort_totals(findings_econ, patient_count)
+    per_patient_cost = t["total_intervention_cost"] / patient_count
+    per_patient_benefit = t["total_cost_averted"] / patient_count
+    return {
         "patient_count": patient_count,
-        "n_findings": len(findings),
-        "avg_cost_per_patient": avg_cost,
-        "avg_benefit_per_patient": avg_benefit,
-        "avg_roi": calculate_roi(avg_cost, avg_benefit),
-        "total_cost": round(avg_cost * patient_count, 2),
-        "total_benefit": round(avg_benefit * patient_count, 2),
+        **{k: v for k, v in t.items() if k != "cohort_size"},
+        "avg_cost_per_patient": round(per_patient_cost, 2),
+        "avg_benefit_per_patient": round(per_patient_benefit, 2),
+        # Established key names retained so every consumer keeps working — the
+        # values behind them are the corrected ones. Renaming would have left
+        # the report rendering blanks where the numbers used to be, which is a
+        # worse failure than a wrong number because nobody notices it.
+        "total_cost": round(t["total_intervention_cost"], 2),
+        "total_benefit": round(t["total_cost_averted"], 2),
+        "avg_roi": calculate_roi(per_patient_cost, per_patient_benefit),
+        "value_to_cost_ratio": calculate_roi(per_patient_cost, per_patient_benefit),
+        "payback_period_months": (
+            round(per_patient_cost / (CLINIC_REVENUE_MONTHLY * CLINIC_GROSS_MARGIN), 1)
+            if CLINIC_REVENUE_MONTHLY * CLINIC_GROSS_MARGIN else None),
         "revenue_model_monthly": CLINIC_REVENUE_MONTHLY,
         "gross_margin": CLINIC_GROSS_MARGIN,
-        "payback_period_months": payback,
+        # The subscription model is a BUSINESS assumption and is reported on its
+        # own. Dividing an intervention cost by a subscription margin and
+        # printing the result beside a health-value ratio put two different
+        # numerators under one "ROI" heading — the same cost-saving vs.
+        # cost-effective conflation corrected elsewhere in this model.
+        "revenue_model": {
+            "monthly_per_patient": CLINIC_REVENUE_MONTHLY,
+            "gross_margin": CLINIC_GROSS_MARGIN,
+            "monthly_margin_per_patient": round(
+                CLINIC_REVENUE_MONTHLY * CLINIC_GROSS_MARGIN, 2),
+            "note": ("Business-model assumption, not a clinical or economic "
+                     "result. Kept separate from the health-value figures "
+                     "above: they have different numerators and combining them "
+                     "into one ratio is not meaningful."),
+        },
         "summary": (
-            f"Applied to {patient_count} patients: "
-            f"prevalence-weighted cost ${round(avg_cost * patient_count):,}, "
-            f"modeled benefit ${round(avg_benefit * patient_count):,}, "
-            f"ROI {calculate_roi(avg_cost, avg_benefit)}:1"
+            f"Across {patient_count} patients: intervention cost "
+            f"${t['total_intervention_cost']:,}, cost averted "
+            f"${t['total_cost_averted']:,}, {t['total_qalys']:,} QALYs. "
+            f"Corrections removed ${t['benefit_reduction']:,} "
+            f"({t['benefit_reduction_pct']}%) of the previously claimed benefit."
         ),
     }
 
 
-def scale_to_payer(findings_econ: dict, member_population: int = DEFAULT_PAYER_MEMBERS) -> dict:
-    """Scale per-finding economics to a payer's member population using each
-    finding's population prevalence."""
-    findings = findings_econ.get("findings_with_economics", [])
-    if not findings:
+def scale_to_payer(findings_econ: dict,
+                   member_population: int = DEFAULT_PAYER_MEMBERS) -> dict:
+    """Cohort view at payer scale, on the corrected per-person economics."""
+    if not (findings_econ.get("findings_with_economics") or []):
         return {"member_population": member_population, "affected_members": 0,
                 "note": "No actionable findings with economics for this profile."}
-
-    affected_total = 0
-    total_cost = 0.0
-    total_benefit = 0.0
-    total_qalys = 0.0
-    per_finding: list[dict] = []
-    for f in findings:
-        affected = round(member_population * f.get("prevalence", 0.0))
-        cost = affected * f["intervention_cost"]
-        benefit = affected * f["outcome_value"]
-        qalys = affected * f.get("qaly_gain", 0.0)
-        affected_total += affected
-        total_cost += cost
-        total_benefit += benefit
-        total_qalys += qalys
-        per_finding.append({
-            "finding": f["finding"], "affected_members": affected,
-            "total_cost": round(cost), "total_benefit": round(benefit),
-        })
-
-    # Cap affected_total at plan size — independent prevalence sums
-    # double-count members who qualify for multiple interventions.
-    unique_affected = min(affected_total, member_population)
-
-    cost_per_qaly = round(total_cost / total_qalys) if total_qalys else None
+    t = _cohort_totals(findings_econ, member_population)
     return {
         "member_population": member_population,
-        "affected_members": unique_affected,
-        "affected_member_interventions": affected_total,
-        "total_cost": round(total_cost),
-        "total_benefit": round(total_benefit),
-        "roi": calculate_roi(total_cost, total_benefit),
-        "cost_per_qaly": cost_per_qaly,
-        "net_savings": round(total_benefit - total_cost),
-        "per_finding": per_finding,
+        **{k: v for k, v in t.items() if k != "cohort_size"},
+        "affected_members": t["unique_members_affected"],
+        "total_cost": round(t["total_intervention_cost"], 2),
+        "total_benefit": round(t["total_cost_averted"], 2),
+        "roi": calculate_roi(t["total_intervention_cost"], t["total_cost_averted"]),
+        "net_savings": t["net_cash"],
         "summary": (
-            f"Applied to {member_population:,} members: "
-            f"{unique_affected:,} unique members affected, "
-            f"{affected_total:,} intervention-events, cost ${round(total_cost):,}, "
-            f"modeled savings ${round(total_benefit):,}, "
-            f"ROI {calculate_roi(total_cost, total_benefit)}:1"
+            f"Across {member_population:,} members: "
+            f"{t['unique_members_affected']:,} members affected across "
+            f"{t['intervention_events']:,} intervention-events, cost "
+            f"${t['total_intervention_cost']:,}, cost averted "
+            f"${t['total_cost_averted']:,}, {t['total_qalys']:,} QALYs. "
+            f"Corrections removed ${t['benefit_reduction']:,} "
+            f"({t['benefit_reduction_pct']}%)."
         ),
     }
 
@@ -1775,7 +1963,39 @@ _CATEGORY_ADHERENCE: dict[str, str] = {
     "Addiction Genetics":        "adherence_lifestyle",
     "Wellness Genetics":         "adherence_lifestyle",
     "Biological aging":          "adherence_lifestyle",
+
+    # The curated per-finding tables use a second, different vocabulary for the
+    # same idea (``source=`` on _econ_record rather than the category passed to
+    # add()). Both are mapped here so one table governs adherence everywhere;
+    # keeping two would let the cohort view drift from the individual view,
+    # which is the defect this consolidation exists to remove.
+    "Pharmacogenomics":          "adherence_pharmacological",
+    "Top-Drugs PGx Screen":      "adherence_pharmacological",
+    "Genotype":                  "adherence_pharmacological",
+    "Polygenic Risk":            "adherence_pharmacological",
+    "Clinical Variant (ClinVar)": "adherence_screening",
+    "Immunogenetics":            "adherence_screening",
+    "Urologic/GU":               "adherence_lifestyle",
+    "Metal/Oxidative":           "adherence_lifestyle",
+    "Detoxification":            "adherence_lifestyle",
+    "Exercise / Lifestyle":      "adherence_lifestyle",
+    "Longevity":                 "adherence_lifestyle",
+    "Family Planning":           "adherence_screening",
 }
+
+# Categories the rest of the model has decided not to monetise. Section 1 keeps
+# them in value_of_information.NOT_VALUED and Section 2 lists them under
+# ``not_monetised``; the cohort views below scaled them anyway, so one document
+# both declined to price a finding and multiplied it across 100,000 members.
+# Longevity only. Its composite re-aggregates variants that are already priced
+# individually, so giving it a value would double-count by construction — and it
+# already emits zeros, so excluding it changes no number. Family Planning is NOT
+# here: partner-testing value is a genuine, separately-derived benefit stream
+# (partner carrier frequency x child clinical risk x cost of an affected child),
+# and it is now POOLED against the carrier-screening line that prices the same
+# reproductive decision at a flat $2,000, rather than dropped. Pooling keeps the
+# better-derived estimate and discounts the other; dropping it lost real value.
+COHORT_NOT_VALUED = ("Longevity",)
 
 
 def _adherence_for_category(category: str) -> float:
