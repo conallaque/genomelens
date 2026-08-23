@@ -44,12 +44,15 @@ a figure it does not state would defeat the purpose of the exercise.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence
 
 __all__ = [
     "Param", "PARAMS", "get", "value", "validate_registry",
     "assumptions", "by_tier", "assumption_burden", "citation_list",
+    "overridden", "sampleable", "draw", "sample_all",
+    "CURATED_SOURCE_IDS", "resolve_curated_source", "audit_curated_tables",
     "TIERS",
 ]
 
@@ -528,6 +531,104 @@ def validate_registry(params: Optional[Sequence[Param]] = None) -> List[str]:
     for p in (params if params is not None else _REGISTRY):
         problems.extend(p.validate())
     return problems
+
+
+class overridden:
+    """Temporarily replace registry values, for sensitivity analysis.
+
+    Probabilistic and one-way sensitivity analyses need to re-run the model
+    with different parameter values. Doing that by passing overrides down
+    through every call signature would be invasive and easy to get partially
+    wrong — a parameter read from the registry somewhere deep would silently
+    keep its base value and quietly narrow the reported uncertainty.
+
+    Swapping the registry itself means every reader sees the drawn value, by
+    construction. Restores on exit, including on exception.
+
+        with overridden({"discount_rate": 0.05}):
+            ...
+    """
+
+    def __init__(self, values: Dict[str, float]):
+        self._values = dict(values or {})
+        self._saved: Dict[str, Param] = {}
+
+    def __enter__(self):
+        import dataclasses
+        for key, val in self._values.items():
+            if key not in PARAMS:
+                continue
+            self._saved[key] = PARAMS[key]
+            PARAMS[key] = dataclasses.replace(PARAMS[key], value=float(val))
+        return self
+
+    def __exit__(self, *exc):
+        for key, param in self._saved.items():
+            PARAMS[key] = param
+        self._saved.clear()
+        return False
+
+
+def sampleable() -> List[Param]:
+    """Parameters carrying enough information to be drawn from.
+
+    A parameter with no distribution and no range is held fixed rather than
+    given invented uncertainty — pretending to know a spread is the same error
+    as pretending to know a value.
+    """
+    return [p for p in _REGISTRY
+            if p.dist in ("beta", "gamma", "lognormal")
+            and (p.se is not None or (p.low is not None and p.high is not None))]
+
+
+def draw(rng, param: Param) -> float:
+    """One draw from a parameter's documented uncertainty.
+
+    Distributions follow the usual health-economic conventions: beta for
+    quantities bounded on [0, 1], gamma for costs and other non-negative
+    unbounded quantities. Where only a range is published, it is read as an
+    approximate 95% interval and converted to a standard error.
+    """
+    v = float(param.value)
+    se = param.se
+    if se is None and param.low is not None and param.high is not None:
+        se = (float(param.high) - float(param.low)) / 3.92   # 95% CI -> SE
+    if not se or se <= 0:
+        return v
+
+    if param.dist == "beta":
+        if not (0.0 < v < 1.0):
+            return v
+        var = min(se ** 2, v * (1 - v) * 0.999)
+        if var <= 0:
+            return v
+        common = v * (1 - v) / var - 1.0
+        a, b = max(1e-6, v * common), max(1e-6, (1 - v) * common)
+        out = rng.betavariate(a, b)
+    elif param.dist == "gamma":
+        if v <= 0:
+            return v
+        shape = max(1e-6, (v / se) ** 2)
+        out = rng.gammavariate(shape, v / shape)
+    elif param.dist == "lognormal":
+        if v <= 0:
+            return v
+        sigma = (se / v)
+        out = math.exp(rng.gauss(math.log(v), max(1e-9, sigma)))
+    else:
+        return v
+
+    if param.low is not None:
+        out = max(float(param.low), out)
+    if param.high is not None:
+        out = min(float(param.high), out)
+    return out
+
+
+def sample_all(rng, keys: Optional[Sequence[str]] = None) -> Dict[str, float]:
+    """A full parameter draw, for one probabilistic-sensitivity iteration."""
+    pool = ([get(k) for k in keys] if keys is not None else sampleable())
+    return {p.key: draw(rng, p) for p in pool}
 
 
 def by_tier(tier: str) -> List[Param]:

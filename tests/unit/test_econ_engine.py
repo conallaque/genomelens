@@ -430,3 +430,99 @@ def test_custom_vocabulary_is_honoured():
                for i in ee.deduplicate_by_target(items))
     out = ee.deduplicate_by_target(items, vocabulary=frozenset({"ZZZ9"}))
     assert any(i["retained"] < 1.0 for i in out)
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Uncertainty propagation
+# ══════════════════════════════════════════════════════════════════════════
+
+def _pools_for_psa():
+    return ee.pool_findings([_f(coi="CAD"), _f(coi="CAD", hc=0.3),
+                             _f(coi="T2D"), _f(coi="Alzheimer")])
+
+
+def test_psa_varies_parameters_and_reports_an_interval():
+    r = ee.run_psa(_pools_for_psa(), n=300, test_cost=100)
+    assert r["n_iterations"] == 300
+    assert r["n_parameters_varied"] > 10
+    assert r["inmb_ci_low"] < r["mean_inmb"] < r["inmb_ci_high"], (
+        "a PSA that produces no spread is not varying anything")
+
+
+def test_psa_is_reproducible_for_a_given_seed():
+    a = ee.run_psa(_pools_for_psa(), n=200, seed=42, test_cost=100)
+    b = ee.run_psa(_pools_for_psa(), n=200, seed=42, test_cost=100)
+    assert a["mean_inmb"] == b["mean_inmb"]
+    c = ee.run_psa(_pools_for_psa(), n=200, seed=43, test_cost=100)
+    assert c["mean_inmb"] != a["mean_inmb"], "different seeds must differ"
+
+
+def test_psa_restores_the_registry_afterwards():
+    # The override context manager swaps registry entries in place. If it
+    # leaked, every later calculation in the run would silently use a random
+    # draw instead of the base value — a spectacular and near-undetectable bug.
+    before = {k: p.value for k, p in ep.PARAMS.items()}
+    ee.run_psa(_pools_for_psa(), n=50, test_cost=100)
+    after = {k: p.value for k, p in ep.PARAMS.items()}
+    assert before == after
+
+
+def test_psa_respects_documented_bounds():
+    import random
+    rng = random.Random(3)
+    for p in ep.sampleable():
+        for _ in range(200):
+            v = ep.draw(rng, p)
+            if p.low is not None:
+                assert v >= p.low - 1e-9, f"{p.key} drew below its stated low"
+            if p.high is not None:
+                assert v <= p.high + 1e-9, f"{p.key} drew above its stated high"
+
+
+def test_parameters_without_a_published_spread_are_held_fixed():
+    # Inventing uncertainty is the same error as inventing a value.
+    import random
+    rng = random.Random(1)
+    fixed = [p for p in ep.PARAMS.values()
+             if p.dist == "fixed" or (p.se is None and p.low is None)]
+    assert fixed
+    for p in fixed:
+        if p.dist == "fixed":
+            assert ep.draw(rng, p) == p.value
+
+
+def test_ceac_is_monotonic_in_willingness_to_pay():
+    # More willingness to pay can never make a strategy less likely to be
+    # cost-effective. A non-monotonic curve means the thresholds were resampled
+    # independently and the curve is showing Monte Carlo noise.
+    curve = ee.ceac(_pools_for_psa(), n=200, test_cost=100)
+    ps = [c["p_cost_effective"] for c in curve]
+    assert ps == sorted(ps), f"CEAC not monotonic: {ps}"
+    assert all(0.0 <= x <= 1.0 for x in ps)
+
+
+def test_tornado_ranks_by_swing_and_names_assumption_tiers():
+    rows = ee.tornado(_pools_for_psa(), test_cost=100)
+    assert rows
+    swings = [r["swing"] for r in rows]
+    assert swings == sorted(swings, reverse=True)
+    for r in rows:
+        assert r["tier"] in ep.TIERS
+        assert r["low_value"] < r["high_value"]
+
+
+def test_tornado_swings_come_from_the_registry_range():
+    rows = {r["parameter"]: r for r in ee.tornado(_pools_for_psa(), top=50)}
+    for key, row in rows.items():
+        p = ep.get(key)
+        assert row["low_value"] == p.low and row["high_value"] == p.high
+
+
+def test_override_context_manager_restores_on_exception():
+    base = ep.value("discount_rate")
+    try:
+        with ep.overridden({"discount_rate": 0.99}):
+            raise RuntimeError("boom")
+    except RuntimeError:
+        pass
+    assert ep.value("discount_rate") == base

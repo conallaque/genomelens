@@ -53,6 +53,8 @@ __all__ = [
     "incremental_analysis", "dual_perspective", "impact_inventory",
     "cheers_checklist", "validate_model", "COI_KEY_TO_PARAM",
     "simpson_weights", "discount_weights",
+    "deduplicate_by_target", "DEFAULT_GENE_VOCABULARY",
+    "run_psa", "ceac", "tornado",
 ]
 
 _DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -880,3 +882,125 @@ def validate_model(pools: Dict[str, ConditionPool], evaluated: Dict) -> List[Dic
         f"assumptions")
 
     return checks
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Uncertainty: PSA, CEAC, tornado
+# ══════════════════════════════════════════════════════════════════════════
+# The registry records a distribution and a range for most parameters. Until
+# these functions existed those fields were documentation — the model ran on
+# point estimates and reported a single number, which invites the reader to
+# treat it as more certain than it is. Propagating the documented uncertainty
+# is what turns the provenance table from a display into a working input.
+
+def run_psa(pools: Dict[str, "ConditionPool"], *, n: int = 2000,
+            seed: int = 20260822, test_cost: float = 0.0,
+            wtp: Optional[float] = None) -> Dict:
+    """Probabilistic sensitivity analysis over the registry's distributions.
+
+    Each iteration draws every sampleable parameter from its documented
+    distribution, re-runs the pooled evaluation with those values in place,
+    and records incremental cost and QALYs. Parameters with no published
+    spread are held fixed rather than given invented uncertainty.
+    """
+    import random
+    wtp = ep.value("wtp_per_qaly") if wtp is None else float(wtp)
+    rng = random.Random(seed)
+    costs: List[float] = []
+    qalys: List[float] = []
+    inmbs: List[float] = []
+    for _ in range(max(1, int(n))):
+        with ep.overridden(ep.sample_all(rng)):
+            ev = evaluate_pools(pools, wtp=wtp, test_cost=test_cost)
+            cea = ev["cea"]
+        costs.append(float(cea["incremental_cost"]))
+        qalys.append(float(cea["incremental_qaly"]))
+        inmbs.append(float(cea["inmb"]))
+
+    def pct(xs: List[float], q: float) -> float:
+        if not xs:
+            return 0.0
+        s = sorted(xs)
+        i = min(len(s) - 1, max(0, int(round(q * (len(s) - 1)))))
+        return s[i]
+
+    n_eff = len(inmbs) or 1
+    return {
+        "available": True,
+        "n_iterations": n_eff,
+        "n_parameters_varied": len(ep.sampleable()),
+        "mean_incremental_cost": round(sum(costs) / n_eff),
+        "mean_incremental_qaly": round(sum(qalys) / n_eff, 4),
+        "mean_inmb": round(sum(inmbs) / n_eff),
+        "inmb_ci_low": round(pct(inmbs, 0.025)),
+        "inmb_ci_high": round(pct(inmbs, 0.975)),
+        "cost_ci_low": round(pct(costs, 0.025)),
+        "cost_ci_high": round(pct(costs, 0.975)),
+        "qaly_ci_low": round(pct(qalys, 0.025), 4),
+        "qaly_ci_high": round(pct(qalys, 0.975), 4),
+        "p_cost_effective": round(sum(1 for x in inmbs if x > 0) / n_eff, 4),
+        "p_cost_saving": round(sum(1 for c in costs if c < 0) / n_eff, 4),
+        "wtp": round(wtp),
+        "note": ("Parameters without a published spread are held fixed; the "
+                 "interval below therefore understates true uncertainty "
+                 "rather than overstating it."),
+    }
+
+
+def ceac(pools: Dict[str, "ConditionPool"], *,
+         thresholds: Sequence[float] = (0, 25_000, 50_000, 75_000, 100_000,
+                                        150_000, 200_000),
+         n: int = 800, seed: int = 20260822,
+         test_cost: float = 0.0) -> List[Dict]:
+    """Cost-effectiveness acceptability curve from the pooled model.
+
+    Reuses one set of draws across all thresholds — resampling per threshold
+    produces a curve that jitters non-monotonically for no reason other than
+    Monte Carlo noise.
+    """
+    import random
+    rng = random.Random(seed)
+    draws: List[Tuple[float, float]] = []
+    for _ in range(max(1, int(n))):
+        with ep.overridden(ep.sample_all(rng)):
+            cea = evaluate_pools(pools, test_cost=test_cost)["cea"]
+        draws.append((float(cea["incremental_cost"]),
+                      float(cea["incremental_qaly"])))
+    out: List[Dict] = []
+    for w in thresholds:
+        p = sum(1 for c, q in draws if q * w - c > 0) / (len(draws) or 1)
+        out.append({"wtp": round(float(w)), "p_cost_effective": round(p, 4)})
+    return out
+
+
+def tornado(pools: Dict[str, "ConditionPool"], *,
+            test_cost: float = 0.0, wtp: Optional[float] = None,
+            top: int = 10) -> List[Dict]:
+    """One-way sensitivity: swing in net monetary benefit across each
+    parameter's documented range.
+
+    Answers the question a probabilistic interval cannot: *which* parameter is
+    responsible for the spread, and therefore which one is worth arguing about
+    or resolving first.
+    """
+    wtp = ep.value("wtp_per_qaly") if wtp is None else float(wtp)
+    base = evaluate_pools(pools, wtp=wtp, test_cost=test_cost)["cea"]["inmb"]
+    rows: List[Dict] = []
+    for p in ep.PARAMS.values():
+        if p.low is None or p.high is None or p.low == p.high:
+            continue
+        with ep.overridden({p.key: p.low}):
+            lo = evaluate_pools(pools, wtp=wtp, test_cost=test_cost)["cea"]["inmb"]
+        with ep.overridden({p.key: p.high}):
+            hi = evaluate_pools(pools, wtp=wtp, test_cost=test_cost)["cea"]["inmb"]
+        swing = abs(hi - lo)
+        if swing < 1:
+            continue
+        rows.append({
+            "parameter": p.key, "units": p.units, "tier": p.tier,
+            "low_value": p.low, "high_value": p.high,
+            "inmb_at_low": round(lo), "inmb_at_high": round(hi),
+            "base_inmb": round(base), "swing": round(swing),
+        })
+    rows.sort(key=lambda r: -r["swing"])
+    return rows[:top]

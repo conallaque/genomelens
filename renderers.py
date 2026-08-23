@@ -2153,6 +2153,60 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
     <th style="text-align:right">ICER</th></tr></thead>
   <tbody>{srows}</tbody></table></details>"""
 
+    # ── Uncertainty: PSA interval, CEAC, tornado ──
+    psa = p.get("psa") or {}
+    unc_html = ""
+    if psa.get("available"):
+        curve = p.get("ceac") or []
+        curve_html = ""
+        if curve:
+            pts = "".join(
+                f"<tr><td style='padding:3px 4px'>{money(c['wtp'])}/QALY</td>"
+                f"<td style='text-align:right;padding:3px 4px'>"
+                f"{c['p_cost_effective']:.0%}</td></tr>" for c in curve)
+            curve_html = f"""
+<div style="margin-top:8px"><div style="font-weight:600;color:#5b6673">
+  Probability cost-effective, by threshold</div>
+<table style="border-collapse:collapse;font-size:.85em;margin-top:4px">{pts}</table></div>"""
+
+        trows = "".join(f"""
+<tr style="border-bottom:1px solid #f5f6f8">
+  <td style="padding:3px 4px">{_esc(t['parameter'])}
+    <span style="color:{'#b06a00' if t['tier'] == 'assumption' else '#9aa4b0'};
+                 font-size:.85em"> [{_esc(t['tier'])}]</span></td>
+  <td style="text-align:right;padding:3px 4px;color:#8a94a3">
+    {t['low_value']:g} &ndash; {t['high_value']:g}</td>
+  <td style="text-align:right;padding:3px 4px"><strong>{money(t['swing'])}</strong></td>
+</tr>""" for t in (p.get("tornado") or []))
+
+        unc_html = f"""
+<details style="margin-top:10px" open><summary style="cursor:pointer;color:#5b6673;font-weight:600">
+  Uncertainty &mdash; {psa.get('n_iterations', 0):,} simulations over
+  {psa.get('n_parameters_varied', 0)} parameters</summary>
+<div style="font-size:.85em;color:#5b6673;margin:7px 0">
+  Each iteration draws every parameter with a documented spread from its own
+  distribution and re-runs the model. Net monetary benefit
+  <strong>{money(psa.get('mean_inmb'))}</strong>
+  (95% interval {money(psa.get('inmb_ci_low'))} to
+  {money(psa.get('inmb_ci_high'))}); cost-effective in
+  <strong>{psa.get('p_cost_effective', 0):.0%}</strong> of simulations at
+  {money(psa.get('wtp'))}/QALY, cost-<em>saving</em> in
+  <strong>{psa.get('p_cost_saving', 0):.0%}</strong>.</div>
+<div style="font-size:.8em;color:#8a94a3;font-style:italic">
+  {_esc(psa.get('note', ''))}</div>
+{curve_html}
+<div style="margin-top:10px"><div style="font-weight:600;color:#5b6673">
+  What drives the answer &mdash; swing in net benefit across each parameter's range</div>
+<table style="width:100%;border-collapse:collapse;font-size:.85em;margin-top:4px">
+  <thead><tr style="text-align:left;color:#5b6673;border-bottom:1px solid #e3e7ec">
+    <th style="padding:4px">Parameter</th><th style="text-align:right">Range</th>
+    <th style="text-align:right">Swing</th></tr></thead>
+  <tbody>{trows}</tbody></table>
+<div style="font-size:.8em;color:#8a94a3;margin-top:5px">
+  A parameter high on this list is one the conclusion depends on. Anything
+  tagged <span style="color:#b06a00">[assumption]</span> is a judgement call
+  carrying real weight &mdash; worth disagreeing with first.</div></div></details>"""
+
     # ── Dual perspective ──
     dp = p.get("dual_perspective") or {}
     dp_html = ""
@@ -2326,7 +2380,7 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
       <th style="text-align:right">NMB</th></tr></thead>
     <tbody>{rows}</tbody>
   </table>
-  {struct_html}{dp_html}{inv_html}{val_html}{prov_html}{cheers_html}
+  {unc_html}{struct_html}{dp_html}{inv_html}{val_html}{prov_html}{cheers_html}
 </div>"""
 
 

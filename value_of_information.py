@@ -852,6 +852,12 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
         _pooled["cheers"] = _ee.cheers_checklist(
             wtp=wtp, rate=rate,
             horizon=_econ_params.value("horizon_years_personal"))
+        # Propagate the registry's documented uncertainty. Until this ran,
+        # the distribution and range fields were documentation only and the
+        # model reported a point estimate as if it were precise.
+        _pooled["psa"] = _ee.run_psa(_pools, n=1500, test_cost=test_cost, wtp=wtp)
+        _pooled["ceac"] = _ee.ceac(_pools, n=600, test_cost=test_cost)
+        _pooled["tornado"] = _ee.tornado(_pools, test_cost=test_cost, wtp=wtp)
         _pooled["provenance"] = _econ_params.assumption_burden()
         _pooled["declared_assumptions"] = [
             {"key": p.key, "value": p.value, "units": p.units, "note": p.note}
