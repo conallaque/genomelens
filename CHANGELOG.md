@@ -6,6 +6,31 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [7.1.0] — 2026-08-23 — Real-world adherence, econ package, clean CI
+
+### Added
+- Adherence layer — trial efficacy discounted to real-world effectiveness on both benefit and ongoing cost
+- Three adherence archetypes keyed on what acting asks of the person; all sampled in PSA
+- Naive, pooled-efficacy and realised-effectiveness reported as three tiers, not one number
+- Cost-effectiveness acceptability curve drawn as inline SVG; the table moves behind a disclosure
+- CI workflow — tests on 3.10/3.11/3.12, ruff, mypy, end-to-end report, and a DNA guard
+- `econ/` package grouping the eight health-economics modules
+
+### Changed
+- Emergency card is written on every run; `--no-emergency-card` opts out
+- Personal economic sheet reports on the same adherence basis as the pooled analysis
+- Published-model comparison now gates on each case's declared tolerance
+- README: live CI badge, honest test count, real output listing instead of broken screenshots
+
+### Fixed
+- `weasyprint_available()` always returned True after an unused-import autofix removed the probe
+- Closure captured a loop variable in the VCF writer and the decade planner
+- mypy config applied `strict` globally from a per-module section — 2,250 reported errors were one config line
+- Two trait rsIDs were fetched and never reported; marker count corrected 48 → 46
+- ruff and mypy both clean
+
+---
+
 ## [7.0.0] — 2026-08-23 — Economic model rebuilt on cited parameters
 
 Most dollar figures changed, several went down substantially.

@@ -509,6 +509,61 @@ gene-shaped words, which reads "MI", "MACE" and "B12" as genes.
 Refs: independence assumptions in combined-risk modelling; Drummond et al. (2015) on
 double counting.
 
+**22a · Adherence — from trial efficacy to real-world effectiveness**
+
+*The defect.* Every effect size in the model is **efficacy**: what a trial measures in
+people who followed a protocol. The model applied those figures to a whole cohort with no
+discount, which is an implicit assumption that everyone takes the tablet, keeps the
+appointment and sustains the habit for the entire horizon. That is not a conservative
+simplification — it is a systematic overstatement of every benefit reported, and it was
+invisible because nothing in the output named it.
+
+*The rule.* Adherence enters as a third multiplicative term alongside the evidence-strength
+haircut, **inside** the product rather than applied to the pooled result:
+
+```math
+\text{RRR}_{\text{pooled}}=\min\!\Big(c,\;1-\prod_{i=1}^{n}\big(1-r_i\,h_i\,a_i\,\rho^{\,i-1}\big)\Big)
+```
+
+The placement is not cosmetic. Adherence attenuates each intervention's own effect and the
+attenuated effects then combine, so `a` belongs before the product. Because the
+combination is concave the two orderings differ, and the correct one is the slightly *less*
+conservative of the two — pinned by test so nobody "fixes" it toward the smaller number on
+the assumption that smaller means safer.
+
+*Three archetypes, keyed on the ask not the disease.* What predicts follow-through is what
+acting requires of the person, not which organ is involved:
+
+| Archetype | Value | What it covers | Tier |
+|---|---|---|---|
+| Pharmacological | 0.50 | Chronic preventive medication — statins, metformin, SSRIs | published (WHO 2003) |
+| Screening | 0.65 | A programme you attend — colonoscopy, imaging surveillance, ferritin monitoring | assumption |
+| Lifestyle | 0.35 | Sustained behaviour change — diet, activity, abstinence | assumption |
+
+An unmapped condition falls back to 0.50 rather than to 1.0. Defaulting a gap to perfect
+adherence would make the gap invisible by making it flattering. All four are sampled from
+beta distributions in the probabilistic sensitivity analysis, because a parameter this
+influential cannot be a pinned point estimate.
+
+*The cost side moves too.* The ongoing intervention cost is scaled by the same factor:
+somebody who stops taking a statin at month six stops paying for it. Costing the full
+course while crediting only the adhered fraction of the benefit would be the mirror image
+of the double-count §22 was built to remove. What does **not** scale is the one-off test
+cost — you pay for the array whether or not you act on it. That asymmetry is the whole
+result: adherence leaves the intervention's own cost per QALY roughly alone, and moves
+cost-effectiveness by spreading a fixed cost over fewer realised QALYs.
+
+*Reported as two corrections, not one.* Pooling is measured at full adherence and adherence
+is measured after pooling, so neither absorbs the other and the pair sums to the total
+shrinkage. The report shows all three tiers per condition — naive additive, pooled
+efficacy, realised effectiveness — because collapsing them would hide two separate
+judgement calls behind one smaller number. On the synthetic reference genome the efficacy-to-
+effectiveness gap costs **61.6% of the modelled health benefit**, and the individual's
+economic sheet is reported on the same basis rather than on the undiscounted one.
+
+Refs: WHO (2003), *Adherence to Long-Term Therapies: Evidence for Action*; Drummond et al.
+(2015) on efficacy vs. effectiveness in economic evaluation.
+
 **23 · Parameter provenance — stating how much of the model is evidence**
 
 *The problem.* An internal audit found roughly two thirds of the economic parameters had

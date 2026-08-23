@@ -2374,6 +2374,84 @@ def _render_decision_layer(d: dict | None) -> str:
 {blocks}</details>"""
 
 
+def _ceac_svg(curve: list, width: int = 460, height: int = 170) -> str:
+    """Inline SVG cost-effectiveness acceptability curve.
+
+    The CEAC was reported as a table of thresholds, which is exactly the shape
+    a reader cannot see. The curve's job is to show at a glance where the
+    decision flips, and whether it flips steeply or barely at all — a flat line
+    at 100% and a line crossing 50% between two thresholds read identically in
+    a table and nothing like each other here.
+
+    Drawn as inline SVG rather than a generated image: the report is one
+    self-contained HTML file with no build step and no network, and that
+    constraint is the point of the project rather than an inconvenience.
+    """
+    pts = [(float(c["wtp"]), float(c["p_cost_effective"])) for c in curve
+           if c.get("wtp") is not None and c.get("p_cost_effective") is not None]
+    if len(pts) < 2:
+        return ""
+    pad_l, pad_r, pad_t, pad_b = 42, 10, 12, 26
+    x_max = max(x for x, _ in pts) or 1.0
+    iw, ih = width - pad_l - pad_r, height - pad_t - pad_b
+
+    def sx(x: float) -> float:
+        return pad_l + iw * (x / x_max)
+
+    def sy(y: float) -> float:
+        return pad_t + ih * (1.0 - max(0.0, min(1.0, y)))
+
+    line = " ".join(f"{sx(x):.1f},{sy(y):.1f}" for x, y in pts)
+    area = f"{sx(pts[0][0]):.1f},{pad_t + ih:.1f} " + line + \
+           f" {sx(pts[-1][0]):.1f},{pad_t + ih:.1f}"
+
+    grid = ""
+    for frac in (0.0, 0.25, 0.5, 0.75, 1.0):
+        y = sy(frac)
+        grid += (f'<line x1="{pad_l}" y1="{y:.1f}" x2="{width - pad_r}" '
+                 f'y2="{y:.1f}" stroke="#e8ecf1" stroke-width="1"/>'
+                 f'<text x="{pad_l - 6}" y="{y + 3.5:.1f}" text-anchor="end" '
+                 f'font-size="9" fill="#8a94a3">{frac:.0%}</text>')
+    # The 50% line is where the decision actually changes, so it is drawn as a
+    # reference rather than as one more gridline.
+    y50 = sy(0.5)
+    grid += (f'<line x1="{pad_l}" y1="{y50:.1f}" x2="{width - pad_r}" '
+             f'y2="{y50:.1f}" stroke="#c8d0da" stroke-width="1" '
+             f'stroke-dasharray="3 3"/>')
+
+    ticks = ""
+    for x, _ in pts:
+        if x == 0 or x == x_max or abs(x - 100_000) < 1:
+            lbl = "0" if x == 0 else f"${x / 1000:.0f}k"
+            ticks += (f'<text x="{sx(x):.1f}" y="{height - 8}" '
+                      f'text-anchor="middle" font-size="9" fill="#8a94a3">'
+                      f'{lbl}</text>')
+
+    # A marker at the conventional US threshold, when the curve covers it.
+    marker = ""
+    at100 = next((p for p in pts if abs(p[0] - 100_000) < 1), None)
+    if at100:
+        marker = (f'<circle cx="{sx(at100[0]):.1f}" cy="{sy(at100[1]):.1f}" '
+                  f'r="3.5" fill="#1a7f37"/>')
+
+    return f"""
+<svg viewBox="0 0 {width} {height}" width="100%" height="{height}"
+     role="img" xmlns="http://www.w3.org/2000/svg"
+     aria-label="Cost-effectiveness acceptability curve: probability the
+     strategy is cost-effective across willingness-to-pay thresholds">
+  <rect x="{pad_l}" y="{pad_t}" width="{iw}" height="{ih}" fill="#fbfcfd"/>
+  {grid}
+  <polygon points="{area}" fill="#1a7f37" fill-opacity="0.10"/>
+  <polyline points="{line}" fill="none" stroke="#1a7f37" stroke-width="2"
+            stroke-linejoin="round"/>
+  {marker}{ticks}
+  <text x="{pad_l}" y="{pad_t - 3}" font-size="9" fill="#8a94a3">
+    probability cost-effective</text>
+  <text x="{width - pad_r}" y="{height - 8}" text-anchor="end" font-size="9"
+        fill="#8a94a3">willingness to pay per QALY</text>
+</svg>"""
+
+
 def _assumption_dominance_note(tornado: list[dict]) -> str:
     """Say plainly when judgement calls, not evidence, drive the conclusion.
 
@@ -2595,7 +2673,11 @@ def _render_pooled_economics(p: dict | None) -> str:
             curve_html = f"""
 <div style="margin-top:8px"><div style="font-weight:600;color:#5b6673">
   Probability cost-effective, by threshold</div>
-<table style="border-collapse:collapse;font-size:.85em;margin-top:4px">{pts}</table></div>"""
+{_ceac_svg(curve)}
+<details style="margin-top:2px"><summary style="cursor:pointer;font-size:.82em;
+  color:#8a94a3">the same curve as numbers</summary>
+<table style="border-collapse:collapse;font-size:.85em;margin-top:4px">{pts}</table>
+</details></div>"""
 
         trows = "".join(f"""
 <tr style="border-bottom:1px solid #f5f6f8">

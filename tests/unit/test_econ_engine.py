@@ -822,3 +822,55 @@ def test_the_life_table_stays_at_the_repository_root():
         assert ee._LIFE_TABLE_PATH.endswith(
             os.path.join("data", "LifeTable_USA_Mx_2015.csv"))
     assert os.path.isdir(os.path.dirname(ee._LIFE_TABLE_PATH))
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# CEAC rendering
+# ══════════════════════════════════════════════════════════════════════════
+
+def test_ceac_svg_is_wellformed_and_monotone_in_x():
+    import xml.etree.ElementTree as ET
+
+    import renderers
+    curve = [{"wtp": w, "p_cost_effective": p} for w, p in
+             [(0, 0.0), (50_000, 0.2), (100_000, 0.76), (200_000, 1.0)]]
+    svg = renderers._ceac_svg(curve)
+    root = ET.fromstring(svg)          # malformed SVG breaks the whole report
+    pts = next(n for n in root.iter() if n.tag.endswith("polyline"))
+    xs = [float(p.split(",")[0]) for p in pts.get("points").split()]
+    assert xs == sorted(xs), "the curve must run left to right"
+    assert "aria-label" in svg, "a chart with no text alternative is not readable"
+
+
+def test_ceac_svg_puts_higher_probability_higher_up():
+    import renderers
+    svg = renderers._ceac_svg([{"wtp": 0, "p_cost_effective": 0.0},
+                               {"wtp": 100_000, "p_cost_effective": 1.0}])
+    ys = [float(p.split(",")[1]) for p in
+          svg.split('<polyline points="')[1].split('"')[0].split()]
+    # SVG y grows downward, so a rising probability must give a falling y.
+    assert ys[0] > ys[-1]
+
+
+def test_ceac_svg_degrades_rather_than_drawing_a_meaningless_chart():
+    import renderers
+    assert renderers._ceac_svg([]) == ""
+    assert renderers._ceac_svg([{"wtp": 0, "p_cost_effective": 0.5}]) == "", \
+        "one point is not a curve"
+
+
+def test_ceac_numbers_remain_available_alongside_the_chart():
+    # The table was the only representation; it is now behind a disclosure.
+    # Removing it entirely would make the figures unreadable to anyone who
+    # needs the exact values.
+    import renderers
+    fs = [ee.Finding(label="a", coi_key="CAD", p_event=0.2, rrr=0.27,
+                     haircut=1.0, intervention_cost=9000.0, adherence=0.5)]
+    pools = ee.pool_findings(fs)
+    res = ee.evaluate_pools(pools, test_cost=300.0)
+    res["psa"] = ee.run_psa(pools, n=40, test_cost=300.0)
+    res["ceac"] = ee.ceac(pools, n=40, test_cost=300.0)
+    html = renderers._render_pooled_economics(res)
+    assert "<svg" in html
+    assert "the same curve as numbers" in html
+    assert "/QALY</td>" in html

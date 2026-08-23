@@ -1,0 +1,111 @@
+name: CI
+
+# Gates on what actually passes on a clean tree: the test suite, ruff's lint
+# rules, and mypy on its configured strict set. It deliberately does NOT run
+# `ruff format --check` — the formatter would reflow 132 files, collapsing the
+# hand-aligned parameter tables and comment blocks that carry most of this
+# codebase's explanation. Lint catches defects; the formatter has an opinion
+# about layout, and here the layout is load-bearing.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: tests (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run the test suite
+        run: pytest -q
+
+      # The suite imports modules directly and never exercises the facade that
+      # pipeline.py imports through, so a green suite is not proof the CLI
+      # starts. An unused-import autofix once deleted a re-export and every
+      # test still passed while the pipeline would not run.
+      - name: Check the CLI entry point loads
+        run: python -c "import pipeline, analyze, renderers"
+
+      # End-to-end on the repository's own synthetic genome. No personal data:
+      # test_genome.txt is committed, and the report is written to a temporary
+      # directory that is never uploaded.
+      - name: Generate a report end-to-end
+        run: |
+          python analyze.py test_genome.txt --output "${RUNNER_TEMP}/report.html"
+          test -s "${RUNNER_TEMP}/report.html"
+          test -s "${RUNNER_TEMP}/economic_analysis.html"
+          test -s "${RUNNER_TEMP}/emergency_card.html"
+
+  lint:
+    name: lint and types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: ruff
+        run: ruff check .
+
+      - name: mypy (strict set)
+        run: mypy snp_registry.py cli.py
+
+  dna-guard:
+    name: no genotype data in the tree
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # A standing condition of this repository is that no real genome ever
+      # enters it. The .gitignore blanket-ignores *.csv with one path-anchored
+      # exception for the vendored life table; this asserts both halves of that
+      # rule are still in place and that nothing genotype-shaped slipped in
+      # besides the committed synthetic test file.
+      - name: Check the gitignore DNA rules are intact
+        run: |
+          grep -qx '\*\.csv' .gitignore
+          grep -qx '!data/LifeTable_USA_Mx_2015.csv' .gitignore
+
+      - name: Check no unexpected genotype files are tracked
+        run: |
+          unexpected=$(git ls-files \
+            | grep -iE '\.(csv|txt|vcf|vcf\.gz|23andme)$' \
+            | grep -viE '^(requirements.*\.txt|data/LifeTable_USA_Mx_2015\.csv|test_genome\.txt|cpic_drugs_batch1\.csv)$' \
+            || true)
+          if [ -n "$unexpected" ]; then
+            echo "Unexpected data files tracked:"; echo "$unexpected"; exit 1
+          fi

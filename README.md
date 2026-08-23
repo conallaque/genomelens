@@ -53,7 +53,8 @@ Unauthorized copying, modification, or distribution is prohibited.
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![privacy](https://img.shields.io/badge/privacy-100%25%20local%20%C2%B7%20offline-purple)
 ![code](https://img.shields.io/badge/code-~54.8k%20lines%20%C2%B7%2079%20modules-orange)
-![tests](https://img.shields.io/badge/tests-729%20passing-brightgreen)
+[![CI](https://github.com/conallaque/genomelens/actions/workflows/ci.yml/badge.svg)](https://github.com/conallaque/genomelens/actions/workflows/ci.yml)
+![tests](https://img.shields.io/badge/tests-749%20passing-brightgreen)
 ![input](https://img.shields.io/badge/input-chip%20%2B%20whole--genome%20VCF-blue)
 ![license](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
 [![Buy Me a Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/caque)
@@ -755,12 +756,29 @@ After a full run, the working directory will contain:
 
 ## Sample output
 
-> *(Add screenshots of `report.html`, `supplements.html`, `bloodwork.html`,
-> and the FHIR JSON here once running on your own data — placeholders below.)*
+One run writes a self-contained set of HTML pages next to the output path — no
+server, no build step, no network. Every one opens in a browser on its own.
 
-| ![main report](docs/screenshot-report.png) | ![supplements](docs/screenshot-supplements.png) |
+| File | What is in it |
 |---|---|
-| Main HTML report (`report.html`) | Personalised supplement stack |
+| `report.html` | The main report. Every module's section, including the pooled cost-effectiveness analysis, the plain-language summary, and the Y-DNA / mtDNA lineage chains. |
+| `economic_analysis.html` | The individual's economic sheet — cost avoided, QALYs, net monetary benefit, and the cost-saving / cost-effective split kept explicitly apart. |
+| `emergency_card.html` | One page, actionable findings only: drug hypersensitivities, clotting disorders, pharmacogenomic extremes. Designed to be printed and carried. |
+| `supplements.html` | Ranked supplement stack with the genotype behind each entry and a tier for how well evidenced it is. |
+| `nutrition.html` | Macronutrient pressures, food-specific guidance, and a 30-day meal plan. |
+| `exercise.html` | Power/endurance bias, trainability tiers, and lift-level protocol cards. |
+| `longevity.html` | Longevity composite and a quarterly year-long plan. |
+| `personalized_plan.html` | The master dashboard tying the other pages together. |
+
+Screenshots are not committed. This tool reads a genome, so the only reports
+that exist are of somebody's real data or of the synthetic `test_genome.txt`
+in this repository — and a screenshot of synthetic data illustrates the layout
+while telling you nothing true about the analysis. To see it for yourself, run
+it on `test_genome.txt`:
+
+```bash
+python analyze.py test_genome.txt --output /tmp/genomelens/report.html
+```
 
 ---
 
@@ -808,7 +826,7 @@ pytest --cov --cov-report=term-missing  # with coverage
 pytest --snapshot-update tests/golden/  # regenerate golden snapshots (review the diff!)
 ```
 
-The suite ships **386 tests** across:
+The suite ships **749 tests** across:
 
 - `tests/unit/` — per-module behavioural tests (strand-handling, threshold
   boundaries, render smoke tests).
@@ -831,9 +849,24 @@ set grows as legacy modules are cleaned up.
 
 ### CI
 
-`.github/workflows/ci.yml` runs the test suite across Python 3.10 / 3.11 /
-3.12, plus `ruff check`, `ruff format --check`, and `mypy` on the strict
-module set, on every push and pull request.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push and
+pull request:
+
+- **tests** — the full suite on Python 3.10 / 3.11 / 3.12, then an import of the
+  CLI entry point and a full end-to-end report generation from the committed
+  synthetic genome. The suite imports modules directly and never exercises the
+  facade `pipeline.py` imports through, so a green suite alone is not proof the
+  CLI starts — that is checked separately.
+- **lint and types** — `ruff check` and `mypy` on its configured strict set,
+  both clean on a clean tree.
+- **dna-guard** — asserts the two `.gitignore` rules that keep genotype data
+  out of the repository are still in place, and that nothing genotype-shaped
+  besides the synthetic test file is tracked.
+
+`ruff format --check` is deliberately **not** gated: the formatter reflows 132
+files, collapsing hand-aligned parameter tables and comment blocks that carry
+most of this codebase's explanation. Lint catches defects; the formatter has an
+opinion about layout, and here the layout is load-bearing.
 
 ### Contributing
 
