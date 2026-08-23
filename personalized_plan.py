@@ -41,7 +41,6 @@ def _ex_headline(ex: dict | None) -> str:
         return "—"
     pe = ex["power_endurance"]
     recov = ex["recovery"]["speed"].lower()
-    chrono = ex["chronotype"]["chronotype"].lower()
     window = ex["chronotype"]["optimal_window"]
     return (
         f"{pe['bias']} ({pe['ratio_pct_power']}/{pe['ratio_pct_endurance']}) · "

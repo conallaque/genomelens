@@ -1404,7 +1404,9 @@ def analyze_evppi(findings: list[dict], n: int = 3000, seed: int = 777) -> dict:
     if not _HAVE_NP or not findings:
         return {"available": False}
     rng = np.random.default_rng(seed)
-    wtp = float(WTP["base"])
+    # No fixed WTP here on purpose: this routine samples willingness-to-pay
+    # per draw below, so a base-case value would be a pinned parameter
+    # sitting unused beside the distribution that replaced it.
 
     # Sample NMB per finding while recording the driving parameter draws.
     nmb = np.zeros((n, len(findings)))

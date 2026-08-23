@@ -283,12 +283,7 @@ def _detect_favorable_genome_leverage(tier1, prs_result, immuno, neurochem,
     elif n_prs_high >= 3:
         score -= 8; reasons_down.append(f"{n_prs_high} PRS panels in elevated/high tier")
 
-    # Longevity variants
-    gl = _get(deep_ancestry, "neanderthal", default={}) and \
-         _get(deep_ancestry, "ancient_populations", default={})
-    longevity = _get(deep_ancestry, "neanderthal", default={})   # placeholder
-    genetic_longevity = None
-    # Actual longevity variants live in deep_ancestry.genetic_longevity or in immuno
+    # Longevity variants live in deep_ancestry.genetic_longevity or in immuno.
     gl_variants = _get(deep_ancestry, "genetic_longevity", default={}) or {}
     if gl_variants.get("lean") == "favorable" or gl_variants.get("n_favorable", 0) >= 2:
         score += 6; reasons_up.append(f"{gl_variants.get('n_favorable',0)} favorable longevity variants (FOXO3/CETP/IL6/APOE ε2)")

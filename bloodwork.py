@@ -1219,7 +1219,6 @@ def compute_advanced_indices(labs: dict[str, float], derived: dict[str, float],
     tg = g("triglycerides", "tg")
     hdl = g("hdl", "hdl_c")
     tc = g("total_cholesterol", "cholesterol")
-    ldl = g("ldl", "ldl_c")
     ins = g("fasting_insulin", "insulin")
     alb = g("albumin")
     neut = g("neutrophils")

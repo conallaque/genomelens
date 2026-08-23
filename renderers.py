@@ -257,7 +257,6 @@ def build_ydna_html(y_result: dict) -> str:
     status = y_result.get("status", "no_y_data")
     path = y_result.get("path", [])
     terminal = y_result.get("terminal_haplogroup", "Unknown")
-    haplogroup_path = y_result.get("haplogroup_path", "Unknown")
     migration = y_result.get("terminal_migration") or ""
     further = y_result.get("further_testing") or ""
     chip_gaps = y_result.get("chip_gaps", [])
@@ -4812,7 +4811,6 @@ def build_genetic_age_html(g: dict | None) -> str:
         return ""
     long_pct = g["longevity"]["percentile"]
     years = g.get("longevity_years_offset", 0)
-    direction = g.get("longevity_direction", "")
 
     def _panel_meta(panel: dict) -> str:
         # Z-score + variant coverage as inner text. These panels are small (the

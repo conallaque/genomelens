@@ -78,7 +78,6 @@ def analyze_reproductive(carrier_result: dict | None,
             freqs = {"General population": 0.01}  # generic 1 in 100 fallback
 
         dosage = f.get("dosage")
-        status = f.get("status_label", "")
 
         # Build scenario
         scenario = {

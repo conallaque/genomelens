@@ -2149,7 +2149,6 @@ def analyze_personal_economics(economics_result: dict | None = None,
     # Rank the lines that share a target, keep the strongest at full value and
     # discount the rest. The discount is recorded on the item rather than
     # applied invisibly, so the report can show which lines were reduced.
-    n_before = len(items)
     try:
         from . import engine as _ee
         # Match against the gene symbols THIS module actually emits, rather

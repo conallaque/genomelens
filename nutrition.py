@@ -603,7 +603,6 @@ def _analyze_vitamin_a(snps_df) -> dict:
 
 def _analyze_vitamin_c(snps_df) -> dict:
     slc = _gt(snps_df, "rs33972313") or _gt(snps_df, "rs6596473")
-    haptoglobin = _gt(snps_df, "rs72294371")
     factors: list[str] = []
     higher_need = False
     if slc:
@@ -650,7 +649,6 @@ def _analyze_vitamin_e(snps_df) -> dict:
 def _analyze_taste(snps_df) -> dict:
     tas2r38 = _gt(snps_df, "rs713598")          # G = PAV taster, C = AVI non-taster
     cd36 = _gt(snps_df, "rs1761667")            # A = poor fat-taste sensitivity
-    sweet = _gt(snps_df, "rs35874116")          # TAS1R2
     factors: list[str] = []
     bitter = "Unknown"
     fat_taste = "Unknown"

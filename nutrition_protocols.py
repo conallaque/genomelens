@@ -385,7 +385,6 @@ def fasting_matchmaker(result: dict) -> dict:
     appetite = result.get("satiety", {}).get("appetite_phenotype", "Standard")
     chrono = (result.get("meal_timing", {}).get("eating_window", "")
               if result.get("meal_timing") else "")
-    glycemic = result.get("glycemic_threshold", {}).get("max_carbs_per_meal_g", 75)
     t2d_pct = result.get("polygenic_scores", {}).get("T2D", {}).get("percentile", 50)
     iron_overload = "High" in (result.get("iron", {}).get("overload_risk", "") or "")
     # Female state would be required to fully assess — keep general

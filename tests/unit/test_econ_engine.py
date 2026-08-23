@@ -811,8 +811,6 @@ def test_the_life_table_stays_at_the_repository_root():
     # matching, so the life table becomes untracked while the DNA guard looks
     # untouched.
     import os
-    root = os.path.dirname(os.path.dirname(os.path.dirname(
-        os.path.abspath(ee.__file__))))
     gitignore = os.path.join(os.path.dirname(os.path.dirname(
         os.path.abspath(ee.__file__))), ".gitignore")
     if os.path.exists(gitignore):

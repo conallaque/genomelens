@@ -211,7 +211,6 @@ def _dat1(df):
     gt = _gt(df, "rs27072")
     if gt is None:
         return None
-    n_T = gt.count("T")
     return _f(CAT_OPIOID, "DAT1 (SLC6A3) dopamine transporter", "SLC6A3",
               "rs27072", gt, "informational",
               f"DAT1 genotype {gt}",

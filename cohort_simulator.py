@@ -394,7 +394,6 @@ def demand_curve(cohort: dict,
         return {"available": False}
     totals = cohort["_totals"]
     wgs = cohort["_wgs"]
-    n = len(totals)
 
     rows = []
     for pr in prices:

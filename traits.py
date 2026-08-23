@@ -525,7 +525,6 @@ def _trait_salt_sensitivity(snps_df) -> dict:
 
 def _trait_endurance_vs_power(snps_df) -> dict:
     actn3 = _gt(snps_df, "rs1815739")
-    ace = _gt(snps_df, "rs1799752")  # I/D indel — may not type well
     if actn3 is None:
         return {"trait": "Endurance vs Power Bias", "result": "Not tested",
                 "evidence": "ACTN3 not called", "confidence": "n/a"}
@@ -581,7 +580,6 @@ def _trait_bone_density(snps_df) -> dict:
 
 def _trait_pain_sensitivity(snps_df) -> dict:
     comt = _gt(snps_df, "rs4680")
-    oprm = _gt(snps_df, "rs1799971")
     if comt is None:
         return {"trait": "Pain Sensitivity (COMT)", "result": "Not tested",
                 "evidence": "rs4680 not called", "confidence": "n/a"}

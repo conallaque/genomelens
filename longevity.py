@@ -279,9 +279,7 @@ def body_composition_trajectory(
     Returns 12-week realistic projection.
     """
     caloric = nutrition.get("caloric", {})
-    bias = exercise.get("power_endurance", {}).get("bias", "Balanced")
     strength_tier = exercise.get("strength_trainability", {}).get("tier", "")
-    fat_loss = nutrition.get("polygenic_scores", {}).get("Obesity_BMI", {}).get("percentile", 50)
     fto_risk = nutrition.get("satiety", {}).get("appetite_phenotype", "Standard") != "Standard"
 
     if goal == "fat_loss":

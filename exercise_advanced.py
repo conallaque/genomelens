@@ -213,7 +213,6 @@ def readiness_formula(base: dict) -> dict:
 
 def sample_workouts(base: dict) -> list[dict]:
     bias = base["power_endurance"]["bias"]
-    fast_recovery = base["recovery"]["speed"] == "Fast"
     window = base["chronotype"].get("optimal_window", "anytime")
 
     if bias.startswith("Power"):

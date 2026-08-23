@@ -151,12 +151,6 @@ def analyze_local_ancestry(snps_df: pd.DataFrame,
         }
 
     all_windows: list[dict] = []
-    # Find global ancestry to identify deviant segments later
-    global_pop = None
-    if global_proportions:
-        sorted_g = sorted(global_proportions.items(), key=lambda x: -x[1])
-        global_pop = sorted_g[0][0]
-
     for chrom, length in CHROM_LENGTHS_MB.items():
         aims = aim_by_chrom.get(chrom, [])
         # Window iteration

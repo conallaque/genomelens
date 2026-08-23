@@ -259,9 +259,7 @@ def detect_interactions(snps_df: pd.DataFrame) -> dict:
 
     # ── Slow NAT2 + GSTM1/GSTT1 null ──────────────────────────────────────────
     nat2 = _dose(snps_df, "rs1495741", "A")  # A = fast acetylator allele; G/G = slow
-    nat2_slow = (2 - nat2) if nat2 is not None else None  # crude
     gstm1 = _dose(snps_df, "rs366631", "DEL")  # not reliably detectable
-    gstt1 = _dose(snps_df, "rs71748309", "DEL")
     if nat2 is not None and nat2 == 0:  # G/G slow acetylator
         findings.append({
             "title": "NAT2 Slow Acetylator Phenotype",
@@ -285,7 +283,6 @@ def detect_interactions(snps_df: pd.DataFrame) -> dict:
     # ── Estrogen metabolism profile (Slow COMT + Active CYP1B1) ───────────────
     comt = _dose(snps_df, "rs4680", "A")          # Met allele (slow)
     cyp1b1_a = _dose(snps_df, "rs1056836", "G")   # Val allele (active)
-    cyp1b1_b = _dose(snps_df, "rs1056827", "T")
     if comt is not None and comt == 2 and (cyp1b1_a or 0) >= 1:
         findings.append({
             "title": "Estrogen-Metabolism Profile: Slow COMT + Active CYP1B1",

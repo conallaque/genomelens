@@ -141,7 +141,6 @@ def _maoa(df):
     if gt is None:
         return None
     # T = high-activity (T-allele-carrying males have MAOA-H phenotype)
-    is_male = len(gt) == 2 and gt[0] == gt[1]   # heuristic
     if "T" in gt and "G" not in gt:
         ph = "MAOA-H (high activity) — fast monoamine clearance"
         mech = ("The high-activity MAOA allele produces more enzyme, "
@@ -326,7 +325,6 @@ def _htr2a(df):
     gt = _gt(df, "rs6313")
     if gt is None:
         return None
-    n_A = gt.count("A")   # A = T-allele on some strand conventions
     return _find(CAT_SEROTONIN, "HTR2A T102C", "HTR2A", "rs6313", gt,
                  f"HTR2A rs6313 {gt}",
                  "5-HT2A receptor coding-region SNP. Associations with SSRI "
@@ -450,7 +448,6 @@ def build_composite(df: pd.DataFrame, findings: list[dict]) -> dict:
     bdnf = _classify_bdnf(_gt(df, "rs6265"))
     oprm1 = _gt(df, "rs1799971")
     chrna5 = _gt(df, "rs16969968")
-    cacna1c = _gt(df, "rs1006737")
 
     # ── Stress response profile ────
     if comt == "warrior" and maoa == "MAOA-H":

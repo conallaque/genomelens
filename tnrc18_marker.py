@@ -129,7 +129,6 @@ def analyze_tnrc18_marker(snps_df) -> dict:
         return base
 
     oriented = _orient_to_ref_strand(raw)
-    a1, a2 = oriented[0], oriented[1]
     n_alt = sum(1 for b in oriented if b == ALT_ALLELE)
     n_ref = sum(1 for b in oriented if b == REF_ALLELE)
 

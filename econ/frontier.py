@@ -506,7 +506,8 @@ def validate_against_published(cases: list[dict] | None = None) -> dict:
                          "our_icer": None, "ratio_to_published": "not computed",
                          "relative_error": None, "direction_correct": False,
                          "within_order_of_magnitude": False,
-                         "within_tolerance": False, "source": c["source"]})
+                         "within_tolerance": False, "tolerance_pct": tol,
+                         "source": c["source"]})
             continue
         # Face-validity bar: agree on DIRECTION and ORDER OF MAGNITUDE.
         #  - cost-saving (published negative): engine must also be dominant/negative.
@@ -528,6 +529,14 @@ def validate_against_published(cases: list[dict] | None = None) -> dict:
             ratio = (ours / pub) if pub else None
             ok = direction_ok and (ratio is not None) and (0.2 <= ratio <= 5.0)
             ratio_label = round(ratio, 2) if ratio is not None else "n/a"
+        # Each case declares its own tolerance because the published models
+        # differ in how much of their structure this engine can reproduce.
+        # Until now that number was unpacked and then ignored, and
+        # within_tolerance was emitted only on the not-computed path — so rows
+        # from the two paths had different keys, which is the asymmetry the
+        # comment above claims to have fixed, in the other direction.
+        within_tol = (rel_err is not None and rel_err <= tol) if pub >= 0 \
+            else direction_ok
         n_pass += int(ok)
         row = {
             "scenario": c["name"],
@@ -537,6 +546,8 @@ def validate_against_published(cases: list[dict] | None = None) -> dict:
             "relative_error": round(rel_err, 3) if rel_err is not None else None,
             "direction_correct": direction_ok,
             "within_order_of_magnitude": ok,
+            "within_tolerance": within_tol,
+            "tolerance_pct": tol,
             "source": c["source"],
         }
         if not ok and c.get("note"):

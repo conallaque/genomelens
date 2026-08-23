@@ -274,20 +274,17 @@ def estimate_ancestry_heuristic(snps_df: pd.DataFrame) -> dict:
     # Confidence is CAPPED at "moderate": a ~10-marker pigmentation/diet panel
     # can never give a high-confidence ancestry call.
     if n_independent < MIN_AIMS_FOR_CALL:
-        confidence = "low"
         confidence_note = (
             f"Only {n_independent} independent AIM(s) typed (min "
             f"{MIN_AIMS_FOR_CALL} for any call) — estimate is unreliable."
         )
     elif ambiguous:
-        confidence = "low"
         confidence_note = (
             f"{SUPERPOP_LONG[primary]} and {SUPERPOP_LONG[runner_up]} are nearly "
             f"equally likely on this panel (evidence margin "
             f"{margin_nats:.1f} nats) — they cannot be reliably distinguished."
         )
     else:
-        confidence = "moderate"
         confidence_note = (
             f"Best single-population match on {n_independent} independent AIMs. "
             "This heuristic panel is too small for high confidence or for "

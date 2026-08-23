@@ -62,7 +62,6 @@ def test_european_sample_calls_european_not_asian() -> None:
 
 
 def test_crosscheck_concordant_for_t1a1a_and_european_autosomal() -> None:
-    auto = ap.estimate_ancestry_heuristic(_european_profile())
     y = {"terminal_haplogroup": "T1a1a", "confidence": "high",
          "path": [{"haplogroup": h} for h in
                   ["CT", "F", "K", "LT", "T", "T1a", "T1a1", "T1a1a"]]}

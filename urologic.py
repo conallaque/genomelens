@@ -303,7 +303,7 @@ def _cldn14_stones(snps):
               "has been passed.")
     return _finding(CAT_STONES, "CLDN14 rs219780 (calcium-stone risk)",
                     "CLDN14", "rs219780", gt, result, action,
-                    "moderate", "reduced" if d >= 1 else "typical")
+                    "moderate", impact)
 
 
 def _slc34a1_stones(snps):

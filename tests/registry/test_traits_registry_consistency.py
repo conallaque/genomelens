@@ -24,12 +24,21 @@ def test_at_least_16_traits_rsids_registered() -> None:
     assert len(audit["registered"]) >= 16
 
 
-def test_total_rsids_is_48() -> None:
+def test_total_rsids_is_46() -> None:
     """If this count changes, traits.py gained / lost a rule; the V8.1
-    deferred-list in CHANGELOG.md should be updated to match."""
+    deferred-list in CHANGELOG.md should be updated to match.
+
+    48 at the V8 cut, 46 now. The tripwire fired as designed: two of the 48
+    were fetched into local variables the module never read — rs1799752 (ACE
+    I/D) and rs1799971 (OPRM1) were looked up and nothing was reported from
+    either. They were never part of the trait output, so counting them as
+    referenced markers overstated coverage by two. Removing the dead lookups
+    is a real reduction in what this module claims, which is why the number
+    moved rather than being held steady with a suppression.
+    """
     audit = traits.audit_against_registry()
     total = len(audit["registered"]) + len(audit["missing"])
-    assert total == 48, (
-        f"traits.py now references {total} rsIDs (was 48 at V8 cut). "
-        "Update CHANGELOG.md V8.1 follow-ups + this test together."
+    assert total == 46, (
+        f"traits.py now references {total} rsIDs (was 46 after the dead-lookup "
+        "removal). Update CHANGELOG.md V8.1 follow-ups + this test together."
     )

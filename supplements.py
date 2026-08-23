@@ -257,12 +257,6 @@ def _rule_vitamin_d(snps_df, wellness, phewas) -> list[dict]:
     if vdr_taq:
         snps_used.append(f"rs731236 (VDR TaqI) {vdr_taq}")
 
-    # If labs available, use measured D
-    measured_d = None
-    if phewas:
-        # Caller may augment with bloodwork later; here we just take the prediction.
-        pass
-
     if score >= 3 or vdr_active:
         dose = "4000 IU"
         tier = TIER_ESSENTIAL
