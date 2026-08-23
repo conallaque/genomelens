@@ -14,6 +14,7 @@ import pytest
 
 from econ import engine as ee
 from econ import params as ep
+import itertools
 
 
 def _f(label="f", coi="CAD", p=0.20, rrr=0.30, hc=1.0, cost=500.0, src=""):
@@ -52,7 +53,7 @@ def test_each_additional_correlated_finding_adds_less_than_the_last():
         cur = pool.combined_rrr()
         marginals.append(cur - prev)
         prev = cur
-    for a, b in zip(marginals, marginals[1:], strict=False):
+    for a, b in itertools.pairwise(marginals):
         assert b < a + 1e-12, f"marginal contributions not decreasing: {marginals}"
 
 
@@ -760,7 +761,7 @@ def test_every_personal_economics_category_is_mapped():
 
 def test_personal_economics_categories_do_not_default_to_perfect_adherence():
     from econ import health_economics as he
-    for cat in list(he._CATEGORY_ADHERENCE) + ["NoSuchCategory"]:
+    for cat in [*list(he._CATEGORY_ADHERENCE), "NoSuchCategory"]:
         assert he._adherence_for_category(cat) < 1.0
 
 

@@ -662,7 +662,7 @@ def _mt_walk(node: dict, snps_df, prefix: list[dict], depth: int = 0):
     if status == "ancestral" and node.get("markers"):
         return None
     entry = _mt_entry(node, status, n_der, evidence)
-    path = prefix + [entry]
+    path = [*prefix, entry]
     children = node.get("children", [])
     if not children:
         return path, ("resolved" if status == "derived" else "chip_gap")

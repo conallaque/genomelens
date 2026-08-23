@@ -23,7 +23,7 @@ from pathlib import Path
 
 def weasyprint_available() -> bool:
     try:
-        import weasyprint  # noqa: F401
+        import weasyprint
         return True
     except Exception:
         return False

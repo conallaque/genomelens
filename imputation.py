@@ -35,6 +35,7 @@ import time
 from pathlib import Path
 
 import pandas as pd
+import contextlib
 
 SCRIPT_DIR = Path(__file__).parent
 REF_DIR = SCRIPT_DIR / "reference"
@@ -387,10 +388,8 @@ def impute_genotypes(
     save_cache(input_file, merged)
 
     # Clean up workspace
-    try:
+    with contextlib.suppress(Exception):
         shutil.rmtree(work)
-    except Exception:
-        pass
 
     return merged, {
         "available": True,

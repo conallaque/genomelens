@@ -27,6 +27,7 @@ defined by non-ambiguous co-markers instead.
 
 
 import pandas as pd
+import contextlib
 
 # ── Complement helper ──────────────────────────────────────────────────────────
 _COMP = str.maketrans("ACGT", "TGCA")
@@ -350,10 +351,8 @@ def _build_lookup(snps_df: pd.DataFrame) -> tuple[dict[str, str], dict[int, str]
 
         pos = row.get("pos", None)
         if pos is not None:
-            try:
+            with contextlib.suppress(ValueError, TypeError):
                 pos_map[int(pos)] = gt
-            except (ValueError, TypeError):
-                pass
 
     return rsid_map, pos_map
 
@@ -442,7 +441,7 @@ def _walk(node: dict, rsid_map: dict, pos_map: dict, prefix: list[dict], depth: 
         return None                                  # branch excluded
 
     entry = _make_entry(node, status, n_der, n_anc, evidence)
-    path = prefix + [entry]
+    path = [*prefix, entry]
     children = node.get("children", [])
 
     if not children:

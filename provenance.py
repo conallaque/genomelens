@@ -82,10 +82,7 @@ def tag_imputed_rows(
 
     Returns the updated DataFrame.
     """
-    if "source" not in snps_df.columns:
-        snps_df = tag_chip_source(snps_df)
-    else:
-        snps_df = snps_df.copy()
+    snps_df = tag_chip_source(snps_df) if "source" not in snps_df.columns else snps_df.copy()
 
     dr2_by_rsid = dr2_by_rsid or {}
     imputed_mask = ~snps_df.index.isin(chip_rsids)

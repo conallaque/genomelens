@@ -388,31 +388,30 @@ def detect_interactions(snps_df: pd.DataFrame) -> dict:
     # ── APOE-ε4 carriage flag ─────────────────────────────────────────────────
     apoe_e4 = _dose(snps_df, "rs429358", "C")
     apoe_e2 = _dose(snps_df, "rs7412", "T")
-    if apoe_e4 is not None and apoe_e2 is not None:
-        if apoe_e4 == 2:
-            findings.append({
-                "title": "APOE ε4/ε4 — Highest-Risk Alzheimer's Genotype",
-                "severity": "high",
-                "variants": ["rs429358 (C/C)", "rs7412 (C/C)"],
-                "interpretation": (
-                    "~2% of the population carries two ε4 alleles, with ~8–12× "
-                    "lifetime Alzheimer's risk vs ε3/ε3. Also elevates cardiovascular "
-                    "risk and LDL cholesterol. ε4/ε4 does NOT mean Alzheimer's is "
-                    "certain — many carriers never develop it — but prevention "
-                    "is unusually high-value."
-                ),
-                "action": (
-                    "Daily aerobic exercise (≥150 min/week; reduces amyloid burden "
-                    "in trials). Mediterranean or MIND diet. 7–9 h sleep (deep "
-                    "sleep clears amyloid). Treat hypertension and dyslipidemia "
-                    "aggressively (BP <120/80, ApoB <80). Treat hearing loss "
-                    "early (hearing loss is a top modifiable AD risk). Avoid "
-                    "head trauma. Consider consulting a behavioral neurologist "
-                    "or AD-prevention clinic for personalized risk-reduction. "
-                    "Clinical trials of prevention agents are ongoing — eligible "
-                    "for some."
-                ),
-            })
+    if apoe_e4 is not None and apoe_e2 is not None and apoe_e4 == 2:
+        findings.append({
+            "title": "APOE ε4/ε4 — Highest-Risk Alzheimer's Genotype",
+            "severity": "high",
+            "variants": ["rs429358 (C/C)", "rs7412 (C/C)"],
+            "interpretation": (
+                "~2% of the population carries two ε4 alleles, with ~8–12× "
+                "lifetime Alzheimer's risk vs ε3/ε3. Also elevates cardiovascular "
+                "risk and LDL cholesterol. ε4/ε4 does NOT mean Alzheimer's is "
+                "certain — many carriers never develop it — but prevention "
+                "is unusually high-value."
+            ),
+            "action": (
+                "Daily aerobic exercise (≥150 min/week; reduces amyloid burden "
+                "in trials). Mediterranean or MIND diet. 7–9 h sleep (deep "
+                "sleep clears amyloid). Treat hypertension and dyslipidemia "
+                "aggressively (BP <120/80, ApoB <80). Treat hearing loss "
+                "early (hearing loss is a top modifiable AD risk). Avoid "
+                "head trauma. Consider consulting a behavioral neurologist "
+                "or AD-prevention clinic for personalized risk-reduction. "
+                "Clinical trials of prevention agents are ongoing — eligible "
+                "for some."
+            ),
+        })
 
     return {
         "findings": findings,

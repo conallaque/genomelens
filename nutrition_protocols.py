@@ -70,9 +70,12 @@ def simulate_postprandial_glucose(
         iauc *= 1.18            # circadian glucose intolerance
 
     peak = 80 + 0.8 * available_carbs * gi_factor * (75 / base_threshold)
-    if meal.get("protein_first"): peak *= 0.85
-    if walk >= 10: peak *= 0.88
-    if time_of_day == "dinner": peak *= 1.08
+    if meal.get("protein_first"):
+        peak *= 0.85
+    if walk >= 10:
+        peak *= 0.88
+    if time_of_day == "dinner":
+        peak *= 1.08
 
     # Verdict
     if peak < 140:

@@ -351,8 +351,10 @@ def analyze_blood_type(snps_df: pd.DataFrame) -> dict:
             break
     rh_sign = None
     st = rhd.get("status", "")
-    if st.startswith("Rh-positive"): rh_sign = "+"
-    elif st.startswith("Rh-negative"): rh_sign = "-"
+    if st.startswith("Rh-positive"):
+        rh_sign = "+"
+    elif st.startswith("Rh-negative"):
+        rh_sign = "-"
     combined = f"{letter}{rh_sign}" if letter and rh_sign else None
 
     return {

@@ -161,12 +161,18 @@ def _phi(z: float) -> float:
 def _tier_from_percentile(p: float | None) -> str:
     if p is None:
         return "Insufficient data"
-    if p >= 90: return "Very high"
-    if p >= 75: return "High"
-    if p >= 60: return "Above average"
-    if p >= 40: return "Average"
-    if p >= 25: return "Below average"
-    if p >= 10: return "Low"
+    if p >= 90:
+        return "Very high"
+    if p >= 75:
+        return "High"
+    if p >= 60:
+        return "Above average"
+    if p >= 40:
+        return "Average"
+    if p >= 25:
+        return "Below average"
+    if p >= 10:
+        return "Low"
     return "Very low"
 
 
@@ -239,13 +245,16 @@ def inflammation_index(snps_df) -> dict:
     factors: list[str] = []
     if il6:
         factors.append(f"rs1800795 (IL6 -174) {il6}")
-        if "G" in il6: score += il6.count("G")
+        if "G" in il6:
+            score += il6.count("G")
     if crp:
         factors.append(f"CRP {crp}")
-        if "C" in crp: score += crp.count("C") * 0.5
+        if "C" in crp:
+            score += crp.count("C") * 0.5
     if tnf:
         factors.append(f"rs1800629 (TNF-α -308) {tnf}")
-        if "A" in tnf: score += tnf.count("A")
+        if "A" in tnf:
+            score += tnf.count("A")
     if score >= 3:
         tier = "Elevated inflammatory tone"
         diet = (
@@ -277,13 +286,16 @@ def histamine_intolerance(snps_df) -> dict:
     factors: list[str] = []
     if dao1:
         factors.append(f"rs10156191 (DAO/AOC1) {dao1}")
-        if "T" in dao1: score += dao1.count("T")
+        if "T" in dao1:
+            score += dao1.count("T")
     if dao2:
         factors.append(f"rs1049742 (DAO) {dao2}")
-        if "T" in dao2: score += dao2.count("T")
+        if "T" in dao2:
+            score += dao2.count("T")
     if hnmt:
         factors.append(f"rs11558538 (HNMT) {hnmt}")
-        if "T" in hnmt: score += hnmt.count("T")
+        if "T" in hnmt:
+            score += hnmt.count("T")
     risk = score >= 2
     return {
         "elevated_risk": risk, "score": score,

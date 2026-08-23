@@ -162,7 +162,7 @@ def _annuity_pv(years: float, rate: float) -> float:
     years = max(0.0, float(years))
     if rate <= 0:
         return years
-    n = int(round(years))
+    n = round(years)
     if n <= 0:
         return 0.0
     # Σ 1/(1+r)^t for t=1..n, half-cycle correction (+0.5 at t=0).
@@ -1028,11 +1028,11 @@ def _resolve_age(genetic_age_result: dict | None, default: float = 35.0) -> floa
     g = genetic_age_result or {}
     for key in ("chronological_age", "chronological", "age_used", "age"):
         v = g.get(key)
-        if isinstance(v, (int, float)) and 0 < float(v) < 120:
+        if isinstance(v, int | float) and 0 < float(v) < 120:
             return float(v)
     clinical = g.get("clinical") if isinstance(g.get("clinical"), dict) else {}
     v = clinical.get("age_used")
-    if isinstance(v, (int, float)) and 0 < float(v) < 120:
+    if isinstance(v, int | float) and 0 < float(v) < 120:
         return float(v)
     return default
 

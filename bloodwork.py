@@ -286,14 +286,14 @@ def compare_bloodwork(
     meta = dict(meta or {})
     trajectory = None
     raw = json.loads(Path(bloodwork_path).expanduser().read_text())
-    if isinstance(raw, (dict, list)) and (
+    if isinstance(raw, dict | list) and (
             isinstance(raw, list) or isinstance(raw.get("history"), list)):
         if isinstance(raw, list):
             history, scalars = raw, {}
         else:
             history = raw["history"]
             scalars = {k: v for k, v in raw.items()
-                       if k != "history" and not isinstance(v, (list, dict))}
+                       if k != "history" and not isinstance(v, list | dict)}
         series = _parse_series(history, scalars) if history else []
         if series:
             labs = series[-1][1]                      # latest visit = current panel

@@ -17,7 +17,7 @@ from pathlib import Path
 # surface from analyze. An unused-import autofix removed this line and the
 # pipeline stopped starting, while all 749 tests still passed — the suite
 # imports the modules directly and never exercises the facade.
-from y_haplogroup import analyze_y_haplogroup  # noqa: F401
+from y_haplogroup import analyze_y_haplogroup
 
 try:
     from mt_haplogroup import analyze_mt_haplogroup

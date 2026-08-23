@@ -466,7 +466,7 @@ def deduplicate_by_target(items: Sequence[dict], *,
                     f"above under a different panel; this is the same "
                     f"genotype seen from another angle, not a second benefit.")
             for k in ("avoided", "qaly_value", "net", "qaly", "intervention"):
-                if k in copy and isinstance(copy[k], (int, float)):
+                if k in copy and isinstance(copy[k], int | float):
                     copy[k] = (round(copy[k] * keep, 4) if k == "qaly"
                                else round(copy[k] * keep))
             out.append(copy)
@@ -1102,7 +1102,7 @@ def run_psa(pools: dict[str, ConditionPool], *, n: int = 2000,
         if not xs:
             return 0.0
         s = sorted(xs)
-        i = min(len(s) - 1, max(0, int(round(q * (len(s) - 1)))))
+        i = min(len(s) - 1, max(0, round(q * (len(s) - 1))))
         return s[i]
 
     n_eff = len(inmbs) or 1

@@ -273,7 +273,7 @@ def calculate_pgs(snps_df: pd.DataFrame, variants: list[dict],
         # Optional: drop low-r2 imputed sites
         r2 = row.get("r2", 1.0)
         source = row.get("source", "chip")
-        if source == "imputed" and isinstance(r2, (int, float)) and r2 < 0.5:
+        if source == "imputed" and isinstance(r2, int | float) and r2 < 0.5:
             n_low_r2 += 1
             # still include but flag
         beta = v["weight"]

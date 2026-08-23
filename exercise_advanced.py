@@ -511,12 +511,14 @@ def thermal_adaptation(snps_df) -> dict:
     cold = "Average"
     if ucp1:
         factors.append(f"rs1800592 (UCP1) {ucp1}")
-        if "G" in ucp1: cold = "Reduced cold tolerance (lower brown-fat thermogenesis)"
+        if "G" in ucp1:
+            cold = "Reduced cold tolerance (lower brown-fat thermogenesis)"
     if ucp3:
         factors.append(f"rs1800849 (UCP3) {ucp3}")
     if adrb3:
         factors.append(f"rs4994 (ADRB3) {adrb3}")
-        if "G" in adrb3: cold = "Reduced lipolytic cold response"
+        if "G" in adrb3:
+            cold = "Reduced lipolytic cold response"
     return {
         "cold_tolerance": cold,
         "factors": factors or ["Thermal SNPs not typed"],

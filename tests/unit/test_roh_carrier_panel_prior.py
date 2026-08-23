@@ -35,7 +35,7 @@ def test_result_never_contains_a_monetary_field():
 def test_no_numeric_field_could_be_read_as_currency():
     out = voi.assess_carrier_panel_prior(_roh(0.06, 0.05, 4))
     for k, v in out.items():
-        if isinstance(v, (int, float)) and not isinstance(v, bool):
+        if isinstance(v, int | float) and not isinstance(v, bool):
             assert v <= 100, f"{k}={v} is large enough to be mistaken for money"
 
 

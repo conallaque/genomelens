@@ -966,7 +966,7 @@ def _exercise_longevity_findings(findings: dict) -> list[dict]:
             qaly_gain=e["qaly_gain"], evidence=f"VO2max tier: {vo2}",
         ))
     pct = findings.get("longevity_percentile")
-    if isinstance(pct, (int, float)) and 0 <= pct < 50:
+    if isinstance(pct, int | float) and 0 <= pct < 50:
         headroom = 50 - pct  # percentiles of achievable improvement to median
         # NOT MONETISED, deliberately. This used to be valued at a flat
         # $10,000 per percentile of headroom, which made it the single largest

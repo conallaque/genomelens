@@ -594,7 +594,8 @@ def run_chat(
             continue
         if low in ("suggest", "/suggest", "suggestions"):
             print("\033[2mSuggested questions:\033[0m")
-            for q in SUGGESTED_QUESTIONS: print(f"  · {q}")
+            for q in SUGGESTED_QUESTIONS:
+                print(f"  · {q}")
             print()
             continue
         if low in ("/context", "context"):
@@ -650,7 +651,8 @@ def run_chat(
                 resp.raise_for_status()
                 def _chunks():
                     for line in resp.iter_lines():
-                        if not line: continue
+                        if not line:
+                            continue
                         try:
                             obj = json.loads(line)
                         except Exception:

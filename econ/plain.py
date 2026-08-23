@@ -102,17 +102,17 @@ def number_needed_to_screen(conditions: Sequence[dict],
         # conditional mood costs nothing and keeps the sentence true.
         if assumed_baseline:
             plain = (f"If the model's assumptions hold, roughly 1 in "
-                     f"{int(round(nns)):,} people with this pattern of results "
+                     f"{round(nns):,} people with this pattern of results "
                      f"would avoid {cond} by acting on it.")
         else:
-            plain = (f"About 1 in {int(round(nns)):,} people like you who act "
+            plain = (f"About 1 in {round(nns):,} people like you who act "
                      f"on this avoid {cond} that they would otherwise "
                      f"have had.")
         out.append({
             "condition": c.get("condition", ""),
             "condition_plain": cond,
             "absolute_risk_reduction": round(arr, 5),
-            "number_needed_to_screen": int(round(nns)),
+            "number_needed_to_screen": round(nns),
             "baseline_is_assumed": bool(assumed_baseline),
             "plain": plain,
         })
@@ -264,7 +264,7 @@ def plain_confidence(psa: dict | None) -> dict:
     if not psa or not psa.get("available"):
         return {"available": False}
     p = float(psa.get("p_cost_effective", 0) or 0)
-    n = int(round(p * 100))
+    n = round(p * 100)
     lo, hi = psa.get("inmb_ci_low"), psa.get("inmb_ci_high")
     if n >= 95:
         strength = "The conclusion is not close to the line."
@@ -301,7 +301,7 @@ def plain_actions(conditions: Sequence[dict], *, top: int = 5) -> list[dict]:
         if (c.get("inmb", 0) or 0) <= 0:
             continue
         arr = float(c.get("cases_averted", 0.0) or 0.0)
-        nns = int(round(1.0 / arr)) if arr > 0 else None
+        nns = round(1.0 / arr) if arr > 0 else None
         rrr = float(c.get("combined_rrr", 0.0) or 0.0)
         n_src = int(c.get("n_findings", 0) or 0)
         flagged = ("One of your results flags this."

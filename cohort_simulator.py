@@ -653,7 +653,7 @@ def personalize_for_report(voi_result: dict, age: float = 40.0,
     # The appreciation horizon depends on age: a younger person has more remaining
     # years over which free re-analysis keeps paying off. Capped at 20y because
     # knowledge-growth projections beyond that are too speculative to report.
-    ltv_years = max(5, min(20, int(round(85.0 - float(age)))))
+    ltv_years = max(5, min(20, round(85.0 - float(age))))
     ltv = data_asset_ltv(initial_value=max(1.0, total), years=ltv_years)
 
     # Percentile placement against the reference population.

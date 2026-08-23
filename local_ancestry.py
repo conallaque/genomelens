@@ -154,7 +154,7 @@ def analyze_local_ancestry(snps_df: pd.DataFrame,
     for chrom, length in CHROM_LENGTHS_MB.items():
         aims = aim_by_chrom.get(chrom, [])
         # Window iteration
-        n_windows = max(1, int(math.ceil(length / window_mb)))
+        n_windows = max(1, math.ceil(length / window_mb))
         for w in range(n_windows):
             wstart = w * window_mb
             wend = min((w + 1) * window_mb, length)
@@ -250,7 +250,7 @@ def render_chromosome_painting_svg(local_ancestry: dict, width: int = 760) -> st
     # Legend
     legend_y = 12
     x_off = left
-    for sp in SUPERPOPS + ["UNK"]:
+    for sp in [*SUPERPOPS, "UNK"]:
         col = SUPERPOP_COLORS.get(sp, "#888")
         label = "Unassigned (no AIM)" if sp == "UNK" else f"{sp} ({SUPERPOP_LONG.get(sp, sp)})"
         parts.append(

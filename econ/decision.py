@@ -41,6 +41,7 @@ from collections.abc import Callable, Sequence
 
 from . import engine as ee
 from . import params as ep
+import itertools
 
 __all__ = [
     "analyze_decision_layer",
@@ -285,12 +286,12 @@ def efficiency_frontier(strategies: Sequence[dict],
         if len(live) < 3:
             break
         icers = []
-        for prev, cur in zip(live, live[1:], strict=False):
+        for prev, cur in itertools.pairwise(live):
             dq = cur["qaly"] - prev["qaly"]
             icers.append((cur, (cur["cost"] - prev["cost"]) / dq
                           if dq > 0 else float("inf")))
         dropped = False
-        for (cur, ic), (_, nxt) in zip(icers, icers[1:], strict=False):
+        for (cur, ic), (_, nxt) in itertools.pairwise(icers):
             if ic > nxt:
                 cur["status"] = "extendedly dominated"
                 dropped = True
@@ -299,7 +300,7 @@ def efficiency_frontier(strategies: Sequence[dict],
             break
 
     live = [r for r in rows if r["status"] == "on frontier"]
-    for prev, cur in zip(live, live[1:], strict=False):
+    for prev, cur in itertools.pairwise(live):
         dq = cur["qaly"] - prev["qaly"]
         cur["icer"] = round((cur["cost"] - prev["cost"]) / dq) if dq > 0 else None
 
@@ -611,7 +612,7 @@ def wgs_marginal_value(*, chip_findings_present: bool = True,
         "available": True,
         "basis": "prospective",
         "expected_incremental_yield": round(incremental_yield, 5),
-        "number_needed_to_sequence": (int(round(nns)) if nns else None),
+        "number_needed_to_sequence": (round(nns) if nns else None),
         "value_per_finding": round(value_per_finding),
         "secondary_findings_value": round(secondary_value),
         "pgx_incremental_value": round(pgx_incremental),
@@ -633,7 +634,7 @@ def wgs_marginal_value(*, chip_findings_present: bool = True,
         "plain": (
             f"Sequencing is expected to turn up a serious, actionable "
             f"inherited finding that your array missed in roughly 1 person in "
-            f"{int(round(nns)):,}. Averaged over everyone, that is worth about "
+            f"{round(nns):,}. Averaged over everyone, that is worth about "
             f"${round(gross):,} against an extra "
             f"${round(incremental_cost):,} to buy — so on these numbers it "
             f"{'is' if net > 0 else 'is not'} worth it, "

@@ -126,10 +126,14 @@ def longevity_composite(nutrition: dict, exercise: dict) -> dict:
 
 
 def _longevity_tier(score: float) -> str:
-    if score >= 80: return "Tailwind — strong genetic + capacity profile"
-    if score >= 65: return "Above average — modest headwinds, easily counterable"
-    if score >= 50: return "Average — usual mix of strengths and risks"
-    if score >= 35: return "Headwind — multiple risk axes; behavioural levers matter more"
+    if score >= 80:
+        return "Tailwind — strong genetic + capacity profile"
+    if score >= 65:
+        return "Above average — modest headwinds, easily counterable"
+    if score >= 50:
+        return "Average — usual mix of strengths and risks"
+    if score >= 35:
+        return "Headwind — multiple risk axes; behavioural levers matter more"
     return "Strong headwind — lifestyle interventions are mandatory, not optional"
 
 

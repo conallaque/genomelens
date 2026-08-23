@@ -89,10 +89,7 @@ def _analyze_power_endurance(snps_df) -> dict:
         }
 
     total = power_score + endurance_score
-    if total == 0:
-        ratio_power = 50
-    else:
-        ratio_power = round(100 * power_score / total)
+    ratio_power = 50 if total == 0 else round(100 * power_score / total)
     ratio_endurance = 100 - ratio_power
 
     if ratio_power >= 70:
@@ -145,18 +142,17 @@ def _analyze_injury_risk(snps_df) -> dict:
     mmp3 = _gt(snps_df, "rs679620")
     risks: list[dict] = []
 
-    if col1a1:
-        if "T" in col1a1:                    # one or two T copies
-            risks.append({
-                "tissue": "Ligaments / ACL",
-                "level": "Elevated" if col1a1.count("T") == 2 else "Moderate",
-                "marker": f"rs1800012 (COL1A1 Sp1) {col1a1}",
-                "mitigation": (
-                    "Prioritise neuromuscular knee-control drills (Nordics, single-leg "
-                    "RDL, balance work). Collagen + vitamin C 1 hour pre-training "
-                    "(15 g + 50 mg) improves tendon collagen synthesis."
-                ),
-            })
+    if col1a1 and "T" in col1a1:                    # one or two T copies
+        risks.append({
+            "tissue": "Ligaments / ACL",
+            "level": "Elevated" if col1a1.count("T") == 2 else "Moderate",
+            "marker": f"rs1800012 (COL1A1 Sp1) {col1a1}",
+            "mitigation": (
+                "Prioritise neuromuscular knee-control drills (Nordics, single-leg "
+                "RDL, balance work). Collagen + vitamin C 1 hour pre-training "
+                "(15 g + 50 mg) improves tendon collagen synthesis."
+            ),
+        })
 
     if col5a1:
         if "C" in col5a1 and col5a1.count("C") == 2:
@@ -214,10 +210,9 @@ def _analyze_recovery(snps_df) -> dict:
             inflam_score += 1
             notes.append(f"rs1800795 (IL6 -174) {il6} — moderate inflammatory tendency")
 
-    if crp:
-        if "C" in crp and crp.count("C") == 2:
-            inflam_score += 1
-            notes.append(f"CRP genotype {crp} — higher baseline CRP")
+    if crp and "C" in crp and crp.count("C") == 2:
+        inflam_score += 1
+        notes.append(f"CRP genotype {crp} — higher baseline CRP")
 
     if sod2 and "G" in sod2:
         notes.append(f"rs4880 (SOD2 Ala16Val) {sod2} — reduced mitochondrial antioxidant capacity")
@@ -477,9 +472,8 @@ def _analyze_strength_trainability(snps_df) -> dict:
         factors.append(f"rs35767 (IGF1) {igf1}")
         if "A" in igf1:
             score += 1
-    if actn3:
-        if "C" in actn3:
-            score += actn3.count("C") * 0.5
+    if actn3 and "C" in actn3:
+        score += actn3.count("C") * 0.5
     if score >= 2:
         tier = "High hypertrophy responder"
         rec = (

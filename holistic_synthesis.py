@@ -283,8 +283,10 @@ def _detect_favorable_genome_leverage(tier1, prs_result, immuno, neurochem,
     prs = ((tier1 or {}).get("prs_summary") or {}) if isinstance(tier1, dict) else {}
     for _, p in (prs or {}).items():
         tier = ((p or {}).get("tier") or "").lower()
-        if "high" in tier or "elevated" in tier: n_prs_high += 1
-        elif "below" in tier or "low" in tier: n_prs_low += 1
+        if "high" in tier or "elevated" in tier:
+            n_prs_high += 1
+        elif "below" in tier or "low" in tier:
+            n_prs_low += 1
     if n_prs_high == 0 and n_prs_low >= 2:
         score += 6
         reasons_up.append(f"{n_prs_low} PRS panels in below-average tier, none elevated")
@@ -328,7 +330,7 @@ def _detect_favorable_genome_leverage(tier1, prs_result, immuno, neurochem,
         score -= 6 * n_critical
         reasons_down.append(f"{n_critical} critical clinical marker(s)")
 
-    score = max(0, min(100, int(round(score))))
+    score = max(0, min(100, round(score)))
     if score >= 75:
         tier = "Very favorable"
         narrative = (

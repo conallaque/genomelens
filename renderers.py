@@ -747,7 +747,7 @@ def build_prs_html(prs: dict | None) -> str:
                 lor = u.get("log_or", 0.0)
                 orr = math.exp(lor)
                 af = u.get("af")
-                af_txt = f"{af:.0%}" if isinstance(af, (int, float)) else "—"
+                af_txt = f"{af:.0%}" if isinstance(af, int | float) else "—"
                 vrows += (
                     f'<tr><td class="rsid-cell">'
                     f'<a href="https://www.ncbi.nlm.nih.gov/snp/{_esc(u.get("rsid",""))}" '
@@ -2829,7 +2829,7 @@ def _build_personalized_voi_html(p: dict | None) -> str:
 
     def _dm(v):
         try:
-            return f"${int(round(float(v))):,}"
+            return f"${round(float(v)):,}"
         except Exception:
             return "—"
 
@@ -5139,11 +5139,11 @@ def build_economics_html(economics_result: dict | None) -> str:
         # favour of the payer aggregate. Cost/QALY is the standard cost-
         # effectiveness metric (≈ <$50k/QALY is conventionally "cost-effective").
         qaly = f.get("qaly_gain")
-        qaly_txt = f"{qaly:.3f}".rstrip("0").rstrip(".") if isinstance(qaly, (int, float)) else "—"
+        qaly_txt = f"{qaly:.3f}".rstrip("0").rstrip(".") if isinstance(qaly, int | float) else "—"
         cpq = f.get("cost_per_qaly")
         cpq_sub = (
             f'<div class="econ-sub">{_money(cpq)}/QALY</div>'
-            if isinstance(cpq, (int, float))
+            if isinstance(cpq, int | float)
             else ""
         )
         rows += (

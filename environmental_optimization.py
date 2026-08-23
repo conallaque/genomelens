@@ -39,6 +39,7 @@ Holick 2007; Engelsen 2010 (latitude & cutaneous vitamin-D synthesis).
 from __future__ import annotations
 
 import pandas as pd
+import contextlib
 
 
 def _gt(df, rsid) -> str | None:
@@ -283,18 +284,12 @@ def analyze_environmental_optimization(df: pd.DataFrame,
     circadian = None
     exercise = None
     vitamin_d = None
-    try:
+    with contextlib.suppress(Exception):
         circadian = analyze_circadian_light(df)
-    except Exception:
-        pass
-    try:
+    with contextlib.suppress(Exception):
         exercise = analyze_exercise_modality(df)
-    except Exception:
-        pass
-    try:
+    with contextlib.suppress(Exception):
         vitamin_d = analyze_vitamin_d_seasonal(df, latitude=latitude)
-    except Exception:
-        pass
 
     return {
         "available": any([circadian, exercise, vitamin_d]),

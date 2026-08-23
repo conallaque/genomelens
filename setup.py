@@ -702,8 +702,7 @@ def main() -> None:
     _predictor_flags = [args.alphamissense, args.revel, args.gnomad,
                         args.spliceai, args.cadd, args.predictors,
                         args.predictors_refresh]
-    if not any([args.check, args.beagle, args.pgs, args.ancestry,
-                args.clinvar, args.clinvar_refresh, args.all] + _predictor_flags):
+    if not any([args.check, args.beagle, args.pgs, args.ancestry, args.clinvar, args.clinvar_refresh, args.all, *_predictor_flags]):
         ap.print_help()
         return
 
