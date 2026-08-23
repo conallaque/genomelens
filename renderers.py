@@ -2017,6 +2017,280 @@ variants queried. <strong>Predictors used:</strong> {_esc(pred_line)}.
 """
 
 
+def _render_pooled_economics(p: Optional[Dict]) -> str:
+    """Render the pooled cost-effectiveness result.
+
+    Four things this has to communicate that the old output did not: that
+    findings bearing on one condition were combined rather than summed, that
+    costs and quality-adjusted life-years are different objects reported
+    separately, that the perspective is a choice with itemised consequences,
+    and that a stated share of the model rests on judgement rather than
+    literature.
+    """
+    if not p or not p.get("available"):
+        return ""
+
+    def money(v):
+        try:
+            v = round(float(v))
+        except (TypeError, ValueError):
+            return "—"
+        return f"-${abs(v):,}" if v < 0 else f"${v:,}"
+
+    cea = p.get("cea") or {}
+    dc = p.get("double_counting") or {}
+    prov = p.get("provenance") or {}
+
+    # ── Per-condition table, with the correction made visible ──
+    rows = ""
+    for c in sorted(p.get("conditions") or [],
+                    key=lambda r: r.get("inmb", 0), reverse=True):
+        naive, pooled = c.get("naive_additive_rrr", 0), c.get("combined_rrr", 0)
+        stacked = c.get("n_findings", 0) > 1
+        corr = (f'<span style="color:#b06a00">{naive:.0%} &rarr; '
+                f'<strong>{pooled:.0%}</strong></span>' if stacked
+                else f"{pooled:.0%}")
+        srcs = ", ".join(c.get("sources") or []) or "&mdash;"
+        rows += f"""
+<tr style="border-bottom:1px solid #f0f2f5">
+  <td style="padding:5px 4px"><strong>{_esc(c.get('condition',''))}</strong>
+    <div style="font-size:.78em;color:#8a94a3">{_esc(srcs)}</div></td>
+  <td style="text-align:right;padding:5px 4px">{c.get('n_findings',0)}</td>
+  <td style="text-align:right;padding:5px 4px">{c.get('baseline_risk',0):.1%}</td>
+  <td style="text-align:right;padding:5px 4px">{corr}</td>
+  <td style="text-align:right;padding:5px 4px">{money(c.get('cost_averted'))}</td>
+  <td style="text-align:right;padding:5px 4px">{c.get('qaly_gained',0):.3f}</td>
+  <td style="text-align:right;padding:5px 4px">{money(c.get('inmb'))}</td>
+</tr>"""
+
+    # ── The correction banner — only when it actually bit ──
+    corr_html = ""
+    if dc.get("inflation_removed", 0) > 0:
+        corr_html = f"""
+<div style="border:1px solid #f0dcc0;background:#fffaf2;border-radius:10px;
+            padding:12px 14px;margin:12px 0">
+  <div style="font-weight:700;color:#8a5a00">Double-counting correction applied</div>
+  <div style="font-size:.87em;color:#6b5330;margin-top:5px">
+    Adding every finding's risk reduction separately would have claimed
+    <strong>{money(dc.get('naive_cost_averted'))}</strong> of avoided cost. Several
+    findings speak to the same condition &mdash; a polygenic score, a biomarker and a
+    causal estimate for one trait are re-measurements of one liability, not
+    independent chances to prevent three separate events. Combining them on the risk
+    scale and charging each condition's cost once gives
+    <strong>{money(dc.get('pooled_cost_averted'))}</strong>, removing
+    <strong>{money(dc.get('inflation_removed'))}</strong>
+    ({dc.get('pct_removed', 0)}%).</div>
+</div>"""
+
+    # ── Disaggregated headline: cost and health kept apart ──
+    icer = cea.get("icer")
+    icer_txt = (money(icer) + "/QALY" if icer is not None
+                else _esc(cea.get("icer_note") or "not applicable"))
+    cards = f"""
+<div style="display:flex;gap:12px;flex-wrap:wrap;margin:12px 0">
+  <div style="flex:1;min-width:160px;background:#f7f9fb;border:1px solid #e3e7ec;
+              border-radius:10px;padding:11px 13px">
+    <div style="font-size:.76em;color:#8a94a3;text-transform:uppercase;
+                letter-spacing:.04em">Incremental cost</div>
+    <div style="font-size:1.3em;font-weight:700;color:#2b3440">
+      {money(cea.get('incremental_cost'))}</div>
+    <div style="font-size:.76em;color:#8a94a3">healthcare sector, negative = saves money</div>
+  </div>
+  <div style="flex:1;min-width:160px;background:#f7f9fb;border:1px solid #e3e7ec;
+              border-radius:10px;padding:11px 13px">
+    <div style="font-size:.76em;color:#8a94a3;text-transform:uppercase;
+                letter-spacing:.04em">Incremental QALYs</div>
+    <div style="font-size:1.3em;font-weight:700;color:#2b3440">
+      {cea.get('incremental_qaly', 0):.3f}</div>
+    <div style="font-size:.76em;color:#8a94a3">health gain, not monetised here</div>
+  </div>
+  <div style="flex:1;min-width:160px;background:#f7f9fb;border:1px solid #e3e7ec;
+              border-radius:10px;padding:11px 13px">
+    <div style="font-size:.76em;color:#8a94a3;text-transform:uppercase;
+                letter-spacing:.04em">ICER</div>
+    <div style="font-size:1.3em;font-weight:700;color:#2b3440">{icer_txt}</div>
+    <div style="font-size:.76em;color:#8a94a3">cost per QALY gained</div>
+  </div>
+  <div style="flex:1;min-width:160px;background:#f7f9fb;border:1px solid #e3e7ec;
+              border-radius:10px;padding:11px 13px">
+    <div style="font-size:.76em;color:#8a94a3;text-transform:uppercase;
+                letter-spacing:.04em">Net monetary benefit</div>
+    <div style="font-size:1.3em;font-weight:700;color:#177a54">
+      {money(cea.get('inmb'))}</div>
+    <div style="font-size:.76em;color:#8a94a3">at {money(cea.get('wtp'))}/QALY</div>
+  </div>
+</div>
+<div style="font-size:.87em;color:#48545f;margin:-2px 0 8px">
+  <strong>Verdict:</strong> {_esc(cea.get('verdict',''))}</div>"""
+
+    # ── Structural (Markov) re-estimate ──
+    struct = [s for s in (p.get("structural") or []) if s.get("available")]
+    struct_html = ""
+    if struct:
+        srows = "".join(f"""
+<tr style="border-bottom:1px solid #f0f2f5">
+  <td style="padding:4px">{_esc(s.get('condition',''))}</td>
+  <td style="text-align:right;padding:4px">{money(s.get('incremental_cost'))}</td>
+  <td style="text-align:right;padding:4px">{s.get('incremental_qaly',0):.3f}</td>
+  <td style="text-align:right;padding:4px">{s.get('life_years_gained',0):.3f}</td>
+  <td style="text-align:right;padding:4px">{
+      money(s['icer']) + '/QALY' if s.get('icer') is not None else '&mdash;'}</td>
+</tr>""" for s in struct)
+        struct_html = f"""
+<details style="margin-top:10px"><summary style="cursor:pointer;color:#5b6673;font-weight:600">
+  Structural re-estimate &mdash; cohort state-transition model</summary>
+<div style="font-size:.85em;color:#5b6673;margin:7px 0">
+  The figures above discount the whole horizon at its midpoint, which cannot
+  express the fact that a person has to survive long enough to collect a
+  prevented event. These rerun the top conditions through a three-state
+  Well/Diseased/Dead cohort model against US life-table mortality, with
+  Simpson's 1/3 within-cycle correction. Where the two disagree, the
+  structural figure is the more careful one.</div>
+<table style="width:100%;border-collapse:collapse;font-size:.85em">
+  <thead><tr style="text-align:left;color:#5b6673;border-bottom:1px solid #e3e7ec">
+    <th style="padding:4px">Condition</th><th style="text-align:right">Δ cost</th>
+    <th style="text-align:right">Δ QALY</th><th style="text-align:right">Δ life-years</th>
+    <th style="text-align:right">ICER</th></tr></thead>
+  <tbody>{srows}</tbody></table></details>"""
+
+    # ── Dual perspective ──
+    dp = p.get("dual_perspective") or {}
+    dp_html = ""
+    if dp:
+        adds = "".join(f"""
+<tr><td style="padding:3px 4px">{_esc(a.get('item',''))}</td>
+  <td style="text-align:right;padding:3px 4px">{money(a.get('value'))}</td>
+  <td style="padding:3px 4px;font-size:.9em;color:#8a94a3">{_esc(a.get('basis',''))}</td></tr>"""
+            for a in (dp.get("societal_additions") or []))
+        dp_html = f"""
+<details style="margin-top:10px"><summary style="cursor:pointer;color:#5b6673;font-weight:600">
+  Perspective &mdash; healthcare sector vs societal</summary>
+<div style="font-size:.85em;color:#5b6673;margin:7px 0">
+  The reference case counts healthcare-sector costs only
+  (<strong>{money((dp.get('healthcare_sector') or {}).get('cost_averted'))}</strong>
+  averted). The societal perspective adds
+  <strong>{money(dp.get('delta'))}</strong> more, itemised below so that a reader
+  who rejects any one of these valuations can subtract it rather than having to
+  discard the whole figure.</div>
+<table style="width:100%;border-collapse:collapse;font-size:.85em">{adds}</table></details>"""
+
+    # ── Impact inventory ──
+    inv = p.get("impact_inventory") or []
+    inv_html = ""
+    if inv:
+        irows = "".join(f"""
+<tr style="border-bottom:1px solid #f5f6f8">
+  <td style="padding:3px 4px">{_esc(r.get('sector',''))}</td>
+  <td style="padding:3px 4px">{_esc(r.get('item',''))}</td>
+  <td style="padding:3px 4px;color:{'#177a54' if r.get('healthcare')=='included' else '#9aa4b0'}">
+    {_esc(r.get('healthcare',''))}</td>
+  <td style="padding:3px 4px;color:{'#177a54' if r.get('societal')=='included' else '#9aa4b0'}">
+    {_esc(r.get('societal',''))}</td>
+  <td style="padding:3px 4px;font-size:.9em;color:#8a94a3">{_esc(r.get('note',''))}</td>
+</tr>""" for r in inv)
+        inv_html = f"""
+<details style="margin-top:10px"><summary style="cursor:pointer;color:#5b6673;font-weight:600">
+  Impact inventory &mdash; what is counted and what is not</summary>
+<table style="width:100%;border-collapse:collapse;font-size:.85em;margin-top:6px">
+  <thead><tr style="text-align:left;color:#5b6673;border-bottom:1px solid #e3e7ec">
+    <th style="padding:4px">Sector</th><th>Item</th><th>Healthcare</th>
+    <th>Societal</th><th>Note</th></tr></thead>
+  <tbody>{irows}</tbody></table></details>"""
+
+    # ── Validation ──
+    checks = p.get("validation") or []
+    val_html = ""
+    if checks:
+        n_pass = sum(1 for c in checks if c.get("pass"))
+        crows = "".join(f"""
+<tr style="border-bottom:1px solid #f5f6f8">
+  <td style="padding:4px;color:{'#177a54' if c.get('pass') else '#b03a2e'};
+             font-weight:700;white-space:nowrap">{'PASS' if c.get('pass') else 'FAIL'}</td>
+  <td style="padding:4px">{_esc(c.get('check',''))}
+    <div style="font-size:.85em;color:#8a94a3">{_esc(c.get('detail',''))}</div></td>
+</tr>""" for c in checks)
+        val_html = f"""
+<details style="margin-top:10px"><summary style="cursor:pointer;color:#5b6673;font-weight:600">
+  Model validation &mdash; {n_pass}/{len(checks)} checks pass</summary>
+<div style="font-size:.85em;color:#5b6673;margin:7px 0">
+  Internal consistency checks plus one external cross-validation against
+  published statin cost-effectiveness analyses. A model that has never been
+  asked whether it obeys its own constraints is not validated by having a lot
+  of methods in it.</div>
+<table style="width:100%;border-collapse:collapse;font-size:.87em">{crows}</table></details>"""
+
+    # ── Provenance + declared assumptions + references ──
+    assums = "".join(f"""
+<li style="margin-bottom:5px"><strong>{_esc(a.get('key',''))}</strong> =
+  {_esc(str(a.get('value','')))} {_esc(a.get('units',''))}<br>
+  <span style="color:#8a94a3">{_esc(a.get('note',''))}</span></li>"""
+        for a in (p.get("declared_assumptions") or []))
+    refs = "".join(f"""
+<li style="margin-bottom:4px">{_esc(r.get('source',''))}
+  <span style="color:#8a94a3">{_esc(r.get('citation',''))}</span>
+  <span style="color:#b0b7c0;font-size:.9em"> &mdash; {_esc(r.get('params',''))}</span></li>"""
+        for r in (p.get("references") or []))
+    prov_html = f"""
+<details style="margin-top:10px"><summary style="cursor:pointer;color:#5b6673;font-weight:600">
+  Parameter provenance &mdash; {prov.get('pct_sourced', 0)}% of parameters carry a citation</summary>
+<div style="font-size:.85em;color:#5b6673;margin:7px 0">
+  Of {prov.get('n_parameters', 0)} economic parameters,
+  <strong>{prov.get('n_published', 0)}</strong> are read directly from a cited
+  source, <strong>{prov.get('n_derived', 0)}</strong> are derived from one by a
+  stated arithmetic step, and <strong>{prov.get('n_assumption', 0)}</strong> are
+  judgement calls with no published anchor. The last group is listed in full
+  rather than blended in with the others &mdash; they are the parts of this model
+  most worth arguing with.</div>
+<div style="font-weight:600;color:#5b6673;margin-top:8px">Declared assumptions</div>
+<ul style="font-size:.85em;color:#5b6673;margin:5px 0 0 18px">{assums}</ul>
+<div style="font-weight:600;color:#5b6673;margin-top:10px">References</div>
+<ul style="font-size:.82em;color:#5b6673;margin:5px 0 0 18px">{refs}</ul></details>"""
+
+    # ── CHEERS 2022 ──
+    cheers = p.get("cheers") or []
+    cheers_html = ""
+    if cheers:
+        crows = "".join(f"""
+<tr style="border-bottom:1px solid #f5f6f8">
+  <td style="padding:3px 4px;white-space:nowrap;color:#5b6673">{_esc(c.get('item',''))}</td>
+  <td style="padding:3px 4px">{_esc(c.get('response',''))}</td></tr>"""
+            for c in cheers)
+        cheers_html = f"""
+<details style="margin-top:10px"><summary style="cursor:pointer;color:#5b6673;font-weight:600">
+  CHEERS 2022 reporting checklist</summary>
+<table style="width:100%;border-collapse:collapse;font-size:.85em;margin-top:6px">
+  {crows}</table></details>"""
+
+    return f"""
+<div style="border:1px solid #e3e7ec;border-left:4px solid #177a54;border-radius:10px;
+            padding:14px 16px;margin:16px 0;background:#fbfcfe">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;
+              gap:12px;flex-wrap:wrap">
+    <div style="font-weight:700;color:#177a54">Pooled cost-effectiveness analysis</div>
+    <div style="font-size:.72em;color:#8a94a3;border:1px solid #dfe4ea;border-radius:20px;
+                padding:2px 9px;white-space:nowrap">costs and QALYs reported separately</div>
+  </div>
+  <div style="font-size:.87em;color:#48545f;margin-top:6px">
+    Findings are grouped by the condition they bear on, combined on the risk
+    scale rather than added, and each condition is charged its cost of illness
+    once.</div>
+  {corr_html}
+  {cards}
+  <table style="width:100%;border-collapse:collapse;font-size:.88em;margin-top:4px">
+    <thead><tr style="text-align:left;color:#5b6673;border-bottom:1px solid #e3e7ec">
+      <th style="padding:5px 4px">Condition</th>
+      <th style="text-align:right">Findings</th>
+      <th style="text-align:right">Baseline risk</th>
+      <th style="text-align:right">Risk reduction</th>
+      <th style="text-align:right">Cost averted</th>
+      <th style="text-align:right">QALYs</th>
+      <th style="text-align:right">NMB</th></tr></thead>
+    <tbody>{rows}</tbody>
+  </table>
+  {struct_html}{dp_html}{inv_html}{val_html}{prov_html}{cheers_html}
+</div>"""
+
+
 def _build_personalized_voi_html(p: Optional[Dict]) -> str:
     """Individually-relevant HEOR panels for this genome: a personal cost-
     effectiveness frontier + CEAC, the genome as an appreciating data asset, and the
@@ -2169,6 +2443,8 @@ def build_voi_html(voi: Optional[Dict]) -> str:
     {_esc(cp["why_not_monetised"])}</div>
   <div style="font-size:.72em;color:#9aa4b0;margin-top:5px">{_esc(cp["src"])}</div>
 </div>"""
+
+    pooled_html = _render_pooled_economics(voi.get("pooled_economics") or {})
 
     price = voi.get("price", {})
     methods = "".join(f"<li>{_esc(m)}</li>" for m in (voi.get("methods") or []))
@@ -2427,6 +2703,7 @@ pharmacogenomic averted-adverse-reactions — with a Monte-Carlo sensitivity ana
   <tbody>{rows}</tbody>
 </table>
 {ceac_svg}
+{pooled_html}
 {panel_html}
 {_build_personalized_voi_html(voi.get("personalized"))}
 {extended}

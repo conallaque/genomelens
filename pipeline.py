@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import datetime
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -936,6 +937,45 @@ def run_pipeline(args: argparse.Namespace) -> int:
                     f"{top_drugs_result['n_with_pgx']} with PGx data)")
         except Exception as e:
             log(f"  WARNING: Top-drugs screen failed: {e}")
+
+    # ── Dev affordance: snapshot the economics inputs for offline model work ──
+    # Set GENOMELENS_ECON_SNAPSHOT=/abs/path.pkl to capture every module result
+    # that feeds the economic model, so the econ layer can be iterated on (and
+    # its numbers diffed) without re-running the whole genome pipeline. Never on
+    # by default; the snapshot is genotype-derived, so it must be written
+    # outside the repo.
+    _econ_snap = os.environ.get("GENOMELENS_ECON_SNAPSHOT")
+    if _econ_snap:
+        try:
+            import pickle as _pickle
+            with open(_econ_snap, "wb") as _fh:
+                _pickle.dump({
+                    "tier1_summary": tier1_summary,
+                    "expanded_pgs_result": expanded_pgs_result,
+                    "hla_result": hla_result,
+                    "carrier_result": carrier_result,
+                    "interactions_result": interactions_result,
+                    "addiction_result": addiction_genetics_result,
+                    "metal_oxidative_result": metal_oxidative_result,
+                    "mr_result": mr_result,
+                    "neurochemistry_result": neurochemistry_result,
+                    "urologic_result": urologic_result,
+                    "clinical_variants_result": clinical_variants_result,
+                    "phewas_result": phewas_result,
+                    "immunogenetics_result": immunogenetics_result,
+                    "wellness_result": wellness_result,
+                    "detox_result": detox_result,
+                    "family_planning_result": family_planning_result,
+                    "top_drugs_result": top_drugs_result,
+                    "novel_variants_result": novel_variants_result,
+                    "genetic_age_result": genetic_age_result,
+                    "roh_result": roh_result,
+                    "bloodwork_result": bloodwork_result,
+                    "qc_result": qc_result,
+                }, _fh)
+            log(f"  [dev] economics inputs snapshotted -> {_econ_snap}")
+        except Exception as _se:
+            log(f"  [dev] economics snapshot failed: {_se}")
 
     # ── Health economics (runs AFTER all analysis modules for maximum coverage) ──
     if analyze_health_economics is not None:

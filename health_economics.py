@@ -416,7 +416,11 @@ VO2MAX_ECONOMICS = {
     "cost": 2_000, "outcome_value": 40_000,
     "prevalence": 0.30, "qaly_gain": 0.50, "recurring": True,
 }
-LONGEVITY_VALUE_PER_PERCENTILE = 10_000  # $ per 1-percentile longevity gain
+# LONGEVITY_VALUE_PER_PERCENTILE was removed in the 2026-08-22 provenance pass.
+# It priced a percentile of a composite longevity score at a flat $10,000 with
+# no source, and because the composite re-aggregates variants valued elsewhere
+# in this module, every dollar it produced was also a double count. The
+# longevity signal is still reported; see _exercise_longevity_findings.
 
 
 # ─── Addiction genetics economics (keyed by substance category) ────────────
@@ -965,17 +969,31 @@ def _exercise_longevity_findings(findings: Dict) -> List[Dict]:
     pct = findings.get("longevity_percentile")
     if isinstance(pct, (int, float)) and 0 <= pct < 50:
         headroom = 50 - pct  # percentiles of achievable improvement to median
-        value = round(headroom * LONGEVITY_VALUE_PER_PERCENTILE)
-        cost = 1_500  # representative annual longevity-program cost
+        # NOT MONETISED, deliberately. This used to be valued at a flat
+        # $10,000 per percentile of headroom, which made it the single largest
+        # line in the report — on one measured genome it produced $431,000 of
+        # claimed benefit and 54% of the entire modelled total. Two independent
+        # reasons to stop:
+        #
+        #   1. The longevity percentile is a COMPOSITE of variants that are
+        #      already valued individually elsewhere in this module. Valuing it
+        #      too counts the same genotypes a second time.
+        #   2. The $10,000/percentile rate had no source. A percentile of a
+        #      composite score is not a disease, has no cost of illness, and no
+        #      published dose-response converts one into dollars.
+        #
+        # It stays in the report as a signal worth acting on — it just no
+        # longer carries a number the model can be wrong about.
         out.append(_econ_record(
             finding="Below-median longevity composite (improvement headroom)",
             clinical_benefit=(
-                f"~{headroom:g} percentile points of achievable longevity gain "
-                f"(~${LONGEVITY_VALUE_PER_PERCENTILE:,}/percentile)"),
-            cost=cost, outcome_value=value,
-            confidence="low", source="Longevity", recurring=True,
-            prevalence=0.50, qaly_gain=round(headroom * 0.02, 2),
-            evidence=f"Longevity percentile: {pct:g}",
+                f"~{headroom:g} percentile points of headroom to the population "
+                f"median. Reported as a signal, not monetised — the composite "
+                f"aggregates variants already valued individually above."),
+            cost=0, outcome_value=0,
+            confidence="low", source="Longevity", recurring=False,
+            prevalence=0.0, qaly_gain=0.0,
+            evidence=f"Longevity percentile: {pct:g} (not monetised)",
         ))
     return out
 
@@ -1752,6 +1770,10 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
                                wellness_result: Optional[Dict] = None) -> Dict:
     """Build the personal 10-year economic-impact model from the run's results."""
     items: List[Dict] = []
+    # Findings that carry a real decision but deliberately no dollar figure.
+    # Kept as a first-class output rather than dropped, so "not monetised" is
+    # visible in the report as a choice instead of looking like an omission.
+    not_monetised: List[Dict] = []
 
     def add(category, finding, avoided, qaly, intervention, confidence, basis):
         # MARGINAL vs AVERAGE: the per-condition cost constants here (_MACE_COST,
@@ -1987,17 +2009,36 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
                 f"ClinVar {sig} in {gene} — {econ['clinical_benefit']} "
                 f"({econ.get('src', '')}).")
 
-    # ── Family planning (personal) ──
+    # ── Family planning (personal) — NOT MONETISED ──
+    # This block used to add $5,000 and 0.1 QALY per carrier condition. That
+    # contradicted the policy stated in value_of_information.NOT_VALUED, which
+    # says reproductive findings are deliberately never given a dollar value —
+    # two parts of the same report were answering the same question
+    # differently, and the one with a number was winning.
+    #
+    # The reasoning in NOT_VALUED holds here: attaching a figure to an affected
+    # birth prices a prospective child, and the $5,000 rate embedded an uptake
+    # assumption that is really a reproductive preference. The finding is
+    # surfaced as a decision to consider, and the carrier-panel recommendation
+    # driven by runs of homozygosity is reported categorically alongside it.
     if family_planning_result and family_planning_result.get("available"):
         n_actionable = family_planning_result.get("n_actionable", 0)
         if n_actionable > 0:
-            test_cost = PARTNER_TESTING_COST + GENETIC_COUNSELING_COST
-            expected_benefit = n_actionable * 5_000
-            add("Family Planning",
-                f"Reproductive genetics — {n_actionable} carrier condition(s) for partner testing",
-                expected_benefit, 0.10 * n_actionable, test_cost, "moderate",
-                "Partner carrier testing ROI: cost of testing vs expected "
-                "value of informed reproductive decisions.")
+            not_monetised.append({
+                "category": "Family Planning",
+                "finding": f"Reproductive genetics — {n_actionable} carrier "
+                           f"condition(s) where partner testing would be "
+                           f"informative",
+                "decision": "Consider partner carrier testing and genetic "
+                            "counselling before conception.",
+                "indicative_cost": PARTNER_TESTING_COST + GENETIC_COUNSELING_COST,
+                "reason": "Reproductive outcomes are deliberately not "
+                          "monetised. The cost of testing is shown because it "
+                          "is a real price; no benefit figure is attached "
+                          "because valuing one would price a prospective "
+                          "child and embed one set of reproductive "
+                          "preferences as if it were universal.",
+            })
 
     # ── PheWAS extreme predictions (personal) ──
     if phewas_result:
@@ -2078,6 +2119,8 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
         "n_items": len(items),
         "horizon_years": PERSONAL_HORIZON_YEARS,
         "items": items,
+        "not_monetised": not_monetised,
+        "n_not_monetised": len(not_monetised),
         "total_avoided": round(total_avoided),
         "total_qaly": round(total_qaly, 2),
         "total_qaly_value": round(total_qaly_value),
@@ -2220,6 +2263,43 @@ def _esc_econ(s) -> str:
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
+def _render_not_monetised_html(rows: Optional[List[Dict]]) -> str:
+    """Findings that carry a real decision but deliberately no dollar figure.
+
+    Showing these matters. If a reproductive finding simply vanished from the
+    economic page, the omission would look like an oversight; stated as a
+    choice, with the reason attached, it reads as what it is.
+    """
+    if not rows:
+        return ""
+    items = "".join(f"""
+      <div style="border-top:1px solid #eef1f4;padding:9px 0">
+        <div style="font-weight:600;color:#2b3440">{_esc_econ(r.get('finding',''))}</div>
+        <div style="font-size:.88em;color:#48545f;margin-top:3px">
+          <strong>Decision:</strong> {_esc_econ(r.get('decision',''))}</div>
+        <div style="font-size:.85em;color:#6a7683;margin-top:3px">
+          Indicative cost of acting: {_money(r.get('indicative_cost', 0))}
+          &middot; no benefit figure attached</div>
+        <div style="font-size:.82em;color:#8a94a3;margin-top:4px;font-style:italic">
+          {_esc_econ(r.get('reason',''))}</div>
+      </div>""" for r in rows)
+    return f"""
+    <div style="border:1px solid #e3e7ec;border-left:4px solid #8a5cf6;border-radius:10px;
+                padding:13px 15px;margin:14px 0;background:#fbfcfe">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;
+                  gap:12px;flex-wrap:wrap">
+        <div style="font-weight:700;color:#8a5cf6">Reported without a dollar figure</div>
+        <div style="font-size:.72em;color:#8a94a3;border:1px solid #dfe4ea;
+                    border-radius:20px;padding:2px 9px;white-space:nowrap">
+          deliberately not monetised</div>
+      </div>
+      <div style="font-size:.86em;color:#48545f;margin-top:5px">
+        These findings are excluded from every total on this page. That is a
+        modelling decision, not a gap.</div>
+      {items}
+    </div>"""
+
+
 def render_economic_analysis_html(econ: Dict, file_label: str = "") -> str:
     """Standalone economic-impact sheet (economic_analysis.html)."""
     if not econ or not econ.get("available"):
@@ -2318,6 +2398,7 @@ def render_economic_analysis_html(econ: Dict, file_label: str = "") -> str:
           </div>
         </div>
         {_render_cca_html(build_cost_consequence_analysis(econ))}
+        {_render_not_monetised_html(econ.get("not_monetised"))}
         {top_prev}
         <table style="width:100%;border-collapse:collapse;font-size:.9em;margin-top:8px">
           <thead><tr style="background:#f7f9fb;text-align:right">

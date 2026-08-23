@@ -2,6 +2,13 @@
 # Raw DNA files (any consumer chip format)
 *.csv
 *.txt
+
+# The blanket *.csv rule above exists to keep genotype files out of the repo
+# and must stay. Public reference data that the model needs at run time is
+# allowed back in ONE FILE AT A TIME, by exact path, never by pattern — a
+# directory-wide or extension-wide exception here is how a genome file
+# eventually slips through. Provenance for each is in data/PROVENANCE.md.
+!data/LifeTable_USA_Mx_2015.csv
 *.vcf
 *.vcf.gz
 *.bcf

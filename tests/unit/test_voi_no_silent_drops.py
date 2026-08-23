@@ -59,9 +59,17 @@ def test_every_module_source_reaches_the_model():
     valued = [c for c in cats if voi._classify_category(c, "")[0] in ("pgx", "coi")]
     excluded = [c for c in cats if voi._not_valued_reason(c)]
     assert len(valued) + len(excluded) == len(cats)
-    assert excluded == ["Family Planning"], (
-        "Family Planning is the only category that should be excluded on "
+    # Two categories are excluded on principle, each for a documented reason:
+    # Family Planning because monetising a reproductive outcome prices a
+    # prospective child, and Longevity because the composite re-aggregates
+    # variants already valued individually (double counting) at a rate that
+    # had no published source. Anything else appearing here is an oversight.
+    assert excluded == ["Family Planning", "Longevity"], (
+        "Family Planning and Longevity are the only categories excluded on "
         f"principle; got {excluded}")
+    for cat in excluded:
+        assert len(voi._not_valued_reason(cat)) > 80, (
+            f"{cat} must carry a substantive documented reason, not a stub")
 
 
 def test_weak_evidence_sources_are_discounted_not_dropped():

@@ -28,6 +28,8 @@ from __future__ import annotations
 import math
 from typing import Dict, List, Optional, Tuple
 
+import econ_params as _econ_params
+
 try:
     import numpy as np
     _HAVE_NP = True
@@ -327,8 +329,10 @@ def _classify_category(category: Optional[str], label: str = "") -> Tuple[str, s
         return ("coi", "CAD")
 
     # ── Polygenic risk, lifestyle, wellness and longevity → cardiometabolic.
+    # "longevity" is deliberately absent from this list — it is registered in
+    # NOT_VALUED as a composite of variants already valued individually.
     for token in ("polygenic", "prs", "genotype", "exercise", "lifestyle",
-                  "longevity", "cardio", "metabolic", "wellness"):
+                  "cardio", "metabolic", "wellness"):
         if token in cat:
             return ("coi", "CAD")
     return ("", "")
@@ -374,6 +378,15 @@ def _evidence_haircut(category: Optional[str]) -> float:
 # is a decision. Findings from these sources still appear in the report — they
 # are excluded from the economic model only.
 NOT_VALUED: Dict[str, str] = {
+    "Longevity": (
+        "The longevity composite is a summary of variants this module already "
+        "values individually, so monetising it counts the same genotypes "
+        "twice. It also has no cost of illness to anchor against — a "
+        "percentile of a composite score is not a disease — and the flat "
+        "per-percentile rate previously used had no published source. On one "
+        "measured genome that single line produced 54% of the entire modelled "
+        "benefit. It is reported as a signal worth acting on, without a "
+        "dollar figure."),
     "Family Planning": (
         "Reproductive findings are deliberately never monetised. Attaching a "
         "dollar figure to an affected birth prices a prospective child, and "
@@ -791,6 +804,63 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
     except Exception as _e:
         result["carrier_panel_prior"] = {"available": False, "monetised": False}
         _degraded.append(("carrier_panel_prior", repr(_e)))
+
+    # ── Pooled cost-effectiveness (the double-counting correction) ────────
+    # The NMB table above still treats every finding as its own line, which is
+    # the right shape for EVPI/EVPPI — those ask which PARAMETER is worth
+    # resolving. It is the wrong shape for "what is this genome worth", because
+    # eight of the report's finding sources route onto the same cardiometabolic
+    # anchor and summing them prevents the same heart attack eight times. The
+    # pooled result below combines findings per condition on the risk scale and
+    # charges one cost of illness, and reports the difference so the size of the
+    # correction is visible rather than quietly banked.
+    try:
+        import econ_engine as _ee
+        _age = _resolve_age(genetic_age_result)
+        _ee_findings = [
+            _ee.Finding(label=f["label"], coi_key=f.get("coi_key", ""),
+                        p_event=float(f.get("p_event", 0.0) or 0.0),
+                        rrr=float(f.get("rrr", 0.0) or 0.0),
+                        haircut=float(f.get("haircut", 1.0) or 1.0),
+                        intervention_cost=float(f.get("intervention", 0.0) or 0.0),
+                        confidence=f.get("confidence", "moderate"),
+                        source_category=f.get("source_category", ""),
+                        qaly_override=(float(f["qaly"]) if f.get("qaly") is not None
+                                       else None))
+            for f in findings if f.get("kind") == "coi" and f.get("coi_key")
+        ]
+        _pools = _ee.pool_findings(_ee_findings)
+        _pooled = _ee.evaluate_pools(_pools, wtp=wtp, test_cost=test_cost)
+        _pooled["validation"] = _ee.validate_model(_pools, _pooled)
+        _pooled["dual_perspective"] = _ee.dual_perspective(
+            _pooled["cea"]["cost_averted"], _pooled["cea"]["incremental_qaly"],
+            conditions=_pooled["conditions"], wtp=wtp)
+        _pooled["impact_inventory"] = _ee.impact_inventory(_pooled["conditions"])
+        _pooled["cheers"] = _ee.cheers_checklist(
+            wtp=wtp, rate=rate,
+            horizon=_econ_params.value("horizon_years_personal"))
+        _pooled["provenance"] = _econ_params.assumption_burden()
+        _pooled["declared_assumptions"] = [
+            {"key": p.key, "value": p.value, "units": p.units, "note": p.note}
+            for p in _econ_params.assumptions()]
+        _pooled["references"] = _econ_params.citation_list()
+        # Structural (Markov) re-estimate for the conditions that dominate the
+        # total, where event timing and competing mortality actually matter.
+        _top = sorted(_pooled["conditions"],
+                      key=lambda c: c.get("inmb", 0), reverse=True)[:3]
+        _pooled["structural"] = [
+            _ee.incremental_analysis(
+                start_age=_age,
+                annual_incidence=max(1e-4, float(c["baseline_risk"]) / 25.0),
+                coi_key=c["condition"], rrr=float(c["combined_rrr"]),
+                intervention_cost_annual=float(c["intervention_cost"]) / 10.0,
+                wtp=wtp)
+            for c in _top if c.get("condition") in _ee.COI_KEY_TO_PARAM
+        ]
+        result["pooled_economics"] = _pooled
+    except Exception as _e:
+        result["pooled_economics"] = {"available": False, "reason": repr(_e)}
+        _degraded.append(("pooled_economics", repr(_e)))
 
     # Surface any degradation rather than letting a failed sub-analysis disappear.
     result["degraded_components"] = [{"component": k, "error": e} for k, e in _degraded]

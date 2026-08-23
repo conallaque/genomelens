@@ -28,10 +28,16 @@ def test_real_health_economics_category_strings_are_recognised():
     # matched only short keys ("pgx"/"prs"/"apoe"), so every chip finding was
     # silently dropped and the engine reported "no findings" on chip input.
     real = {"Pharmacogenomics": "pgx", "Polygenic Risk": "coi",
-            "Genotype": "coi", "Exercise / Lifestyle": "coi", "Longevity": "coi"}
+            "Genotype": "coi", "Exercise / Lifestyle": "coi"}
     for cat, expected_kind in real.items():
         kind, _ = voi._classify_category(cat, "APOE e3/e4" if cat == "Genotype" else "")
         assert kind == expected_kind, f"{cat!r} → {kind!r}, expected {expected_kind!r}"
+    # "Longevity" is deliberately NOT valued: the composite re-aggregates
+    # variants already valued individually, so routing it to a cost-of-illness
+    # anchor counted the same genotypes twice. It must resolve to no kind AND
+    # carry a documented reason, so it reads as a decision, not an oversight.
+    assert voi._classify_category("Longevity")[0] == ""
+    assert voi._not_valued_reason("Longevity")
     # Short internal keys must keep working too (both conventions supported).
     assert voi._classify_category("pgx")[0] == "pgx"
     assert voi._classify_category("apoe")[1] == "Alzheimer"
