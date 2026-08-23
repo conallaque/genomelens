@@ -157,3 +157,30 @@ def test_retired_longevity_parameter_has_not_returned():
         assert "per_percentile" not in key, (
             f"{key}: pricing a percentile of a composite score needs an "
             f"explicit anchor; the previous one had none")
+
+
+# ── The coverage claim must not overstate itself ──────────────────────────
+
+def test_coverage_is_reported_against_the_whole_model_not_just_the_registry():
+    # A true statement about a subset, phrased as a statement about the whole,
+    # is the same species of error the registry was built to fix. The burden
+    # report must carry the honest denominator.
+    b = ep.assumption_burden()
+    assert "n_unregistered" in b and "pct_of_model_registered" in b
+    assert b["n_unregistered"] > 0, (
+        "the curated per-finding tables in health_economics.py hold hundreds "
+        "of load-bearing numbers; reporting zero here means the counter broke")
+    assert b["n_total_known"] == b["n_parameters"] + b["n_unregistered"]
+    assert b["pct_of_model_registered"] < b["pct_sourced"], (
+        "registry coverage of the whole model is necessarily lower than the "
+        "cited share within the registry; if these are equal the denominator "
+        "is wrong")
+
+
+def test_unregistered_counter_sees_the_curated_tables():
+    n = ep.count_unregistered_parameters()
+    assert n > 100, f"expected the curated econ tables to dominate, got {n}"
+
+
+def test_burden_scope_names_what_is_not_covered():
+    assert "not yet registered" in ep.assumption_burden()["scope"]

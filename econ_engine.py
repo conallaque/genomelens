@@ -219,6 +219,128 @@ def pool_findings(findings: Iterable[Finding]) -> Dict[str, ConditionPool]:
     return pools
 
 
+# When the same gene produces a line in two panels — COMT via the
+# neurochemistry panel and again via pharmacogenomic prescribing guidance —
+# those are two framings of one genotype, not two independent benefits.
+#
+# Matching is against an explicit VOCABULARY rather than a regex for
+# gene-shaped words. A shape-based pattern reads "MI", "MACE" and "B12" as
+# genes and invents targets that do not exist; worse, it could collapse two
+# genuinely independent findings and under-count. Callers pass the vocabulary
+# their own modules actually emit; this default covers the common case.
+DEFAULT_GENE_VOCABULARY = frozenset({
+    "APOE", "COMT", "BDNF", "DRD2", "OPRM1", "MTHFR", "FTO", "TCF7L2",
+    "CYP2C9", "CYP2C19", "CYP2D6", "CYP3A5", "CYP4F2", "VKORC1", "SLCO1B1",
+    "DPYD", "TPMT", "NUDT15", "UGT1A1", "G6PD", "NAT2", "PON1", "GSTT1",
+    "GSTM1", "BRCA1", "BRCA2", "MLH1", "MSH2", "MSH6", "PMS2", "APC",
+    "LDLR", "APOB", "PCSK9", "MYH7", "MYBPC3", "KCNQ1", "KCNH2", "SCN5A",
+    "RYR1", "RYR2", "TTN", "LMNA", "TP53", "PTEN", "RB1", "VHL", "RET",
+    "SDHB", "SDHD", "MEN1", "NF2", "TSC1", "TSC2", "HFE", "SERPINA1",
+    "F5", "F2", "PTPN22", "HLA", "CCR5", "IL28B", "LRRK2", "ATP7B",
+    "CFTR", "SMN1", "HEXA", "HBB", "GBA", "PAH", "GJB2", "FLG", "ALDH2",
+    "ADH1B", "CHRNA5", "SLC30A8", "PPARG", "KCNJ11", "ACE", "AGT", "NOS3",
+})
+
+# Topic tokens for lines that name no gene but plainly describe the same
+# clinical target as another line. Deliberately short: over-collapsing here
+# would hide a genuine second benefit, so only phrases whose duplication has
+# actually been observed in this report's output are listed.
+DEFAULT_TOPIC_TARGETS: Tuple[Tuple[str, str], ...] = (
+    ("autoimmune", "topic:autoimmune"),
+    ("statin-induced", "topic:statin-myopathy"),
+    ("myopathy", "topic:statin-myopathy"),
+)
+
+
+def _extract_target(text: str,
+                    vocabulary: Optional[frozenset] = None,
+                    topics: Optional[Sequence[Tuple[str, str]]] = None) -> str:
+    """Identifier for what a finding is *about*, or '' if it shares nothing.
+
+    Returns a gene symbol when the text names one from the vocabulary, since
+    that is the sharpest signal that two lines describe the same genotype;
+    otherwise a topic tag for the few clinical targets known to surface twice.
+    Returning '' is the safe answer — the caller then leaves the line alone.
+    """
+    vocab = DEFAULT_GENE_VOCABULARY if vocabulary is None else vocabulary
+    tops = DEFAULT_TOPIC_TARGETS if topics is None else topics
+
+    # Topics are checked BEFORE genes, and deliberately so. The duplication
+    # this catches is "same clinical target described twice" — a carrier
+    # result named by its gene in one panel and by its clinical implication in
+    # another. Matching the gene first would give those two lines different
+    # keys and leave the duplicate standing. Pooling too eagerly under-counts
+    # a benefit, which is the safer direction to be wrong in; the topic list
+    # is kept to phrases whose duplication has actually been observed here.
+    low = (text or "").lower()
+    for needle, tag in tops:
+        if needle in low:
+            return tag
+
+    # Gene symbols. Split on the punctuation that attaches to them in prose
+    # ("COMT-guided", "HLA-B*58:01") before testing against the vocabulary.
+    import re
+    for token in re.findall(r"[A-Z][A-Z0-9]*(?:[*:\-][A-Z0-9]+)*", (text or "").upper()):
+        for base in re.split(r"[*:\-]", token):
+            if base in vocab:
+                return base
+    return ""
+
+
+def deduplicate_by_target(items: Sequence[Dict], *,
+                          value_key: str = "net",
+                          text_key: str = "finding",
+                          fallback_key: str = "category",
+                          vocabulary: Optional[frozenset] = None,
+                          penalty: Optional[float] = None) -> List[Dict]:
+    """Down-weight repeated claims on the same underlying genotype.
+
+    The condition-level pooling above catches "four findings, one disease".
+    This catches the other shape the report produces: one variant surfacing in
+    two panels and being valued twice — a COMT line from the neurochemistry
+    panel and a COMT-guided-prescribing line from the pharmacogenomics panel
+    are the same genotype seen from two angles.
+
+    Items are ranked by value within each target; the strongest keeps its full
+    value and each subsequent one is multiplied by the correlated-signal
+    penalty compounding by rank. Returns copies annotated with
+    ``pool_target``, ``pool_rank`` and ``retained`` so the report can show
+    which lines were discounted and why, rather than silently shrinking them.
+    """
+    pen = ep.value("correlated_signal_penalty") if penalty is None else float(penalty)
+    grouped: Dict[str, List[Dict]] = {}
+    for i, it in enumerate(items):
+        # A line naming no shared target gets a unique key, so it is never
+        # pooled with anything. Grouping unmatched lines together by category
+        # would discount independent findings for no reason.
+        target = (_extract_target(str(it.get(text_key, "")), vocabulary)
+                  or f"unique:{i}")
+        grouped.setdefault(target, []).append(it)
+
+    out: List[Dict] = []
+    for target, group in grouped.items():
+        ranked = sorted(group, key=lambda d: float(d.get(value_key, 0) or 0),
+                        reverse=True)
+        shared = len(ranked) > 1 and not target.startswith("unique:")
+        for rank, it in enumerate(ranked):
+            keep = (pen ** rank) if shared else 1.0
+            copy = dict(it)
+            copy["pool_target"] = target
+            copy["pool_rank"] = rank
+            copy["retained"] = round(keep, 4)
+            if shared and rank > 0:
+                copy["pool_note"] = (
+                    f"Discounted to {keep:.0%} — {target} is already valued "
+                    f"above under a different panel; this is the same "
+                    f"genotype seen from another angle, not a second benefit.")
+            for k in ("avoided", "qaly_value", "net", "qaly", "intervention"):
+                if k in copy and isinstance(copy[k], (int, float)):
+                    copy[k] = (round(copy[k] * keep, 4) if k == "qaly"
+                               else round(copy[k] * keep))
+            out.append(copy)
+    return out
+
+
 # ══════════════════════════════════════════════════════════════════════════
 # Disaggregated cost-effectiveness output
 # ══════════════════════════════════════════════════════════════════════════
@@ -671,9 +793,14 @@ def cheers_checklist(*, wtp: float, rate: float, horizon: float,
                      "life-table background mortality and Simpson's 1/3 "
                      "within-cycle correction."},
         {"item": "Analytics and assumptions",
-         "response": f"{burton_pct(burden)} of parameters carry a literature "
-                     f"citation; {burden['n_assumption']} are declared "
-                     f"assumptions, listed explicitly."},
+         "response": f"Of {burden['n_parameters']} registered parameters "
+                     f"(method conventions, cost-of-illness anchors, effect "
+                     f"sizes, utilities), {burden['pct_sourced']:.0f}% carry a "
+                     f"literature citation and {burden['n_assumption']} are "
+                     f"declared assumptions. A further "
+                     f"{burden.get('n_unregistered', 0)} per-finding figures in "
+                     f"the curated module tables are not yet registered and "
+                     f"carry no provenance tier — a stated limitation."},
         {"item": "Characterising heterogeneity",
          "response": f"Willingness to pay varied ${ep.get('wtp_per_qaly').low:,.0f}"
                      f"–${ep.get('wtp_per_qaly').high:,.0f}/QALY; age and sex "

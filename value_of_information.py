@@ -212,6 +212,12 @@ def _collect(economics_result: Optional[Dict],
             out.append({"label": label, "kind": "coi", "coi_key": coi_key,
                         "p_event": 0.15 if coi_key == "Alzheimer" else 0.20,
                         "rrr": 0.30, "qaly": float(f.get("qaly_gain") or 0.5),
+                        # Whether the SOURCE supplied a QALY figure or this is
+                        # the 0.5 fallback. The pooling engine needs to tell
+                        # them apart: passing the fallback through as an
+                        # override would shadow the registry's per-condition
+                        # QALY anchors on every finding, leaving them dead.
+                        "qaly_explicit": f.get("qaly_gain") is not None,
                         "intervention": 500.0, "horizon": 25, "wgs_only": False,
                         "haircut": _hc, "confidence": conf,
                         "source_category": f.get("category") or ""})
@@ -238,14 +244,16 @@ def _collect(economics_result: Optional[Dict],
                         "kind": "coi", "coi_key": coi_key, "p_event": p,
                         "penetrance_literature": round(p_lit, 4),
                         "penetrance_corrected": round(p, 4),
-                        "rrr": rrr, "qaly": qaly, "intervention": 1_500.0,
+                        "rrr": rrr, "qaly": qaly, "qaly_explicit": True,
+                        "intervention": 1_500.0,
                         "horizon": 30, "wgs_only": True, "haircut": 1.0,
                         "confidence": "high"})
         # carriers: reproductive value (small direct health value to self)
         for f in (buckets.get("carrier") or [])[:6]:
             out.append({"label": f"{f.get('gene','?')} carrier (reproductive)",
                         "kind": "coi", "coi_key": "Pathogenic", "p_event": 0.04,
-                        "rrr": 0.5, "qaly": 0.2, "intervention": 400.0,
+                        "rrr": 0.5, "qaly": 0.2, "qaly_explicit": True,
+                        "intervention": 400.0,
                         "horizon": 5, "wgs_only": True, "haircut": 1.0,
                         "confidence": "moderate"})
 
@@ -257,7 +265,8 @@ def _collect(economics_result: Optional[Dict],
             out.append({"label": f"predicted-pathogenic {f.get('chrom','?')}:"
                                   f"{f.get('pos','?')}", "kind": "coi",
                         "coi_key": "Pathogenic", "p_event": 0.10, "rrr": 0.4,
-                        "qaly": 0.5, "intervention": 800.0, "horizon": 25,
+                        "qaly": 0.5, "qaly_explicit": True,
+                        "intervention": 800.0, "horizon": 25,
                         "wgs_only": True,
                         "haircut": max(0.1, float(am)),   # scale value by AM confidence
                         "confidence": f.get("confidence", "low")})
@@ -825,7 +834,11 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
                         intervention_cost=float(f.get("intervention", 0.0) or 0.0),
                         confidence=f.get("confidence", "moderate"),
                         source_category=f.get("source_category", ""),
-                        qaly_override=(float(f["qaly"]) if f.get("qaly") is not None
+                        # Only a QALY figure the source actually stated may
+                        # override the registry's per-condition anchor.
+                        qaly_override=(float(f["qaly"])
+                                       if f.get("qaly_explicit")
+                                       and f.get("qaly") is not None
                                        else None))
             for f in findings if f.get("kind") == "coi" and f.get("coi_key")
         ]

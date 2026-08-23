@@ -2232,15 +2232,29 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
         for r in (p.get("references") or []))
     prov_html = f"""
 <details style="margin-top:10px"><summary style="cursor:pointer;color:#5b6673;font-weight:600">
-  Parameter provenance &mdash; {prov.get('pct_sourced', 0)}% of parameters carry a citation</summary>
+  Parameter provenance &mdash; {prov.get('n_parameters', 0)} registered parameters,
+  {prov.get('pct_sourced', 0)}% cited</summary>
 <div style="font-size:.85em;color:#5b6673;margin:7px 0">
-  Of {prov.get('n_parameters', 0)} economic parameters,
+  Of the {prov.get('n_parameters', 0)} <em>registered</em> parameters &mdash; method
+  conventions, cost-of-illness anchors, effect sizes and utilities &mdash;
   <strong>{prov.get('n_published', 0)}</strong> are read directly from a cited
   source, <strong>{prov.get('n_derived', 0)}</strong> are derived from one by a
   stated arithmetic step, and <strong>{prov.get('n_assumption', 0)}</strong> are
   judgement calls with no published anchor. The last group is listed in full
   rather than blended in with the others &mdash; they are the parts of this model
   most worth arguing with.</div>
+<div style="border:1px solid #f0dcc0;background:#fffaf2;border-radius:8px;
+            padding:10px 12px;margin:8px 0;font-size:.85em;color:#6b5330">
+  <strong>Coverage is partial, and the percentage above is not a claim about the
+  whole model.</strong> A further
+  <strong>{prov.get('n_unregistered', 0)}</strong> load-bearing numbers &mdash; the
+  per-finding cost, outcome-value, prevalence and QALY fields in the curated
+  module tables &mdash; are not registered yet and reach the model without a
+  provenance tier. Registered parameters are
+  <strong>{prov.get('pct_of_model_registered', 0)}%</strong> of the
+  {prov.get('n_total_known', 0)} identified so far. Registering the rest is the
+  remaining work; until then, treat the per-finding figures as
+  order-of-magnitude.</div>
 <div style="font-weight:600;color:#5b6673;margin-top:8px">Declared assumptions</div>
 <ul style="font-size:.85em;color:#5b6673;margin:5px 0 0 18px">{assums}</ul>
 <div style="font-weight:600;color:#5b6673;margin-top:10px">References</div>
@@ -2274,6 +2288,18 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
     Findings are grouped by the condition they bear on, combined on the risk
     scale rather than added, and each condition is charged its cost of illness
     once.</div>
+  <div style="font-size:.83em;color:#6a7683;margin-top:6px;padding:8px 10px;
+              background:#f4f7fa;border-radius:8px">
+    <strong>Which number is the answer?</strong> This one. The report shows three
+    totals because they answer three questions: this pooled analysis is the
+    <em>reference case</em> &mdash; what acting on the findings costs and gains.
+    The <em>value-of-information</em> figure above it prices something different:
+    what it was worth knowing any of this, which is why it is smaller and why
+    resolving one uncertain parameter can move it. The
+    <em>personal economic-impact</em> page itemises the same findings
+    line-by-line for readability; its total runs higher because per-finding
+    figures come from the curated module tables, which are not yet on the
+    provenance registry.</div>
   {corr_html}
   {cards}
   <table style="width:100%;border-collapse:collapse;font-size:.88em;margin-top:4px">

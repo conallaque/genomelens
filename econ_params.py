@@ -541,15 +541,49 @@ def assumptions() -> List[Param]:
     return by_tier("assumption")
 
 
+def count_unregistered_parameters() -> int:
+    """How many load-bearing numbers still live outside the registry.
+
+    The curated per-finding tables in ``health_economics`` (``PGX_ECONOMICS``,
+    ``ACMG_GENE_ECONOMICS``, ``PHEWAS_CATEGORY_ECONOMICS`` and the rest) each
+    carry ``cost`` / ``outcome_value`` / ``prevalence`` / ``qaly_gain`` fields,
+    and every one of them reaches a dollar figure. They are not in the registry
+    yet. Counting them is what keeps :func:`assumption_burden` from reporting a
+    flattering number about a small corner of the model — the registry covers
+    method conventions, cost-of-illness anchors and effect sizes, which is the
+    spine, not the whole skeleton.
+    """
+    try:
+        import health_economics as _he
+    except Exception:
+        return 0
+    fields = ("cost", "outcome_value", "prevalence", "qaly_gain",
+              "adr_cost", "rrr")
+    total = 0
+    for name in dir(_he):
+        if not (name.endswith("_ECONOMICS") or name.endswith("_COSTS")):
+            continue
+        table = getattr(_he, name, None)
+        if not isinstance(table, dict):
+            continue
+        for entry in table.values():
+            if isinstance(entry, dict):
+                total += sum(1 for f in fields if f in entry)
+    return total
+
+
 def assumption_burden() -> Dict[str, float]:
     """How much of the registry rests on judgement rather than literature.
 
-    This is the number the internal audit was really asking for: not "is the
-    model sophisticated" but "what fraction of it is invented". Reported in the
-    methods section so a reader can weigh the output accordingly.
+    Reports registry coverage AND how much of the model the registry does not
+    yet reach. Quoting only the first would be the same species of error the
+    registry was built to fix: a true statement about a subset, phrased so it
+    reads as a statement about the whole.
     """
     n = len(_REGISTRY) or 1
     counts = {t: len(by_tier(t)) for t in TIERS}
+    unregistered = count_unregistered_parameters()
+    total_known = n + unregistered
     return {
         "n_parameters": n,
         "n_published": counts["published"],
@@ -557,6 +591,16 @@ def assumption_burden() -> Dict[str, float]:
         "n_assumption": counts["assumption"],
         "pct_sourced": round(100.0 * (counts["published"] + counts["derived"]) / n, 1),
         "pct_assumption": round(100.0 * counts["assumption"] / n, 1),
+        # The honest denominator.
+        "n_unregistered": unregistered,
+        "n_total_known": total_known,
+        "pct_of_model_registered": round(100.0 * n / total_known, 1)
+        if total_known else 100.0,
+        "scope": ("Registered parameters cover method conventions, "
+                  "cost-of-illness anchors, effect sizes and utilities. The "
+                  "per-finding curated tables in health_economics.py are not "
+                  "yet registered; their figures reach the model without a "
+                  "provenance tier."),
     }
 
 

@@ -349,3 +349,84 @@ def test_correlation_penalty_binds_before_the_cap():
     # bind instead, that is a real behaviour change and should be noticed.
     many = ee.ConditionPool("CAD", [_f(label=f"f{i}") for i in range(30)])
     assert many.combined_rrr() < ep.value("max_combined_rrr")
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Duplicate-target pooling (the personal-economics path)
+# ══════════════════════════════════════════════════════════════════════════
+
+def _item(finding, net, category="Genomic"):
+    return {"finding": finding, "category": category, "net": net,
+            "avoided": net // 2, "qaly_value": net // 2, "qaly": 0.1,
+            "intervention": 100}
+
+
+def test_same_gene_in_two_panels_is_not_valued_twice():
+    # THE BUG: COMT surfaced once via the neurochemistry panel and once via
+    # pharmacogenomic prescribing guidance, and both were counted in full.
+    items = [_item("COMT Val158Met — psychiatric medication response", 8_340),
+             _item("COMT-guided SSRI/SNRI selection", 8_210)]
+    out = ee.deduplicate_by_target(items)
+    assert {i["pool_target"] for i in out} == {"COMT"}
+    kept = sorted(i["net"] for i in out)
+    assert kept[1] == 8_340, "the strongest line keeps its full value"
+    assert kept[0] < 8_210, "the duplicate must be discounted"
+
+
+def test_hyphenated_and_starred_gene_names_still_match():
+    # "COMT-guided" and "HLA-B*58:01" must resolve to their gene, or the
+    # duplicate they form with a plain mention goes uncaught.
+    assert ee._extract_target("COMT-guided prescribing") == "COMT"
+    assert ee._extract_target("HLA-B*58:01 allopurinol risk") == "HLA"
+
+
+def test_unrelated_findings_are_never_pooled():
+    items = [_item("Avoid clopidogrel non-response", 8_904),
+             _item("1 actionable wellness variant(s)", 5_048),
+             _item("Targeted supplementation (vitamin D/B12/folate)", 4_070)]
+    out = ee.deduplicate_by_target(items)
+    assert all(i["retained"] == 1.0 for i in out), (
+        "independent findings must keep their full value")
+    assert len({i["pool_target"] for i in out}) == 3
+
+
+def test_shape_lookalikes_are_not_mistaken_for_genes():
+    # A regex for gene-shaped words reads these as genes and invents targets.
+    for text in ("Intensive cardiovascular risk reduction (MI/stroke)",
+                 "Avoid MACE after stent thrombosis",
+                 "Targeted supplementation (vitamin D/B12/folate)"):
+        assert ee._extract_target(text) == "", f"{text!r} matched a gene"
+
+
+def test_pooling_is_recorded_on_the_item_not_applied_silently():
+    items = [_item("COMT Val158Met", 8_000), _item("COMT-guided dosing", 4_000)]
+    out = ee.deduplicate_by_target(items)
+    discounted = [i for i in out if i["pool_rank"] > 0]
+    assert discounted and discounted[0]["pool_note"], (
+        "a reduced line must say why it was reduced")
+
+
+def test_pooling_scales_every_money_field_consistently():
+    items = [_item("COMT a", 1_000), _item("COMT b", 1_000)]
+    out = sorted(ee.deduplicate_by_target(items), key=lambda d: d["pool_rank"])
+    second = out[1]
+    keep = second["retained"]
+    assert second["net"] == round(1_000 * keep)
+    assert second["avoided"] == round(500 * keep)
+    assert second["qaly_value"] == round(500 * keep)
+
+
+def test_pooling_only_ever_reduces_a_total():
+    items = [_item(f"COMT variant {i}", 1_000) for i in range(5)] \
+        + [_item("Unrelated finding", 2_000)]
+    before = sum(i["net"] for i in items)
+    after = sum(i["net"] for i in ee.deduplicate_by_target(items))
+    assert after <= before
+
+
+def test_custom_vocabulary_is_honoured():
+    items = [_item("ZZZ9 finding one", 100), _item("ZZZ9 finding two", 50)]
+    assert all(i["retained"] == 1.0
+               for i in ee.deduplicate_by_target(items))
+    out = ee.deduplicate_by_target(items, vocabulary=frozenset({"ZZZ9"}))
+    assert any(i["retained"] < 1.0 for i in out)

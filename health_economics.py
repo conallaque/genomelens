@@ -2087,6 +2087,45 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
         deduped_items.append(item)
     items = deduped_items
 
+    # CORRELATED-TARGET POOLING. The exact-key dedup above only catches items
+    # that are literally identical. It does not catch the same genotype
+    # surfacing through two different panels — a COMT line from the
+    # neurochemistry module and a COMT-guided-prescribing line from the
+    # pharmacogenomics module were both counted in full, which on one measured
+    # genome valued that single variant at $16,550. Same for a carrier result
+    # appearing once as a carrier finding and again as symptom awareness.
+    #
+    # Rank the lines that share a target, keep the strongest at full value and
+    # discount the rest. The discount is recorded on the item rather than
+    # applied invisibly, so the report can show which lines were reduced.
+    n_before = len(items)
+    try:
+        import econ_engine as _ee
+        # Match against the gene symbols THIS module actually emits, rather
+        # than a regex for gene-shaped words — the latter reads "MI", "MACE"
+        # and "B12" as genes and invents targets that do not exist.
+        _vocab = frozenset(_ee.DEFAULT_GENE_VOCABULARY) | frozenset(
+            k.split("*")[0].split(":")[0].upper()
+            for d in (ACMG_GENE_ECONOMICS, PGX_ECONOMICS, HLA_ECONOMICS,
+                      NEUROCHEMISTRY_ECONOMICS, METAL_OXIDATIVE_ECONOMICS,
+                      IMMUNOGENETICS_ECONOMICS, DETOX_ECONOMICS)
+            for k in d
+            if k.replace("-", "").replace("*", "").replace(":", "").isalnum())
+        items = _ee.deduplicate_by_target(items, value_key="net",
+                                          text_key="finding",
+                                          fallback_key="category",
+                                          vocabulary=_vocab)
+        items = [i for i in items if i.get("net", 0) or i.get("qaly", 0)]
+        pooled_targets = sorted({i["pool_target"] for i in items
+                                 if i.get("pool_rank", 0) > 0})
+    except Exception:
+        # The economics must still produce a number if the engine is missing;
+        # it just produces the older, higher one, and says so via the flag.
+        pooled_targets = []
+        _pooling_applied = False
+    else:
+        _pooling_applied = True
+
     total_avoided = sum(i["avoided"] for i in items)
     total_qaly = sum(i["qaly"] for i in items)
     total_qaly_value = sum(i["qaly_value"] for i in items)
@@ -2121,6 +2160,10 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
         "items": items,
         "not_monetised": not_monetised,
         "n_not_monetised": len(not_monetised),
+        # Correlated-target pooling, reported rather than applied invisibly.
+        "pooling_applied": _pooling_applied,
+        "pooled_targets": pooled_targets,
+        "n_pooled_targets": len(pooled_targets),
         "total_avoided": round(total_avoided),
         "total_qaly": round(total_qaly, 2),
         "total_qaly_value": round(total_qaly_value),
