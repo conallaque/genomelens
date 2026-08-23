@@ -9,14 +9,27 @@ Unauthorized copying, modification, or distribution is prohibited.
 ### For reviewers — the 30-second version
 
 1. **What this is:** an applied **health-economics** model that answers *what is knowing
-   your genome actually worth?* — cost-effectiveness, value-of-information, and budget
+   your genome actually worth?* — cost–utility analysis, value of information, and budget
    impact — computed on real genomic data, entirely offline.
-2. **Method:** discounted net monetary benefit, Markov cohort CEA, Monte-Carlo PSA with a
-   CEAC, EVPI/EVPPI, and the ascertainment and winner's-curse corrections applied to the
-   genetics *before* anything is monetised.
-3. **Headline result:** on the public GIAB HG001 genome — modelled expected value
-   **≈ \$24,070** (95% CI ≈ \$11k–\$41k), computed end-to-end locally, with the
-   whole-genome-only findings accounting for nearly all of it.
+2. **Method:** cost-utility analysis reporting cost, QALYs, ICER and INMB **separately**;
+   correlated findings **pooled on the risk scale rather than summed**; a cohort
+   state-transition model against US life-table mortality; probabilistic sensitivity
+   analysis with a CEAC and a one-way tornado; EVPI, EVPPI and breakeven; an efficiency
+   frontier with **extended** dominance; a Second Panel dual perspective with an impact
+   inventory; and CHEERS 2022 reporting.
+3. **What it will not do,** which is the part worth reading:
+   - It **pools findings by condition instead of adding them.** Eight of twenty-one
+     finding sources route onto the same cardiometabolic anchor. Summing them claimed a
+     79% risk reduction — not a probability. Pooling removes ~52% of that inflation, and
+     the report shows the size of its own correction rather than quietly banking it.
+   - It **tells you how much of the answer is guesswork.** Every parameter carries a
+     provenance tier; 47% of the model's ~350 figures resolve to a PMID or DOI, 99% carry
+     a named source. When declared assumptions drive most of the variance, the report
+     says so in a coloured box instead of leaving it in a footnote.
+   - It **refuses to price some things.** Reproductive outcomes are never monetised —
+     attaching a figure to an affected birth prices a prospective child and embeds one
+     set of preferences as universal. A negative ICER is never reported, because the
+     ratio is ambiguous in the dominance quadrants.
 4. **The methods, with every equation and citation:** [`docs/METHODS.md`](docs/METHODS.md).
 5. **Authorship, plainly:** the health-economics modelling, scientific decisions, and
    product direction are mine; the **software implementation was largely AI-generated**
@@ -39,8 +52,8 @@ Unauthorized copying, modification, or distribution is prohibited.
 ![status](https://img.shields.io/badge/status-active-brightgreen)
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![privacy](https://img.shields.io/badge/privacy-100%25%20local%20%C2%B7%20offline-purple)
-![code](https://img.shields.io/badge/code-~42.7k%20lines%20%C2%B7%2041%20modules-orange)
-![tests](https://img.shields.io/badge/tests-386%20passing-brightgreen)
+![code](https://img.shields.io/badge/code-~54.8k%20lines%20%C2%B7%2079%20modules-orange)
+![tests](https://img.shields.io/badge/tests-729%20passing-brightgreen)
 ![input](https://img.shields.io/badge/input-chip%20%2B%20whole--genome%20VCF-blue)
 ![license](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
 [![Buy Me a Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/caque)
@@ -165,10 +178,10 @@ unlock them is to hand your genome — the one piece of data you can never chang
 revoke — to a company's cloud, where it can be breached, sold, or repurposed.
 
 That's a health-economics problem hiding in plain sight. The **value of information** in
-a genome is large — GenomeLens's own model (a transparent but uncertain estimate) puts it
-in the *tens of thousands of dollars* of expected health value — yet access is gated by
-cost and by an
-unacceptable privacy price. So the *return on health* that genomics promises is, in
+a genome is real but individual — GenomeLens's own model puts it anywhere from
+negligible to tens of thousands of dollars depending on what the file contains, and
+reports which of the two it is rather than assuming the flattering answer — yet access
+is gated by cost and by an unacceptable privacy price. So the *return on health* that genomics promises is, in
 practice, only available to people who can pay and are willing to give themselves away.
 
 **GenomeLens removes both barriers at once.** It runs the analysis locally, for free, on
@@ -182,23 +195,45 @@ The point was never a slick genomics toy. It's that the payoff of knowing your o
 biology shouldn't require a big budget or a surrendered genome. On an ordinary laptop,
 it doesn't.
 
+## What this demonstrates, for anyone screening it as HEOR work
+
+A portfolio project can show that someone is able to run a cost-effectiveness analysis.
+That is table stakes. What follows is the part that is harder to fake, and each item is
+traceable to a commit and a named test.
+
+| Competency | Where to look |
+|---|---|
+| **Cost–utility analysis done properly** | Cost, QALYs, ICER and INMB reported separately, never blended into one "value" figure. ICER suppressed in the dominance quadrants, because a negative ratio is ambiguous. `econ_engine.CEAResult` |
+| **Finding your own errors** | Eight of twenty-one finding sources routed onto one cardiometabolic anchor and were summed — a 79% risk reduction, which is not a probability. The fix is pooling on the risk scale; the report shows the size of its own correction. `ConditionPool`, `test_stacked_findings_do_not_sum_their_risk_reductions` |
+| **Parameter provenance** | Every figure carries a source and a tier. 47% resolve to a PMID or DOI, 99% carry a named source, and the model states its own coverage rather than claiming "sourced". `econ_params.py`, `test_econ_params.py` |
+| **Uncertainty that is real** | PSA over documented distributions, CEAC, one-way tornado. An earlier version reported a strategy as cost-saving in 100% of simulations — the finding-level parameters were pinned. Now the interval crosses zero and the report names the assumptions driving it. `test_psa_without_rebuild_understates_uncertainty` |
+| **Value of information** | EVPI, EVPPI per parameter, and breakeven — so "this assumption matters" becomes "resolving it is worth \$X". EVPPI bounded above by EVPI, which an earlier draft violated. `econ_decision.py` |
+| **Reporting standards** | CHEERS 2022 checklist including the items *not* addressed, Second Panel dual perspective, impact inventory listing what is deliberately excluded. |
+| **Knowing what not to monetise** | Reproductive outcomes are never priced. The reasoning is stated in the code, enforced by a test, and surfaced in the report as a decision rather than an omission. `NOT_VALUED` |
+| **Structural modelling** | Cohort state-transition model against US life-table mortality with Simpson's 1/3 within-cycle correction, cross-checked against an independent implementation. `test_within_cycle_weights_match_the_published_implementation` |
+| **Communicating to non-specialists** | Number needed to screen, healthy time in days, payback period, confidence as a count out of a hundred — with the conditional mood wherever the underlying baseline is an assumption. `econ_plain.py` |
+
+The recurring theme is that the model is built to report an unflattering answer as
+readily as a flattering one, and several of the commits above exist because it did.
+
 ## What it does
 
-GenomeLens runs **41 interlocking analysis modules** (≈42,700 lines of Python, a
+GenomeLens runs **79 interlocking analysis modules** (≈54,800 lines of Python, a
 386-test suite) entirely offline — across two input tiers: a consumer chip file
 or a whole-genome / exome **VCF**.
 
 **Health economics — the headline capability**
 - **Health ROI — Value of Information (health economics):** answers one question — **what is knowing your genome actually worth?** — with a real decision model, not a marketing number:
   - **Puts a dollar value on each finding** — how much acting on it (screening, prevention, safer prescriptions) is worth to your health.
-  - **Uses real data, not guesses** — sourced cost-of-illness figures and published drug cost-effectiveness studies.
+  - **Says how much is evidence and how much is judgement** — every parameter carries a provenance tier. 47% of the model's figures resolve to a PMID or DOI, 99% carry a named source, and the handful of declared assumptions are listed individually. Where those assumptions drive most of the variance, the report says so rather than claiming the whole thing is "sourced".
   - **Counts future health and money fairly** — discounts both costs and quality-adjusted life-years (QALYs) at 3%, the health-economics standard.
-  - **Tells you if a full genome is worth it *for you*** — the extra value of upgrading a chip → whole genome ("marginal ROI").
+  - **Tells you whether sequencing is worth buying** — prospectively, from published yields, not by counting sequencing-only findings a chip file cannot contain. (That retrospective figure is structurally $0 for every array user; the report now explains this rather than letting it read as "sequencing adds nothing".)
   - **Shows its uncertainty honestly** — a Monte-Carlo simulation gives a *range* (95% confidence interval), never one fake-precise number, plus the **downside case** (VaR/CVaR) and **EVPI**, the ceiling on what further testing could be worth.
   - **Models health as depreciating capital** (Grossman) and **when to test** as a real option — so it can tell you the information is worth more *now* than later.
   - **Corrects the genetics before the economics** — penetrance is de-biased for ascertainment and GWAS effects are winner's-curse shrunk, so the dollar figures don't inherit inflated risk estimates.
   - **Separates price from value** — what the tests *cost to buy* vs what acting on them is *worth*.
-  - *Example (public GIAB genome): ≈ **\$24k** modelled expected value (with a confidence range) — almost all of it from the whole-genome findings; for this healthy reference genome the chip-only part nets ≈ \$0 after test cost. **Your number is individual and can be far lower.***
+  - **Reports in plain English as well as in QALYs** — "roughly 1 in 56 people carry a serious actionable variant their array missed", "about 25 extra days of healthy life", "worth it in 98 of every 100 runs of the model". Number needed to screen, healthy time in days, and payback period sit alongside the ICER.
+  - *No headline figure is quoted here. A previous version cited ≈$24k on the public GIAB HG001 genome; the pooling correction and the removal of an unsourced longevity term changed the arithmetic materially, and that genome has not been re-run since. Quoting the old number would be the exact error this model was rebuilt to stop making. **Any figure is individual and can be far lower.***
 
 **Clinical & pharmacogenomic**
 - **Pharmacogenomics (CPIC):** drug-response variants + dosing implications that *flag and reduce* adverse-drug-reaction risk.
@@ -307,12 +342,13 @@ attenuated for other ancestries); and the output is explicitly an *illustrative
 decision-analytic model — not a formal economic evaluation, and not financial or
 medical advice.*
 
-> **Worked example — public GIAB HG001 genome:** modelled expected value ≈ **\$24,070**
-> (95% CI ≈ \$11k–\$41k). The chip→WGS marginal (**≈ \$24,479**, reported *gross* of test
-> cost) nearly equals the total because, for this essentially-healthy reference genome, the
-> chip-only contribution nets ≈ \$0 after test cost — so almost all the modelled value comes
-> from the whole-genome findings. A different genome would give a very different number.
-> Computed end-to-end, locally.
+> **On worked examples.** Earlier versions of this README quoted ≈\$24,070 for the public
+> GIAB HG001 genome. That figure is withdrawn rather than updated: pooling correlated
+> findings and removing an unsourced longevity term changed the arithmetic materially,
+> and HG001 has not been re-run since. A stale headline number is precisely the kind of
+> claim this model was rebuilt to stop making, so it is not carried forward on the
+> strength of having once been true. The engine's outputs are reproducible from any input
+> file in a few seconds; the figures in the report are the ones to read.
 
 
 ## Engineering notes
@@ -404,9 +440,10 @@ hand you those savings.
 **Value (what acting on the findings is worth).** Price is not value — and at its
 core GenomeLens is a health-economics tool that models the latter. Its built-in
 **Value-of-Information engine** estimates the expected **return on health** of acting
-on your genome (averted adverse drug reactions, earlier screening, prevention) — on
-the order of **tens of thousands of dollars** in risk-adjusted expected value for a
-whole genome (**≈\$24k with a 95% confidence interval on the public GIAB demo**).
+on your genome (averted adverse drug reactions, earlier screening, prevention), reported
+with a confidence interval and with the share of that interval attributable to declared
+assumptions rather than evidence. The magnitude is individual and frequently small — the
+model is built to report a modest or negative result as readily as a large one.
 
 *Illustrative comparison using typical U.S. self-pay pricing; the value figure is a
 modelled, uncertain estimate from the built-in health-economics engine. Not a formal

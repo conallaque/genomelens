@@ -384,6 +384,27 @@ change and re-run; none of it is a slogan.
 A static decision model cannot answer "what happens over 40 years?" or "can a payer afford
 this?" Both canonical structures are implemented in [`markov_model.py`](markov_model.py).
 
+**There are two cohort models, and they answer different questions.** This is deliberate,
+and worth stating plainly because an unexplained pair looks like duplication:
+
+| | `markov_model.py` | `econ_engine.run_markov` |
+|---|---|---|
+| Question | *Would a payer fund genotype-guided care for a population?* | *What is this individual's own pooled finding set worth, once competing mortality is modelled?* |
+| Cohort | Hypothetical, parameterised | Built from this person's pooled conditions |
+| Mortality | Gompertz | US life table (2015), sex-specific |
+| Within-cycle correction | Half-cycle (trapezoidal) | Simpson's 1/3 |
+| Reported as | Cohort CEA + PMPM budget impact | "Structural re-estimate" beside the pooled result |
+
+The two will not agree, and should not: they start from different cohorts. The payer model
+is the HTA deliverable; the structural re-estimate exists to check whether the pooled
+one-shot arithmetic survives contact with a model that knows people die of other things
+first. Where they diverge, the divergence is the finding.
+
+**One budget-impact analysis, not two.** Affordability is computed once, in
+`markov_model.budget_impact`, under ISPOR conventions; `econ_decision.budget_impact`
+delegates to it. A second implementation briefly existed and gave a payer two answers to
+one question.
+
 **Markov state-transition cohort model.** A closed cohort moves between health states
 (Well → Disease → Dead) on annual cycles under a validated transition matrix:
 
@@ -444,7 +465,95 @@ isn't there. The report therefore separates the **cash** side (averted cost − 
 cost-effective but cost-adding, or not cost-effective at this threshold.
 Refs: Drummond et al. (2015); prevention economics — cost-effective ≠ cost-saving.
 
-**22 · Named frameworks behind this tool's honesty mechanisms**
+**22 · Pooling correlated findings — why the model stopped adding them up**
+
+*The defect.* Twenty-one finding sources feed the economic model, and eight of them route
+onto the same cardiometabolic anchor: a polygenic score for coronary disease, an expanded
+polygenic panel, PheWAS lipid biomarkers, a Mendelian-randomisation estimate for the same
+lipid, wellness and lifestyle panels. Each arrived as its own line with its own risk
+reduction, and the lines were **added**. Eight findings at a 30% reduction each summed to
+0.79 — a number presented as a probability that is not one. These are not eight chances to
+prevent eight heart attacks; they are eight measurements of one liability.
+
+*The rule.* Findings bearing on a condition are combined on the **risk scale** by
+complement-of-products, with a compounding penalty for correlated re-measurement, and the
+total capped:
+
+```math
+\text{RRR}_{\text{pooled}}=\min\!\Big(c,\;1-\prod_{i=1}^{n}\big(1-r_i\,h_i\,\rho^{\,i-1}\big)\Big)
+```
+
+`r_i` is finding *i*'s relative risk reduction, `h_i` the evidence-strength haircut for its
+source module, `ρ` the correlated-signal penalty, `i` the rank order strongest-first, and
+`c` a ceiling on what acting on genomic information can achieve for one common complex
+disease.
+
+*In plain English:* if four things all tell you your heart risk is up, acting on them is
+one course of action, not four. The first signal counts fully, the second counts for half
+as much again, the third less than that — because a second measurement of the same thing
+is mostly the same information. And the cost of illness is charged **once**, as is the
+intervention: charging four interventions for one course of action was the cost-side
+mirror of the same error.
+
+Two properties matter and are enforced by test. The combination is always a probability
+(additive summation is not). And the marginal contribution of each additional finding is
+strictly decreasing — the fifth cardiometabolic signal adds very little. On a realistic
+finding set this removes roughly **52%** of the previously claimed averted cost, and the
+report shows the naive figure beside the pooled one rather than quietly banking the
+correction.
+
+A second axis catches the same genotype surfacing in two panels — a COMT result reported
+once by the neurochemistry module and again by pharmacogenomic prescribing guidance was
+valued twice. Matching is against an explicit gene vocabulary rather than a regex for
+gene-shaped words, which reads "MI", "MACE" and "B12" as genes.
+Refs: independence assumptions in combined-risk modelling; Drummond et al. (2015) on
+double counting.
+
+**23 · Parameter provenance — stating how much of the model is evidence**
+
+*The problem.* An internal audit found roughly two thirds of the economic parameters had
+no traceable source. A model whose inputs cannot be traced is not so much wrong as
+**uncheckable**, which is worse: nobody can find the error, including its author.
+
+*The mechanism.* Parameters are records, not floats. Each carries a value, units, a
+source, a resolvable identifier (PMID / DOI / ISBN / URL), a year, a distribution and a
+range — and a **tier** stating honestly how much authority stands behind it:
+
+| Tier | Meaning |
+|---|---|
+| `published` | The value appears in the cited source; a reader can read it off the paper. |
+| `derived` | Computed from the source by a stated arithmetic step — inflated, converted, or taken as a midpoint. The step is recorded so it can be disputed separately from the source. |
+| `assumption` | A judgement call with no published anchor. Permitted, but enumerated individually in the report rather than blended in with sourced values. |
+
+The registry is validated at import: a `published` or `derived` parameter without a
+citation is an error, and so is an `assumption` without a justification. An unregistered
+key raises rather than silently defaulting.
+
+*Reporting the honest denominator.* The registry covers the model's spine — method
+conventions, cost-of-illness anchors, effect sizes, utilities. The per-finding curated
+tables hold several hundred more figures. Quoting registry coverage alone would be a true
+statement about a subset phrased as a statement about the whole, which is the same species
+of error the registry exists to prevent. So the report gives both: of roughly **350**
+parameters, **47%** resolve to a PMID or DOI, **99%** carry at least a named literature
+attribution, and under **1%** rest on judgement alone. The unresolved sources are listed
+as a ranked work queue, largest first.
+
+*Making provenance load-bearing.* The distribution and range fields are not documentation.
+Probabilistic sensitivity analysis draws every parameter from its own recorded
+distribution, and the one-way tornado uses the recorded range — so a parameter with no
+published spread is held **fixed** rather than given invented uncertainty. Parameters are
+swapped in the registry itself during sampling, so every reader of a value sees the drawn
+one by construction rather than by remembering to thread it through.
+
+The output of that machinery is the sentence the report leads with when it applies: on a
+typical run, **around two thirds of the variance in net benefit traces to parameters with
+no published anchor** — chiefly how much acting on a genetic risk actually reduces it, a
+quantity nobody has measured directly for most of these findings. A model that cannot say
+this about itself is not being careful; it is being quiet.
+Refs: CHEERS 2022 (Husereau et al., BMJ 2022) on reporting of analytic assumptions;
+Briggs, Claxton & Sculpher (2006) on probabilistic sensitivity analysis.
+
+**24 · Named frameworks behind this tool's honesty mechanisms**
 
 Several guardrails here were derived from first principles; each corresponds to an
 established idea, named below so the reasoning is checkable against the literature rather

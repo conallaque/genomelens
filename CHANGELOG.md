@@ -6,6 +6,47 @@ All notable changes to this project are documented here. Format inspired by
 
 ---
 
+## [7.0.0] — 2026-08-23 — Economic model rebuilt on cited parameters
+
+Most dollar figures changed, several went down substantially.
+
+### Added
+- Parameter registry — source, PMID/DOI, distribution and provenance tier per parameter
+- Pooled cost–utility engine — findings combined on the risk scale, not summed
+- Cost, QALYs, ICER and INMB reported separately
+- Cohort state-transition model against the US life table
+- PSA, CEAC, tornado, EVPI, EVPPI, breakeven
+- Efficiency frontier with extended dominance
+- Second Panel dual perspective, impact inventory, CHEERS 2022 checklist
+- Subgroup analysis by age and sex; equity-weighted distributional analysis
+- Prospective estimate of whole-genome sequencing value
+- Plain-language layer — number needed to screen, healthy days, payback period
+- mtDNA maternal lineage chain with per-branch evidence
+
+### Changed
+- Coverage reported against the whole model: ~350 parameters, 47% PMID/DOI, 99% sourced
+- One budget-impact analysis, under ISPOR conventions
+- The two cohort models scoped explicitly in `docs/METHODS.md` §20
+- Withdrew the ≈$24,070 GIAB headline rather than updating it — not re-run since
+
+### Fixed
+- Eight finding sources summed onto one anchor, claiming a 79% risk reduction
+- Same genotype valued twice across panels
+- Unsourced longevity term producing 54% of the total on one genome
+- Reproductive findings monetised against stated policy
+- PSA reported cost-saving in 100% of runs — parameters pinned outside the loop
+- Seven conditions sharing one QALY decrement
+- Negative ICER reported alongside a "dominant" verdict
+- EVPPI exceeding EVPI
+- Budget impact crediting decades of savings to five years
+- Strategy comparison built from hard-coded multipliers, on the wrong cost basis
+- mtDNA marker at 12705 inverted; I/W/X reachable under R instead of N
+
+### Tests
+- 562 → 729
+
+---
+
 ## [6.23.0] — 2026-07-30 — Phase 3 predictors + Value-of-Information health-economics engine
 
 ### Added
