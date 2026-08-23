@@ -2,13 +2,15 @@
 build-gated back-fill, and VCF profiling."""
 
 from __future__ import annotations
-import tempfile, os
+
+import os
+import tempfile
+
 import pandas as pd
 import pytest
 
 import genome_input as gi
 import snp_registry as reg
-
 
 # ── genotype conversion rules (one case per rule) ─────────────────────────────
 

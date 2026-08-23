@@ -19,7 +19,6 @@ defaults.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple
 import pandas as pd
 
 try:
@@ -32,7 +31,7 @@ except ImportError:
     analyze_exercise_protocols = None
 
 
-def _gt(snps_df: Optional[pd.DataFrame], rsid: str) -> Optional[str]:
+def _gt(snps_df: pd.DataFrame | None, rsid: str) -> str | None:
     if snps_df is None or rsid not in snps_df.index:
         return None
     raw = snps_df.loc[rsid].get("genotype")
@@ -46,14 +45,14 @@ def _gt(snps_df: Optional[pd.DataFrame], rsid: str) -> Optional[str]:
 
 # ── Power vs endurance ──────────────────────────────────────────────────────
 
-def _analyze_power_endurance(snps_df) -> Dict:
+def _analyze_power_endurance(snps_df) -> dict:
     actn3 = _gt(snps_df, "rs1815739")        # C=R (power), T=X (stop codon)
     ace = _gt(snps_df, "rs4646994") or _gt(snps_df, "rs4341")   # I/D proxy
     ppargc1a = _gt(snps_df, "rs8192678")     # G=Gly482, A=Ser482 (lower endurance trainability)
 
     power_score = 0
     endurance_score = 0
-    factors: List[str] = []
+    factors: list[str] = []
 
     if actn3:
         if actn3.count("C") == 2:
@@ -140,11 +139,11 @@ def _analyze_power_endurance(snps_df) -> Dict:
 
 # ── Injury risk ─────────────────────────────────────────────────────────────
 
-def _analyze_injury_risk(snps_df) -> Dict:
+def _analyze_injury_risk(snps_df) -> dict:
     col1a1 = _gt(snps_df, "rs1800012")       # Sp1 site; T allele = soft-tissue risk
     col5a1 = _gt(snps_df, "rs12722")         # CC vs TT; T = better tendon, C = stiffer
     mmp3 = _gt(snps_df, "rs679620")
-    risks: List[Dict] = []
+    risks: list[dict] = []
 
     if col1a1:
         if "T" in col1a1:                    # one or two T copies
@@ -164,7 +163,7 @@ def _analyze_injury_risk(snps_df) -> Dict:
             risks.append({
                 "tissue": "Achilles / patellar tendon",
                 "level": "Elevated",
-                "marker": f"rs12722 (COL5A1) CC",
+                "marker": "rs12722 (COL5A1) CC",
                 "mitigation": (
                     "Higher tendinopathy risk profile. Build eccentric calf/quad capacity "
                     "(slow heel drops, decline squats). Avoid sudden volume jumps in running."
@@ -174,7 +173,7 @@ def _analyze_injury_risk(snps_df) -> Dict:
             risks.append({
                 "tissue": "Achilles / patellar tendon",
                 "level": "Protective",
-                "marker": f"rs12722 (COL5A1) TT",
+                "marker": "rs12722 (COL5A1) TT",
                 "mitigation": "Favourable tendon-stiffness profile — running economy advantage.",
             })
 
@@ -199,13 +198,13 @@ def _analyze_injury_risk(snps_df) -> Dict:
 
 # ── Recovery / inflammation ─────────────────────────────────────────────────
 
-def _analyze_recovery(snps_df) -> Dict:
+def _analyze_recovery(snps_df) -> dict:
     il6 = _gt(snps_df, "rs1800795")
     crp = _gt(snps_df, "rs2794520") or _gt(snps_df, "rs1205")
     sod2 = _gt(snps_df, "rs4880")
 
     inflam_score = 0
-    notes: List[str] = []
+    notes: list[str] = []
 
     if il6:
         if "G" in il6 and il6.count("G") == 2:
@@ -254,11 +253,11 @@ def _analyze_recovery(snps_df) -> Dict:
 
 # ── Chronotype / training window ────────────────────────────────────────────
 
-def _analyze_chronotype(snps_df) -> Dict:
+def _analyze_chronotype(snps_df) -> dict:
     clock = _gt(snps_df, "rs1801260")       # T=evening, C=morning (3111C)
     per3 = _gt(snps_df, "rs228697")
 
-    factors: List[str] = []
+    factors: list[str] = []
     score = 0  # negative = morning, positive = evening
     if clock:
         if "T" in clock and clock.count("T") == 2:
@@ -308,7 +307,7 @@ def _analyze_chronotype(snps_df) -> Dict:
 
 # ── BDNF / cognitive exercise benefits ──────────────────────────────────────
 
-def _analyze_cognitive_exercise(snps_df) -> Dict:
+def _analyze_cognitive_exercise(snps_df) -> dict:
     bdnf = _gt(snps_df, "rs6265")           # Val66Met; A = Met (reduced activity-dependent secretion)
     if not bdnf:
         return {
@@ -360,10 +359,10 @@ def _analyze_cognitive_exercise(snps_df) -> Dict:
 
 # ── Weekly template synthesis ───────────────────────────────────────────────
 
-def _build_weekly_template(power_endurance: Dict, recovery: Dict, chronotype: Dict) -> List[Dict]:
+def _build_weekly_template(power_endurance: dict, recovery: dict, chronotype: dict) -> list[dict]:
     bias = power_endurance["bias"]
     fast_recovery = recovery["speed"] == "Fast"
-    days: List[Dict] = []
+    days: list[dict] = []
     window = chronotype.get("optimal_window", "")
 
     if bias.startswith("Power"):
@@ -413,12 +412,12 @@ def _build_weekly_template(power_endurance: Dict, recovery: Dict, chronotype: Di
 
 # ── VO2max trainability ─────────────────────────────────────────────────────
 
-def _analyze_vo2max_trainability(snps_df) -> Dict:
+def _analyze_vo2max_trainability(snps_df) -> dict:
     vegfa = _gt(snps_df, "rs2010963")
     hif1a = _gt(snps_df, "rs11549465")
     adrb2 = _gt(snps_df, "rs1042713")
     nrf2 = _gt(snps_df, "rs7181866")
-    factors: List[str] = []
+    factors: list[str] = []
     score = 0
     if vegfa:
         factors.append(f"rs2010963 (VEGFA) {vegfa}")
@@ -464,11 +463,11 @@ def _analyze_vo2max_trainability(snps_df) -> Dict:
 
 # ── Strength trainability (MSTN / IGF1 / ACVR1B) ────────────────────────────
 
-def _analyze_strength_trainability(snps_df) -> Dict:
+def _analyze_strength_trainability(snps_df) -> dict:
     mstn = _gt(snps_df, "rs1805086")
     igf1 = _gt(snps_df, "rs35767")
     actn3 = _gt(snps_df, "rs1815739")
-    factors: List[str] = []
+    factors: list[str] = []
     score = 0
     if mstn:
         factors.append(f"rs1805086 (MSTN) {mstn}")
@@ -506,11 +505,11 @@ def _analyze_strength_trainability(snps_df) -> Dict:
 
 # ── Fat-loss response to exercise (FTO + ADRB2/ADRB3) ───────────────────────
 
-def _analyze_fat_loss_response(snps_df) -> Dict:
+def _analyze_fat_loss_response(snps_df) -> dict:
     fto = _gt(snps_df, "rs9939609")
     adrb2_27 = _gt(snps_df, "rs1042714")
     adrb3 = _gt(snps_df, "rs4994")
-    factors: List[str] = []
+    factors: list[str] = []
     fto_risk = False
     if fto:
         factors.append(f"rs9939609 (FTO) {fto}")
@@ -539,10 +538,10 @@ def _analyze_fat_loss_response(snps_df) -> Dict:
 
 # ── Pain tolerance (COMT, OPRM1) ────────────────────────────────────────────
 
-def _analyze_pain_tolerance(snps_df) -> Dict:
+def _analyze_pain_tolerance(snps_df) -> dict:
     comt = _gt(snps_df, "rs4680")
     oprm1 = _gt(snps_df, "rs1799971")
-    factors: List[str] = []
+    factors: list[str] = []
     tolerance = "Average"
     if comt:
         factors.append(f"rs4680 (COMT Val158Met) {comt}")
@@ -575,17 +574,17 @@ def _analyze_pain_tolerance(snps_df) -> Dict:
 
 # ── Motivation / adherence (DRD2, COMT, dopamine) ───────────────────────────
 
-def _analyze_motivation(snps_df) -> Dict:
+def _analyze_motivation(snps_df) -> dict:
     drd2 = _gt(snps_df, "rs1800497")  # A1 allele = lower D2 receptor density
     comt = _gt(snps_df, "rs4680")
-    factors: List[str] = []
+    factors: list[str] = []
     low_drive = False
     if drd2:
         factors.append(f"rs1800497 (DRD2 Taq1A) {drd2}")
         if "A" in drd2:
             low_drive = True
     if comt and "G" in comt and comt.count("G") == 2:
-        factors.append(f"rs4680 (COMT Val/Val) — fast dopamine clearance")
+        factors.append("rs4680 (COMT Val/Val) — fast dopamine clearance")
     if low_drive:
         guidance = (
             "Reduced D2 receptor density — exercise-induced 'reward' feels muted and "
@@ -607,9 +606,9 @@ def _analyze_motivation(snps_df) -> Dict:
 
 # ── Caffeine ergogenic response (CYP1A2 for performance) ────────────────────
 
-def _analyze_caffeine_ergogenic(snps_df) -> Dict:
+def _analyze_caffeine_ergogenic(snps_df) -> dict:
     cyp1a2 = _gt(snps_df, "rs762551")
-    factors: List[str] = []
+    factors: list[str] = []
     if not cyp1a2:
         return {"responder": "Unknown",
                 "factors": ["CYP1A2 not typed"],
@@ -641,10 +640,10 @@ def _analyze_caffeine_ergogenic(snps_df) -> Dict:
 
 # ── Sleep need / recovery quality ───────────────────────────────────────────
 
-def _analyze_sleep(snps_df) -> Dict:
+def _analyze_sleep(snps_df) -> dict:
     ada = _gt(snps_df, "rs73598374")
     per3_vntr = _gt(snps_df, "rs57875989")
-    factors: List[str] = []
+    factors: list[str] = []
     deep_sleep = "Average"
     if ada:
         factors.append(f"rs73598374 (ADA) {ada}")
@@ -664,10 +663,10 @@ def _analyze_sleep(snps_df) -> Dict:
 
 # ── Iron-endurance interaction (HFE) ────────────────────────────────────────
 
-def _analyze_iron_endurance(snps_df) -> Dict:
+def _analyze_iron_endurance(snps_df) -> dict:
     c282y = _gt(snps_df, "rs1800562")
     h63d = _gt(snps_df, "rs1799945")
-    factors: List[str] = []
+    factors: list[str] = []
     risk = False
     if c282y and "A" in c282y:
         factors.append(f"rs1800562 (HFE C282Y) {c282y}")
@@ -694,10 +693,10 @@ def _analyze_iron_endurance(snps_df) -> Dict:
 
 # ── Stress fracture / bone health ───────────────────────────────────────────
 
-def _analyze_stress_fracture(snps_df) -> Dict:
+def _analyze_stress_fracture(snps_df) -> dict:
     vdr_fok = _gt(snps_df, "rs2228570")
     col1a1 = _gt(snps_df, "rs1800012")
-    factors: List[str] = []
+    factors: list[str] = []
     risk = False
     if vdr_fok:
         factors.append(f"rs2228570 (VDR FokI) {vdr_fok}")
@@ -722,7 +721,7 @@ def _analyze_stress_fracture(snps_df) -> Dict:
 
 # ── HR zones (formula-based since age not provided) ─────────────────────────
 
-def _hr_zones() -> Dict:
+def _hr_zones() -> dict:
     return {
         "formula": "HRmax ≈ 208 − 0.7 × age (Tanaka). Zones as % HRmax:",
         "zones": [
@@ -738,7 +737,7 @@ def _hr_zones() -> Dict:
 
 # ── Training nutrition (pre/intra/post) ─────────────────────────────────────
 
-def _training_nutrition(power_endurance: Dict, caffeine_erg: Dict) -> Dict:
+def _training_nutrition(power_endurance: dict, caffeine_erg: dict) -> dict:
     is_endurance = power_endurance["bias"].startswith("Endurance") or "endurance-leaning" in power_endurance["bias"]
     return {
         "pre_workout": (
@@ -762,7 +761,7 @@ def _training_nutrition(power_endurance: Dict, caffeine_erg: Dict) -> Dict:
 
 # ── Periodisation overview ──────────────────────────────────────────────────
 
-def _periodisation(power_endurance: Dict) -> List[Dict]:
+def _periodisation(power_endurance: dict) -> list[dict]:
     if power_endurance["bias"].startswith("Power"):
         return [
             {"phase": "Weeks 1–4 — Hypertrophy", "focus": "8–12 reps, 12–16 sets/muscle/wk, RPE 7–8"},
@@ -787,7 +786,7 @@ def _periodisation(power_endurance: Dict) -> List[Dict]:
 
 # ── Warm-up / mobility prescription ─────────────────────────────────────────
 
-def _warmup(injury_risk: Dict, power_endurance: Dict) -> Dict:
+def _warmup(injury_risk: dict, power_endurance: dict) -> dict:
     elevated = any("elev" in r["level"].lower() for r in injury_risk["risks"])
     base = [
         "5 min easy cardio (bike/row/jog) — raise core temp",
@@ -808,7 +807,7 @@ def _warmup(injury_risk: Dict, power_endurance: Dict) -> Dict:
 
 # ── Public API ──────────────────────────────────────────────────────────────
 
-def analyze_exercise(snps_df: Optional[pd.DataFrame]) -> Dict:
+def analyze_exercise(snps_df: pd.DataFrame | None) -> dict:
     if snps_df is None:
         return {"status": "no_data"}
 
@@ -859,14 +858,14 @@ def analyze_exercise(snps_df: Optional[pd.DataFrame]) -> Dict:
         try:
             advanced = analyze_advanced_exercise(snps_df, result)
             result.update(advanced)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             result["advanced_error"] = str(exc)
 
     if analyze_exercise_protocols is not None:
         try:
             protocols = analyze_exercise_protocols(result)
             result["protocols"] = protocols
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             result["protocols_error"] = str(exc)
 
     return result
@@ -926,7 +925,7 @@ def _risk_class(level: str) -> str:
     return "ex-risk-base"
 
 
-def _render_advanced_exercise(result: Dict) -> str:
+def _render_advanced_exercise(result: dict) -> str:
     profile = result.get("composite_profile")
     injury_map = result.get("injury_risk_map")
     readiness = result.get("daily_readiness")
@@ -1146,7 +1145,7 @@ def _render_advanced_exercise(result: Dict) -> str:
     return blob
 
 
-def _render_exercise_protocols(result: Dict) -> str:
+def _render_exercise_protocols(result: dict) -> str:
     p = result.get("protocols")
     if not p:
         return ""
@@ -1230,7 +1229,7 @@ def _render_exercise_protocols(result: Dict) -> str:
     if plans:
         cards = ""
 
-        def _week_body(w: Dict) -> str:
+        def _week_body(w: dict) -> str:
             # Week dicts are heterogeneous across sports: strength plans use
             # `schedule`(+`accessory`); endurance plans (marathon / cycling /
             # triathlon) use `weekly_mileage_km`(+`key_workouts`). Render every
@@ -1378,7 +1377,7 @@ def _render_exercise_protocols(result: Dict) -> str:
     return out
 
 
-def render_exercise_html(result: Dict, file_label: str = "") -> str:
+def render_exercise_html(result: dict, file_label: str = "") -> str:
     if not result or result.get("status") != "ok":
         return f"""<!DOCTYPE html><html><head><meta charset="utf-8"><title>Exercise</title>{_EX_CSS}</head><body>
 <div class="ex-wrap"><h1>Personalised Exercise Programming</h1>

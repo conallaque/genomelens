@@ -28,7 +28,6 @@ Output dict:
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
 import pandas as pd
 
 try:
@@ -41,7 +40,7 @@ except ImportError:
     analyze_nutrition_protocols = None
 
 
-def _gt(snps_df: Optional[pd.DataFrame], rsid: str) -> Optional[str]:
+def _gt(snps_df: pd.DataFrame | None, rsid: str) -> str | None:
     if snps_df is None or rsid not in snps_df.index:
         return None
     raw = snps_df.loc[rsid].get("genotype")
@@ -55,7 +54,7 @@ def _gt(snps_df: Optional[pd.DataFrame], rsid: str) -> Optional[str]:
 
 # ── Macronutrient ratios ────────────────────────────────────────────────────
 
-def _analyze_macros(snps_df) -> Dict:
+def _analyze_macros(snps_df) -> dict:
     fto = _gt(snps_df, "rs9939609")       # A = obesity risk
     tcf7l2 = _gt(snps_df, "rs7903146")     # T = T2D risk + worse carb response
     ppara = _gt(snps_df, "rs1800206")      # PPARA — fat metabolism
@@ -65,7 +64,7 @@ def _analyze_macros(snps_df) -> Dict:
 
     carb_pressure = 0
     fat_pressure = 0
-    factors: List[str] = []
+    factors: list[str] = []
 
     if fto:
         if "A" in fto:
@@ -83,7 +82,7 @@ def _analyze_macros(snps_df) -> Dict:
         # rs429358 C + rs7412 C = ε4 carrier — saturated-fat sensitive
         if "C" in apoe1 and "C" in apoe2:
             fat_pressure -= 1
-            factors.append(f"APOE ε4 carrier — lower saturated fat, prefer mono/poly")
+            factors.append("APOE ε4 carrier — lower saturated fat, prefer mono/poly")
 
     if fads and "T" in fads:
         factors.append(f"rs174547 (FADS1) {fads} — favour direct EPA/DHA from fish, not ALA")
@@ -122,7 +121,7 @@ def _analyze_macros(snps_df) -> Dict:
 
 # ── Caffeine ────────────────────────────────────────────────────────────────
 
-def _analyze_caffeine(snps_df) -> Dict:
+def _analyze_caffeine(snps_df) -> dict:
     cyp1a2 = _gt(snps_df, "rs762551")     # A allele = fast metaboliser
     adora2a = _gt(snps_df, "rs5751876")    # T allele = anxiety-prone with caffeine
 
@@ -179,22 +178,22 @@ def _analyze_caffeine(snps_df) -> Dict:
 
 # ── Alcohol ─────────────────────────────────────────────────────────────────
 
-def _analyze_alcohol(snps_df) -> Dict:
+def _analyze_alcohol(snps_df) -> dict:
     aldh2 = _gt(snps_df, "rs671")          # A allele (East Asian variant) → flushing
     adh1b = _gt(snps_df, "rs1229984")      # A allele → fast ethanol→acetaldehyde
-    factors: List[str] = []
+    factors: list[str] = []
     risk = "Standard"
 
     if aldh2 and "A" in aldh2:
         if aldh2.count("A") == 2:
             risk = "Avoid entirely"
-            factors.append(f"rs671 (ALDH2*2/*2) — non-functional ALDH2; acetaldehyde toxic accumulation")
+            factors.append("rs671 (ALDH2*2/*2) — non-functional ALDH2; acetaldehyde toxic accumulation")
         else:
             risk = "Strongly limit"
-            factors.append(f"rs671 (ALDH2*1/*2) — partial deficiency; flushing, cancer-risk elevated")
+            factors.append("rs671 (ALDH2*1/*2) — partial deficiency; flushing, cancer-risk elevated")
 
     if adh1b and "A" in adh1b:
-        factors.append(f"rs1229984 (ADH1B*2) — fast acetaldehyde production; aldehyde load higher")
+        factors.append("rs1229984 (ADH1B*2) — fast acetaldehyde production; aldehyde load higher")
         if risk == "Standard":
             risk = "Reduce"
 
@@ -220,10 +219,10 @@ def _analyze_alcohol(snps_df) -> Dict:
 
 # ── Salt sensitivity ────────────────────────────────────────────────────────
 
-def _analyze_salt(snps_df) -> Dict:
+def _analyze_salt(snps_df) -> dict:
     ace = _gt(snps_df, "rs4341") or _gt(snps_df, "rs4646994")
     agt = _gt(snps_df, "rs699")         # AGT M235T; T = salt-sensitive
-    factors: List[str] = []
+    factors: list[str] = []
     sensitive = False
     if agt and "G" in agt:
         sensitive = True
@@ -246,7 +245,7 @@ def _analyze_salt(snps_df) -> Dict:
 
 # ── Lactose ─────────────────────────────────────────────────────────────────
 
-def _analyze_lactose(snps_df) -> Dict:
+def _analyze_lactose(snps_df) -> dict:
     lct = _gt(snps_df, "rs4988235")        # T = persistence; CC = intolerant
     if not lct:
         return {"tolerance": "Unknown", "factors": ["LCT rs4988235 not typed"],
@@ -273,11 +272,11 @@ def _analyze_lactose(snps_df) -> Dict:
 
 # ── Gluten / DQ2-DQ8 risk ───────────────────────────────────────────────────
 
-def _analyze_gluten(snps_df) -> Dict:
+def _analyze_gluten(snps_df) -> dict:
     dq2 = _gt(snps_df, "rs2187668")        # HLA-DQ2.5 tag
     dq8 = _gt(snps_df, "rs7454108")        # HLA-DQ8 tag
     carrier = (dq2 and "T" in dq2) or (dq8 and "C" in dq8)
-    factors: List[str] = []
+    factors: list[str] = []
     if dq2:
         factors.append(f"rs2187668 (HLA-DQ2 tag) {dq2}")
     if dq8:
@@ -298,10 +297,10 @@ def _analyze_gluten(snps_df) -> Dict:
 
 # ── Methylation diet ────────────────────────────────────────────────────────
 
-def _analyze_methylation_diet(snps_df) -> Dict:
+def _analyze_methylation_diet(snps_df) -> dict:
     mthfr_c677t = _gt(snps_df, "rs1801133")
     mthfr_a1298c = _gt(snps_df, "rs1801131")
-    factors: List[str] = []
+    factors: list[str] = []
     needs_extra = False
     if mthfr_c677t:
         factors.append(f"rs1801133 (MTHFR C677T) {mthfr_c677t}")
@@ -328,7 +327,7 @@ def _analyze_methylation_diet(snps_df) -> Dict:
 
 # ── Vitamin D from food ─────────────────────────────────────────────────────
 
-def _analyze_vitamin_d_food(snps_df) -> Dict:
+def _analyze_vitamin_d_food(snps_df) -> dict:
     cyp = _gt(snps_df, "rs10741657")
     gc = _gt(snps_df, "rs2282679")
     vdr_fok = _gt(snps_df, "rs2228570")
@@ -357,9 +356,9 @@ def _analyze_vitamin_d_food(snps_df) -> Dict:
 
 # ── Foods to emphasise / avoid (synthesised) ───────────────────────────────
 
-def _build_food_lists(macros: Dict, alcohol: Dict, lactose: Dict, salt: Dict, gluten: Dict) -> Dict:
-    emphasise: List[str] = []
-    avoid: List[str] = []
+def _build_food_lists(macros: dict, alcohol: dict, lactose: dict, salt: dict, gluten: dict) -> dict:
+    emphasise: list[str] = []
+    avoid: list[str] = []
 
     if macros["pct_carbs"] <= 35:
         avoid.extend(["Sugary drinks", "White bread / pastries", "Sweetened breakfast cereals"])
@@ -388,7 +387,7 @@ def _build_food_lists(macros: Dict, alcohol: Dict, lactose: Dict, salt: Dict, gl
 
 # ── Daily template ──────────────────────────────────────────────────────────
 
-def _build_daily_template(macros: Dict, caffeine: Dict, alcohol: Dict) -> List[Dict]:
+def _build_daily_template(macros: dict, caffeine: dict, alcohol: dict) -> list[dict]:
     low_carb = macros["pct_carbs"] <= 35
     return [
         {"meal": "Breakfast", "example": (
@@ -418,11 +417,11 @@ def _build_daily_template(macros: Dict, caffeine: Dict, alcohol: Dict) -> List[D
 
 # ── Omega-3 (FADS1/FADS2 ALA→EPA/DHA conversion) ────────────────────────────
 
-def _analyze_omega3(snps_df) -> Dict:
+def _analyze_omega3(snps_df) -> dict:
     fads1 = _gt(snps_df, "rs174547")
     fads2 = _gt(snps_df, "rs174537") or _gt(snps_df, "rs174575")
     elovl2 = _gt(snps_df, "rs953413")
-    factors: List[str] = []
+    factors: list[str] = []
     poor = False
     if fads1:
         factors.append(f"rs174547 (FADS1) {fads1}")
@@ -462,11 +461,11 @@ def _analyze_omega3(snps_df) -> Dict:
 
 # ── Iron overload risk (hemochromatosis) ────────────────────────────────────
 
-def _analyze_iron(snps_df) -> Dict:
+def _analyze_iron(snps_df) -> dict:
     c282y = _gt(snps_df, "rs1800562")
     h63d = _gt(snps_df, "rs1799945")
     tmprss6 = _gt(snps_df, "rs855791")
-    factors: List[str] = []
+    factors: list[str] = []
     overload = "Low"
     if c282y:
         factors.append(f"rs1800562 (HFE C282Y) {c282y}")
@@ -511,10 +510,10 @@ def _analyze_iron(snps_df) -> Dict:
 
 # ── Choline (PEMT) ──────────────────────────────────────────────────────────
 
-def _analyze_choline(snps_df) -> Dict:
+def _analyze_choline(snps_df) -> dict:
     pemt = _gt(snps_df, "rs7946")
     mthfd1 = _gt(snps_df, "rs2236225")
-    factors: List[str] = []
+    factors: list[str] = []
     needs = False
     if pemt:
         factors.append(f"rs7946 (PEMT) {pemt}")
@@ -542,10 +541,10 @@ def _analyze_choline(snps_df) -> Dict:
 
 # ── Vitamin B12 (FUT2 secretor status, TCN2) ────────────────────────────────
 
-def _analyze_b12(snps_df) -> Dict:
+def _analyze_b12(snps_df) -> dict:
     fut2 = _gt(snps_df, "rs601338")
     tcn2 = _gt(snps_df, "rs1801198")
-    factors: List[str] = []
+    factors: list[str] = []
     lower_status = False
     if fut2:
         factors.append(f"rs601338 (FUT2 secretor) {fut2}")
@@ -572,10 +571,10 @@ def _analyze_b12(snps_df) -> Dict:
 
 # ── Vitamin A conversion (BCO1) ─────────────────────────────────────────────
 
-def _analyze_vitamin_a(snps_df) -> Dict:
+def _analyze_vitamin_a(snps_df) -> dict:
     bco1a = _gt(snps_df, "rs7501331")
     bco1b = _gt(snps_df, "rs12934922")
-    factors: List[str] = []
+    factors: list[str] = []
     poor = False
     if bco1a:
         factors.append(f"rs7501331 (BCO1) {bco1a}")
@@ -602,10 +601,10 @@ def _analyze_vitamin_a(snps_df) -> Dict:
 
 # ── Vitamin C, E ────────────────────────────────────────────────────────────
 
-def _analyze_vitamin_c(snps_df) -> Dict:
+def _analyze_vitamin_c(snps_df) -> dict:
     slc = _gt(snps_df, "rs33972313") or _gt(snps_df, "rs6596473")
     haptoglobin = _gt(snps_df, "rs72294371")
-    factors: List[str] = []
+    factors: list[str] = []
     higher_need = False
     if slc:
         factors.append(f"SLC23A1/A2 {slc}")
@@ -625,9 +624,9 @@ def _analyze_vitamin_c(snps_df) -> Dict:
     }
 
 
-def _analyze_vitamin_e(snps_df) -> Dict:
+def _analyze_vitamin_e(snps_df) -> dict:
     cyp4f2 = _gt(snps_df, "rs2108622")
-    factors: List[str] = []
+    factors: list[str] = []
     higher = False
     if cyp4f2:
         factors.append(f"rs2108622 (CYP4F2) {cyp4f2}")
@@ -648,11 +647,11 @@ def _analyze_vitamin_e(snps_df) -> Dict:
 
 # ── Taste perception (TAS2R38 bitter, CD36 fat, sweet preference) ───────────
 
-def _analyze_taste(snps_df) -> Dict:
+def _analyze_taste(snps_df) -> dict:
     tas2r38 = _gt(snps_df, "rs713598")          # G = PAV taster, C = AVI non-taster
     cd36 = _gt(snps_df, "rs1761667")            # A = poor fat-taste sensitivity
     sweet = _gt(snps_df, "rs35874116")          # TAS1R2
-    factors: List[str] = []
+    factors: list[str] = []
     bitter = "Unknown"
     fat_taste = "Unknown"
     if tas2r38:
@@ -698,11 +697,11 @@ def _analyze_taste(snps_df) -> Dict:
 
 # ── Satiety / appetite (FTO, MC4R, LEPR) ────────────────────────────────────
 
-def _analyze_satiety(snps_df) -> Dict:
+def _analyze_satiety(snps_df) -> dict:
     fto = _gt(snps_df, "rs9939609")
     mc4r = _gt(snps_df, "rs17782313")
     lepr = _gt(snps_df, "rs1137101")
-    factors: List[str] = []
+    factors: list[str] = []
     appetite = "Standard"
     score = 0
     if fto:
@@ -743,11 +742,11 @@ def _analyze_satiety(snps_df) -> Dict:
 
 # ── Saturated-fat sub-typing (APOE detailed + APOA2) ────────────────────────
 
-def _analyze_saturated_fat(snps_df) -> Dict:
+def _analyze_saturated_fat(snps_df) -> dict:
     apoe1 = _gt(snps_df, "rs429358")
     apoe2 = _gt(snps_df, "rs7412")
     apoa2 = _gt(snps_df, "rs5082")
-    factors: List[str] = []
+    factors: list[str] = []
     apoe_geno = "Unknown"
     if apoe1 and apoe2:
         # ε2: rs429358 T + rs7412 T; ε3: T+C; ε4: C+C
@@ -760,7 +759,7 @@ def _analyze_saturated_fat(snps_df) -> Dict:
         else:
             apoe_geno = "ε3/ε3 (typical)"
         factors.append(f"APOE: rs429358={apoe1}, rs7412={apoe2} ({apoe_geno})")
-    high_sat_risk = "C" in (apoe1 or "") and not ("T" in (apoe2 or ""))
+    high_sat_risk = "C" in (apoe1 or "") and "T" not in (apoe2 or "")
     if apoa2:
         factors.append(f"rs5082 (APOA2) {apoa2}")
     sat_cap_g = 15 if high_sat_risk else 22  # ~7% vs ~10% of 2000 kcal
@@ -788,10 +787,10 @@ def _analyze_saturated_fat(snps_df) -> Dict:
 
 # ── Meal-timing / chrononutrition ───────────────────────────────────────────
 
-def _analyze_meal_timing(snps_df) -> Dict:
+def _analyze_meal_timing(snps_df) -> dict:
     clock = _gt(snps_df, "rs1801260")
     melatonin = _gt(snps_df, "rs10830963")  # MTNR1B G allele = impaired glucose tolerance evening
-    factors: List[str] = []
+    factors: list[str] = []
     eating_window = "08:00–20:00"
     note = ""
     if clock:
@@ -818,11 +817,11 @@ def _analyze_meal_timing(snps_df) -> Dict:
 
 # ── Antioxidant capacity ────────────────────────────────────────────────────
 
-def _analyze_antioxidants(snps_df) -> Dict:
+def _analyze_antioxidants(snps_df) -> dict:
     sod2 = _gt(snps_df, "rs4880")
     gpx1 = _gt(snps_df, "rs1050450")
     nqo1 = _gt(snps_df, "rs1800566")
-    factors: List[str] = []
+    factors: list[str] = []
     low = 0
     if sod2:
         factors.append(f"rs4880 (SOD2 Ala16Val) {sod2}")
@@ -856,9 +855,9 @@ def _analyze_antioxidants(snps_df) -> Dict:
 
 # ── Fiber target ────────────────────────────────────────────────────────────
 
-def _analyze_fiber(snps_df, macros: Dict, satiety: Dict, salt: Dict) -> Dict:
+def _analyze_fiber(snps_df, macros: dict, satiety: dict, salt: dict) -> dict:
     base = 38  # men default
-    extra: List[str] = []
+    extra: list[str] = []
     if macros["pct_carbs"] >= 50:
         base = 45
         extra.append("Higher-carb prescription — push fibre to anchor glycemic response.")
@@ -881,7 +880,7 @@ def _analyze_fiber(snps_df, macros: Dict, satiety: Dict, salt: Dict) -> Dict:
 
 # ── Hydration ───────────────────────────────────────────────────────────────
 
-def _analyze_hydration(snps_df, salt: Dict) -> Dict:
+def _analyze_hydration(snps_df, salt: dict) -> dict:
     avp = _gt(snps_df, "rs1042615")
     note = "Baseline: 30–35 mL/kg body weight daily, +500–750 mL per hour exercise."
     if salt["sensitive"]:
@@ -895,7 +894,7 @@ def _analyze_hydration(snps_df, salt: Dict) -> Dict:
 
 # ── Caloric framework (no body data, give worksheet) ────────────────────────
 
-def _caloric_framework(macros: Dict, satiety: Dict) -> Dict:
+def _caloric_framework(macros: dict, satiety: dict) -> dict:
     return {
         "tdee_formula": "Mifflin-St Jeor: BMR(♂) = 10·kg + 6.25·cm − 5·age + 5; (♀) −161. TDEE = BMR × activity (1.4 sedentary, 1.55 moderate, 1.75 active, 1.9 athlete).",
         "loss_deficit_kcal": 400 if satiety["appetite_phenotype"] != "Standard" else 500,
@@ -912,7 +911,7 @@ def _caloric_framework(macros: Dict, satiety: Dict) -> Dict:
 
 # ── Public API ──────────────────────────────────────────────────────────────
 
-def analyze_nutrition(snps_df: Optional[pd.DataFrame]) -> Dict:
+def analyze_nutrition(snps_df: pd.DataFrame | None) -> dict:
     if snps_df is None:
         return {"status": "no_data"}
 
@@ -991,14 +990,14 @@ def analyze_nutrition(snps_df: Optional[pd.DataFrame]) -> Dict:
         try:
             advanced = analyze_advanced_nutrition(snps_df, result)
             result.update(advanced)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             result["advanced_error"] = str(exc)
 
     if analyze_nutrition_protocols is not None:
         try:
             protocols = analyze_nutrition_protocols(result)
             result["protocols"] = protocols
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             result["protocols_error"] = str(exc)
 
     return result
@@ -1050,7 +1049,7 @@ table.nu th { background:#f9f9f9; }
 """
 
 
-def _render_advanced_sections(result: Dict) -> str:
+def _render_advanced_sections(result: dict) -> str:
     pgs = result.get("polygenic_scores")
     dash = result.get("cardiometabolic_dashboard")
     inflam = result.get("inflammation")
@@ -1228,7 +1227,7 @@ def _render_advanced_sections(result: Dict) -> str:
     return advanced_blob
 
 
-def _render_protocols(result: Dict) -> str:
+def _render_protocols(result: dict) -> str:
     p = result.get("protocols")
     if not p:
         return ""
@@ -1422,7 +1421,7 @@ Peak ≥140 mg/dL = caution; ≥180 = restructure.</p>
     return out
 
 
-def render_nutrition_html(result: Dict, file_label: str = "") -> str:
+def render_nutrition_html(result: dict, file_label: str = "") -> str:
     if not result or result.get("status") != "ok":
         return f"""<!DOCTYPE html><html><head><meta charset="utf-8"><title>Nutrition</title>{_NU_CSS}</head>
 <body><div class="nu-wrap"><h1>Personalised Nutrition Plan</h1>

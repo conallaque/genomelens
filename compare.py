@@ -21,18 +21,17 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 
-def _load(path: Path) -> Dict:
+def _load(path: Path) -> dict:
     return json.loads(Path(path).read_text())
 
 
-def _variants_by_rsid(data: Dict) -> Dict[str, Dict]:
+def _variants_by_rsid(data: dict) -> dict[str, dict]:
     return {v["rsid"]: v for v in data.get("variants", [])}
 
 
-def diff_runs(prev_path: Path, curr_path: Path) -> Dict:
+def diff_runs(prev_path: Path, curr_path: Path) -> dict:
     """Compute the diff between two tier1_results.json files."""
     try:
         prev = _load(prev_path)
@@ -50,7 +49,7 @@ def diff_runs(prev_path: Path, curr_path: Path) -> Dict:
     removed_rsids = sorted(set(prev_v) - set(curr_v))
     common_rsids = sorted(set(prev_v) & set(curr_v))
 
-    new_variants: List[Dict] = []
+    new_variants: list[dict] = []
     for r in new_rsids:
         v = curr_v[r]
         new_variants.append({
@@ -62,7 +61,7 @@ def diff_runs(prev_path: Path, curr_path: Path) -> Dict:
             "significance": v.get("significance"),
         })
 
-    removed_variants: List[Dict] = []
+    removed_variants: list[dict] = []
     for r in removed_rsids:
         v = prev_v[r]
         removed_variants.append({
@@ -72,9 +71,9 @@ def diff_runs(prev_path: Path, curr_path: Path) -> Dict:
             "category": v.get("category"),
         })
 
-    changed_significance: List[Dict] = []
-    changed_category: List[Dict] = []
-    changed_risk_copies: List[Dict] = []
+    changed_significance: list[dict] = []
+    changed_category: list[dict] = []
+    changed_risk_copies: list[dict] = []
     for r in common_rsids:
         a, b = prev_v[r], curr_v[r]
         if a.get("significance") != b.get("significance"):
@@ -96,7 +95,7 @@ def diff_runs(prev_path: Path, curr_path: Path) -> Dict:
     # PRS tier shifts
     prs_prev = prev.get("prs_summary") or {}
     prs_curr = curr.get("prs_summary") or {}
-    prs_changes: List[Dict] = []
+    prs_changes: list[dict] = []
     for name in sorted(set(prs_prev) | set(prs_curr)):
         a = (prs_prev.get(name) or {}).get("tier")
         b = (prs_curr.get(name) or {}).get("tier")
@@ -108,7 +107,7 @@ def diff_runs(prev_path: Path, curr_path: Path) -> Dict:
     # PGx phenotype shifts
     pgx_prev = prev.get("pgx_summary") or {}
     pgx_curr = curr.get("pgx_summary") or {}
-    pgx_changes: List[Dict] = []
+    pgx_changes: list[dict] = []
     for gene in sorted(set(pgx_prev) | set(pgx_curr)):
         a = (pgx_prev.get(gene) or {}).get("phenotype")
         b = (pgx_curr.get(gene) or {}).get("phenotype")
@@ -143,11 +142,11 @@ def diff_runs(prev_path: Path, curr_path: Path) -> Dict:
 
 
 # ── Pretty printer (terminal) ─────────────────────────────────────────────────
-def render_diff_text(diff: Dict) -> str:
+def render_diff_text(diff: dict) -> str:
     if "error" in diff:
         return diff["error"]
 
-    out: List[str] = []
+    out: list[str] = []
     def header(s: str) -> None:
         out.append(f"\n\033[1m{s}\033[0m")
         out.append("─" * len(s))

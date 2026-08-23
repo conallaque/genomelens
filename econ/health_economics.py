@@ -36,7 +36,6 @@ elevated. Missing data never raises; it just yields fewer findings.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
 import pandas as pd
 
 try:
@@ -70,7 +69,7 @@ DEFAULT_PAYER_MEMBERS = 100_000
 #   qaly_gain       — QALYs gained per averted event (cost-per-QALY)
 # Sources: CPIC guidelines + published PGx cost-effectiveness analyses;
 # rounded to order-of-magnitude. ROI is derived (outcome_value / cost).
-PGX_ECONOMICS: Dict[str, Dict] = {
+PGX_ECONOMICS: dict[str, dict] = {
     "CYP2C9": {
         "drug": "warfarin",
         "clinical_benefit": "Prevent major bleeding event from warfarin overdosing",
@@ -157,7 +156,7 @@ _ACTIONABLE_PGX_KEYWORDS = (
 # Keyed by the PRS panel name in prs_summary (and APOE handled separately).
 # Cost here is an *annual* program cost; outcome_value is the averted
 # event's value. Triggered when the polygenic tier is Elevated or High.
-PRS_ECONOMICS: Dict[str, Dict] = {
+PRS_ECONOMICS: dict[str, dict] = {
     "Coronary Artery Disease": {
         "finding": "Elevated coronary-artery-disease polygenic risk",
         "clinical_benefit": "Intensive lipid management (statin) to prevent MI",
@@ -219,7 +218,7 @@ PRS_ECONOMICS: Dict[str, Dict] = {
 # ─── Expanded PGS Catalog economics (conditions beyond the core PRS panels) ──
 # These map to conditions scored by pgs_catalog.py that are NOT already in
 # PRS_ECONOMICS. Keyed by the label string from pgs_catalog.CONDITIONS.
-EXPANDED_PGS_ECONOMICS: Dict[str, Dict] = {
+EXPANDED_PGS_ECONOMICS: dict[str, dict] = {
     "Hypertension / Systolic BP": {
         "finding": "Elevated hypertension polygenic risk",
         "clinical_benefit": "Early antihypertensive therapy + lifestyle modification",
@@ -280,7 +279,7 @@ EXPANDED_PGS_ECONOMICS: Dict[str, Dict] = {
 
 # ─── HLA drug-hypersensitivity economics ────────────────────────────────────
 # Keyed by allele name as it appears in hla_result["carrier_alleles"].
-HLA_ECONOMICS: Dict[str, Dict] = {
+HLA_ECONOMICS: dict[str, dict] = {
     "HLA-B*58:01": {
         "finding": "HLA-B*58:01 carrier — allopurinol hypersensitivity risk",
         "clinical_benefit": "Avoid allopurinol SJS/TEN (use febuxostat instead)",
@@ -308,7 +307,7 @@ HLA_ECONOMICS: Dict[str, Dict] = {
 }
 
 # ─── Carrier-screening economics (per condition affected/carrier) ────────────
-CARRIER_ECONOMICS: Dict[str, Dict] = {
+CARRIER_ECONOMICS: dict[str, dict] = {
     "Hereditary Hemochromatosis (HH, type 1)": {
         "finding_affected": "HFE C282Y homozygous — hemochromatosis monitoring",
         "finding_carrier": "HFE C282Y carrier — reproductive awareness",
@@ -372,7 +371,7 @@ CARRIER_ECONOMICS: Dict[str, Dict] = {
 }
 
 # ─── Compound-interaction economics ──────────────────────────────────────────
-INTERACTION_ECONOMICS: Dict[str, Dict] = {
+INTERACTION_ECONOMICS: dict[str, dict] = {
     "MTHFR C677T Homozygous (T/T)": {
         "finding": "MTHFR 677TT — methylfolate supplementation",
         "clinical_benefit": "Prevent hyperhomocysteinemia-driven cardiovascular / fertility risk",
@@ -424,7 +423,7 @@ VO2MAX_ECONOMICS = {
 
 
 # ─── Addiction genetics economics (keyed by substance category) ────────────
-ADDICTION_ECONOMICS: Dict[str, Dict] = {
+ADDICTION_ECONOMICS: dict[str, dict] = {
     "Alcohol": {
         "finding": "Alcohol-metabolism susceptibility variant",
         "clinical_benefit": "Personalized AUD risk awareness + naltrexone/acamprosate matching",
@@ -463,7 +462,7 @@ ADDICTION_ECONOMICS: Dict[str, Dict] = {
 }
 
 # ─── Metal/oxidative stress economics (keyed by gene) ──────────────────────
-METAL_OXIDATIVE_ECONOMICS: Dict[str, Dict] = {
+METAL_OXIDATIVE_ECONOMICS: dict[str, dict] = {
     "G6PD": {
         "finding": "G6PD deficiency — oxidative drug avoidance",
         "clinical_benefit": "Avoid primaquine/dapsone/rasburicase hemolytic crisis",
@@ -488,7 +487,7 @@ METAL_OXIDATIVE_ECONOMICS: Dict[str, Dict] = {
 }
 
 # ─── Mendelian randomization outcome costs (maps MR outcome → healthcare cost) ─
-MR_OUTCOME_COSTS: Dict[str, Dict] = {
+MR_OUTCOME_COSTS: dict[str, dict] = {
     "CAD": {"cost": 85_000, "qaly_loss": 1.50, "baseline_10yr": 0.10,
             "src": "Heidenreich (2011) Circulation"},
     "T2D": {"cost": 85_000, "qaly_loss": 2.00, "baseline_10yr": 0.15,
@@ -508,7 +507,7 @@ MR_OUTCOME_COSTS: Dict[str, Dict] = {
 }
 
 # ─── Neurochemistry economics (keyed by gene) ─────────────────────────────
-NEUROCHEMISTRY_ECONOMICS: Dict[str, Dict] = {
+NEUROCHEMISTRY_ECONOMICS: dict[str, dict] = {
     "COMT": {
         "finding": "COMT Val158Met — psychiatric medication optimization",
         "clinical_benefit": "COMT-guided SSRI/SNRI selection (catecholamine clearance)",
@@ -540,7 +539,7 @@ NEUROCHEMISTRY_ECONOMICS: Dict[str, Dict] = {
 }
 
 # ─── Urologic/genitourinary economics (keyed by category) ─────────────────
-UROLOGIC_ECONOMICS: Dict[str, Dict] = {
+UROLOGIC_ECONOMICS: dict[str, dict] = {
     "BPH/Prostate": {
         "finding": "Prostate-risk variant — early screening",
         "clinical_benefit": "PRS-augmented PSA + MRI surveillance",
@@ -572,7 +571,7 @@ UROLOGIC_ECONOMICS: Dict[str, Dict] = {
 }
 
 # ─── ACMG actionable gene economics (ClinVar P/LP → intervention) ─────────
-ACMG_GENE_ECONOMICS: Dict[str, Dict] = {
+ACMG_GENE_ECONOMICS: dict[str, dict] = {
     "BRCA1": {"finding": "BRCA1 pathogenic variant", "cost": 2_000, "outcome_value": 150_000,
               "qaly_gain": 3.00, "clinical_benefit": "Enhanced screening + risk-reducing surgery option",
               "src": "Manchanda et al. (2015) J Clin Oncol"},
@@ -627,7 +626,7 @@ ACMG_GENE_ECONOMICS: Dict[str, Dict] = {
 }
 
 # ─── PheWAS extreme-tier category economics ───────────────────────────────
-PHEWAS_CATEGORY_ECONOMICS: Dict[str, Dict] = {
+PHEWAS_CATEGORY_ECONOMICS: dict[str, dict] = {
     "Lipids": {"finding": "Extreme-tier lipid prediction", "cost": 500,
                "outcome_value": 30_000, "qaly_gain": 0.50,
                "clinical_benefit": "Lipid-lowering therapy",
@@ -663,7 +662,7 @@ PHEWAS_CATEGORY_ECONOMICS: Dict[str, Dict] = {
 }
 
 # ─── Immunogenetics economics (keyed by gene) ─────────────────────────────
-IMMUNOGENETICS_ECONOMICS: Dict[str, Dict] = {
+IMMUNOGENETICS_ECONOMICS: dict[str, dict] = {
     "CCR5": {
         "finding": "CCR5-delta32 — HIV resistance",
         "clinical_benefit": "PrEP decision support (natural HIV resistance factor)",
@@ -688,7 +687,7 @@ IMMUNOGENETICS_ECONOMICS: Dict[str, Dict] = {
 }
 
 # ─── Wellness prediction economics (keyed by category) ────────────────────
-WELLNESS_ECONOMICS: Dict[str, Dict] = {
+WELLNESS_ECONOMICS: dict[str, dict] = {
     "Nutrition": {
         "finding": "Nutrient-metabolism variant — deficiency prevention",
         "clinical_benefit": "Targeted supplementation (vitamin D/B12/folate/iron)",
@@ -713,7 +712,7 @@ WELLNESS_ECONOMICS: Dict[str, Dict] = {
 }
 
 # ─── Detoxification economics (keyed by gene) ─────────────────────────────
-DETOX_ECONOMICS: Dict[str, Dict] = {
+DETOX_ECONOMICS: dict[str, dict] = {
     "NAT2": {
         "finding": "NAT2 slow acetylator — occupational cancer risk awareness",
         "clinical_benefit": "Aromatic amine exposure monitoring + bladder screening",
@@ -764,7 +763,7 @@ DISCLAIMER = (
 
 # ─── Core economic math ────────────────────────────────────────────────────
 
-def calculate_roi(cost: float, outcome_value: float) -> Optional[float]:
+def calculate_roi(cost: float, outcome_value: float) -> float | None:
     """ROI as a simple ratio (outcome value / cost). None if cost is zero."""
     if not cost or cost <= 0:
         return None
@@ -773,7 +772,7 @@ def calculate_roi(cost: float, outcome_value: float) -> Optional[float]:
 
 def calculate_payback_months(cost: float, outcome_value: float,
                              recurring_cost: bool = False,
-                             rate: float = DISCOUNT_RATE) -> Optional[float]:
+                             rate: float = DISCOUNT_RATE) -> float | None:
     """Months until cumulative discounted benefit exceeds cumulative cost.
 
     Walks month-by-month: benefit accrues at ``outcome_value / 12`` per month
@@ -830,7 +829,7 @@ def _econ_record(
     prevalence: float = 0.0,
     qaly_gain: float = 0.0,
     evidence: str = "",
-) -> Dict:
+) -> dict:
     """Assemble one finding's economics record with derived metrics."""
     return {
         "finding": finding,
@@ -860,8 +859,8 @@ def _is_actionable_pgx(phenotype: str) -> bool:
     return any(k in p for k in _ACTIONABLE_PGX_KEYWORDS)
 
 
-def _pgx_findings(pgx_summary: Dict) -> List[Dict]:
-    out: List[Dict] = []
+def _pgx_findings(pgx_summary: dict) -> list[dict]:
+    out: list[dict] = []
     for gene, info in (pgx_summary or {}).items():
         econ = PGX_ECONOMICS.get(gene)
         if econ is None:
@@ -891,8 +890,8 @@ def _pgx_findings(pgx_summary: Dict) -> List[Dict]:
     return out
 
 
-def _prs_findings(prs_summary: Dict) -> List[Dict]:
-    out: List[Dict] = []
+def _prs_findings(prs_summary: dict) -> list[dict]:
+    out: list[dict] = []
     for panel, info in (prs_summary or {}).items():
         econ = PRS_ECONOMICS.get(panel)
         if econ is None:
@@ -915,7 +914,7 @@ def _prs_findings(prs_summary: Dict) -> List[Dict]:
     return out
 
 
-def _apoe_genotype_from_snps(snps_df: Optional[pd.DataFrame]) -> Optional[str]:
+def _apoe_genotype_from_snps(snps_df: pd.DataFrame | None) -> str | None:
     """Best-effort APOE ε4 confirmation via the registry SNP, used only when
     the caller did not supply an apoe_genotype. Returns None if undetermined."""
     if snps_df is None or snp_registry is None:
@@ -932,13 +931,13 @@ def _apoe_genotype_from_snps(snps_df: Optional[pd.DataFrame]) -> Optional[str]:
     return None
 
 
-def _apoe_findings(apoe_genotype: Optional[str], snps_df) -> List[Dict]:
+def _apoe_findings(apoe_genotype: str | None, snps_df) -> list[dict]:
     geno = apoe_genotype
     confirm = ""
     if not geno:
         geno = _apoe_genotype_from_snps(snps_df)
         confirm = " (rs429358-derived)"
-    if not geno or "4" not in str(geno) and "e4" not in str(geno).lower():
+    if not geno or ("4" not in str(geno) and "e4" not in str(geno).lower()):
         return []
     e = APOE_E4_ECONOMICS
     return [_econ_record(
@@ -951,10 +950,10 @@ def _apoe_findings(apoe_genotype: Optional[str], snps_df) -> List[Dict]:
     )]
 
 
-def _exercise_longevity_findings(findings: Dict) -> List[Dict]:
+def _exercise_longevity_findings(findings: dict) -> list[dict]:
     """Optional findings the caller may supply: low VO2max tier, and a
     longevity percentile to quantify improvement headroom."""
-    out: List[Dict] = []
+    out: list[dict] = []
     vo2 = str(findings.get("vo2max_tier", "")).lower()
     if vo2 in ("low", "poor", "below average"):
         e = VO2MAX_ECONOMICS
@@ -998,9 +997,9 @@ def _exercise_longevity_findings(findings: Dict) -> List[Dict]:
     return out
 
 
-def _expanded_pgs_findings(expanded_pgs_result: Optional[Dict]) -> List[Dict]:
+def _expanded_pgs_findings(expanded_pgs_result: dict | None) -> list[dict]:
     """Findings from expanded PGS catalog conditions not already in PRS_ECONOMICS."""
-    out: List[Dict] = []
+    out: list[dict] = []
     if not expanded_pgs_result or not expanded_pgs_result.get("panels"):
         return out
     already_keyed = set(PRS_ECONOMICS.keys())
@@ -1028,10 +1027,10 @@ def _expanded_pgs_findings(expanded_pgs_result: Optional[Dict]) -> List[Dict]:
     return out
 
 
-def _hla_findings(hla_result: Optional[Dict]) -> List[Dict]:
+def _hla_findings(hla_result: dict | None) -> list[dict]:
     """Drug-hypersensitivity economics from HLA typing (beyond HLA-B*57:01
     which is already in PGX_ECONOMICS via the PGx pathway)."""
-    out: List[Dict] = []
+    out: list[dict] = []
     if not hla_result:
         return out
     carrier_alleles = hla_result.get("carrier_alleles", [])
@@ -1050,10 +1049,10 @@ def _hla_findings(hla_result: Optional[Dict]) -> List[Dict]:
     return out
 
 
-def _carrier_findings(carrier_result: Optional[Dict]) -> List[Dict]:
+def _carrier_findings(carrier_result: dict | None) -> list[dict]:
     """Economic findings from carrier screening — both affected (homozygous)
     and carrier (heterozygous) states with distinct valuations."""
-    out: List[Dict] = []
+    out: list[dict] = []
     if not carrier_result:
         return out
     for record in (carrier_result.get("affected") or []):
@@ -1087,9 +1086,9 @@ def _carrier_findings(carrier_result: Optional[Dict]) -> List[Dict]:
     return out
 
 
-def _interaction_findings(interactions_result: Optional[Dict]) -> List[Dict]:
+def _interaction_findings(interactions_result: dict | None) -> list[dict]:
     """Economic findings from compound multi-variant interactions."""
-    out: List[Dict] = []
+    out: list[dict] = []
     if not interactions_result:
         return out
     for finding in (interactions_result.get("findings") or []):
@@ -1109,8 +1108,8 @@ def _interaction_findings(interactions_result: Optional[Dict]) -> List[Dict]:
     return out
 
 
-def _addiction_findings(addiction_result: Optional[Dict]) -> List[Dict]:
-    out: List[Dict] = []
+def _addiction_findings(addiction_result: dict | None) -> list[dict]:
+    out: list[dict] = []
     if not addiction_result or not addiction_result.get("available"):
         return out
     seen_cats: set = set()
@@ -1137,8 +1136,8 @@ def _addiction_findings(addiction_result: Optional[Dict]) -> List[Dict]:
     return out
 
 
-def _metal_oxidative_findings(metal_oxidative_result: Optional[Dict]) -> List[Dict]:
-    out: List[Dict] = []
+def _metal_oxidative_findings(metal_oxidative_result: dict | None) -> list[dict]:
+    out: list[dict] = []
     if not metal_oxidative_result:
         return out
     seen_genes: set = set()
@@ -1171,9 +1170,9 @@ def _metal_oxidative_findings(metal_oxidative_result: Optional[Dict]) -> List[Di
     return out
 
 
-def _mr_findings(mr_result: Optional[Dict]) -> List[Dict]:
+def _mr_findings(mr_result: dict | None) -> list[dict]:
     """Economic findings from Mendelian randomization: causal risk → cost."""
-    out: List[Dict] = []
+    out: list[dict] = []
     if not mr_result:
         return out
     seen: set = set()
@@ -1212,8 +1211,8 @@ def _mr_findings(mr_result: Optional[Dict]) -> List[Dict]:
     return out
 
 
-def _neurochemistry_findings(neurochemistry_result: Optional[Dict]) -> List[Dict]:
-    out: List[Dict] = []
+def _neurochemistry_findings(neurochemistry_result: dict | None) -> list[dict]:
+    out: list[dict] = []
     if not neurochemistry_result or not neurochemistry_result.get("available"):
         return out
     seen: set = set()
@@ -1238,8 +1237,8 @@ def _neurochemistry_findings(neurochemistry_result: Optional[Dict]) -> List[Dict
     return out
 
 
-def _urologic_findings(urologic_result: Optional[Dict]) -> List[Dict]:
-    out: List[Dict] = []
+def _urologic_findings(urologic_result: dict | None) -> list[dict]:
+    out: list[dict] = []
     if not urologic_result or not urologic_result.get("available"):
         return out
     seen_cats: set = set()
@@ -1265,9 +1264,9 @@ def _urologic_findings(urologic_result: Optional[Dict]) -> List[Dict]:
     return out
 
 
-def _clinical_variant_findings(clinical_variants_result: Optional[Dict]) -> List[Dict]:
+def _clinical_variant_findings(clinical_variants_result: dict | None) -> list[dict]:
     """Economics for ClinVar P/LP variants in ACMG actionable genes."""
-    out: List[Dict] = []
+    out: list[dict] = []
     if not clinical_variants_result or not clinical_variants_result.get("available"):
         return out
     seen_genes: set = set()
@@ -1294,9 +1293,9 @@ def _clinical_variant_findings(clinical_variants_result: Optional[Dict]) -> List
     return out
 
 
-def _phewas_findings(phewas_result: Optional[Dict]) -> List[Dict]:
+def _phewas_findings(phewas_result: dict | None) -> list[dict]:
     """Economics for extreme-tier PheWAS biomarker predictions."""
-    out: List[Dict] = []
+    out: list[dict] = []
     if not phewas_result:
         return out
     seen_cats: set = set()
@@ -1323,8 +1322,8 @@ def _phewas_findings(phewas_result: Optional[Dict]) -> List[Dict]:
     return out
 
 
-def _immunogenetics_findings(immunogenetics_result: Optional[Dict]) -> List[Dict]:
-    out: List[Dict] = []
+def _immunogenetics_findings(immunogenetics_result: dict | None) -> list[dict]:
+    out: list[dict] = []
     if not immunogenetics_result or not immunogenetics_result.get("available"):
         return out
     seen: set = set()
@@ -1350,8 +1349,8 @@ def _immunogenetics_findings(immunogenetics_result: Optional[Dict]) -> List[Dict
     return out
 
 
-def _wellness_findings(wellness_result: Optional[Dict]) -> List[Dict]:
-    out: List[Dict] = []
+def _wellness_findings(wellness_result: dict | None) -> list[dict]:
+    out: list[dict] = []
     if not wellness_result:
         return out
     seen_cats: set = set()
@@ -1377,8 +1376,8 @@ def _wellness_findings(wellness_result: Optional[Dict]) -> List[Dict]:
     return out
 
 
-def _detox_findings(detox_result: Optional[Dict]) -> List[Dict]:
-    out: List[Dict] = []
+def _detox_findings(detox_result: dict | None) -> list[dict]:
+    out: list[dict] = []
     if not detox_result or not detox_result.get("available"):
         return out
     seen: set = set()
@@ -1405,10 +1404,10 @@ def _detox_findings(detox_result: Optional[Dict]) -> List[Dict]:
     return out
 
 
-def _family_planning_findings(family_planning_result: Optional[Dict]) -> List[Dict]:
+def _family_planning_findings(family_planning_result: dict | None) -> list[dict]:
     """Partner testing ROI from reproductive genetics — cost of test vs
     expected cost of affected offspring."""
-    out: List[Dict] = []
+    out: list[dict] = []
     if not family_planning_result or not family_planning_result.get("available"):
         return out
     for item in (family_planning_result.get("recessive_items") or []):
@@ -1444,12 +1443,12 @@ def _family_planning_findings(family_planning_result: Optional[Dict]) -> List[Di
     return out
 
 
-def _top_drugs_findings(top_drugs_result: Optional[Dict]) -> List[Dict]:
+def _top_drugs_findings(top_drugs_result: dict | None) -> list[dict]:
     """High-value PGx findings from the top-prescribed-drugs screen:
     for drugs that are genotype-actionable, the p_rx is effectively 1.0
     because these are commonly prescribed medications the patient is
     likely to encounter."""
-    out: List[Dict] = []
+    out: list[dict] = []
     if not top_drugs_result or not top_drugs_result.get("available"):
         return out
     seen_genes: set = set()
@@ -1481,7 +1480,7 @@ def _top_drugs_findings(top_drugs_result: Optional[Dict]) -> List[Dict]:
 
 # ─── Scaling ───────────────────────────────────────────────────────────────
 
-def scale_to_clinic(findings_econ: Dict, patient_count: int = DEFAULT_CLINIC_PATIENTS) -> Dict:
+def scale_to_clinic(findings_econ: dict, patient_count: int = DEFAULT_CLINIC_PATIENTS) -> dict:
     """Scale per-finding economics to a clinic population, weighting each
     finding by the fraction of patients who actually have it (prevalence)."""
     findings = findings_econ.get("findings_with_economics", [])
@@ -1521,7 +1520,7 @@ def scale_to_clinic(findings_econ: Dict, patient_count: int = DEFAULT_CLINIC_PAT
     }
 
 
-def scale_to_payer(findings_econ: Dict, member_population: int = DEFAULT_PAYER_MEMBERS) -> Dict:
+def scale_to_payer(findings_econ: dict, member_population: int = DEFAULT_PAYER_MEMBERS) -> dict:
     """Scale per-finding economics to a payer's member population using each
     finding's population prevalence."""
     findings = findings_econ.get("findings_with_economics", [])
@@ -1533,7 +1532,7 @@ def scale_to_payer(findings_econ: Dict, member_population: int = DEFAULT_PAYER_M
     total_cost = 0.0
     total_benefit = 0.0
     total_qalys = 0.0
-    per_finding: List[Dict] = []
+    per_finding: list[dict] = []
     for f in findings:
         affected = round(member_population * f.get("prevalence", 0.0))
         cost = affected * f["intervention_cost"]
@@ -1575,7 +1574,7 @@ def scale_to_payer(findings_econ: Dict, member_population: int = DEFAULT_PAYER_M
 
 # ─── Markdown summary ──────────────────────────────────────────────────────
 
-def generate_economics_summary(findings_econ: Dict) -> str:
+def generate_economics_summary(findings_econ: dict) -> str:
     """Human-readable markdown for the HTML report."""
     findings = findings_econ.get("findings_with_economics", [])
     if not findings:
@@ -1626,30 +1625,30 @@ def generate_economics_summary(findings_econ: Dict) -> str:
 
 # ─── Master analyzer ───────────────────────────────────────────────────────
 
-def analyze_health_economics(findings: Dict, snps_df: pd.DataFrame,
-                             expanded_pgs_result: Optional[Dict] = None,
-                             hla_result: Optional[Dict] = None,
-                             carrier_result: Optional[Dict] = None,
-                             interactions_result: Optional[Dict] = None,
-                             addiction_result: Optional[Dict] = None,
-                             metal_oxidative_result: Optional[Dict] = None,
-                             mr_result: Optional[Dict] = None,
-                             neurochemistry_result: Optional[Dict] = None,
-                             urologic_result: Optional[Dict] = None,
-                             clinical_variants_result: Optional[Dict] = None,
-                             phewas_result: Optional[Dict] = None,
-                             immunogenetics_result: Optional[Dict] = None,
-                             wellness_result: Optional[Dict] = None,
-                             detox_result: Optional[Dict] = None,
-                             family_planning_result: Optional[Dict] = None,
-                             top_drugs_result: Optional[Dict] = None) -> Dict:
+def analyze_health_economics(findings: dict, snps_df: pd.DataFrame,
+                             expanded_pgs_result: dict | None = None,
+                             hla_result: dict | None = None,
+                             carrier_result: dict | None = None,
+                             interactions_result: dict | None = None,
+                             addiction_result: dict | None = None,
+                             metal_oxidative_result: dict | None = None,
+                             mr_result: dict | None = None,
+                             neurochemistry_result: dict | None = None,
+                             urologic_result: dict | None = None,
+                             clinical_variants_result: dict | None = None,
+                             phewas_result: dict | None = None,
+                             immunogenetics_result: dict | None = None,
+                             wellness_result: dict | None = None,
+                             detox_result: dict | None = None,
+                             family_planning_result: dict | None = None,
+                             top_drugs_result: dict | None = None) -> dict:
     """Compute clinical & payer ROI for genomic interventions.
 
     Accepts results from all pipeline analysis modules and produces
     economic findings for every data source that has a valuation pathway.
     """
     findings = findings or {}
-    econ_findings: List[Dict] = []
+    econ_findings: list[dict] = []
     try:
         econ_findings += _pgx_findings(findings.get("pgx_summary", {}))
         econ_findings += _prs_findings(findings.get("prs_summary", {}))
@@ -1677,8 +1676,8 @@ def analyze_health_economics(findings: Dict, snps_df: pd.DataFrame,
 
     # Deduplicate: when the same condition appears from both carrier and
     # interaction extractors (e.g. HFE C282Y), keep the higher-value one.
-    seen_conditions: Dict[str, int] = {}
-    deduped: List[Dict] = []
+    seen_conditions: dict[str, int] = {}
+    deduped: list[dict] = []
     for f in econ_findings:
         key = f["finding"].lower().split("—")[0].strip()
         if key in seen_conditions:
@@ -1693,7 +1692,7 @@ def analyze_health_economics(findings: Dict, snps_df: pd.DataFrame,
     # Rank by ROI (highest first); keep None ROIs last.
     econ_findings.sort(key=lambda f: (f.get("roi") or 0), reverse=True)
 
-    result: Dict = {
+    result: dict = {
         "status": "success" if econ_findings else "no_findings",
         "n_findings": len(econ_findings),
         "findings_with_economics": econ_findings,
@@ -1761,7 +1760,7 @@ def _money(x) -> str:
 # Anything unmapped falls back to ``adherence_default`` rather than to 1.0, so
 # a gap in this table shows up as a discount rather than as a flattering
 # silence.
-_CATEGORY_ADHERENCE: Dict[str, str] = {
+_CATEGORY_ADHERENCE: dict[str, str] = {
     "Pharmacogenomic / genomic": "adherence_pharmacological",
     "HLA Pharmacogenomics":      "adherence_pharmacological",
     "Neurochemistry":            "adherence_pharmacological",
@@ -1792,27 +1791,27 @@ def _adherence_for_category(category: str) -> float:
         return 1.0
 
 
-def analyze_personal_economics(economics_result: Optional[Dict] = None,
-                               bloodwork_result: Optional[Dict] = None,
-                               genetic_age_result: Optional[Dict] = None,
-                               meta: Optional[Dict] = None,
-                               carrier_result: Optional[Dict] = None,
-                               hla_result: Optional[Dict] = None,
-                               interactions_result: Optional[Dict] = None,
-                               expanded_pgs_result: Optional[Dict] = None,
-                               addiction_result: Optional[Dict] = None,
-                               neurochemistry_result: Optional[Dict] = None,
-                               mr_result: Optional[Dict] = None,
-                               clinical_variants_result: Optional[Dict] = None,
-                               family_planning_result: Optional[Dict] = None,
-                               phewas_result: Optional[Dict] = None,
-                               wellness_result: Optional[Dict] = None) -> Dict:
+def analyze_personal_economics(economics_result: dict | None = None,
+                               bloodwork_result: dict | None = None,
+                               genetic_age_result: dict | None = None,
+                               meta: dict | None = None,
+                               carrier_result: dict | None = None,
+                               hla_result: dict | None = None,
+                               interactions_result: dict | None = None,
+                               expanded_pgs_result: dict | None = None,
+                               addiction_result: dict | None = None,
+                               neurochemistry_result: dict | None = None,
+                               mr_result: dict | None = None,
+                               clinical_variants_result: dict | None = None,
+                               family_planning_result: dict | None = None,
+                               phewas_result: dict | None = None,
+                               wellness_result: dict | None = None) -> dict:
     """Build the personal 10-year economic-impact model from the run's results."""
-    items: List[Dict] = []
+    items: list[dict] = []
     # Findings that carry a real decision but deliberately no dollar figure.
     # Kept as a first-class output rather than dropped, so "not monetised" is
     # visible in the report as a choice instead of looking like an omission.
-    not_monetised: List[Dict] = []
+    not_monetised: list[dict] = []
 
     def add(category, finding, avoided, qaly, intervention, confidence, basis):
         # REAL-WORLD ADHERENCE. Everything below is trial efficacy: the benefit
@@ -2126,8 +2125,8 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
                 "with published intervention economics.")
 
     # ── Deduplicate personal items: same condition from multiple sections ──
-    seen_keys: Dict[str, int] = {}
-    deduped_items: List[Dict] = []
+    seen_keys: dict[str, int] = {}
+    deduped_items: list[dict] = []
     for item in items:
         key = item["finding"].lower().split("—")[0].strip()
         if key in seen_keys:
@@ -2255,7 +2254,7 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
     }
 
 
-def build_cost_consequence_analysis(econ: Optional[Dict]) -> Dict:
+def build_cost_consequence_analysis(econ: dict | None) -> dict:
     """**Cost-consequence analysis (CCA)** — the disaggregated table.
 
     *In plain English:* a cost-effectiveness analysis crushes everything into one
@@ -2327,7 +2326,7 @@ def build_cost_consequence_analysis(econ: Optional[Dict]) -> Dict:
     }
 
 
-def _render_cca_html(cca: Optional[Dict]) -> str:
+def _render_cca_html(cca: dict | None) -> str:
     """Render the cost-consequence table (NICE's preferred digital-health format)."""
     if not cca or not cca.get("available"):
         return ""
@@ -2374,7 +2373,7 @@ def _esc_econ(s) -> str:
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-def _render_not_monetised_html(rows: Optional[List[Dict]]) -> str:
+def _render_not_monetised_html(rows: list[dict] | None) -> str:
     """Findings that carry a real decision but deliberately no dollar figure.
 
     Showing these matters. If a reproductive finding simply vanished from the
@@ -2411,7 +2410,7 @@ def _render_not_monetised_html(rows: Optional[List[Dict]]) -> str:
     </div>"""
 
 
-def _render_adherence_basis_html(econ: Dict) -> str:
+def _render_adherence_basis_html(econ: dict) -> str:
     """State that the totals above are effectiveness, not efficacy.
 
     Without this the page reports a smaller number than it used to with no
@@ -2444,7 +2443,7 @@ def _render_adherence_basis_html(econ: Dict) -> str:
     </div>"""
 
 
-def render_economic_analysis_html(econ: Dict, file_label: str = "") -> str:
+def render_economic_analysis_html(econ: dict, file_label: str = "") -> str:
     """Standalone economic-impact sheet (economic_analysis.html)."""
     if not econ or not econ.get("available"):
         body = ("<p>No modeled economic-impact items for this profile — this needs "

@@ -1,12 +1,10 @@
 """Unit tests for clinical_variants.py (Phase-2 ClinVar screen)."""
 
 from __future__ import annotations
-import gzip, tempfile, os
-from pathlib import Path
+
 import pytest
 
 import clinical_variants as cv
-
 
 # ── pure helpers ──────────────────────────────────────────────────────────────
 
@@ -148,7 +146,8 @@ def test_missing_table_degrades_gracefully(tmp_path, monkeypatch):
 
 
 def test_freshness_fields_surface_and_flag_stale(clinvar_table, tmp_path, monkeypatch):
-    import json, datetime
+    import datetime
+    import json
     # write a 60-day-old meta sidecar next to the distilled table
     meta = cv.CLINVAR_DIR / "clinvar_plp_grch38.meta.json"
     old = (datetime.datetime.now() - datetime.timedelta(days=60)).isoformat(timespec="seconds")

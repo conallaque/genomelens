@@ -25,7 +25,7 @@ Strand safety: markers whose ancestral/derived alleles are a complementary pair
 defined by non-ambiguous co-markers instead.
 """
 
-from typing import Optional, Dict, List, Tuple
+
 import pandas as pd
 
 # ── Complement helper ──────────────────────────────────────────────────────────
@@ -46,8 +46,8 @@ def _comp(base: str) -> str:
 # (position-only lookup). Strand-ambiguous pairs (A/T, C/G) are skipped at
 # lookup time, so a clade should always carry at least one non-ambiguous marker.
 
-def _node(haplogroup: str, markers: List[Tuple], description: str = "",
-          migration: str = "", further: str = "", children: Optional[List] = None) -> Dict:
+def _node(haplogroup: str, markers: list[tuple], description: str = "",
+          migration: str = "", further: str = "", children: list | None = None) -> dict:
     rsids = [m[1] for m in markers if m[1]]
     return {
         "haplogroup": haplogroup,
@@ -64,7 +64,7 @@ def _node(haplogroup: str, markers: List[Tuple], description: str = "",
 
 # ── Haplogroup decision tree (backbone) ─────────────────────────────────────────
 
-HAPLOGROUP_TREE: Dict = _node(
+HAPLOGROUP_TREE: dict = _node(
     "CT", [("M168", "rs2032595", 14813991, "C", "T"),
            ("M5576", "", 2744386, "G", "T"),
            ("M5577", "", 2757670, "C", "T")],
@@ -318,7 +318,7 @@ HAPLOGROUP_TREE: Dict = _node(
 
 # ── Lookup tables ────────────────────────────────────────────────────────────────
 
-def _build_lookup(snps_df: pd.DataFrame) -> Tuple[Dict[str, str], Dict[int, str]]:
+def _build_lookup(snps_df: pd.DataFrame) -> tuple[dict[str, str], dict[int, str]]:
     """
     Build two lookup tables from the parsed DataFrame:
       rsid_map  : rsid (str) → genotype (str, upper-case)
@@ -326,8 +326,8 @@ def _build_lookup(snps_df: pd.DataFrame) -> Tuple[Dict[str, str], Dict[int, str]
     Handles both hemizygous single-char ('A') and doubled ('AA') genotypes.
     Filters to chromosome Y rows only.
     """
-    rsid_map: Dict[str, str] = {}
-    pos_map: Dict[int, str] = {}
+    rsid_map: dict[str, str] = {}
+    pos_map: dict[int, str] = {}
 
     def _is_y(chrom_val) -> bool:
         return str(chrom_val).strip().upper() in ("Y", "24")
@@ -360,7 +360,7 @@ def _build_lookup(snps_df: pd.DataFrame) -> Tuple[Dict[str, str], Dict[int, str]
 
 # ── Node lookup (multi-marker majority vote) ────────────────────────────────────
 
-def _lookup(node: Dict, rsid_map: Dict, pos_map: Dict) -> Tuple[str, int, int, List[str]]:
+def _lookup(node: dict, rsid_map: dict, pos_map: dict) -> tuple[str, int, int, list[str]]:
     """
     Vote across all of a node's defining markers.
 
@@ -372,7 +372,7 @@ def _lookup(node: Dict, rsid_map: Dict, pos_map: Dict) -> Tuple[str, int, int, L
     because the observed base cannot be oriented.
     """
     n_der = n_anc = 0
-    evidence: List[str] = []
+    evidence: list[str] = []
 
     for marker in node.get("markers", []):
         name, rsid, pos, anc, der = marker
@@ -410,7 +410,7 @@ def _lookup(node: Dict, rsid_map: Dict, pos_map: Dict) -> Tuple[str, int, int, L
 
 # ── Tree walker ────────────────────────────────────────────────────────────────
 
-def _make_entry(node: Dict, status: str, n_der: int, n_anc: int, evidence: List[str]) -> Dict:
+def _make_entry(node: dict, status: str, n_der: int, n_anc: int, evidence: list[str]) -> dict:
     return {
         "haplogroup": node["haplogroup"],
         "snp_name": node["snp_name"],
@@ -428,7 +428,7 @@ def _make_entry(node: Dict, status: str, n_der: int, n_anc: int, evidence: List[
     }
 
 
-def _walk(node: Dict, rsid_map: Dict, pos_map: Dict, prefix: List[Dict], depth: int):
+def _walk(node: dict, rsid_map: dict, pos_map: dict, prefix: list[dict], depth: int):
     """
     Recursive walk. Returns (path, status) or None if this node is ruled out
     (ancestral). Never descends past a node unless a downstream marker is
@@ -448,8 +448,8 @@ def _walk(node: Dict, rsid_map: Dict, pos_map: Dict, prefix: List[Dict], depth: 
     if not children:
         return path, ("resolved" if status == "derived" else "chip_gap")
 
-    confirmed: List[Tuple[Dict, int]] = []
-    gaps: List[Dict] = []
+    confirmed: list[tuple[dict, int]] = []
+    gaps: list[dict] = []
     for child in children:
         cs, cder, _canc, _ev = _lookup(child, rsid_map, pos_map)
         if cs == "derived":
@@ -471,7 +471,7 @@ def _walk(node: Dict, rsid_map: Dict, pos_map: Dict, prefix: List[Dict], depth: 
     # Only chip-gap children: descend only toward a confirmed descendant.
     best = None
     best_confirmed = 0
-    branches_with_support: List[str] = []
+    branches_with_support: list[str] = []
     for child in gaps:
         res = _walk(child, rsid_map, pos_map, path, depth + 1)
         if res is None:
@@ -495,7 +495,7 @@ def _walk(node: Dict, rsid_map: Dict, pos_map: Dict, prefix: List[Dict], depth: 
 
 # ── Public API ─────────────────────────────────────────────────────────────────
 
-def _empty(status: str, y_count: int, message: str, **extra) -> Dict:
+def _empty(status: str, y_count: int, message: str, **extra) -> dict:
     base = {
         "status": status,
         "confidence": "none",
@@ -514,7 +514,7 @@ def _empty(status: str, y_count: int, message: str, **extra) -> Dict:
     return base
 
 
-def analyze_y_haplogroup(snps_df: pd.DataFrame) -> Dict:
+def analyze_y_haplogroup(snps_df: pd.DataFrame) -> dict:
     """
     Analyse Y-chromosome SNPs and return a result dict. The terminal haplogroup
     reported is always the DEEPEST CONFIRMED node — markers that are merely
@@ -578,7 +578,7 @@ def analyze_y_haplogroup(snps_df: pd.DataFrame) -> Dict:
     contradictions = [c for n in path for c in n.get("contradiction", [])]
 
     # Untested branches immediately below the terminal node.
-    not_tested: List[Dict] = []
+    not_tested: list[dict] = []
     for child in terminal.get("children", []):
         cs, _d, _a, _ev = _lookup(child, rsid_map, pos_map)
         if cs in ("not_found", "conflict"):

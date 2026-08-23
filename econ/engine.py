@@ -42,20 +42,35 @@ from __future__ import annotations
 import csv
 import math
 import os
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 from . import params as ep
 
 __all__ = [
-    "Finding", "ConditionPool", "CEAResult", "MarkovResult",
-    "pool_findings", "evaluate_pools", "run_markov", "life_table",
-    "incremental_analysis", "dual_perspective", "impact_inventory",
-    "cheers_checklist", "validate_model", "COI_KEY_TO_PARAM",
-    "ADHERENCE_BY_COI_KEY", "adherence_for",
-    "simpson_weights", "discount_weights",
-    "deduplicate_by_target", "DEFAULT_GENE_VOCABULARY",
-    "run_psa", "ceac", "tornado",
+    "ADHERENCE_BY_COI_KEY",
+    "COI_KEY_TO_PARAM",
+    "DEFAULT_GENE_VOCABULARY",
+    "CEAResult",
+    "ConditionPool",
+    "Finding",
+    "MarkovResult",
+    "adherence_for",
+    "ceac",
+    "cheers_checklist",
+    "deduplicate_by_target",
+    "discount_weights",
+    "dual_perspective",
+    "evaluate_pools",
+    "impact_inventory",
+    "incremental_analysis",
+    "life_table",
+    "pool_findings",
+    "run_markov",
+    "run_psa",
+    "simpson_weights",
+    "tornado",
+    "validate_model",
 ]
 
 # One level up: this module lives in econ/ but the vendored life table stays
@@ -80,7 +95,7 @@ _LIFE_TABLE_PATH = os.path.join(_DATA_DIR, "LifeTable_USA_Mx_2015.csv")
 # sensitivity analysis: one constant carrying seven conditions dominated the
 # tornado, so the report named it the model's key driver when it was really
 # just the most overloaded placeholder.
-COI_KEY_TO_PARAM: Dict[str, Tuple[str, str]] = {
+COI_KEY_TO_PARAM: dict[str, tuple[str, str]] = {
     # coi_key            (cost param,               qaly-loss param)
     "CAD":               ("coi_mace",               "qaly_loss_mace"),
     "T2D":               ("coi_t2d",                "qaly_loss_t2d"),
@@ -105,7 +120,7 @@ COI_KEY_TO_PARAM: Dict[str, Tuple[str, str]] = {
 # Conditions are assigned to one of three archetypes by what acting on the
 # finding actually requires of the person, since that — not the disease — is
 # what predicts whether they keep doing it.
-ADHERENCE_BY_COI_KEY: Dict[str, str] = {
+ADHERENCE_BY_COI_KEY: dict[str, str] = {
     # coi_key            registry key           what acting requires
     "CAD":               "adherence_pharmacological",   # statin, daily
     "T2D":               "adherence_lifestyle",         # diet and exercise
@@ -160,7 +175,7 @@ class Finding:
     intervention_cost: float = 0.0
     confidence: str = "moderate"
     source_category: str = ""
-    qaly_override: Optional[float] = None
+    qaly_override: float | None = None
     adherence: float = 1.0
 
     @property
@@ -202,11 +217,11 @@ class ConditionPool:
     """
 
     coi_key: str
-    findings: List[Finding] = field(default_factory=list)
+    findings: list[Finding] = field(default_factory=list)
 
     # ── combination ─────────────────────────────────────────────────────
     @staticmethod
-    def _combine(values: List[float]) -> float:
+    def _combine(values: list[float]) -> float:
         """Complement-of-products with the correlated-signal penalty and cap.
 
         Factored out so the same rule can be applied to efficacy and to
@@ -300,7 +315,7 @@ class ConditionPool:
         """
         return sum(f.efficacy_rrr for f in self.findings)
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {
             "condition": self.coi_key,
             "n_findings": len(self.findings),
@@ -326,9 +341,9 @@ class ConditionPool:
         }
 
 
-def pool_findings(findings: Iterable[Finding]) -> Dict[str, ConditionPool]:
+def pool_findings(findings: Iterable[Finding]) -> dict[str, ConditionPool]:
     """Group findings by condition into pools."""
-    pools: Dict[str, ConditionPool] = {}
+    pools: dict[str, ConditionPool] = {}
     for f in findings:
         if not f.coi_key:
             continue
@@ -362,7 +377,7 @@ DEFAULT_GENE_VOCABULARY = frozenset({
 # clinical target as another line. Deliberately short: over-collapsing here
 # would hide a genuine second benefit, so only phrases whose duplication has
 # actually been observed in this report's output are listed.
-DEFAULT_TOPIC_TARGETS: Tuple[Tuple[str, str], ...] = (
+DEFAULT_TOPIC_TARGETS: tuple[tuple[str, str], ...] = (
     ("autoimmune", "topic:autoimmune"),
     ("statin-induced", "topic:statin-myopathy"),
     ("myopathy", "topic:statin-myopathy"),
@@ -370,8 +385,8 @@ DEFAULT_TOPIC_TARGETS: Tuple[Tuple[str, str], ...] = (
 
 
 def _extract_target(text: str,
-                    vocabulary: Optional[frozenset] = None,
-                    topics: Optional[Sequence[Tuple[str, str]]] = None) -> str:
+                    vocabulary: frozenset | None = None,
+                    topics: Sequence[tuple[str, str]] | None = None) -> str:
     """Identifier for what a finding is *about*, or '' if it shares nothing.
 
     Returns a gene symbol when the text names one from the vocabulary, since
@@ -404,12 +419,12 @@ def _extract_target(text: str,
     return ""
 
 
-def deduplicate_by_target(items: Sequence[Dict], *,
+def deduplicate_by_target(items: Sequence[dict], *,
                           value_key: str = "net",
                           text_key: str = "finding",
                           fallback_key: str = "category",
-                          vocabulary: Optional[frozenset] = None,
-                          penalty: Optional[float] = None) -> List[Dict]:
+                          vocabulary: frozenset | None = None,
+                          penalty: float | None = None) -> list[dict]:
     """Down-weight repeated claims on the same underlying genotype.
 
     The condition-level pooling above catches "four findings, one disease".
@@ -425,7 +440,7 @@ def deduplicate_by_target(items: Sequence[Dict], *,
     which lines were discounted and why, rather than silently shrinking them.
     """
     pen = ep.value("correlated_signal_penalty") if penalty is None else float(penalty)
-    grouped: Dict[str, List[Dict]] = {}
+    grouped: dict[str, list[dict]] = {}
     for i, it in enumerate(items):
         # A line naming no shared target gets a unique key, so it is never
         # pooled with anything. Grouping unmatched lines together by category
@@ -434,7 +449,7 @@ def deduplicate_by_target(items: Sequence[Dict], *,
                   or f"unique:{i}")
         grouped.setdefault(target, []).append(it)
 
-    out: List[Dict] = []
+    out: list[dict] = []
     for target, group in grouped.items():
         ranked = sorted(group, key=lambda d: float(d.get(value_key, 0) or 0),
                         reverse=True)
@@ -478,10 +493,10 @@ class CEAResult:
     inc_cost: float
     inc_qaly: float
     wtp: float
-    detail: Dict = field(default_factory=dict)
+    detail: dict = field(default_factory=dict)
 
     @property
-    def icer(self) -> Optional[float]:
+    def icer(self) -> float | None:
         if abs(self.inc_qaly) < 1e-9:
             return None
         if self.inc_cost < 0 and self.inc_qaly > 0:
@@ -504,7 +519,7 @@ class CEAResult:
             return f"cost-effective at ${self.wtp:,.0f}/QALY"
         return f"not cost-effective at ${self.wtp:,.0f}/QALY"
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {
             "strategy": self.strategy,
             "incremental_cost": round(self.inc_cost),
@@ -520,11 +535,11 @@ class CEAResult:
         }
 
 
-def evaluate_pools(pools: Dict[str, ConditionPool],
-                   *, wtp: Optional[float] = None,
-                   horizon_years: Optional[float] = None,
+def evaluate_pools(pools: dict[str, ConditionPool],
+                   *, wtp: float | None = None,
+                   horizon_years: float | None = None,
                    test_cost: float = 0.0,
-                   marginal_only: bool = True) -> Dict:
+                   marginal_only: bool = True) -> dict:
     """Turn condition pools into a disaggregated cost-effectiveness result.
 
     Returns per-condition rows plus a portfolio total, with costs and QALYs
@@ -541,7 +556,7 @@ def evaluate_pools(pools: Dict[str, ConditionPool],
     # timing matters, and reports both.
     disc = 1.0 / (1.0 + rate) ** (horizon / 2.0)
 
-    rows: List[Dict] = []
+    rows: list[dict] = []
     tot_cost_averted = tot_qaly = tot_intervention = 0.0
     tot_naive_cost_averted = 0.0
     tot_efficacy_cost_averted = tot_efficacy_qaly = 0.0
@@ -653,7 +668,7 @@ def evaluate_pools(pools: Dict[str, ConditionPool],
 # Cohort state-transition model
 # ══════════════════════════════════════════════════════════════════════════
 
-def life_table(sex: str = "Total") -> Dict[int, float]:
+def life_table(sex: str = "Total") -> dict[int, float]:
     """Age-specific all-cause mortality hazard, from the vendored US table.
 
     Returns ``{age: mx}``. Missing file degrades to an empty dict, and callers
@@ -662,7 +677,7 @@ def life_table(sex: str = "Total") -> Dict[int, float]:
     """
     col = {"m": "Male", "male": "Male", "f": "Female", "female": "Female"}.get(
         (sex or "").strip().lower(), "Total")
-    out: Dict[int, float] = {}
+    out: dict[int, float] = {}
     try:
         with open(_LIFE_TABLE_PATH, newline="", encoding="utf-8") as fh:
             for row in csv.DictReader(fh):
@@ -675,7 +690,7 @@ def life_table(sex: str = "Total") -> Dict[int, float]:
     return out
 
 
-def simpson_weights(n_cycles: int) -> List[float]:
+def simpson_weights(n_cycles: int) -> list[float]:
     """Simpson's 1/3 within-cycle correction weights over ``n_cycles + 1``
     points, transcribed from ``darthtools::gen_wcc``.
 
@@ -701,7 +716,7 @@ def simpson_weights(n_cycles: int) -> List[float]:
 
 
 def discount_weights(n_cycles: int, rate: float,
-                     cycle_length: float = 1.0) -> List[float]:
+                     cycle_length: float = 1.0) -> list[float]:
     return [1.0 / (1.0 + rate) ** (t * cycle_length) for t in range(n_cycles + 1)]
 
 
@@ -710,11 +725,11 @@ class MarkovResult:
     cost: float
     qaly: float
     life_years: float
-    trace: List[Tuple[float, float, float]]   # (well, diseased, dead)
+    trace: list[tuple[float, float, float]]   # (well, diseased, dead)
     n_cycles: int
     start_age: float
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {"cost": round(self.cost), "qaly": round(self.qaly, 4),
                 "life_years": round(self.life_years, 3),
                 "n_cycles": self.n_cycles, "start_age": self.start_age}
@@ -725,7 +740,7 @@ def run_markov(*, start_age: float, annual_incidence: float,
                rrr: float = 0.0, annual_intervention_cost: float = 0.0,
                excess_mortality_rr: float = 1.5,
                sex: str = "Total", max_age: int = 100,
-               rate: Optional[float] = None) -> MarkovResult:
+               rate: float | None = None) -> MarkovResult:
     """Three-state cohort model — Well → Diseased → Dead — against US mortality.
 
     This exists to answer one question the scalar-discount approach cannot:
@@ -746,10 +761,10 @@ def run_markov(*, start_age: float, annual_incidence: float,
     inc = max(0.0, min(1.0, float(annual_incidence) * (1.0 - float(rrr))))
 
     well, sick, dead = 1.0, 0.0, 0.0
-    trace: List[Tuple[float, float, float]] = [(well, sick, dead)]
-    costs: List[float] = [annual_intervention_cost * well]
-    utils: List[float] = [u_well * well + u_sick * sick]
-    lys: List[float] = [well + sick]
+    trace: list[tuple[float, float, float]] = [(well, sick, dead)]
+    costs: list[float] = [annual_intervention_cost * well]
+    utils: list[float] = [u_well * well + u_sick * sick]
+    lys: list[float] = [well + sick]
 
     for t in range(n):
         age = a0 + t
@@ -770,9 +785,9 @@ def run_markov(*, start_age: float, annual_incidence: float,
 
     wcc = simpson_weights(n)
     dw = discount_weights(n, rate)
-    tc = sum(c * w * d for c, w, d in zip(costs, wcc, dw))
-    tq = sum(u * w * d for u, w, d in zip(utils, wcc, dw))
-    tl = sum(l * w * d for l, w, d in zip(lys, wcc, dw))
+    tc = sum(c * w * d for c, w, d in zip(costs, wcc, dw, strict=False))
+    tq = sum(u * w * d for u, w, d in zip(utils, wcc, dw, strict=False))
+    tl = sum(l * w * d for l, w, d in zip(lys, wcc, dw, strict=False))
     return MarkovResult(tc, tq, tl, trace, n, float(a0))
 
 
@@ -780,7 +795,7 @@ def incremental_analysis(*, start_age: float, annual_incidence: float,
                          coi_key: str, rrr: float,
                          intervention_cost_annual: float = 0.0,
                          sex: str = "Total",
-                         wtp: Optional[float] = None) -> Dict:
+                         wtp: float | None = None) -> dict:
     """Run the Markov model with and without acting, and return the increment.
 
     This is the structural alternative to `p × cost × rrr`: the same question
@@ -818,8 +833,8 @@ def incremental_analysis(*, start_age: float, annual_incidence: float,
 # ══════════════════════════════════════════════════════════════════════════
 
 def dual_perspective(healthcare_cost_averted: float, qaly_gained: float,
-                     *, conditions: Optional[Sequence[Dict]] = None,
-                     wtp: Optional[float] = None) -> Dict:
+                     *, conditions: Sequence[dict] | None = None,
+                     wtp: float | None = None) -> dict:
     """Report the healthcare-sector and societal perspectives side by side.
 
     The Second Panel asks for both, and for the societal additions to be
@@ -870,7 +885,7 @@ def dual_perspective(healthcare_cost_averted: float, qaly_gained: float,
     }
 
 
-def impact_inventory(conditions: Sequence[Dict]) -> List[Dict]:
+def impact_inventory(conditions: Sequence[dict]) -> list[dict]:
     """Second Panel impact inventory: what is counted, in which perspective.
 
     An explicit "counted / not counted" table is the cheapest defence against
@@ -911,7 +926,7 @@ def impact_inventory(conditions: Sequence[Dict]) -> List[Dict]:
 
 def cheers_checklist(*, wtp: float, rate: float, horizon: float,
                      perspective: str = "Healthcare sector (reference case), "
-                                        "societal reported alongside") -> List[Dict]:
+                                        "societal reported alongside") -> list[dict]:
     """CHEERS 2022 items this model can answer, with the answer.
 
     Reported so a reader can see which items are addressed and, just as
@@ -981,18 +996,18 @@ def cheers_checklist(*, wtp: float, rate: float, horizon: float,
     ]
 
 
-def burton_pct(burden: Dict) -> str:
+def burton_pct(burden: dict) -> str:
     """Format the sourced-parameter share for the CHEERS analytics line."""
     return f"{burden['pct_sourced']:.0f}%"
 
 
-def validate_model(pools: Dict[str, ConditionPool], evaluated: Dict) -> List[Dict]:
+def validate_model(pools: dict[str, ConditionPool], evaluated: dict) -> list[dict]:
     """Internal-validity checks, reported rather than silently assumed.
 
     A model that has never been asked whether it obeys its own constraints is
     not validated by having a lot of methods in it.
     """
-    checks: List[Dict] = []
+    checks: list[dict] = []
 
     def add(name: str, ok: bool, detail: str):
         checks.append({"check": name, "pass": bool(ok), "detail": detail})
@@ -1050,9 +1065,9 @@ def validate_model(pools: Dict[str, ConditionPool], evaluated: Dict) -> List[Dic
 # treat it as more certain than it is. Propagating the documented uncertainty
 # is what turns the provenance table from a display into a working input.
 
-def run_psa(pools: Dict[str, "ConditionPool"], *, n: int = 2000,
+def run_psa(pools: dict[str, ConditionPool], *, n: int = 2000,
             seed: int = 20260822, test_cost: float = 0.0,
-            wtp: Optional[float] = None, rebuild=None) -> Dict:
+            wtp: float | None = None, rebuild=None) -> dict:
     """Probabilistic sensitivity analysis over the registry's distributions.
 
     Each iteration draws every sampleable parameter from its documented
@@ -1071,9 +1086,9 @@ def run_psa(pools: Dict[str, "ConditionPool"], *, n: int = 2000,
     import random
     wtp = ep.value("wtp_per_qaly") if wtp is None else float(wtp)
     rng = random.Random(seed)
-    costs: List[float] = []
-    qalys: List[float] = []
-    inmbs: List[float] = []
+    costs: list[float] = []
+    qalys: list[float] = []
+    inmbs: list[float] = []
     for _ in range(max(1, int(n))):
         with ep.overridden(ep.sample_all(rng)):
             iter_pools = rebuild() if rebuild is not None else pools
@@ -1083,7 +1098,7 @@ def run_psa(pools: Dict[str, "ConditionPool"], *, n: int = 2000,
         qalys.append(float(cea["incremental_qaly"]))
         inmbs.append(float(cea["inmb"]))
 
-    def pct(xs: List[float], q: float) -> float:
+    def pct(xs: list[float], q: float) -> float:
         if not xs:
             return 0.0
         s = sorted(xs)
@@ -1113,11 +1128,11 @@ def run_psa(pools: Dict[str, "ConditionPool"], *, n: int = 2000,
     }
 
 
-def ceac(pools: Dict[str, "ConditionPool"], *,
+def ceac(pools: dict[str, ConditionPool], *,
          thresholds: Sequence[float] = (0, 25_000, 50_000, 75_000, 100_000,
                                         150_000, 200_000),
          n: int = 800, seed: int = 20260822,
-         test_cost: float = 0.0, rebuild=None) -> List[Dict]:
+         test_cost: float = 0.0, rebuild=None) -> list[dict]:
     """Cost-effectiveness acceptability curve from the pooled model.
 
     Reuses one set of draws across all thresholds — resampling per threshold
@@ -1126,23 +1141,23 @@ def ceac(pools: Dict[str, "ConditionPool"], *,
     """
     import random
     rng = random.Random(seed)
-    draws: List[Tuple[float, float]] = []
+    draws: list[tuple[float, float]] = []
     for _ in range(max(1, int(n))):
         with ep.overridden(ep.sample_all(rng)):
             iter_pools = rebuild() if rebuild is not None else pools
             cea = evaluate_pools(iter_pools, test_cost=test_cost)["cea"]
         draws.append((float(cea["incremental_cost"]),
                       float(cea["incremental_qaly"])))
-    out: List[Dict] = []
+    out: list[dict] = []
     for w in thresholds:
         p = sum(1 for c, q in draws if q * w - c > 0) / (len(draws) or 1)
         out.append({"wtp": round(float(w)), "p_cost_effective": round(p, 4)})
     return out
 
 
-def tornado(pools: Dict[str, "ConditionPool"], *,
-            test_cost: float = 0.0, wtp: Optional[float] = None,
-            top: int = 10, rebuild=None) -> List[Dict]:
+def tornado(pools: dict[str, ConditionPool], *,
+            test_cost: float = 0.0, wtp: float | None = None,
+            top: int = 10, rebuild=None) -> list[dict]:
     """One-way sensitivity: swing in net monetary benefit across each
     parameter's documented range.
 
@@ -1152,7 +1167,7 @@ def tornado(pools: Dict[str, "ConditionPool"], *,
     """
     wtp = ep.value("wtp_per_qaly") if wtp is None else float(wtp)
     base = evaluate_pools(pools, wtp=wtp, test_cost=test_cost)["cea"]["inmb"]
-    rows: List[Dict] = []
+    rows: list[dict] = []
     for p in ep.PARAMS.values():
         if p.low is None or p.high is None or p.low == p.high:
             continue

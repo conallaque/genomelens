@@ -18,7 +18,7 @@ _FULL_KEYS = {"runs", "n_runs", "total_roh_mb", "f_roh", "short", "medium", "lon
 
 def test_empty_input_result_has_full_schema():
     r = roh.detect_roh(pd.DataFrame())
-    assert _FULL_KEYS <= set(r.keys()), f"missing: {_FULL_KEYS - set(r.keys())}"
+    assert set(r.keys()) >= _FULL_KEYS, f"missing: {_FULL_KEYS - set(r.keys())}"
     # the keys the downstream log line and renderer index directly
     assert r["context_tier"] == "unavailable"
     assert r["n_short"] == 0 and r["n_medium"] == 0 and r["n_long"] == 0
@@ -26,7 +26,7 @@ def test_empty_input_result_has_full_schema():
 
 def test_no_chrom_column_result_has_full_schema():
     r = roh.detect_roh(pd.DataFrame({"genotype": ["AA", "GG"]}))
-    assert _FULL_KEYS <= set(r.keys())
+    assert set(r.keys()) >= _FULL_KEYS
 
 
 def test_build_roh_html_survives_empty_result():

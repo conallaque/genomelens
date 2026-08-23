@@ -8,10 +8,8 @@ DiagnosticReport and added a Provenance resource. Lock those invariants here.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import fhir_export as fx
-
 
 # ── Stub upstream-module data ────────────────────────────────────────────────
 

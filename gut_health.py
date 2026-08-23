@@ -47,13 +47,13 @@ from __future__ import annotations
 
 import re as _re
 from pathlib import Path as _Path
-from typing import Dict, List, Optional
+
 import pandas as pd
 
 import snp_registry  # strand-aware dose + import-time audit (see bottom)
 
 
-def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
+def _gt(snps_df: pd.DataFrame, rsid: str) -> str | None:
     """Raw genotype string for chip-gap detection (presence vs absence)."""
     if rsid not in snps_df.index:
         return None
@@ -66,7 +66,7 @@ def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
     return s
 
 
-def _dose(snps_df: pd.DataFrame, rsid: str) -> Optional[int]:
+def _dose(snps_df: pd.DataFrame, rsid: str) -> int | None:
     """Strand-aware derived(=effect)-allele dose via the unified registry."""
     return snp_registry.risk_dose_from_df(snps_df, rsid)
 
@@ -78,7 +78,7 @@ CAT_INTOL = "Food Intolerance"
 CAT_IBD = "Inflammatory-Bowel Predisposition"
 
 
-def _chip_gap(category: str, trait: str, rsid: str, gene: str) -> Dict:
+def _chip_gap(category: str, trait: str, rsid: str, gene: str) -> dict:
     """Surface a variant the chip didn't type — never silently return nothing.
 
     A silent ``return None`` is indistinguishable to the user from "checked and
@@ -274,7 +274,7 @@ def _il23r_protective(snps):
 
 # ─── Master analyzer ──────────────────────────────────────────────────────
 
-def analyze_gut_health(snps_df: pd.DataFrame) -> Dict:
+def analyze_gut_health(snps_df: pd.DataFrame) -> dict:
     analyzers = [
         # Carbohydrate digestion
         _lactase,
@@ -287,7 +287,7 @@ def analyze_gut_health(snps_df: pd.DataFrame) -> Dict:
         # Inflammatory-bowel predisposition
         _nod2_crohn, _il23r_protective,
     ]
-    predictions: List[Dict] = []
+    predictions: list[dict] = []
     for a in analyzers:
         try:
             r = a(snps_df)
@@ -296,7 +296,7 @@ def analyze_gut_health(snps_df: pd.DataFrame) -> Dict:
         except Exception:
             continue
 
-    by_category: Dict[str, List[Dict]] = {}
+    by_category: dict[str, list[dict]] = {}
     for p in predictions:
         by_category.setdefault(p["category"], []).append(p)
 
@@ -310,7 +310,7 @@ def analyze_gut_health(snps_df: pd.DataFrame) -> Dict:
 
 # ── Cross-check against the unified SNP registry ──────────────────────────
 
-def _scan_rsids_referenced() -> List[str]:
+def _scan_rsids_referenced() -> list[str]:
     """Every standalone rsID literal referenced in this module must be
     registered (combined-string literals like ``"rsA / rsB"`` are intentionally
     not matched by this regex; their components appear separately)."""
@@ -318,7 +318,7 @@ def _scan_rsids_referenced() -> List[str]:
     return sorted(set(_re.findall(r'"(rs\d+)"', src)))
 
 
-def audit_against_registry() -> Dict[str, List[str]]:
+def audit_against_registry() -> dict[str, list[str]]:
     """Presence-only audit: every rsID referenced here must be in the registry.
     Returns ``{"registered": [...], "missing": [...]}``."""
     registered, missing = [], []

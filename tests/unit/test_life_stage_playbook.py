@@ -1,8 +1,8 @@
 """Unit tests for life_stage_playbook.py."""
 
 from __future__ import annotations
-import life_stage_playbook as lsp
 
+import life_stage_playbook as lsp
 
 HOLISTIC = {"genome_leverage": {"tier": "Favorable", "score": 74},
             "insights": [{"id": "glucose_hba1c_stress_discordance"}]}

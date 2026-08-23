@@ -31,8 +31,6 @@ import datetime
 import json
 import uuid
 from pathlib import Path
-from typing import Dict, List, Optional
-
 
 FHIR_VERSION = "4.0.1"
 CG_IG_VERSION = "2.0.0"  # Clinical Genomics IG
@@ -49,19 +47,19 @@ def _now_iso() -> str:
     return datetime.datetime.now().astimezone().isoformat(timespec="seconds")
 
 
-def _coding(system: str, code: str, display: str) -> Dict:
+def _coding(system: str, code: str, display: str) -> dict:
     return {"system": system, "code": code, "display": display}
 
 
-def _codeable(*codings: Dict, text: str = "") -> Dict:
-    cc: Dict = {"coding": list(codings)}
+def _codeable(*codings: dict, text: str = "") -> dict:
+    cc: dict = {"coding": list(codings)}
     if text:
         cc["text"] = text
     return cc
 
 
-def _patient(patient_id: str, sex: Optional[str]) -> Dict:
-    res: Dict = {
+def _patient(patient_id: str, sex: str | None) -> dict:
+    res: dict = {
         "resourceType": "Patient",
         "id": patient_id,
         "meta": {"profile": [
@@ -76,7 +74,7 @@ def _patient(patient_id: str, sex: Optional[str]) -> Dict:
 
 # ── PGx Observation builders ────────────────────────────────────────────────
 
-def _pgx_observation(patient_ref: str, gene_name: str, gene_data: Dict) -> Dict:
+def _pgx_observation(patient_ref: str, gene_name: str, gene_data: dict) -> dict:
     """Build a Genotype/Phenotype Observation for one PGx gene per CG-IG."""
     obs_id = _uid()
 
@@ -85,7 +83,7 @@ def _pgx_observation(patient_ref: str, gene_name: str, gene_data: Dict) -> Dict:
     activity = gene_data.get("activity_score")
     is_binary = gene_data.get("is_binary", False)
 
-    components: List[Dict] = []
+    components: list[dict] = []
 
     # Activity score component (where applicable)
     if activity is not None and not is_binary:
@@ -153,9 +151,9 @@ def _pgx_observation(patient_ref: str, gene_name: str, gene_data: Dict) -> Dict:
 
 
 def _pgx_drug_recommendation_observations(patient_ref: str,
-                                          actionable: List[Dict]) -> List[Dict]:
+                                          actionable: list[dict]) -> list[dict]:
     """One MedicationStatement-style Observation per actionable drug rec."""
-    out: List[Dict] = []
+    out: list[dict] = []
     for f in actionable:
         out.append({
             "resourceType": "Observation",
@@ -182,7 +180,7 @@ def _pgx_drug_recommendation_observations(patient_ref: str,
 
 # ── Carrier Observation builder ─────────────────────────────────────────────
 
-def _carrier_observation(patient_ref: str, record: Dict, status: str) -> Dict:
+def _carrier_observation(patient_ref: str, record: dict, status: str) -> dict:
     """
     status: 'affected' (homozygous), 'carrier' (heterozygous), or
             'not-carrier' (homozygous reference).
@@ -255,7 +253,7 @@ def _carrier_observation(patient_ref: str, record: Dict, status: str) -> Dict:
 
 # ── HLA Observation builder ─────────────────────────────────────────────────
 
-def _hla_observation(patient_ref: str, allele_result: Dict) -> Dict:
+def _hla_observation(patient_ref: str, allele_result: dict) -> dict:
     return {
         "resourceType": "Observation",
         "id": uuid.uuid4().hex,
@@ -287,7 +285,7 @@ def _hla_observation(patient_ref: str, allele_result: Dict) -> Dict:
 
 # ── APOE genotype Observation ───────────────────────────────────────────────
 
-def _apoe_observation(patient_ref: str, apoe_genotype: str) -> Dict:
+def _apoe_observation(patient_ref: str, apoe_genotype: str) -> dict:
     return {
         "resourceType": "Observation",
         "id": uuid.uuid4().hex,
@@ -318,9 +316,9 @@ def _apoe_observation(patient_ref: str, apoe_genotype: str) -> Dict:
 
 def _diagnostic_report(
     patient_ref: str,
-    observation_refs: List[Dict],
+    observation_refs: list[dict],
     summary_text: str,
-) -> Dict:
+) -> dict:
     """
     Per the HL7 Clinical Genomics IG, a genomic report is a DiagnosticReport
     that *contains* (via `result` references) the per-finding Observations.
@@ -360,9 +358,9 @@ def _diagnostic_report(
 
 
 def _provenance(
-    target_refs: List[Dict],
+    target_refs: list[dict],
     file_label: str,
-) -> Dict:
+) -> dict:
     """
     A Provenance resource records the chain of custody / derivation: where the
     data came from (the chip raw file), what software produced the
@@ -407,18 +405,18 @@ def _provenance(
 # ── Bundle builder ──────────────────────────────────────────────────────────
 
 def build_fhir_bundle(
-    pgx_result: Optional[Dict] = None,
-    carrier_result: Optional[Dict] = None,
-    hla_result: Optional[Dict] = None,
-    apoe_genotype: Optional[str] = None,
+    pgx_result: dict | None = None,
+    carrier_result: dict | None = None,
+    hla_result: dict | None = None,
+    apoe_genotype: str | None = None,
     patient_id: str = "patient-1",
-    inferred_sex: Optional[str] = None,
+    inferred_sex: str | None = None,
     file_label: str = "",
-) -> Dict:
+) -> dict:
     """Assemble a FHIR R4 Bundle of clinically-validated findings only."""
     patient_ref = f"Patient/{patient_id}"
-    entries: List[Dict] = []
-    obs_refs: List[Dict] = []  # collected for DiagnosticReport.result
+    entries: list[dict] = []
+    obs_refs: list[dict] = []  # collected for DiagnosticReport.result
 
     # Patient resource
     patient_res = _patient(patient_id, inferred_sex)
@@ -427,7 +425,7 @@ def build_fhir_bundle(
         "resource": patient_res,
     })
 
-    def _add(res: Dict) -> None:
+    def _add(res: dict) -> None:
         full_url = f"urn:uuid:{res['id']}"
         entries.append({"fullUrl": full_url, "resource": res})
         obs_refs.append({"reference": f"{res['resourceType']}/{res['id']}"})
@@ -472,7 +470,7 @@ def build_fhir_bundle(
                 n_hla += 1
 
     # Build a human-readable conclusion paragraph for the DiagnosticReport
-    conclusion_parts: List[str] = []
+    conclusion_parts: list[str] = []
     if apoe_genotype:
         conclusion_parts.append(f"APOE genotype: {apoe_genotype}.")
     if n_pgx:
@@ -551,13 +549,13 @@ def build_fhir_bundle(
 
 def export_fhir(
     out_path: Path,
-    pgx_result: Optional[Dict] = None,
-    carrier_result: Optional[Dict] = None,
-    hla_result: Optional[Dict] = None,
-    apoe_genotype: Optional[str] = None,
-    inferred_sex: Optional[str] = None,
+    pgx_result: dict | None = None,
+    carrier_result: dict | None = None,
+    hla_result: dict | None = None,
+    apoe_genotype: str | None = None,
+    inferred_sex: str | None = None,
     file_label: str = "",
-) -> Dict:
+) -> dict:
     """Write the FHIR bundle to disk; return the summary dict."""
     result = build_fhir_bundle(
         pgx_result=pgx_result,

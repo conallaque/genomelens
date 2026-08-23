@@ -6,6 +6,7 @@ surface an auditable breakdown instead of only a coverage count.
 """
 
 import pandas as pd
+
 import phewas
 
 
@@ -22,7 +23,7 @@ def test_score_trait_returns_used_and_missing_variants():
     res = phewas.analyze_phewas(_df_for_trait(name), sex="male")
     t = res["traits"][name]["result"]
     assert t["status"] == "ok"
-    assert "used_variants" in t and t["used_variants"], "used_variants missing"
+    assert t.get("used_variants"), "used_variants missing"
     uv = t["used_variants"][0]
     for k in ("rsid", "effect_allele", "dose", "beta", "af"):
         assert k in uv, f"used_variant missing key {k}"

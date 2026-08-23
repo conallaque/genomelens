@@ -23,13 +23,10 @@ core report works without them. Run this script when you want to enable:
 
 import argparse
 import json
-import os
 import shutil
 import subprocess
-import sys
 import urllib.request
 from pathlib import Path
-from typing import Dict, List, Optional
 
 SCRIPT_DIR = Path(__file__).parent
 REF_DIR = SCRIPT_DIR / "reference"
@@ -54,7 +51,7 @@ BEAGLE_MAP_ZIP = "plink.GRCh37.map.zip"
 # ── PGS Catalog scoring files (one per condition) ─────────────────────────────
 # Map condition → published PGS Catalog ID. These are well-validated scores for
 # each trait. Files downloaded from https://www.pgscatalog.org/
-PGS_CONDITIONS: Dict[str, Dict[str, str]] = {
+PGS_CONDITIONS: dict[str, dict[str, str]] = {
     "coronary_artery_disease": {
         "pgs_id": "PGS000018",
         "description": "Coronary Artery Disease (Inouye 2018, 1.7M variants)",
@@ -162,7 +159,7 @@ def check_java() -> bool:
         return False
 
 
-def check_python_packages() -> Dict[str, bool]:
+def check_python_packages() -> dict[str, bool]:
     """Verify Python packages used by v3 modules."""
     required = {
         "snps": "raw DNA file parsing",
@@ -176,7 +173,7 @@ def check_python_packages() -> Dict[str, bool]:
         "matplotlib": "ancestry PCA plot",
         "pyarrow": "compressed imputation cache",
     }
-    results: Dict[str, bool] = {}
+    results: dict[str, bool] = {}
     log("  Required packages:")
     for pkg, desc in required.items():
         try:
@@ -307,7 +304,7 @@ def setup_pgs_catalog() -> None:
     log("PGS Catalog setup complete.")
 
 
-def _remote_last_modified(url: str) -> Optional[str]:
+def _remote_last_modified(url: str) -> str | None:
     """HEAD the URL and return its Last-Modified header (or None if unreachable).
     Used to detect when NCBI has published a newer ClinVar than we hold."""
     import urllib.request
@@ -332,8 +329,8 @@ def setup_clinvar(force: bool = False) -> None:
 
     ~380 MB fetched when refreshing; the raw VCFs are deleted after distilling,
     leaving only the small tables in reference/clinvar/."""
-    import json
     import datetime as _dt
+    import json
     log("ClinVar clinical-variant database setup (auto-updating) ...")
     clinvar_dir = REF_DIR / "clinvar"
     clinvar_dir.mkdir(parents=True, exist_ok=True)
@@ -490,8 +487,8 @@ def _ensure_bgzip_tabix(gz_path: Path, seq_col: int, start_col: int,
                         end_col: int, meta_char: str = "#") -> bool:
     """Guarantee gz_path is bgzipped + tabix-indexed. Recompresses plain gzip if
     needed (a large decompress/recompress cycle). Returns True on success."""
-    import shutil
     import gzip as _gz
+    import shutil
     try:
         import pysam
     except Exception:
@@ -558,8 +555,8 @@ def setup_gnomad(force: bool = False) -> None:
 def setup_revel(force: bool = False) -> None:
     """REVEL (NON-COMMERCIAL). Download zip → slim to chr/pos/ref/alt/REVEL per
     build → sort → bgzip → tabix."""
-    import zipfile
     import csv
+    import zipfile
     log("REVEL (NON-COMMERCIAL license — see PREDICTOR_LICENSES.md) ...")
     d = REF_DIR / "revel"
     d.mkdir(parents=True, exist_ok=True)
@@ -577,7 +574,7 @@ def setup_revel(force: bool = False) -> None:
             raw = d / "revel_grch38.tsv"
             rows = []
             with z.open(member) as fh:
-                rdr = csv.reader((ln.decode() for ln in fh))
+                rdr = csv.reader(ln.decode() for ln in fh)
                 next(rdr, None)                      # header
                 for r in rdr:
                     if len(r) < 8 or not r[2]:       # grch38_pos empty → skip

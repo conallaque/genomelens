@@ -9,8 +9,6 @@ eczema only.
 """
 from __future__ import annotations
 
-import re
-
 import carrier
 import family_planning as fp
 
@@ -21,9 +19,7 @@ def _recessive_genes_detectable():
     out = set()
     for v in carrier.CARRIER_VARIANTS:
         inh = (v.get("inheritance") or "").lower()
-        if "recessive" in inh and "x-linked" not in inh:
-            out.add(v["gene"])
-        elif "semi-dominant" in inh or "codominant" in inh:
+        if ("recessive" in inh and "x-linked" not in inh) or "semi-dominant" in inh or "codominant" in inh:
             out.add(v["gene"])
     return out
 

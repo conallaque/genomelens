@@ -31,7 +31,7 @@ Every prevalence below is sourced. The economic parameters are inherited from
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Sequence, Tuple
+from collections.abc import Sequence
 
 try:
     import numpy as np
@@ -41,7 +41,9 @@ except Exception:                       # pragma: no cover
     _HAVE_NP = False
 
 from econ.value_of_information import (
-    DISCOUNT_RATE, TEST_COST, WTP, _finding_nmb,
+    DISCOUNT_RATE,
+    WTP,
+    _finding_nmb,
 )
 
 try:
@@ -129,7 +131,7 @@ ANCESTRY_SRC = ("Approximate US population mix (US Census 2020 broad categories)
 
 # ── persona sampling ──────────────────────────────────────────────────────────
 
-def _sample_persona(rng) -> Dict:
+def _sample_persona(rng) -> dict:
     """Draw one synthetic customer from the published prevalences above."""
     age = float(np.clip(rng.normal(AGE_DIST["mean"], AGE_DIST["sd"]),
                         AGE_DIST["min"], AGE_DIST["max"]))
@@ -147,7 +149,7 @@ def _sample_persona(rng) -> Dict:
     }
 
 
-def _persona_findings(p: Dict) -> List[Dict]:
+def _persona_findings(p: dict) -> list[dict]:
     """Convert a persona into the finding dicts the VOI engine already scores.
 
     ``wgs_only`` marks findings a genotyping chip cannot deliver — rare pathogenic
@@ -155,7 +157,7 @@ def _persona_findings(p: Dict) -> List[Dict]:
     pharmacogenomics, polygenic scores and APOE, so those are marked False. That
     split is what makes the chip-to-whole-genome comparison meaningful.
     """
-    out: List[Dict] = []
+    out: list[dict] = []
     horizon = max(5, int(85 - p["age"]))          # remaining years to benefit
     # Polygenic scores transfer poorly outside European-ancestry cohorts, so the
     # value they carry is attenuated rather than assumed constant.
@@ -209,7 +211,7 @@ def _persona_findings(p: Dict) -> List[Dict]:
     return out
 
 
-def _score(findings: Sequence[Dict], wtp: float) -> Tuple[float, float, float]:
+def _score(findings: Sequence[dict], wtp: float) -> tuple[float, float, float]:
     """(total NMB, sequencing-only NMB, prevention quality-of-life value).
 
     The third term isolates the *quality-of-life* value of the life-expectancy-
@@ -235,7 +237,7 @@ def _score(findings: Sequence[Dict], wtp: float) -> Tuple[float, float, float]:
 # ── 1. cohort simulation ──────────────────────────────────────────────────────
 
 def simulate_cohort(n: int = 10_000, seed: int = 20260803,
-                    wtp: Optional[float] = None) -> Dict:
+                    wtp: float | None = None) -> dict:
     """**Simulate a synthetic customer population and score every member.**
 
     *In plain English:* instead of asking "what is this one person's genome worth",
@@ -300,7 +302,7 @@ def simulate_cohort(n: int = 10_000, seed: int = 20260803,
 
 # ── 2. segment analysis ───────────────────────────────────────────────────────
 
-def segment_analysis(cohort: Dict) -> Dict:
+def segment_analysis(cohort: dict) -> dict:
     """**Who gets the most value?** Slice the cohort by age, family history, ancestry.
 
     *In plain English:* the same test is worth more to some people than others.
@@ -377,9 +379,9 @@ def segment_analysis(cohort: Dict) -> Dict:
 
 # ── 3. demand curve / price sensitivity ───────────────────────────────────────
 
-def demand_curve(cohort: Dict,
+def demand_curve(cohort: dict,
                  prices: Sequence[float] = (0, 99, 199, 299, 399, 599, 799, 999,
-                                            1499, 1999, 2999, 4999)) -> Dict:
+                                            1499, 1999, 2999, 4999)) -> dict:
     """**At each price, what share of customers get more value than they pay?**
 
     *In plain English:* a customer should rationally buy when the expected value of
@@ -439,7 +441,7 @@ def demand_curve(cohort: Dict,
 
 def adoption_curve(periods: int = 10, p_innovate: float = 0.03,
                    q_imitate: float = 0.38, market_size: float = 1_000_000,
-                   behavioural_drag: float = 0.30) -> Dict:
+                   behavioural_drag: float = 0.30) -> dict:
     """**Bass diffusion — how adoption spreads, and why it lags the value.**
 
     *In plain English:* new products spread in a predictable S-curve. A few
@@ -498,7 +500,7 @@ def adoption_curve(periods: int = 10, p_innovate: float = 0.03,
 
 def data_asset_ltv(initial_value: float = 4_463.0, years: int = 10,
                    knowledge_growth: float = 0.07, discount_rate: float = DISCOUNT_RATE,
-                   reanalysis_cost: float = 0.0) -> Dict:
+                   reanalysis_cost: float = 0.0) -> dict:
     """**#4 — The genome is bought once but appreciates forever.**
 
     *In plain English:* unlike almost any other purchase, a sequenced genome does
@@ -595,8 +597,8 @@ def _reference_totals():
     return _REFERENCE_COHORT
 
 
-def personalize_for_report(voi_result: Dict, age: float = 40.0,
-                           wtp: float = None) -> Dict:
+def personalize_for_report(voi_result: dict, age: float = 40.0,
+                           wtp: float = None) -> dict:
     """Turn ONE person's value-of-information result into the individually-relevant
     health-economics panels for their personal report.
 

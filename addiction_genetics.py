@@ -44,9 +44,8 @@ alcoholism); Sipe 2002 (FAAH C385A).
 """
 
 from __future__ import annotations
-from typing import Dict, List, Optional
-import pandas as pd
 
+import pandas as pd
 
 CAT_ALCOHOL = "Alcohol — Metabolism & Dependence"
 CAT_OPIOID = "Opioid & Endogenous-reward"
@@ -55,7 +54,7 @@ CAT_CANNABIS = "Cannabis & Endocannabinoid"
 CAT_STRESS = "Stress × Substance-use"
 
 
-def _gt(df, rsid) -> Optional[str]:
+def _gt(df, rsid) -> str | None:
     if rsid not in df.index:
         return None
     row = df.loc[rsid]
@@ -365,7 +364,7 @@ def _tally(findings, impact):
     return sum(1 for f in findings if f.get("impact") == impact)
 
 
-def build_composite(findings: List[Dict]) -> Dict:
+def build_composite(findings: list[dict]) -> dict:
     protective = _tally(findings, "protective")
     susceptible = _tally(findings, "susceptible")
     conditional = _tally(findings, "conditional")
@@ -454,7 +453,7 @@ def build_composite(findings: List[Dict]) -> Dict:
 CATEGORY_ORDER = [CAT_ALCOHOL, CAT_OPIOID, CAT_NICOTINE, CAT_CANNABIS, CAT_STRESS]
 
 
-def analyze_addiction_genetics(df: pd.DataFrame) -> Dict:
+def analyze_addiction_genetics(df: pd.DataFrame) -> dict:
     analyzers = [
         _adh1b, _aldh2, _cyp2e1, _gabra2,          # alcohol
         _oprm1, _dat1,                             # opioid / reward
@@ -462,7 +461,7 @@ def analyze_addiction_genetics(df: pd.DataFrame) -> Dict:
         _cnr1, _faah,                              # cannabis
         _crhr1, _fkbp5,                            # stress × substance
     ]
-    findings: List[Dict] = []
+    findings: list[dict] = []
     for a in analyzers:
         try:
             r = a(df)
@@ -472,7 +471,7 @@ def analyze_addiction_genetics(df: pd.DataFrame) -> Dict:
             continue
         findings.append(r)
 
-    by_category: Dict[str, List[Dict]] = {}
+    by_category: dict[str, list[dict]] = {}
     for f in findings:
         by_category.setdefault(f["category"], []).append(f)
 

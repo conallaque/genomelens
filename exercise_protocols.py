@@ -20,12 +20,9 @@ Concrete operational layers on top of the analytic core:
 
 from __future__ import annotations
 
-from typing import Dict, List
-
-
 # ── Fitness test calculators ───────────────────────────────────────────────
 
-def fitness_test_calculators() -> Dict:
+def fitness_test_calculators() -> dict:
     return {
         "cooper_12min_run": {
             "formula": "VO2max (ml/kg/min) = (distance_m − 504.9) / 44.73",
@@ -66,7 +63,7 @@ def fitness_test_calculators() -> Dict:
 
 # ── HR-Zone & Pace calculator (function user can call with age) ────────────
 
-def hr_zones_for_age(age: int, resting_hr: int = 60) -> Dict:
+def hr_zones_for_age(age: int, resting_hr: int = 60) -> dict:
     """Return BPM ranges per zone using Tanaka + Karvonen reserve method."""
     hrmax = round(208 - 0.7 * age)
     hrr = hrmax - resting_hr
@@ -88,7 +85,7 @@ def hr_zones_for_age(age: int, resting_hr: int = 60) -> Dict:
             "note": "Karvonen (using HR reserve) is more individually accurate than flat %HRmax."}
 
 
-def running_pace_zones(threshold_pace_min_per_km: float) -> Dict:
+def running_pace_zones(threshold_pace_min_per_km: float) -> dict:
     """Given lactate-threshold pace (min/km), return pace targets per zone."""
     t = threshold_pace_min_per_km  # in minutes per km
     return {
@@ -105,7 +102,7 @@ def running_pace_zones(threshold_pace_min_per_km: float) -> Dict:
 
 
 def race_time_predictor(known_distance_km: float, known_time_min: float,
-                        target_distance_km: float) -> Dict:
+                        target_distance_km: float) -> dict:
     """Riegel formula: T2 = T1 × (D2/D1)^1.06"""
     predicted = known_time_min * ((target_distance_km / known_distance_km) ** 1.06)
     return {
@@ -116,7 +113,7 @@ def race_time_predictor(known_distance_km: float, known_time_min: float,
     }
 
 
-def cycling_ftp_zones(ftp_watts: int) -> Dict:
+def cycling_ftp_zones(ftp_watts: int) -> dict:
     """Coggan power zones from FTP."""
     z = lambda lo, hi: f"{int(ftp_watts*lo)}-{int(ftp_watts*hi)} W"
     return {
@@ -140,7 +137,7 @@ def cycling_ftp_zones(ftp_watts: int) -> Dict:
 
 # ── Sport-Specific 12-Week Plans ───────────────────────────────────────────
 
-def _plan_powerlifting() -> Dict:
+def _plan_powerlifting() -> dict:
     return {
         "sport": "Powerlifting",
         "weeks": [
@@ -160,7 +157,7 @@ def _plan_powerlifting() -> Dict:
     }
 
 
-def _plan_marathon() -> Dict:
+def _plan_marathon() -> dict:
     return {
         "sport": "Marathon (sub-3:30 target as example)",
         "weeks": [
@@ -186,7 +183,7 @@ def _plan_marathon() -> Dict:
     }
 
 
-def _plan_crossfit_hybrid() -> Dict:
+def _plan_crossfit_hybrid() -> dict:
     return {
         "sport": "CrossFit / Hybrid",
         "weeks": [
@@ -207,7 +204,7 @@ def _plan_crossfit_hybrid() -> Dict:
     }
 
 
-def _plan_olympic_weightlifting() -> Dict:
+def _plan_olympic_weightlifting() -> dict:
     return {
         "sport": "Olympic Weightlifting",
         "weeks": [
@@ -224,7 +221,7 @@ def _plan_olympic_weightlifting() -> Dict:
     }
 
 
-def _plan_5k_runner() -> Dict:
+def _plan_5k_runner() -> dict:
     return {
         "sport": "5k Runner",
         "weeks": [
@@ -241,7 +238,7 @@ def _plan_5k_runner() -> Dict:
     }
 
 
-def sport_specific_plans(ranked_sports: List[Dict]) -> List[Dict]:
+def sport_specific_plans(ranked_sports: list[dict]) -> list[dict]:
     table = {
         "Powerlifting": _plan_powerlifting,
         "Olympic weightlifting": _plan_olympic_weightlifting,
@@ -273,7 +270,7 @@ def sport_specific_plans(ranked_sports: List[Dict]) -> List[Dict]:
 
 # ── Lifting Cue Library ────────────────────────────────────────────────────
 
-def lifting_cues() -> List[Dict]:
+def lifting_cues() -> list[dict]:
     return [
         {"lift": "Back squat",
          "setup": "Bar across mid-traps. Brace 360°. Feet shoulder-width, slight toe-out 15-20°.",
@@ -328,7 +325,7 @@ def lifting_cues() -> List[Dict]:
 
 # ── Recovery Modality Matrix (quantified) ──────────────────────────────────
 
-def recovery_modality_matrix() -> List[Dict]:
+def recovery_modality_matrix() -> list[dict]:
     return [
         {"modality": "Sleep 8-9 h",
          "effect_size": "★★★★★ — single highest-leverage intervention",
@@ -387,7 +384,7 @@ def recovery_modality_matrix() -> List[Dict]:
 
 # ── Master Athlete Adjustments by Decade ───────────────────────────────────
 
-def master_athlete_adjustments() -> List[Dict]:
+def master_athlete_adjustments() -> list[dict]:
     return [
         {"decade": "30s",
          "key_changes": "Recovery slightly slower vs 20s. Mostly indistinguishable from younger.",
@@ -418,13 +415,13 @@ def master_athlete_adjustments() -> List[Dict]:
 
 # ── Pre / Post workout supplement stacks ───────────────────────────────────
 
-def workout_supplement_stacks(caffeine_ergogenic: Dict, strength_tier: str,
-                              vo2_tier: str) -> Dict:
+def workout_supplement_stacks(caffeine_ergogenic: dict, strength_tier: str,
+                              vo2_tier: str) -> dict:
     caff = caffeine_ergogenic.get("responder", "")
     return {
         "pre_workout": [
-            (f"Caffeine 3-6 mg/kg 45 min pre" if caff.startswith("Strong")
-             else f"Caffeine ≤1 mg/kg or skip" if caff.startswith("Null")
+            ("Caffeine 3-6 mg/kg 45 min pre" if caff.startswith("Strong")
+             else "Caffeine ≤1 mg/kg or skip" if caff.startswith("Null")
              else "Caffeine 2-3 mg/kg 45 min pre (test response)"),
             "Beta-alanine 3-5 g daily (loading 2-4 wk; benefits 1-4 min efforts)",
             "Creatine monohydrate 5 g daily (timing doesn't matter; total stack)",
@@ -462,7 +459,7 @@ def workout_supplement_stacks(caffeine_ergogenic: Dict, strength_tier: str,
 
 # ── Movement Screen (FMS-style self test) ──────────────────────────────────
 
-def movement_screen() -> List[Dict]:
+def movement_screen() -> list[dict]:
     return [
         {"test": "Overhead squat (PVC overhead, feet shoulder-width)",
          "checks": "Heels stay down, knees track over feet, chest tall, bar over feet",
@@ -497,7 +494,7 @@ def movement_screen() -> List[Dict]:
 
 # ── Detraining / Retraining Timeline ───────────────────────────────────────
 
-def detraining_timeline() -> List[Dict]:
+def detraining_timeline() -> list[dict]:
     return [
         {"period": "Day 1-3 off", "what_happens": "Glycogen stores stay full; soreness clears. ZERO detraining."},
         {"period": "Week 1", "what_happens": "Plasma volume drops 5-10%; HR rises 5-10 bpm at given pace. Strength UNCHANGED."},
@@ -512,7 +509,7 @@ def detraining_timeline() -> List[Dict]:
 
 # ── HRV-Guided Week Structure ──────────────────────────────────────────────
 
-def hrv_guided_week() -> Dict:
+def hrv_guided_week() -> dict:
     return {
         "tracking": (
             "AM HRV (rMSSD or proprietary) immediately on waking, daily. Track 14-day "
@@ -547,7 +544,7 @@ def hrv_guided_week() -> Dict:
 
 # ── Public synthesis API ───────────────────────────────────────────────────
 
-def analyze_exercise_protocols(result: Dict) -> Dict:
+def analyze_exercise_protocols(result: dict) -> dict:
     profile = result.get("composite_profile", {})
     ranked = profile.get("ranked_sports", [])
     caff_erg = result.get("caffeine_ergogenic", {})

@@ -13,14 +13,12 @@ The report renders both:
   * A consolidated References appendix grouped by category
 """
 
-from typing import Dict, List
-
 
 # CPIC evidence levels (A = strong, B = moderate, C = optional, D = informational)
 # GWAS levels: GWAS-A = genome-wide significant + replicated; GWAS-B = GWS + meta-analysis
 # Clinical levels: ClinVar Path/Likely Path; ACMG; OMIM
 
-REFERENCES: Dict[str, Dict] = {
+REFERENCES: dict[str, dict] = {
     # ── APOE / Alzheimer's ───────────────────────────────────────────────────
     "rs429358": {
         "evidence_level": "Clinical-Validated",
@@ -304,7 +302,7 @@ REFERENCES: Dict[str, Dict] = {
 }
 
 
-def get_reference(rsid: str) -> Dict:
+def get_reference(rsid: str) -> dict:
     """Return the reference entry for an rsID, or a default 'not catalogued' record."""
     return REFERENCES.get(rsid, {
         "evidence_level": "Catalogued (GWAS/lit)",
@@ -314,7 +312,7 @@ def get_reference(rsid: str) -> Dict:
     })
 
 
-def collect_references_used(tier1_results: List[Dict]) -> List[Dict]:
+def collect_references_used(tier1_results: list[dict]) -> list[dict]:
     """Return the catalogued references for variants that appeared in tier-1
     results, sorted by category and gene."""
     refs = []

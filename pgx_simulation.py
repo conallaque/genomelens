@@ -16,15 +16,12 @@ level. Real prescribing requires clinical assessment.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
-
-
 # Per-drug PK / response model. Each entry:
 #   drug: name
 #   gene_pheno_map: gene → phenotype → (rel_clearance, dose_factor, ae_rr, note)
 #   ddi: list of (other_drug_class, modifier_description)
 
-DRUG_MODELS: Dict[str, Dict] = {
+DRUG_MODELS: dict[str, dict] = {
     "Vyvanse (lisdexamfetamine)": {
         "primary_gene": "CYP2D6",
         "gene_pheno": {
@@ -178,15 +175,15 @@ DRUG_MODELS: Dict[str, Dict] = {
 }
 
 
-def simulate_pgx(pgx_result: Optional[Dict]) -> Dict:
+def simulate_pgx(pgx_result: dict | None) -> dict:
     """Layer quantitative simulation over PGx phenotype calls."""
     if not pgx_result or not pgx_result.get("per_gene"):
         return {"available": False, "drugs": []}
 
     pheno_by_gene = {g: r.get("phenotype_code") for g, r in pgx_result["per_gene"].items()}
-    drug_sims: List[Dict] = []
+    drug_sims: list[dict] = []
     for drug, model in DRUG_MODELS.items():
-        relevant_phenos: List[Dict] = []
+        relevant_phenos: list[dict] = []
         for gene, pheno_map in model["gene_pheno"].items():
             pheno_code = pheno_by_gene.get(gene)
             if not pheno_code:

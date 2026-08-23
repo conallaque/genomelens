@@ -28,13 +28,13 @@ V8.1 SNPRecord schema extension to handle non-SNV variants. See
 ``CHANGELOG.md`` for the full reconciliation log.
 """
 
-from typing import Dict, List, Optional
+
 import pandas as pd
 
 import snp_registry  # V8 cross-check; see audit_against_registry below
 
 
-def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> Optional[int]:
+def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> int | None:
     if rsid not in snps_df.index:
         return None
     gt = snps_df.loc[rsid].get("genotype")
@@ -46,7 +46,7 @@ def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> Optional[int]:
     return s.count(allele.upper())
 
 
-CARRIER_VARIANTS: List[Dict] = [
+CARRIER_VARIANTS: list[dict] = [
     {
         "rsid": "rs1800562",
         "gene": "HFE",
@@ -488,12 +488,12 @@ CARRIER_VARIANTS: List[Dict] = [
 ]
 
 
-def analyze_carriers(snps_df: pd.DataFrame) -> Dict:
+def analyze_carriers(snps_df: pd.DataFrame) -> dict:
     """Returns a dict of carrier-status findings, organised by category."""
-    affected: List[Dict] = []
-    carriers: List[Dict] = []
-    not_carriers: List[Dict] = []
-    untested: List[Dict] = []
+    affected: list[dict] = []
+    carriers: list[dict] = []
+    not_carriers: list[dict] = []
+    untested: list[dict] = []
 
     for entry in CARRIER_VARIANTS:
         rsid = entry["rsid"]
@@ -529,7 +529,7 @@ def analyze_carriers(snps_df: pd.DataFrame) -> Dict:
 _COMPLEMENT = {"A": "T", "T": "A", "C": "G", "G": "C"}
 
 
-def audit_against_registry() -> Dict[str, List[str]]:
+def audit_against_registry() -> dict[str, list[str]]:
     """Verify that every rsID in ``CARRIER_VARIANTS`` that is also present in
     ``snp_registry.SNPS`` agrees on (a) the gene symbol and (b) the
     pathogenic allele being either the registry's ``derived`` allele or its
@@ -551,10 +551,10 @@ def audit_against_registry() -> Dict[str, List[str]]:
     Run on module import; raises ``AssertionError`` only on real biology
     disagreements — strand flips are documented in CHANGELOG.md and allowed.
     """
-    agreed: List[str] = []
-    strand_flipped: List[str] = []
-    disagreed: List[str] = []
-    registry_missing: List[str] = []
+    agreed: list[str] = []
+    strand_flipped: list[str] = []
+    disagreed: list[str] = []
+    registry_missing: list[str] = []
 
     for entry in CARRIER_VARIANTS:
         rec = snp_registry.get(entry["rsid"])

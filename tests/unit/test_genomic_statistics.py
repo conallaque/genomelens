@@ -69,7 +69,7 @@ def test_empirical_bayes_shrinks_noisiest_estimate_most():
     ses = [0.02, 0.05, 0.04, 0.10, 0.03]
     eb = gs.empirical_bayes_shrinkage(eff, ses)
     assert eb["available"] is True
-    moves = [abs(r - s) for r, s in zip(eb["effects_raw"], eb["effects_shrunk"])]
+    moves = [abs(r - s) for r, s in zip(eb["effects_raw"], eb["effects_shrunk"], strict=False)]
     assert moves.index(max(moves)) == ses.index(max(ses))   # noisiest moves most
     assert 0.0 <= eb["mean_shrinkage_weight"] <= 1.0
 

@@ -24,7 +24,6 @@ without a highlight and a note explains why. There is no silent default — a
 """
 
 from __future__ import annotations
-from typing import Dict, List, Optional
 
 
 def _get(d, *keys, default=None):
@@ -111,8 +110,8 @@ _DECADE_BASE = {
 _DECADE_ORDER = ["20s", "30s", "40s", "50s", "60s+"]
 
 
-def resolve_age(explicit_age: Optional[int],
-                bloodwork_result: Optional[Dict]) -> Optional[int]:
+def resolve_age(explicit_age: int | None,
+                bloodwork_result: dict | None) -> int | None:
     """Resolve the subject's age for the playbook. Priority: an explicit age
     (from --age), else the age nested in a compare_bloodwork result at
     ``result["clinical"]["age_used"]`` (its true location — the top level does
@@ -126,7 +125,7 @@ def resolve_age(explicit_age: Optional[int],
     return None
 
 
-def _decade_for_age(age: Optional[int]) -> Optional[str]:
+def _decade_for_age(age: int | None) -> str | None:
     if age is None:
         return None
     for key in _DECADE_ORDER:
@@ -137,14 +136,14 @@ def _decade_for_age(age: Optional[int]) -> Optional[str]:
 
 
 def analyze_life_stage_playbook(
-    age: Optional[int] = None,
-    holistic_synthesis_result: Optional[Dict] = None,
-    immunogenetics_result: Optional[Dict] = None,
-    addiction_genetics_result: Optional[Dict] = None,
-    neurochemistry_result: Optional[Dict] = None,
-    family_planning_result: Optional[Dict] = None,
-    tier1_results: Optional[Dict] = None,
-) -> Dict:
+    age: int | None = None,
+    holistic_synthesis_result: dict | None = None,
+    immunogenetics_result: dict | None = None,
+    addiction_genetics_result: dict | None = None,
+    neurochemistry_result: dict | None = None,
+    family_planning_result: dict | None = None,
+    tier1_results: dict | None = None,
+) -> dict:
     """Build the decade-by-decade playbook, modulated by genome context."""
 
     # ── Gather genome-specific modulators ────
@@ -182,10 +181,10 @@ def analyze_life_stage_playbook(
 
     # ── Build decades ────
     current = _decade_for_age(age)
-    decades: List[Dict] = []
+    decades: list[dict] = []
     for key in _DECADE_ORDER:
         base = _DECADE_BASE[key]
-        genome_items: List[Dict] = []
+        genome_items: list[dict] = []
 
         def add(text, source):
             genome_items.append({"text": text, "source": source})

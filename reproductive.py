@@ -21,14 +21,13 @@ back to a generic "1 in 100" assumption.
 from __future__ import annotations
 
 import re
-from typing import Dict, List, Optional
 
 
-def _parse_frequency_string(freq_str: str) -> Dict[str, float]:
+def _parse_frequency_string(freq_str: str) -> dict[str, float]:
     """Parse a free-form 'European ~1:25, Asian ~1:90' string into a dict."""
     if not freq_str:
         return {}
-    out: Dict[str, float] = {}
+    out: dict[str, float] = {}
     # Find each population: freq pair
     parts = re.split(r"[,;]", freq_str)
     for p in parts:
@@ -49,7 +48,7 @@ def _parse_frequency_string(freq_str: str) -> Dict[str, float]:
     return out
 
 
-def _inheritance_class(entry: Dict) -> str:
+def _inheritance_class(entry: dict) -> str:
     inh = entry.get("inheritance", "").lower()
     if "x-linked" in inh:
         return "x-linked"
@@ -60,13 +59,13 @@ def _inheritance_class(entry: Dict) -> str:
     return "unknown"
 
 
-def analyze_reproductive(carrier_result: Optional[Dict],
-                          roh_result: Optional[Dict] = None) -> Dict:
+def analyze_reproductive(carrier_result: dict | None,
+                          roh_result: dict | None = None) -> dict:
     """Generate reproductive scenarios for each carrier/affected finding."""
     if not carrier_result:
         return {"available": False, "scenarios": []}
 
-    scenarios: List[Dict] = []
+    scenarios: list[dict] = []
     all_findings = (carrier_result.get("carriers", []) +
                     carrier_result.get("affected", []))
 

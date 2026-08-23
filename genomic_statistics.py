@@ -28,7 +28,7 @@ statistical corrections whose consistent direction is to make risk estimates
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Optional, Sequence
+from collections.abc import Sequence
 
 try:
     import numpy as np
@@ -75,7 +75,7 @@ def _norm_ppf(p: float) -> float:
 
 def liability_threshold_risk(prs_percentile: float, prevalence: float,
                              h2_liability: float = 0.30,
-                             prs_r2: Optional[float] = None) -> Dict:
+                             prs_r2: float | None = None) -> dict:
     """**Falconer liability-threshold model** — PRS percentile → absolute risk.
 
     The disease is modelled as a latent continuous *liability* L ~ N(0,1); you are
@@ -144,9 +144,9 @@ def liability_threshold_risk(prs_percentile: float, prevalence: float,
 
 def age_dependent_penetrance(lifetime_penetrance: float, current_age: float = 35.0,
                              onset_median: float = 60.0, onset_shape: float = 4.0,
-                             horizon: Optional[int] = None, max_age: float = 95.0,
+                             horizon: int | None = None, max_age: float = 95.0,
                              penetrance_ref_age: float = 80.0,
-                             competing_mortality: bool = True) -> Dict:
+                             competing_mortality: bool = True) -> dict:
     """**Penetrance as a cumulative incidence function, with competing risks.**
 
     A single "lifetime penetrance" number is the wrong object for a decision model.
@@ -247,7 +247,7 @@ def age_dependent_penetrance(lifetime_penetrance: float, current_age: float = 35
 # ── 3. Empirical-Bayes / James–Stein joint shrinkage ─────────────────────────
 
 def empirical_bayes_shrinkage(effects: Sequence[float],
-                              ses: Sequence[float]) -> Dict:
+                              ses: Sequence[float]) -> dict:
     """**Joint (James–Stein / empirical-Bayes) shrinkage of many effect estimates.**
 
     Individually shrinking each effect (winner's curse) is necessary but not
@@ -303,7 +303,7 @@ PORTABILITY = {
 
 
 def prs_portability(prs_percentile: float, prevalence: float,
-                    ancestry: str = "european", base_r2: float = 0.10) -> Dict:
+                    ancestry: str = "european", base_r2: float = 0.10) -> dict:
     """**Ancestry-transferability decay of a polygenic score.**
 
     Most GWAS discovery samples are European. Linkage-disequilibrium structure, allele
@@ -356,8 +356,8 @@ LONGEVITY_SCENARIOS = [
 
 def longevity_sensitivity(lifetime_penetrance: float = 0.55,
                           current_age: float = 35.0,
-                          scenarios: Optional[Sequence[float]] = None,
-                          mortality_improvement: float = 0.30) -> Dict:
+                          scenarios: Sequence[float] | None = None,
+                          mortality_improvement: float = 0.30) -> dict:
     """**Sensitivity to lifespan extension** — how much does the value of genomic
     information change if people live substantially longer?
 
@@ -419,7 +419,7 @@ def summarise_genomic_corrections(prs_percentile: float = 0.95,
                                   prevalence: float = 0.06,
                                   lifetime_penetrance: float = 0.55,
                                   ancestry: str = "european",
-                                  current_age: float = 35.0) -> Dict:
+                                  current_age: float = 35.0) -> dict:
     """Run the full correction chain and report how much each step moves the risk —
     so the effect of every statistical adjustment is auditable, not buried."""
     lt = liability_threshold_risk(prs_percentile, prevalence)

@@ -18,7 +18,7 @@ can fully override an unfavourable score.
 from __future__ import annotations
 
 from math import erf, sqrt
-from typing import Dict, List, Optional
+
 import pandas as pd
 
 
@@ -89,7 +89,7 @@ def _score_panel(snps_df, panel):
             "used": used}
 
 
-def analyze_genetic_age(snps_df: pd.DataFrame) -> Dict:
+def analyze_genetic_age(snps_df: pd.DataFrame) -> dict:
     longevity = _score_panel(snps_df, LONGEVITY_VARIANTS)
     skin = _score_panel(snps_df, SKIN_AGING_VARIANTS)
     telomere = _score_panel(snps_df, TELOMERE_VARIANTS)

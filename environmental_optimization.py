@@ -37,11 +37,11 @@ Holick 2007; Engelsen 2010 (latitude & cutaneous vitamin-D synthesis).
 """
 
 from __future__ import annotations
-from typing import Dict, List, Optional
+
 import pandas as pd
 
 
-def _gt(df, rsid) -> Optional[str]:
+def _gt(df, rsid) -> str | None:
     if rsid not in df.index:
         return None
     row = df.loc[rsid]
@@ -56,7 +56,7 @@ def _gt(df, rsid) -> Optional[str]:
 
 # ─── 1. Circadian light timing ────────────────────────────────────────────────
 
-def analyze_circadian_light(df) -> Optional[Dict]:
+def analyze_circadian_light(df) -> dict | None:
     gt = _gt(df, "rs1801260")   # CLOCK 3111T/C; C → evening lean
     if gt is None:
         return None
@@ -110,7 +110,7 @@ def analyze_circadian_light(df) -> Optional[Dict]:
 
 # ─── 2. Exercise-modality fit ─────────────────────────────────────────────────
 
-def analyze_exercise_modality(df) -> Optional[Dict]:
+def analyze_exercise_modality(df) -> dict | None:
     actn3 = _gt(df, "rs1815739")   # C=R577 (power), T=X577 (endurance-lean)
     ace = _gt(df, "rs4343")        # ACE I/D proxy; G≈D (power), A≈I (endurance)
     if actn3 is None and ace is None:
@@ -118,7 +118,7 @@ def analyze_exercise_modality(df) -> Optional[Dict]:
 
     power_score = 0.0
     endurance_score = 0.0
-    basis: List[Dict] = []
+    basis: list[dict] = []
 
     if actn3 is not None:
         n_r = actn3.count("C")  # R allele
@@ -194,7 +194,7 @@ _VITD_LOW_ALLELE = {
 }
 
 
-def analyze_vitamin_d_seasonal(df, latitude: float = 40.0) -> Optional[Dict]:
+def analyze_vitamin_d_seasonal(df, latitude: float = 40.0) -> dict | None:
     typed = []
     n_low = 0
     n_typed = 0
@@ -277,7 +277,7 @@ def analyze_vitamin_d_seasonal(df, latitude: float = 40.0) -> Optional[Dict]:
 # ─── Master ───────────────────────────────────────────────────────────────────
 
 def analyze_environmental_optimization(df: pd.DataFrame,
-                                       latitude: float = 40.0) -> Dict:
+                                       latitude: float = 40.0) -> dict:
     circadian = None
     exercise = None
     vitamin_d = None

@@ -24,7 +24,6 @@ import nutrition as nu
 import personalized_plan as pp
 import supplements as sup
 
-
 pytestmark = pytest.mark.golden
 
 

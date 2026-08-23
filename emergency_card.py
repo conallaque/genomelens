@@ -27,8 +27,6 @@ emergency-relevant.
 from __future__ import annotations
 
 import datetime as _dt
-from pathlib import Path
-from typing import Dict, List, Optional
 
 
 def _esc(s):
@@ -38,15 +36,15 @@ def _esc(s):
 
 
 def _filter_emergency_findings(
-    carrier_result: Optional[Dict],
-    pgx_result: Optional[Dict],
-    pgx_sim_result: Optional[Dict],
-    hla_result: Optional[Dict],
-    interactions_result: Optional[Dict],
-    apoe_genotype: Optional[str],
-) -> List[Dict]:
+    carrier_result: dict | None,
+    pgx_result: dict | None,
+    pgx_sim_result: dict | None,
+    hla_result: dict | None,
+    interactions_result: dict | None,
+    apoe_genotype: str | None,
+) -> list[dict]:
     """Pull actionable, emergency-relevant findings."""
-    items: List[Dict] = []
+    items: list[dict] = []
 
     # ── HLA drug hypersensitivities ──
     if hla_result:
@@ -144,12 +142,12 @@ def build_emergency_card(
     file_label: str,
     file_hash: str,
     version: str,
-    apoe_genotype: Optional[str] = None,
-    carrier_result: Optional[Dict] = None,
-    pgx_result: Optional[Dict] = None,
-    pgx_sim_result: Optional[Dict] = None,
-    hla_result: Optional[Dict] = None,
-    interactions_result: Optional[Dict] = None,
+    apoe_genotype: str | None = None,
+    carrier_result: dict | None = None,
+    pgx_result: dict | None = None,
+    pgx_sim_result: dict | None = None,
+    hla_result: dict | None = None,
+    interactions_result: dict | None = None,
     report_link: str = "report.html",
 ) -> str:
     items = _filter_emergency_findings(

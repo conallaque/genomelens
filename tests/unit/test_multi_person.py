@@ -1,8 +1,11 @@
 """Unit tests for multi_person_module.py — KING-robust relationship inference."""
 
 from __future__ import annotations
+
 import random
+
 import pandas as pd
+
 import multi_person_module as mp
 
 

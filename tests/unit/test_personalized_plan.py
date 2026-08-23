@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import personalized_plan as pp
 
-
 # ── Stub inputs (matching shapes from the V6 modules) ────────────────────────
 
 def _supp_stub() -> dict:

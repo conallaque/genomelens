@@ -18,9 +18,6 @@ Concrete, deployable layers on top of the analytic core:
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
-
-
 # ── Postprandial Glucose Simulator ─────────────────────────────────────────
 #
 # Predicts incremental area-under-curve (iAUC) above fasting for a meal based
@@ -30,8 +27,8 @@ from typing import Dict, List, Optional
 # at the population average, scaled inversely with personal threshold.
 
 def simulate_postprandial_glucose(
-    meal: Dict, glycemic: Dict, time_of_day: str = "lunch"
-) -> Dict:
+    meal: dict, glycemic: dict, time_of_day: str = "lunch"
+) -> dict:
     """
     meal: {
        'name': str, 'carbs_g': float, 'protein_g': float, 'fat_g': float,
@@ -103,7 +100,7 @@ def simulate_postprandial_glucose(
     }
 
 
-def simulate_common_meals(glycemic: Dict) -> List[Dict]:
+def simulate_common_meals(glycemic: dict) -> list[dict]:
     meals = [
         # Naïve carb-heavy
         {"name": "Bagel + orange juice (naïve)", "carbs_g": 75, "protein_g": 10,
@@ -185,9 +182,9 @@ _SNACKS = [
 ]
 
 
-def thirty_day_meal_plan(macros: Dict, gluten: bool, lactose: bool,
+def thirty_day_meal_plan(macros: dict, gluten: bool, lactose: bool,
                          iron_overload: bool, e4: bool,
-                         high_omega3: bool) -> List[Dict]:
+                         high_omega3: bool) -> list[dict]:
     low_carb = macros["pct_carbs"] <= 35
     breakfasts = _BREAKFASTS_LC if low_carb else _BREAKFASTS_HC
     lunches = list(_LUNCHES)
@@ -221,7 +218,7 @@ def thirty_day_meal_plan(macros: Dict, gluten: bool, lactose: bool,
             pass
         return m
 
-    plan: List[Dict] = []
+    plan: list[dict] = []
     for day in range(1, 31):
         b = adapt(breakfasts[(day - 1) % len(breakfasts)])
         l = adapt(lunches[(day - 1) % len(lunches)])
@@ -244,7 +241,7 @@ def thirty_day_meal_plan(macros: Dict, gluten: bool, lactose: bool,
 
 # ── Cooking-method Optimizer (AGE / oxidation) ─────────────────────────────
 
-def cooking_method_optimizer() -> Dict:
+def cooking_method_optimizer() -> dict:
     return {
         "rationale": (
             "Advanced glycation end-products (AGEs) form when proteins/fats are "
@@ -285,7 +282,7 @@ def cooking_method_optimizer() -> Dict:
 
 # ── Restaurant / Cuisine Ordering Guides ───────────────────────────────────
 
-def restaurant_guides(result: Dict) -> List[Dict]:
+def restaurant_guides(result: dict) -> list[dict]:
     e4 = result.get("saturated_fat", {}).get("apoe_genotype", "").startswith("ε4")
     appetite = result.get("satiety", {}).get("appetite_phenotype", "Standard") != "Standard"
     lactose = result.get("lactose", {}).get("tolerance", "").startswith("Intolerant")
@@ -384,7 +381,7 @@ def restaurant_guides(result: Dict) -> List[Dict]:
 
 # ── Fasting Protocol Matchmaker ────────────────────────────────────────────
 
-def fasting_matchmaker(result: Dict) -> Dict:
+def fasting_matchmaker(result: dict) -> dict:
     appetite = result.get("satiety", {}).get("appetite_phenotype", "Standard")
     chrono = (result.get("meal_timing", {}).get("eating_window", "")
               if result.get("meal_timing") else "")
@@ -435,7 +432,7 @@ def fasting_matchmaker(result: Dict) -> Dict:
 
 # ── Polyphenol Quantitative Prescription ───────────────────────────────────
 
-def polyphenol_panel(antioxidants: Dict, inflam: Dict) -> Dict:
+def polyphenol_panel(antioxidants: dict, inflam: dict) -> dict:
     boost = antioxidants.get("reduced_capacity") or (inflam.get("score", 0) >= 2)
     target_mg_day = 1500 if boost else 800
     foods = [
@@ -469,7 +466,7 @@ def polyphenol_panel(antioxidants: Dict, inflam: Dict) -> Dict:
 
 # ── Mineral Quantitative Panel ─────────────────────────────────────────────
 
-def mineral_panel(result: Dict) -> List[Dict]:
+def mineral_panel(result: dict) -> list[dict]:
     salt_sensitive = result.get("salt", {}).get("sensitive", False)
     appetite = result.get("satiety", {}).get("appetite_phenotype", "Standard") != "Standard"
     return [
@@ -510,7 +507,7 @@ def mineral_panel(result: Dict) -> List[Dict]:
 
 # ── MIND Diet (APOE ε4 detailed cognitive protocol) ────────────────────────
 
-def mind_diet_protocol(e4: bool) -> Dict:
+def mind_diet_protocol(e4: bool) -> dict:
     if not e4:
         return {"applicable": False,
                 "note": "MIND-diet protocol is highest-leverage for ApoE ε4 carriers. "
@@ -566,7 +563,7 @@ def mind_diet_protocol(e4: bool) -> Dict:
 
 # ── Female cycle-phase nutrition (placeholder; activates if user supplied) ──
 
-def cycle_phase_nutrition() -> Dict:
+def cycle_phase_nutrition() -> dict:
     return {
         "note": "Activate by passing reproductive_state. Tailors macros, iron, and "
                 "training-fuelling to follicular/ovulatory/luteal/menstrual phases.",
@@ -599,7 +596,7 @@ def cycle_phase_nutrition() -> Dict:
 
 # ── Travel / Jet-lag nutrition ─────────────────────────────────────────────
 
-def travel_jetlag_protocol() -> Dict:
+def travel_jetlag_protocol() -> dict:
     return {
         "header": "5-step protocol to compress jet-lag adjustment from 1 day/timezone to ~half.",
         "steps": [
@@ -656,7 +653,7 @@ def travel_jetlag_protocol() -> Dict:
 
 # ── Pre-bed muscle protein synthesis ───────────────────────────────────────
 
-def pre_bed_mps_protocol() -> Dict:
+def pre_bed_mps_protocol() -> dict:
     return {
         "rationale": (
             "Overnight is the longest fasting window. 30-40 g slow-digesting protein "
@@ -680,7 +677,7 @@ def pre_bed_mps_protocol() -> Dict:
 
 # ── Public synthesis API ───────────────────────────────────────────────────
 
-def analyze_nutrition_protocols(result: Dict) -> Dict:
+def analyze_nutrition_protocols(result: dict) -> dict:
     glycemic = result.get("glycemic_threshold", {})
     macros = result.get("macros", {"pct_carbs": 45})
     antiox = result.get("antioxidants", {})

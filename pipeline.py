@@ -25,7 +25,90 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional
+
+from analyze import (
+    PROFESSIONAL_MODULES_LOADED,
+    REPORT_VERSION,
+    SCRIPT_DIR,
+    _build_module_context,
+    ai_interpret_modules,
+    analyze_addiction_genetics,
+    analyze_ancestral_story,
+    analyze_ancestry,
+    analyze_blood_type,
+    analyze_carriers,
+    analyze_clinical_variants,
+    analyze_deep_ancestry,
+    analyze_detox,
+    analyze_environmental_optimization,
+    analyze_exercise,
+    analyze_expanded_pgs,
+    analyze_family_planning,
+    analyze_genetic_age,
+    analyze_health_economics,
+    analyze_hla,
+    analyze_holistic_synthesis,
+    analyze_immunogenetics,
+    analyze_life_stage_playbook,
+    analyze_local_ancestry,
+    analyze_medications,
+    analyze_metal_oxidative,
+    analyze_mr,
+    analyze_mt_haplogroup,
+    analyze_multi_person,
+    analyze_neurochemistry,
+    analyze_novel_variants,
+    analyze_nutrition,
+    analyze_personal_economics,
+    analyze_pgx,
+    analyze_phewas,
+    analyze_polygenic_scores,
+    analyze_polygenic_traits,
+    analyze_reproductive,
+    analyze_urologic,
+    analyze_value_of_information,
+    analyze_wellness,
+    # Optional module bindings (any of these can be None if the module
+    # couldn't be imported — orchestration handles that via `is not None`).
+    analyze_y_haplogroup,
+    build_carrier_report,
+    build_emergency_card,
+    build_personalized_plan,
+    build_supplement_stack,
+    collect_references_used,
+    compare_bloodwork,
+    cross_category_synthesis,
+    detect_interactions,
+    detect_roh,
+    diff_runs,
+    evaluate_counseling_triggers,
+    export_fhir,
+    generate_narrative_report,
+    html_to_pdf,
+    imputation_available,
+    impute_genotypes,
+    load_snp_database,
+    log,
+    parse_dna_file,
+    predict_traits,
+    render_bloodwork_html,
+    render_carrier_html,
+    render_diff_text,
+    render_economic_analysis_html,
+    render_exercise_html,
+    render_multi_person_html,
+    render_nutrition_html,
+    render_plan_html,
+    render_supplements_html,
+    retry_failed_categories,
+    run_chat,
+    run_qc,
+    simulate_pgx,
+    tier1_lookup,
+    tier2_analysis,
+    weasyprint_available,
+    write_failed_categories,
+)
 
 # Bulk re-export: bring every symbol the orchestration body references into
 # this module's namespace. The split between "library functions" (defined in
@@ -33,89 +116,7 @@ from typing import Dict, List, Optional
 # remains the canonical home for the small, well-tested helpers; pipeline.py
 # owns the long sequencing logic.
 from renderers import build_html_report
-from analyze import (
-    SCRIPT_DIR,
-    REPORT_VERSION,
-    log,
-    load_snp_database,
-    parse_dna_file,
-    tier1_lookup,
-    tier2_analysis,
-    cross_category_synthesis,
-    _build_module_context,
-    ai_interpret_modules,
-    write_failed_categories,
-    retry_failed_categories,
-    # Optional module bindings (any of these can be None if the module
-    # couldn't be imported — orchestration handles that via `is not None`).
-    analyze_y_haplogroup,
-    analyze_mt_haplogroup,
-    impute_genotypes,
-    imputation_available,
-    PROFESSIONAL_MODULES_LOADED,
-    run_qc,
-    analyze_polygenic_scores,
-    analyze_pgx,
-    detect_interactions,
-    analyze_carriers,
-    predict_traits,
-    collect_references_used,
-    evaluate_counseling_triggers,
-    analyze_expanded_pgs,
-    analyze_ancestry,
-    analyze_medications,
-    analyze_wellness,
-    analyze_hla,
-    detect_roh,
-    analyze_local_ancestry,
-    analyze_phewas,
-    analyze_mr,
-    analyze_genetic_age,
-    simulate_pgx,
-    analyze_reproductive,
-    compare_bloodwork,
-    render_bloodwork_html,
-    build_supplement_stack,
-    render_supplements_html,
-    analyze_exercise,
-    render_exercise_html,
-    analyze_nutrition,
-    render_nutrition_html,
-    export_fhir,
-    build_personalized_plan,
-    render_plan_html,
-    analyze_health_economics,
-    analyze_personal_economics,
-    render_economic_analysis_html,
-    build_carrier_report,
-    render_carrier_html,
-    build_emergency_card,
-    generate_narrative_report,
-    html_to_pdf,
-    weasyprint_available,
-    diff_runs,
-    render_diff_text,
-    run_chat,
-    analyze_metal_oxidative,
-    analyze_detox,
-    analyze_urologic,
-    analyze_deep_ancestry,
-    analyze_blood_type,
-    analyze_immunogenetics,
-    analyze_ancestral_story,
-    analyze_neurochemistry,
-    analyze_holistic_synthesis,
-    analyze_addiction_genetics,
-    analyze_family_planning,
-    analyze_polygenic_traits,
-    analyze_environmental_optimization,
-    analyze_life_stage_playbook,
-    analyze_clinical_variants,
-    analyze_novel_variants,
-    analyze_value_of_information,
-    analyze_multi_person,
-    render_multi_person_html,
-)
+
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:
     from analyze import _MODULE_LOAD_ERROR
@@ -329,12 +330,12 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Genome comparison failed: {e}")
 
     # ── Optional imputation step ──
-    imputation_info: Optional[Dict] = None
+    imputation_info: dict | None = None
     if args.impute:
         if impute_genotypes is None:
             log("ERROR: imputation module not available")
         else:
-            log(f"Imputation requested. Checking Beagle setup ...")
+            log("Imputation requested. Checking Beagle setup ...")
             ok, reason = imputation_available()
             log(f"  {reason}")
             if ok:
@@ -361,7 +362,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
     log(f"  {y_result['message']}")
 
     # mtDNA haplogroup analysis (maternal lineage)
-    mt_result: Optional[Dict] = None
+    mt_result: dict | None = None
     if analyze_mt_haplogroup is not None:
         log("Analysing mtDNA haplogroup ...")
         try:
@@ -374,14 +375,14 @@ def run_pipeline(args: argparse.Namespace) -> int:
         log("mtDNA module not available — skipping maternal-lineage analysis")
 
     # ── Professional-grade analyses ──
-    qc_result: Optional[Dict] = None
-    prs_result: Optional[Dict] = None
-    pgx_result: Optional[Dict] = None
-    interactions_result: Optional[Dict] = None
-    carrier_result: Optional[Dict] = None
-    traits_result: Optional[Dict] = None
-    counseling_result: Optional[Dict] = None
-    references_used: Optional[List[Dict]] = None
+    qc_result: dict | None = None
+    prs_result: dict | None = None
+    pgx_result: dict | None = None
+    interactions_result: dict | None = None
+    carrier_result: dict | None = None
+    traits_result: dict | None = None
+    counseling_result: dict | None = None
+    references_used: list[dict] | None = None
 
     if PROFESSIONAL_MODULES_LOADED:
         log("Running professional-grade analyses ...")
@@ -451,9 +452,9 @@ def run_pipeline(args: argparse.Namespace) -> int:
         log(f"Professional modules NOT loaded ({_MODULE_LOAD_ERROR}); using core analysis only.")
 
     # ── v3 modules: expanded PGS Catalog + ancestry PCA + medications ──
-    expanded_pgs_result: Optional[Dict] = None
-    ancestry_result: Optional[Dict] = None
-    medications_result: Optional[Dict] = None
+    expanded_pgs_result: dict | None = None
+    ancestry_result: dict | None = None
+    medications_result: dict | None = None
 
     if analyze_expanded_pgs is not None:
         try:
@@ -508,7 +509,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 log(f"  WARNING: Medications module failed: {e}")
 
     # ── V4: wellness predictions ──
-    wellness_result: Optional[Dict] = None
+    wellness_result: dict | None = None
     if analyze_wellness is not None:
         try:
             log("Generating wellness predictions ...")
@@ -519,14 +520,14 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Wellness module failed: {e}")
 
     # ── V5: premium statistical genetics ──
-    hla_result: Optional[Dict] = None
-    roh_result: Optional[Dict] = None
-    local_ancestry_result: Optional[Dict] = None
-    phewas_result: Optional[Dict] = None
-    mr_result: Optional[Dict] = None
-    genetic_age_result: Optional[Dict] = None
-    pgx_sim_result: Optional[Dict] = None
-    reproductive_result: Optional[Dict] = None
+    hla_result: dict | None = None
+    roh_result: dict | None = None
+    local_ancestry_result: dict | None = None
+    phewas_result: dict | None = None
+    mr_result: dict | None = None
+    genetic_age_result: dict | None = None
+    pgx_sim_result: dict | None = None
+    reproductive_result: dict | None = None
 
     if analyze_hla is not None:
         try:
@@ -600,7 +601,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Reproductive module failed: {e}")
 
     # ── V6: bloodwork comparison, supplements, exercise, nutrition ────────────
-    bloodwork_result: Optional[Dict] = None
+    bloodwork_result: dict | None = None
     if args.bloodwork:
         if compare_bloodwork is None:
             log("  Bloodwork comparison skipped: module not available")
@@ -620,7 +621,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             except Exception as e:
                 log(f"  WARNING: Bloodwork comparison failed: {e}")
 
-    supplement_result: Optional[Dict] = None
+    supplement_result: dict | None = None
     if build_supplement_stack is not None:
         try:
             log("Building personalised supplement stack ...")
@@ -638,7 +639,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Supplements module failed: {e}")
 
-    exercise_result: Optional[Dict] = None
+    exercise_result: dict | None = None
     if analyze_exercise is not None:
         try:
             log("Generating personalised exercise programming ...")
@@ -650,7 +651,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Exercise module failed: {e}")
 
-    nutrition_result: Optional[Dict] = None
+    nutrition_result: dict | None = None
     if analyze_nutrition is not None:
         try:
             log("Generating personalised nutrition plan ...")
@@ -694,10 +695,10 @@ def run_pipeline(args: argparse.Namespace) -> int:
     log(f"  Tier 1 results saved: {tier1_path}")
 
     # ── Health economics runs AFTER all analysis modules (wired below) ──
-    economics_result: Optional[Dict] = None
+    economics_result: dict | None = None
 
     # ── Metal handling / oxidative-defense / neurodegeneration panel ──
-    metal_oxidative_result: Optional[Dict] = None
+    metal_oxidative_result: dict | None = None
     if analyze_metal_oxidative is not None:
         try:
             metal_oxidative_result = analyze_metal_oxidative(snps_df)
@@ -707,7 +708,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Metal/oxidative module failed: {e}")
 
     # ── Detoxification & environmental resilience (smoke / PAH / metals) ──
-    detox_result: Optional[Dict] = None
+    detox_result: dict | None = None
     if analyze_detox is not None:
         try:
             detox_result = analyze_detox(snps_df)
@@ -719,7 +720,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Detoxification module failed: {e}")
 
     # ── Urologic & genitourinary panel (OAB, BPH, prostate, stones, testis) ──
-    urologic_result: Optional[Dict] = None
+    urologic_result: dict | None = None
     if analyze_urologic is not None:
         try:
             urologic_result = analyze_urologic(snps_df)
@@ -731,7 +732,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Urologic module failed: {e}")
 
     # ── Deep ancestry (Neanderthal + ancient-pop + N/S Europe + timelines) ──
-    deep_ancestry_result: Optional[Dict] = None
+    deep_ancestry_result: dict | None = None
     if analyze_deep_ancestry is not None:
         try:
             deep_ancestry_result = analyze_deep_ancestry(
@@ -745,7 +746,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Deep-ancestry module failed: {e}")
 
     # ── Blood type (ABO + Rh + secretor) ──
-    blood_type_result: Optional[Dict] = None
+    blood_type_result: dict | None = None
     if analyze_blood_type is not None:
         try:
             blood_type_result = analyze_blood_type(snps_df)
@@ -757,7 +758,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Blood-type module failed: {e}")
 
     # ── Neurochemistry (COMT axis + composite phenotype recommendations) ──
-    neurochemistry_result: Optional[Dict] = None
+    neurochemistry_result: dict | None = None
     if analyze_neurochemistry is not None:
         try:
             neurochemistry_result = analyze_neurochemistry(snps_df)
@@ -771,7 +772,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
     # ── Holistic Synthesis is computed near the end (needs upstream outputs) ──
 
     # ── Addiction genetics (alcohol/opioid/nicotine/cannabis susceptibility) ──
-    addiction_genetics_result: Optional[Dict] = None
+    addiction_genetics_result: dict | None = None
     if analyze_addiction_genetics is not None:
         try:
             addiction_genetics_result = analyze_addiction_genetics(snps_df)
@@ -783,7 +784,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Addiction-genetics module failed: {e}")
 
     # ── Trait genetics (genotype-level single-variant traits) ──
-    polygenic_traits_result: Optional[Dict] = None
+    polygenic_traits_result: dict | None = None
     if analyze_polygenic_traits is not None:
         try:
             polygenic_traits_result = analyze_polygenic_traits(snps_df)
@@ -794,7 +795,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Trait-genetics module failed: {e}")
 
     # ── TNRC18 rs117910193 novelty marker (single-variant genotype read-out) ──
-    tnrc18_result: Optional[Dict] = None
+    tnrc18_result: dict | None = None
     try:
         from tnrc18_marker import analyze_tnrc18_marker
         tnrc18_result = analyze_tnrc18_marker(snps_df)
@@ -807,7 +808,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         log(f"  WARNING: TNRC18 marker module failed: {e}")
 
     # ── Environmental optimization (light / exercise / vitamin-D × latitude) ──
-    environmental_optimization_result: Optional[Dict] = None
+    environmental_optimization_result: dict | None = None
     if analyze_environmental_optimization is not None:
         try:
             environmental_optimization_result = analyze_environmental_optimization(
@@ -821,7 +822,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Environmental-optimization module failed: {e}")
 
     # ── Clinical variants (Phase 2 — ClinVar P/LP screen; VCF input only) ──
-    clinical_variants_result: Optional[Dict] = None
+    clinical_variants_result: dict | None = None
     if analyze_clinical_variants is not None:
         try:
             import genome_input as _gi
@@ -840,7 +841,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Clinical-variants module failed: {e}")
 
     # ── Novel/rare variants (Phase 3 — computational predictor screen; VCF only) ──
-    novel_variants_result: Optional[Dict] = None
+    novel_variants_result: dict | None = None
     if analyze_novel_variants is not None:
         try:
             import genome_input as _gi3
@@ -861,11 +862,11 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Novel-variants module failed: {e}")
 
-    voi_result: Optional[Dict] = None
+    voi_result: dict | None = None
     # (VOI + health economics moved below, after all analysis modules)
 
     # ── Family planning (reproductive genetics — needs carrier + mt + sex) ──
-    family_planning_result: Optional[Dict] = None
+    family_planning_result: dict | None = None
     if analyze_family_planning is not None:
         try:
             family_planning_result = analyze_family_planning(
@@ -884,7 +885,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Family-planning module failed: {e}")
 
     # ── Immunogenetics (viral/bacterial/parasitic resistance + selection) ──
-    immunogenetics_result: Optional[Dict] = None
+    immunogenetics_result: dict | None = None
     if analyze_immunogenetics is not None:
         try:
             immunogenetics_result = analyze_immunogenetics(snps_df)
@@ -896,7 +897,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Immunogenetics module failed: {e}")
 
     # ── Ancestral Story (template narrative; AI-enhanced if AI enabled) ──
-    ancestral_story_result: Optional[Dict] = None
+    ancestral_story_result: dict | None = None
     if analyze_ancestral_story is not None:
         try:
             ancestral_story_result = analyze_ancestral_story(
@@ -915,7 +916,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Ancestral-story module failed: {e}")
 
     # ── ClinPGx/PharmGKB clinical-variant annotations for typed rsIDs ──
-    pharmgkb_result: Optional[Dict] = None
+    pharmgkb_result: dict | None = None
     if analyze_pharmgkb_clinical is not None:
         try:
             pharmgkb_result = analyze_pharmgkb_clinical(snps_df)
@@ -927,7 +928,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: PharmGKB clinical module failed: {e}")
 
     # ── Top-prescribed-drugs pharmacogenomic screen ──
-    top_drugs_result: Optional[Dict] = None
+    top_drugs_result: dict | None = None
     if analyze_top_drugs is not None:
         try:
             top_drugs_result = analyze_top_drugs(snps_df, pgx_result)
@@ -1041,10 +1042,10 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Value-of-Information module failed: {e}")
 
-    ai_results: Dict[str, str] = {}
+    ai_results: dict[str, str] = {}
     # ── Holistic Synthesis — computed BEFORE the AI block so its Genome
     #    Leverage Score can frame the executive summary + synthesis prompts. ──
-    holistic_synthesis_result: Optional[Dict] = None
+    holistic_synthesis_result: dict | None = None
     if analyze_holistic_synthesis is not None:
         try:
             _sex = (qc_result or {}).get("inferred_sex")
@@ -1097,10 +1098,10 @@ def run_pipeline(args: argparse.Namespace) -> int:
     except Exception as e:
         log(f"  WARNING: module-context digest failed: {e}")
 
-    exec_summary: Optional[str] = None
-    cross_cat: Optional[str] = None
-    failed_categories: List[Dict] = []
-    module_ai: Dict[str, str] = {}
+    exec_summary: str | None = None
+    cross_cat: str | None = None
+    failed_categories: list[dict] = []
+    module_ai: dict[str, str] = {}
 
     if not args.no_ai:
         log(f"Starting Tier 2 AI analysis (model: {args.model}) ...")
@@ -1151,7 +1152,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         log("Skipping AI analysis (--no-ai)")
 
     # ── Life-stage playbook (runs AFTER holistic_synthesis — needs leverage) ──
-    life_stage_playbook_result: Optional[Dict] = None
+    life_stage_playbook_result: dict | None = None
     if analyze_life_stage_playbook is not None:
         try:
             # Age priority: --age flag, else bloodwork labs age; see resolve_age.
@@ -1468,7 +1469,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             long_path.write_text(_render_longevity_html(integrated, file_label),
                                   encoding="utf-8")
             log(f"  Longevity composite + year-long plan saved: {long_path}")
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         log(f"  WARNING: Longevity composite failed: {e}")
 
     # ── V6: FHIR clinical export ──

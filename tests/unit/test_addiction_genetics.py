@@ -1,7 +1,9 @@
 """Unit tests for addiction_genetics.py."""
 
 from __future__ import annotations
+
 import pandas as pd
+
 import addiction_genetics as ag
 
 

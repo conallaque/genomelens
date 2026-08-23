@@ -36,16 +36,15 @@ not to score); Lo 2017 (personality GWAS effect sizes).
 """
 
 from __future__ import annotations
-from typing import Dict, List, Optional
-import pandas as pd
 
+import pandas as pd
 
 CAT_CHRONO = "Chronotype & Sleep"
 CAT_TASTE = "Taste, Smell & Diet Perception"
 CAT_APPEAR = "Appearance & Physical Traits"
 
 
-def _gt(df, rsid) -> Optional[str]:
+def _gt(df, rsid) -> str | None:
     if rsid not in df.index:
         return None
     row = df.loc[rsid]
@@ -304,7 +303,7 @@ def _edar_hair(df):
 
 # ─── Polygenic / fraught traits — STRUCTURAL CAP (no scores) ──────────────────
 
-def _polygenic_notes() -> List[Dict]:
+def _polygenic_notes() -> list[dict]:
     """These traits are either irreducibly polygenic (height) or low-signal and
     socially fraught (cognition, personality). By design this returns
     *explanations*, never scores, percentiles, or rankings."""
@@ -360,14 +359,14 @@ def _polygenic_notes() -> List[Dict]:
 CATEGORY_ORDER = [CAT_CHRONO, CAT_TASTE, CAT_APPEAR]
 
 
-def analyze_polygenic_traits(df: pd.DataFrame) -> Dict:
+def analyze_polygenic_traits(df: pd.DataFrame) -> dict:
     analyzers = [
         _clock_chronotype, _per2_morningness, _abcc9_sleep_duration, _dec2_short_sleeper,
         _tas2r38_bitter, _or6a2_cilantro, _abcc11_earwax_odor, _asparagus_anosmia,
         _photic_sneeze,
         _herc2_eye, _mc1r_red_hair, _irf4_pigment, _edar_hair,
     ]
-    findings: List[Dict] = []
+    findings: list[dict] = []
     for a in analyzers:
         try:
             r = a(df)
@@ -376,7 +375,7 @@ def analyze_polygenic_traits(df: pd.DataFrame) -> Dict:
         if r is not None:
             findings.append(r)
 
-    by_category: Dict[str, List[Dict]] = {}
+    by_category: dict[str, list[dict]] = {}
     for f in findings:
         by_category.setdefault(f["category"], []).append(f)
 

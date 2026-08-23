@@ -1,6 +1,7 @@
 """ClinPGx/PharmGKB clinical-variant annotation module."""
 
 import pandas as pd
+
 import pharmgkb_clinical as pg
 
 

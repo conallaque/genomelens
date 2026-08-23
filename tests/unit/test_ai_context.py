@@ -2,6 +2,7 @@
 AI specs, and the section AI-callout injector."""
 
 from __future__ import annotations
+
 import analyze
 import renderers
 

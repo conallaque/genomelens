@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-import immunogenetics as ig
 import ancestral_story as story
+import immunogenetics as ig
 
 
 def _df(g: dict) -> pd.DataFrame:

@@ -20,9 +20,8 @@ The module:
      a migration narrative, and ancient-DNA comparisons.
 """
 
-from typing import Dict, List, Optional
-import pandas as pd
 
+import pandas as pd
 
 # ─── Defining markers ─────────────────────────────────────────────────────────
 #
@@ -37,7 +36,7 @@ import pandas as pd
 #               or "subclade" (e.g. H1, J1c)
 #   description — short description shown in the report
 
-MTDNA_MARKERS: List[Dict] = [
+MTDNA_MARKERS: list[dict] = [
     # ── Macro-haplogroups ─────────────────────────────────────────────────────
     {
         # Recorded from the non-R side until 2026-08-23 ("derived" T meaning
@@ -148,7 +147,7 @@ MTDNA_MARKERS: List[Dict] = [
 
 
 # ─── Haplogroup metadata: migration & ancient DNA ─────────────────────────────
-HAPLOGROUP_INFO: Dict[str, Dict[str, str]] = {
+HAPLOGROUP_INFO: dict[str, dict[str, str]] = {
     "H": {
         "migration": (
             "Haplogroup H is the most common mtDNA lineage in Europe (~40% of "
@@ -397,7 +396,7 @@ HAPLOGROUP_INFO: Dict[str, Dict[str, str]] = {
 
 # ─── Analysis function ────────────────────────────────────────────────────────
 
-def _normalise_genotype(gt: object) -> Optional[str]:
+def _normalise_genotype(gt: object) -> str | None:
     if gt is None:
         return None
     s = str(gt).upper().strip().replace(" ", "").replace("-", "")
@@ -406,7 +405,7 @@ def _normalise_genotype(gt: object) -> Optional[str]:
     return s
 
 
-def _find_marker(snps_df: pd.DataFrame, marker: Dict) -> Optional[Dict]:
+def _find_marker(snps_df: pd.DataFrame, marker: dict) -> dict | None:
     """Look up a marker by rsID list, then by chrMT+position. Returns dict
     with {found_genotype, rsid_hit, derived_status} or None if not found."""
     # rsID lookup
@@ -464,9 +463,9 @@ def _find_marker(snps_df: pd.DataFrame, marker: Dict) -> Optional[Dict]:
 # sample that passes through it. ``test_mt_haplogroup.py`` pins the rule.
 
 
-def _mt_node(haplogroup: str, markers: List[tuple], description: str = "",
+def _mt_node(haplogroup: str, markers: list[tuple], description: str = "",
              migration: str = "", further: str = "",
-             children: Optional[List[Dict]] = None) -> Dict:
+             children: list[dict] | None = None) -> dict:
     """One branch point. ``markers`` are (name, rsids, pos, derived, ancestral)."""
     return {
         "haplogroup": haplogroup,
@@ -481,7 +480,7 @@ def _mt_node(haplogroup: str, markers: List[tuple], description: str = "",
     }
 
 
-MT_TREE: Dict = _mt_node(
+MT_TREE: dict = _mt_node(
     "mt-MRCA", [],
     description="Mitochondrial Eve — the most recent common maternal ancestor "
                 "of every living person.",
@@ -609,11 +608,11 @@ MT_TREE: Dict = _mt_node(
     ])
 
 
-def _mt_lookup(node: Dict, snps_df) -> tuple:
+def _mt_lookup(node: dict, snps_df) -> tuple:
     """Resolve one node's markers. Returns (status, n_derived, n_ancestral,
     evidence) using the same vocabulary as the Y module."""
     n_der = n_anc = 0
-    evidence: List[str] = []
+    evidence: list[str] = []
     for (name, rsids, pos, derived, ancestral) in node.get("markers", []):
         hit = _find_marker(snps_df, {"name": name, "rsids": rsids, "pos": pos,
                                      "derived": derived, "ancestral": ancestral})
@@ -632,7 +631,7 @@ def _mt_lookup(node: Dict, snps_df) -> tuple:
     return "not_found", 0, 0, evidence
 
 
-def _mt_entry(node: Dict, status: str, n_der: int, evidence: List[str]) -> Dict:
+def _mt_entry(node: dict, status: str, n_der: int, evidence: list[str]) -> dict:
     return {
         "haplogroup": node["haplogroup"],
         "snp_name": node["snp_name"],
@@ -649,7 +648,7 @@ def _mt_entry(node: Dict, status: str, n_der: int, evidence: List[str]) -> Dict:
     }
 
 
-def _mt_walk(node: Dict, snps_df, prefix: List[Dict], depth: int = 0):
+def _mt_walk(node: dict, snps_df, prefix: list[dict], depth: int = 0):
     """Walk the maternal tree, returning (path, status).
 
     Mirrors the Y-DNA walker deliberately, including its central rule: never
@@ -699,10 +698,10 @@ def _mt_walk(node: Dict, snps_df, prefix: List[Dict], depth: int = 0):
     return path, ("resolved" if status == "derived" else "chip_gap")
 
 
-def _classify(matched: List[Dict]) -> tuple:
+def _classify(matched: list[dict]) -> tuple:
     """From the set of confirmed-derived markers, pick the most-specific
     haplogroup call. Returns (haplogroup, confidence)."""
-    derived_haplogroups: List[str] = []
+    derived_haplogroups: list[str] = []
     for m in matched:
         if m["status"] == "derived":
             # marker['defines'] may contain "/" — take the first clean token
@@ -725,12 +724,12 @@ def _classify(matched: List[Dict]) -> tuple:
     return derived_haplogroups[0], "low"
 
 
-def analyze_mt_haplogroup(snps_df: pd.DataFrame) -> Dict:
+def analyze_mt_haplogroup(snps_df: pd.DataFrame) -> dict:
     """Walk MTDNA_MARKERS against the parsed SNPs and return a result dict."""
     mt_df = snps_df[snps_df["chrom"].isin(["MT", "M", "chrMT", "chrM"])]
     mt_count = len(mt_df)
 
-    matched_markers: List[Dict] = []
+    matched_markers: list[dict] = []
     for marker in MTDNA_MARKERS:
         hit = _find_marker(snps_df, marker)
         if hit is None:

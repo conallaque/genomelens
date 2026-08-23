@@ -41,7 +41,6 @@ from __future__ import annotations
 
 import gzip
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 SCRIPT_DIR = Path(__file__).parent
 CLINVAR_DIR = SCRIPT_DIR / "reference" / "clinvar"
@@ -80,7 +79,7 @@ def is_uncertain_sig(sig: str) -> bool:
 # ── ACMG SF: curated inheritance for genes where it is unambiguous ────────────
 # Only genes with well-established, unambiguous inheritance for the reportable
 # phenotype. Everything not here → inheritance-unknown (never guessed).
-_ACMG_SF_INHERITANCE: Dict[str, str] = {
+_ACMG_SF_INHERITANCE: dict[str, str] = {
     # hereditary cancer
     "BRCA1": "AD", "BRCA2": "AD", "PALB2": "AD",
     "MLH1": "AD", "MSH2": "AD", "MSH6": "AD", "PMS2": "AD", "EPCAM": "AD",
@@ -117,7 +116,7 @@ def _norm_chrom(c: str) -> str:
     return c[3:] if c.lower().startswith("chr") else c
 
 
-def norm_key(chrom: str, pos: int, ref: str, alt: str) -> Tuple[str, int, str, str]:
+def norm_key(chrom: str, pos: int, ref: str, alt: str) -> tuple[str, int, str, str]:
     """Canonical (chrom, pos, ref, alt). Trims shared suffix then shared prefix
     (advancing pos) so ``AG>A`` at 100 and ``G>`` representations collapse to the
     same key on both the ClinVar and user sides."""
@@ -134,7 +133,7 @@ def norm_key(chrom: str, pos: int, ref: str, alt: str) -> Tuple[str, int, str, s
 
 # ── distiller (called by setup.py --clinvar) ──────────────────────────────────
 
-def _parse_info(info: str) -> Dict[str, str]:
+def _parse_info(info: str) -> dict[str, str]:
     out = {}
     for kv in info.split(";"):
         if "=" in kv:
@@ -185,13 +184,13 @@ def distill_clinvar_vcf(in_path: str, out_path: str, log=print) -> int:
 
 # ── table loading (with truncation guard) ─────────────────────────────────────
 
-def load_clinvar_table(build: str) -> Optional[Dict[Tuple, Dict]]:
+def load_clinvar_table(build: str) -> dict[tuple, dict] | None:
     """Load the distilled table for a build into {norm_key: record}, or None if
     absent. Refuses a truncated/headerless table."""
     path = CLINVAR_DIR / f"clinvar_plp_{build}.tsv.gz"
     if not path.exists():
         return None
-    table: Dict[Tuple, Dict] = {}
+    table: dict[tuple, dict] = {}
     try:
         with gzip.open(path, "rt") as f:
             header = f.readline().rstrip("\n").split("\t")
@@ -211,7 +210,7 @@ def load_clinvar_table(build: str) -> Optional[Dict[Tuple, Dict]]:
 
 # ── zygosity resolved against the matched ALT ─────────────────────────────────
 
-def zygosity_for_alt(gt_field: str, matched_alt_index: int) -> Optional[str]:
+def zygosity_for_alt(gt_field: str, matched_alt_index: int) -> str | None:
     """Zygosity of the sample for a SPECIFIC ALT allele index (1-based ALT →
     VCF allele number). Returns 'homozygous'/'heterozygous'/'hemizygous', or
     None if the sample doesn't carry that allele / is a no-call."""
@@ -245,8 +244,8 @@ _NEGATIVE_DISCLAIMER = (
 
 
 def analyze_clinical_variants(vcf_path: str, build: str,
-                              inferred_sex: Optional[str] = None,
-                              log=None) -> Dict:
+                              inferred_sex: str | None = None,
+                              log=None) -> dict:
     """Screen a user VCF against distilled ClinVar. Returns structured findings
     with classification, zygosity, star confidence, and compound-het detection."""
     _log = log or (lambda *a, **k: None)
@@ -267,7 +266,8 @@ def analyze_clinical_variants(vcf_path: str, build: str,
     meta_path = CLINVAR_DIR / f"clinvar_plp_{build}.meta.json"
     if meta_path.exists():
         try:
-            import json as _json, datetime as _dt
+            import datetime as _dt
+            import json as _json
             m = _json.loads(meta_path.read_text())
             clinvar_date = m.get("distilled")
             if clinvar_date:
@@ -279,7 +279,7 @@ def analyze_clinical_variants(vcf_path: str, build: str,
         except Exception:
             pass
 
-    findings: List[Dict] = []
+    findings: list[dict] = []
     n_scanned = 0
     opener = gzip.open if str(vcf_path).lower().endswith((".gz", ".bgz")) else open
     with opener(vcf_path, "rt", errors="ignore") as f:
@@ -319,8 +319,8 @@ def analyze_clinical_variants(vcf_path: str, build: str,
     return result
 
 
-def _classify(findings: List[Dict], n_scanned: int,
-              inferred_sex: Optional[str]) -> Dict:
+def _classify(findings: list[dict], n_scanned: int,
+              inferred_sex: str | None) -> dict:
     """Attach ACMG/inheritance classification, run the per-gene compound-het
     pass, split P/LP from uncertain, and bucket by category."""
     plp = [f for f in findings if not f["is_vus"] and f["stars"] >= 1]
@@ -328,7 +328,7 @@ def _classify(findings: List[Dict], n_scanned: int,
     excluded_0star = [f for f in findings if not f["is_vus"] and f["stars"] < 1]
 
     # per-gene compound-het detection (recessive genes, ≥2 distinct P/LP variants)
-    by_gene: Dict[str, List[Dict]] = {}
+    by_gene: dict[str, list[dict]] = {}
     for f in plp:
         by_gene.setdefault(f["gene"], []).append(f)
 

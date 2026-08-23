@@ -86,6 +86,7 @@ def test_imputed_provenance_threads_and_renders():
     them and the catalogue must flag imputed calls (never mistaking a
     statistical call for a measured one). Chip data is unaffected."""
     import pandas as pd
+
     import analyze
     db = {"rs1801133": {"gene": "MTHFR", "name": "C677T",
                         "category": "Methylation & Folate", "risk_allele": "T",

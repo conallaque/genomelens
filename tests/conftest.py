@@ -16,7 +16,6 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Dict
 
 import pandas as pd
 import pytest
@@ -38,7 +37,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 # The keys MUST stay stable — golden-snapshot tests are byte-exact against
 # the resulting JSON. If you change a genotype here, you change every snapshot.
 
-_SYNTHETIC_GENOTYPES: Dict[str, Dict[str, object]] = {
+_SYNTHETIC_GENOTYPES: dict[str, dict[str, object]] = {
     # rsid:        (chrom, pos_GRCh37,  genotype)
     # ── V6 supplement rule SNPs ────────────────────────────────────────────
     "rs1801133":  {"chrom": "1",  "pos": 11856378, "genotype": "CT"},   # MTHFR C677T het

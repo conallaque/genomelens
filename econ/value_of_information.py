@@ -26,7 +26,6 @@ down-weighted because they are computational, not confirmed.
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Optional, Tuple
 
 from . import params as _econ_params
 
@@ -44,7 +43,7 @@ DISCOUNT_SENSITIVITY = (0.0, 0.03, 0.05)
 TEST_COST = {"chip": 100.0, "wgs": 300.0}                 # consumer chip vs WGS promo
 
 # Cost-of-Illness: lifetime, direct + indirect, present-ish value (illustrative).
-COI: Dict[str, Dict] = {
+COI: dict[str, dict] = {
     "CAD":            {"cost": 90_000,  "src": "AHA — lifetime CVD direct+indirect"},
     "T2D":            {"cost": 85_000,  "src": "ADA 2018 — lifetime excess cost"},
     "Alzheimer":      {"cost": 350_000, "src": "Alz. Assoc. 2023 — incl. long-term care"},
@@ -93,7 +92,7 @@ MARGINAL_COST_FRACTION = 0.60
 # p_rx = P(prescribed over a lifetime); p_adr = P(severe ADR | actionable genotype,
 # standard dosing); rrr = relative risk reduction with genotype-guided care;
 # adr_cost = cost of the ADR event; qaly = QALY loss averted.
-PGX_CEA: Dict[str, Dict] = {
+PGX_CEA: dict[str, dict] = {
     "HLA-B*57:01/abacavir": {"p_rx": 0.02, "p_adr": 0.55, "rrr": 0.95,
                              "adr_cost": 20_000, "qaly": 0.30,
                              "src": "Schackman 2008 — cost-saving"},
@@ -172,10 +171,10 @@ def _annuity_pv(years: float, rate: float) -> float:
 
 # ── finding collection ────────────────────────────────────────────────────────
 
-def _collect(economics_result: Optional[Dict],
-             clinical_variants_result: Optional[Dict],
-             novel_variants_result: Optional[Dict],
-             unvalued: Optional[List[Dict]] = None) -> List[Dict]:
+def _collect(economics_result: dict | None,
+             clinical_variants_result: dict | None,
+             novel_variants_result: dict | None,
+             unvalued: list[dict] | None = None) -> list[dict]:
     """Unify findings across sources into explicit economic parameter dicts:
     {label, kind, coi_key/pgx_key, p_event, rrr, qaly, intervention, horizon,
      wgs_only, haircut, confidence}.
@@ -186,7 +185,7 @@ def _collect(economics_result: Optional[Dict],
     ``health_economics.py`` gains new ``source=`` labels regularly, and a label
     it emits that this module has no mapping for silently disappears from the
     model while the report still claims a complete computation."""
-    out: List[Dict] = []
+    out: list[dict] = []
 
     econ = economics_result or {}
     for f in (econ.get("findings_with_economics") or []):
@@ -290,7 +289,7 @@ def _collect(economics_result: Optional[Dict],
     return out
 
 
-def _classify_category(category: Optional[str], label: str = "") -> Tuple[str, str]:
+def _classify_category(category: str | None, label: str = "") -> tuple[str, str]:
     """Map a health-economics finding onto ('pgx'|'coi'|'', coi_key).
 
     ``health_economics.py`` labels findings with human-readable sources
@@ -373,7 +372,7 @@ def _classify_category(category: Optional[str], label: str = "") -> Tuple[str, s
 # These are judgement calls, not published multipliers, and are labelled as such
 # in the report. The ordering is what matters: hypothesis-generating panels
 # (PheWAS, wellness) are worth a fraction of a curated clinical finding.
-EVIDENCE_HAIRCUT: Dict[str, float] = {
+EVIDENCE_HAIRCUT: dict[str, float] = {
     "phewas biomarker":        0.10,   # typically <1% of trait variance explained
     "wellness prediction":     0.10,   # lifestyle-adjacent, largely non-clinical
     "expanded polygenic score": 0.25,  # broad panels, uneven validation
@@ -388,7 +387,7 @@ EVIDENCE_HAIRCUT: Dict[str, float] = {
 }
 
 
-def _evidence_haircut(category: Optional[str]) -> float:
+def _evidence_haircut(category: str | None) -> float:
     """Fraction of modelled value retained for this source (1.0 = no discount)."""
     cat = (category or "").strip().lower()
     if cat in EVIDENCE_HAIRCUT:
@@ -403,7 +402,7 @@ def _evidence_haircut(category: Optional[str]) -> float:
 # matters: an unlisted category is an oversight to fix, whereas one listed here
 # is a decision. Findings from these sources still appear in the report — they
 # are excluded from the economic model only.
-NOT_VALUED: Dict[str, str] = {
+NOT_VALUED: dict[str, str] = {
     "Longevity": (
         "The longevity composite is a summary of variants this module already "
         "values individually, so monetising it counts the same genotypes "
@@ -425,7 +424,7 @@ NOT_VALUED: Dict[str, str] = {
 }
 
 
-def _not_valued_reason(category: Optional[str]) -> str:
+def _not_valued_reason(category: str | None) -> str:
     """Return the documented reason this category carries no economic value,
     or '' if the category is simply unmapped (i.e. an oversight)."""
     cat = (category or "").strip()
@@ -496,7 +495,7 @@ ROH_PANEL_TIERS = {
 }
 
 
-def assess_carrier_panel_prior(roh_result: Optional[Dict] = None) -> Dict:
+def assess_carrier_panel_prior(roh_result: dict | None = None) -> dict:
     """Translate an ROH profile into a CATEGORICAL carrier-panel recommendation.
 
     Returns a dict carrying a tier, a recommendation, the reasoning, and an
@@ -561,7 +560,7 @@ def _match_pgx(label: str) -> str:
     return "PGx-generic"
 
 
-def _gene_to_econ(gene: str) -> Tuple[str, float, float, float]:
+def _gene_to_econ(gene: str) -> tuple[str, float, float, float]:
     """(coi_key, penetrance, screening/prophylaxis RRR, QALY gain) for a gene."""
     g = (gene or "").upper()
     table = {
@@ -579,7 +578,7 @@ def _gene_to_econ(gene: str) -> Tuple[str, float, float, float]:
 
 # ── per-finding NMB ───────────────────────────────────────────────────────────
 
-def _finding_nmb(f: Dict, wtp: float, rate: float, rng=None) -> Tuple[float, float, float]:
+def _finding_nmb(f: dict, wtp: float, rate: float, rng=None) -> tuple[float, float, float]:
     """Return (nmb, dcost_averted, dqaly) for one finding. If rng is given, sample
     uncertain parameters (PSA); else use point estimates."""
     disc = _annuity_pv(f.get("horizon", 20), rate) / max(1e-9,
@@ -637,20 +636,20 @@ def _gamma(rng, mean: float, cv: float = 0.4) -> float:
 
 # ── main ──────────────────────────────────────────────────────────────────────
 
-def analyze_value_of_information(economics_result: Optional[Dict] = None,
-                                 clinical_variants_result: Optional[Dict] = None,
-                                 novel_variants_result: Optional[Dict] = None,
-                                 genetic_age_result: Optional[Dict] = None,
-                                 roh_result: Optional[Dict] = None,
+def analyze_value_of_information(economics_result: dict | None = None,
+                                 clinical_variants_result: dict | None = None,
+                                 novel_variants_result: dict | None = None,
+                                 genetic_age_result: dict | None = None,
+                                 roh_result: dict | None = None,
                                  input_type: str = "chip",
                                  n_mc: int = 5000, seed: int = 12345,
-                                 log=None) -> Dict:
+                                 log=None) -> dict:
     # Records any sub-analysis that failed, so a crashing extension degrades
     # VISIBLY instead of silently vanishing from the report. A silent
     # {"available": False} is exactly how the chip-input bug stayed hidden.
-    _degraded: List[Tuple[str, str]] = []
+    _degraded: list[tuple[str, str]] = []
 
-    _unvalued: List[Dict] = []
+    _unvalued: list[dict] = []
     findings = _collect(economics_result, clinical_variants_result,
                         novel_variants_result, unvalued=_unvalued)
     if not findings:
@@ -931,7 +930,7 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
                         "qaly": float(cea["incremental_qaly"])}
 
             _all = _ee_findings
-            _chip_only = [f for f, src in zip(_ee_findings, findings)
+            _chip_only = [f for f, src in zip(_ee_findings, findings, strict=False)
                           if not src.get("wgs_only")]
             _wgs_extra = len(_all) - len(_chip_only)
             _arms = [{"name": "No testing", "cost": 0.0, "qaly": 0.0}]
@@ -1024,7 +1023,7 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
     return result
 
 
-def _resolve_age(genetic_age_result: Optional[Dict], default: float = 35.0) -> float:
+def _resolve_age(genetic_age_result: dict | None, default: float = 35.0) -> float:
     """Best-effort age from the bloodwork/aging module; falls back to a default."""
     g = genetic_age_result or {}
     for key in ("chronological_age", "chronological", "age_used", "age"):
@@ -1038,7 +1037,7 @@ def _resolve_age(genetic_age_result: Optional[Dict], default: float = 35.0) -> f
     return default
 
 
-def _risk_adjusted(result: Dict, test_cost: float) -> Dict:
+def _risk_adjusted(result: dict, test_cost: float) -> dict:
     """Portfolio-style risk-adjusted summaries of the modelled value distribution.
 
     * **Return on investment** — modelled value per dollar of test cost.
@@ -1072,7 +1071,7 @@ def _risk_adjusted(result: Dict, test_cost: float) -> Dict:
     }
 
 
-def _exante(test_cost: float) -> Dict:
+def _exante(test_cost: float) -> dict:
     """Ex-ante (EVSI-style) value to a random person BEFORE testing: population
     prevalence × ΔNB across a catalog of screenable actionable findings."""
     catalog = [
@@ -1094,7 +1093,7 @@ def _exante(test_cost: float) -> Dict:
     return {"voi_exante_point": round(total - test_cost)}
 
 
-def _psa(findings: List[Dict], test_cost: float, n: int, seed: int) -> Dict:
+def _psa(findings: list[dict], test_cost: float, n: int, seed: int) -> dict:
     """Seeded Monte-Carlo PSA. Effects/costs are sampled per draw; λ is varied
     deterministically for the CEAC via NMB(λ) = NMB_base + ΔQALY·(λ − λ_base)."""
     rng = np.random.default_rng(seed)
@@ -1151,7 +1150,7 @@ def _psa(findings: List[Dict], test_cost: float, n: int, seed: int) -> Dict:
     }
 
 
-def _tornado(findings: List[Dict], test_cost: float) -> List[Dict]:
+def _tornado(findings: list[dict], test_cost: float) -> list[dict]:
     """One-way sensitivity: swing WTP and discount rate to their extremes."""
     base = sum(_finding_nmb(f, float(WTP["base"]), DISCOUNT_RATE)[0]
                for f in findings) - test_cost
@@ -1171,7 +1170,7 @@ def _tornado(findings: List[Dict], test_cost: float) -> List[Dict]:
 
 
 def analyze_health_capital(age: float = 35.0, horizon: int = 50,
-                           informed_efficiency_gain: Optional[float] = None) -> Dict:
+                           informed_efficiency_gain: float | None = None) -> dict:
     """**Grossman (1972) health-capital model.**
 
     Health is a durable capital stock that depreciates with age and is replenished
@@ -1243,7 +1242,7 @@ def analyze_health_capital(age: float = 35.0, horizon: int = 50,
 
 
 def analyze_real_option(voi_now: float, test_cost: float, age: float = 35.0,
-                        defer_years: int = 5) -> Dict:
+                        defer_years: int = 5) -> dict:
     """**Real-options / optimal-timing analysis (Dixit–Pindyck).**
 
     Sequencing is an irreversible purchase under uncertainty with a timing choice.
@@ -1318,8 +1317,8 @@ def analyze_real_option(voi_now: float, test_cost: float, age: float = 35.0,
     }
 
 
-def analyze_evpi(findings: List[Dict], test_cost: float, n: int = 4000,
-                 seed: int = 4242) -> Dict:
+def analyze_evpi(findings: list[dict], test_cost: float, n: int = 4000,
+                 seed: int = 4242) -> dict:
     """**Expected Value of Perfect Information (EVPI)** — the formal ceiling.
 
     EVPI is the canonical VOI quantity in decision theory (Raiffa & Schlaifer 1961):
@@ -1384,7 +1383,7 @@ def analyze_evpi(findings: List[Dict], test_cost: float, n: int = 4000,
     }
 
 
-def analyze_evppi(findings: List[Dict], n: int = 3000, seed: int = 777) -> Dict:
+def analyze_evppi(findings: list[dict], n: int = 3000, seed: int = 777) -> dict:
     """**EVPPI — Expected Value of *Partial* Perfect Information.**
 
     EVPI tells you what resolving *all* uncertainty is worth. EVPPI answers the more
@@ -1465,7 +1464,7 @@ def analyze_evppi(findings: List[Dict], n: int = 3000, seed: int = 777) -> Dict:
 
 
 def analyze_behavioural(mean: float, sd: float, test_cost: float,
-                        horizon_years: int = 30) -> Dict:
+                        horizon_years: int = 30) -> dict:
     """**Behavioural economics: prospect theory and hyperbolic discounting.**
 
     Expected-utility theory says people maximise E[u(w)]. They demonstrably don't, and
@@ -1531,7 +1530,7 @@ def analyze_behavioural(mean: float, sd: float, test_cost: float,
     }
 
 
-def analyze_utility(mean: float, sd: float, wealth: float = 60_000.0) -> Dict:
+def analyze_utility(mean: float, sd: float, wealth: float = 60_000.0) -> dict:
     """**Expected-utility / Arrow–Pratt risk preferences.**
 
     A risk-averse agent does not value an uncertain payoff at its mean. Under CRRA
@@ -1568,7 +1567,7 @@ def analyze_welfare_comparison(voi: float, test_cost: float,
                                loss_given_breach: float = 25_000.0,
                                participation_local: float = 0.85,
                                participation_central: float = 0.60,
-                               participation_source: str = "Miller & Tucker (2018)") -> Dict:
+                               participation_source: str = "Miller & Tucker (2018)") -> dict:
     """**Welfare comparison: local vs centralised genomic analysis.**
 
     The economic case for local-only analysis, stated as a surplus comparison rather
@@ -1690,7 +1689,7 @@ def analyze_welfare_comparison(voi: float, test_cost: float,
     }
 
 
-def analyze_insurance_economics(evpi: float, mean_value: float) -> Dict:
+def analyze_insurance_economics(evpi: float, mean_value: float) -> dict:
     """**Information economics of genomic testing** — asymmetric information.
 
     Genomic results create a classic Akerlof/Rothschild–Stiglitz problem: if the
@@ -1730,7 +1729,7 @@ def analyze_insurance_economics(evpi: float, mean_value: float) -> Dict:
 
 def analyze_penetrance_posterior(prior_penetrance: float, gene: str = "",
                                  family_history: bool = False,
-                                 ascertainment_inflation: float = 2.0) -> Dict:
+                                 ascertainment_inflation: float = 2.0) -> dict:
     """**Bayesian penetrance with ascertainment correction** (the genomics-side rigor).
 
     The single biggest error in consumer genomic risk estimates is using penetrance
@@ -1781,7 +1780,7 @@ def analyze_penetrance_posterior(prior_penetrance: float, gene: str = "",
     }
 
 
-def shrink_effect_size(beta_hat: float, se: float, threshold_z: float = 5.45) -> Dict:
+def shrink_effect_size(beta_hat: float, se: float, threshold_z: float = 5.45) -> dict:
     """**Winner's-curse correction for GWAS effect sizes.**
 
     Effect sizes at variants discovered *because* they crossed genome-wide
@@ -1819,7 +1818,7 @@ def shrink_effect_size(beta_hat: float, se: float, threshold_z: float = 5.45) ->
     }
 
 
-def _price_panel() -> Dict:
+def _price_panel() -> dict:
     total = sum(p for _, p in MARKET_PRICE_ITEMS)
     return {"a_la_carte_total": total, "consolidated": CONSOLIDATED_PRICE,
             "items": [{"name": n, "price": p} for n, p in MARKET_PRICE_ITEMS],
@@ -1827,9 +1826,9 @@ def _price_panel() -> Dict:
                     "health-economic VALUE above."}
 
 
-def _methods(rate: float, wtp: float, test_cost: float, input_type: str) -> List[str]:
+def _methods(rate: float, wtp: float, test_cost: float, input_type: str) -> list[str]:
     return [
-        f"Perspective: individual lifetime; decision-analytic net monetary benefit.",
+        "Perspective: individual lifetime; decision-analytic net monetary benefit.",
         f"Willingness-to-pay λ = ${wtp:,.0f}/QALY (sensitivity ${WTP['low']:,}–"
         f"${WTP['high']:,}; Neumann et al., NEJM 2014).",
         f"Discounting: {rate:.0%} on both costs and QALYs (sensitivity 0/3/5%).",

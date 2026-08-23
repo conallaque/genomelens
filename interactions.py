@@ -22,11 +22,11 @@ Each finding combines specific risk-allele dosages and emits a clinical
 interpretation with action items.
 """
 
-from typing import Dict, List, Optional
+
 import pandas as pd
 
 
-def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> Optional[int]:
+def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> int | None:
     if rsid not in snps_df.index:
         return None
     gt = snps_df.loc[rsid].get("genotype")
@@ -38,7 +38,7 @@ def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> Optional[int]:
     return s.count(allele.upper())
 
 
-def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
+def _gt(snps_df: pd.DataFrame, rsid: str) -> str | None:
     if rsid not in snps_df.index:
         return None
     gt = snps_df.loc[rsid].get("genotype")
@@ -47,10 +47,10 @@ def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
     return str(gt).upper()
 
 
-def detect_interactions(snps_df: pd.DataFrame) -> Dict:
+def detect_interactions(snps_df: pd.DataFrame) -> dict:
     """Returns a dict with a list of finding-records, each describing a
     multi-variant pattern detected in the genotype data."""
-    findings: List[Dict] = []
+    findings: list[dict] = []
 
     # ── MTHFR compound heterozygosity ─────────────────────────────────────────
     c677t = _dose(snps_df, "rs1801133", "T")   # C677T
@@ -187,7 +187,7 @@ def detect_interactions(snps_df: pd.DataFrame) -> Dict:
             findings.append({
                 "title": "Factor V Leiden Heterozygote",
                 "severity": "moderate",
-                "variants": [f"rs6025 (A/G, dosage 1)"],
+                "variants": ["rs6025 (A/G, dosage 1)"],
                 "interpretation": (
                     "Single-copy Factor V Leiden — ~5–7× VTE risk vs background. "
                     "Most carriers never have a VTE event."

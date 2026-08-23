@@ -13,10 +13,8 @@ Output: narrative_report.html (standalone, self-contained).
 from __future__ import annotations
 
 import datetime as _dt
-import json
 import re
 from pathlib import Path
-from typing import Dict, List, Optional
 
 
 def _esc(s):
@@ -66,26 +64,26 @@ SYSTEM_PROMPT = (
 
 
 def _build_context(
-    tier1_results: List[Dict],
-    apoe_genotype: Optional[str],
-    y_result: Optional[Dict],
-    mt_result: Optional[Dict],
-    pgx_result: Optional[Dict],
-    prs_result: Optional[Dict],
-    interactions_result: Optional[Dict],
-    carrier_result: Optional[Dict],
-    traits_result: Optional[Dict],
-    wellness_result: Optional[Dict],
-    ancestry_result: Optional[Dict],
-    hla_result: Optional[Dict],
-    roh_result: Optional[Dict],
-    phewas_result: Optional[Dict],
-    mr_result: Optional[Dict],
-    genetic_age_result: Optional[Dict],
-    counseling_result: Optional[Dict],
+    tier1_results: list[dict],
+    apoe_genotype: str | None,
+    y_result: dict | None,
+    mt_result: dict | None,
+    pgx_result: dict | None,
+    prs_result: dict | None,
+    interactions_result: dict | None,
+    carrier_result: dict | None,
+    traits_result: dict | None,
+    wellness_result: dict | None,
+    ancestry_result: dict | None,
+    hla_result: dict | None,
+    roh_result: dict | None,
+    phewas_result: dict | None,
+    mr_result: dict | None,
+    genetic_age_result: dict | None,
+    counseling_result: dict | None,
 ) -> str:
     """Build the long context string we send to the LLM."""
-    out: List[str] = []
+    out: list[str] = []
     out.append("=== PATIENT GENETIC SUMMARY ===\n")
 
     # Overall
@@ -221,23 +219,23 @@ def generate_narrative_report(
     file_hash: str,
     version: str,
     model: str,
-    tier1_results: List[Dict],
-    apoe_genotype: Optional[str] = None,
-    y_result: Optional[Dict] = None,
-    mt_result: Optional[Dict] = None,
-    pgx_result: Optional[Dict] = None,
-    prs_result: Optional[Dict] = None,
-    interactions_result: Optional[Dict] = None,
-    carrier_result: Optional[Dict] = None,
-    traits_result: Optional[Dict] = None,
-    wellness_result: Optional[Dict] = None,
-    ancestry_result: Optional[Dict] = None,
-    hla_result: Optional[Dict] = None,
-    roh_result: Optional[Dict] = None,
-    phewas_result: Optional[Dict] = None,
-    mr_result: Optional[Dict] = None,
-    genetic_age_result: Optional[Dict] = None,
-    counseling_result: Optional[Dict] = None,
+    tier1_results: list[dict],
+    apoe_genotype: str | None = None,
+    y_result: dict | None = None,
+    mt_result: dict | None = None,
+    pgx_result: dict | None = None,
+    prs_result: dict | None = None,
+    interactions_result: dict | None = None,
+    carrier_result: dict | None = None,
+    traits_result: dict | None = None,
+    wellness_result: dict | None = None,
+    ancestry_result: dict | None = None,
+    hla_result: dict | None = None,
+    roh_result: dict | None = None,
+    phewas_result: dict | None = None,
+    mr_result: dict | None = None,
+    genetic_age_result: dict | None = None,
+    counseling_result: dict | None = None,
 ) -> str:
     """Send a comprehensive summary to Ollama and write narrative_report.html."""
     import requests

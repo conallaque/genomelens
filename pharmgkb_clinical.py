@@ -25,7 +25,6 @@ from __future__ import annotations
 import csv
 import re
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -43,10 +42,10 @@ _PGX_GENES = {
     "SLCO1B1", "VKORC1", "UGT1A1", "DPYD",
 }
 
-_TSV_CACHE: Optional[List[Dict]] = None
+_TSV_CACHE: list[dict] | None = None
 
 
-def _load_table() -> List[Dict]:
+def _load_table() -> list[dict]:
     """Parse clinicalVariants.tsv into rows keyed by a single clean rsID.
 
     Rows whose `variant` is not a single rsID (star alleles, HGVS, multi-allele
@@ -55,7 +54,7 @@ def _load_table() -> List[Dict]:
     global _TSV_CACHE
     if _TSV_CACHE is not None:
         return _TSV_CACHE
-    rows: List[Dict] = []
+    rows: list[dict] = []
     if not _TSV_PATH.exists():
         _TSV_CACHE = rows
         return rows
@@ -82,7 +81,7 @@ def _load_table() -> List[Dict]:
     return rows
 
 
-def analyze_pharmgkb_clinical(snps_df: Optional[pd.DataFrame]) -> Dict:
+def analyze_pharmgkb_clinical(snps_df: pd.DataFrame | None) -> dict:
     """Report ClinPGx/PharmGKB clinical annotations for typed rsIDs.
 
     Returns a dict with `high` (Level 1A/1B/2A/2B) and `low` (Level 3/4)
@@ -93,7 +92,7 @@ def analyze_pharmgkb_clinical(snps_df: Optional[pd.DataFrame]) -> Dict:
         return {"available": False, "reason": "No genotype data or dataset not present."}
 
     index = snps_df.index
-    by_rsid: Dict[str, Dict] = {}
+    by_rsid: dict[str, dict] = {}
     for row in table:
         rsid = row["rsid"]
         if rsid not in index:
@@ -125,7 +124,7 @@ def analyze_pharmgkb_clinical(snps_df: Optional[pd.DataFrame]) -> Dict:
         })
 
     # Best (strongest) evidence level per rsID drives tiering + sort order.
-    def _best_rank(entry: Dict) -> int:
+    def _best_rank(entry: dict) -> int:
         return min(
             (_LEVEL_RANK.get(a["level"], 99) for a in entry["annotations"]),
             default=99,

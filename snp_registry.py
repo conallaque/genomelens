@@ -46,7 +46,6 @@ from typing import Any
 
 import pandas as pd
 
-
 # ── Core record ──────────────────────────────────────────────────────────────
 
 # Single canonical ancestral/derived assignment per rsID, ALWAYS reported on

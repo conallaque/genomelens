@@ -13,10 +13,8 @@ Cross-cutting synthesis layer that combines nutrition + exercise analyses into:
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
 
-
-def _safe_pct(d: Dict, key: str, default: float = 50.0) -> float:
+def _safe_pct(d: dict, key: str, default: float = 50.0) -> float:
     s = d.get(key) if d else None
     if not s:
         return default
@@ -31,14 +29,14 @@ def _inv(p: float) -> float:
 
 # ── Longevity Composite Score ──────────────────────────────────────────────
 
-def longevity_composite(nutrition: Dict, exercise: Dict) -> Dict:
+def longevity_composite(nutrition: dict, exercise: dict) -> dict:
     pgs = nutrition.get("polygenic_scores", {})
     inflam = nutrition.get("inflammation", {})
     sat_fat = nutrition.get("saturated_fat", {})
     profile = exercise.get("composite_profile", {})
     injury_map = exercise.get("injury_risk_map", {})
 
-    components: List[Dict] = []
+    components: list[dict] = []
 
     # Cardiometabolic — invert LDL, TG, BP, T2D so higher score = better
     cmd_components = []
@@ -135,7 +133,7 @@ def _longevity_tier(score: float) -> str:
     return "Strong headwind — lifestyle interventions are mandatory, not optional"
 
 
-def _improvement_lever(component: str, nutrition: Dict, exercise: Dict) -> str:
+def _improvement_lever(component: str, nutrition: dict, exercise: dict) -> str:
     if "Cardiometabolic" in component:
         return ("Adopt Mediterranean pattern strictly, eliminate sugar-sweetened beverages, "
                 "150+ min Z2/wk, achieve 25 g oat β-glucan + 2 g plant sterols/day. "
@@ -166,7 +164,7 @@ def _improvement_lever(component: str, nutrition: Dict, exercise: Dict) -> str:
 
 # ── Year-Long Integrated Plan ──────────────────────────────────────────────
 
-def year_long_plan(nutrition: Dict, exercise: Dict) -> List[Dict]:
+def year_long_plan(nutrition: dict, exercise: dict) -> list[dict]:
     bias = exercise.get("power_endurance", {}).get("bias", "Balanced")
     sat = nutrition.get("saturated_fat", {}).get("apoe_genotype", "")
     inflam_tier = nutrition.get("inflammation", {}).get("tier", "")
@@ -237,7 +235,7 @@ def _quarterly_exercise_focus(q: int, bias: str) -> str:
     ][q-1]
 
 
-def _quarterly_labs(q: int) -> List[str]:
+def _quarterly_labs(q: int) -> list[str]:
     schedule = {
         1: ["Full lipid panel (Total/LDL/HDL/Triglycerides + ApoB)",
             "hs-CRP", "Fasting glucose + HbA1c + insulin", "Vitamin D 25(OH)",
@@ -273,9 +271,9 @@ def _quarterly_milestone(q: int, bias: str) -> str:
 # ── Body Composition Trajectory ────────────────────────────────────────────
 
 def body_composition_trajectory(
-    body_weight_kg: float, body_fat_pct: Optional[float],
-    goal: str, nutrition: Dict, exercise: Dict
-) -> Dict:
+    body_weight_kg: float, body_fat_pct: float | None,
+    goal: str, nutrition: dict, exercise: dict
+) -> dict:
     """
     goal: 'fat_loss' | 'lean_gain' | 'maintenance' | 'recomposition'
     Returns 12-week realistic projection.
@@ -337,7 +335,7 @@ def body_composition_trajectory(
 
 # ── Executive One-Page Summary ─────────────────────────────────────────────
 
-def executive_summary(nutrition: Dict, exercise: Dict, longevity: Dict) -> Dict:
+def executive_summary(nutrition: dict, exercise: dict, longevity: dict) -> dict:
     return {
         "headline_score": longevity["composite_score"],
         "headline_tier": longevity["tier"],
@@ -383,11 +381,11 @@ def executive_summary(nutrition: Dict, exercise: Dict, longevity: Dict) -> Dict:
 # ── Public synthesis API ───────────────────────────────────────────────────
 
 def integrated_longevity_plan(
-    nutrition_result: Dict, exercise_result: Dict,
-    body_weight_kg: Optional[float] = None,
-    body_fat_pct: Optional[float] = None,
+    nutrition_result: dict, exercise_result: dict,
+    body_weight_kg: float | None = None,
+    body_fat_pct: float | None = None,
     body_comp_goal: str = "maintenance",
-) -> Dict:
+) -> dict:
     longevity = longevity_composite(nutrition_result, exercise_result)
     annual_plan = year_long_plan(nutrition_result, exercise_result)
     summary = executive_summary(nutrition_result, exercise_result, longevity)

@@ -7,7 +7,6 @@ wrong haplogroup. Both existed in this module before these tests.
 """
 
 import pandas as pd
-import pytest
 
 import mt_haplogroup as mt
 

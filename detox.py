@@ -36,16 +36,14 @@ from __future__ import annotations
 
 import re as _re
 from pathlib import Path as _Path
-from typing import Dict, List, Optional
 
 import pandas as pd
 
 import snp_registry
 
-
 # ── genotype helpers (strand-aware via the registry) ──────────────────────────
 
-def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
+def _gt(snps_df: pd.DataFrame, rsid: str) -> str | None:
     if rsid not in snps_df.index:
         return None
     row = snps_df.loc[rsid]
@@ -59,7 +57,7 @@ def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
 
 
 def _dose(snps_df: pd.DataFrame, rsid: str, risk_allele: str,
-          ref_allele: str) -> Optional[int]:
+          ref_allele: str) -> int | None:
     """Strand-aware risk-allele dosage using the shared registry helper."""
     return snp_registry.risk_dose_from_df(
         snps_df, rsid, risk_allele=risk_allele, ref_allele=ref_allele)
@@ -78,7 +76,7 @@ _IMPACT_ORDER = {"higher-load": 3, "reduced-clearance": 3, "reduced": 2,
 
 def _finding(category: str, trait: str, gene: str, rsid: str, genotype: str,
              result: str, action: str, confidence: str, impact: str,
-             evidence: str = "") -> Dict:
+             evidence: str = "") -> dict:
     return {
         "category": category, "trait": trait, "gene": gene, "rsid": rsid,
         "genotype": genotype or "—", "result": result, "action": action,
@@ -544,7 +542,7 @@ def _mt_metals(snps):
 
 # ─── Composite smoke-resilience score ─────────────────────────────────────────
 
-def _smoke_resilience(findings: List[Dict]) -> Dict:
+def _smoke_resilience(findings: list[dict]) -> dict:
     """Aggregate the Phase I / Phase II / antioxidant findings into a single
     interpretable susceptibility index. The genotype that matters is FAST Phase I
     (more activation) combined with SLOW Phase II / weak antioxidant defence
@@ -590,7 +588,7 @@ def _smoke_resilience(findings: List[Dict]) -> Dict:
 
 # ─── Personalised protocol ─────────────────────────────────────────────────────
 
-def _build_protocol(findings: List[Dict], score: Dict) -> Dict:
+def _build_protocol(findings: list[dict], score: dict) -> dict:
     """Turn the genotype picture into a concrete, tiered action plan. Behavioural
     measures apply to everyone; the nutrient emphases scale with the specific
     deficits found."""
@@ -600,7 +598,7 @@ def _build_protocol(findings: List[Dict], score: Dict) -> Dict:
         return any(by_gene.get(g, {}).get("impact") in
                    ("reduced", "reduced-clearance") for g in genes)
 
-    nutrition: List[Dict] = []
+    nutrition: list[dict] = []
 
     # Sulforaphane / NRF2 — the single highest-leverage food lever, scaled up
     # when the NRF2/Phase-II axis is weak.
@@ -732,7 +730,7 @@ MICHIGAN_CONTEXT = (
 
 # ─── Master analyzer ───────────────────────────────────────────────────────────
 
-def analyze_detox(snps_df: pd.DataFrame) -> Dict:
+def analyze_detox(snps_df: pd.DataFrame) -> dict:
     analyzers = [
         # Phase I
         _cyp1a1, _cyp1a2, _cyp1b1, _ahr,
@@ -743,7 +741,7 @@ def analyze_detox(snps_df: pd.DataFrame) -> Dict:
         # Heavy metals
         _alad_lead, _as3mt_arsenic, _pon1, _mt_metals,
     ]
-    findings: List[Dict] = []
+    findings: list[dict] = []
     for a in analyzers:
         try:
             r = a(snps_df)
@@ -752,7 +750,7 @@ def analyze_detox(snps_df: pd.DataFrame) -> Dict:
         except Exception:
             continue
 
-    by_category: Dict[str, List[Dict]] = {}
+    by_category: dict[str, list[dict]] = {}
     for f in findings:
         by_category.setdefault(f["category"], []).append(f)
 
@@ -773,12 +771,12 @@ def analyze_detox(snps_df: pd.DataFrame) -> Dict:
 
 # ── Cross-check against the unified SNP registry ──────────────────────────────
 
-def _scan_rsids_referenced() -> List[str]:
+def _scan_rsids_referenced() -> list[str]:
     src = _Path(__file__).read_text()
     return sorted(set(_re.findall(r'"(rs\d+)"', src)))
 
 
-def audit_against_registry() -> Dict[str, List[str]]:
+def audit_against_registry() -> dict[str, list[str]]:
     """Presence-only audit: every rsID referenced here must be registered."""
     registered, missing = [], []
     for rsid in _scan_rsids_referenced():

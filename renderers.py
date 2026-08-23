@@ -30,7 +30,6 @@ import datetime
 import math
 import re
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 # Late import — analyze.py finishes loading before any of these renderer
 # functions are called at runtime, so circular-import issues do not arise.
@@ -108,7 +107,7 @@ def _cat_id(cat: str) -> str:
 
 def _patch_ai_section_in_html(
     html: str, cat_id: str, new_inner_html: str
-) -> Tuple[str, bool]:
+) -> tuple[str, bool]:
     """Replace the AI Interpretation content for a single category section in
     an existing report. Returns (new_html, success). If the category's section
     doesn't yet contain an ai-section block (e.g. the original run crashed
@@ -169,7 +168,7 @@ def risk_indicator(copies: int) -> str:
 
 # Ancient-DNA reference summaries for major Y-DNA haplogroups. Used as a
 # supplemental box in the Y-DNA section.
-Y_ANCIENT_DNA_REFS: Dict[str, str] = {
+Y_ANCIENT_DNA_REFS: dict[str, str] = {
     "R1b": (
         "R1b is the dominant Y-DNA haplogroup in modern Western Europe. Ancient "
         "DNA evidence places R1b prominently in the <strong>Yamnaya culture</strong> "
@@ -232,7 +231,7 @@ Y_ANCIENT_DNA_REFS: Dict[str, str] = {
 }
 
 
-def build_ydna_ancient_block(terminal_hg: str, path: List[Dict]) -> str:
+def build_ydna_ancient_block(terminal_hg: str, path: list[dict]) -> str:
     """Return a small ancient-DNA reference box for the terminal haplogroup,
     falling back through ancestors if no entry matches the leaf."""
     # First try the terminal haplogroup, then walk up the path
@@ -253,7 +252,7 @@ def build_ydna_ancient_block(terminal_hg: str, path: List[Dict]) -> str:
     return ""
 
 
-def build_ydna_html(y_result: Dict) -> str:
+def build_ydna_html(y_result: dict) -> str:
     """Render the Y-DNA haplogroup section for the HTML report."""
     status = y_result.get("status", "no_y_data")
     path = y_result.get("path", [])
@@ -428,7 +427,7 @@ not a medical or identity test.
 
 # ── mtDNA HTML builder ────────────────────────────────────────────────────────
 
-def build_mtdna_html(mt_result: Dict) -> str:
+def build_mtdna_html(mt_result: dict) -> str:
     """Render the mtDNA haplogroup section for the HTML report."""
     status = mt_result.get("status", "no_data")
     haplogroup = mt_result.get("haplogroup", "Unknown")
@@ -599,7 +598,7 @@ _CONF_LABELS = {
 }
 
 
-def _confidence_badge(confidence: Optional[str], note: str = "") -> str:
+def _confidence_badge(confidence: str | None, note: str = "") -> str:
     """Render a consistent confidence pill (+ optional explanatory note) used
     across every score section. Returns '' when no confidence is supplied."""
     if not confidence:
@@ -615,7 +614,7 @@ def _confidence_badge(confidence: Optional[str], note: str = "") -> str:
     )
 
 
-def build_qc_html(qc: Optional[Dict]) -> str:
+def build_qc_html(qc: dict | None) -> str:
     if not qc:
         return ""
     domain_rows = ""
@@ -681,7 +680,7 @@ def build_qc_html(qc: Optional[Dict]) -> str:
 """
 
 
-def build_prs_html(prs: Optional[Dict]) -> str:
+def build_prs_html(prs: dict | None) -> str:
     if not prs or not prs.get("panels"):
         return ""
 
@@ -845,7 +844,7 @@ factors; not diagnostic.
 """
 
 
-def _build_novelty_panels_html(panels: List[Dict]) -> str:
+def _build_novelty_panels_html(panels: list[dict]) -> str:
     if not panels:
         return ""
     section_blocks = ""
@@ -897,7 +896,7 @@ def _build_novelty_panels_html(panels: List[Dict]) -> str:
 """
 
 
-def build_pgx_html(pgx: Optional[Dict]) -> str:
+def build_pgx_html(pgx: dict | None) -> str:
     if not pgx:
         return ""
 
@@ -1058,7 +1057,7 @@ judgment.
 """
 
 
-def _build_drug_database_html(findings: List[Dict]) -> str:
+def _build_drug_database_html(findings: list[dict]) -> str:
     if not findings:
         return ""
     rows = ""
@@ -1091,7 +1090,7 @@ def _build_drug_database_html(findings: List[Dict]) -> str:
     )
 
 
-def build_interactions_html(inter: Optional[Dict]) -> str:
+def build_interactions_html(inter: dict | None) -> str:
     if not inter or not inter.get("findings"):
         return ""
     items = ""
@@ -1135,7 +1134,7 @@ when SNPs are reported one at a time.
 """
 
 
-def build_carrier_html(carr: Optional[Dict]) -> str:
+def build_carrier_html(carr: dict | None) -> str:
     if not carr:
         return ""
 
@@ -1225,7 +1224,7 @@ using sequencing). It is the subset detectable from this chip's variants.
 """
 
 
-def build_traits_html(tr: Optional[Dict]) -> str:
+def build_traits_html(tr: dict | None) -> str:
     if not tr or not tr.get("predictions"):
         return ""
     cards = ""
@@ -1258,7 +1257,7 @@ genotype→phenotype link in the literature.
 """
 
 
-def build_counseling_html(c: Optional[Dict]) -> str:
+def build_counseling_html(c: dict | None) -> str:
     if not c or not c.get("triggers"):
         return ""
     items = ""
@@ -1285,7 +1284,7 @@ specialist. {c['n_triggers']} triggers identified
 """
 
 
-def build_references_html(refs: Optional[List[Dict]]) -> str:
+def build_references_html(refs: list[dict] | None) -> str:
     if not refs:
         return ""
     rows = ""
@@ -1344,7 +1343,7 @@ in this report's curated reference catalog).
 
 # ── V3 section renderers ──────────────────────────────────────────────────────
 
-def build_imputation_html(imp: Optional[Dict]) -> str:
+def build_imputation_html(imp: dict | None) -> str:
     if not imp:
         return ""
     if not imp.get("available"):
@@ -1379,7 +1378,7 @@ filters at DR2 ≥ {_esc(imp.get('min_r2', 0.3))}.
 """
 
 
-def build_expanded_pgs_html(epgs: Optional[Dict]) -> str:
+def build_expanded_pgs_html(epgs: dict | None) -> str:
     if not epgs:
         return ""
     if not epgs.get("available"):
@@ -1490,7 +1489,7 @@ confirm anything actionable with a clinician.
 """
 
 
-def _build_crosscheck_html(cc: Optional[Dict]) -> str:
+def _build_crosscheck_html(cc: dict | None) -> str:
     """Render the Y-DNA / mtDNA geographic cross-check box."""
     if not cc:
         return ""
@@ -1560,7 +1559,7 @@ def _bar(value: float, max_value: float, color: str) -> str:
         f'<div style="height:100%;width:{pct:.1f}%;background:{color}"></div></div>')
 
 
-def build_holistic_synthesis_html(hs: Optional[Dict]) -> str:
+def build_holistic_synthesis_html(hs: dict | None) -> str:
     """Cross-panel synthesis — genome leverage score + insights + priorities.
     Rendered FIRST after the exec summary so readers see the meta-view."""
     if not hs or not hs.get("available"):
@@ -1656,7 +1655,7 @@ underlying modules but the composite is judgment, not clinical guidance.
 """
 
 
-def _prepend_ai_interpretation(section_html: str, ai_text: Optional[str]) -> str:
+def _prepend_ai_interpretation(section_html: str, ai_text: str | None) -> str:
     """Inject a local-AI interpretation callout immediately under a section's
     <h2> heading. Used for 'AI on all tiers' — every module section gets its own
     AI interpretation when AI is enabled. No-op if there's no section or no text."""
@@ -1675,7 +1674,7 @@ def _prepend_ai_interpretation(section_html: str, ai_text: Optional[str]) -> str
     return section_html[:idx + 5] + block + section_html[idx + 5:]
 
 
-def build_life_stage_playbook_html(lsp: Optional[Dict]) -> str:
+def build_life_stage_playbook_html(lsp: dict | None) -> str:
     """Decade-by-decade life-stage playbook, current decade highlighted."""
     if not lsp or not lsp.get("available"):
         return ""
@@ -1736,7 +1735,7 @@ and evolving recommendations.
 """
 
 
-def build_environmental_optimization_html(eo: Optional[Dict]) -> str:
+def build_environmental_optimization_html(eo: dict | None) -> str:
     """Environmental optimization — light timing, exercise modality, vitamin-D
     seasonality."""
     if not eo or not eo.get("available"):
@@ -1819,7 +1818,7 @@ pass your real latitude for precision).
 """
 
 
-def build_polygenic_traits_html(pt: Optional[Dict]) -> str:
+def build_polygenic_traits_html(pt: dict | None) -> str:
     """Trait genetics — genotype-level single-variant calls + explicit no-score
     handling for polygenic/fraught traits."""
     if not pt or not pt.get("available"):
@@ -1879,7 +1878,7 @@ a hard design limit, not a caveat.</p>
 """
 
 
-def build_clinical_variants_html(cv: Optional[Dict]) -> str:
+def build_clinical_variants_html(cv: dict | None) -> str:
     """Phase-2 ClinVar rare/pathogenic screen. Deliberately conservative: strong
     framing, star-graded confidence, and a MANDATORY negative-result statement
     (shown whether findings are present or not) so an empty list is never read
@@ -1946,10 +1945,10 @@ because they fall in ACMG genes and may be reclassified in future ClinVar releas
 
     none_found = cv["n_plp"] == 0
     headline = (
-        f'<div style="background:linear-gradient(135deg,#f2f9f4,#eef4fb);border:1px solid #cfe3d6;'
-        f'border-radius:10px;padding:14px 18px;margin:10px 0">'
-        f'<strong>No ClinVar-classified pathogenic variants matched.</strong> '
-        f'That is reassuring but limited — read the statement below.</div>'
+        '<div style="background:linear-gradient(135deg,#f2f9f4,#eef4fb);border:1px solid #cfe3d6;'
+        'border-radius:10px;padding:14px 18px;margin:10px 0">'
+        '<strong>No ClinVar-classified pathogenic variants matched.</strong> '
+        'That is reassuring but limited — read the statement below.</div>'
         if none_found else
         f'<div style="background:linear-gradient(135deg,#fdf3f3,#f7f4fc);border:1px solid #f0cfcf;'
         f'border-radius:10px;padding:14px 18px;margin:10px 0">'
@@ -1977,7 +1976,7 @@ findings are shown. {cv['n_scanned']:,} VCF variants scanned.
 """
 
 
-def build_novel_variants_html(nv: Optional[Dict]) -> str:
+def build_novel_variants_html(nv: dict | None) -> str:
     """Phase-3 computational novel/rare-variant screen. Every finding is a MODEL
     PREDICTION, not a clinical call — the framing, per-finding label, and mandatory
     disclaimers all say so. Never presented with ClinVar-style certainty."""
@@ -2065,7 +2064,7 @@ variants queried. <strong>Predictors used:</strong> {_esc(pred_line)}.
 """
 
 
-def _render_wgs_decision(w: Optional[Dict]) -> str:
+def _render_wgs_decision(w: dict | None) -> str:
     """Whether sequencing is worth buying, and why the other figure says $0.
 
     The report shows a chip-to-sequencing marginal value that is structurally
@@ -2136,7 +2135,7 @@ def _render_wgs_decision(w: Optional[Dict]) -> str:
 </div>"""
 
 
-def _render_plain_summary(pl: Optional[Dict]) -> str:
+def _render_plain_summary(pl: dict | None) -> str:
     """The plain-English answer, placed before any of the technical output.
 
     Everything else in this section is correct and unreadable without training.
@@ -2222,7 +2221,7 @@ def _render_plain_summary(pl: Optional[Dict]) -> str:
     <div style="font-weight:600;color:#5b6673">How often it makes a difference</div>
     <ul style="font-size:.9em;margin:6px 0 0 18px;padding:0">{nns}</ul>
     <div style="font-size:.85em;color:#8a94a3;margin-top:5px">
-      {_esc((time_gain.get('caveat') or ''))}</div>
+      {_esc(time_gain.get('caveat') or '')}</div>
   </div>''' if nns else ""}
 
   <div style="border:1px solid #f0dcc0;background:#fffaf2;border-radius:8px;
@@ -2235,7 +2234,7 @@ def _render_plain_summary(pl: Optional[Dict]) -> str:
 </div>"""
 
 
-def _render_decision_layer(d: Optional[Dict]) -> str:
+def _render_decision_layer(d: dict | None) -> str:
     """Render value of information, breakeven, frontier, budget and equity.
 
     These answer the questions that follow a cost-effectiveness result rather
@@ -2376,7 +2375,7 @@ def _render_decision_layer(d: Optional[Dict]) -> str:
 {blocks}</details>"""
 
 
-def _assumption_dominance_note(tornado: List[Dict]) -> str:
+def _assumption_dominance_note(tornado: list[dict]) -> str:
     """Say plainly when judgement calls, not evidence, drive the conclusion.
 
     A reader can work this out from the tornado table, but only by noticing
@@ -2405,7 +2404,7 @@ def _assumption_dominance_note(tornado: List[Dict]) -> str:
   They are stated in full under parameter provenance below.</div>"""
 
 
-def _render_pooled_economics(p: Optional[Dict]) -> str:
+def _render_pooled_economics(p: dict | None) -> str:
     """Render the pooled cost-effectiveness result.
 
     Four things this has to communicate that the old output did not: that
@@ -2821,7 +2820,7 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
 </div>"""
 
 
-def _build_personalized_voi_html(p: Optional[Dict]) -> str:
+def _build_personalized_voi_html(p: dict | None) -> str:
     """Individually-relevant HEOR panels for this genome: a personal cost-
     effectiveness frontier + CEAC, the genome as an appreciating data asset, and the
     person's percentile in the population value distribution. Market-level analyses
@@ -2888,7 +2887,7 @@ def _build_personalized_voi_html(p: Optional[Dict]) -> str:
 </div>"""
 
 
-def build_voi_html(voi: Optional[Dict]) -> str:
+def build_voi_html(voi: dict | None) -> str:
     """Value-of-Information health-economics section: the discipline-grade headline
     answering 'what is knowing your genome worth?'. Every number is illustrative +
     probabilistic; market PRICE is shown separately from health-economic VALUE."""
@@ -3253,7 +3252,7 @@ pharmacogenomic averted-adverse-reactions — with a Monte-Carlo sensitivity ana
 """
 
 
-def build_family_planning_html(fp: Optional[Dict]) -> str:
+def build_family_planning_html(fp: dict | None) -> str:
     """In-report reproductive-genetics section — carrier compound risk with a
     random partner, dominant transmission (kept separate from penetrance),
     sex-gated mtDNA, and hereditary-cancer partner-screening guidance."""
@@ -3394,7 +3393,7 @@ Directory: findageneticcounselor.com.
 """
 
 
-def build_addiction_genetics_html(ag: Optional[Dict]) -> str:
+def build_addiction_genetics_html(ag: dict | None) -> str:
     """Addiction genetics — alcohol / opioid / nicotine / cannabis susceptibility."""
     if not ag or not ag.get("available"):
         return ""
@@ -3491,7 +3490,7 @@ and trauma history dominate individual outcomes. This section is educational.
 """
 
 
-def build_neurochemistry_html(nc: Optional[Dict]) -> str:
+def build_neurochemistry_html(nc: dict | None) -> str:
     """Neurochemistry — COMT axis + composite phenotype recommendations."""
     if not nc or not nc.get("available"):
         return ""
@@ -3587,7 +3586,7 @@ you'd already consider — not a verdict on who you are.
 """
 
 
-def build_immunogenetics_html(ig: Optional[Dict]) -> str:
+def build_immunogenetics_html(ig: dict | None) -> str:
     """Immunogenetics — viral/bacterial/parasitic resistance + Historical Selection."""
     if not ig or not ig.get("available"):
         return ""
@@ -3688,7 +3687,7 @@ Vaccination and standard infection prevention still apply regardless of genotype
 """
 
 
-def build_ancestral_story_html(story: Optional[Dict]) -> str:
+def build_ancestral_story_html(story: dict | None) -> str:
     """Long-form Ancestral Story — deterministic chapters + optional AI narrative."""
     if not story or not story.get("available"):
         return ""
@@ -3754,7 +3753,7 @@ documented lineage.
 """
 
 
-def build_blood_type_html(bt: Optional[Dict]) -> str:
+def build_blood_type_html(bt: dict | None) -> str:
     """Blood type inference — ABO + RhD + FUT2 secretor status."""
     if not bt or not bt.get("available"):
         return ""
@@ -3818,7 +3817,7 @@ def build_blood_type_html(bt: Optional[Dict]) -> str:
 """
 
 
-def build_deep_ancestry_html(da: Optional[Dict]) -> str:
+def build_deep_ancestry_html(da: dict | None) -> str:
     """State-of-the-art deep ancestry — Neanderthal, ancient populations,
     N-S European axis, and haplogroup migration timelines."""
     if not da or not da.get("available"):
@@ -3961,7 +3960,7 @@ the migration timeline of your Y-DNA and mtDNA haplogroups.</p>
 """
 
 
-def build_ancestry_html(anc: Optional[Dict]) -> str:
+def build_ancestry_html(anc: dict | None) -> str:
     if not anc or not anc.get("available"):
         return ""
     proportions = anc.get("proportions", {})
@@ -4036,7 +4035,7 @@ def build_ancestry_html(anc: Optional[Dict]) -> str:
     aims = anc.get("used_aims") or []
     aims_html = ""
     if aims:
-        def _aim_role(a: Dict) -> str:
+        def _aim_role(a: dict) -> str:
             if a.get("palindromic"):
                 return "palindrome — shown only, cannot be strand-oriented"
             if not a.get("counted", True):
@@ -4123,7 +4122,7 @@ _DETOX_IMPACT_STYLE = {
 }
 
 
-def build_urologic_html(ur: Optional[Dict]) -> str:
+def build_urologic_html(ur: dict | None) -> str:
     """Urologic & Genitourinary panel — OAB, BPH, prostate cancer, kidney stones,
     testicular / reproductive, DHT metabolism."""
     if not ur or not ur.get("available"):
@@ -4179,7 +4178,7 @@ self-exam remains the single highest-yield screening action here.
 """
 
 
-def build_detox_html(dx: Optional[Dict]) -> str:
+def build_detox_html(dx: dict | None) -> str:
     """Detoxification & Environmental Resilience — smoke / PAH / heavy metals."""
     if not dx or not dx.get("available"):
         return ""
@@ -4305,7 +4304,7 @@ and selenium) with a clinician before starting.
 """
 
 
-def build_metal_oxidative_html(mx: Optional[Dict]) -> str:
+def build_metal_oxidative_html(mx: dict | None) -> str:
     """Metal-handling, oxidative-defense & neurodegeneration panel (wires in the
     previously-unrendered metal_oxidative module)."""
     if not mx or not mx.get("predictions"):
@@ -4365,7 +4364,7 @@ actionable exceptions and are flagged as such.
 
 # ── V5: premium section renderers ────────────────────────────────────────────
 
-def build_hla_html(h: Optional[Dict]) -> str:
+def build_hla_html(h: dict | None) -> str:
     if not h:
         return ""
     cards = ""
@@ -4487,7 +4486,7 @@ outside Asian populations.
 """
 
 
-def build_roh_html(r: Optional[Dict]) -> str:
+def build_roh_html(r: dict | None) -> str:
     if not r:
         return ""
     # Degrade gracefully if the ROH analysis failed or returned a partial result
@@ -4550,7 +4549,7 @@ extended homozygous segments.
 """
 
 
-def build_local_ancestry_html(la: Optional[Dict]) -> str:
+def build_local_ancestry_html(la: dict | None) -> str:
     if not la or not la.get("available"):
         return ""
     svg = ""
@@ -4610,7 +4609,7 @@ windows could be confidently called given the AIM panel available.
 """
 
 
-def build_phewas_html(p: Optional[Dict]) -> str:
+def build_phewas_html(p: dict | None) -> str:
     if not p:
         return ""
     by_cat = p.get("by_category", {})
@@ -4760,7 +4759,7 @@ measurements, and not medical advice.
 """
 
 
-def build_mr_html(m: Optional[Dict]) -> str:
+def build_mr_html(m: dict | None) -> str:
     if not m or not m.get("findings"):
         return ""
     items = ""
@@ -4808,14 +4807,14 @@ only through the exposure. Educational only — not for clinical decisions.
 """
 
 
-def build_genetic_age_html(g: Optional[Dict]) -> str:
+def build_genetic_age_html(g: dict | None) -> str:
     if not g or not g.get("available"):
         return ""
     long_pct = g["longevity"]["percentile"]
     years = g.get("longevity_years_offset", 0)
     direction = g.get("longevity_direction", "")
 
-    def _panel_meta(panel: Dict) -> str:
+    def _panel_meta(panel: dict) -> str:
         # Z-score + variant coverage as inner text. These panels are small (the
         # telomere proxy can be ≤2 variants), so coverage is essential honesty —
         # a percentile built on 1–2 SNPs is far weaker than the full panel.
@@ -4828,7 +4827,7 @@ def build_genetic_age_html(g: Optional[Dict]) -> str:
             parts.append(f"{nu}/{nt} variants")
         return " · ".join(parts)
 
-    def _meta_div(panel: Dict) -> str:
+    def _meta_div(panel: dict) -> str:
         m = _panel_meta(panel)
         return f'<div class="ga-sub-meta">{m}</div>' if m else ""
 
@@ -4867,7 +4866,7 @@ def build_genetic_age_html(g: Optional[Dict]) -> str:
 """
 
 
-def build_pgx_sim_html(s: Optional[Dict]) -> str:
+def build_pgx_sim_html(s: dict | None) -> str:
     if not s or not s.get("available") or not s.get("drugs"):
         return ""
     items = ""
@@ -4876,7 +4875,7 @@ def build_pgx_sim_html(s: Optional[Dict]) -> str:
         df = d["combined_dose_factor"]
         ae_color = "var(--red)" if ae > 2 else ("var(--ora)" if ae > 1.3 else "var(--grn)")
         df_color = "var(--red)" if df == 0 else ("var(--ora)" if df < 0.8 else "var(--grn)")
-        def _gene_metrics(g: Dict) -> str:
+        def _gene_metrics(g: dict) -> str:
             # Per-gene contribution to the combined estimate. For multi-gene
             # drugs (e.g. warfarin VKORC1×CYP2C9) the combined metrics are a
             # product of these; showing each gene's share makes the result
@@ -4943,7 +4942,7 @@ prescriptions — actual dosing requires clinical assessment.</strong>
 """
 
 
-def build_reproductive_html(r: Optional[Dict]) -> str:
+def build_reproductive_html(r: dict | None) -> str:
     if not r or not r.get("scenarios"):
         return ""
     items = ""
@@ -4995,7 +4994,7 @@ which conditions a prospective partner should be tested for.
 """
 
 
-def build_wellness_html(w: Optional[Dict]) -> str:
+def build_wellness_html(w: dict | None) -> str:
     if not w or not w.get("predictions"):
         return ""
     cat_order = ["Nutrition", "Sleep & Circadian", "Fitness & Recovery",
@@ -5036,7 +5035,7 @@ disease. {w['n_predictions']} predictions across {len(w['categories'])} categori
 """
 
 
-def build_medications_html(med: Optional[Dict]) -> str:
+def build_medications_html(med: dict | None) -> str:
     if not med or not med.get("reviews"):
         return ""
     cards = ""
@@ -5091,7 +5090,7 @@ with your prescriber before any medication change.</strong>
 """
 
 
-def build_economics_html(economics_result: Optional[Dict]) -> str:
+def build_economics_html(economics_result: dict | None) -> str:
     """Render the health-economics section: findings ranked by ROI, a clinic
     ROI dashboard and a payer-impact brief. Returns "" when there is nothing
     to show (no module / no findings), matching every sibling renderer."""
@@ -5224,7 +5223,7 @@ outcome it averts, with payback period and 3-year NPV (discounted at 3%).
 """
 
 
-def build_pharmgkb_html(pk: Optional[Dict]) -> str:
+def build_pharmgkb_html(pk: dict | None) -> str:
     """ClinPGx/PharmGKB clinical-annotation positions typed on this chip.
 
     High-evidence (Level 1A/1B/2A/2B) positions are shown open; the weak,
@@ -5240,7 +5239,7 @@ def build_pharmgkb_html(pk: Optional[Dict]) -> str:
         cls = "pk-lvl-high" if lvl in ("1A", "1B", "2A", "2B") else "pk-lvl-low"
         return f'<span class="pk-lvl {cls}">{_esc(lvl)}</span>'
 
-    def _rows(entries: List[Dict]) -> str:
+    def _rows(entries: list[dict]) -> str:
         out = ""
         for e in entries:
             pgx_note = (
@@ -5268,7 +5267,7 @@ def build_pharmgkb_html(pk: Optional[Dict]) -> str:
                 )
         return out
 
-    def _table(entries: List[Dict]) -> str:
+    def _table(entries: list[dict]) -> str:
         return (
             f'<div class="tbl-wrap"><table class="snp-tbl"><thead><tr>'
             f"<th>rsID</th><th>Gene</th><th>Your genotype</th><th>Evidence</th>"
@@ -5316,7 +5315,7 @@ and CPIC dosing — is authoritative.
 """
 
 
-def build_top_drugs_html(td: Optional[Dict]) -> str:
+def build_top_drugs_html(td: dict | None) -> str:
     """Top-prescribed-medications pharmacogenomic screen.
 
     Four tiers: drugs your genotype may affect (open); PGx drugs where your
@@ -5329,7 +5328,7 @@ def build_top_drugs_html(td: Optional[Dict]) -> str:
     if not td or not td.get("available"):
         return ""
 
-    def _pheno_cell(e: Dict) -> str:
+    def _pheno_cell(e: dict) -> str:
         gp = e.get("gene_phenotypes") or []
         if not gp:
             return "—"
@@ -5338,7 +5337,7 @@ def build_top_drugs_html(td: Optional[Dict]) -> str:
             for p in gp
         )
 
-    def _lvl(e: Dict) -> str:
+    def _lvl(e: dict) -> str:
         cp = e.get("cpic_level")
         cl = e.get("clin_level")
         bits = []
@@ -5348,7 +5347,7 @@ def build_top_drugs_html(td: Optional[Dict]) -> str:
             bits.append(f'<span class="td-lvl td-clin">PharmGKB {_esc(cl)}</span>')
         return " ".join(bits) or "—"
 
-    def _table(rows: List[Dict], with_pheno: bool) -> str:
+    def _table(rows: list[dict], with_pheno: bool) -> str:
         body = ""
         for e in rows:
             genes = ", ".join(_esc(g) for g in e.get("genes", [])) or "—"
@@ -5424,59 +5423,59 @@ pharmacist.
 # ── HTML report builder ───────────────────────────────────────────────────────
 
 def build_html_report(
-    tier1_results: List[Dict],
-    apoe_genotype: Optional[str],
-    ai_results: Dict[str, str],
-    exec_summary: Optional[str],
+    tier1_results: list[dict],
+    apoe_genotype: str | None,
+    ai_results: dict[str, str],
+    exec_summary: str | None,
     dna_filepath: str,
     no_ai: bool,
     model: str,
-    y_result: Optional[Dict] = None,
-    mt_result: Optional[Dict] = None,
-    cross_cat_synthesis: Optional[str] = None,
-    qc_result: Optional[Dict] = None,
-    prs_result: Optional[Dict] = None,
-    pgx_result: Optional[Dict] = None,
-    interactions_result: Optional[Dict] = None,
-    carrier_result: Optional[Dict] = None,
-    traits_result: Optional[Dict] = None,
-    counseling_result: Optional[Dict] = None,
-    references_used: Optional[List[Dict]] = None,
-    imputation_info: Optional[Dict] = None,
-    expanded_pgs_result: Optional[Dict] = None,
-    ancestry_result: Optional[Dict] = None,
-    medications_result: Optional[Dict] = None,
-    wellness_result: Optional[Dict] = None,
-    hla_result: Optional[Dict] = None,
-    roh_result: Optional[Dict] = None,
-    local_ancestry_result: Optional[Dict] = None,
-    phewas_result: Optional[Dict] = None,
-    mr_result: Optional[Dict] = None,
-    genetic_age_result: Optional[Dict] = None,
-    pgx_sim_result: Optional[Dict] = None,
-    reproductive_result: Optional[Dict] = None,
-    economics_result: Optional[Dict] = None,
-    pharmgkb_result: Optional[Dict] = None,
-    top_drugs_result: Optional[Dict] = None,
-    metal_oxidative_result: Optional[Dict] = None,
-    detox_result: Optional[Dict] = None,
-    urologic_result: Optional[Dict] = None,
-    deep_ancestry_result: Optional[Dict] = None,
-    blood_type_result: Optional[Dict] = None,
-    immunogenetics_result: Optional[Dict] = None,
-    ancestral_story_result: Optional[Dict] = None,
-    neurochemistry_result: Optional[Dict] = None,
-    holistic_synthesis_result: Optional[Dict] = None,
-    addiction_genetics_result: Optional[Dict] = None,
-    family_planning_result: Optional[Dict] = None,
-    polygenic_traits_result: Optional[Dict] = None,
-    tnrc18_result: Optional[Dict] = None,
-    environmental_optimization_result: Optional[Dict] = None,
-    life_stage_playbook_result: Optional[Dict] = None,
-    clinical_variants_result: Optional[Dict] = None,
-    novel_variants_result: Optional[Dict] = None,
-    voi_result: Optional[Dict] = None,
-    module_ai: Optional[Dict] = None,
+    y_result: dict | None = None,
+    mt_result: dict | None = None,
+    cross_cat_synthesis: str | None = None,
+    qc_result: dict | None = None,
+    prs_result: dict | None = None,
+    pgx_result: dict | None = None,
+    interactions_result: dict | None = None,
+    carrier_result: dict | None = None,
+    traits_result: dict | None = None,
+    counseling_result: dict | None = None,
+    references_used: list[dict] | None = None,
+    imputation_info: dict | None = None,
+    expanded_pgs_result: dict | None = None,
+    ancestry_result: dict | None = None,
+    medications_result: dict | None = None,
+    wellness_result: dict | None = None,
+    hla_result: dict | None = None,
+    roh_result: dict | None = None,
+    local_ancestry_result: dict | None = None,
+    phewas_result: dict | None = None,
+    mr_result: dict | None = None,
+    genetic_age_result: dict | None = None,
+    pgx_sim_result: dict | None = None,
+    reproductive_result: dict | None = None,
+    economics_result: dict | None = None,
+    pharmgkb_result: dict | None = None,
+    top_drugs_result: dict | None = None,
+    metal_oxidative_result: dict | None = None,
+    detox_result: dict | None = None,
+    urologic_result: dict | None = None,
+    deep_ancestry_result: dict | None = None,
+    blood_type_result: dict | None = None,
+    immunogenetics_result: dict | None = None,
+    ancestral_story_result: dict | None = None,
+    neurochemistry_result: dict | None = None,
+    holistic_synthesis_result: dict | None = None,
+    addiction_genetics_result: dict | None = None,
+    family_planning_result: dict | None = None,
+    polygenic_traits_result: dict | None = None,
+    tnrc18_result: dict | None = None,
+    environmental_optimization_result: dict | None = None,
+    life_stage_playbook_result: dict | None = None,
+    clinical_variants_result: dict | None = None,
+    novel_variants_result: dict | None = None,
+    voi_result: dict | None = None,
+    module_ai: dict | None = None,
 ) -> str:
     # build_category_map expands cross-referenced SNPs into each relevant
     # category so they render in multiple sections with the appropriate

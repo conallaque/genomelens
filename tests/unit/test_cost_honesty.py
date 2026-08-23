@@ -15,7 +15,6 @@ from __future__ import annotations
 from econ import health_economics as he
 from econ import value_of_information as voi
 
-
 # ── A) marginal vs average cost ──────────────────────────────────────────────
 
 def test_marginal_fraction_is_a_conservative_discount():
@@ -141,7 +140,6 @@ def test_horizon_discount_is_applied_not_just_labelled():
 
 def test_horizon_length_changes_the_discount(monkeypatch):
     # Directional: a longer horizon discounts harder at the midpoint.
-    import importlib
     short = 1.0 / (1.0 + he.DISCOUNT_RATE) ** (4 / 2.0)
     long_ = 1.0 / (1.0 + he.DISCOUNT_RATE) ** (20 / 2.0)
     assert long_ < short

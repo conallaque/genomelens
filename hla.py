@@ -30,11 +30,10 @@ This is enough for the vast majority of clinically actionable HLA findings.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
 import pandas as pd
 
 
-def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
+def _gt(snps_df: pd.DataFrame, rsid: str) -> str | None:
     if rsid not in snps_df.index:
         return None
     gt = snps_df.loc[rsid].get("genotype")
@@ -46,7 +45,7 @@ def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
     return s
 
 
-def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> Optional[int]:
+def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> int | None:
     gt = _gt(snps_df, rsid)
     if gt is None or len(gt) != 2:
         return None
@@ -60,7 +59,7 @@ def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> Optional[int]:
 # Sources: Karnes 2017, de Bakker 2006, Hetherington 2002, Karlin-Neumann
 # HLA-tag literature, and CPIC documentation.
 
-HLA_TAGS: List[Dict] = [
+HLA_TAGS: list[dict] = [
     {
         "allele": "HLA-B*57:01",
         "tags": [
@@ -271,7 +270,7 @@ INFECTION_CONTEXT = [
 
 # ─── Core analysis ───────────────────────────────────────────────────────────
 
-def _impute_allele(snps_df: pd.DataFrame, allele_def: Dict) -> Dict:
+def _impute_allele(snps_df: pd.DataFrame, allele_def: dict) -> dict:
     """Estimate carrier status for one HLA allele using its tag SNP(s).
 
     Returns dict with status, dosage, confidence, called_tags.
@@ -286,10 +285,10 @@ def _impute_allele(snps_df: pd.DataFrame, allele_def: Dict) -> Dict:
             "untested_tags": [],
         }
 
-    called: List[Dict] = []
-    untested: List[Dict] = []
-    dosages: List[int] = []
-    qualities: List[str] = []
+    called: list[dict] = []
+    untested: list[dict] = []
+    dosages: list[int] = []
+    qualities: list[str] = []
 
     for tag in allele_def["tags"]:
         rsid = tag["rsid"]
@@ -344,11 +343,11 @@ def _impute_allele(snps_df: pd.DataFrame, allele_def: Dict) -> Dict:
     }
 
 
-def analyze_hla(snps_df: pd.DataFrame) -> Dict:
+def analyze_hla(snps_df: pd.DataFrame) -> dict:
     """Impute clinically actionable HLA alleles. Returns a structured dict for
     the HTML report and downstream consumers (PGx, counseling, emergency card).
     """
-    results: List[Dict] = []
+    results: list[dict] = []
     for allele_def in HLA_TAGS:
         r = _impute_allele(snps_df, allele_def)
         results.append(r)

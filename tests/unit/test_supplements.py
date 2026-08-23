@@ -19,7 +19,6 @@ import pytest
 
 import supplements as sup
 
-
 # ── _risk_dose strand-awareness ──────────────────────────────────────────────
 
 @pytest.mark.parametrize("genotype,expected", [

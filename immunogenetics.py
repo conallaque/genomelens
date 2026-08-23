@@ -64,9 +64,7 @@ Allison 1954 (HbS heterozygote advantage & P. falciparum malaria).
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
 import pandas as pd
-
 
 CAT_VIRAL = "Viral Resistance & Susceptibility"
 CAT_BACTERIAL = "Bacterial / Sepsis"
@@ -74,7 +72,7 @@ CAT_PARASITIC = "Parasitic (Malaria)"
 CAT_AUTOIMMUNE = "Autoimmune Trade-offs"
 
 
-def _gt(df: pd.DataFrame, rsid: str) -> Optional[str]:
+def _gt(df: pd.DataFrame, rsid: str) -> str | None:
     if rsid not in df.index:
         return None
     row = df.loc[rsid]
@@ -552,10 +550,10 @@ def _irf5(df):
 
 # ─── Historical selection narrative ──────────────────────────────────────────
 
-def build_selection_timeline(findings: List[Dict]) -> List[Dict]:
+def build_selection_timeline(findings: list[dict]) -> list[dict]:
     """Map protective findings to historical selection events, sorted by
     approximate epoch (oldest first)."""
-    events: List[Dict] = []
+    events: list[dict] = []
     for f in findings:
         if not f.get("historical"):
             continue
@@ -589,7 +587,7 @@ def build_selection_timeline(findings: List[Dict]) -> List[Dict]:
 
 # ─── Master analyzer ─────────────────────────────────────────────────────────
 
-def analyze_immunogenetics(df: pd.DataFrame) -> Dict:
+def analyze_immunogenetics(df: pd.DataFrame) -> dict:
     """Full immunogenetics work-up + Historical Selection Timeline."""
     analyzers = [
         # Viral
@@ -602,7 +600,7 @@ def analyze_immunogenetics(df: pd.DataFrame) -> Dict:
         # Autoimmune
         _ptpn22, _stat4, _irf5,
     ]
-    findings: List[Dict] = []
+    findings: list[dict] = []
     for a in analyzers:
         try:
             r = a(df)
@@ -612,7 +610,7 @@ def analyze_immunogenetics(df: pd.DataFrame) -> Dict:
             continue
         findings.append(r)
 
-    by_category: Dict[str, List[Dict]] = {}
+    by_category: dict[str, list[dict]] = {}
     for f in findings:
         by_category.setdefault(f["category"], []).append(f)
 

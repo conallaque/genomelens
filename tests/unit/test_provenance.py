@@ -3,11 +3,9 @@
 from __future__ import annotations
 
 import pandas as pd
-import pytest
 
 import provenance
 import snp_registry as reg
-
 
 # ── tag_chip_source ──────────────────────────────────────────────────────────
 

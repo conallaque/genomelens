@@ -1,6 +1,7 @@
 """Unit tests for holistic_synthesis.py."""
 
 from __future__ import annotations
+
 import holistic_synthesis as hs
 
 

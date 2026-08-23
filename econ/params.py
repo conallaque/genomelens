@@ -45,15 +45,27 @@ a figure it does not state would defeat the purpose of the exercise.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Sequence
+from collections.abc import Sequence
+from dataclasses import dataclass
 
 __all__ = [
-    "Param", "PARAMS", "get", "value", "validate_registry",
-    "assumptions", "by_tier", "assumption_burden", "citation_list",
-    "overridden", "sampleable", "draw", "sample_all",
-    "CURATED_SOURCE_IDS", "resolve_curated_source", "audit_curated_tables",
+    "CURATED_SOURCE_IDS",
+    "PARAMS",
     "TIERS",
+    "Param",
+    "assumption_burden",
+    "assumptions",
+    "audit_curated_tables",
+    "by_tier",
+    "citation_list",
+    "draw",
+    "get",
+    "overridden",
+    "resolve_curated_source",
+    "sample_all",
+    "sampleable",
+    "validate_registry",
+    "value",
 ]
 
 TIERS = ("published", "derived", "assumption")
@@ -70,16 +82,16 @@ class Param:
     note: str = ""
     source: str = ""
     citation: str = ""          # PMID / DOI / ISBN / stable URL
-    year: Optional[int] = None
+    year: int | None = None
     dist: str = ""              # "beta" | "gamma" | "lognormal" | "fixed"
-    se: Optional[float] = None
-    low: Optional[float] = None
-    high: Optional[float] = None
+    se: float | None = None
+    low: float | None = None
+    high: float | None = None
 
     # ── validation ──────────────────────────────────────────────────────
-    def validate(self) -> List[str]:
+    def validate(self) -> list[str]:
         """Return a list of provenance problems with this parameter."""
-        bad: List[str] = []
+        bad: list[str] = []
         if self.tier not in TIERS:
             bad.append(f"{self.key}: tier {self.tier!r} not in {TIERS}")
         if self.tier in ("published", "derived"):
@@ -107,7 +119,7 @@ class Param:
         return self.tier in ("published", "derived")
 
     @property
-    def range(self) -> Optional[tuple]:
+    def range(self) -> tuple | None:
         if self.low is None or self.high is None:
             return None
         return (self.low, self.high)
@@ -130,7 +142,7 @@ def _p(*a, **kw) -> Param:
 # Grouped by role. Keys are stable strings — other modules look parameters up
 # by key rather than importing floats, so provenance travels with the value.
 
-_REGISTRY: List[Param] = [
+_REGISTRY: list[Param] = [
 
     # ── Method conventions ────────────────────────────────────────────────
     _p("wtp_per_qaly", 100_000.0, "$/QALY", "published",
@@ -771,9 +783,9 @@ _REGISTRY: List[Param] = [
        dist="beta", low=0.30, high=0.75),
 ]
 
-PARAMS: Dict[str, Param] = {p.key: p for p in _REGISTRY}
+PARAMS: dict[str, Param] = {p.key: p for p in _REGISTRY}
 if len(PARAMS) != len(_REGISTRY):
-    _seen: Dict[str, int] = {}
+    _seen: dict[str, int] = {}
     for _p_ in _REGISTRY:
         _seen[_p_.key] = _seen.get(_p_.key, 0) + 1
     raise ValueError(f"duplicate parameter keys: "
@@ -796,7 +808,7 @@ def get(key: str) -> Param:
         ) from None
 
 
-def value(key: str, default: Optional[float] = None) -> float:
+def value(key: str, default: float | None = None) -> float:
     """Return a parameter's value. ``default`` is honoured only for keys that
     genuinely may be absent; an unregistered key is otherwise an error."""
     if default is not None and key not in PARAMS:
@@ -804,9 +816,9 @@ def value(key: str, default: Optional[float] = None) -> float:
     return float(get(key).value)
 
 
-def validate_registry(params: Optional[Sequence[Param]] = None) -> List[str]:
+def validate_registry(params: Sequence[Param] | None = None) -> list[str]:
     """Return every provenance problem across the registry (empty == clean)."""
-    problems: List[str] = []
+    problems: list[str] = []
     for p in (params if params is not None else _REGISTRY):
         problems.extend(p.validate())
     return problems
@@ -828,9 +840,9 @@ class overridden:
             ...
     """
 
-    def __init__(self, values: Dict[str, float]):
+    def __init__(self, values: dict[str, float]):
         self._values = dict(values or {})
-        self._saved: Dict[str, Param] = {}
+        self._saved: dict[str, Param] = {}
 
     def __enter__(self):
         import dataclasses
@@ -848,7 +860,7 @@ class overridden:
         return False
 
 
-def sampleable() -> List[Param]:
+def sampleable() -> list[Param]:
     """Parameters carrying enough information to be drawn from.
 
     A parameter with no distribution and no range is held fixed rather than
@@ -904,18 +916,18 @@ def draw(rng, param: Param) -> float:
     return out
 
 
-def sample_all(rng, keys: Optional[Sequence[str]] = None) -> Dict[str, float]:
+def sample_all(rng, keys: Sequence[str] | None = None) -> dict[str, float]:
     """A full parameter draw, for one probabilistic-sensitivity iteration."""
     pool = ([get(k) for k in keys] if keys is not None else sampleable())
     return {p.key: draw(rng, p) for p in pool}
 
 
-def by_tier(tier: str) -> List[Param]:
+def by_tier(tier: str) -> list[Param]:
     """All parameters at one provenance tier."""
     return [p for p in _REGISTRY if p.tier == tier]
 
 
-def assumptions() -> List[Param]:
+def assumptions() -> list[Param]:
     """Parameters with no published anchor, for the report's declared-
     assumptions section."""
     return by_tier("assumption")
@@ -937,7 +949,7 @@ def assumptions() -> List[Param]:
 # which is the honest state and doubles as the work queue. A WRONG identifier
 # would be worse than none: it sends a reader to the wrong paper while looking
 # more rigorous, so guessing is not an option.
-CURATED_SOURCE_IDS: Dict[str, str] = {
+CURATED_SOURCE_IDS: dict[str, str] = {
     # ── Cost-effectiveness and trial evidence ──
     "Ladabaum et al. (2011) Ann Intern Med":
         "PMID:21768580 doi:10.7326/0003-4819-155-2-201107190-00002",
@@ -1005,7 +1017,7 @@ CURATED_SOURCE_IDS: Dict[str, str] = {
 _RESOLVABLE_RE = None
 
 
-def resolve_curated_source(src: str) -> Dict[str, str]:
+def resolve_curated_source(src: str) -> dict[str, str]:
     """Classify one curated-table ``src`` string and attach an identifier.
 
     Returns ``{"text", "identifier", "state"}`` where ``state`` is one of
@@ -1029,7 +1041,7 @@ def resolve_curated_source(src: str) -> Dict[str, str]:
     return {"text": text, "identifier": "", "state": "attributed"}
 
 
-def audit_curated_tables() -> Dict:
+def audit_curated_tables() -> dict:
     """Provenance state of every numeric field in the curated econ tables.
 
     The registry covers the model's spine — method conventions, cost-of-illness
@@ -1044,8 +1056,8 @@ def audit_curated_tables() -> Dict:
     fields = ("cost", "outcome_value", "prevalence", "qaly_gain",
               "adr_cost", "rrr")
     counts = {"resolvable": 0, "attributed": 0, "missing": 0}
-    unresolved: Dict[str, int] = {}
-    tables: List[Dict] = []
+    unresolved: dict[str, int] = {}
+    tables: list[dict] = []
     for name in sorted(dir(_he)):
         if not (name.endswith("_ECONOMICS") or name.endswith("_COSTS")):
             continue
@@ -1118,7 +1130,7 @@ def count_unregistered_parameters() -> int:
     return total
 
 
-def assumption_burden() -> Dict[str, float]:
+def assumption_burden() -> dict[str, float]:
     """How much of the registry rests on judgement rather than literature.
 
     Reports registry coverage AND how much of the model the registry does not
@@ -1171,9 +1183,9 @@ def assumption_burden() -> Dict[str, float]:
     }
 
 
-def citation_list() -> List[Dict[str, str]]:
+def citation_list() -> list[dict[str, str]]:
     """De-duplicated reference list for the report, sorted by source."""
-    seen: Dict[str, Dict[str, str]] = {}
+    seen: dict[str, dict[str, str]] = {}
     for p in _REGISTRY:
         if not p.sourced or not p.citation:
             continue

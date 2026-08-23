@@ -7,7 +7,6 @@ arithmetic conventions (within-cycle correction, discounting, ICER quadrants)
 against the published definitions rather than against the engine's own output.
 """
 
-import math
 import os
 import sys
 
@@ -53,7 +52,7 @@ def test_each_additional_correlated_finding_adds_less_than_the_last():
         cur = pool.combined_rrr()
         marginals.append(cur - prev)
         prev = cur
-    for a, b in zip(marginals, marginals[1:]):
+    for a, b in zip(marginals, marginals[1:], strict=False):
         assert b < a + 1e-12, f"marginal contributions not decreasing: {marginals}"
 
 
@@ -750,6 +749,7 @@ def test_every_personal_economics_category_is_mapped():
     # An unmapped category silently falls back to adherence_default. That is a
     # safe fallback, not a place to leave real categories sitting.
     import re
+
     from econ import health_economics as he
     src = open(he.__file__).read()
     used = set(re.findall(r'^\s+add\("([^"]+)"', src, re.M))

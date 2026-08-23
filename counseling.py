@@ -11,19 +11,18 @@ chip-based findings cross from 'informative' into 'professional review
 warranted'.
 """
 
-from typing import Dict, List
 
 
 def evaluate_counseling_triggers(
-    tier1_results: List[Dict],
+    tier1_results: list[dict],
     apoe_genotype: str,
-    pgx_results: Dict,
-    prs_results: Dict,
-    carrier_results: Dict,
-    interactions_results: Dict,
-) -> Dict:
+    pgx_results: dict,
+    prs_results: dict,
+    carrier_results: dict,
+    interactions_results: dict,
+) -> dict:
     """Aggregate counseling triggers from all analyses."""
-    triggers: List[Dict] = []
+    triggers: list[dict] = []
 
     # ── APOE ε4/ε4 ───────────────────────────────────────────────────────────
     if apoe_genotype == "E4/E4":

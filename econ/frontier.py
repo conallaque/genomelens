@@ -24,7 +24,7 @@ economic assumptions and their caveats. Nothing here is medical or financial adv
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Sequence, Tuple
+from collections.abc import Sequence
 
 try:
     import numpy as np
@@ -40,7 +40,7 @@ WTP_BASE = 100_000.0
 # ── 6. Value-based price ──────────────────────────────────────────────────────
 
 def value_based_price(incremental_qaly: float, incremental_cost_offset: float,
-                      wtp: float = WTP_BASE) -> Dict:
+                      wtp: float = WTP_BASE) -> dict:
     """**#6 — At what price is this test exactly worth buying?**
 
     *In plain English:* health technology assessment usually asks "given the
@@ -85,8 +85,8 @@ def value_based_price(incremental_qaly: float, incremental_cost_offset: float,
 
 # ── 7. Cost-effectiveness frontier ────────────────────────────────────────────
 
-def cost_effectiveness_frontier(strategies: Optional[List[Dict]] = None,
-                                wtp: float = WTP_BASE) -> Dict:
+def cost_effectiveness_frontier(strategies: list[dict] | None = None,
+                                wtp: float = WTP_BASE) -> dict:
     """**#7 — Which testing strategy is efficient, and which are ruled out?**
 
     *In plain English:* when several options exist — no test, a cheap chip, a full
@@ -117,7 +117,7 @@ def cost_effectiveness_frontier(strategies: Optional[List[Dict]] = None,
     s = sorted([dict(x) for x in strategies], key=lambda x: x["cost"])
 
     # 1) Remove strongly dominated options (more cost, less/equal QALY than a cheaper one).
-    kept: List[Dict] = []
+    kept: list[dict] = []
     best_qaly = -float("inf")
     for opt in s:
         if opt["qaly"] > best_qaly + 1e-12:
@@ -188,10 +188,10 @@ def cost_effectiveness_frontier(strategies: Optional[List[Dict]] = None,
     }
 
 
-def frontier_psa(strategies: Optional[List[Dict]] = None,
+def frontier_psa(strategies: list[dict] | None = None,
                  wtp_grid: Sequence[float] = (0, 25_000, 50_000, 75_000, 100_000,
                                               150_000, 200_000),
-                 n_mc: int = 4000, seed: int = 90210) -> Dict:
+                 n_mc: int = 4000, seed: int = 90210) -> dict:
     """**#7B — Probabilistic frontier: how *sure* are we which strategy wins?**
 
     *In plain English:* the frontier above uses single best-guess numbers. But costs
@@ -276,9 +276,9 @@ def frontier_psa(strategies: Optional[List[Dict]] = None,
 
 # ── 8. Distributional cost-effectiveness (equity weighting) ───────────────────
 
-def distributional_cea(groups: Optional[List[Dict]] = None,
+def distributional_cea(groups: list[dict] | None = None,
                        inequality_aversion: float = 2.0,
-                       wtp: float = WTP_BASE) -> Dict:
+                       wtp: float = WTP_BASE) -> dict:
     """**#8 — Who captures the value, and does that make it more or less fair?**
 
     *In plain English:* a standard cost-effectiveness analysis treats a
@@ -388,7 +388,7 @@ def distributional_cea(groups: Optional[List[Dict]] = None,
 
 def _pgx_icer(test_cost: float, p_event: float, rrr: float, event_cost: float,
               qaly_per_event: float, benefiting_fraction: float = 1.0,
-              added_treatment_cost: float = 0.0) -> Tuple:
+              added_treatment_cost: float = 0.0) -> tuple:
     """Compute an ICER for a pharmacogenomic ADR-avoidance scenario from published
     clinical inputs.
 
@@ -409,7 +409,7 @@ def _pgx_icer(test_cost: float, p_event: float, rrr: float, event_cost: float,
     return icer, inc_cost, inc_qaly
 
 
-def _lynch_icer() -> Optional[float]:
+def _lynch_icer() -> float | None:
     """Compute the Lynch-screening ICER through the actual Markov cohort engine,
     parameterised with inputs approximated from the published model."""
     try:
@@ -442,7 +442,7 @@ def _lynch_icer() -> Optional[float]:
     return (r.get("incremental_cost") or 0.0) / dq
 
 
-def validate_against_published(cases: Optional[List[Dict]] = None) -> Dict:
+def validate_against_published(cases: list[dict] | None = None) -> dict:
     """**#9 — Does the engine reproduce results a peer-reviewed study already got?**
 
     *In plain English:* the strongest thing you can say about a model is not that it

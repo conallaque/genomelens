@@ -5,18 +5,19 @@ Two-tier analysis: deterministic SNP lookup + local Ollama AI interpretation.
 Usage: python analyze.py /path/to/raw_dna_file.csv [--no-ai] [--model MODEL]
 """
 
-import sys
-import json
-import math
-import re
-import time
-import argparse
 import datetime
-from pathlib import Path
+import json
+import re
+import sys
+import time
 from collections import defaultdict
-from typing import Optional, Dict, List, Tuple
+from pathlib import Path
 
-from y_haplogroup import analyze_y_haplogroup
+# Re-exported, not used in this module: pipeline.py imports the whole module
+# surface from analyze. An unused-import autofix removed this line and the
+# pipeline stopped starting, while all 749 tests still passed — the suite
+# imports the modules directly and never exercises the facade.
+from y_haplogroup import analyze_y_haplogroup  # noqa: F401
 
 try:
     from mt_haplogroup import analyze_mt_haplogroup
@@ -25,14 +26,14 @@ except ImportError:
 
 # Professional-grade analysis modules
 try:
-    from prs import analyze_polygenic_scores
-    from pgx import analyze_pgx
-    from interactions import detect_interactions
     from carrier import analyze_carriers
-    from traits import predict_traits
+    from counseling import evaluate_counseling_triggers
+    from interactions import detect_interactions
+    from pgx import analyze_pgx
+    from prs import analyze_polygenic_scores
     from qc import run_qc
     from references import collect_references_used, get_reference, level_class
-    from counseling import evaluate_counseling_triggers
+    from traits import predict_traits
     PROFESSIONAL_MODULES_LOADED = True
 except ImportError as _e:
     PROFESSIONAL_MODULES_LOADED = False
@@ -40,7 +41,7 @@ except ImportError as _e:
 
 # v3 modules (graceful degradation when missing)
 try:
-    from imputation import impute_genotypes, imputation_available
+    from imputation import imputation_available, impute_genotypes
 except ImportError:
     impute_genotypes = None
     imputation_available = None
@@ -62,8 +63,7 @@ try:
 except ImportError:
     analyze_medications = None
 try:
-    from family_planning import (build_carrier_report, render_carrier_html,
-                                  analyze_family_planning)
+    from family_planning import analyze_family_planning, build_carrier_report, render_carrier_html
 except ImportError:
     build_carrier_report = None
     render_carrier_html = None
@@ -159,8 +159,7 @@ try:
 except ImportError:
     analyze_health_economics = None
 try:
-    from econ.health_economics import (analyze_personal_economics,
-                                  render_economic_analysis_html)
+    from econ.health_economics import analyze_personal_economics, render_economic_analysis_html
 except ImportError:
     analyze_personal_economics = None
     render_economic_analysis_html = None
@@ -229,8 +228,7 @@ try:
 except ImportError:
     analyze_value_of_information = None
 try:
-    from multi_person_module import (analyze_multi_person,
-                                      render_multi_person_html)
+    from multi_person_module import analyze_multi_person, render_multi_person_html
 except ImportError:
     analyze_multi_person = None
     render_multi_person_html = None
@@ -279,7 +277,7 @@ CATEGORY_ORDER = [
 
 # Category-specific extra questions appended to the base AI prompt.
 # Each value is a string that will be injected before the standard 6 questions.
-CATEGORY_PROMPTS: Dict[str, str] = {
+CATEGORY_PROMPTS: dict[str, str] = {
     "Testosterone & Hormones": (
         "Focus your interpretation on:\n"
         "  • What this genotype profile implies for *natural* testosterone levels, "
@@ -453,7 +451,7 @@ def log(msg: str) -> None:
     print(f"[{ts}] {msg}", flush=True)
 
 
-def load_snp_database() -> Dict:
+def load_snp_database() -> dict:
     if not DB_PATH.exists():
         log(f"ERROR: SNP database not found at {DB_PATH}")
         sys.exit(1)
@@ -520,7 +518,7 @@ def parse_dna_file(filepath: str):
     return snps_df
 
 
-def determine_apoe(rs429358_gt: Optional[str], rs7412_gt: Optional[str]) -> Optional[str]:
+def determine_apoe(rs429358_gt: str | None, rs7412_gt: str | None) -> str | None:
     """
     Determine APOE genotype from the two defining SNPs.
     rs429358 C allele = E4 haplotype
@@ -549,13 +547,13 @@ def determine_apoe(rs429358_gt: Optional[str], rs7412_gt: Optional[str]) -> Opti
 
 
 def tier1_lookup(
-    snps_df, database: Dict
-) -> Tuple[List[Dict], Optional[str]]:
+    snps_df, database: dict
+) -> tuple[list[dict], str | None]:
     """Match the person's SNPs against the curated database."""
     log("Matching SNPs against database ...")
 
     results = []
-    apoe_gts: Dict[str, str] = {}
+    apoe_gts: dict[str, str] = {}
 
     for rsid, entry in database.items():
         if rsid not in snps_df.index:
@@ -628,7 +626,7 @@ AI_NUM_CTX = 16384
 
 def call_ollama(prompt: str, model: str, timeout: int = 1800,
                 stream: bool = True, num_ctx: int = AI_NUM_CTX,
-                num_predict: int = 1024, think: Optional[bool] = None,
+                num_predict: int = 1024, think: bool | None = None,
                 retries: int = 2) -> str:
     """Send a prompt to local Ollama and return the response text.
 
@@ -663,7 +661,7 @@ def call_ollama(prompt: str, model: str, timeout: int = 1800,
             resp.raise_for_status()
             content = resp.json()["message"]["content"]
         else:
-            content_parts: List[str] = []
+            content_parts: list[str] = []
             last_token_t = time.time()
             with requests.post(OLLAMA_URL, json=payload, stream=True,
                                timeout=(30, timeout)) as resp:
@@ -692,7 +690,7 @@ def call_ollama(prompt: str, model: str, timeout: int = 1800,
             stripped = after or raw.replace("<think>", "").replace("</think>", "").strip()
         return stripped
 
-    last_err: Optional[Exception] = None
+    last_err: Exception | None = None
     for attempt in range(retries + 1):
         try:
             return _attempt()
@@ -714,13 +712,13 @@ def call_ollama(prompt: str, model: str, timeout: int = 1800,
     raise RuntimeError(f"Ollama error after retries: {last_err}")
 
 
-def build_category_map(tier1_results: List[Dict]) -> Dict[str, List[Dict]]:
+def build_category_map(tier1_results: list[dict]) -> dict[str, list[dict]]:
     """Group results by category, expanding each result into every category
     listed in its cross_references. Cross-referenced entries are shallow
     copies with summary replaced by the cross-ref implication and an
     is_cross_ref flag set so the renderer can label them.
     """
-    by_cat: Dict[str, List[Dict]] = defaultdict(list)
+    by_cat: dict[str, list[dict]] = defaultdict(list)
     for r in tier1_results:
         by_cat[r["category"]].append(r)
         for xref in r.get("cross_references", []) or []:
@@ -744,7 +742,7 @@ AI_BATCH_MAX = 8
 AI_BATCH_MIN = 2   # never split below this
 
 
-def _split_evenly(items: List[Dict], max_size: int) -> List[List[Dict]]:
+def _split_evenly(items: list[dict], max_size: int) -> list[list[dict]]:
     """Split a list into batches of at most `max_size`, sizes as equal as
     possible (so the last batch isn't a lonely small one)."""
     n = len(items)
@@ -753,7 +751,7 @@ def _split_evenly(items: List[Dict], max_size: int) -> List[List[Dict]]:
     import math as _m
     n_batches = _m.ceil(n / max_size)
     base, extras = divmod(n, n_batches)
-    out: List[List[Dict]] = []
+    out: list[list[dict]] = []
     start = 0
     for i in range(n_batches):
         size = base + (1 if i < extras else 0)
@@ -762,16 +760,16 @@ def _split_evenly(items: List[Dict], max_size: int) -> List[List[Dict]]:
     return out
 
 
-def _split_into_batches(items: List[Dict], target_max: int = AI_BATCH_MAX) -> List[List[Dict]]:
+def _split_into_batches(items: list[dict], target_max: int = AI_BATCH_MAX) -> list[list[dict]]:
     """Back-compat alias for :func:`_split_evenly` (identical behaviour)."""
     return _split_evenly(items, target_max)
 
 
 def _build_category_prompt(
     category: str,
-    snps: List[Dict],
-    batch_idx: Optional[int] = None,
-    total_batches: Optional[int] = None,
+    snps: list[dict],
+    batch_idx: int | None = None,
+    total_batches: int | None = None,
 ) -> str:
     """Build the AI prompt for one category (or one sub-batch of a category)."""
     lines = []
@@ -839,15 +837,15 @@ def _build_category_prompt(
 
 
 def _run_category_ai_with_batching(
-    category: str, snps: List[Dict], model: str
-) -> Tuple[str, bool]:
+    category: str, snps: list[dict], model: str
+) -> tuple[str, bool]:
     """Run the per-category AI interpretation, splitting into sub-batches if
     the category has more than AI_BATCH_MAX variants. On a timeout the batch
     is automatically halved and retried (down to AI_BATCH_MIN), so a single
     slow response no longer kills the entire category's output."""
 
-    def _try_one(batch: List[Dict], idx: Optional[int] = None,
-                 total: Optional[int] = None) -> Tuple[str, bool]:
+    def _try_one(batch: list[dict], idx: int | None = None,
+                 total: int | None = None) -> tuple[str, bool]:
         """Attempt one AI call. On TimeoutError, halve the batch and recurse
         (up to AI_BATCH_MIN). Returns (text, had_failure)."""
         try:
@@ -866,7 +864,7 @@ def _run_category_ai_with_batching(
             half = max(AI_BATCH_MIN, len(batch) // 2)
             log(f"    Batch of {len(batch)} timed out; auto-splitting to {half} and retrying")
             sub = _split_evenly(batch, half)
-            sub_parts: List[str] = []
+            sub_parts: list[str] = []
             any_fail = False
             for j, sb in enumerate(sub, start=1):
                 t, f = _try_one(sb, j, len(sub))
@@ -882,7 +880,7 @@ def _run_category_ai_with_batching(
 
     sizes = ", ".join(str(len(b)) for b in batches)
     log(f"    Splitting {len(snps)} variants into {len(batches)} sub-batches ({sizes})")
-    parts: List[str] = []
+    parts: list[str] = []
     had_failure = False
     offset = 0
     for i, batch in enumerate(batches, start=1):
@@ -901,23 +899,23 @@ def _run_category_ai_with_batching(
 
 
 def _build_module_context(
-    bloodwork_result: Optional[Dict] = None,
-    immunogenetics_result: Optional[Dict] = None,
-    neurochemistry_result: Optional[Dict] = None,
-    addiction_genetics_result: Optional[Dict] = None,
-    deep_ancestry_result: Optional[Dict] = None,
-    blood_type_result: Optional[Dict] = None,
-    family_planning_result: Optional[Dict] = None,
-    polygenic_traits_result: Optional[Dict] = None,
-    environmental_optimization_result: Optional[Dict] = None,
-    holistic_synthesis_result: Optional[Dict] = None,
-    detox_result: Optional[Dict] = None,
-    ancestry_result: Optional[Dict] = None,
-    clinical_variants_result: Optional[Dict] = None,
-    novel_variants_result: Optional[Dict] = None,
-    voi_result: Optional[Dict] = None,
-    y_result: Optional[Dict] = None,
-    mt_result: Optional[Dict] = None,
+    bloodwork_result: dict | None = None,
+    immunogenetics_result: dict | None = None,
+    neurochemistry_result: dict | None = None,
+    addiction_genetics_result: dict | None = None,
+    deep_ancestry_result: dict | None = None,
+    blood_type_result: dict | None = None,
+    family_planning_result: dict | None = None,
+    polygenic_traits_result: dict | None = None,
+    environmental_optimization_result: dict | None = None,
+    holistic_synthesis_result: dict | None = None,
+    detox_result: dict | None = None,
+    ancestry_result: dict | None = None,
+    clinical_variants_result: dict | None = None,
+    novel_variants_result: dict | None = None,
+    voi_result: dict | None = None,
+    y_result: dict | None = None,
+    mt_result: dict | None = None,
     max_chars: int = 7000,
     per_section_chars: int = 900,
 ) -> str:
@@ -930,9 +928,9 @@ def _build_module_context(
     summary, the cross-category synthesis, and the interactive chat assistant
     so all three reason over the same rich context.
     """
-    sections: List[Tuple[str, str]] = []
+    sections: list[tuple[str, str]] = []
 
-    def _add(title: str, lines: List[str]) -> None:
+    def _add(title: str, lines: list[str]) -> None:
         lines = [str(x) for x in lines if x]
         if not lines:
             return
@@ -1163,7 +1161,7 @@ def _build_module_context(
 # Per-module AI ("AI on all tiers"): each new module section gets its own local
 # AI interpretation. Keys are the report section anchor ids so the renderer can
 # attach each interpretation to the right section.
-_MODULE_AI_SPECS: Dict[str, Dict[str, str]] = {
+_MODULE_AI_SPECS: dict[str, dict[str, str]] = {
     "clinical-variants": {
         "kwarg": "clinical_variants_result", "title": "Clinical Variants (ClinVar)",
         "focus": "Explain each pathogenic/likely-pathogenic finding plainly — what "
@@ -1268,7 +1266,7 @@ def _extract_numbers(s: str) -> set:
     return nums
 
 
-def _ground_ai_output(text: str, context: str) -> List[str]:
+def _ground_ai_output(text: str, context: str) -> list[str]:
     """Return the list of numeric claims in `text` that do NOT appear in the
     grounding `context` (i.e. likely hallucinated statistics). Small integers and
     plausible years are whitelisted to avoid false positives on ordinary prose."""
@@ -1286,12 +1284,12 @@ def _ground_ai_output(text: str, context: str) -> List[str]:
     return ungrounded
 
 
-def ai_interpret_modules(model: str, log=None, **results) -> Dict[str, str]:
+def ai_interpret_modules(model: str, log=None, **results) -> dict[str, str]:
     """AI-interpret each higher-order module ('AI on all tiers'). Returns a dict
     keyed by report section-id → AI interpretation text. Each call is small and
     fully local; per-module failures are logged and skipped, never fatal."""
     _log = log or (lambda *a, **k: None)
-    out: Dict[str, str] = {}
+    out: dict[str, str] = {}
     for section_id, spec in _MODULE_AI_SPECS.items():
         res = results.get(spec["kwarg"])
         if not res:
@@ -1334,9 +1332,9 @@ def ai_interpret_modules(model: str, log=None, **results) -> Dict[str, str]:
 
 
 def tier2_analysis(
-    tier1_results: List[Dict], apoe_genotype: Optional[str], model: str,
+    tier1_results: list[dict], apoe_genotype: str | None, model: str,
     module_context: str = "",
-) -> Tuple[Dict[str, str], str, List[Dict]]:
+) -> tuple[dict[str, str], str, list[dict]]:
     """Run per-category AI interpretation then an executive summary.
 
     Returns (ai_results, exec_summary, failed_categories). failed_categories
@@ -1346,8 +1344,8 @@ def tier2_analysis(
     """
     categories = build_category_map(tier1_results)
 
-    ai_results: Dict[str, str] = {}
-    failed_categories: List[Dict] = []
+    ai_results: dict[str, str] = {}
+    failed_categories: list[dict] = []
 
     for category in sorted(categories.keys()):
         snps = categories[category]
@@ -1442,7 +1440,7 @@ def tier2_analysis(
 
 
 def cross_category_synthesis(
-    tier1_results: List[Dict], model: str, module_context: str = "",
+    tier1_results: list[dict], model: str, module_context: str = "",
 ) -> str:
     """Generate a synthesis of how findings across categories interact.
 
@@ -1453,8 +1451,8 @@ def cross_category_synthesis(
     log("  AI generating Cross-Category Interactions synthesis ...")
 
     # Group by category, prioritise risk-carrying variants and any with cross-refs
-    by_cat: Dict[str, List[Dict]] = defaultdict(list)
-    cross_ref_pairs: List[Tuple[str, str, Dict]] = []
+    by_cat: dict[str, list[dict]] = defaultdict(list)
+    cross_ref_pairs: list[tuple[str, str, dict]] = []
     for r in tier1_results:
         if r["risk_copies"] > 0 or r.get("cross_references"):
             by_cat[r["category"]].append(r)
@@ -1549,10 +1547,10 @@ FAILED_CATEGORIES_PATH = SCRIPT_DIR / "failed_categories.json"
 
 
 def write_failed_categories(
-    failed: List[Dict],
+    failed: list[dict],
     model: str,
     report_path: Path,
-    dna_file: Optional[str] = None,
+    dna_file: str | None = None,
 ) -> None:
     """Persist the list of categories whose AI analysis didn't fully succeed
     so the user can re-run just those via --retry-failed. Always overwrites
@@ -1575,10 +1573,10 @@ def write_failed_categories(
         log(f"  Logged {len(failed)} failed categor"
             f"{'y' if len(failed) == 1 else 'ies'} -> "
             f"{FAILED_CATEGORIES_PATH.name} ({names})")
-        log(f"  Re-run with: python analyze.py --retry-failed")
+        log("  Re-run with: python analyze.py --retry-failed")
 
 
-def retry_failed_categories(model: str, override_report: Optional[Path] = None) -> int:
+def retry_failed_categories(model: str, override_report: Path | None = None) -> int:
     """Read failed_categories.json, re-run AI for each entry, and patch the
     new interpretations into the existing report.html. Returns a process
     exit code (0 success, non-zero if something prevented the retry).
@@ -1618,7 +1616,7 @@ def retry_failed_categories(model: str, override_report: Optional[Path] = None) 
     # trigger module __getattr__ — import them explicitly to avoid NameError.
     from renderers import _cat_id, _patch_ai_section_in_html, md_to_html
 
-    still_failed: List[Dict] = []
+    still_failed: list[dict] = []
     patched = 0
     for entry in failed:
         category = entry.get("category")

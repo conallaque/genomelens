@@ -23,13 +23,10 @@ prs.py continue to provide a baseline.
 from __future__ import annotations
 
 import gzip
-import json
 from math import erf, sqrt
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
-
 
 SCRIPT_DIR = Path(__file__).parent
 PGS_DIR = SCRIPT_DIR / "reference" / "pgs_scores"
@@ -37,7 +34,7 @@ PGS_DIR = SCRIPT_DIR / "reference" / "pgs_scores"
 
 # Maps condition slug -> display info. Mirrors setup.py so the report can use
 # friendly names even if the scoring file is named by PGS ID.
-CONDITIONS: Dict[str, Dict[str, str]] = {
+CONDITIONS: dict[str, dict[str, str]] = {
     "coronary_artery_disease": {
         "pgs_id": "PGS000018",
         "label": "Coronary Artery Disease",
@@ -142,7 +139,7 @@ def _log(msg: str) -> None:
 
 
 # ── Scoring file parsing ──────────────────────────────────────────────────────
-def parse_pgs_scoring_file(path: Path) -> List[Dict]:
+def parse_pgs_scoring_file(path: Path) -> list[dict]:
     """Parse a PGS Catalog harmonised scoring file (Hmpos format).
 
     Returns a list of variant dicts:
@@ -151,8 +148,8 @@ def parse_pgs_scoring_file(path: Path) -> List[Dict]:
     Allele frequency may not be present in older files; we tolerate that.
     """
     opener = gzip.open if str(path).endswith(".gz") else open
-    variants: List[Dict] = []
-    header_cols: List[str] = []
+    variants: list[dict] = []
+    header_cols: list[str] = []
     with opener(path, "rt") as f:
         for line in f:
             if line.startswith("#"):
@@ -166,7 +163,7 @@ def parse_pgs_scoring_file(path: Path) -> List[Dict]:
             parts = line.split("\t")
             if len(parts) < len(header_cols):
                 parts += [""] * (len(header_cols) - len(parts))
-            row = dict(zip(header_cols, parts))
+            row = dict(zip(header_cols, parts, strict=False))
             # PGS Catalog hm columns
             rsid = row.get("rsID") or row.get("hm_rsID") or row.get("rsid") or ""
             chrom = row.get("hm_chr") or row.get("chr_name") or ""
@@ -200,7 +197,7 @@ def parse_pgs_scoring_file(path: Path) -> List[Dict]:
 
 
 # ── Genotype-to-dosage helper ─────────────────────────────────────────────────
-def _dosage(genotype: object, effect_allele: str) -> Optional[int]:
+def _dosage(genotype: object, effect_allele: str) -> int | None:
     if genotype is None:
         return None
     gt = str(genotype).upper().replace(" ", "").replace("-", "")
@@ -240,8 +237,8 @@ def _pgs_confidence(n_used: int, total: int, n_low_r2: int) -> tuple:
 
 
 # ── PGS calculation ───────────────────────────────────────────────────────────
-def calculate_pgs(snps_df: pd.DataFrame, variants: List[Dict],
-                  default_af: float = 0.30) -> Dict:
+def calculate_pgs(snps_df: pd.DataFrame, variants: list[dict],
+                  default_af: float = 0.30) -> dict:
     """Compute the raw score, expected mean & variance, z-score, percentile,
     and a coverage breakdown for a single PGS panel.
 
@@ -254,7 +251,7 @@ def calculate_pgs(snps_df: pd.DataFrame, variants: List[Dict],
     expected_var = 0.0
     n_chip = n_imputed = n_low_r2 = 0
     n_missing = 0
-    used: List[Dict] = []
+    used: list[dict] = []
 
     for v in variants:
         rsid = v["rsid"]
@@ -342,7 +339,7 @@ def calculate_pgs(snps_df: pd.DataFrame, variants: List[Dict],
 
 
 # ── Top-level analyzer ────────────────────────────────────────────────────────
-def analyze_expanded_pgs(snps_df: pd.DataFrame, sex: Optional[str] = None) -> Dict:
+def analyze_expanded_pgs(snps_df: pd.DataFrame, sex: str | None = None) -> dict:
     """Run all available PGS Catalog panels.
 
     Returns a dict with per-condition results. If scoring files are not
@@ -351,11 +348,11 @@ def analyze_expanded_pgs(snps_df: pd.DataFrame, sex: Optional[str] = None) -> Di
     if not PGS_DIR.exists():
         return {
             "available": False,
-            "reason": f"PGS scoring files not downloaded. Run `python setup.py --pgs`.",
+            "reason": "PGS scoring files not downloaded. Run `python setup.py --pgs`.",
             "panels": {},
         }
 
-    panels: Dict[str, Dict] = {}
+    panels: dict[str, dict] = {}
     for slug, info in CONDITIONS.items():
         pgs_id = info["pgs_id"]
         applies_to = info.get("applies_to")

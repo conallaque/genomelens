@@ -30,9 +30,6 @@ Story section in the main report. Educational, not clinical.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
-
-
 # ══════════════════════════════════════════════════════════════════════════
 # Curated regional / haplogroup story blocks
 # ══════════════════════════════════════════════════════════════════════════
@@ -357,7 +354,7 @@ _MT_STORIES = {
 # Story assembler (deterministic template mode)
 # ══════════════════════════════════════════════════════════════════════════
 
-def _resolve(hg: str, table: Dict) -> Optional[Dict]:
+def _resolve(hg: str, table: dict) -> dict | None:
     """Longest-prefix haplogroup lookup."""
     if not hg:
         return None
@@ -368,14 +365,14 @@ def _resolve(hg: str, table: Dict) -> Optional[Dict]:
     return None
 
 
-def build_template_story(y_result: Optional[Dict],
-                         mt_result: Optional[Dict],
-                         deep_ancestry_result: Optional[Dict],
-                         immunogenetics_result: Optional[Dict],
-                         ancestry_result: Optional[Dict]) -> Dict:
+def build_template_story(y_result: dict | None,
+                         mt_result: dict | None,
+                         deep_ancestry_result: dict | None,
+                         immunogenetics_result: dict | None,
+                         ancestry_result: dict | None) -> dict:
     """Assemble a multi-chapter deterministic Ancestral Story from the run's
     upstream results."""
-    chapters: List[Dict] = []
+    chapters: list[dict] = []
 
     # Chapter 1 — deep prehistory (Neanderthal + WHG/EEF/Yamnaya)
     dp = deep_ancestry_result or {}
@@ -570,13 +567,13 @@ plausibility-weighted narrative from anonymous DNA-derived data, not a documente
     return "\n".join(lines)
 
 
-def analyze_ancestral_story(y_result: Optional[Dict],
-                            mt_result: Optional[Dict],
-                            deep_ancestry_result: Optional[Dict],
-                            immunogenetics_result: Optional[Dict],
-                            ancestry_result: Optional[Dict],
-                            model: Optional[str] = None,
-                            use_ai: bool = False) -> Dict:
+def analyze_ancestral_story(y_result: dict | None,
+                            mt_result: dict | None,
+                            deep_ancestry_result: dict | None,
+                            immunogenetics_result: dict | None,
+                            ancestry_result: dict | None,
+                            model: str | None = None,
+                            use_ai: bool = False) -> dict:
     """Build the Ancestral Story. Always returns the deterministic template
     narrative; optionally attaches an AI-enhanced long-form version if
     ``use_ai=True`` and Ollama is reachable."""
@@ -585,8 +582,8 @@ def analyze_ancestral_story(y_result: Optional[Dict],
         immunogenetics_result, ancestry_result,
     )
 
-    ai_text: Optional[str] = None
-    ai_error: Optional[str] = None
+    ai_text: str | None = None
+    ai_error: str | None = None
     if use_ai and model:
         try:
             # Local Ollama import kept optional so template mode always works.

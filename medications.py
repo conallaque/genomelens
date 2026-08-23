@@ -14,11 +14,8 @@ otherwise we emit a "not flagged by PGx" note explaining why.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
-
-
 # Brand → generic. Multiple brands may map to the same generic.
-BRAND_TO_GENERIC: Dict[str, str] = {
+BRAND_TO_GENERIC: dict[str, str] = {
     # SSRIs/SNRIs/antidepressants
     "zoloft": "sertraline",
     "lexapro": "escitalopram",
@@ -117,7 +114,7 @@ BRAND_TO_GENERIC: Dict[str, str] = {
 # Generic → list of (gene, pathway_note). Multi-gene drugs list all relevant
 # metabolizers/transporters. Note: this table reflects CPIC-prioritised
 # gene-drug pairs, not every metabolic pathway.
-DRUG_GENES: Dict[str, List[Dict[str, str]]] = {
+DRUG_GENES: dict[str, list[dict[str, str]]] = {
     # SSRIs / SNRIs
     "sertraline":      [{"gene": "CYP2C19", "note": "Primary metabolizer; PMs/IMs may need lower dose."}],
     "escitalopram":    [{"gene": "CYP2C19", "note": "Primary metabolizer; PMs accumulate, UMs underexposed."}],
@@ -227,7 +224,7 @@ def normalize_drug(name: str) -> str:
     return BRAND_TO_GENERIC.get(s, s)
 
 
-def lookup_medication(drug_input: str, pgx_result: Dict) -> Dict:
+def lookup_medication(drug_input: str, pgx_result: dict) -> dict:
     """For a single drug, find applicable genes + the user's phenotype +
     the CPIC recommendation if present."""
     generic = normalize_drug(drug_input)
@@ -246,7 +243,7 @@ def lookup_medication(drug_input: str, pgx_result: Dict) -> Dict:
             "findings": [],
         }
 
-    findings: List[Dict] = []
+    findings: list[dict] = []
     per_gene_results = (pgx_result or {}).get("per_gene", {})
     for entry in genes_info:
         gene = entry["gene"]
@@ -305,7 +302,7 @@ def lookup_medication(drug_input: str, pgx_result: Dict) -> Dict:
     }
 
 
-def analyze_medications(drug_list: List[str], pgx_result: Dict) -> Dict:
+def analyze_medications(drug_list: list[str], pgx_result: dict) -> dict:
     """Run lookup_medication over a user-provided list."""
     reviews = [lookup_medication(d, pgx_result) for d in drug_list]
     return {

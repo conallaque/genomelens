@@ -22,8 +22,7 @@ keep working through the back-compat shim at the bottom of ``analyze.py``.
 from __future__ import annotations
 
 import argparse
-from typing import Sequence
-
+from collections.abc import Sequence
 
 # Importing ``analyze`` at function scope (inside ``main``) avoids paying the
 # multi-second import cost when the parser is constructed for ``--help`` or for
@@ -241,7 +240,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     full orchestration directly and ``analyze.py`` will be deleted (or
     reduced to a back-compat shim).
     """
-    import analyze   # local import — see module docstring
+    import analyze  # local import — see module docstring
     analyze.main(argv=argv)
     return 0
 

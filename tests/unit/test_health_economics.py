@@ -20,8 +20,8 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from econ import health_economics as he
 import renderers
+from econ import health_economics as he
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 

@@ -26,7 +26,6 @@ breaking existing consumers that ignore them.
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import pandas as pd
 
@@ -66,7 +65,7 @@ def tag_chip_source(snps_df: pd.DataFrame) -> pd.DataFrame:
 def tag_imputed_rows(
     snps_df: pd.DataFrame,
     chip_rsids: set[str],
-    dr2_by_rsid: Optional[dict[str, float]] = None,
+    dr2_by_rsid: dict[str, float] | None = None,
     high_r2_threshold: float = DEFAULT_HIGH_R2_THRESHOLD,
 ) -> pd.DataFrame:
     """Mark every variant that is *not* in ``chip_rsids`` as imputed.

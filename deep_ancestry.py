@@ -50,11 +50,7 @@ Citations:
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple
 import pandas as pd
-
-import snp_registry
-
 
 # ══════════════════════════════════════════════════════════════════════════
 # 1. NEANDERTHAL INTROGRESSION
@@ -68,7 +64,7 @@ import snp_registry
 # tag SNPs); it is an interpretable score comparable across users of this
 # tool. Where reference papers give an allele frequency in non-Africans, we
 # use it to convert the raw score into a rough percentile.
-_NEANDERTHAL_SNPS: List[Dict] = [
+_NEANDERTHAL_SNPS: list[dict] = [
     {"rsid": "rs35044562", "gene": "chr3p21.31 (LZTFL1/SLC6A20)",
      "neanderthal": "G", "ancestral": "A",
      "trait": "Severe COVID-19 risk haplotype (Zeberg & Pääbo, Nature 2020)"},
@@ -103,7 +99,7 @@ _NEANDERTHAL_SNPS: List[Dict] = [
 ]
 
 
-def analyze_neanderthal(snps_df: pd.DataFrame) -> Dict:
+def analyze_neanderthal(snps_df: pd.DataFrame) -> dict:
     """Compute a Neanderthal affinity score from curated introgressed SNPs.
 
     The score = (# Neanderthal-derived alleles observed) / (2 × # markers typed).
@@ -195,7 +191,7 @@ def analyze_neanderthal(snps_df: pd.DataFrame) -> Dict:
 # We score the user against each ancient-population "fingerprint" by counting
 # characteristic derived alleles, then normalise.
 
-_ANCIENT_FINGERPRINTS: List[Dict] = [
+_ANCIENT_FINGERPRINTS: list[dict] = [
     {"name": "Yamnaya / Steppe (Bronze Age, ~5-4 kya)",
      "short": "Yamnaya",
      "narrative": (
@@ -237,13 +233,13 @@ _ANCIENT_FINGERPRINTS: List[Dict] = [
 ]
 
 
-def _count_derived(snps_df: pd.DataFrame, alleles: List[Tuple[str, str]]) -> Dict:
+def _count_derived(snps_df: pd.DataFrame, alleles: list[tuple[str, str]]) -> dict:
     """Count derived alleles for a fingerprint. Returns
     {n_carried, n_max, n_typed, per_marker: [...]}."""
     carried = 0
     n_max = 0
-    per: List[Dict] = []
-    from ancestry_pca import _dosage        # reuse strand-aware helper
+    per: list[dict] = []
+    from ancestry_pca import _dosage  # reuse strand-aware helper
     for rsid, allele in alleles:
         if rsid not in snps_df.index:
             per.append({"rsid": rsid, "typed": False, "dose": None})
@@ -274,9 +270,9 @@ def _count_derived(snps_df: pd.DataFrame, alleles: List[Tuple[str, str]]) -> Dic
             "n_typed": sum(1 for p in per if p["typed"] and p["dose"] is not None)}
 
 
-def analyze_ancient_populations(snps_df: pd.DataFrame) -> Dict:
+def analyze_ancient_populations(snps_df: pd.DataFrame) -> dict:
     """Score the user's affinity to each of Yamnaya / EEF / WHG fingerprints."""
-    populations: List[Dict] = []
+    populations: list[dict] = []
     for fp in _ANCIENT_FINGERPRINTS:
         counts = _count_derived(snps_df, fp["alleles"])
         if counts["n_max"] == 0:
@@ -318,7 +314,7 @@ def analyze_ancient_populations(snps_df: pd.DataFrame) -> Dict:
 # A positive index leans Northern; negative leans Southern. This is a *soft*
 # axis — many modern individuals are admixed across it.
 
-_NS_EUROPE_AXIS: List[Dict] = [
+_NS_EUROPE_AXIS: list[dict] = [
     {"rsid": "rs4988235", "allele": "A", "weight": 1.0,   # LCT persistence — very Northern
      "gene": "LCT", "note": "Lactase persistence — strong Northern-European signal"},
     {"rsid": "rs12913832", "allele": "G", "weight": 0.8,  # HERC2 blue eyes
@@ -330,12 +326,12 @@ _NS_EUROPE_AXIS: List[Dict] = [
 ]
 
 
-def analyze_north_south_europe(snps_df: pd.DataFrame) -> Dict:
+def analyze_north_south_europe(snps_df: pd.DataFrame) -> dict:
     """Compute a soft Northern-vs-Southern European axis score."""
-    from ancestry_pca import _dosage, AIMS_PRIORS
+    from ancestry_pca import AIMS_PRIORS, _dosage
     score = 0.0
     max_score = 0.0
-    used: List[Dict] = []
+    used: list[dict] = []
     for m in _NS_EUROPE_AXIS:
         if m["rsid"] not in snps_df.index:
             continue
@@ -388,7 +384,7 @@ def analyze_north_south_europe(snps_df: pd.DataFrame) -> Dict:
 # academic literature. We match by longest-prefix (T1a1a → T1a1a → T1a1 → T1a
 # → T).
 
-_Y_TIMELINE: Dict[str, Dict] = {
+_Y_TIMELINE: dict[str, dict] = {
     "R1b": {"tmrca_kya": 22, "origin": "Ponto-Caspian steppe",
             "story": "The dominant Western-European Y-lineage. Expanded with the Bronze-Age "
                      "Bell Beaker culture (~4.5 kya) after emerging on the steppe."},
@@ -423,7 +419,7 @@ _Y_TIMELINE: Dict[str, Dict] = {
     "C":   {"tmrca_kya": 65, "origin": "Deep non-African"},
 }
 
-_MT_TIMELINE: Dict[str, Dict] = {
+_MT_TIMELINE: dict[str, dict] = {
     "H":  {"tmrca_kya": 25, "origin": "Palaeolithic Europe / Near East",
            "story": "The most common European maternal lineage — nearly half of modern Europeans."},
     "V":  {"tmrca_kya": 15, "origin": "Iberian post-glacial refugium",
@@ -454,7 +450,7 @@ _MT_TIMELINE: Dict[str, Dict] = {
 }
 
 
-def _longest_prefix(haplogroup: str, table: Dict[str, Dict]) -> Optional[Dict]:
+def _longest_prefix(haplogroup: str, table: dict[str, dict]) -> dict | None:
     if not haplogroup:
         return None
     key = haplogroup.strip().upper()
@@ -467,8 +463,8 @@ def _longest_prefix(haplogroup: str, table: Dict[str, Dict]) -> Optional[Dict]:
     return None
 
 
-def build_haplogroup_timeline(y_result: Optional[Dict],
-                              mt_result: Optional[Dict]) -> Dict:
+def build_haplogroup_timeline(y_result: dict | None,
+                              mt_result: dict | None) -> dict:
     y_hg = (y_result or {}).get("terminal_haplogroup")
     mt_hg = (mt_result or {}).get("haplogroup")
     return {
@@ -488,8 +484,8 @@ def build_haplogroup_timeline(y_result: Optional[Dict],
 # ══════════════════════════════════════════════════════════════════════════
 
 def analyze_deep_ancestry(snps_df: pd.DataFrame,
-                          y_result: Optional[Dict] = None,
-                          mt_result: Optional[Dict] = None) -> Dict:
+                          y_result: dict | None = None,
+                          mt_result: dict | None = None) -> dict:
     """Full state-of-the-art deep-ancestry analysis: archaic + ancient
     populations + Northern-Southern European axis + haplogroup timelines."""
     neanderthal = analyze_neanderthal(snps_df)

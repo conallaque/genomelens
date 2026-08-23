@@ -116,6 +116,13 @@ ignore = [
     "E501",   # line-too-long — many migration narratives exceed; format-fix only
     "B008",   # function-call-in-default-argument — pandas DataFrame() default ok here
     "RUF012", # mutable-class-attribute — many dicts are intentionally module-level
+    # Ambiguous-unicode, in strings / docstrings / comments respectively. This
+    # codebase writes prose that ends up rendered as HTML, so ×, −, –, ’ and ≈
+    # are the correct characters rather than ASCII lookalikes. The rule exists
+    # to catch a Cyrillic 'а' smuggled into an identifier; here it fires 763
+    # times on deliberate typography, and "fixing" it would mean letting a
+    # linter rewrite the writing.
+    "RUF001", "RUF002", "RUF003",
 ]
 
 [tool.ruff.lint.per-file-ignores]

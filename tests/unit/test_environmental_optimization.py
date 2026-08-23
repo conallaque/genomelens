@@ -1,7 +1,9 @@
 """Unit tests for environmental_optimization.py."""
 
 from __future__ import annotations
+
 import pandas as pd
+
 import environmental_optimization as eo
 
 

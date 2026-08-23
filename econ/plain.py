@@ -33,18 +33,24 @@ Where the honest answer is "we don't know", these functions say so.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Sequence
+from collections.abc import Sequence
 
 from . import params as ep
 
 __all__ = [
-    "number_needed_to_screen", "healthy_time_gained", "payback_period",
-    "plain_money", "plain_verdict", "plain_confidence", "plain_actions",
-    "build_plain_summary", "CONDITION_NAMES",
+    "CONDITION_NAMES",
+    "build_plain_summary",
+    "healthy_time_gained",
+    "number_needed_to_screen",
+    "payback_period",
+    "plain_actions",
+    "plain_confidence",
+    "plain_money",
+    "plain_verdict",
 ]
 
 # Human names for the internal condition keys. "coi_key: CAD" is not English.
-CONDITION_NAMES: Dict[str, str] = {
+CONDITION_NAMES: dict[str, str] = {
     "CAD": "heart attack or stroke",
     "T2D": "type 2 diabetes",
     "Alzheimer": "dementia",
@@ -67,8 +73,8 @@ def _name(coi_key: str) -> str:
 # Outcomes that are intuitive by construction
 # ══════════════════════════════════════════════════════════════════════════
 
-def number_needed_to_screen(conditions: Sequence[Dict],
-                            *, assumed_baseline: bool = True) -> List[Dict]:
+def number_needed_to_screen(conditions: Sequence[dict],
+                            *, assumed_baseline: bool = True) -> list[dict]:
     """"About 1 in N people who do this avoid X."
 
     Number needed to screen is the inverse of the absolute risk reduction, and
@@ -80,7 +86,7 @@ def number_needed_to_screen(conditions: Sequence[Dict],
     honest description of most population screening, and a reader who sees it
     understands the trade-off better than one shown only a dollar figure.
     """
-    out: List[Dict] = []
+    out: list[dict] = []
     for c in conditions:
         arr = float(c.get("cases_averted", 0.0) or 0.0)
         if arr <= 0:
@@ -114,7 +120,7 @@ def number_needed_to_screen(conditions: Sequence[Dict],
     return out
 
 
-def healthy_time_gained(qalys: float) -> Dict:
+def healthy_time_gained(qalys: float) -> dict:
     """Quality-adjusted life-years, said as time a person can picture.
 
     A QALY is a year of life in full health; fractions of one are the usual
@@ -147,7 +153,7 @@ def healthy_time_gained(qalys: float) -> Dict:
 
 
 def payback_period(*, upfront_cost: float, annual_saving: float,
-                   max_years: int = 40) -> Dict:
+                   max_years: int = 40) -> dict:
     """"It pays for itself after about N years" — or honestly, that it doesn't.
 
     Undiscounted deliberately: this answers a cash question in the terms
@@ -199,7 +205,7 @@ def plain_money(v) -> str:
     return f"minus {s}" if v < 0 else s
 
 
-def plain_verdict(cea: Dict, *, wtp: Optional[float] = None) -> Dict:
+def plain_verdict(cea: dict, *, wtp: float | None = None) -> dict:
     """One sentence answering "is this worth doing?".
 
     The three cases a reader needs distinguished, and which the technical
@@ -248,7 +254,7 @@ def plain_verdict(cea: Dict, *, wtp: Optional[float] = None) -> Dict:
             "tone": "neutral"}
 
 
-def plain_confidence(psa: Optional[Dict]) -> Dict:
+def plain_confidence(psa: dict | None) -> dict:
     """"In N out of 100 versions of this model, it was worth it."
 
     A probability of cost-effectiveness is a frequency, and frequencies are
@@ -283,14 +289,14 @@ def plain_confidence(psa: Optional[Dict]) -> Dict:
     }
 
 
-def plain_actions(conditions: Sequence[Dict], *, top: int = 5) -> List[Dict]:
+def plain_actions(conditions: Sequence[dict], *, top: int = 5) -> list[dict]:
     """The ranked list of what to actually do, in English.
 
     The technical table is sorted by net monetary benefit, which is the right
     ordering and an opaque label. This says what each row means.
     """
     rows = sorted(conditions, key=lambda c: c.get("inmb", 0), reverse=True)
-    out: List[Dict] = []
+    out: list[dict] = []
     for c in rows[:top]:
         if (c.get("inmb", 0) or 0) <= 0:
             continue
@@ -318,7 +324,7 @@ def plain_actions(conditions: Sequence[Dict], *, top: int = 5) -> List[Dict]:
 # Assembly
 # ══════════════════════════════════════════════════════════════════════════
 
-def build_plain_summary(pooled: Optional[Dict]) -> Dict:
+def build_plain_summary(pooled: dict | None) -> dict:
     """Assemble the plain-language summary from the pooled economic result."""
     if not pooled or not pooled.get("available"):
         return {"available": False}

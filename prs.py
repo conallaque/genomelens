@@ -29,8 +29,8 @@ Limitations (called out in the report):
   * Not a clinical diagnostic.
 """
 
-from math import sqrt, erf, log
-from typing import Dict, List, Optional
+from math import erf, sqrt
+
 import pandas as pd
 
 
@@ -54,7 +54,7 @@ def _norm_cdf(z: float) -> float:
 # panel-specific.
 #
 
-PRS_PANELS: Dict[str, Dict] = {
+PRS_PANELS: dict[str, dict] = {
     "Coronary Artery Disease": {
         "trait_short": "CAD",
         "description": (
@@ -288,7 +288,7 @@ def _prs_confidence(n_used: int, n_total: int) -> tuple:
 
 
 # ─── Core scoring ─────────────────────────────────────────────────────────────
-def _dosage(genotype: str, effect_allele: str) -> Optional[int]:
+def _dosage(genotype: str, effect_allele: str) -> int | None:
     if not genotype:
         return None
     gt = str(genotype).upper().replace(" ", "").replace("-", "")
@@ -299,7 +299,7 @@ def _dosage(genotype: str, effect_allele: str) -> Optional[int]:
     return gt.count(effect_allele.upper())
 
 
-def _score_panel(snps_df: pd.DataFrame, panel: Dict, sex: Optional[str] = None) -> Dict:
+def _score_panel(snps_df: pd.DataFrame, panel: dict, sex: str | None = None) -> dict:
     """Compute z-score / percentile / tier for a single panel."""
     applies_to = panel.get("applies_to")
     if applies_to == "female" and sex == "male":
@@ -312,8 +312,8 @@ def _score_panel(snps_df: pd.DataFrame, panel: Dict, sex: Optional[str] = None) 
     raw_score = 0.0
     expected_mean = 0.0
     expected_var = 0.0
-    used: List[Dict] = []
-    missing: List[Dict] = []
+    used: list[dict] = []
+    missing: list[dict] = []
 
     for v in panel["variants"]:
         rsid = v["rsid"]
@@ -389,14 +389,14 @@ def _score_panel(snps_df: pd.DataFrame, panel: Dict, sex: Optional[str] = None) 
     }
 
 
-def analyze_polygenic_scores(snps_df: pd.DataFrame, sex: Optional[str] = None) -> Dict:
+def analyze_polygenic_scores(snps_df: pd.DataFrame, sex: str | None = None) -> dict:
     """Run all PRS panels. `sex` may be 'male', 'female', or None (auto)."""
     if sex is None:
         # Heuristic: count Y-chrom SNPs with non-trivial genotypes
         y = snps_df[snps_df.get("chrom") == "Y"] if "chrom" in snps_df.columns else pd.DataFrame()
         sex = "male" if len(y) > 100 else "female"
 
-    panels: Dict[str, Dict] = {}
+    panels: dict[str, dict] = {}
     for name, panel in PRS_PANELS.items():
         result = _score_panel(snps_df, panel, sex=sex)
         panels[name] = {

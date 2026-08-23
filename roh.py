@@ -40,10 +40,8 @@ elevated rare-recessive-disease risk for offspring of related parents.
 
 from __future__ import annotations
 
-from typing import Dict, List, Tuple
-import pandas as pd
 import numpy as np
-
+import pandas as pd
 
 # Approximate autosomal genome length in GRCh37/38 (Mb)
 AUTOSOMAL_LENGTH_MB = 2881.0
@@ -68,7 +66,7 @@ CHROM_LENGTHS_MB = {
 
 # Disease-relevant gene regions (chr, start_Mb, end_Mb, gene, condition)
 # Light-touch annotation so we can flag ROH overlapping known disease genes
-DISEASE_GENE_REGIONS: List[Tuple] = [
+DISEASE_GENE_REGIONS: list[tuple] = [
     ("1", 11.0, 12.0, "MTHFR", "Folate metabolism"),
     ("1", 11.6, 11.9, "PCSK9", "Lipids"),
     ("4", 88.0, 89.0, "PKD2", "Polycystic kidney disease"),
@@ -108,7 +106,7 @@ def _detect_roh_one_chrom(positions: np.ndarray, hom: np.ndarray,
                           min_snps: int, min_length_mb: float,
                           max_hets: int,
                           window_snps: int = WINDOW_SNPS,
-                          max_gap_mb: float = MAX_GAP_MB) -> List[Dict]:
+                          max_gap_mb: float = MAX_GAP_MB) -> list[dict]:
     """Detect ROH on one chromosome.
 
     positions: SNP positions in bp (int)
@@ -125,7 +123,7 @@ def _detect_roh_one_chrom(positions: np.ndarray, hom: np.ndarray,
     uncalled stretch is absence of evidence, and bridging it manufactures a
     single long run out of two unrelated homozygous stretches.
     """
-    runs: List[Dict] = []
+    runs: list[dict] = []
     n = len(positions)
     max_gap_bp = max_gap_mb * 1e6
 
@@ -151,7 +149,7 @@ def _detect_roh_one_chrom(positions: np.ndarray, hom: np.ndarray,
             i += 1
             continue
         start_idx = i
-        het_idx: List[int] = []      # positions of hets inside the current run
+        het_idx: list[int] = []      # positions of hets inside the current run
         j = i
         while j < n:
             # Gap guard — never extend across an uncalled stretch.
@@ -173,7 +171,7 @@ def _detect_roh_one_chrom(positions: np.ndarray, hom: np.ndarray,
 def detect_roh(snps_df: pd.DataFrame,
                min_snps: int = 50,
                min_length_mb: float = 1.0,
-               max_hets: int = 1) -> Dict:
+               max_hets: int = 1) -> dict:
     """Detect ROH genome-wide. Returns aggregated results with classification."""
     if snps_df.empty or "chrom" not in snps_df.columns:
         # Schema-consistent empty result: MUST carry the same keys as the full
@@ -187,8 +185,8 @@ def detect_roh(snps_df: pd.DataFrame,
                                        "for runs of homozygosity."),
                 "context_tier": "unavailable"}
 
-    runs_all: List[Dict] = []
-    for c in CHROM_LENGTHS_MB.keys():
+    runs_all: list[dict] = []
+    for c in CHROM_LENGTHS_MB:
         sub = snps_df[snps_df["chrom"].astype(str) == c]
         if len(sub) < min_snps:
             continue
@@ -269,7 +267,7 @@ def detect_roh(snps_df: pd.DataFrame,
     }
 
 
-def _annotate_roh_with_genes(roh: Dict) -> Dict:
+def _annotate_roh_with_genes(roh: dict) -> dict:
     """Note any disease-relevant gene regions overlapping the ROH."""
     chrom = roh["chrom"]
     start_mb = roh["start_bp"] / 1e6
@@ -288,7 +286,7 @@ def _annotate_roh_with_genes(roh: Dict) -> Dict:
 
 # ─── SVG ideogram rendering ──────────────────────────────────────────────────
 
-def render_ideogram_svg(roh_runs: List[Dict], width: int = 720) -> str:
+def render_ideogram_svg(roh_runs: list[dict], width: int = 720) -> str:
     """Render a chromosome ideogram SVG with ROH bands highlighted."""
     chroms = list(CHROM_LENGTHS_MB.keys())
     n_chroms = len(chroms)

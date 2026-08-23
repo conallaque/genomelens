@@ -30,15 +30,13 @@ Limitations (called out in the report):
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple
 import math
-import pandas as pd
-import numpy as np
 
+import pandas as pd
 
 # Reuse the AIMs panel + superpop allele frequencies from ancestry_pca.py
 try:
-    from ancestry_pca import AIMS_PRIORS, SUPERPOPS, SUPERPOP_LONG
+    from ancestry_pca import AIMS_PRIORS, SUPERPOP_LONG, SUPERPOPS
 except Exception:
     AIMS_PRIORS = {}
     SUPERPOPS = ["EUR", "AFR", "EAS", "SAS", "AMR"]
@@ -67,7 +65,7 @@ CHROM_LENGTHS_MB = {
 
 # Disease/trait genes by approximate chromosomal position — used to annotate
 # interesting ancestry-discordant segments.
-GENE_ANNOTATIONS: List[Tuple] = [
+GENE_ANNOTATIONS: list[tuple] = [
     ("4", 100, 101, "ADH1B / ALDH2 region — alcohol metabolism"),
     ("6", 26, 33, "HLA / MHC — immune function"),
     ("7", 117, 118, "CFTR — cystic fibrosis"),
@@ -80,7 +78,7 @@ GENE_ANNOTATIONS: List[Tuple] = [
 ]
 
 
-def _dose(genotype: object, effect_allele: str) -> Optional[int]:
+def _dose(genotype: object, effect_allele: str) -> int | None:
     if genotype is None:
         return None
     gt = str(genotype).upper().replace(" ", "").replace("-", "")
@@ -98,9 +96,9 @@ def _binomial_loglik(dose: int, af: float) -> float:
     return 2 * math.log(af)
 
 
-def _aim_by_chrom_pos(snps_df: pd.DataFrame) -> Dict[str, List[Dict]]:
+def _aim_by_chrom_pos(snps_df: pd.DataFrame) -> dict[str, list[dict]]:
     """Group the AIM panel by chromosome and attach the user's genotype."""
-    by_chrom: Dict[str, List[Dict]] = {}
+    by_chrom: dict[str, list[dict]] = {}
     for rsid, info in AIMS_PRIORS.items():
         if rsid not in snps_df.index:
             continue
@@ -127,8 +125,8 @@ def _aim_by_chrom_pos(snps_df: pd.DataFrame) -> Dict[str, List[Dict]]:
     return by_chrom
 
 
-def _annotate_genes(chrom: str, start_mb: float, end_mb: float) -> List[str]:
-    notes: List[str] = []
+def _annotate_genes(chrom: str, start_mb: float, end_mb: float) -> list[str]:
+    notes: list[str] = []
     for c, gs, ge, name in GENE_ANNOTATIONS:
         if c == chrom and gs < end_mb and ge > start_mb:
             notes.append(name)
@@ -137,8 +135,8 @@ def _annotate_genes(chrom: str, start_mb: float, end_mb: float) -> List[str]:
 
 def analyze_local_ancestry(snps_df: pd.DataFrame,
                             window_mb: float = 5.0,
-                            global_proportions: Optional[Dict[str, float]] = None
-                            ) -> Dict:
+                            global_proportions: dict[str, float] | None = None
+                            ) -> dict:
     """Compute per-window local ancestry calls.
 
     Returns dict with windows (list of window dicts), summary stats, and
@@ -152,7 +150,7 @@ def analyze_local_ancestry(snps_df: pd.DataFrame,
             "windows": [],
         }
 
-    all_windows: List[Dict] = []
+    all_windows: list[dict] = []
     # Find global ancestry to identify deviant segments later
     global_pop = None
     if global_proportions:
@@ -201,14 +199,14 @@ def analyze_local_ancestry(snps_df: pd.DataFrame,
             all_windows.append(window)
 
     # Summary stats
-    by_call: Dict[str, int] = {}
+    by_call: dict[str, int] = {}
     for w in all_windows:
         if w["call"] != "UNK":
             by_call[w["call"]] = by_call.get(w["call"], 0) + 1
     total_called = sum(by_call.values())
 
     # Deviant segments: those whose call is not the genome-wide mode (and confident)
-    deviant: List[Dict] = []
+    deviant: list[dict] = []
     mode_pop = max(by_call.items(), key=lambda x: x[1])[0] if by_call else None
     for w in all_windows:
         if (w["call"] != mode_pop and w["call"] != "UNK"
@@ -238,7 +236,7 @@ def analyze_local_ancestry(snps_df: pd.DataFrame,
 
 # ─── SVG chromosome painting ─────────────────────────────────────────────────
 
-def render_chromosome_painting_svg(local_ancestry: Dict, width: int = 760) -> str:
+def render_chromosome_painting_svg(local_ancestry: dict, width: int = 760) -> str:
     """Render a chromosome painting SVG with windows coloured by local ancestry call."""
     chroms = list(CHROM_LENGTHS_MB.keys())
     n = len(chroms)
@@ -268,7 +266,7 @@ def render_chromosome_painting_svg(local_ancestry: Dict, width: int = 760) -> st
         )
         x_off += 120
 
-    windows_by_chrom: Dict[str, List[Dict]] = {}
+    windows_by_chrom: dict[str, list[dict]] = {}
     for w in local_ancestry.get("windows", []):
         windows_by_chrom.setdefault(w["chrom"], []).append(w)
 

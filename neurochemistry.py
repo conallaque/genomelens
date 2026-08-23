@@ -55,9 +55,7 @@ Ge 2009 (IL28B - not here). Way & Taylor 2010 (COMT & social pain). Wang 2019
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
 import pandas as pd
-
 
 CAT_DOPAMINE = "Prefrontal Dopamine (COMT axis)"
 CAT_MONOAMINE = "Monoamine Turnover (MAOA)"
@@ -68,7 +66,7 @@ CAT_MOOD = "Mood Stability & Ion Channels"
 CAT_ADDICTION = "Addiction / Substance Response"
 
 
-def _gt(df, rsid: str) -> Optional[str]:
+def _gt(df, rsid: str) -> str | None:
     if rsid not in df.index:
         return None
     row = df.loc[rsid]
@@ -420,14 +418,14 @@ def _chrna5(df):
 # Composite phenotype synthesis
 # ══════════════════════════════════════════════════════════════════════════
 
-def _classify_comt(gt: Optional[str]) -> str:
+def _classify_comt(gt: str | None) -> str:
     if not gt:
         return "unknown"
     n_val = gt.count("G")
     return {2: "warrior", 1: "middle", 0: "worrier"}.get(n_val, "unknown")
 
 
-def _classify_maoa(gt: Optional[str]) -> str:
+def _classify_maoa(gt: str | None) -> str:
     if not gt:
         return "unknown"
     if "T" in gt and "G" not in gt:
@@ -437,7 +435,7 @@ def _classify_maoa(gt: Optional[str]) -> str:
     return "heterozygous"
 
 
-def _classify_bdnf(gt: Optional[str]) -> str:
+def _classify_bdnf(gt: str | None) -> str:
     if not gt:
         return "unknown"
     n_T = gt.count("T")
@@ -445,7 +443,7 @@ def _classify_bdnf(gt: Optional[str]) -> str:
             2: "Met/Met (low)"}.get(n_T, "unknown")
 
 
-def build_composite(df: pd.DataFrame, findings: List[Dict]) -> Dict:
+def build_composite(df: pd.DataFrame, findings: list[dict]) -> dict:
     """Assemble the practical composite phenotype and recommendations."""
     comt = _classify_comt(_gt(df, "rs4680"))
     maoa = _classify_maoa(_gt(df, "rs6323"))
@@ -609,11 +607,11 @@ CATEGORY_ORDER = [CAT_DOPAMINE, CAT_MONOAMINE, CAT_PLASTICITY, CAT_REWARD,
                   CAT_SEROTONIN, CAT_MOOD, CAT_ADDICTION]
 
 
-def analyze_neurochemistry(df: pd.DataFrame) -> Dict:
+def analyze_neurochemistry(df: pd.DataFrame) -> dict:
     """Full neurochemistry work-up + composite phenotype recommendations."""
     analyzers = [_comt, _maoa, _bdnf, _drd2, _drd4, _oprm1,
                  _five_htt, _htr2a, _tph2, _cacna1c, _chrna5]
-    findings: List[Dict] = []
+    findings: list[dict] = []
     for a in analyzers:
         try:
             r = a(df)
@@ -623,7 +621,7 @@ def analyze_neurochemistry(df: pd.DataFrame) -> Dict:
             continue
         findings.append(r)
 
-    by_category: Dict[str, List[Dict]] = {}
+    by_category: dict[str, list[dict]] = {}
     for f in findings:
         by_category.setdefault(f["category"], []).append(f)
 

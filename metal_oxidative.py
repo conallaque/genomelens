@@ -41,13 +41,13 @@ from __future__ import annotations
 
 import re as _re
 from pathlib import Path as _Path
-from typing import Dict, List, Optional
+
 import pandas as pd
 
 import snp_registry  # cross-check via audit_against_registry below
 
 
-def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
+def _gt(snps_df: pd.DataFrame, rsid: str) -> str | None:
     if rsid not in snps_df.index:
         return None
     gt = snps_df.loc[rsid].get("genotype")
@@ -59,7 +59,7 @@ def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
     return s
 
 
-def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> Optional[int]:
+def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> int | None:
     gt = _gt(snps_df, rsid)
     if gt is None or len(gt) != 2:
         return None
@@ -372,7 +372,7 @@ def _gst_detox(snps):
 
 # ─── Master analyzer ──────────────────────────────────────────────────────
 
-def analyze_metal_oxidative(snps_df: pd.DataFrame) -> Dict:
+def analyze_metal_oxidative(snps_df: pd.DataFrame) -> dict:
     analyzers = [
         # Neurodegeneration
         _lrrk2_g2019s, _gba_parkinsons,
@@ -382,7 +382,7 @@ def analyze_metal_oxidative(snps_df: pd.DataFrame) -> Dict:
         # Oxidative defense
         _cat_catalase, _g6pd_oxidative, _gst_detox,
     ]
-    predictions: List[Dict] = []
+    predictions: list[dict] = []
     for a in analyzers:
         try:
             r = a(snps_df)
@@ -391,7 +391,7 @@ def analyze_metal_oxidative(snps_df: pd.DataFrame) -> Dict:
         except Exception:
             continue
 
-    by_category: Dict[str, List[Dict]] = {}
+    by_category: dict[str, list[dict]] = {}
     for p in predictions:
         by_category.setdefault(p["category"], []).append(p)
 
@@ -405,13 +405,13 @@ def analyze_metal_oxidative(snps_df: pd.DataFrame) -> Dict:
 
 # ── Cross-check against the unified SNP registry ──────────────────────────
 
-def _scan_rsids_referenced() -> List[str]:
+def _scan_rsids_referenced() -> list[str]:
     """Every rsID literal referenced in this module must be registered."""
     src = _Path(__file__).read_text()
     return sorted(set(_re.findall(r'"(rs\d+)"', src)))
 
 
-def audit_against_registry() -> Dict[str, List[str]]:
+def audit_against_registry() -> dict[str, list[str]]:
     """Presence-only audit: every rsID referenced here must be in the
     registry. Returns ``{"registered": [...], "missing": [...]}``."""
     registered, missing = [], []

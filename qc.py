@@ -15,13 +15,12 @@ This is a critical part of professional-grade reporting because it tells
 the user how much of the report's confidence depends on chip coverage.
 """
 
-from typing import Dict, List, Optional
-import pandas as pd
 import hashlib
 
+import pandas as pd
 
 # ─── Key variants we'd want any clinical-grade analysis to cover ──────────────
-KEY_VARIANTS_BY_DOMAIN: Dict[str, List[Dict]] = {
+KEY_VARIANTS_BY_DOMAIN: dict[str, list[dict]] = {
     "APOE / Alzheimer's": [
         {"rsid": "rs429358", "gene": "APOE ε4"},
         {"rsid": "rs7412",   "gene": "APOE ε2"},
@@ -96,7 +95,7 @@ def _file_hash(filepath: str) -> str:
 def run_qc(snps_df: pd.DataFrame, filepath: str = "",
            tier1_match_count: int = 0,
            file_format: str = "unknown",
-           db_size: int = 0) -> Dict:
+           db_size: int = 0) -> dict:
     """Compute quality / callability metrics."""
     total = len(snps_df)
     no_call = 0

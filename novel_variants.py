@@ -24,8 +24,8 @@ Educational screening, NOT a clinical diagnostic test.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Tuple
 
 # Reuse the strand/indel-normalisation + zygosity helpers from Phase 2 so the two
 # modules agree on what "the same variant" and "carries this allele" mean.
@@ -71,7 +71,7 @@ class Predictor:
     """One pluggable pathogenicity predictor backed by a tabix-indexed table."""
 
     def __init__(self, name: str, axis: str, license: str, commercial_ok: bool,
-                 parse: Callable[[List[List[str]], str, str], Optional[float]],
+                 parse: Callable[[list[list[str]], str, str], float | None],
                  subdir: str = "", glob: str = "", remote_url: str = ""):
         self.name = name
         self.axis = axis                 # 'missense' | 'splice' | 'rarity'
@@ -104,7 +104,7 @@ class Predictor:
         self.source = path
         return self._tabix is not None
 
-    def lookup(self, chrom: str, pos: int, ref: str, alt: str) -> Optional[float]:
+    def lookup(self, chrom: str, pos: int, ref: str, alt: str) -> float | None:
         if self._tabix is None:
             return None
         rows = _fetch(self._tabix, chrom, pos)
@@ -138,7 +138,7 @@ def _open_tabix(path: str):
     return tbx, fmt
 
 
-def _fetch(tabix_pair, chrom: str, pos: int) -> List[List[str]]:
+def _fetch(tabix_pair, chrom: str, pos: int) -> list[list[str]]:
     tbx, fmt = tabix_pair
     try:
         return [row.split("\t") for row in tbx.fetch(fmt(chrom), pos - 1, pos)]
@@ -146,7 +146,7 @@ def _fetch(tabix_pair, chrom: str, pos: int) -> List[List[str]]:
         return []
 
 
-def _info_field(info: str, key: str) -> Optional[str]:
+def _info_field(info: str, key: str) -> str | None:
     for kv in info.split(";"):
         if kv.startswith(key + "="):
             return kv[len(key) + 1:]
@@ -161,7 +161,7 @@ def _parse_alphamissense(rows, ref, alt):
     """AlphaMissense TSV: CHROM POS REF ALT genome uniprot transcript prot_var
     am_pathogenicity am_class. Multiple transcript rows per locus → keep MAX
     pathogenicity (returned as a (score, class) tuple)."""
-    best_s: Optional[float] = None
+    best_s: float | None = None
     best_c = ""
     for c in rows:
         if len(c) < 10 or c[2].upper() != ref or c[3].upper() != alt:
@@ -248,7 +248,7 @@ def _parse_gnomad(rows, ref, alt):
     return None
 
 
-def _registry() -> List[Predictor]:
+def _registry() -> list[Predictor]:
     return [
         Predictor("AlphaMissense", "missense", "CC BY 4.0", True,
                   _parse_alphamissense, subdir="alphamissense",
@@ -274,11 +274,11 @@ _CADD_REMOTE_GRCH38 = ("https://krishna.gs.washington.edu/download/CADD/v1.7/"
 # ── main analysis ─────────────────────────────────────────────────────────────
 
 def analyze_novel_variants(vcf_path: str, build: str,
-                           clinvar_result: Optional[Dict] = None,
-                           inferred_sex: Optional[str] = None,
+                           clinvar_result: dict | None = None,
+                           inferred_sex: str | None = None,
                            commercial_safe: bool = False,
                            allow_remote: bool = False,
-                           log=None) -> Dict:
+                           log=None) -> dict:
     """Screen a user VCF for predicted-damaging novel/rare variants. Mirrors the
     ``clinical_variants`` result-dict contract for drop-in wiring."""
     _log = log or (lambda *a, **k: None)
@@ -291,8 +291,8 @@ def analyze_novel_variants(vcf_path: str, build: str,
                             "safely (try --assume-build grch38).")
 
     # Resolve which predictor tables are actually available.
-    predictors: List[Predictor] = []
-    dropped_nc: List[str] = []
+    predictors: list[Predictor] = []
+    dropped_nc: list[str] = []
     for p in _registry():
         if commercial_safe and not p.commercial_ok:
             dropped_nc.append(p.name)
@@ -320,7 +320,7 @@ def analyze_novel_variants(vcf_path: str, build: str,
     for f in (clinvar_result or {}).get("findings") or []:
         known.add(norm_key(f["chrom"], f["pos"], f["ref"], f["alt"]))
 
-    findings: List[Dict] = []
+    findings: list[dict] = []
     n_scanned = 0
     n_queried = 0
     import gzip as _gz
@@ -373,7 +373,7 @@ def analyze_novel_variants(vcf_path: str, build: str,
     return result
 
 
-def _score_variant(predictors: List[Predictor], chrom, pos, ref, alt) -> Optional[Dict]:
+def _score_variant(predictors: list[Predictor], chrom, pos, ref, alt) -> dict | None:
     """Query every predictor; return a finding dict only if the ensemble flags the
     variant as damaging or splice-altering. Otherwise None."""
     am_score = am_class = None
@@ -414,7 +414,7 @@ def _score_variant(predictors: List[Predictor], chrom, pos, ref, alt) -> Optiona
     }
 
 
-def _rarity(af: Optional[float]) -> str:
+def _rarity(af: float | None) -> str:
     if af is None:
         return "unknown"
     if af <= _VERY_RARE_AF:
@@ -426,7 +426,7 @@ def _rarity(af: Optional[float]) -> str:
     return "common"
 
 
-def _confidence(rec: Dict) -> str:
+def _confidence(rec: dict) -> str:
     n = rec["n_missense_hits"]
     am = rec.get("am_score")
     if rec["splice_hit"] or n >= 2 or (am is not None and am >= 0.9):
@@ -436,9 +436,9 @@ def _confidence(rec: Dict) -> str:
     return "low"
 
 
-def _classify(findings: List[Dict], n_scanned: int, n_queried: int,
-              gnomad_present: bool) -> Dict:
-    buckets: Dict[str, List[Dict]] = {
+def _classify(findings: list[dict], n_scanned: int, n_queried: int,
+              gnomad_present: bool) -> dict:
+    buckets: dict[str, list[dict]] = {
         "predicted_splice_disrupting": [], "predicted_pathogenic_rare": [],
         "predicted_pathogenic_uncommon": [], "predicted_pathogenic_common": [],
         "ambiguous": [],
@@ -500,6 +500,6 @@ def _classify(findings: List[Dict], n_scanned: int, n_queried: int,
     }
 
 
-def _unavailable(reason: str) -> Dict:
+def _unavailable(reason: str) -> dict:
     return {"available": False, "reason": reason,
             "negative_disclaimer": _NEGATIVE_DISCLAIMER, "disclaimer": _DISCLAIMER}

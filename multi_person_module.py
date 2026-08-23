@@ -45,15 +45,14 @@ excludes *.csv/*.txt/*.vcf/*.zip so no genome is ever committed.
 """
 
 from __future__ import annotations
-from typing import Dict, List, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-
 
 _VALID = set("ACGT")
 
 
-def _norm_gt(g) -> Optional[str]:
+def _norm_gt(g) -> str | None:
     """Return a normalised 2-allele biallelic genotype as a sorted string, or
     None for no-calls / indels / non-ACGT."""
     if g is None:
@@ -84,7 +83,7 @@ def _prep(df: pd.DataFrame) -> pd.Series:
     return d["genotype"].astype(str).str.upper().str.replace(" ", "", regex=False)
 
 
-def king_kinship(df_a: pd.DataFrame, df_b: pd.DataFrame) -> Dict:
+def king_kinship(df_a: pd.DataFrame, df_b: pd.DataFrame) -> dict:
     """Compute KING-robust kinship + IBS0 over shared autosomal biallelic SNPs.
 
     Fully vectorised: deduplicates non-unique indices, joins on shared rsIDs,
@@ -100,7 +99,7 @@ def king_kinship(df_a: pd.DataFrame, df_b: pd.DataFrame) -> Dict:
     valid = ga.str.fullmatch(r"[ACGT]{2}") & gb.str.fullmatch(r"[ACGT]{2}")
     ga = ga[valid]
     gb = gb[valid]
-    n_shared = int(len(ga))
+    n_shared = len(ga)
     if n_shared == 0:
         return {"n_shared_snps": 0, "n_hethet": 0, "n_ibs0": 0,
                 "ibs0_rate": None, "n_het_a": 0, "n_het_b": 0,
@@ -144,8 +143,8 @@ def king_kinship(df_a: pd.DataFrame, df_b: pd.DataFrame) -> Dict:
     }
 
 
-def classify_relationship(kinship: Optional[float], ibs0_rate: Optional[float],
-                          n_shared: int) -> Dict:
+def classify_relationship(kinship: float | None, ibs0_rate: float | None,
+                          n_shared: int) -> dict:
     """Map KING kinship + IBS0 to a relationship-degree estimate with a
     confidence caveat."""
     if kinship is None or n_shared < 200:
@@ -188,7 +187,7 @@ def classify_relationship(kinship: Optional[float], ibs0_rate: Optional[float],
     }
 
 
-def couple_carrier_risk(df_a: pd.DataFrame, df_b: pd.DataFrame) -> Optional[Dict]:
+def couple_carrier_risk(df_a: pd.DataFrame, df_b: pd.DataFrame) -> dict | None:
     """If both individuals are carriers of the same recessive condition, a child
     has a 25% risk of being affected. Uses the project carrier module if present."""
     try:
@@ -233,7 +232,7 @@ def couple_carrier_risk(df_a: pd.DataFrame, df_b: pd.DataFrame) -> Optional[Dict
 
 def analyze_multi_person(df_a: pd.DataFrame, df_b: pd.DataFrame,
                          label_a: str = "Person A",
-                         label_b: str = "Person B") -> Dict:
+                         label_b: str = "Person B") -> dict:
     """Full two-genome comparison: kinship/relationship, concordance, and
     couple carrier risk."""
     king = king_kinship(df_a, df_b)
@@ -267,7 +266,7 @@ def _esc(s) -> str:
             .replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
 
 
-def render_multi_person_html(result: Dict, version: str = "v6.19.0") -> str:
+def render_multi_person_html(result: dict, version: str = "v6.19.0") -> str:
     """Render the two-genome comparison as a standalone HTML page."""
     import datetime as _dt
     if not result or not result.get("available"):

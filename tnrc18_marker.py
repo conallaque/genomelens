@@ -28,8 +28,6 @@ Design notes:
 
 from __future__ import annotations
 
-from typing import Dict, Optional
-
 RSID = "rs117910193"
 GENE = "TNRC18"
 CHROM = "7"
@@ -49,7 +47,7 @@ def _norm_chrom(value: object) -> str:
     return s.upper() if s in ("x", "y", "mt", "m") else s
 
 
-def _clean_genotype(gt: object) -> Optional[str]:
+def _clean_genotype(gt: object) -> str | None:
     """Extract the two called bases from a genotype string, or None if not a clean
     biallelic SNP call. Accepts 'GA', 'G/A', 'G|A', etc.; rejects indels/no-calls."""
     if gt is None:
@@ -77,7 +75,7 @@ def _orient_to_ref_strand(alleles: str) -> str:
     return alleles                                          # not on this locus's axis
 
 
-def _locate(snps_df) -> Optional[Dict]:
+def _locate(snps_df) -> dict | None:
     """Find the marker row by rsID, then by chrom:pos. Returns a small dict or None."""
     if snps_df is None or getattr(snps_df, "empty", True):
         return None
@@ -102,7 +100,7 @@ def _locate(snps_df) -> Optional[Dict]:
     return None
 
 
-def analyze_tnrc18_marker(snps_df) -> Dict:
+def analyze_tnrc18_marker(snps_df) -> dict:
     """Look up rs117910193 and classify the genotype.
 
     Returns a dict with availability, the raw and strand-oriented genotype, a
@@ -172,7 +170,7 @@ def analyze_tnrc18_marker(snps_df) -> Dict:
     return base
 
 
-def build_tnrc18_html(result: Optional[Dict]) -> str:
+def build_tnrc18_html(result: dict | None) -> str:
     """Minimal, self-contained HTML card. Returns '' if there's nothing to show."""
     if not result:
         return ""

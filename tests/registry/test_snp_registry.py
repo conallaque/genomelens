@@ -12,7 +12,6 @@ import pytest
 
 import snp_registry as reg
 
-
 # ── Record-level invariants ──────────────────────────────────────────────────
 
 def test_rsid_must_start_with_rs() -> None:

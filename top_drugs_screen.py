@@ -22,7 +22,6 @@ import csv
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -34,7 +33,7 @@ _PGKB_TSV_PATH = _DIR / "cpic_data" / "drugs.tsv"
 # Metabolizer phenotypes that can alter standard dosing (from pgx.py).
 _ACTIONABLE_CODES = {"PM", "IM", "UM", "RM", "POS"}
 
-_CACHE: Dict[str, object] = {}
+_CACHE: dict[str, object] = {}
 
 
 def _base_name(name: str) -> str:
@@ -49,7 +48,7 @@ def _base_name(name: str) -> str:
     return n
 
 
-def _load_reference() -> List[Dict]:
+def _load_reference() -> list[dict]:
     if "top" not in _CACHE:
         _CACHE["top"] = (
             json.loads(_TOP_PATH.read_text()).get("drugs", [])
@@ -58,11 +57,11 @@ def _load_reference() -> List[Dict]:
     return _CACHE["top"]  # type: ignore[return-value]
 
 
-def _load_cpic_db() -> Dict[str, Dict]:
+def _load_cpic_db() -> dict[str, dict]:
     """base drug name -> merged CPIC record (genes, markers, dosing)."""
     if "cpic" in _CACHE:
         return _CACHE["cpic"]  # type: ignore[return-value]
-    out: Dict[str, Dict] = {}
+    out: dict[str, dict] = {}
     if _CPIC_DB_PATH.exists():
         for e in json.loads(_CPIC_DB_PATH.read_text()).get("drugs", []):
             key = _base_name(e.get("drug_name", ""))
@@ -77,11 +76,11 @@ def _load_cpic_db() -> Dict[str, Dict]:
     return out
 
 
-def _load_pgkb() -> Dict[str, Dict]:
+def _load_pgkb() -> dict[str, dict]:
     """base drug name -> {cpic_level, clin_level} from PharmGKB drugs.tsv."""
     if "pgkb" in _CACHE:
         return _CACHE["pgkb"]  # type: ignore[return-value]
-    out: Dict[str, Dict] = {}
+    out: dict[str, dict] = {}
     if _PGKB_TSV_PATH.exists():
         try:
             csv.field_size_limit(sys.maxsize)
@@ -107,9 +106,9 @@ def _load_pgkb() -> Dict[str, Dict]:
 
 
 def analyze_top_drugs(
-    snps_df: Optional[pd.DataFrame],
-    pgx_result: Optional[Dict] = None,
-) -> Dict:
+    snps_df: pd.DataFrame | None,
+    pgx_result: dict | None = None,
+) -> dict:
     """Classify every reference drug by its pharmacogenomic relevance to this
     genome. Returns tiered lists + counts.
     """
@@ -122,10 +121,10 @@ def analyze_top_drugs(
     per_gene = (pgx_result or {}).get("per_gene", {}) if pgx_result else {}
     index = snps_df.index if snps_df is not None else pd.Index([])
 
-    actionable: List[Dict] = []       # your genotype may change dosing
-    typed_normal: List[Dict] = []     # PGx drug, your relevant gene typed & normal
-    pgx_relevant: List[Dict] = []     # PGx data exists, your gene unresolved
-    no_pgx: List[Dict] = []           # no PGx data in bundled databases
+    actionable: list[dict] = []       # your genotype may change dosing
+    typed_normal: list[dict] = []     # PGx drug, your relevant gene typed & normal
+    pgx_relevant: list[dict] = []     # PGx data exists, your gene unresolved
+    no_pgx: list[dict] = []           # no PGx data in bundled databases
 
     for d in ref:
         key = _base_name(d["generic"])

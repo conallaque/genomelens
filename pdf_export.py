@@ -19,7 +19,6 @@ from __future__ import annotations
 import datetime
 import re
 from pathlib import Path
-from typing import Optional
 
 
 def weasyprint_available() -> bool:
@@ -218,7 +217,7 @@ def html_to_pdf(
     if not weasyprint_available():
         return ("weasyprint not installed. Install via: "
                 "pip install weasyprint  (and on macOS: brew install pango libffi)")
-    from weasyprint import HTML, CSS
+    from weasyprint import CSS, HTML
 
     html = Path(html_path).read_text()
     report_date = datetime.datetime.now().strftime("%B %d, %Y at %H:%M")

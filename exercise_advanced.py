@@ -11,11 +11,10 @@ adaptation, mobility prescription, and a 12-week plyometric progression.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple
 import pandas as pd
 
 
-def _gt(snps_df: Optional[pd.DataFrame], rsid: str) -> Optional[str]:
+def _gt(snps_df: pd.DataFrame | None, rsid: str) -> str | None:
     if snps_df is None or rsid not in snps_df.index:
         return None
     raw = snps_df.loc[rsid].get("genotype")
@@ -54,7 +53,7 @@ def _normalise(v: float, lo: float = 0, hi: float = 100) -> float:
     return max(0, min(100, (v - lo) * 100 / (hi - lo)))
 
 
-def composite_athletic_profile(base: Dict) -> Dict:
+def composite_athletic_profile(base: dict) -> dict:
     """Synthesise base+advanced exercise data into normalised 0-100 attributes."""
     pe = base["power_endurance"]
     recovery_speed = base["recovery"]["speed"]
@@ -97,7 +96,7 @@ def composite_athletic_profile(base: Dict) -> Dict:
     }
 
     # Score each sport
-    sport_scores: List[Dict] = []
+    sport_scores: list[dict] = []
     for name, weights in _SPORTS:
         score = sum(weights.get(k, 0) * attrs.get(k, 50) for k in attrs)
         sport_scores.append({"sport": name, "fit_score": round(score, 1)})
@@ -119,7 +118,7 @@ def composite_athletic_profile(base: Dict) -> Dict:
 
 # ── Quantitative Body-Region Injury Risk Map ────────────────────────────────
 
-def injury_risk_map(snps_df) -> Dict:
+def injury_risk_map(snps_df) -> dict:
     col1a1 = _gt(snps_df, "rs1800012")
     col5a1 = _gt(snps_df, "rs12722")
     mmp3 = _gt(snps_df, "rs679620")
@@ -182,7 +181,7 @@ def injury_risk_map(snps_df) -> Dict:
 
 # ── Daily Readiness Formula ─────────────────────────────────────────────────
 
-def readiness_formula(base: Dict) -> Dict:
+def readiness_formula(base: dict) -> dict:
     recovery_speed = base["recovery"]["speed"]
     slow = recovery_speed == "Slow"
     return {
@@ -212,7 +211,7 @@ def readiness_formula(base: Dict) -> Dict:
 
 # ── Detailed Sample Workouts ────────────────────────────────────────────────
 
-def sample_workouts(base: Dict) -> List[Dict]:
+def sample_workouts(base: dict) -> list[dict]:
     bias = base["power_endurance"]["bias"]
     fast_recovery = base["recovery"]["speed"] == "Fast"
     window = base["chronotype"].get("optimal_window", "anytime")
@@ -357,7 +356,7 @@ def sample_workouts(base: Dict) -> List[Dict]:
 
 # ── Concurrent Training Interference Model ──────────────────────────────────
 
-def concurrent_training_model(base: Dict) -> Dict:
+def concurrent_training_model(base: dict) -> dict:
     bias = base["power_endurance"]["bias"]
     recovery = base["recovery"]["speed"]
     if bias.startswith("Power") and recovery == "Slow":
@@ -382,7 +381,7 @@ def concurrent_training_model(base: Dict) -> Dict:
 
 # ── Lactate Threshold & VO2max Rough Estimates ──────────────────────────────
 
-def aerobic_estimates(base: Dict) -> Dict:
+def aerobic_estimates(base: dict) -> dict:
     vo2_tier = base.get("vo2max", {}).get("tier", "Unknown")
     estimate = {
         "High responder": ("Strong genetic ceiling — well-trained endurance athletes from this profile reach VO2max 60+ ml/kg/min (men), 55+ (women).",
@@ -408,7 +407,7 @@ def aerobic_estimates(base: Dict) -> Dict:
 
 # ── Tapering Protocol ───────────────────────────────────────────────────────
 
-def tapering_protocol(base: Dict) -> Dict:
+def tapering_protocol(base: dict) -> dict:
     bias = base["power_endurance"]["bias"]
     if bias.startswith("Power"):
         return {
@@ -447,7 +446,7 @@ def tapering_protocol(base: Dict) -> Dict:
 
 # ── Deload Protocol ─────────────────────────────────────────────────────────
 
-def deload_protocol(base: Dict) -> Dict:
+def deload_protocol(base: dict) -> dict:
     return {
         "frequency": "Every 4-6 weeks (slow recovery: every 4; fast: every 6).",
         "structure": [
@@ -467,13 +466,13 @@ def deload_protocol(base: Dict) -> Dict:
 
 # ── Mental Skills Profile (COMT-driven) ─────────────────────────────────────
 
-def mental_skills_profile(snps_df) -> Dict:
+def mental_skills_profile(snps_df) -> dict:
     comt = _gt(snps_df, "rs4680")
     drd2 = _gt(snps_df, "rs1800497")
     bdnf = _gt(snps_df, "rs6265")
-    factors: List[str] = []
+    factors: list[str] = []
     profile = "Balanced"
-    strategies: List[str] = []
+    strategies: list[str] = []
     if comt:
         factors.append(f"rs4680 (COMT) {comt}")
         if "A" in comt and comt.count("A") == 2:
@@ -505,11 +504,11 @@ def mental_skills_profile(snps_df) -> Dict:
 
 # ── Cold / Heat Adaptation ──────────────────────────────────────────────────
 
-def thermal_adaptation(snps_df) -> Dict:
+def thermal_adaptation(snps_df) -> dict:
     ucp1 = _gt(snps_df, "rs1800592")
     ucp3 = _gt(snps_df, "rs1800849")
     adrb3 = _gt(snps_df, "rs4994")
-    factors: List[str] = []
+    factors: list[str] = []
     cold = "Average"
     if ucp1:
         factors.append(f"rs1800592 (UCP1) {ucp1}")
@@ -539,7 +538,7 @@ def thermal_adaptation(snps_df) -> Dict:
 
 # ── Mobility / Flexibility Protocol ─────────────────────────────────────────
 
-def mobility_protocol(base: Dict) -> Dict:
+def mobility_protocol(base: dict) -> dict:
     bias = base["power_endurance"]["bias"]
     elev_injury = any("elev" in r["level"].lower() for r in base["injury_risk"]["risks"])
     items = [
@@ -560,7 +559,7 @@ def mobility_protocol(base: Dict) -> Dict:
 
 # ── Plyometric Progression ──────────────────────────────────────────────────
 
-def plyometric_progression(base: Dict, injury_map: Dict) -> Dict:
+def plyometric_progression(base: dict, injury_map: dict) -> dict:
     elev = any(r["risk_pct"] >= 50 for r in injury_map.get("regions", [])
                if r["region"] in ("Knee / ACL", "Patellar tendon", "Achilles tendon"))
     if elev:
@@ -597,7 +596,7 @@ def plyometric_progression(base: Dict, injury_map: Dict) -> Dict:
 
 # ── Public synthesis API ────────────────────────────────────────────────────
 
-def analyze_advanced_exercise(snps_df, base_result: Dict) -> Dict:
+def analyze_advanced_exercise(snps_df, base_result: dict) -> dict:
     profile = composite_athletic_profile(base_result)
     injury_map = injury_risk_map(snps_df)
     readiness = readiness_formula(base_result)

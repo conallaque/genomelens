@@ -13,13 +13,13 @@ from __future__ import annotations
 
 import re as _re
 from pathlib import Path as _Path
-from typing import Dict, List, Optional
+
 import pandas as pd
 
 import snp_registry  # V8 cross-check; see audit_against_registry below
 
 
-def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
+def _gt(snps_df: pd.DataFrame, rsid: str) -> str | None:
     if rsid not in snps_df.index:
         return None
     gt = snps_df.loc[rsid].get("genotype")
@@ -31,7 +31,7 @@ def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
     return s
 
 
-def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> Optional[int]:
+def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> int | None:
     gt = _gt(snps_df, rsid)
     if gt is None or len(gt) != 2:
         return None
@@ -99,7 +99,7 @@ def _w_folate(snps):
         return {"category": CAT_NUTR, "trait": "Folate Metabolism (MTHFR)",
                 "result": "Markedly reduced MTHFR activity (~70% loss)",
                 "action": "Use methylfolate (5-MTHF) 400-800 mcg/day instead of folic acid; B12 + B6 sufficiency; monitor homocysteine.",
-                "evidence": f"MTHFR C677T: TT", "confidence": "high"}
+                "evidence": "MTHFR C677T: TT", "confidence": "high"}
     if c677 or a1298:
         return {"category": CAT_NUTR, "trait": "Folate Metabolism (MTHFR)",
                 "result": "Moderately reduced MTHFR activity",
@@ -142,7 +142,7 @@ def _w_iron(snps):
         return {"category": CAT_NUTR, "trait": "Iron Absorption",
                 "result": "Lower iron absorption tendency",
                 "action": "Test ferritin if symptomatic (fatigue); pair iron-rich foods with vitamin C; avoid concurrent tea/coffee.",
-                "evidence": f"TMPRSS6: A/A", "confidence": "moderate"}
+                "evidence": "TMPRSS6: A/A", "confidence": "moderate"}
     return {"category": CAT_NUTR, "trait": "Iron Absorption",
             "result": "Typical iron metabolism",
             "action": "Standard iron status monitoring as indicated.",
@@ -244,12 +244,12 @@ def _w_muscle_fiber(snps):
         return {"category": CAT_FITNESS, "trait": "Muscle Fiber Composition",
                 "result": "Endurance-typical (ACTN3 null)",
                 "action": "Endurance training favoured. Power training still effective; just less elite-level advantage.",
-                "evidence": f"ACTN3: TT", "confidence": "high"}
+                "evidence": "ACTN3: TT", "confidence": "high"}
     if g == "CC":
         return {"category": CAT_FITNESS, "trait": "Muscle Fiber Composition",
                 "result": "Power/sprint-typical (ACTN3 RR)",
                 "action": "Sprint/strength training favoured.",
-                "evidence": f"ACTN3: CC", "confidence": "high"}
+                "evidence": "ACTN3: CC", "confidence": "high"}
     return {"category": CAT_FITNESS, "trait": "Muscle Fiber Composition",
             "result": "Mixed type",
             "action": "Versatile responder to varied training.",
@@ -306,7 +306,7 @@ def _w_cortisol(snps):
         return {"category": CAT_STRESS, "trait": "Cortisol Sensitivity",
                 "result": "More sensitive cortisol response",
                 "action": "Daily stress-management practice (mindfulness, breath work, exercise). Avoid chronic overtraining and chronic sleep deprivation.",
-                "evidence": f"NR3C1 BclI: GG", "confidence": "moderate"}
+                "evidence": "NR3C1 BclI: GG", "confidence": "moderate"}
     return None
 
 
@@ -406,7 +406,7 @@ def _w_oxidative_stress(snps):
 
 # ─── Master analyzer ──────────────────────────────────────────────────────
 
-def analyze_wellness(snps_df: pd.DataFrame) -> Dict:
+def analyze_wellness(snps_df: pd.DataFrame) -> dict:
     analyzers = [
         # Nutrition
         _w_vitamin_d, _w_vitamin_b12, _w_folate, _w_omega3, _w_iron,
@@ -421,7 +421,7 @@ def analyze_wellness(snps_df: pd.DataFrame) -> Dict:
         # Aging
         _w_telomere, _w_longevity_alleles, _w_skin_aging, _w_oxidative_stress,
     ]
-    predictions: List[Dict] = []
+    predictions: list[dict] = []
     for a in analyzers:
         try:
             r = a(snps_df)
@@ -431,7 +431,7 @@ def analyze_wellness(snps_df: pd.DataFrame) -> Dict:
             continue
 
     # Group by category
-    by_category: Dict[str, List[Dict]] = {}
+    by_category: dict[str, list[dict]] = {}
     for p in predictions:
         by_category.setdefault(p["category"], []).append(p)
 
@@ -445,7 +445,7 @@ def analyze_wellness(snps_df: pd.DataFrame) -> Dict:
 
 # ── V8: cross-check against the unified SNP registry ──────────────────────
 
-def _scan_rsids_referenced() -> List[str]:
+def _scan_rsids_referenced() -> list[str]:
     """Extract every rsID literal that appears in this module's source.
 
     wellness.py does not use a structured rsID dict — every rule calls
@@ -460,7 +460,7 @@ def _scan_rsids_referenced() -> List[str]:
     return sorted(rsids)
 
 
-def audit_against_registry() -> Dict[str, List[str]]:
+def audit_against_registry() -> dict[str, list[str]]:
     """Presence-only audit: every rsID referenced anywhere in this module
     must be registered. wellness.py does not encode a "this is the risk
     allele" claim in a machine-readable form (rules are conditional
@@ -472,8 +472,8 @@ def audit_against_registry() -> Dict[str, List[str]]:
     fail fast so a typo in a rule doesn't silently always-return-not-tested.
     """
     referenced = _scan_rsids_referenced()
-    registered: List[str] = []
-    missing: List[str] = []
+    registered: list[str] = []
+    missing: list[str] = []
     for r in referenced:
         if snp_registry.get(r) is not None:
             registered.append(r)

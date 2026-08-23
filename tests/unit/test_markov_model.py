@@ -6,7 +6,6 @@ from __future__ import annotations
 
 from econ import markov as mk
 
-
 # ── rate → probability ───────────────────────────────────────────────────────
 
 def test_rate_to_probability_never_exceeds_one():

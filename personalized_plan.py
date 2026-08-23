@@ -21,13 +21,9 @@ Output keys in the returned dict (also rendered as HTML):
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Dict, List, Optional
-
-
 # ── Source-of-truth: headline picker per pillar ─────────────────────────────
 
-def _supp_headline(supp: Optional[Dict]) -> str:
+def _supp_headline(supp: dict | None) -> str:
     if not supp or supp.get("status") != "ok":
         return "—"
     essential = supp["tiers"].get("essential", [])
@@ -40,7 +36,7 @@ def _supp_headline(supp: Optional[Dict]) -> str:
     return "No genotype-driven essentials"
 
 
-def _ex_headline(ex: Optional[Dict]) -> str:
+def _ex_headline(ex: dict | None) -> str:
     if not ex or ex.get("status") != "ok":
         return "—"
     pe = ex["power_endurance"]
@@ -53,7 +49,7 @@ def _ex_headline(ex: Optional[Dict]) -> str:
     )
 
 
-def _nu_headline(nu: Optional[Dict]) -> str:
+def _nu_headline(nu: dict | None) -> str:
     if not nu or nu.get("status") != "ok":
         return "—"
     m = nu["macros"]
@@ -62,7 +58,7 @@ def _nu_headline(nu: Optional[Dict]) -> str:
     return f"{m['pct_carbs']}C/{m['pct_fat']}F/{m['pct_protein']}P · caffeine {caf.lower()} · alcohol {alc.lower()}"
 
 
-def _bw_headline(bw: Optional[Dict]) -> str:
+def _bw_headline(bw: dict | None) -> str:
     if not bw or bw.get("status") != "ok":
         return "Bloodwork not supplied"
     return (
@@ -72,12 +68,12 @@ def _bw_headline(bw: Optional[Dict]) -> str:
     )
 
 
-def _phewas_headlines(phewas: Optional[Dict]) -> List[Dict]:
+def _phewas_headlines(phewas: dict | None) -> list[dict]:
     """Top 5 most extreme biomarker predictions (very-high / very-low)."""
     if not phewas:
         return []
     hl = phewas.get("headline", [])
-    out: List[Dict] = []
+    out: list[dict] = []
     for h in hl[:5]:
         out.append({
             "trait": h.get("trait", ""),
@@ -91,10 +87,10 @@ def _phewas_headlines(phewas: Optional[Dict]) -> List[Dict]:
 
 # ── Cross-module synthesis: "morning routine" extraction ────────────────────
 
-def _morning_actions(supp: Optional[Dict], nu: Optional[Dict],
-                     ex: Optional[Dict]) -> List[str]:
+def _morning_actions(supp: dict | None, nu: dict | None,
+                     ex: dict | None) -> list[str]:
     """Pull the morning-timed actions from all three modules into one list."""
-    actions: List[str] = []
+    actions: list[str] = []
     if supp and supp.get("status") == "ok":
         for tier_key in ("essential", "recommended"):
             for r in supp["tiers"].get(tier_key, []):
@@ -120,9 +116,9 @@ def _morning_actions(supp: Optional[Dict], nu: Optional[Dict],
     return actions
 
 
-def _evening_actions(supp: Optional[Dict], nu: Optional[Dict],
-                     ex: Optional[Dict]) -> List[str]:
-    actions: List[str] = []
+def _evening_actions(supp: dict | None, nu: dict | None,
+                     ex: dict | None) -> list[str]:
+    actions: list[str] = []
     if supp and supp.get("status") == "ok":
         for tier_key in ("essential", "recommended"):
             for r in supp["tiers"].get(tier_key, []):
@@ -138,14 +134,14 @@ def _evening_actions(supp: Optional[Dict], nu: Optional[Dict],
 
 # ── Bloodwork ↔ supplement reconciliation ────────────────────────────────────
 
-def _reconciliation(supp: Optional[Dict], bw: Optional[Dict]) -> List[Dict]:
+def _reconciliation(supp: dict | None, bw: dict | None) -> list[dict]:
     """
     For each Diverged bloodwork row, find supplement recommendations that
     address the same biomarker and surface them as a "highest-leverage" list.
     """
     if not bw or bw.get("status") != "ok":
         return []
-    out: List[Dict] = []
+    out: list[dict] = []
     diverged = [r for r in bw.get("rows", []) if r["verdict"] == "Diverged"]
     if not diverged or not supp:
         return out
@@ -162,7 +158,7 @@ def _reconciliation(supp: Optional[Dict], bw: Optional[Dict]) -> List[Dict]:
         "Folate":             ["L-Methylfolate"],
     }
 
-    flat: List[Dict] = []
+    flat: list[dict] = []
     for tier_key in ("essential", "recommended", "optional", "avoid"):
         for r in (supp.get("tiers", {}).get(tier_key) or []):
             flat.append(r)
@@ -188,12 +184,12 @@ def _reconciliation(supp: Optional[Dict], bw: Optional[Dict]) -> List[Dict]:
 # ── Public API ──────────────────────────────────────────────────────────────
 
 def build_personalized_plan(
-    supplement_result: Optional[Dict] = None,
-    exercise_result: Optional[Dict] = None,
-    nutrition_result: Optional[Dict] = None,
-    bloodwork_result: Optional[Dict] = None,
-    phewas_result: Optional[Dict] = None,
-) -> Dict:
+    supplement_result: dict | None = None,
+    exercise_result: dict | None = None,
+    nutrition_result: dict | None = None,
+    bloodwork_result: dict | None = None,
+    phewas_result: dict | None = None,
+) -> dict:
     headlines = {
         "supplements": _supp_headline(supplement_result),
         "exercise":    _ex_headline(exercise_result),
@@ -306,7 +302,7 @@ _PILLAR_META = [
 ]
 
 
-def render_plan_html(plan: Dict, file_label: str = "",
+def render_plan_html(plan: dict, file_label: str = "",
                      report_link: str = "report.html") -> str:
     if not plan or plan.get("status") != "ok":
         return f"""<!DOCTYPE html><html><head><meta charset="utf-8">
@@ -316,7 +312,7 @@ def render_plan_html(plan: Dict, file_label: str = "",
 
     # Pillar cards
     headlines = plan["headlines"]
-    pillar_cards: List[str] = []
+    pillar_cards: list[str] = []
     pillars = plan["pillars"]
     for key, icon, name, link in _PILLAR_META:
         has_data = pillars.get(key) is not None and (

@@ -28,19 +28,13 @@ from __future__ import annotations
 
 import gzip
 import hashlib
-import json
-import os
 import shutil
 import subprocess
-import sys
 import tempfile
 import time
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
-import numpy as np
-
 
 SCRIPT_DIR = Path(__file__).parent
 REF_DIR = SCRIPT_DIR / "reference"
@@ -53,7 +47,7 @@ def _log(msg: str) -> None:
 
 
 # ── Capability check ─────────────────────────────────────────────────────────
-def imputation_available() -> Tuple[bool, str]:
+def imputation_available() -> tuple[bool, str]:
     """Returns (ok, reason)."""
     if shutil.which("java") is None:
         return False, "Java not installed (`brew install openjdk` or apt install default-jre)"
@@ -75,7 +69,7 @@ def beagle_jar() -> Path:
     return next(BEAGLE_DIR.glob("beagle.*.jar"))
 
 
-def genetic_map_for(chrom: str) -> Optional[Path]:
+def genetic_map_for(chrom: str) -> Path | None:
     candidates = list(BEAGLE_DIR.glob(f"plink.chr{chrom}.GRCh37.map"))
     return candidates[0] if candidates else None
 
@@ -138,12 +132,12 @@ def chip_to_vcf(snps_df: pd.DataFrame, sample_id: str, vcf_path: Path) -> None:
             )
 
 
-def _split_vcf_by_chrom(vcf_path: Path, out_dir: Path) -> Dict[str, Path]:
+def _split_vcf_by_chrom(vcf_path: Path, out_dir: Path) -> dict[str, Path]:
     """Split a single VCF into per-chromosome files."""
     out_dir.mkdir(parents=True, exist_ok=True)
-    handles: Dict[str, "tempfile._TemporaryFileWrapper"] = {}
-    paths: Dict[str, Path] = {}
-    header_lines: List[str] = []
+    handles: dict[str, tempfile._TemporaryFileWrapper] = {}
+    paths: dict[str, Path] = {}
+    header_lines: list[str] = []
     with open(vcf_path) as f:
         for line in f:
             if line.startswith("#"):
@@ -169,10 +163,10 @@ def _run_beagle_for_chrom(
     ref_panel: Path,
     out_prefix: Path,
     jar: Path,
-    map_file: Optional[Path] = None,
+    map_file: Path | None = None,
     java_mem_gb: int = 4,
     timeout_s: int = 7200,
-) -> Tuple[bool, str]:
+) -> tuple[bool, str]:
     cmd = [
         "java", f"-Xmx{java_mem_gb}g", "-jar", str(jar),
         f"gt={in_vcf}",
@@ -203,7 +197,7 @@ def parse_imputed_vcf(vcf_gz: Path, min_r2: float = 0.0) -> pd.DataFrame:
     columns: chrom, pos, genotype, source ('imputed'), r2.
     """
     opener = gzip.open if str(vcf_gz).endswith(".gz") else open
-    rows: List[Dict] = []
+    rows: list[dict] = []
     with opener(vcf_gz, "rt") as f:
         for line in f:
             if line.startswith("#"):
@@ -271,7 +265,7 @@ def cache_path_for(input_file: str) -> Path:
     return CACHE_DIR / f"imputed_{h}.parquet"
 
 
-def load_cached(input_file: str) -> Optional[pd.DataFrame]:
+def load_cached(input_file: str) -> pd.DataFrame | None:
     cp = cache_path_for(input_file)
     if not cp.exists():
         return None
@@ -298,9 +292,9 @@ def impute_genotypes(
     input_file: str,
     sample_id: str = "USER",
     min_r2: float = 0.3,
-    chromosomes: Optional[List[str]] = None,
+    chromosomes: list[str] | None = None,
     force: bool = False,
-) -> Tuple[pd.DataFrame, Dict]:
+) -> tuple[pd.DataFrame, dict]:
     """Main entry point. Returns:
         (merged_df, info)
     where merged_df is the chip + imputed variants combined (with `source`
@@ -339,7 +333,7 @@ def impute_genotypes(
 
     jar = beagle_jar()
     imputed_frames = []
-    failures: List[str] = []
+    failures: list[str] = []
 
     for c in chromosomes:
         if c not in per_chrom:

@@ -37,15 +37,21 @@ equity weights — closing a gap this project's own CHEERS checklist declares.
 from __future__ import annotations
 
 import random
-from typing import Callable, Dict, List, Optional, Sequence, Tuple
+from collections.abc import Callable, Sequence
 
 from . import engine as ee
 from . import params as ep
 
 __all__ = [
-    "evpi", "evppi", "population_evpi", "breakeven",
-    "efficiency_frontier", "budget_impact", "subgroup_analysis",
-    "distributional_cea", "analyze_decision_layer",
+    "analyze_decision_layer",
+    "breakeven",
+    "budget_impact",
+    "distributional_cea",
+    "efficiency_frontier",
+    "evpi",
+    "evppi",
+    "population_evpi",
+    "subgroup_analysis",
 ]
 
 
@@ -53,16 +59,16 @@ __all__ = [
 # Value of information
 # ══════════════════════════════════════════════════════════════════════════
 
-def _inmb_draws(rebuild: Callable[[], Dict], *, n: int, seed: int,
+def _inmb_draws(rebuild: Callable[[], dict], *, n: int, seed: int,
                 test_cost: float, wtp: float,
-                fixed: Optional[Dict[str, float]] = None) -> List[float]:
+                fixed: dict[str, float] | None = None) -> list[float]:
     """Incremental net monetary benefit across ``n`` parameter draws.
 
     ``fixed`` pins named parameters at given values — the mechanism behind
     EVPPI, which asks what happens when one parameter becomes known.
     """
     rng = random.Random(seed)
-    out: List[float] = []
+    out: list[float] = []
     for _ in range(max(1, int(n))):
         draw = ep.sample_all(rng)
         if fixed:
@@ -73,8 +79,8 @@ def _inmb_draws(rebuild: Callable[[], Dict], *, n: int, seed: int,
     return out
 
 
-def evpi(rebuild: Callable[[], Dict], *, n: int = 2000, seed: int = 20260823,
-         test_cost: float = 0.0, wtp: Optional[float] = None) -> Dict:
+def evpi(rebuild: Callable[[], dict], *, n: int = 2000, seed: int = 20260823,
+         test_cost: float = 0.0, wtp: float | None = None) -> dict:
     """Expected value of perfect information, per person.
 
     The cost of making the wrong choice given current uncertainty. With two
@@ -107,9 +113,9 @@ def evpi(rebuild: Callable[[], Dict], *, n: int = 2000, seed: int = 20260823,
     }
 
 
-def evppi(rebuild: Callable[[], Dict], *, parameters: Sequence[str],
+def evppi(rebuild: Callable[[], dict], *, parameters: Sequence[str],
           n_outer: int = 150, n_inner: int = 50, seed: int = 20260823,
-          test_cost: float = 0.0, wtp: Optional[float] = None) -> List[Dict]:
+          test_cost: float = 0.0, wtp: float | None = None) -> list[dict]:
     """Expected value of partial perfect information, per parameter.
 
     Two-level Monte Carlo: draw the parameter of interest, average net benefit
@@ -124,13 +130,13 @@ def evppi(rebuild: Callable[[], Dict], *, parameters: Sequence[str],
     """
     wtp = ep.value("wtp_per_qaly") if wtp is None else float(wtp)
 
-    rows: List[Dict] = []
+    rows: list[dict] = []
     for i, key in enumerate(parameters):
         if key not in ep.PARAMS:
             continue
         param = ep.get(key)
         rng = random.Random(seed + 1000 + i)
-        conditional_means: List[float] = []
+        conditional_means: list[float] = []
         for j in range(max(1, int(n_outer))):
             phi = ep.draw(rng, param)
             inner = _inmb_draws(rebuild, n=n_inner, seed=seed + 50_000 + j,
@@ -158,7 +164,7 @@ def evppi(rebuild: Callable[[], Dict], *, parameters: Sequence[str],
 
 
 def population_evpi(evpi_per_person: float, *, population: int = 1_000_000,
-                    years: int = 10, rate: Optional[float] = None) -> Dict:
+                    years: int = 10, rate: float | None = None) -> dict:
     """Scale per-person EVPI to a population over a decision horizon.
 
     Research is funded against population value, not per-person value, so this
@@ -183,9 +189,9 @@ def population_evpi(evpi_per_person: float, *, population: int = 1_000_000,
 # Threshold / breakeven
 # ══════════════════════════════════════════════════════════════════════════
 
-def breakeven(rebuild: Callable[[], Dict], *, parameter: str,
-              test_cost: float = 0.0, wtp: Optional[float] = None,
-              steps: int = 60) -> Dict:
+def breakeven(rebuild: Callable[[], dict], *, parameter: str,
+              test_cost: float = 0.0, wtp: float | None = None,
+              steps: int = 60) -> dict:
     """Value of one parameter at which net benefit crosses zero.
 
     When a judgement call drives the conclusion, its point value is less
@@ -213,7 +219,7 @@ def breakeven(rebuild: Callable[[], Dict], *, parameter: str,
     ys = [inmb_at(x) for x in xs]
 
     crossing = None
-    for (x0, y0), (x1, y1) in zip(zip(xs, ys), zip(xs[1:], ys[1:])):
+    for (x0, y0), (x1, y1) in zip(zip(xs, ys, strict=False), zip(xs[1:], ys[1:], strict=False), strict=False):
         if (y0 <= 0 <= y1) or (y1 <= 0 <= y0):
             crossing = x0 if y1 == y0 else x0 + (x1 - x0) * (0 - y0) / (y1 - y0)
             break
@@ -245,8 +251,8 @@ def breakeven(rebuild: Callable[[], Dict], *, parameter: str,
 # Multi-strategy comparison
 # ══════════════════════════════════════════════════════════════════════════
 
-def efficiency_frontier(strategies: Sequence[Dict],
-                        wtp: Optional[float] = None) -> Dict:
+def efficiency_frontier(strategies: Sequence[dict],
+                        wtp: float | None = None) -> dict:
     """Rank strategies by cost, applying dominance and extended dominance.
 
     Each strategy is ``{"name", "cost", "qaly"}`` in absolute terms.
@@ -279,12 +285,12 @@ def efficiency_frontier(strategies: Sequence[Dict],
         if len(live) < 3:
             break
         icers = []
-        for prev, cur in zip(live, live[1:]):
+        for prev, cur in zip(live, live[1:], strict=False):
             dq = cur["qaly"] - prev["qaly"]
             icers.append((cur, (cur["cost"] - prev["cost"]) / dq
                           if dq > 0 else float("inf")))
         dropped = False
-        for (cur, ic), (_, nxt) in zip(icers, icers[1:]):
+        for (cur, ic), (_, nxt) in zip(icers, icers[1:], strict=False):
             if ic > nxt:
                 cur["status"] = "extendedly dominated"
                 dropped = True
@@ -293,7 +299,7 @@ def efficiency_frontier(strategies: Sequence[Dict],
             break
 
     live = [r for r in rows if r["status"] == "on frontier"]
-    for prev, cur in zip(live, live[1:]):
+    for prev, cur in zip(live, live[1:], strict=False):
         dq = cur["qaly"] - prev["qaly"]
         cur["icer"] = round((cur["cost"] - prev["cost"]) / dq) if dq > 0 else None
 
@@ -321,7 +327,7 @@ def efficiency_frontier(strategies: Sequence[Dict],
 def budget_impact(*, per_person_cost: float = 0.0,
                   per_person_offset: float = 0.0,
                   population: int = 1_000_000,
-                  years: int = 5, **kwargs) -> Dict:
+                  years: int = 5, **kwargs) -> dict:
     """Payer affordability — delegates to :mod:`markov_model`.
 
     This module briefly carried its own budget-impact implementation, which
@@ -346,11 +352,11 @@ def budget_impact(*, per_person_cost: float = 0.0,
 # Heterogeneity
 # ══════════════════════════════════════════════════════════════════════════
 
-def subgroup_analysis(*, coi_key: str = "CAD", rrr: Optional[float] = None,
-                      annual_incidence: Optional[float] = None,
+def subgroup_analysis(*, coi_key: str = "CAD", rrr: float | None = None,
+                      annual_incidence: float | None = None,
                       ages: Sequence[int] = (30, 40, 50, 60, 70, 80),
                       sexes: Sequence[str] = ("Female", "Male"),
-                      wtp: Optional[float] = None) -> Dict:
+                      wtp: float | None = None) -> dict:
     """Re-run the structural model across age and sex.
 
     An average result hides that the same intervention is excellent value at
@@ -363,7 +369,7 @@ def subgroup_analysis(*, coi_key: str = "CAD", rrr: Optional[float] = None,
     if annual_incidence is None:
         annual_incidence = ep.value("subgroup_annual_incidence")
     wtp = ep.value("wtp_per_qaly") if wtp is None else float(wtp)
-    rows: List[Dict] = []
+    rows: list[dict] = []
     for sex in sexes:
         for age in ages:
             r = ee.incremental_analysis(
@@ -397,9 +403,9 @@ def subgroup_analysis(*, coi_key: str = "CAD", rrr: Optional[float] = None,
     }
 
 
-def distributional_cea(baseline_qaly_by_group: Dict[str, float],
-                       gain_by_group: Dict[str, float],
-                       *, inequality_aversion: Optional[float] = None) -> Dict:
+def distributional_cea(baseline_qaly_by_group: dict[str, float],
+                       gain_by_group: dict[str, float],
+                       *, inequality_aversion: float | None = None) -> dict:
     """Equity-weighted analysis using an Atkinson social welfare function.
 
     Standard cost-effectiveness is distribution-blind: a QALY counts the same
@@ -418,9 +424,9 @@ def distributional_cea(baseline_qaly_by_group: Dict[str, float],
     if not groups:
         return {"available": False}
     base = [max(1e-9, float(baseline_qaly_by_group.get(g, 0.0))) for g in groups]
-    after = [b + float(gain_by_group.get(g, 0.0)) for g, b in zip(groups, base)]
+    after = [b + float(gain_by_group.get(g, 0.0)) for g, b in zip(groups, base, strict=False)]
 
-    def ede(xs: List[float]) -> float:
+    def ede(xs: list[float]) -> float:
         """Equally-distributed equivalent under Atkinson aversion."""
         n = len(xs) or 1
         e = float(inequality_aversion)
@@ -430,7 +436,7 @@ def distributional_cea(baseline_qaly_by_group: Dict[str, float],
         s = sum(max(1e-9, x) ** (1.0 - e) for x in xs) / n
         return s ** (1.0 / (1.0 - e))
 
-    def gini(xs: List[float]) -> float:
+    def gini(xs: list[float]) -> float:
         n = len(xs)
         if n < 2:
             return 0.0
@@ -448,7 +454,7 @@ def distributional_cea(baseline_qaly_by_group: Dict[str, float],
         "groups": [
             {"group": g, "baseline_qaly": round(b, 3),
              "qaly_after": round(a, 3), "gain": round(a - b, 4)}
-            for g, b, a in zip(groups, base, after)],
+            for g, b, a in zip(groups, base, after, strict=False)],
         "mean_qaly_before": round(mean_before, 4),
         "mean_qaly_after": round(mean_after, 4),
         "ede_before": round(ede_before, 4),
@@ -469,15 +475,15 @@ def distributional_cea(baseline_qaly_by_group: Dict[str, float],
 # Orchestration
 # ══════════════════════════════════════════════════════════════════════════
 
-def analyze_decision_layer(rebuild: Callable[[], Dict], *,
-                           tornado_rows: Optional[Sequence[Dict]] = None,
+def analyze_decision_layer(rebuild: Callable[[], dict], *,
+                           tornado_rows: Sequence[dict] | None = None,
                            test_cost: float = 0.0,
-                           wtp: Optional[float] = None,
+                           wtp: float | None = None,
                            age: float = 40.0,
-                           fast: bool = False) -> Dict:
+                           fast: bool = False) -> dict:
     """Run the decision-analytic layer and assemble it for the report."""
     wtp = ep.value("wtp_per_qaly") if wtp is None else float(wtp)
-    out: Dict = {"available": True, "wtp": round(wtp)}
+    out: dict = {"available": True, "wtp": round(wtp)}
 
     # Which parameters to interrogate: the ones the tornado says matter, since
     # spending EVPPI iterations on a parameter with no swing is wasted effort.
@@ -536,9 +542,9 @@ def analyze_decision_layer(rebuild: Callable[[], Dict], *,
 def wgs_marginal_value(*, chip_findings_present: bool = True,
                        wgs_only_findings_value: float = 0.0,
                        n_wgs_only_findings: int = 0,
-                       wtp: Optional[float] = None,
-                       chip_cost: Optional[float] = None,
-                       wgs_cost: Optional[float] = None) -> Dict:
+                       wtp: float | None = None,
+                       chip_cost: float | None = None,
+                       wgs_cost: float | None = None) -> dict:
     """Expected value of sequencing over a genotyping array, before buying it.
 
     THE PROBLEM THIS SOLVES. The report's ``marginal_chip_to_wgs`` figure sums

@@ -22,16 +22,16 @@ Caveats (called out in the report):
     but is not guaranteed.
 """
 
-from pathlib import Path
-from typing import Dict, List, Optional
 import json
+from pathlib import Path
+
 import pandas as pd
 
 _DRUG_DB_PATH = Path(__file__).resolve().parent / "drug_database.json"
-_DRUG_DB_CACHE: Optional[List[Dict]] = None
+_DRUG_DB_CACHE: list[dict] | None = None
 
 
-def _load_drug_database() -> List[Dict]:
+def _load_drug_database() -> list[dict]:
     global _DRUG_DB_CACHE
     if _DRUG_DB_CACHE is None:
         try:
@@ -43,13 +43,13 @@ def _load_drug_database() -> List[Dict]:
     return _DRUG_DB_CACHE
 
 
-def analyze_drug_database(snps_df: pd.DataFrame) -> List[Dict]:
+def analyze_drug_database(snps_df: pd.DataFrame) -> list[dict]:
     """For every drug entry in drug_database.json, report a finding if the
     user has a called genotype for any of the drug's snp_markers.
 
     Returns one finding per drug entry that has at least one matched SNP.
     """
-    findings: List[Dict] = []
+    findings: list[dict] = []
     drugs = _load_drug_database()
     if not drugs:
         return findings
@@ -62,7 +62,7 @@ def analyze_drug_database(snps_df: pd.DataFrame) -> List[Dict]:
 
     for entry in drugs:
         markers = entry.get("snp_markers") or []
-        matched: List[Dict] = []
+        matched: list[dict] = []
         for rsid in markers:
             if rsid not in snps_index:
                 continue
@@ -91,7 +91,7 @@ def analyze_drug_database(snps_df: pd.DataFrame) -> List[Dict]:
 
 
 # ─── Helper ───────────────────────────────────────────────────────────────────
-def _dosage(genotype: object, allele: str) -> Optional[int]:
+def _dosage(genotype: object, allele: str) -> int | None:
     if genotype is None:
         return None
     gt = str(genotype).upper().replace(" ", "").replace("-", "")
@@ -113,7 +113,7 @@ def _dosage(genotype: object, allele: str) -> Optional[int]:
 #   cpic_guideline        — reference URL/citation string
 #
 
-GENES: Dict[str, Dict] = {
+GENES: dict[str, dict] = {
 
     # ── CYP2D6 ────────────────────────────────────────────────────────────────
     "CYP2D6": {
@@ -502,16 +502,16 @@ def _pgx_confidence(callable_variants: int, total_variants: int) -> tuple:
     )
 
 
-def _classify(activity: float, bins: List) -> tuple:
+def _classify(activity: float, bins: list) -> tuple:
     for max_act, label, code, cls in bins:
         if activity <= max_act:
             return label, code, cls
     return bins[-1][1], bins[-1][2], bins[-1][3]
 
 
-def _analyze_gene(gene_name: str, gene_def: Dict, snps_df: pd.DataFrame) -> Dict:
+def _analyze_gene(gene_name: str, gene_def: dict, snps_df: pd.DataFrame) -> dict:
     activity = gene_def.get("baseline_activity", 2.0)
-    variant_calls: List[Dict] = []
+    variant_calls: list[dict] = []
     callable_variants = 0
     total_variants = len(gene_def["variants"])
 
@@ -643,7 +643,7 @@ def _analyze_gene(gene_name: str, gene_def: Dict, snps_df: pd.DataFrame) -> Dict
 # clear "non-clinical / for fun" disclaimer and never feed into actionable
 # recommendations.
 #
-NOVELTY_PANELS: List[Dict] = [
+NOVELTY_PANELS: list[dict] = [
     {
         "section": "Electro-Biological Sensitivity",
         "description": "Genetic factors affecting electrical/neurological sensitivity.",
@@ -699,7 +699,7 @@ NOVELTY_PANELS: List[Dict] = [
 ]
 
 
-def analyze_novelty_panels(snps_df: pd.DataFrame) -> List[Dict]:
+def analyze_novelty_panels(snps_df: pd.DataFrame) -> list[dict]:
     """Light-touch lookup for novelty panels. Returns one dict per section
     with per-gene genotype calls (or 'Not tested on this chip')."""
     sections = []
@@ -731,15 +731,15 @@ def analyze_novelty_panels(snps_df: pd.DataFrame) -> List[Dict]:
     return sections
 
 
-def analyze_pgx(snps_df: pd.DataFrame) -> Dict:
+def analyze_pgx(snps_df: pd.DataFrame) -> dict:
     """Run all PGx genes. Returns a dict with per-gene phenotypes and a
     consolidated list of clinically-actionable drug findings."""
-    per_gene: Dict[str, Dict] = {}
+    per_gene: dict[str, dict] = {}
     for gene_name, gene_def in GENES.items():
         per_gene[gene_name] = _analyze_gene(gene_name, gene_def, snps_df)
 
     # Aggregate actionable findings — phenotypes that change standard dosing
-    actionable: List[Dict] = []
+    actionable: list[dict] = []
     actionable_codes = {"PM", "IM", "UM", "RM", "POS"}
     for gene_name, result in per_gene.items():
         if result["phenotype_code"] not in actionable_codes:

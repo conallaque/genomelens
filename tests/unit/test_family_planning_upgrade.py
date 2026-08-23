@@ -1,6 +1,7 @@
 """Unit tests for the V35 analyze_family_planning() upgrade."""
 
 from __future__ import annotations
+
 import family_planning as fp
 
 

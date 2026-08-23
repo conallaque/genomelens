@@ -35,11 +35,8 @@ Every insight cites the *specific* upstream findings that trigger it.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
-import math
 
-
-def _get(d: Optional[Dict], *keys, default=None):
+def _get(d: dict | None, *keys, default=None):
     for k in keys:
         if d is None:
             return default
@@ -47,7 +44,7 @@ def _get(d: Optional[Dict], *keys, default=None):
     return d if d is not None else default
 
 
-def _find_variant(module_result: Optional[Dict], rsid: str) -> Optional[Dict]:
+def _find_variant(module_result: dict | None, rsid: str) -> dict | None:
     if not module_result:
         return None
     for k in ("variants", "findings", "indices"):
@@ -59,7 +56,7 @@ def _find_variant(module_result: Optional[Dict], rsid: str) -> Optional[Dict]:
     return None
 
 
-def _bloodwork_marker(bloodwork_result: Optional[Dict], name: str) -> Optional[float]:
+def _bloodwork_marker(bloodwork_result: dict | None, name: str) -> float | None:
     """Find a raw lab value from the clinical panel by name (case-insensitive)."""
     if not bloodwork_result:
         return None
@@ -86,8 +83,8 @@ def _detect_fut2_crp_baseline(immuno, bloodwork):
     for f in _get(immuno, "findings", default=[]) or []:
         if f.get("gene") == "FUT2":
             fut2 = f; break
-    if not fut2 or "non-secretor" not in fut2.get("phenotype", "").lower() \
-       and "non-secretor" not in fut2.get("verdict", "").lower():
+    if not fut2 or ("non-secretor" not in fut2.get("phenotype", "").lower() \
+       and "non-secretor" not in fut2.get("verdict", "").lower()):
         return None
     crp = _bloodwork_marker(bloodwork, "hs-CRP") or _bloodwork_marker(bloodwork, "C-Reactive Protein")
     if crp is None or crp <= 1.0:
@@ -264,8 +261,8 @@ def _detect_favorable_genome_leverage(tier1, prs_result, immuno, neurochem,
     dominates. Very-favorable genomes have wider upside/downside than average."""
     score = 50   # start at neutral
 
-    reasons_up: List[str] = []
-    reasons_down: List[str] = []
+    reasons_up: list[str] = []
+    reasons_down: list[str] = []
 
     # APOE ε4 status (a big single lever)
     apoe = (tier1 or {}).get("apoe_genotype", "") or ""
@@ -423,8 +420,8 @@ def _detect_iron_stress_pattern(bloodwork, immuno, tier1):
         f"acute-phase reactant"
         + (f"; your hs-CRP is {crp:g}, which fits" if crp and crp > 1.5 else "")
         + "), fatty liver, alcohol, high red-meat diet, "
-        f"iron supplementation. Ferritin alone can look scary without "
-        f"context.",
+        "iron supplementation. Ferritin alone can look scary without "
+        "context.",
         "Add transferrin saturation to the next panel; if it's >45%, "
         "hereditary hemochromatosis panels (beyond C282Y/H63D — some rare "
         "variants aren't on consumer chips) may be worth pursuing. If "
@@ -455,11 +452,11 @@ def _detect_coffee_synthesis(neurochem, pgx_result):
         f"COMT {c.get('comt_class','?')} + MAOA "
         f"{c.get('maoa_class','?')}"
         + (f" + CYP1A2 {cyp1a2}" if cyp1a2 else "") + ". "
-        f"You clear caffeine and catecholamines fast. Practical "
-        f"consequences: caffeine wears off subjectively quickly, but its "
-        f"REM-suppressing half-life in sleep-relevant compartments is longer "
-        f"than you feel. Anxiety ceiling is real (COMT + fast MAOA can tip "
-        f"into jitter above ~200 mg per bolus dose).",
+        "You clear caffeine and catecholamines fast. Practical "
+        "consequences: caffeine wears off subjectively quickly, but its "
+        "REM-suppressing half-life in sleep-relevant compartments is longer "
+        "than you feel. Anxiety ceiling is real (COMT + fast MAOA can tip "
+        "into jitter above ~200 mg per bolus dose).",
         "Espresso-style: 1-2 shots (~120-180 mg) in the morning, one more "
         "before noon if needed, **no caffeine after 2 pm** regardless of "
         "feeling. Avoid single-dose bolus > 200 mg (large drip coffees, "
@@ -474,8 +471,8 @@ def _detect_coffee_synthesis(neurochem, pgx_result):
 # Priority-action ranking
 # ═════════════════════════════════════════════════════════════════════════════
 
-def _rank_priority_actions(insights: List[Dict],
-                           genome_leverage: Dict) -> List[Dict]:
+def _rank_priority_actions(insights: list[dict],
+                           genome_leverage: dict) -> list[dict]:
     """Turn detected insights into a ranked priority list based on severity
     × confidence × modifiability."""
     ranked = []
@@ -508,16 +505,16 @@ def _rank_priority_actions(insights: List[Dict],
 # ═════════════════════════════════════════════════════════════════════════════
 
 def analyze_holistic_synthesis(
-    tier1_results: Optional[Dict] = None,
-    bloodwork_result: Optional[Dict] = None,
-    immunogenetics_result: Optional[Dict] = None,
-    neurochemistry_result: Optional[Dict] = None,
-    deep_ancestry_result: Optional[Dict] = None,
-    ancestry_result: Optional[Dict] = None,
-    prs_result: Optional[Dict] = None,
-    pgx_result: Optional[Dict] = None,
-    meta: Optional[Dict] = None,
-) -> Dict:
+    tier1_results: dict | None = None,
+    bloodwork_result: dict | None = None,
+    immunogenetics_result: dict | None = None,
+    neurochemistry_result: dict | None = None,
+    deep_ancestry_result: dict | None = None,
+    ancestry_result: dict | None = None,
+    prs_result: dict | None = None,
+    pgx_result: dict | None = None,
+    meta: dict | None = None,
+) -> dict:
     """Detect cross-panel patterns and produce a composite genome-leverage
     score + ranked priority actions."""
     detectors = [
@@ -530,7 +527,7 @@ def analyze_holistic_synthesis(
         lambda: _detect_iron_stress_pattern(bloodwork_result, immunogenetics_result, tier1_results),
         lambda: _detect_coffee_synthesis(neurochemistry_result, pgx_result),
     ]
-    insights: List[Dict] = []
+    insights: list[dict] = []
     for d in detectors:
         try:
             r = d()

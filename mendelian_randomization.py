@@ -29,7 +29,7 @@ Limitations:
 from __future__ import annotations
 
 from math import erf, sqrt
-from typing import Dict, List, Optional
+
 import pandas as pd
 
 
@@ -37,7 +37,7 @@ def _norm_cdf(z: float) -> float:
     return 0.5 * (1.0 + erf(z / sqrt(2.0)))
 
 
-def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> Optional[int]:
+def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> int | None:
     if rsid not in snps_df.index:
         return None
     gt = snps_df.loc[rsid].get("genotype")
@@ -73,7 +73,7 @@ def _score_exposure(snps_df, exposure_snps):
 #   outcome: name + literature MR causal estimate (β_MR per SD increase in exposure)
 #   units: human description of effect
 
-MR_LIBRARY: List[Dict] = [
+MR_LIBRARY: list[dict] = [
     {
         "exposure": "Genetically predicted LDL cholesterol",
         "outcome": "Coronary Artery Disease",
@@ -276,9 +276,9 @@ MR_LIBRARY: List[Dict] = [
 ]
 
 
-def analyze_mr(snps_df: pd.DataFrame, sex: Optional[str] = None) -> Dict:
+def analyze_mr(snps_df: pd.DataFrame, sex: str | None = None) -> dict:
     """Compute personalised MR projections for each exposure-outcome pair."""
-    findings: List[Dict] = []
+    findings: list[dict] = []
     for entry in MR_LIBRARY:
         if entry.get("applies_to") == "male" and sex == "female":
             continue

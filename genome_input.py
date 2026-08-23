@@ -54,13 +54,10 @@ from __future__ import annotations
 
 import gzip
 import re
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
 import snp_registry as _reg
-
 
 # ── Input-type detection ──────────────────────────────────────────────────────
 
@@ -90,7 +87,7 @@ def looks_like_vcf(path: str) -> bool:
 # chromosomes is enough to call the build straight from the header — essential for
 # whole-genome callsets (e.g. GIAB benchmarks) whose variants have no rsIDs, so the
 # probe-position detector in provenance.py returns "unknown".
-_CONTIG_BUILD_LEN: Dict[str, Tuple[int, int]] = {
+_CONTIG_BUILD_LEN: dict[str, tuple[int, int]] = {
     "1": (249250621, 248956422),
     "2": (243199373, 242193529),
     "3": (198022430, 198295559),
@@ -106,7 +103,7 @@ def detect_build_from_vcf_header(path: str, max_header_lines: int = 5000) -> str
     p = str(path)
     opener = gzip.open if p.lower().endswith((".gz", ".bgz")) else open
     votes = {"grch37": 0, "grch38": 0}
-    ref_hint: Optional[str] = None
+    ref_hint: str | None = None
     try:
         with opener(p, "rt", errors="ignore") as f:
             for i, line in enumerate(f):
@@ -143,7 +140,7 @@ def detect_build_from_vcf_header(path: str, max_header_lines: int = 5000) -> str
 _ACGT = set("ACGT")
 
 
-def vcf_gt_to_genotype(gt: str, ref: str, alt: str) -> Optional[str]:
+def vcf_gt_to_genotype(gt: str, ref: str, alt: str) -> str | None:
     """Convert a VCF sample ``GT`` (+ REF/ALT) to a sorted 2-char SNV genotype,
     or None to skip (no-call, indel, symbolic, malformed). See module docstring
     for the full rules table."""
@@ -155,7 +152,7 @@ def vcf_gt_to_genotype(gt: str, ref: str, alt: str) -> Optional[str]:
     parts = [a for a in field.split("/") if a != ""]
     if not parts:
         return None
-    idxs: List[int] = []
+    idxs: list[int] = []
     for a in parts:
         if a == ".":
             return None                    # partial no-call → skip
@@ -166,7 +163,7 @@ def vcf_gt_to_genotype(gt: str, ref: str, alt: str) -> Optional[str]:
     if len(idxs) == 1:                     # haploid (e.g. male X/Y) → homozygous
         idxs = [idxs[0], idxs[0]]
     alts = alt.split(",") if alt not in (".", "") else []
-    alleles: List[str] = []
+    alleles: list[str] = []
     for i in idxs[:2]:
         if i == 0:
             seq = ref
@@ -186,7 +183,7 @@ def vcf_gt_to_genotype(gt: str, ref: str, alt: str) -> Optional[str]:
 # gene coordinates. Used ONLY to COUNT how many VCF variants fall in actionable
 # genes (a value-quantifier for the not-yet-built Phase-2 screen) — never for a
 # clinical call. Coordinates are gene-body windows, deliberately approximate.
-_ACMG_GENES: List[Tuple[str, str, int, int, int, int]] = [
+_ACMG_GENES: list[tuple[str, str, int, int, int, int]] = [
     # gene, chrom, g37_start, g37_end, g38_start, g38_end
     ("BRCA1",  "17", 41196312, 41277500, 43044295, 43125483),
     ("BRCA2",  "13", 32889611, 32973805, 32315474, 32400266),
@@ -209,7 +206,7 @@ _ACMG_GENES: List[Tuple[str, str, int, int, int, int]] = [
 def _build_acmg_index(build: str):
     """chrom → list of (start, end, gene) for the detected build."""
     si, ei = (2, 3) if build == "grch37" else (4, 5)
-    idx: Dict[str, List[Tuple[int, int, str]]] = {}
+    idx: dict[str, list[tuple[int, int, str]]] = {}
     for row in _ACMG_GENES:
         gene, chrom = row[0], row[1]
         idx.setdefault(chrom, []).append((row[si], row[ei], gene))
@@ -218,9 +215,9 @@ def _build_acmg_index(build: str):
 
 # ── Registry position map (for build-gated back-fill) ─────────────────────────
 
-def _registry_position_map(build: str) -> Dict[Tuple[str, int], object]:
+def _registry_position_map(build: str) -> dict[tuple[str, int], object]:
     """{(chrom, pos): SNPRecord} for the detected build's coordinates."""
-    out: Dict[Tuple[str, int], object] = {}
+    out: dict[tuple[str, int], object] = {}
     for r in _reg._RECORDS:
         pos = r.pos_grch37 if build == "grch37" else r.pos_grch38
         if pos:
@@ -233,7 +230,7 @@ def _norm_chrom(c: str) -> str:
 
 
 def enrich_and_profile_vcf(snps_df: pd.DataFrame, path: str, build: str,
-                           log=None) -> Tuple[pd.DataFrame, Dict]:
+                           log=None) -> tuple[pd.DataFrame, dict]:
     """Single streaming pass over a VCF: build-gated back-fill of curated
     registry positions the rsID reader dropped, plus a profile of what the file
     contains that the pipeline can't yet interpret.
@@ -252,7 +249,7 @@ def enrich_and_profile_vcf(snps_df: pd.DataFrame, path: str, build: str,
     reg_pos = _registry_position_map(build) if do_backfill else {}
     have_rsids = set(snps_df.index) if snps_df is not None else set()
     acmg_idx = _build_acmg_index(build) if do_backfill else {}
-    new_rows: Dict[str, Dict] = {}
+    new_rows: dict[str, dict] = {}
 
     opener = gzip.open if str(path).lower().endswith((".gz", ".bgz")) else open
     with opener(path, "rt", errors="ignore") as f:

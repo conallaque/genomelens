@@ -30,12 +30,10 @@ from __future__ import annotations
 
 import re as _re
 from pathlib import Path as _Path
-from typing import Dict, List, Optional
 
 import pandas as pd
 
 import snp_registry
-
 
 CAT_BLADDER = "Bladder & Detrusor (OAB / continence)"
 CAT_PROSTATE = "Prostate — BPH & Cancer Risk"
@@ -44,7 +42,7 @@ CAT_TESTIS = "Testicular / Reproductive"
 CAT_HORMONES = "Androgen & DHT Metabolism"
 
 
-def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
+def _gt(snps_df: pd.DataFrame, rsid: str) -> str | None:
     if rsid not in snps_df.index:
         return None
     row = snps_df.loc[rsid]
@@ -501,7 +499,7 @@ def _nat2_bladder(snps):
 CATEGORY_ORDER = [CAT_BLADDER, CAT_PROSTATE, CAT_STONES, CAT_TESTIS, CAT_HORMONES]
 
 
-def analyze_urologic(snps_df: pd.DataFrame) -> Dict:
+def analyze_urologic(snps_df: pd.DataFrame) -> dict:
     analyzers = [
         _adrb3_oab, _chrm3_oab, _nat2_bladder,
         _srd5a2_bph, _srd5a2_a49t, _hoxb13_g84e, _prostate_8q24, _msmb_prostate,
@@ -509,7 +507,7 @@ def analyze_urologic(snps_df: pd.DataFrame) -> Dict:
         _kitlg_testicular, _spry4_testicular,
         _shbg_variant,
     ]
-    findings: List[Dict] = []
+    findings: list[dict] = []
     for a in analyzers:
         try:
             r = a(snps_df)
@@ -518,7 +516,7 @@ def analyze_urologic(snps_df: pd.DataFrame) -> Dict:
         except Exception:
             continue
 
-    by_category: Dict[str, List[Dict]] = {}
+    by_category: dict[str, list[dict]] = {}
     for f in findings:
         by_category.setdefault(f["category"], []).append(f)
 
@@ -536,12 +534,12 @@ def analyze_urologic(snps_df: pd.DataFrame) -> Dict:
 
 # ── Registry cross-check ─────────────────────────────────────────────────────
 
-def _scan_rsids_referenced() -> List[str]:
+def _scan_rsids_referenced() -> list[str]:
     src = _Path(__file__).read_text()
     return sorted(set(_re.findall(r'"(rs\d+)"', src)))
 
 
-def audit_against_registry() -> Dict[str, List[str]]:
+def audit_against_registry() -> dict[str, list[str]]:
     registered, missing = [], []
     for rsid in _scan_rsids_referenced():
         (registered if snp_registry.get(rsid) is not None else missing).append(rsid)

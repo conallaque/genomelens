@@ -23,14 +23,13 @@ Traits covered:
 
 import re as _re
 from pathlib import Path as _Path
-from typing import Dict, List, Optional
 
 import pandas as pd
 
 import snp_registry  # V8 cross-check; see audit_against_registry below
 
 
-def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
+def _gt(snps_df: pd.DataFrame, rsid: str) -> str | None:
     if rsid not in snps_df.index:
         return None
     gt = snps_df.loc[rsid].get("genotype")
@@ -42,7 +41,7 @@ def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
     return s
 
 
-def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> Optional[int]:
+def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> int | None:
     gt = _gt(snps_df, rsid)
     if gt is None or len(gt) != 2:
         return None
@@ -51,7 +50,7 @@ def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> Optional[int]:
 
 # ─── Individual trait analyzers ───────────────────────────────────────────────
 
-def _trait_lactose(snps_df) -> Dict:
+def _trait_lactose(snps_df) -> dict:
     # T allele = lactase persistence (continued lactase production)
     g = _gt(snps_df, "rs4988235") or _gt(snps_df, "rs182549")
     if g is None:
@@ -74,7 +73,7 @@ def _trait_lactose(snps_df) -> Dict:
             )}
 
 
-def _trait_alcohol_flush(snps_df) -> Dict:
+def _trait_alcohol_flush(snps_df) -> dict:
     g = _gt(snps_df, "rs671")  # A = Lys487 = deficient
     if g is None:
         return {"trait": "Alcohol Flush (ALDH2)", "result": "Not tested",
@@ -82,7 +81,7 @@ def _trait_alcohol_flush(snps_df) -> Dict:
     if g == "AA":
         return {"trait": "Alcohol Flush (ALDH2)",
                 "result": "Severe alcohol intolerance — homozygous ALDH2 deficiency",
-                "evidence": f"rs671 genotype: AA (Lys/Lys)",
+                "evidence": "rs671 genotype: AA (Lys/Lys)",
                 "confidence": "high",
                 "detail": (
                     "Essentially cannot metabolize acetaldehyde. Alcohol consumption "
@@ -104,7 +103,7 @@ def _trait_alcohol_flush(snps_df) -> Dict:
             "confidence": "high"}
 
 
-def _trait_caffeine_speed(snps_df) -> Dict:
+def _trait_caffeine_speed(snps_df) -> dict:
     g = _gt(snps_df, "rs762551")  # CYP1A2 *1F — C is slow
     if g is None:
         return {"trait": "Caffeine Metabolism Speed", "result": "Not tested",
@@ -131,7 +130,7 @@ def _trait_caffeine_speed(snps_df) -> Dict:
             "detail": "Caffeine cleared quickly. Higher intake tolerated (still cap ≤400 mg/day)."}
 
 
-def _trait_bitter_taste(snps_df) -> Dict:
+def _trait_bitter_taste(snps_df) -> dict:
     # TAS2R38: PAV haplotype (rs713598 C, rs1726866 G, rs10246939 T) = strong taster
     # AVI haplotype (G, A, C) = non-taster
     a = _gt(snps_df, "rs713598")
@@ -145,7 +144,7 @@ def _trait_bitter_taste(snps_df) -> Dict:
     if pav_count >= 2:
         return {"trait": "Bitter Taste (PTC / PROP)",
                 "result": "Strong taster (PAV/PAV)",
-                "evidence": f"TAS2R38 haplotype: PAV/PAV",
+                "evidence": "TAS2R38 haplotype: PAV/PAV",
                 "confidence": "high",
                 "detail": (
                     "Bitter compounds (PTC, PROP, glucosinolates in cruciferous "
@@ -166,7 +165,7 @@ def _trait_bitter_taste(snps_df) -> Dict:
             "detail": "Cannot taste PTC/PROP; cruciferous vegetables and bitter foods are tolerated easily."}
 
 
-def _trait_earwax(snps_df) -> Dict:
+def _trait_earwax(snps_df) -> dict:
     g = _gt(snps_df, "rs17822931")  # T/T = dry earwax
     if g is None:
         return {"trait": "Earwax Type (ABCC11)", "result": "Not tested",
@@ -192,7 +191,7 @@ def _trait_earwax(snps_df) -> Dict:
             "confidence": "high"}
 
 
-def _trait_eye_color(snps_df) -> Dict:
+def _trait_eye_color(snps_df) -> dict:
     # Primary determinant: HERC2 rs12913832 G allele = blue eyes
     herc2 = _gt(snps_df, "rs12913832")
     tyr = _dose(snps_df, "rs1042602", "A")
@@ -206,12 +205,12 @@ def _trait_eye_color(snps_df) -> Dict:
             modifier = " (with possible lighter/grey gradient via TYR modifier)"
         return {"trait": "Eye Color",
                 "result": f"Blue eyes likely{modifier}",
-                "evidence": f"rs12913832: GG (HERC2 blue-eye haplotype)",
+                "evidence": "rs12913832: GG (HERC2 blue-eye haplotype)",
                 "confidence": "high"}
     if herc2 == "AG" or herc2 == "GA":
         return {"trait": "Eye Color",
                 "result": "Green, hazel, or light brown — intermediate phenotype",
-                "evidence": f"rs12913832: AG",
+                "evidence": "rs12913832: AG",
                 "confidence": "moderate",
                 "detail": "Heterozygous HERC2 typically yields green or hazel eyes."}
     return {"trait": "Eye Color",
@@ -220,7 +219,7 @@ def _trait_eye_color(snps_df) -> Dict:
             "confidence": "high"}
 
 
-def _trait_hair_color(snps_df) -> Dict:
+def _trait_hair_color(snps_df) -> dict:
     # MC1R RHC variants increase red/blonde tendency
     r151c = _dose(snps_df, "rs1805007", "T")
     r160w = _dose(snps_df, "rs1805008", "T")
@@ -245,12 +244,12 @@ def _trait_hair_color(snps_df) -> Dict:
     if rhc_total == 1:
         return {"trait": "Hair Color Tendency",
                 "result": "Red/blonde tinge possible (single MC1R RHC carrier)",
-                "evidence": f"MC1R RHC alleles: 1",
+                "evidence": "MC1R RHC alleles: 1",
                 "confidence": "moderate"}
     if irf4 and irf4 >= 1:
         return {"trait": "Hair Color Tendency",
                 "result": "Light/blonde hair tendency",
-                "evidence": f"IRF4 rs12203592 T allele present",
+                "evidence": "IRF4 rs12203592 T allele present",
                 "confidence": "moderate"}
     return {"trait": "Hair Color Tendency",
             "result": "Dark hair likely",
@@ -258,7 +257,7 @@ def _trait_hair_color(snps_df) -> Dict:
             "confidence": "moderate"}
 
 
-def _trait_chronotype(snps_df) -> Dict:
+def _trait_chronotype(snps_df) -> dict:
     clock = _gt(snps_df, "rs1801260")  # C = evening preference
     per3 = _gt(snps_df, "rs2230912")
     if clock is None and per3 is None:
@@ -280,7 +279,7 @@ def _trait_chronotype(snps_df) -> Dict:
             "confidence": "low"}
 
 
-def _trait_short_sleeper(snps_df) -> Dict:
+def _trait_short_sleeper(snps_df) -> dict:
     g = _gt(snps_df, "rs77086077")  # BHLHE41 / DEC2 short-sleeper variant
     if g is None:
         return {"trait": "Short-Sleeper Allele (BHLHE41/DEC2)", "result": "Not tested",
@@ -302,7 +301,7 @@ def _trait_short_sleeper(snps_df) -> Dict:
             "confidence": "high"}
 
 
-def _trait_muscle_fiber(snps_df) -> Dict:
+def _trait_muscle_fiber(snps_df) -> dict:
     g = _gt(snps_df, "rs1815739")  # ACTN3 R577X — T allele = stop codon
     if g is None:
         return {"trait": "Muscle Fiber Composition (ACTN3)", "result": "Not tested",
@@ -329,7 +328,7 @@ def _trait_muscle_fiber(snps_df) -> Dict:
             "confidence": "high"}
 
 
-def _trait_vitd_efficiency(snps_df) -> Dict:
+def _trait_vitd_efficiency(snps_df) -> dict:
     dbp = _dose(snps_df, "rs2282679", "C")
     cyp2r1 = _dose(snps_df, "rs10741657", "G")
     if dbp is None and cyp2r1 is None:
@@ -351,7 +350,7 @@ def _trait_vitd_efficiency(snps_df) -> Dict:
             "confidence": "moderate"}
 
 
-def _trait_caffeine_anxiety(snps_df) -> Dict:
+def _trait_caffeine_anxiety(snps_df) -> dict:
     g = _gt(snps_df, "rs5751876")
     if g is None:
         return {"trait": "Caffeine-Induced Anxiety Susceptibility", "result": "Not tested",
@@ -368,7 +367,7 @@ def _trait_caffeine_anxiety(snps_df) -> Dict:
             "confidence": "moderate"}
 
 
-def _trait_smoking_dependence(snps_df) -> Dict:
+def _trait_smoking_dependence(snps_df) -> dict:
     chrna3 = _dose(snps_df, "rs1051730", "T")
     chrna5 = _dose(snps_df, "rs16969968", "A")
     score = (chrna3 or 0) + (chrna5 or 0)
@@ -393,7 +392,7 @@ def _trait_smoking_dependence(snps_df) -> Dict:
 
 # ─── V4 trait analyzers (additional ~30) ──────────────────────────────────────
 
-def _trait_male_pattern_baldness(snps_df) -> Dict:
+def _trait_male_pattern_baldness(snps_df) -> dict:
     g = _gt(snps_df, "rs6152")
     if g is None:
         return {"trait": "Male-Pattern Baldness Tendency", "result": "Not tested",
@@ -409,7 +408,7 @@ def _trait_male_pattern_baldness(snps_df) -> Dict:
             "evidence": f"AR rs6152 genotype: {g}", "confidence": "moderate"}
 
 
-def _trait_photic_sneeze(snps_df) -> Dict:
+def _trait_photic_sneeze(snps_df) -> dict:
     g = _gt(snps_df, "rs10427255")
     if g is None:
         return {"trait": "Photic Sneeze Reflex (ACHOO)", "result": "Not tested",
@@ -424,7 +423,7 @@ def _trait_photic_sneeze(snps_df) -> Dict:
             "evidence": f"rs10427255: {g}", "confidence": "moderate"}
 
 
-def _trait_cilantro_aversion(snps_df) -> Dict:
+def _trait_cilantro_aversion(snps_df) -> dict:
     g = _gt(snps_df, "rs72921001")
     if g is None:
         return {"trait": "Cilantro Aversion (OR6A2)", "result": "Not tested",
@@ -439,7 +438,7 @@ def _trait_cilantro_aversion(snps_df) -> Dict:
             "evidence": f"OR6A2 rs72921001: {g}", "confidence": "high"}
 
 
-def _trait_asparagus_smell(snps_df) -> Dict:
+def _trait_asparagus_smell(snps_df) -> dict:
     g = _gt(snps_df, "rs4481887")
     if g is None:
         return {"trait": "Asparagus Urine Smell Detection",
@@ -454,7 +453,7 @@ def _trait_asparagus_smell(snps_df) -> Dict:
             "detail": "Phenotypic curiosity — only some people smell asparagus metabolites in urine."}
 
 
-def _trait_body_odor(snps_df) -> Dict:
+def _trait_body_odor(snps_df) -> dict:
     g = _gt(snps_df, "rs17822931")
     if g is None:
         return {"trait": "Body Odor Type (ABCC11)", "result": "Not tested",
@@ -469,7 +468,7 @@ def _trait_body_odor(snps_df) -> Dict:
             "evidence": f"ABCC11: {g}", "confidence": "high"}
 
 
-def _trait_freckling(snps_df) -> Dict:
+def _trait_freckling(snps_df) -> dict:
     irf4 = _dose(snps_df, "rs12203592", "T")
     mc1r_total = sum(d for d in [
         _dose(snps_df, "rs1805007", "T"),
@@ -490,7 +489,7 @@ def _trait_freckling(snps_df) -> Dict:
             "confidence": "moderate"}
 
 
-def _trait_empathy(snps_df) -> Dict:
+def _trait_empathy(snps_df) -> dict:
     g = _gt(snps_df, "rs53576")
     if g is None:
         return {"trait": "Empathy / Social Sensitivity (OXTR)", "result": "Not tested",
@@ -498,7 +497,7 @@ def _trait_empathy(snps_df) -> Dict:
     if g == "GG":
         return {"trait": "Empathy / Social Sensitivity (OXTR)",
                 "result": "Higher empathic accuracy tendency",
-                "evidence": f"OXTR: GG", "confidence": "low",
+                "evidence": "OXTR: GG", "confidence": "low",
                 "detail": "Modest effect; lived experience dominates."}
     if "G" in g:
         return {"trait": "Empathy / Social Sensitivity (OXTR)",
@@ -509,7 +508,7 @@ def _trait_empathy(snps_df) -> Dict:
             "evidence": f"OXTR: {g}", "confidence": "low"}
 
 
-def _trait_salt_sensitivity(snps_df) -> Dict:
+def _trait_salt_sensitivity(snps_df) -> dict:
     g = _gt(snps_df, "rs5443")
     if g is None:
         return {"trait": "Salt-Sensitivity of Blood Pressure", "result": "Not tested",
@@ -524,7 +523,7 @@ def _trait_salt_sensitivity(snps_df) -> Dict:
             "evidence": f"GNB3 rs5443: {g}", "confidence": "moderate"}
 
 
-def _trait_endurance_vs_power(snps_df) -> Dict:
+def _trait_endurance_vs_power(snps_df) -> dict:
     actn3 = _gt(snps_df, "rs1815739")
     ace = _gt(snps_df, "rs1799752")  # I/D indel — may not type well
     if actn3 is None:
@@ -533,18 +532,18 @@ def _trait_endurance_vs_power(snps_df) -> Dict:
     if actn3 == "TT":
         return {"trait": "Endurance vs Power Bias",
                 "result": "Endurance-typical (ACTN3 null)",
-                "evidence": f"ACTN3: TT", "confidence": "high",
+                "evidence": "ACTN3: TT", "confidence": "high",
                 "detail": "Recreational training response is normal; effects matter most at elite level."}
     if actn3 == "CC":
         return {"trait": "Endurance vs Power Bias",
                 "result": "Power/sprint-typical (ACTN3 R/R)",
-                "evidence": f"ACTN3: CC", "confidence": "high"}
+                "evidence": "ACTN3: CC", "confidence": "high"}
     return {"trait": "Endurance vs Power Bias",
             "result": "Mixed type (heterozygous ACTN3)",
             "evidence": f"ACTN3: {actn3}", "confidence": "high"}
 
 
-def _trait_injury_susceptibility(snps_df) -> Dict:
+def _trait_injury_susceptibility(snps_df) -> dict:
     col1 = _dose(snps_df, "rs1800012", "T")
     col5 = _dose(snps_df, "rs12722", "T")
     total = (col1 or 0) + (col5 or 0)
@@ -563,7 +562,7 @@ def _trait_injury_susceptibility(snps_df) -> Dict:
             "confidence": "moderate"}
 
 
-def _trait_bone_density(snps_df) -> Dict:
+def _trait_bone_density(snps_df) -> dict:
     lrp5 = _dose(snps_df, "rs3736228", "T")
     vdr = _dose(snps_df, "rs2228570", "T")
     score = (lrp5 or 0) + (vdr or 0)
@@ -580,7 +579,7 @@ def _trait_bone_density(snps_df) -> Dict:
             "evidence": f"LRP5+VDR risk dose: {score}", "confidence": "moderate"}
 
 
-def _trait_pain_sensitivity(snps_df) -> Dict:
+def _trait_pain_sensitivity(snps_df) -> dict:
     comt = _gt(snps_df, "rs4680")
     oprm = _gt(snps_df, "rs1799971")
     if comt is None:
@@ -590,18 +589,18 @@ def _trait_pain_sensitivity(snps_df) -> Dict:
         # Met/Met — slow COMT, generally higher pain sensitivity
         return {"trait": "Pain Sensitivity (COMT)",
                 "result": "Higher pain sensitivity (Met/Met)",
-                "evidence": f"COMT: AA", "confidence": "moderate",
+                "evidence": "COMT: AA", "confidence": "moderate",
                 "detail": "May benefit from multimodal pain management; address anxiety component."}
     if comt == "GG":
         return {"trait": "Pain Sensitivity (COMT)",
                 "result": "Lower pain sensitivity (Val/Val)",
-                "evidence": f"COMT: GG", "confidence": "moderate"}
+                "evidence": "COMT: GG", "confidence": "moderate"}
     return {"trait": "Pain Sensitivity (COMT)",
             "result": "Intermediate pain sensitivity",
             "evidence": f"COMT: {comt}", "confidence": "moderate"}
 
 
-def _trait_novelty_seeking(snps_df) -> Dict:
+def _trait_novelty_seeking(snps_df) -> dict:
     drd4 = _gt(snps_df, "rs1800955")
     if drd4 is None:
         return {"trait": "Novelty Seeking Tendency", "result": "Not tested",
@@ -616,7 +615,7 @@ def _trait_novelty_seeking(snps_df) -> Dict:
             "evidence": f"DRD4 rs1800955: {drd4}", "confidence": "low"}
 
 
-def _trait_height_polygenic(snps_df) -> Dict:
+def _trait_height_polygenic(snps_df) -> dict:
     # Quick polygenic-ish estimate from a handful of well-known height SNPs
     height_snps = [
         ("rs6060369", "T"), ("rs2562784", "G"), ("rs143384", "T"),
@@ -644,7 +643,7 @@ def _trait_height_polygenic(snps_df) -> Dict:
             "detail": "Polygenic — many SNPs contribute. Strong genetic component but childhood nutrition matters too."}
 
 
-def _trait_memory_bdnf(snps_df) -> Dict:
+def _trait_memory_bdnf(snps_df) -> dict:
     g = _gt(snps_df, "rs6265")
     if g is None:
         return {"trait": "Memory / Neuroplasticity (BDNF)", "result": "Not tested",
@@ -659,7 +658,7 @@ def _trait_memory_bdnf(snps_df) -> Dict:
             "evidence": f"BDNF: {g}", "confidence": "moderate"}
 
 
-def _trait_warfarin_sensitivity(snps_df) -> Dict:
+def _trait_warfarin_sensitivity(snps_df) -> dict:
     vkorc = _gt(snps_df, "rs9923231")
     if vkorc is None:
         return {"trait": "Warfarin Sensitivity", "result": "Not tested",
@@ -667,7 +666,7 @@ def _trait_warfarin_sensitivity(snps_df) -> Dict:
     if vkorc == "AA":
         return {"trait": "Warfarin Sensitivity",
                 "result": "High warfarin sensitivity — low starting dose if ever prescribed",
-                "evidence": f"VKORC1 -1639G>A: AA", "confidence": "high"}
+                "evidence": "VKORC1 -1639G>A: AA", "confidence": "high"}
     if "A" in vkorc:
         return {"trait": "Warfarin Sensitivity",
                 "result": "Intermediate warfarin sensitivity",
@@ -677,7 +676,7 @@ def _trait_warfarin_sensitivity(snps_df) -> Dict:
             "evidence": f"VKORC1: {vkorc}", "confidence": "high"}
 
 
-def _trait_cortisol_response(snps_df) -> Dict:
+def _trait_cortisol_response(snps_df) -> dict:
     g = _gt(snps_df, "rs41423247")
     if g is None:
         return {"trait": "Cortisol / Stress Response (NR3C1)", "result": "Not tested",
@@ -685,14 +684,14 @@ def _trait_cortisol_response(snps_df) -> Dict:
     if g == "GG":
         return {"trait": "Cortisol / Stress Response (NR3C1)",
                 "result": "More sensitive cortisol response",
-                "evidence": f"NR3C1 BclI: GG", "confidence": "moderate",
+                "evidence": "NR3C1 BclI: GG", "confidence": "moderate",
                 "detail": "Stress-management practices matter more; avoid chronic overtraining."}
     return {"trait": "Cortisol / Stress Response (NR3C1)",
             "result": "Typical cortisol response",
             "evidence": f"NR3C1 BclI: {g}", "confidence": "moderate"}
 
 
-def _trait_thyroid_t3_response(snps_df) -> Dict:
+def _trait_thyroid_t3_response(snps_df) -> dict:
     g = _gt(snps_df, "rs225014")
     if g is None:
         return {"trait": "Thyroid T4→T3 Conversion (DIO2)", "result": "Not tested",
@@ -700,14 +699,14 @@ def _trait_thyroid_t3_response(snps_df) -> Dict:
     if g == "CC":
         return {"trait": "Thyroid T4→T3 Conversion (DIO2)",
                 "result": "Potentially suboptimal T4→T3 conversion",
-                "evidence": f"DIO2 T92A: CC", "confidence": "low",
+                "evidence": "DIO2 T92A: CC", "confidence": "low",
                 "detail": "If hypothyroid and feeling suboptimal on levothyroxine, discuss combination T4/T3 with endocrinologist."}
     return {"trait": "Thyroid T4→T3 Conversion (DIO2)",
             "result": "Typical T4→T3 conversion",
             "evidence": f"DIO2 T92A: {g}", "confidence": "low"}
 
 
-def _trait_endurance_vo2(snps_df) -> Dict:
+def _trait_endurance_vo2(snps_df) -> dict:
     g = _gt(snps_df, "rs8192678")
     if g is None:
         return {"trait": "Aerobic Trainability (PPARGC1A)", "result": "Not tested",
@@ -722,7 +721,7 @@ def _trait_endurance_vo2(snps_df) -> Dict:
             "evidence": f"PPARGC1A: {g}", "confidence": "moderate"}
 
 
-def _trait_lifespan_longevity_snps(snps_df) -> Dict:
+def _trait_lifespan_longevity_snps(snps_df) -> dict:
     foxo3 = _dose(snps_df, "rs2802292", "G")
     apoe_e2 = _dose(snps_df, "rs7412", "T")
     if foxo3 is None and apoe_e2 is None:
@@ -744,7 +743,7 @@ def _trait_lifespan_longevity_snps(snps_df) -> Dict:
 
 # ─── Master analyzer ──────────────────────────────────────────────────────────
 
-def predict_traits(snps_df: pd.DataFrame) -> Dict:
+def predict_traits(snps_df: pd.DataFrame) -> dict:
     analyzers = [
         _trait_lactose, _trait_alcohol_flush, _trait_caffeine_speed,
         _trait_bitter_taste, _trait_earwax, _trait_eye_color,
@@ -779,12 +778,12 @@ def predict_traits(snps_df: pd.DataFrame) -> Dict:
 # Same shape as wellness.audit_against_registry — traits.py uses inline
 # rsID literals in rule conditionals, so the audit is presence-only.
 
-def _scan_rsids_referenced() -> List[str]:
+def _scan_rsids_referenced() -> list[str]:
     src = _Path(__file__).read_text()
     return sorted(set(_re.findall(r'"(rs\d+)"', src)))
 
 
-def audit_against_registry() -> Dict[str, List[str]]:
+def audit_against_registry() -> dict[str, list[str]]:
     """Return ``{"registered": [...], "missing": [...]}`` for every rsID
     referenced anywhere in this module.
 
@@ -796,8 +795,8 @@ def audit_against_registry() -> Dict[str, List[str]]:
     GRCh37/38 coordinates before joining the registry.
     """
     referenced = _scan_rsids_referenced()
-    registered: List[str] = []
-    missing: List[str] = []
+    registered: list[str] = []
+    missing: list[str] = []
     for r in referenced:
         if snp_registry.get(r) is not None:
             registered.append(r)

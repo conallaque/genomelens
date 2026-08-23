@@ -1,8 +1,9 @@
 """Unit tests for polygenic_traits.py — honest genotype-level trait reporting."""
 
 from __future__ import annotations
-import json
+
 import pandas as pd
+
 import polygenic_traits as pt
 
 

@@ -25,8 +25,6 @@ import json
 import re
 import time
 from pathlib import Path
-from typing import Dict, List, Optional
-
 
 SCRIPT_DIR = Path(__file__).parent
 DEFAULT_TIER1 = SCRIPT_DIR / "tier1_results.json"
@@ -36,35 +34,35 @@ DEFAULT_TIER1 = SCRIPT_DIR / "tier1_results.json"
 
 def _summarise_context(
     tier1_path: Path,
-    pgx_result: Optional[Dict] = None,
-    prs_result: Optional[Dict] = None,
-    traits_result: Optional[Dict] = None,
-    carrier_result: Optional[Dict] = None,
-    interactions_result: Optional[Dict] = None,
-    ancestry_result: Optional[Dict] = None,
-    bloodwork_result: Optional[Dict] = None,
-    detox_result: Optional[Dict] = None,
-    economics_result: Optional[Dict] = None,
-    personal_econ_result: Optional[Dict] = None,
-    urologic_result: Optional[Dict] = None,
-    deep_ancestry_result: Optional[Dict] = None,
-    blood_type_result: Optional[Dict] = None,
-    immunogenetics_result: Optional[Dict] = None,
-    neurochemistry_result: Optional[Dict] = None,
-    addiction_genetics_result: Optional[Dict] = None,
-    holistic_synthesis_result: Optional[Dict] = None,
-    clinical_variants_result: Optional[Dict] = None,
-    novel_variants_result: Optional[Dict] = None,
-    voi_result: Optional[Dict] = None,
-    polygenic_traits_result: Optional[Dict] = None,
-    environmental_optimization_result: Optional[Dict] = None,
-    family_planning_result: Optional[Dict] = None,
-    y_result: Optional[Dict] = None,
-    mt_result: Optional[Dict] = None,
+    pgx_result: dict | None = None,
+    prs_result: dict | None = None,
+    traits_result: dict | None = None,
+    carrier_result: dict | None = None,
+    interactions_result: dict | None = None,
+    ancestry_result: dict | None = None,
+    bloodwork_result: dict | None = None,
+    detox_result: dict | None = None,
+    economics_result: dict | None = None,
+    personal_econ_result: dict | None = None,
+    urologic_result: dict | None = None,
+    deep_ancestry_result: dict | None = None,
+    blood_type_result: dict | None = None,
+    immunogenetics_result: dict | None = None,
+    neurochemistry_result: dict | None = None,
+    addiction_genetics_result: dict | None = None,
+    holistic_synthesis_result: dict | None = None,
+    clinical_variants_result: dict | None = None,
+    novel_variants_result: dict | None = None,
+    voi_result: dict | None = None,
+    polygenic_traits_result: dict | None = None,
+    environmental_optimization_result: dict | None = None,
+    family_planning_result: dict | None = None,
+    y_result: dict | None = None,
+    mt_result: dict | None = None,
 ) -> str:
     """Build a rich context block describing the user's genetic + phenotypic
     state. Ordered so the highest-signal / most-actionable items come first."""
-    lines: List[str] = []
+    lines: list[str] = []
 
     # Header ─────────────────────────────────────────────────────────────────
     if tier1_path.exists():
@@ -462,7 +460,7 @@ _TOPIC_HINTS = [
 ]
 
 
-def suggest_followups(user_q: str, answer: str) -> List[str]:
+def suggest_followups(user_q: str, answer: str) -> list[str]:
     text = (user_q + " " + answer).lower()
     for pat, qs in _TOPIC_HINTS:
         if re.search(pat, text):
@@ -492,7 +490,7 @@ _HELP_TEXT = """\
 """
 
 
-def _save_transcript(history: List[Dict[str, str]], path: Path, model: str) -> None:
+def _save_transcript(history: list[dict[str, str]], path: Path, model: str) -> None:
     stamp = _dt.datetime.now().strftime("%Y-%m-%d %H:%M")
     with open(path, "w", encoding="utf-8") as f:
         f.write(f"# DNA Chat Transcript — {stamp}\n\n_Model:_ `{model}`\n\n---\n\n")
@@ -505,32 +503,32 @@ def _save_transcript(history: List[Dict[str, str]], path: Path, model: str) -> N
 
 def run_chat(
     model: str = "qwen3:14b",
-    tier1_path: Optional[Path] = None,
-    pgx_result: Optional[Dict] = None,
-    prs_result: Optional[Dict] = None,
-    traits_result: Optional[Dict] = None,
-    carrier_result: Optional[Dict] = None,
-    interactions_result: Optional[Dict] = None,
-    ancestry_result: Optional[Dict] = None,
-    bloodwork_result: Optional[Dict] = None,
-    detox_result: Optional[Dict] = None,
-    economics_result: Optional[Dict] = None,
-    personal_econ_result: Optional[Dict] = None,
-    urologic_result: Optional[Dict] = None,
-    deep_ancestry_result: Optional[Dict] = None,
-    blood_type_result: Optional[Dict] = None,
-    immunogenetics_result: Optional[Dict] = None,
-    neurochemistry_result: Optional[Dict] = None,
-    addiction_genetics_result: Optional[Dict] = None,
-    holistic_synthesis_result: Optional[Dict] = None,
-    clinical_variants_result: Optional[Dict] = None,
-    novel_variants_result: Optional[Dict] = None,
-    voi_result: Optional[Dict] = None,
-    polygenic_traits_result: Optional[Dict] = None,
-    environmental_optimization_result: Optional[Dict] = None,
-    family_planning_result: Optional[Dict] = None,
-    y_result: Optional[Dict] = None,
-    mt_result: Optional[Dict] = None,
+    tier1_path: Path | None = None,
+    pgx_result: dict | None = None,
+    prs_result: dict | None = None,
+    traits_result: dict | None = None,
+    carrier_result: dict | None = None,
+    interactions_result: dict | None = None,
+    ancestry_result: dict | None = None,
+    bloodwork_result: dict | None = None,
+    detox_result: dict | None = None,
+    economics_result: dict | None = None,
+    personal_econ_result: dict | None = None,
+    urologic_result: dict | None = None,
+    deep_ancestry_result: dict | None = None,
+    blood_type_result: dict | None = None,
+    immunogenetics_result: dict | None = None,
+    neurochemistry_result: dict | None = None,
+    addiction_genetics_result: dict | None = None,
+    holistic_synthesis_result: dict | None = None,
+    clinical_variants_result: dict | None = None,
+    novel_variants_result: dict | None = None,
+    voi_result: dict | None = None,
+    polygenic_traits_result: dict | None = None,
+    environmental_optimization_result: dict | None = None,
+    family_planning_result: dict | None = None,
+    y_result: dict | None = None,
+    mt_result: dict | None = None,
 ) -> None:
     """Start an interactive chat session. Returns when the user exits."""
     import requests
@@ -566,7 +564,7 @@ def run_chat(
     print("Type your question, or \033[36m/help\033[0m for commands. \033[36mexit\033[0m to leave.")
     print("\033[1m" + "─" * 72 + "\033[0m")
 
-    def _system_msg() -> Dict[str, str]:
+    def _system_msg() -> dict[str, str]:
         prompt = system_prompt(mode)
         if topic_bias:
             prompt += (f"\n\nThe user is currently focused on the topic: "
@@ -575,7 +573,7 @@ def run_chat(
         return {"role": "system",
                 "content": prompt + "\n\n--- GENETIC CONTEXT ---\n" + context}
 
-    history: List[Dict[str, str]] = [_system_msg()]
+    history: list[dict[str, str]] = [_system_msg()]
 
     while True:
         try:

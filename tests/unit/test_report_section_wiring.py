@@ -3,13 +3,14 @@ build_html_report into rendered sections. The unit tests exercise the analyzers;
 this checks the wiring (signature -> section var -> body) that unit tests miss."""
 
 from __future__ import annotations
+
 import pandas as pd
 
-import renderers
-import family_planning
-import polygenic_traits
 import environmental_optimization
+import family_planning
 import life_stage_playbook
+import polygenic_traits
+import renderers
 
 
 def _min_tier1():

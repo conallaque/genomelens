@@ -12,7 +12,6 @@ import pytest
 
 from econ import params as ep
 
-
 # ── Registry integrity ────────────────────────────────────────────────────
 
 def test_registry_validates_clean():

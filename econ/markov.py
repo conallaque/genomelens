@@ -32,7 +32,7 @@ submissions. Every assumption is a named argument you can change and re-run.
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Optional, Sequence
+from collections.abc import Sequence
 
 try:
     import numpy as np
@@ -62,7 +62,7 @@ def _gompertz_mortality(age: float, a: float = 0.0001, b: float = 0.085) -> floa
 
 
 def build_transition_matrix(p_well_to_disease: float, p_disease_death_excess: float,
-                            p_background_death: float) -> List[List[float]]:
+                            p_background_death: float) -> list[list[float]]:
     """Assemble a validated 3×3 transition matrix for (Well, Disease, Dead).
 
     Competing risks are handled by construction: from **Well** you may develop the
@@ -96,7 +96,7 @@ def run_markov(strategy: str = "standard_care",
                utility_well: float = 0.90, utility_disease: float = 0.68,
                excess_mortality_rate: float = 0.035,
                discount_rate: float = DISCOUNT_RATE,
-               half_cycle: bool = True) -> Dict:
+               half_cycle: bool = True) -> dict:
     """Run one strategy through the cohort model and return the trace + totals.
 
     ``strategy='genomic_guided'`` applies ``rrr_intervention`` to the Well→Disease
@@ -105,7 +105,7 @@ def run_markov(strategy: str = "standard_care",
     """
     guided = strategy == "genomic_guided"
     cohort = [1.0, 0.0, 0.0]                       # everyone starts Well
-    trace: List[Dict] = []
+    trace: list[dict] = []
     tot_cost = tot_qaly = tot_ly = 0.0
 
     for t in range(cycles):
@@ -159,7 +159,7 @@ def run_markov(strategy: str = "standard_care",
     }
 
 
-def markov_cost_effectiveness(wtp: float = 100_000.0, **kwargs) -> Dict:
+def markov_cost_effectiveness(wtp: float = 100_000.0, **kwargs) -> dict:
     """Run both strategies and produce the incremental analysis (ΔC, ΔQ, ICER, NMB).
 
     This is the deliverable an HTA body reads: two arms, an incremental
@@ -221,7 +221,7 @@ def markov_cost_effectiveness(wtp: float = 100_000.0, **kwargs) -> Dict:
     }
 
 
-def validate_markov(result: Dict) -> Dict:
+def validate_markov(result: dict) -> dict:
     """Structural validation an HTA reviewer would run: cohort conservation, an
     absorbing death state, and monotone accumulation of deaths."""
     checks, ok = [], True
@@ -258,7 +258,7 @@ def budget_impact(plan_members: int = 1_000_000,
                   actionable_fraction: float = 0.20,
                   annual_offset_per_actionable: float = 900.0,
                   annual_intervention_cost: float = 250.0,
-                  horizon_years: int = 5) -> Dict:
+                  horizon_years: int = 5) -> dict:
     """**Budget impact analysis** — the payer's affordability question.
 
     Deliberately *not* a CEA. Per the ISPOR BIA Task Force the conventions differ:

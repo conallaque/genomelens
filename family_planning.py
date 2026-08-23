@@ -19,9 +19,7 @@ East Asian populations.
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Any, Dict, List, Optional
-
+from typing import Any
 
 # Per-condition severity + carrier frequency context. "severity" ranks:
 #   "critical_childhood"  — serious, often fatal in childhood without intervention
@@ -29,7 +27,7 @@ from typing import Any, Dict, List, Optional
 #   "moderate"            — clinically meaningful but variable penetrance
 #   "informational"       — useful context but lower urgency
 
-CONDITION_CONTEXT: Dict[str, Dict] = {
+CONDITION_CONTEXT: dict[str, dict] = {
     "Hereditary Hemochromatosis (HH, type 1)": {
         "severity": "significant_adult",
         "carrier_freq": {
@@ -209,11 +207,11 @@ SEVERITY_LABEL = {
 }
 
 
-def build_carrier_report(carrier_result: Dict) -> Dict:
+def build_carrier_report(carrier_result: dict) -> dict:
     """Reorganise carrier_result by severity + attach context."""
-    sections: Dict[str, List[Dict]] = {sev: [] for sev in SEVERITY_ORDER}
+    sections: dict[str, list[dict]] = {sev: [] for sev in SEVERITY_ORDER}
 
-    all_findings: List[Dict] = []
+    all_findings: list[dict] = []
     for entry in carrier_result.get("affected", []):
         all_findings.append({**entry, "status_label": "AFFECTED (homozygous)"})
     for entry in carrier_result.get("carriers", []):
@@ -235,7 +233,7 @@ def build_carrier_report(carrier_result: Dict) -> Dict:
     }
 
 
-def _summary_text(sections: Dict, carrier_result: Dict) -> str:
+def _summary_text(sections: dict, carrier_result: dict) -> str:
     parts = []
     n_aff = carrier_result.get("n_affected", 0)
     n_car = carrier_result.get("n_carriers", 0)
@@ -262,7 +260,7 @@ def _summary_text(sections: Dict, carrier_result: Dict) -> str:
 
 # ── Standalone HTML renderer ──────────────────────────────────────────────────
 
-def render_carrier_html(carrier_report: Dict, file_label: str = "",
+def render_carrier_html(carrier_report: dict, file_label: str = "",
                         version: str = "v3.0.0") -> str:
     """Render the family-planning carrier report as a standalone HTML page."""
     import datetime as _dt
@@ -733,12 +731,12 @@ def _pct(x: float) -> str:
     return f"{x*100:.2f}%"
 
 
-def _dosage_of(entry: Dict) -> int:
+def _dosage_of(entry: dict) -> int:
     d = entry.get("dosage")
     return d if isinstance(d, int) else (1 if "AFFECTED" not in entry.get("status_label", "") else 2)
 
 
-def analyze_family_planning(carrier_result: Optional[Dict] = None,
+def analyze_family_planning(carrier_result: dict | None = None,
                             # Accepted and ignored. The pipeline passes the
                             # tier-1 result LIST here against a Dict
                             # annotation; nothing in this function ever read
@@ -746,19 +744,19 @@ def analyze_family_planning(carrier_result: Optional[Dict] = None,
                             # signature because callers pass it by keyword,
                             # but annotated honestly rather than removed in a
                             # cleanup commit.
-                            tier1_results: Optional[Any] = None,
-                            mt_result: Optional[Dict] = None,
+                            tier1_results: Any | None = None,
+                            mt_result: dict | None = None,
                             snps_df=None,
-                            inferred_sex: Optional[str] = None,
-                            ancestry: str = "European") -> Dict:
+                            inferred_sex: str | None = None,
+                            ancestry: str = "European") -> dict:
     """Reason quantitatively about what the person's genome means for future
     children. Returns recessive compound-risk items, dominant-transmission
     items (transmission vs penetrance kept separate), sex-gated mtDNA notes,
     and hereditary-cancer partner-screening guidance."""
     carrier_result = carrier_result or {}
 
-    recessive_items: List[Dict] = []
-    dominant_items: List[Dict] = []
+    recessive_items: list[dict] = []
+    dominant_items: list[dict] = []
 
     def _iter(entries, status):
         for e in entries or []:

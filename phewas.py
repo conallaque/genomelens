@@ -31,7 +31,7 @@ GWAS (UK Biobank, GLGC, MAGIC, GIANT, etc.). Results are estimates only.
 from __future__ import annotations
 
 from math import erf, sqrt
-from typing import Dict, List, Optional
+
 import pandas as pd
 
 
@@ -39,7 +39,7 @@ def _norm_cdf(z: float) -> float:
     return 0.5 * (1.0 + erf(z / sqrt(2.0)))
 
 
-def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> Optional[int]:
+def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> int | None:
     if rsid not in snps_df.index:
         return None
     gt = snps_df.loc[rsid].get("genotype")
@@ -63,7 +63,7 @@ def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> Optional[int]:
 # Effect sizes (beta) are in SD units of the trait unless marked. AFs are
 # European (1000G EUR).
 
-PHEWAS_TRAITS: Dict[str, Dict] = {
+PHEWAS_TRAITS: dict[str, dict] = {
 
     # ── Lipids ─────────────────────────────────────────────────────────────
     "LDL cholesterol": {
@@ -512,7 +512,7 @@ PHEWAS_TRAITS: Dict[str, Dict] = {
 
 # ─── Core ─────────────────────────────────────────────────────────────────────
 
-def _score_trait(snps_df: pd.DataFrame, trait: Dict, sex: Optional[str]) -> Dict:
+def _score_trait(snps_df: pd.DataFrame, trait: dict, sex: str | None) -> dict:
     applies_to = trait.get("applies_to")
     if applies_to == "female" and sex == "male":
         return {"status": "not_applicable", "reason": "Female-specific trait"}
@@ -611,9 +611,9 @@ def _score_trait(snps_df: pd.DataFrame, trait: Dict, sex: Optional[str]) -> Dict
     }
 
 
-def analyze_phewas(snps_df: pd.DataFrame, sex: Optional[str] = None) -> Dict:
-    results: Dict[str, Dict] = {}
-    by_category: Dict[str, List[str]] = {}
+def analyze_phewas(snps_df: pd.DataFrame, sex: str | None = None) -> dict:
+    results: dict[str, dict] = {}
+    by_category: dict[str, list[str]] = {}
     for trait_name, trait_def in PHEWAS_TRAITS.items():
         r = _score_trait(snps_df, trait_def, sex)
         results[trait_name] = {**trait_def, "result": r}

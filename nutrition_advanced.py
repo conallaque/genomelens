@@ -15,11 +15,10 @@ typically explaining 5-25% of heritable risk).
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple
 import pandas as pd
 
 
-def _gt(snps_df: Optional[pd.DataFrame], rsid: str) -> Optional[str]:
+def _gt(snps_df: pd.DataFrame | None, rsid: str) -> str | None:
     if snps_df is None or rsid not in snps_df.index:
         return None
     raw = snps_df.loc[rsid].get("genotype")
@@ -31,7 +30,7 @@ def _gt(snps_df: Optional[pd.DataFrame], rsid: str) -> Optional[str]:
     return s
 
 
-def _dose(gt: Optional[str], risk: str) -> int:
+def _dose(gt: str | None, risk: str) -> int:
     """Return 0, 1, or 2 — number of risk alleles."""
     if not gt:
         return 0
@@ -111,11 +110,11 @@ _PGS_DEFS = {
 }
 
 
-def _score_pgs(snps_df, defn: List[Tuple]) -> Dict:
+def _score_pgs(snps_df, defn: list[tuple]) -> dict:
     raw = 0.0
     max_possible = 0.0
-    loci_typed: List[str] = []
-    loci_missing: List[str] = []
+    loci_typed: list[str] = []
+    loci_missing: list[str] = []
     for rsid, risk_allele, weight, label in defn:
         gt = _gt(snps_df, rsid)
         max_possible += 2 * weight
@@ -159,7 +158,7 @@ def _phi(z: float) -> float:
     return cdf if z >= 0 else 1 - cdf
 
 
-def _tier_from_percentile(p: Optional[float]) -> str:
+def _tier_from_percentile(p: float | None) -> str:
     if p is None:
         return "Insufficient data"
     if p >= 90: return "Very high"
@@ -171,8 +170,8 @@ def _tier_from_percentile(p: Optional[float]) -> str:
     return "Very low"
 
 
-def analyze_polygenic_scores(snps_df) -> Dict:
-    out: Dict[str, Dict] = {}
+def analyze_polygenic_scores(snps_df) -> dict:
+    out: dict[str, dict] = {}
     for trait, defn in _PGS_DEFS.items():
         s = _score_pgs(snps_df, defn)
         s["tier"] = _tier_from_percentile(s.get("percentile"))
@@ -185,7 +184,7 @@ def analyze_polygenic_scores(snps_df) -> Dict:
 # Synthesises five lipid/glycaemic axes into a quantitative profile with
 # specific dietary leverage points.
 
-def cardiometabolic_dashboard(pgs: Dict) -> Dict:
+def cardiometabolic_dashboard(pgs: dict) -> dict:
     axes = []
     for key, label, low_advice, high_advice in [
         ("LDL_cholesterol", "LDL response to saturated fat",
@@ -232,12 +231,12 @@ def cardiometabolic_dashboard(pgs: Dict) -> Dict:
 
 # ── Inflammation Index ──────────────────────────────────────────────────────
 
-def inflammation_index(snps_df) -> Dict:
+def inflammation_index(snps_df) -> dict:
     il6 = _gt(snps_df, "rs1800795")
     crp = _gt(snps_df, "rs2794520") or _gt(snps_df, "rs1205")
     tnf = _gt(snps_df, "rs1800629")
     score = 0
-    factors: List[str] = []
+    factors: list[str] = []
     if il6:
         factors.append(f"rs1800795 (IL6 -174) {il6}")
         if "G" in il6: score += il6.count("G")
@@ -270,12 +269,12 @@ def inflammation_index(snps_df) -> Dict:
 
 # ── Histamine intolerance ───────────────────────────────────────────────────
 
-def histamine_intolerance(snps_df) -> Dict:
+def histamine_intolerance(snps_df) -> dict:
     dao1 = _gt(snps_df, "rs10156191")
     dao2 = _gt(snps_df, "rs1049742")
     hnmt = _gt(snps_df, "rs11558538")
     score = 0
-    factors: List[str] = []
+    factors: list[str] = []
     if dao1:
         factors.append(f"rs10156191 (DAO/AOC1) {dao1}")
         if "T" in dao1: score += dao1.count("T")
@@ -306,7 +305,7 @@ def histamine_intolerance(snps_df) -> Dict:
 
 # ── Detoxification (Phase I + Phase II) ─────────────────────────────────────
 
-def detoxification_profile(snps_df) -> Dict:
+def detoxification_profile(snps_df) -> dict:
     # Phase I — CYP enzymes
     cyp1a2 = _gt(snps_df, "rs762551")           # caffeine, polycyclic aromatic hydrocarbons
     cyp1a1 = _gt(snps_df, "rs1048943")          # estrogen 2-hydroxylation
@@ -318,8 +317,8 @@ def detoxification_profile(snps_df) -> Dict:
     nat2 = _gt(snps_df, "rs1799929") or _gt(snps_df, "rs1799930")
     sult1a1 = _gt(snps_df, "rs9282861")
     comt = _gt(snps_df, "rs4680")
-    phase1: List[str] = []
-    phase2: List[str] = []
+    phase1: list[str] = []
+    phase2: list[str] = []
     for label, gt in [("CYP1A2", cyp1a2), ("CYP1A1", cyp1a1), ("CYP2D6", cyp2d6_proxy),
                       ("CYP3A4", cyp3a4)]:
         if gt:
@@ -358,9 +357,9 @@ def detoxification_profile(snps_df) -> Dict:
 # glucose is likely to stay <140 mg/dL. Drawn from TCF7L2/MTNR1B/GCKR effect
 # sizes (each risk allele ~5-10 g/meal tolerance reduction).
 
-def glycemic_threshold(snps_df) -> Dict:
+def glycemic_threshold(snps_df) -> dict:
     base = 75  # g/meal — population average for a healthy adult
-    factors: List[str] = []
+    factors: list[str] = []
     adj = 0
     tcf = _gt(snps_df, "rs7903146")
     mtnr = _gt(snps_df, "rs10830963")
@@ -399,7 +398,7 @@ def glycemic_threshold(snps_df) -> Dict:
 
 # ── Training-day vs Rest-day Macro Periodisation ────────────────────────────
 
-def macro_periodisation(macros: Dict, glycemic: Dict, satiety: Dict) -> Dict:
+def macro_periodisation(macros: dict, glycemic: dict, satiety: dict) -> dict:
     base_carb = macros["pct_carbs"]
     train_day_carb = min(60, base_carb + 15)
     rest_day_carb = max(15, base_carb - 10)
@@ -431,7 +430,7 @@ def macro_periodisation(macros: Dict, glycemic: Dict, satiety: Dict) -> Dict:
 
 # ── Quantitative Weekly Food Matrix ─────────────────────────────────────────
 
-def weekly_food_matrix(result_partial: Dict) -> Dict:
+def weekly_food_matrix(result_partial: dict) -> dict:
     """
     Convert genotype findings into a concrete weekly serving target per food
     group. Result_partial is the in-progress nutrition dict (must contain
@@ -517,7 +516,7 @@ def weekly_food_matrix(result_partial: Dict) -> Dict:
 
 # ── Concrete Shopping List ──────────────────────────────────────────────────
 
-def shopping_list(matrix: Dict) -> List[Dict]:
+def shopping_list(matrix: dict) -> list[dict]:
     sv = matrix["servings_per_week"]
     items = [
         {"category": "Proteins",
@@ -568,7 +567,7 @@ def shopping_list(matrix: Dict) -> List[Dict]:
 
 # ── Generated Recipes ───────────────────────────────────────────────────────
 
-def generate_recipes(result_partial: Dict) -> List[Dict]:
+def generate_recipes(result_partial: dict) -> list[dict]:
     low_carb = result_partial["macros"]["pct_carbs"] <= 35
     e4 = result_partial.get("saturated_fat", {}).get("apoe_genotype", "").startswith("ε4")
     high_omega3 = result_partial.get("omega3", {}).get("ala_conversion") == "Poor"
@@ -672,7 +671,7 @@ def generate_recipes(result_partial: Dict) -> List[Dict]:
 
 # ── Public synthesis API ────────────────────────────────────────────────────
 
-def analyze_advanced_nutrition(snps_df, base_result: Dict) -> Dict:
+def analyze_advanced_nutrition(snps_df, base_result: dict) -> dict:
     """Run all advanced analyzers and return a unified extension dict."""
     pgs = analyze_polygenic_scores(snps_df)
     dashboard = cardiometabolic_dashboard(pgs)

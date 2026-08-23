@@ -42,10 +42,7 @@ pregnancy.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
-
 import pandas as pd
-
 
 # ── ABO ────────────────────────────────────────────────────────────────────
 
@@ -61,7 +58,7 @@ _ABO_MARKERS = {
 }
 
 
-def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
+def _gt(snps_df: pd.DataFrame, rsid: str) -> str | None:
     if rsid not in snps_df.index:
         return None
     row = snps_df.loc[rsid]
@@ -74,16 +71,16 @@ def _gt(snps_df: pd.DataFrame, rsid: str) -> Optional[str]:
     return s or None
 
 
-def analyze_abo(snps_df: pd.DataFrame) -> Dict:
+def analyze_abo(snps_df: pd.DataFrame) -> dict:
     """Predict ABO phenotype and genotype from consumer-chip SNPs.
 
     Returns a dict with keys: available, phenotype ('A' | 'B' | 'AB' | 'O' |
     'inconclusive'), genotype (e.g. 'A/O', 'A/A', 'A/B', 'O/O'), confidence,
     carries_hidden_O (bool), evidence (list of {rsid, gt, interpretation})."""
-    ev: List[Dict] = []
+    ev: list[dict] = []
 
     o_gt = _gt(snps_df, "rs8176719")   # Frameshift: D = O, I = A/B
-    a_b_calls: List[str] = []          # 'A' or 'B' per non-O allele evidence
+    a_b_calls: list[str] = []          # 'A' or 'B' per non-O allele evidence
 
     def _record(rsid, interp):
         ev.append({"rsid": rsid, "gt": _gt(snps_df, rsid) or "—",
@@ -205,12 +202,12 @@ _RHD_TAG_SNPS = {
 _RHD_LOCUS = ("1", 25_580_000, 25_680_000)
 
 
-def analyze_rhd(snps_df: pd.DataFrame) -> Dict:
+def analyze_rhd(snps_df: pd.DataFrame) -> dict:
     """Predict Rh(D) status. Prefer dedicated tag SNPs when present; otherwise
     fall back to a coverage-based inference over the RHD gene body."""
 
     # ── Preferred: dedicated tag SNPs ────
-    tag_hits: List[Dict] = []
+    tag_hits: list[dict] = []
     for rsid, (desc, rh_neg, rh_pos) in _RHD_TAG_SNPS.items():
         gt = _gt(snps_df, rsid)
         if gt:
@@ -277,13 +274,13 @@ def analyze_rhd(snps_df: pd.DataFrame) -> Dict:
 
 # ── FUT2 secretor + Bombay ─────────────────────────────────────────────────
 
-def analyze_secretor_bombay(snps_df: pd.DataFrame) -> Dict:
+def analyze_secretor_bombay(snps_df: pd.DataFrame) -> dict:
     """FUT2 rs601338 secretor status (routine accompaniment to blood typing;
     non-secretors don't express ABO antigens in saliva / body fluids), and
     FUT1 rs28362590 Bombay-phenotype check (extremely rare, but medically
     critical — Bombay individuals appear O on standard typing but reject
     O-transfusions)."""
-    ev: List[Dict] = []
+    ev: list[dict] = []
 
     # FUT2 rs601338 — A = non-secretor (loss of function); G = secretor
     fut2 = _gt(snps_df, "rs601338")
@@ -311,7 +308,7 @@ def analyze_secretor_bombay(snps_df: pd.DataFrame) -> Dict:
 
 # ── Master analyzer ────────────────────────────────────────────────────────
 
-def analyze_blood_type(snps_df: pd.DataFrame) -> Dict:
+def analyze_blood_type(snps_df: pd.DataFrame) -> dict:
     """Full blood-type work-up: ABO + Rh(D) + secretor status."""
     abo = analyze_abo(snps_df)
     rhd = analyze_rhd(snps_df)

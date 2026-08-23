@@ -30,13 +30,10 @@ from __future__ import annotations
 
 import base64
 import io
-import json
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
-import pandas as pd
 import numpy as np
-
+import pandas as pd
 
 SCRIPT_DIR = Path(__file__).parent
 REF_DIR = SCRIPT_DIR / "reference" / "ancestry"
@@ -89,7 +86,7 @@ def _log(msg: str) -> None:
 # (diet/pigmentation) whose frequency tracks environment as well as ancestry —
 # kept in the panel but the report labels them so they aren't over-read.
 
-AIMS_PRIORS: Dict[str, Dict] = {
+AIMS_PRIORS: dict[str, dict] = {
     # ── Skin pigmentation (strong continental discriminators) ──────────────
     "rs1426654":  {"effect_allele": "A", "other_allele": "G", "EUR": 0.999, "AFR": 0.065, "EAS": 0.006, "SAS": 0.55, "AMR": 0.48, "gene": "SLC24A5", "note": "Ala111Thr — derived A = lighter skin, near-fixed in Europe."},
     "rs16891982": {"effect_allele": "G", "other_allele": "C", "EUR": 0.98,  "AFR": 0.05,  "EAS": 0.01,  "SAS": 0.30, "AMR": 0.55, "gene": "SLC45A2", "palindromic": True, "note": "C/G palindrome — displayed only, cannot be strand-oriented from genotype (this was the marker that mis-called European samples)."},
@@ -126,7 +123,7 @@ _COMPLEMENT = {"A": "T", "T": "A", "C": "G", "G": "C"}
 
 
 def _dosage(genotype: object, effect_allele: str,
-            other_allele: Optional[str] = None) -> Optional[int]:
+            other_allele: str | None = None) -> int | None:
     """Strand-aware effect-allele dosage (0/1/2) from a 2-char genotype.
 
     When `other_allele` is supplied, detect whether the genotype is reported on
@@ -177,7 +174,7 @@ MIN_AIMS_FOR_CALL = 4
 AMBIGUOUS_MARGIN_NATS = 2.3
 
 
-def estimate_ancestry_heuristic(snps_df: pd.DataFrame) -> Dict:
+def estimate_ancestry_heuristic(snps_df: pd.DataFrame) -> dict:
     """Rough single-population affinity from the curated AIM panel.
 
     This is NOT an admixture estimate. It computes, under a uniform prior, the
@@ -188,7 +185,7 @@ def estimate_ancestry_heuristic(snps_df: pd.DataFrame) -> Dict:
     once per block (see AIMS_PRIORS).
     """
     loglik = {sp: 0.0 for sp in SUPERPOPS}
-    used_aims: List[Dict] = []
+    used_aims: list[dict] = []
     seen_blocks: set = set()
     n_redundant = 0
     n_palindromic = 0
@@ -344,7 +341,7 @@ def estimate_ancestry_heuristic(snps_df: pd.DataFrame) -> Dict:
 
 
 # ── Full PCA mode (requires 1000G genotype data) ──────────────────────────────
-def _try_full_pca(snps_df: pd.DataFrame) -> Optional[Dict]:
+def _try_full_pca(snps_df: pd.DataFrame) -> dict | None:
     """Attempts a full PCA-based ancestry projection. Looks for the 1000G
     reference genotype matrix at reference/ancestry/kgp_aims.npz.
 
@@ -382,7 +379,7 @@ def _try_full_pca(snps_df: pd.DataFrame) -> Optional[Dict]:
 
     # Build user dosage vector aligned to rsids
     user_dose = np.full(len(rsids), np.nan)
-    for i, (rsid, ea) in enumerate(zip(rsids, effect_alleles)):
+    for i, (rsid, ea) in enumerate(zip(rsids, effect_alleles, strict=False)):
         if rsid in snps_df.index:
             row = snps_df.loc[rsid]
             if isinstance(row, pd.DataFrame):
@@ -488,7 +485,7 @@ def _try_full_pca(snps_df: pd.DataFrame) -> Optional[Dict]:
 # reaches appreciable frequency. Keys are matched by longest-prefix against the
 # terminal haplogroup, so "T1a1a" resolves via the "T" entry, "R1b1a2" via "R1b".
 
-_Y_GEOGRAPHY: Dict[str, Dict] = {
+_Y_GEOGRAPHY: dict[str, dict] = {
     # key: (region, {superpop: weight}, note)
     "R1b":  {"region": "Western & Atlantic Europe", "dist": {"EUR": 0.90, "AMR": 0.05, "SAS": 0.03, "AFR": 0.01, "EAS": 0.01}, "note": "The single most common paternal lineage in Western Europe."},
     "R1a":  {"region": "Eastern Europe, the Steppe, Central & South Asia", "dist": {"EUR": 0.55, "SAS": 0.35, "AMR": 0.05, "AFR": 0.025, "EAS": 0.025}, "note": "Spread with Bronze-Age steppe expansions; spans Slavic Europe and northern India."},
@@ -505,7 +502,7 @@ _Y_GEOGRAPHY: Dict[str, Dict] = {
     "C":    {"region": "Asia, Oceania & the Americas", "dist": {"EAS": 0.55, "AMR": 0.20, "SAS": 0.18, "EUR": 0.04, "AFR": 0.03}, "note": "A deep, widely scattered non-African lineage."},
 }
 
-_MT_GEOGRAPHY: Dict[str, Dict] = {
+_MT_GEOGRAPHY: dict[str, dict] = {
     "HV": {"region": "Europe & the Near East", "dist": {"EUR": 0.80, "SAS": 0.10, "AFR": 0.05, "AMR": 0.03, "EAS": 0.02}},
     "H":  {"region": "Europe (the most common European maternal lineage)", "dist": {"EUR": 0.85, "SAS": 0.07, "AFR": 0.04, "AMR": 0.02, "EAS": 0.02}},
     "V":  {"region": "Western Europe & the Mediterranean", "dist": {"EUR": 0.88, "AFR": 0.05, "SAS": 0.03, "AMR": 0.02, "EAS": 0.02}},
@@ -527,7 +524,7 @@ _MT_GEOGRAPHY: Dict[str, Dict] = {
 }
 
 
-def _match_geography(terminal: str, path_labels: List[str], table: Dict[str, Dict]) -> Optional[Dict]:
+def _match_geography(terminal: str, path_labels: list[str], table: dict[str, dict]) -> dict | None:
     """Longest-prefix match of a haplogroup label against a geography table.
 
     Tries the terminal haplogroup first, then each node from deepest to
@@ -552,15 +549,15 @@ def _match_geography(terminal: str, path_labels: List[str], table: Dict[str, Dic
     return None
 
 
-def _argmax_dist(dist: Dict[str, float]) -> str:
+def _argmax_dist(dist: dict[str, float]) -> str:
     return max(dist.items(), key=lambda kv: kv[1])[0] if dist else ""
 
 
-def haplogroup_geographic_prior(y_result: Optional[Dict],
-                                mt_result: Optional[Dict]) -> Dict:
+def haplogroup_geographic_prior(y_result: dict | None,
+                                mt_result: dict | None) -> dict:
     """Turn Y-DNA and mtDNA calls into geographic expectations over the five
     1000G superpopulations, for use as an ancestry sanity-check."""
-    out: Dict = {"paternal": None, "maternal": None}
+    out: dict = {"paternal": None, "maternal": None}
 
     if y_result and y_result.get("terminal_haplogroup") not in (
             None, "Unknown", "Insufficient Y-chromosome SNPs"):
@@ -592,9 +589,9 @@ def haplogroup_geographic_prior(y_result: Optional[Dict],
     return out
 
 
-def cross_check_ancestry(autosomal: Dict,
-                         y_result: Optional[Dict],
-                         mt_result: Optional[Dict]) -> Optional[Dict]:
+def cross_check_ancestry(autosomal: dict,
+                         y_result: dict | None,
+                         mt_result: dict | None) -> dict | None:
     """Compare the autosomal top call against the paternal/maternal lineages.
 
     Returns a verdict dict (or None if no uniparental data). The verdict is one
@@ -615,10 +612,10 @@ def cross_check_ancestry(autosomal: Dict,
     primary = autosomal.get("primary_population") or autosomal.get("marker_best_affinity")
     primary_long = SUPERPOP_LONG.get(primary, primary)
 
-    lines: List[str] = []
-    verdicts: List[str] = []
+    lines: list[str] = []
+    verdicts: list[str] = []
 
-    def _assess(line: Dict, which: str) -> None:
+    def _assess(line: dict, which: str) -> None:
         dist = line["dist"]
         weight_here = dist.get(primary, 0.0)
         dominant = line["dominant"]
@@ -685,8 +682,8 @@ def cross_check_ancestry(autosomal: Dict,
 
 
 def analyze_ancestry(snps_df: pd.DataFrame,
-                     y_result: Optional[Dict] = None,
-                     mt_result: Optional[Dict] = None) -> Dict:
+                     y_result: dict | None = None,
+                     mt_result: dict | None = None) -> dict:
     """Public entry point. Try full PCA; fall back to heuristic. When Y-DNA and/or
     mtDNA results are supplied, attach a uniparental geographic cross-check that
     flags autosomal calls incompatible with the deep paternal/maternal lineages.

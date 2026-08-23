@@ -51,12 +51,10 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
-
 
 # Map of free-form JSON keys → exact PheWAS trait name.
 # All variant spellings (case, dashes, common abbreviations) collapse here.
-_LAB_TO_PHEWAS: Dict[str, str] = {
+_LAB_TO_PHEWAS: dict[str, str] = {
     # Lipids
     "ldl":                "LDL cholesterol",
     "ldl_c":              "LDL cholesterol",
@@ -135,7 +133,7 @@ def _normalize_key(k: str) -> str:
     return k.strip().lower().replace(" ", "_").replace("-", "_")
 
 
-def load_bloodwork(path: str) -> Dict[str, float]:
+def load_bloodwork(path: str) -> dict[str, float]:
     """Read and normalise a bloodwork JSON file. Drops null/non-numeric values."""
     p = Path(path).expanduser()
     if not p.exists():
@@ -143,7 +141,7 @@ def load_bloodwork(path: str) -> Dict[str, float]:
     raw = json.loads(p.read_text())
     if not isinstance(raw, dict):
         raise ValueError("Bloodwork JSON must be an object at the top level.")
-    cleaned: Dict[str, float] = {}
+    cleaned: dict[str, float] = {}
     for k, v in raw.items():
         if v is None:
             continue
@@ -154,7 +152,7 @@ def load_bloodwork(path: str) -> Dict[str, float]:
     return cleaned
 
 
-def _classify(delta_sd: float) -> Tuple[str, str]:
+def _classify(delta_sd: float) -> tuple[str, str]:
     """
     Return (label, html_class) for a difference expressed in trait SDs.
 
@@ -196,7 +194,7 @@ _TRAJECTORY_TRACKED = [
 ]
 
 
-def _parse_series(history: List, scalars: Dict) -> List:
+def _parse_series(history: list, scalars: dict) -> list:
     """Normalize a list of timepoint dicts → sorted [(date, cleaned_labs)]."""
     out = []
     for i, entry in enumerate(history):
@@ -204,7 +202,7 @@ def _parse_series(history: List, scalars: Dict) -> List:
             continue
         date = entry.get("date") or entry.get("Date") or f"T{i + 1}"
         merged = {**scalars, **entry}
-        cleaned: Dict[str, float] = {}
+        cleaned: dict[str, float] = {}
         for k, v in merged.items():
             if k in ("date", "Date") or v is None:
                 continue
@@ -217,7 +215,7 @@ def _parse_series(history: List, scalars: Dict) -> List:
     return out
 
 
-def _build_trajectory(series: List, snps_df, meta: Dict) -> Optional[Dict]:
+def _build_trajectory(series: list, snps_df, meta: dict) -> dict | None:
     """Compute per-timepoint clinical score, biological age and tracked markers,
     then assemble the metric trajectories."""
     if len(series) < 2:
@@ -257,10 +255,10 @@ def _build_trajectory(series: List, snps_df, meta: Dict) -> Optional[Dict]:
 
 def compare_bloodwork(
     bloodwork_path: str,
-    phewas_result: Optional[Dict],
+    phewas_result: dict | None,
     snps_df=None,
-    meta: Optional[Dict] = None,
-) -> Dict:
+    meta: dict | None = None,
+) -> dict:
     """
     Build the comprehensive bloodwork analysis structure.
 
@@ -331,8 +329,8 @@ def compare_bloodwork(
         }
 
     traits = phewas_result["traits"]
-    rows: List[Dict] = []
-    unmatched: List[str] = []
+    rows: list[dict] = []
+    unmatched: list[str] = []
 
     for lab_key, actual_val in labs.items():
         trait_name = _LAB_TO_PHEWAS.get(lab_key)
@@ -436,7 +434,7 @@ def _build_interpretation(
                 f"measured {actual_tier.lower()}. Genotype is expressing as expected."
             )
         return (
-            f"Within prediction. Genotype and labs both average; nothing notable."
+            "Within prediction. Genotype and labs both average; nothing notable."
         )
 
     direction = "higher" if delta_sd > 0 else "lower"
@@ -508,7 +506,7 @@ SYSTEM_ORDER = [
 ]
 
 # ── Biomarker catalogue ───────────────────────────────────────────────────────
-_BIOMARKERS: List[Dict] = [
+_BIOMARKERS: list[dict] = [
     # ---- Lipids & cardiovascular ----
     _bm("total_cholesterol", "Total Cholesterol", "mg/dL", "Lipids & Cardiovascular",
         "high", (None, 200), (150, 199),
@@ -739,8 +737,8 @@ _BIOMARKERS: List[Dict] = [
 ]
 
 # Build lookups: canonical id + every alias → definition
-_BM_BY_ID: Dict[str, Dict] = {b["id"]: b for b in _BIOMARKERS}
-_ALIAS_TO_ID: Dict[str, str] = {}
+_BM_BY_ID: dict[str, dict] = {b["id"]: b for b in _BIOMARKERS}
+_ALIAS_TO_ID: dict[str, str] = {}
 for _b in _BIOMARKERS:
     _ALIAS_TO_ID[_b["id"]] = _b["id"]
     for _a in _b["aliases"]:
@@ -761,14 +759,14 @@ _STATUS_META = {
 }
 
 
-def _ranges_for(bm: Dict, sex: Optional[str]) -> Tuple[Tuple, Tuple]:
+def _ranges_for(bm: dict, sex: str | None) -> tuple[tuple, tuple]:
     if sex and bm.get("sex") and sex in bm["sex"]:
         s = bm["sex"][sex]
         return s.get("clinical", bm["clinical"]), s.get("optimal", bm["optimal"])
     return bm["clinical"], bm["optimal"]
 
 
-def classify_clinical(value: float, bm: Dict, sex: Optional[str] = None) -> str:
+def classify_clinical(value: float, bm: dict, sex: str | None = None) -> str:
     """Return a status key for a value against a biomarker's ranges."""
     (clo, chi), (olo, ohi) = _ranges_for(bm, sex)
     crit_lo, crit_hi = bm.get("critical", (None, None))
@@ -796,12 +794,12 @@ def classify_clinical(value: float, bm: Dict, sex: Optional[str] = None) -> str:
 
 # ── derived / calculated markers ──────────────────────────────────────────────
 
-def compute_derived_markers(vals: Dict[str, float], meta: Dict) -> Dict[str, float]:
+def compute_derived_markers(vals: dict[str, float], meta: dict) -> dict[str, float]:
     """Compute ratios and formula-based markers from whatever inputs exist.
 
     ``vals`` is keyed by canonical biomarker id. Returns a dict of derived
     canonical ids → value (only those computable from present inputs)."""
-    d: Dict[str, float] = {}
+    d: dict[str, float] = {}
     g = vals.get
     sex = (meta.get("sex") or "").upper()[:1]
     age = meta.get("age")
@@ -867,7 +865,7 @@ def compute_derived_markers(vals: Dict[str, float], meta: Dict) -> Dict[str, flo
 
 
 # Definitions for the derived markers (ranges/optimal/genes as applicable)
-_DERIVED_BMS: List[Dict] = [
+_DERIVED_BMS: list[dict] = [
     _bm("non_hdl", "Non-HDL Cholesterol", "mg/dL", "Lipids & Cardiovascular",
         "high", (None, 130), (None, 100),
         "All atherogenic cholesterol (total − HDL); a better target than LDL alone."),
@@ -915,7 +913,7 @@ for _b in _DERIVED_BMS:
 
 # ── genotype-aware interpretation ─────────────────────────────────────────────
 
-def _gt(snps_df, rsid: str) -> Optional[str]:
+def _gt(snps_df, rsid: str) -> str | None:
     try:
         if snps_df is None or rsid not in snps_df.index:
             return None
@@ -1011,7 +1009,7 @@ ADV_GROUP_ORDER = [
 
 
 def _phenoage_core(albumin_gdl, creatinine_mgdl, glucose_mgdl, crp_mgL,
-                   lymph_pct, mcv, rdw, alp, wbc, age) -> Tuple[float, float]:
+                   lymph_pct, mcv, rdw, alp, wbc, age) -> tuple[float, float]:
     """Levine 2018 PhenoAge. Returns (biological_age, 10-year_mortality_risk).
     Inputs are US clinical units and are converted to the formula's SI units
     (albumin g/L, creatinine µmol/L, glucose mmol/L, CRP mg/dL) before applying
@@ -1053,7 +1051,7 @@ _PHENOAGE_LABELS = {
 }
 
 
-def phenoage_levers(alb, creat, glu, crp, lymph_pct, mcv, rdw, alp, wbc, age) -> Dict:
+def phenoage_levers(alb, creat, glu, crp, lymph_pct, mcv, rdw, alp, wbc, age) -> dict:
     """Counterfactual attribution: how many biological-age years each modifiable
     marker is costing, and how many are recoverable if all were optimal."""
     cur = {"albumin": alb, "creatinine": creat, "glucose": glu, "crp": crp,
@@ -1134,7 +1132,7 @@ def prevent_ascvd_10yr(sex, age, total_chol, hdl, sbp, egfr,
 # Longevity-associated variants (meta-analysis of exceptional-longevity GWAS;
 # Revelas 2018, Sebastiani, Broer). Effect sizes are modest — a genetic "lean",
 # not a verdict — and are shown alongside the phenotypic PhenoAge clock.
-def _genetic_longevity(snps_df) -> Optional[Dict]:
+def _genetic_longevity(snps_df) -> dict | None:
     if snps_df is None:
         return None
     variants = []
@@ -1191,9 +1189,9 @@ def _genetic_longevity(snps_df) -> Optional[Dict]:
             "lean": lean[0], "summary": lean[1]}
 
 
-def compute_advanced_indices(labs: Dict[str, float], derived: Dict[str, float],
-                             meta: Dict, snps_df=None) -> Dict:
-    src: Dict[str, float] = {**labs, **derived}
+def compute_advanced_indices(labs: dict[str, float], derived: dict[str, float],
+                             meta: dict, snps_df=None) -> dict:
+    src: dict[str, float] = {**labs, **derived}
 
     def g(*keys):
         for k in keys:
@@ -1207,7 +1205,7 @@ def compute_advanced_indices(labs: Dict[str, float], derived: Dict[str, float],
 
     sex = (meta.get("sex") or "").upper()[:1] or None
     age = meta.get("age") or g("age")
-    indices: List[Dict] = []
+    indices: list[dict] = []
     bio = None
 
     def add(id, name, value, unit, group, status, label, interp, cite):
@@ -1516,8 +1514,8 @@ def compute_advanced_indices(labs: Dict[str, float], derived: Dict[str, float],
     }
 
 
-def analyze_clinical_bloodwork(labs: Dict[str, float], snps_df=None,
-                               meta: Optional[Dict] = None) -> Dict:
+def analyze_clinical_bloodwork(labs: dict[str, float], snps_df=None,
+                               meta: dict | None = None) -> dict:
     """Classify every supplied biomarker against clinical + optimal ranges,
     compute derived markers, add genotype-aware notes, and score each system."""
     meta = meta or {}
@@ -1527,8 +1525,8 @@ def analyze_clinical_bloodwork(labs: Dict[str, float], snps_df=None,
         meta = {**meta, "age": labs["age"]}
 
     # map supplied labs → canonical ids
-    vals: Dict[str, float] = {}
-    unrecognized: List[str] = []
+    vals: dict[str, float] = {}
+    unrecognized: list[str] = []
     for k, v in labs.items():
         cid = _ALIAS_TO_ID.get(k)
         if cid:
@@ -1539,7 +1537,7 @@ def analyze_clinical_bloodwork(labs: Dict[str, float], snps_df=None,
     derived = compute_derived_markers(vals, meta)
     all_vals = {**vals, **derived}
 
-    rows: List[Dict] = []
+    rows: list[dict] = []
     for cid, value in all_vals.items():
         bm = _BM_BY_ID.get(cid)
         if not bm:
@@ -1563,8 +1561,8 @@ def analyze_clinical_bloodwork(labs: Dict[str, float], snps_df=None,
         })
 
     # group by system + score
-    systems: List[Dict] = []
-    by_sys: Dict[str, List[Dict]] = {}
+    systems: list[dict] = []
+    by_sys: dict[str, list[dict]] = {}
     for r in rows:
         by_sys.setdefault(r["system"], []).append(r)
     for sysname in SYSTEM_ORDER:
@@ -1677,7 +1675,7 @@ table.cl th { background:#fbfcfd; font-size:.82em; text-transform:uppercase; let
 """
 
 
-def _score_color(score: Optional[int]) -> str:
+def _score_color(score: int | None) -> str:
     if score is None:
         return "#8a94a3"
     if score >= 85:
@@ -1687,7 +1685,7 @@ def _score_color(score: Optional[int]) -> str:
     return "#b3261e"
 
 
-def _range_text(r: Dict) -> str:
+def _range_text(r: dict) -> str:
     def fmt(lo, hi):
         if lo is not None and hi is not None:
             return f"{lo:g}–{hi:g}"
@@ -1702,7 +1700,7 @@ def _range_text(r: Dict) -> str:
             f" · optimal {opt}</span>")
 
 
-def _range_bar(r: Dict) -> str:
+def _range_bar(r: dict) -> str:
     """A small track showing the optimal band + a dot at the measured value."""
     v = r["value"]
     lo = r["optimal_low"] if r["optimal_low"] is not None else r["clinical_low"]
@@ -1764,7 +1762,7 @@ def _svg_age_gauge(chrono: float, bio: float) -> str:
 </svg>"""
 
 
-def _svg_radar(systems: List[Dict]) -> str:
+def _svg_radar(systems: list[dict]) -> str:
     """Radar/spider chart of body-system health scores (0–100)."""
     pts = [(s["system"], s["score"]) for s in systems if s.get("score") is not None]
     n = len(pts)
@@ -1800,7 +1798,7 @@ def _svg_radar(systems: List[Dict]) -> str:
 </svg>"""
 
 
-def _sparkline(vals: List, color: str) -> str:
+def _sparkline(vals: list, color: str) -> str:
     ys = [v for _, v in vals]
     n = len(ys)
     mn, mx = min(ys), max(ys)
@@ -1820,7 +1818,7 @@ def _sparkline(vals: List, color: str) -> str:
             f'{dots}<circle cx="{lx:.1f}" cy="{ly:.1f}" r="3" fill="{color}"/></svg>')
 
 
-def _render_trajectory(traj: Optional[Dict]) -> str:
+def _render_trajectory(traj: dict | None) -> str:
     """Longitudinal view: sparklines + direction for each tracked metric."""
     if not traj or not traj.get("metrics"):
         return ""
@@ -1865,7 +1863,7 @@ _BA_SLIDERS = [
 ]
 
 
-def _render_bioage_simulator(inputs: Optional[Dict]) -> str:
+def _render_bioage_simulator(inputs: dict | None) -> str:
     """An in-browser interactive PhenoAge calculator: drag the sliders and watch
     biological age recompute live (works in the HTML report; static in PDF)."""
     if not inputs:
@@ -1939,7 +1937,7 @@ def _render_bioage_simulator(inputs: Optional[Dict]) -> str:
 </div>"""
 
 
-def _render_genetic_longevity(gl: Optional[Dict]) -> str:
+def _render_genetic_longevity(gl: dict | None) -> str:
     """Longevity-associated variants from the user's genome, alongside the clock."""
     if not gl or not gl.get("variants"):
         return ""
@@ -1970,7 +1968,7 @@ def _render_genetic_longevity(gl: Optional[Dict]) -> str:
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px">{cards}</div>"""
 
 
-def _render_advanced_section(advanced: Optional[Dict]) -> str:
+def _render_advanced_section(advanced: dict | None) -> str:
     """Biological age + validated composite indices, each with its citation."""
     if not advanced or not advanced.get("available"):
         return ""
@@ -2077,7 +2075,7 @@ def _render_advanced_section(advanced: Optional[Dict]) -> str:
     </section>"""
 
 
-def _render_clinical_section(clinical: Dict) -> str:
+def _render_clinical_section(clinical: dict) -> str:
     if not clinical or not clinical.get("available"):
         return ""
     overall = clinical.get("overall_score")
@@ -2163,7 +2161,7 @@ def _render_clinical_section(clinical: Dict) -> str:
             "abnormal or borderline results with your clinician.</p>")
 
 
-def render_bloodwork_html(result: Dict, file_label: str = "") -> str:
+def render_bloodwork_html(result: dict, file_label: str = "") -> str:
     """Render the bloodwork analysis as a standalone HTML document: the
     comprehensive clinical panel first, then the genetic-prediction comparison."""
     clinical_dict = result.get("clinical") or {}

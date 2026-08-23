@@ -28,11 +28,9 @@ Each supplement entry:
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple
 import pandas as pd
 
 import snp_registry  # V7: single source of truth for rsID metadata + strand-aware dose
-
 
 # ── Low-level genotype helpers ──────────────────────────────────────────────
 #
@@ -43,7 +41,7 @@ import snp_registry  # V7: single source of truth for rsID metadata + strand-awa
 # don't break — but the rsID must now be in the registry, which forces every
 # downstream rule to declare its variant metadata in one place.
 
-def _gt(snps_df: Optional[pd.DataFrame], rsid: str) -> Optional[str]:
+def _gt(snps_df: pd.DataFrame | None, rsid: str) -> str | None:
     if snps_df is None or rsid not in snps_df.index:
         return None
     raw = snps_df.loc[rsid].get("genotype")
@@ -55,7 +53,7 @@ def _gt(snps_df: Optional[pd.DataFrame], rsid: str) -> Optional[str]:
     return s
 
 
-def _dose(snps_df: Optional[pd.DataFrame], rsid: str, allele: str) -> Optional[int]:
+def _dose(snps_df: pd.DataFrame | None, rsid: str, allele: str) -> int | None:
     gt = _gt(snps_df, rsid)
     if gt is None or len(gt) != 2:
         return None
@@ -63,11 +61,11 @@ def _dose(snps_df: Optional[pd.DataFrame], rsid: str, allele: str) -> Optional[i
 
 
 def _risk_dose(
-    snps_df: Optional[pd.DataFrame],
+    snps_df: pd.DataFrame | None,
     rsid: str,
     risk_allele: str | None = None,
     ref_allele: str | None = None,
-) -> Optional[int]:
+) -> int | None:
     """
     Strand-aware risk-allele dosage. **Delegates to the unified SNP registry.**
 
@@ -86,7 +84,7 @@ def _risk_dose(
     )
 
 
-def _chip_gap(rsid: str, gene_label: str, what_it_would_say: str) -> Dict:
+def _chip_gap(rsid: str, gene_label: str, what_it_would_say: str) -> dict:
     """
     Returns a placeholder entry surfaced when a rule's defining SNP is not on
     the chip. Lets the user see *why* a recommendation was missing rather than
@@ -129,7 +127,7 @@ TIER_OPTIONAL = "optional"
 
 # ── Methylation / B-vitamin rules ────────────────────────────────────────────
 
-def _rule_mthfr(snps_df) -> List[Dict]:
+def _rule_mthfr(snps_df) -> list[dict]:
     # MTHFR C677T (rs1801133) — T allele reduces enzyme activity 30-70% per copy.
     # Risk = T (+ strand) / A (− strand); ancestral = C (+) / G (−).
     t_dose = _risk_dose(snps_df, "rs1801133", "T", "C")
@@ -171,7 +169,7 @@ def _rule_mthfr(snps_df) -> List[Dict]:
     return []
 
 
-def _rule_mthfr_a1298c(snps_df) -> List[Dict]:
+def _rule_mthfr_a1298c(snps_df) -> list[dict]:
     # MTHFR A1298C (rs1801131) — A→C; risk = C (+) / G (−); ancestral = A (+) / T (−).
     risk = _risk_dose(snps_df, "rs1801131", "C", "A")
     if risk is None:
@@ -195,7 +193,7 @@ def _rule_mthfr_a1298c(snps_df) -> List[Dict]:
     return []
 
 
-def _rule_comt(snps_df) -> List[Dict]:
+def _rule_comt(snps_df) -> list[dict]:
     # COMT Val158Met (rs4680) — G→A; risk = A (Met, slow) on + strand or T on − strand.
     met_dose = _risk_dose(snps_df, "rs4680", "A", "G")
     val_dose = (2 - met_dose) if met_dose is not None else None
@@ -241,7 +239,7 @@ def _rule_comt(snps_df) -> List[Dict]:
 
 # ── Vitamin metabolism rules ────────────────────────────────────────────────
 
-def _rule_vitamin_d(snps_df, wellness, phewas) -> List[Dict]:
+def _rule_vitamin_d(snps_df, wellness, phewas) -> list[dict]:
     cyp2r1 = _dose(snps_df, "rs10741657", "G")
     gc = _dose(snps_df, "rs2282679", "C")
     vdr_taq = _gt(snps_df, "rs731236")
@@ -249,7 +247,7 @@ def _rule_vitamin_d(snps_df, wellness, phewas) -> List[Dict]:
 
     score = (cyp2r1 or 0) + (gc or 0)
     vdr_active = vdr_fok and "T" in vdr_fok
-    snps_used: List[str] = []
+    snps_used: list[str] = []
     if cyp2r1 is not None:
         snps_used.append(f"rs10741657 (CYP2R1) dose {cyp2r1}")
     if gc is not None:
@@ -300,7 +298,7 @@ def _rule_vitamin_d(snps_df, wellness, phewas) -> List[Dict]:
     }]
 
 
-def _rule_b12(snps_df) -> List[Dict]:
+def _rule_b12(snps_df) -> list[dict]:
     fut2 = _gt(snps_df, "rs602662")
     tcn2 = _gt(snps_df, "rs1801198")
     needs = []
@@ -327,7 +325,7 @@ def _rule_b12(snps_df) -> List[Dict]:
     }]
 
 
-def _rule_iron(snps_df, carrier) -> List[Dict]:
+def _rule_iron(snps_df, carrier) -> list[dict]:
     # HFE C282Y / H63D carriers should NOT routinely supplement iron
     if carrier:
         for entry in carrier.get("affected", []) + carrier.get("carriers", []):
@@ -369,7 +367,7 @@ def _rule_iron(snps_df, carrier) -> List[Dict]:
     return []
 
 
-def _rule_omega3(snps_df) -> List[Dict]:
+def _rule_omega3(snps_df) -> list[dict]:
     # FADS1 rs174547 — T allele = slower conversion of ALA → EPA/DHA.
     # Risk = T (+) / A (−); ancestral = C (+) / G (−).
     t_dose = _risk_dose(snps_df, "rs174547", "T", "C")
@@ -398,7 +396,7 @@ def _rule_omega3(snps_df) -> List[Dict]:
 
 # ── Hormones / inflammation rules ───────────────────────────────────────────
 
-def _rule_zinc_dhea(snps_df) -> List[Dict]:
+def _rule_zinc_dhea(snps_df) -> list[dict]:
     # SRD5A2 / AR / SHBG context — pragmatic: low SHBG genotypes often benefit
     # from zinc + boron support
     out = []
@@ -422,7 +420,7 @@ def _rule_zinc_dhea(snps_df) -> List[Dict]:
     return out
 
 
-def _rule_curcumin(snps_df, phewas) -> List[Dict]:
+def _rule_curcumin(snps_df, phewas) -> list[dict]:
     # IL6 -174 G/G (rs1800795 CC on - strand reported as GG) → high inflammation
     il6 = _gt(snps_df, "rs1800795")
     crp_pred = None
@@ -448,7 +446,7 @@ def _rule_curcumin(snps_df, phewas) -> List[Dict]:
     }]
 
 
-def _rule_glutathione(snps_df, tier1) -> List[Dict]:
+def _rule_glutathione(snps_df, tier1) -> list[dict]:
     # GSTM1/GSTT1 null and GSTP1 rs1695 — reduced detox capacity
     gstp = _gt(snps_df, "rs1695")
     nrf2 = _gt(snps_df, "rs6721961")
@@ -475,7 +473,7 @@ def _rule_glutathione(snps_df, tier1) -> List[Dict]:
 
 # ── Drug-metabolism awareness ───────────────────────────────────────────────
 
-def _rule_caffeine(snps_df) -> List[Dict]:
+def _rule_caffeine(snps_df) -> list[dict]:
     # CYP1A2 rs762551 — *1F (C) reduces inducibility → slow metaboliser.
     # Risk = C (+) / G (−); ancestral = A (+) / T (−).
     c_dose = _risk_dose(snps_df, "rs762551", "C", "A")
@@ -499,7 +497,7 @@ def _rule_caffeine(snps_df) -> List[Dict]:
     }]
 
 
-def _rule_creatine(snps_df, wellness) -> List[Dict]:
+def _rule_creatine(snps_df, wellness) -> list[dict]:
     # ACTN3 R577X (rs1815739) — C (+) / G (−) is R-allele (power); T (+) / A (−) is X.
     r_dose = _risk_dose(snps_df, "rs1815739", "C", "T")
     actn3 = _gt(snps_df, "rs1815739")
@@ -532,7 +530,7 @@ _TIER_ORDER = {
 
 # Rules whose absence from a chip should be surfaced explicitly to the user.
 # Each entry: (rsid, gene_label, what_it_would_inform).
-_KEY_RULE_SNPS: List[tuple] = [
+_KEY_RULE_SNPS: list[tuple] = [
     ("rs1801133", "MTHFR C677T",       "Methylfolate vs folic-acid recommendation."),
     ("rs1801131", "MTHFR A1298C",      "Methyl-B-complex recommendation."),
     ("rs4680",    "COMT Val158Met",    "Magnesium / SAM-e mood support."),
@@ -553,17 +551,17 @@ _KEY_RULE_SNPS: List[tuple] = [
 
 
 def build_supplement_stack(
-    snps_df: Optional[pd.DataFrame] = None,
-    pgx_result: Optional[Dict] = None,
-    wellness_result: Optional[Dict] = None,
-    carrier_result: Optional[Dict] = None,
-    phewas_result: Optional[Dict] = None,
-    tier1_results: Optional[List[Dict]] = None,
-    bloodwork_result: Optional[Dict] = None,
-) -> Dict:
+    snps_df: pd.DataFrame | None = None,
+    pgx_result: dict | None = None,
+    wellness_result: dict | None = None,
+    carrier_result: dict | None = None,
+    phewas_result: dict | None = None,
+    tier1_results: list[dict] | None = None,
+    bloodwork_result: dict | None = None,
+) -> dict:
     """Run every rule and consolidate into a tiered, deduplicated stack."""
-    all_recs: List[Dict] = []
-    chip_gaps: List[Dict] = []
+    all_recs: list[dict] = []
+    chip_gaps: list[dict] = []
     if snps_df is not None:
         all_recs.extend(_rule_mthfr(snps_df))
         all_recs.extend(_rule_mthfr_a1298c(snps_df))
@@ -586,7 +584,7 @@ def build_supplement_stack(
                 chip_gaps.append(_chip_gap(rsid, label, hint))
 
     # Deduplicate by name, keeping the highest-priority entry
-    by_name: Dict[str, Dict] = {}
+    by_name: dict[str, dict] = {}
     for rec in all_recs:
         key = rec["name"]
         if key not in by_name or _TIER_ORDER[rec["tier"]] < _TIER_ORDER[by_name[key]["tier"]]:
@@ -596,7 +594,7 @@ def build_supplement_stack(
     # Sort within each tier by category
     final.sort(key=lambda r: (_TIER_ORDER[r["tier"]], r["category"], r["name"]))
 
-    tiers: Dict[str, List[Dict]] = {
+    tiers: dict[str, list[dict]] = {
         TIER_ESSENTIAL: [], TIER_RECOMMENDED: [], TIER_OPTIONAL: [], "avoid": [],
         "chip_gap": chip_gaps,
     }
@@ -675,7 +673,7 @@ _SUPP_CSS = """
 """
 
 
-def _render_card(r: Dict) -> str:
+def _render_card(r: dict) -> str:
     snps = [s for s in r.get("snps", []) if s]
     return f"""
 <div class="sp-card sp-{r['tier']}">
@@ -690,7 +688,7 @@ def _render_card(r: Dict) -> str:
 """.strip()
 
 
-def render_supplements_html(result: Dict, file_label: str = "") -> str:
+def render_supplements_html(result: dict, file_label: str = "") -> str:
     if not result or result.get("status") != "ok":
         body = "<p>No supplement recommendations could be generated (insufficient genetic data).</p>"
     else:
