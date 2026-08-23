@@ -4,7 +4,7 @@ Asserts the structural conventions an HTA reviewer checks, not memorised outputs
 """
 from __future__ import annotations
 
-import markov_model as mk
+from econ import markov as mk
 
 
 # ── rate → probability ───────────────────────────────────────────────────────

@@ -40,7 +40,7 @@ except Exception:                       # pragma: no cover
     np = None
     _HAVE_NP = False
 
-from value_of_information import (
+from econ.value_of_information import (
     DISCOUNT_RATE, TEST_COST, WTP, _finding_nmb,
 )
 
@@ -615,7 +615,7 @@ def personalize_for_report(voi_result: Dict, age: float = 40.0,
     if not _HAVE_NP or not voi_result or not voi_result.get("available"):
         return {"available": False}
     try:
-        import heor_frontier as hf
+        from econ import frontier as hf
     except Exception:
         return {"available": False}
 

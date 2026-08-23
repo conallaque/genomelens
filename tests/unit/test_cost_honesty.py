@@ -12,8 +12,8 @@ Both assert THEORETICAL PROPERTIES (directions and invariants), not memorised ou
 """
 from __future__ import annotations
 
-import health_economics as he
-import value_of_information as voi
+from econ import health_economics as he
+from econ import value_of_information as voi
 
 
 # ── A) marginal vs average cost ──────────────────────────────────────────────

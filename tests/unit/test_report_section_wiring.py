@@ -56,7 +56,7 @@ def test_new_sections_appear_in_full_report():
          "negative_disclaimer": "n"})
 
     # Value-of-Information (health economics) renders headline + CEAC.
-    import value_of_information as voi
+    from econ import value_of_information as voi
     vres = voi.analyze_value_of_information(
         {"findings_with_economics": [
             {"finding": "CAD PRS high", "category": "prs", "qaly_gain": 1.5}]},

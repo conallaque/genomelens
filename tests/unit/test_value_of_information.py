@@ -1,7 +1,7 @@
 """Unit tests for the value-of-information health-economics engine."""
 from __future__ import annotations
 
-import value_of_information as voi
+from econ import value_of_information as voi
 
 
 def _econ():

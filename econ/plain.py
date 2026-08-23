@@ -35,7 +35,7 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional, Sequence
 
-import econ_params as ep
+from . import params as ep
 
 __all__ = [
     "number_needed_to_screen", "healthy_time_gained", "payback_period",

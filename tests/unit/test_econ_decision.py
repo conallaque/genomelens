@@ -9,9 +9,9 @@ was being written; the tests below are what caught them.
 
 import pytest
 
-import econ_decision as ed
-import econ_engine as ee
-import econ_params as ep
+from econ import decision as ed
+from econ import engine as ee
+from econ import params as ep
 
 
 def _build(conditions=(("CAD", 1.0), ("T2D", 1.0), ("Alzheimer", 1.0))):
@@ -189,7 +189,7 @@ def test_budget_impact_delegates_rather_than_duplicating():
     # alongside the one in markov_model, so the report contained two
     # affordability analyses with different conventions and different answers.
     # One question, one calculation.
-    import markov_model as mk
+    from econ import markov as mk
     mine = ed.budget_impact(per_person_cost=300, population=1_000_000)
     theirs = mk.budget_impact(plan_members=1_000_000, test_cost=300)
     assert mine["rows"] == theirs["rows"]
@@ -309,7 +309,7 @@ def test_decision_layer_prioritises_the_parameters_the_tornado_names():
 # gross-vs-net cost mismatch survived several passes.
 
 def _voi(input_type="chip", with_wgs_findings=False):
-    import value_of_information as voi
+    from econ import value_of_information as voi
     econ = {"findings_with_economics": [
         {"finding": "CAD polygenic score", "category": "Polygenic Risk",
          "qaly_gain": 0.5, "confidence": "moderate"},
@@ -405,7 +405,7 @@ def test_subgroup_table_declares_itself_illustrative():
 # confident English sentence on top of a hedged technical result. These tests
 # check the translation stays as honest as the thing it translates.
 
-import econ_plain as epl
+from econ import plain as epl
 
 
 def test_number_needed_to_screen_inverts_absolute_risk_reduction():

@@ -28,7 +28,7 @@ from __future__ import annotations
 import math
 from typing import Dict, List, Optional, Tuple
 
-import econ_params as _econ_params
+from . import params as _econ_params
 
 try:
     import numpy as np
@@ -748,7 +748,7 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
 
     # ── HEOR deliverables: Markov cohort CEA + payer budget impact ──
     try:
-        import markov_model as _mk
+        from . import markov as _mk
         _mkr = _mk.markov_cost_effectiveness(start_age=_age, wtp=wtp)
         _mkr["validation"] = _mk.validate_markov(_mkr)
         result["markov"] = _mkr
@@ -841,7 +841,7 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
     # charges one cost of illness, and reports the difference so the size of the
     # correction is visible rather than quietly banked.
     try:
-        import econ_engine as _ee
+        from . import engine as _ee
         _age = _resolve_age(genetic_age_result)
         # One constructor, used by the base case and by every PSA draw. These
         # were two copies of the same argument list, and the last time they
@@ -902,7 +902,7 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
         # worth, where the conclusion flips, which strategy wins, what it does
         # to a budget, and whether it works the same across age and sex.
         try:
-            import econ_decision as _ed
+            from . import decision as _ed
             # Scale the two-level Monte Carlo to the caller's simulation
             # budget. EVPPI is inherently O(outer x inner); at full fidelity
             # it dominates the run, and callers that passed a small n_mc were
@@ -971,7 +971,7 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
         # to anyone who has not done a health-economics course; a result
         # nobody can read is not a result.
         try:
-            import econ_plain as _epl
+            from . import plain as _epl
             _pooled["plain"] = _epl.build_plain_summary(_pooled)
         except Exception as _pe2:
             _pooled["plain"] = {"available": False, "reason": repr(_pe2)}

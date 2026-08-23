@@ -45,7 +45,7 @@ import os
 from dataclasses import dataclass, field
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
-import econ_params as ep
+from . import params as ep
 
 __all__ = [
     "Finding", "ConditionPool", "CEAResult", "MarkovResult",
@@ -58,7 +58,14 @@ __all__ = [
     "run_psa", "ceac", "tornado",
 ]
 
-_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+# One level up: this module lives in econ/ but the vendored life table stays
+# at the repository root. It has to — the .gitignore rule that keeps DNA out
+# of the repo is a blanket ``*.csv`` with a single path-anchored exception for
+# ``data/LifeTable_USA_Mx_2015.csv``. Move the file under econ/ and that
+# exception silently stops matching, so the life table quietly becomes
+# untracked while the DNA guard appears to still be in place.
+_DATA_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 _LIFE_TABLE_PATH = os.path.join(_DATA_DIR, "LifeTable_USA_Mx_2015.csv")
 
 # Condition anchors used by value_of_information._classify_category, mapped to

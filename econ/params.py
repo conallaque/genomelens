@@ -1038,7 +1038,7 @@ def audit_curated_tables() -> Dict:
     statement about a small corner of the model.
     """
     try:
-        import health_economics as _he
+        from . import health_economics as _he
     except Exception:
         return {"available": False, "n_params": 0}
     fields = ("cost", "outcome_value", "prevalence", "qaly_gain",
@@ -1100,7 +1100,7 @@ def count_unregistered_parameters() -> int:
     spine, not the whole skeleton.
     """
     try:
-        import health_economics as _he
+        from . import health_economics as _he
     except Exception:
         return 0
     fields = ("cost", "outcome_value", "prevalence", "qaly_gain",

@@ -10,7 +10,7 @@ import re
 
 import pytest
 
-import econ_params as ep
+from econ import params as ep
 
 
 # ── Registry integrity ────────────────────────────────────────────────────
@@ -246,7 +246,7 @@ def test_resolution_map_entries_are_well_formed():
 def test_resolution_map_keys_match_real_source_strings():
     # A key that matches nothing is a silent no-op — usually a typo made while
     # transcribing the src string.
-    import health_economics as he
+    from econ import health_economics as he
     live = set()
     for name in dir(he):
         if not (name.endswith("_ECONOMICS") or name.endswith("_COSTS")):

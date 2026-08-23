@@ -13,8 +13,8 @@ import sys
 
 import pytest
 
-import econ_engine as ee
-import econ_params as ep
+from econ import engine as ee
+from econ import params as ep
 
 
 def _f(label="f", coi="CAD", p=0.20, rrr=0.30, hc=1.0, cost=500.0, src=""):
@@ -553,7 +553,7 @@ def test_psa_without_rebuild_understates_uncertainty():
 
 def test_finding_defaults_are_registry_backed_not_literals():
     # The two numbers the whole benefit side rests on must be varyable.
-    import value_of_information as voi
+    from econ import value_of_information as voi
     econ = {"findings_with_economics": [
         {"finding": "x", "category": "Polygenic Risk", "qaly_gain": 0.5}]}
     base = voi._collect(econ, None, None, [])[0]
@@ -738,7 +738,7 @@ def test_personal_economics_uses_the_same_adherence_archetypes():
     # analysis charged adherence and this one did not, the report said 62% of
     # the benefit was lost on one page and reported the undiscounted total as
     # the headline dollar figure on the other.
-    import health_economics as he
+    from econ import health_economics as he
     assert set(he._CATEGORY_ADHERENCE.values()) <= (
         set(ee.ADHERENCE_BY_COI_KEY.values()) | {"adherence_default"}), \
         "the two pages must draw on one set of adherence parameters"
@@ -750,7 +750,7 @@ def test_every_personal_economics_category_is_mapped():
     # An unmapped category silently falls back to adherence_default. That is a
     # safe fallback, not a place to leave real categories sitting.
     import re
-    import health_economics as he
+    from econ import health_economics as he
     src = open(he.__file__).read()
     used = set(re.findall(r'^\s+add\("([^"]+)"', src, re.M))
     assert used, "could not find the add() call sites to check"
@@ -759,7 +759,7 @@ def test_every_personal_economics_category_is_mapped():
 
 
 def test_personal_economics_categories_do_not_default_to_perfect_adherence():
-    import health_economics as he
+    from econ import health_economics as he
     for cat in list(he._CATEGORY_ADHERENCE) + ["NoSuchCategory"]:
         assert he._adherence_for_category(cat) < 1.0
 
@@ -769,7 +769,7 @@ def test_the_efficacy_counterfactual_reconciles_with_the_discounted_total():
     # findings pooled the same way, not a figure captured before the
     # correlated-target discount. Captured pre-pooling it overstated the
     # counterfactual by ~$4k and made the adherence drag look bigger than it is.
-    import health_economics as he
+    from econ import health_economics as he
     items = [{"net": 1000, "adherence": 0.5}, {"net": 300, "adherence": 0.35}]
     eff = sum(i["net"] / i["adherence"] for i in items)
     assert eff == pytest.approx(2000 + 857.142857)
@@ -783,8 +783,42 @@ def test_the_efficacy_counterfactual_reconciles_with_the_discounted_total():
 def test_the_adherence_basis_is_stated_whenever_it_is_applied():
     # A page that silently reports a smaller number than it used to is its own
     # kind of dishonesty.
-    import health_economics as he
+    from econ import health_economics as he
     assert he._render_adherence_basis_html({"adherence_applied": False}) == ""
     assert "real-world figures" in he._render_adherence_basis_html({
         "adherence_applied": True, "efficacy_net": 100, "adherence_drag": 50,
         "mean_adherence": 0.5})
+
+
+def test_the_vendored_life_table_is_actually_reachable():
+    # THE BUG THIS CATCHES. life_table() degrades to {} on OSError so the model
+    # loses precision rather than disappearing — which means a wrong path is
+    # invisible. Moving this module into econ/ broke the __file__-relative
+    # lookup exactly that way: every import still passed, every Markov run
+    # still returned numbers, and the age-specific mortality had silently been
+    # replaced by a constant hazard.
+    tbl = ee.life_table()
+    assert tbl, f"life table unreachable at {ee._LIFE_TABLE_PATH}"
+    assert len(tbl) > 100, f"expected ~111 single-year ages, got {len(tbl)}"
+    # Mortality must rise with age, or the file was parsed off the wrong column.
+    assert tbl[80] > tbl[40] > tbl[20]
+
+
+def test_the_life_table_stays_at_the_repository_root():
+    # It cannot move into econ/ alongside this module: .gitignore protects the
+    # repo from DNA with a blanket *.csv and one path-anchored exception for
+    # data/LifeTable_USA_Mx_2015.csv. Relocate the file and that exception stops
+    # matching, so the life table becomes untracked while the DNA guard looks
+    # untouched.
+    import os
+    root = os.path.dirname(os.path.dirname(os.path.dirname(
+        os.path.abspath(ee.__file__))))
+    gitignore = os.path.join(os.path.dirname(os.path.dirname(
+        os.path.abspath(ee.__file__))), ".gitignore")
+    if os.path.exists(gitignore):
+        rules = open(gitignore).read()
+        assert "*.csv" in rules, "the blanket DNA guard is gone"
+        assert "!data/LifeTable_USA_Mx_2015.csv" in rules
+        assert ee._LIFE_TABLE_PATH.endswith(
+            os.path.join("data", "LifeTable_USA_Mx_2015.csv"))
+    assert os.path.isdir(os.path.dirname(ee._LIFE_TABLE_PATH))

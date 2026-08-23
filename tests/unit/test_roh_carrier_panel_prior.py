@@ -12,7 +12,7 @@ yield — so any number here would be fabricated rather than estimated.
 """
 from __future__ import annotations
 
-import value_of_information as voi
+from econ import value_of_information as voi
 
 
 def _roh(f_roh=0.0, f_long=0.0, n_long=0, tier="no_recent_relatedness"):

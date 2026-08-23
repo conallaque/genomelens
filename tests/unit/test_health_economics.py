@@ -20,7 +20,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-import health_economics as he
+from econ import health_economics as he
 import renderers
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -311,7 +311,7 @@ def test_on_disk_tier1_matches_engine_when_present():
 # ── Personal economic-impact sheet ────────────────────────────────────────────
 
 def test_personal_economics_models_items() -> None:
-    import health_economics as he
+    from econ import health_economics as he
     econ = he.analyze_personal_economics(
         economics_result={"findings_with_economics": [
             {"clinical_benefit": "Avoid warfarin bleed", "outcome_value": 15000,
@@ -328,7 +328,7 @@ def test_personal_economics_models_items() -> None:
 
 
 def test_personal_economics_empty() -> None:
-    import health_economics as he
+    from econ import health_economics as he
     econ = he.analyze_personal_economics()
     assert econ["available"] is False and econ["n_items"] == 0
     html = he.render_economic_analysis_html(econ)
@@ -336,7 +336,7 @@ def test_personal_economics_empty() -> None:
 
 
 def test_biological_aging_high_confidence_grounded() -> None:
-    import health_economics as he
+    from econ import health_economics as he
     econ = he.analyze_personal_economics(bloodwork_result={"clinical": {"advanced": {
         "indices": [], "biological_age": {
             "accel": 1.2, "chronological": 41, "mortality_10yr_pct": 2.6, "inputs": {}}},

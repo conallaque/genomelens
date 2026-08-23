@@ -413,7 +413,7 @@ def _lynch_icer() -> Optional[float]:
     """Compute the Lynch-screening ICER through the actual Markov cohort engine,
     parameterised with inputs approximated from the published model."""
     try:
-        import markov_model as mk
+        from . import markov as mk
     except Exception:
         return None
     # Inputs approximated from Mvundura et al. (2010): universal tumour screening,

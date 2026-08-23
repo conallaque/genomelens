@@ -155,11 +155,11 @@ except ImportError:
     build_personalized_plan = None
     render_plan_html = None
 try:
-    from health_economics import analyze_health_economics
+    from econ.health_economics import analyze_health_economics
 except ImportError:
     analyze_health_economics = None
 try:
-    from health_economics import (analyze_personal_economics,
+    from econ.health_economics import (analyze_personal_economics,
                                   render_economic_analysis_html)
 except ImportError:
     analyze_personal_economics = None
@@ -225,7 +225,7 @@ try:
 except ImportError:
     analyze_novel_variants = None
 try:
-    from value_of_information import analyze_value_of_information
+    from econ.value_of_information import analyze_value_of_information
 except ImportError:
     analyze_value_of_information = None
 try:

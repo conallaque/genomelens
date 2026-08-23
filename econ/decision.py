@@ -39,8 +39,8 @@ from __future__ import annotations
 import random
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
-import econ_engine as ee
-import econ_params as ep
+from . import engine as ee
+from . import params as ep
 
 __all__ = [
     "evpi", "evppi", "population_evpi", "breakeven",
@@ -336,7 +336,7 @@ def budget_impact(*, per_person_cost: float = 0.0,
     Kept as a named entry point so callers here do not have to know which
     module owns the calculation.
     """
-    import markov_model as _mk
+    from . import markov as _mk
     return _mk.budget_impact(plan_members=population,
                              test_cost=max(0.0, float(per_person_cost)),
                              horizon_years=int(years))

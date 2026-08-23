@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import pytest
 
-import heor_frontier as hf
+from econ import frontier as hf
 
 np = pytest.importorskip("numpy")
 

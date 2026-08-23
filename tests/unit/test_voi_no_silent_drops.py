@@ -13,7 +13,15 @@ from __future__ import annotations
 
 import re
 
-import value_of_information as voi
+from econ import health_economics as he
+from econ import value_of_information as voi
+
+
+def _he_source() -> str:
+    """Read the module's own source, located from the module rather than from
+    the working directory — a hardcoded ``health_economics.py`` broke the moment
+    the file moved into the econ package."""
+    return open(he.__file__, encoding="utf-8").read()
 
 
 def _econ(*cats):
@@ -54,7 +62,7 @@ def test_every_module_source_reaches_the_model():
     # THE POINT OF WIRING THE MODULES IN: each source label must either produce
     # a valued finding or be the one documented ethical exclusion.
     import re
-    src = open("health_economics.py").read()
+    src = _he_source()
     cats = sorted(set(re.findall(r'source="([^"]+)"', src)))
     valued = [c for c in cats if voi._classify_category(c, "")[0] in ("pgx", "coi")]
     excluded = [c for c in cats if voi._not_valued_reason(c)]
@@ -97,7 +105,7 @@ def test_weak_source_yields_less_value_than_strong_source():
 def test_every_coi_anchor_used_by_the_router_exists():
     # A router pointing at a missing COI key would silently zero the finding.
     import re
-    src = open("health_economics.py").read()
+    src = _he_source()
     for c in sorted(set(re.findall(r'source="([^"]+)"', src))):
         kind, key = voi._classify_category(c, "")
         if kind == "coi":
@@ -122,7 +130,7 @@ def test_every_emitted_category_is_mapped_or_documented():
     # THE INTEGRATION GUARD: health_economics.py and value_of_information.py
     # must not drift. Any new source= label has to be either given an economic
     # mapping or explicitly registered as not-valued.
-    src = open("health_economics.py").read()
+    src = _he_source()
     for cat in sorted(set(re.findall(r'source="([^"]+)"', src))):
         kind, _ = voi._classify_category(cat, "")
         mapped = kind in ("pgx", "coi")

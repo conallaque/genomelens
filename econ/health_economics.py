@@ -1743,7 +1743,7 @@ _PREDIAB_PROGRESSION_10YR = 0.35  # prediabetes → diabetes over ~10 yr
 # case is prevented). Single source of truth, with a fallback so this module stays
 # importable standalone.
 try:
-    from value_of_information import MARGINAL_COST_FRACTION as _MARGINAL_COST_FRACTION
+    from .value_of_information import MARGINAL_COST_FRACTION as _MARGINAL_COST_FRACTION
 except Exception:                 # pragma: no cover — standalone import
     _MARGINAL_COST_FRACTION = 0.60
 
@@ -1782,7 +1782,7 @@ _CATEGORY_ADHERENCE: Dict[str, str] = {
 def _adherence_for_category(category: str) -> float:
     """Real-world adherence multiplier for a personal-economics category."""
     try:
-        import econ_params as _ep
+        from . import params as _ep
         return float(_ep.value(
             _CATEGORY_ADHERENCE.get(category, "adherence_default")))
     except Exception:
@@ -2152,7 +2152,7 @@ def analyze_personal_economics(economics_result: Optional[Dict] = None,
     # applied invisibly, so the report can show which lines were reduced.
     n_before = len(items)
     try:
-        import econ_engine as _ee
+        from . import engine as _ee
         # Match against the gene symbols THIS module actually emits, rather
         # than a regex for gene-shaped words — the latter reads "MI", "MACE"
         # and "B12" as genes and invents targets that do not exist.
