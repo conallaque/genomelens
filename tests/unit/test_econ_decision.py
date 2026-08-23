@@ -380,3 +380,158 @@ def test_subgroup_table_declares_itself_illustrative():
     s = ed.subgroup_analysis(ages=(40, 60), sexes=("Female",))
     assert s.get("illustrative") is True
     assert "not a personalised risk estimate" in s["note"]
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Plain-language layer
+# ══════════════════════════════════════════════════════════════════════════
+# A translation layer is where over-claiming creeps in: it is easy to write a
+# confident English sentence on top of a hedged technical result. These tests
+# check the translation stays as honest as the thing it translates.
+
+import econ_plain as epl
+
+
+def test_number_needed_to_screen_inverts_absolute_risk_reduction():
+    r = epl.number_needed_to_screen([{"condition": "CAD",
+                                      "cases_averted": 0.02}])
+    assert r[0]["number_needed_to_screen"] == 50
+
+
+def test_plain_language_uses_the_conditional_when_the_baseline_is_assumed():
+    # The baseline risk behind these numbers is a registered assumption for
+    # most findings. Stating "1 in 17 people avoid a serious inherited
+    # condition" in the indicative turns that assumption into a claim — which
+    # would make the plain-language layer less honest than the technical
+    # output it summarises.
+    r = epl.number_needed_to_screen([{"condition": "Pathogenic",
+                                      "cases_averted": 0.06}])
+    assert r[0]["baseline_is_assumed"] is True
+    assert "if the model's assumptions hold" in r[0]["plain"].lower()
+
+
+def test_plain_text_contains_no_markdown_or_jargon():
+    pooled = {"available": True,
+              "cea": {"incremental_cost": -6_440, "incremental_qaly": 0.069,
+                      "icer": None, "inmb": 13_340, "wtp": 100_000,
+                      "cost_averted": 8_540, "intervention_cost": 2_000,
+                      "test_cost": 100, "horizon_years": 10},
+              "conditions": [{"condition": "CAD", "cases_averted": 0.02,
+                              "combined_rrr": 0.3, "n_findings": 2,
+                              "inmb": 5_000}],
+              "psa": {"available": True, "p_cost_effective": 0.98,
+                      "n_iterations": 1500, "inmb_ci_low": 300,
+                      "inmb_ci_high": 39_000, "note": "n"},
+              "tornado": [{"parameter": "actionable_rrr", "tier": "assumption",
+                           "swing": 100}]}
+    s = epl.build_plain_summary(pooled)
+    blob = " ".join([s["bottom_line"], s["verdict"]["plain"],
+                     s["money"]["plain"], s["what_would_change_it"],
+                     s["healthy_time"]["plain"]])
+    assert "*" not in blob, "markdown emphasis does not render in HTML"
+    for jargon in ("QALY", "INMB", "ICER", "incremental net monetary",
+                   "coi_key", "EVPPI"):
+        assert jargon not in blob, f"{jargon!r} leaked into plain-language text"
+
+
+def test_verdict_distinguishes_cost_saving_from_merely_cost_effective():
+    # Conflating these is the most common way a report like this misleads:
+    # prevention usually improves health while COSTING money.
+    saving = epl.plain_verdict({"incremental_cost": -5_000,
+                                "incremental_qaly": 0.5, "icer": None})
+    buying = epl.plain_verdict({"incremental_cost": 20_000,
+                                "incremental_qaly": 0.5, "icer": 40_000})
+    assert "saves money" in saving["headline"]
+    assert "costs money" in buying["headline"]
+    assert "not a saving" in buying["plain"]
+
+
+def test_verdict_rejects_a_strategy_above_the_threshold():
+    bad = epl.plain_verdict({"incremental_cost": 200_000,
+                             "incremental_qaly": 0.5, "icer": 400_000},
+                            wtp=100_000)
+    assert bad["tone"] == "negative"
+
+
+def test_healthy_time_scales_units_to_the_magnitude():
+    assert "days" in epl.healthy_time_gained(0.05)["plain"]
+    assert "months" in epl.healthy_time_gained(0.5)["plain"]
+    assert "years" in epl.healthy_time_gained(4.0)["plain"]
+    assert "rounding error" in epl.healthy_time_gained(0.001)["plain"]
+
+
+def test_healthy_time_carries_the_averaging_caveat():
+    # "25 extra days of healthy life" invites being read as a personal
+    # promise. Most people get nothing from any one preventive action.
+    assert "not a promise" in epl.healthy_time_gained(0.07)["caveat"]
+
+
+def test_payback_is_honest_when_there_is_none():
+    r = epl.payback_period(upfront_cost=2_000, annual_saving=0)
+    assert r["pays_back"] is False
+    assert "buying health, not savings" in r["plain"]
+    slow = epl.payback_period(upfront_cost=2_000, annual_saving=10)
+    assert slow["pays_back"] is False
+
+
+def test_payback_reports_a_real_recovery_period():
+    r = epl.payback_period(upfront_cost=2_100, annual_saving=854)
+    assert r["pays_back"] is True
+    assert r["years"] == pytest.approx(2.5, abs=0.1)
+
+
+def test_confidence_is_expressed_as_a_count_out_of_a_hundred():
+    c = epl.plain_confidence({"available": True, "p_cost_effective": 0.83,
+                              "n_iterations": 1000, "inmb_ci_low": -100,
+                              "inmb_ci_high": 5_000, "note": ""})
+    assert c["n_in_100"] == 83
+    assert "83 of every 100" in c["plain"]
+    assert "not all" in c["plain"]
+
+
+def test_confidence_says_so_when_the_result_is_a_coin_flip():
+    c = epl.plain_confidence({"available": True, "p_cost_effective": 0.52,
+                              "n_iterations": 1000, "inmb_ci_low": -5_000,
+                              "inmb_ci_high": 5_000, "note": ""})
+    assert "could go either way" in c["plain"]
+
+
+def test_summary_warns_when_assumptions_drive_the_answer():
+    pooled = {"available": True, "cea": {"incremental_qaly": 0.1, "wtp": 100_000},
+              "conditions": [], "psa": {},
+              "tornado": [{"parameter": "actionable_rrr",
+                           "tier": "assumption", "swing": 900},
+                          {"parameter": "coi_mace", "tier": "derived",
+                           "swing": 100}]}
+    s = epl.build_plain_summary(pooled)
+    assert s["assumption_share"] >= 50
+    assert "guesswork" in s["what_would_change_it"]
+
+
+def test_summary_does_not_cry_wolf_when_evidence_dominates():
+    pooled = {"available": True, "cea": {"incremental_qaly": 0.1, "wtp": 100_000},
+              "conditions": [], "psa": {},
+              "tornado": [{"parameter": "coi_mace", "tier": "derived",
+                           "swing": 900},
+                          {"parameter": "actionable_rrr", "tier": "assumption",
+                           "swing": 50}]}
+    s = epl.build_plain_summary(pooled)
+    assert "published evidence" in s["what_would_change_it"]
+
+
+def test_condition_codes_are_translated_to_english():
+    for key in ("CAD", "T2D", "Alzheimer", "Pathogenic"):
+        assert key not in epl.CONDITION_NAMES[key]
+    assert epl._name("CAD") == "heart attack or stroke"
+
+
+def test_summary_carries_a_disclaimer():
+    pooled = {"available": True, "cea": {"incremental_qaly": 0.1},
+              "conditions": [], "psa": {}, "tornado": []}
+    s = epl.build_plain_summary(pooled)
+    assert "not medical advice" in s["disclaimer"]
+
+
+def test_summary_degrades_when_there_is_nothing_to_summarise():
+    assert epl.build_plain_summary(None)["available"] is False
+    assert epl.build_plain_summary({"available": False})["available"] is False

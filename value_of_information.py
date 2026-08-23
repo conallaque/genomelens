@@ -955,6 +955,16 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
             _pooled["decision"] = {"available": False, "reason": repr(_de)}
             _degraded.append(("decision_layer", repr(_de)))
 
+        # Plain-language layer. Everything above is defensible and unreadable
+        # to anyone who has not done a health-economics course; a result
+        # nobody can read is not a result.
+        try:
+            import econ_plain as _epl
+            _pooled["plain"] = _epl.build_plain_summary(_pooled)
+        except Exception as _pe2:
+            _pooled["plain"] = {"available": False, "reason": repr(_pe2)}
+            _degraded.append(("plain_summary", repr(_pe2)))
+
         _pooled["provenance"] = _econ_params.assumption_burden()
         _pooled["declared_assumptions"] = [
             {"key": p.key, "value": p.value, "units": p.units, "note": p.note}

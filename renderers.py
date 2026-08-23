@@ -2017,6 +2017,105 @@ variants queried. <strong>Predictors used:</strong> {_esc(pred_line)}.
 """
 
 
+def _render_plain_summary(pl: Optional[Dict]) -> str:
+    """The plain-English answer, placed before any of the technical output.
+
+    Everything else in this section is correct and unreadable without training.
+    This card carries the same conclusions in the order a person actually asks
+    them — is it worth it, what do I get, what does it cost, how sure are we,
+    what should I do, and what would change the answer — with the hedging
+    attached to each sentence rather than exiled to a footnote.
+    """
+    if not pl or not pl.get("available"):
+        return ""
+
+    v = pl.get("verdict") or {}
+    accent = {"positive": "#177a54", "negative": "#b03a2e"}.get(
+        v.get("tone"), "#5b6673")
+    conf = pl.get("confidence") or {}
+    money = pl.get("money") or {}
+    payback = pl.get("payback") or {}
+    time_gain = pl.get("healthy_time") or {}
+
+    actions = "".join(f"""
+  <li style="margin-bottom:7px">
+    <strong>{_esc(a.get('what',''))}</strong>
+    <span style="color:#8a94a3">&mdash; {_esc(a.get('value',''))} of modelled value</span>
+    <div style="color:#5b6673">{_esc(a.get('why',''))}</div>
+    <div style="color:#8a94a3;font-size:.94em">{_esc(a.get('scale',''))}</div>
+  </li>""" for a in (pl.get("actions") or []))
+
+    nns = "".join(f"""
+  <li style="margin-bottom:4px;color:#5b6673">{_esc(r.get('plain',''))}</li>"""
+        for r in (pl.get("number_needed_to_screen") or [])[:5])
+
+    return f"""
+<div style="border:2px solid {accent};border-radius:12px;padding:16px 18px;
+            margin:16px 0;background:#fcfdfe">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;
+              gap:12px;flex-wrap:wrap">
+    <div style="font-weight:700;color:{accent};font-size:1.1em">
+      {_esc(v.get('headline',''))}</div>
+    <div style="font-size:.72em;color:#8a94a3;border:1px solid #dfe4ea;
+                border-radius:20px;padding:2px 9px;white-space:nowrap">
+      in plain English</div>
+  </div>
+
+  <div style="font-size:.95em;color:#2b3440;margin-top:8px">
+    {_esc(v.get('plain',''))}</div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin:14px 0">
+    <div style="flex:1;min-width:190px;background:#f7f9fb;border:1px solid #e3e7ec;
+                border-radius:10px;padding:11px 13px">
+      <div style="font-size:.76em;color:#8a94a3;text-transform:uppercase;
+                  letter-spacing:.04em">What you get</div>
+      <div style="font-size:.95em;color:#2b3440;margin-top:3px">
+        {_esc(time_gain.get('plain',''))}</div>
+    </div>
+    <div style="flex:1;min-width:190px;background:#f7f9fb;border:1px solid #e3e7ec;
+                border-radius:10px;padding:11px 13px">
+      <div style="font-size:.76em;color:#8a94a3;text-transform:uppercase;
+                  letter-spacing:.04em">What it costs</div>
+      <div style="font-size:.95em;color:#2b3440;margin-top:3px">
+        {_esc(money.get('plain',''))}</div>
+    </div>
+    <div style="flex:1;min-width:190px;background:#f7f9fb;border:1px solid #e3e7ec;
+                border-radius:10px;padding:11px 13px">
+      <div style="font-size:.76em;color:#8a94a3;text-transform:uppercase;
+                  letter-spacing:.04em">When it pays for itself</div>
+      <div style="font-size:.95em;color:#2b3440;margin-top:3px">
+        {_esc(payback.get('plain',''))}</div>
+    </div>
+  </div>
+
+  {f'''<div style="margin-top:4px">
+    <div style="font-weight:600;color:#5b6673">How sure is this?</div>
+    <div style="font-size:.92em;color:#48545f;margin-top:3px">
+      {_esc(conf.get('plain',''))} {_esc(conf.get('range_plain',''))}</div>
+  </div>''' if conf.get("available") else ""}
+
+  {f'''<div style="margin-top:12px">
+    <div style="font-weight:600;color:#5b6673">What to actually do, most valuable first</div>
+    <ul style="font-size:.92em;margin:6px 0 0 18px;padding:0">{actions}</ul>
+  </div>''' if actions else ""}
+
+  {f'''<div style="margin-top:12px">
+    <div style="font-weight:600;color:#5b6673">How often it makes a difference</div>
+    <ul style="font-size:.9em;margin:6px 0 0 18px;padding:0">{nns}</ul>
+    <div style="font-size:.85em;color:#8a94a3;margin-top:5px">
+      {_esc((time_gain.get('caveat') or ''))}</div>
+  </div>''' if nns else ""}
+
+  <div style="border:1px solid #f0dcc0;background:#fffaf2;border-radius:8px;
+              padding:10px 12px;margin-top:13px;font-size:.88em;color:#6b5330">
+    <strong>What would change this answer</strong><br>
+    {_esc(pl.get('what_would_change_it',''))}</div>
+
+  <div style="font-size:.82em;color:#9aa4b0;margin-top:10px;font-style:italic">
+    {_esc(pl.get('disclaimer',''))}</div>
+</div>"""
+
+
 def _render_decision_layer(d: Optional[Dict]) -> str:
     """Render value of information, breakeven, frontier, budget and equity.
 
@@ -2387,6 +2486,7 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
 {_assumption_dominance_note(p.get("tornado") or [])}</div></details>"""
 
     dec_html = _render_decision_layer(p.get("decision") or {})
+    plain_html = _render_plain_summary(p.get("plain") or {})
 
     # ── Dual perspective ──
     dp = p.get("dual_perspective") or {}
@@ -2532,6 +2632,7 @@ def _render_pooled_economics(p: Optional[Dict]) -> str:
     <div style="font-size:.72em;color:#8a94a3;border:1px solid #dfe4ea;border-radius:20px;
                 padding:2px 9px;white-space:nowrap">costs and QALYs reported separately</div>
   </div>
+  {plain_html}
   <div style="font-size:.87em;color:#48545f;margin-top:6px">
     Findings are grouped by the condition they bear on, combined on the risk
     scale rather than added, and each condition is charged its cost of illness
