@@ -285,3 +285,98 @@ def test_decision_layer_prioritises_the_parameters_the_tornado_names():
     d = ed.analyze_decision_layer(_build(), tornado_rows=tor, test_cost=100,
                                   fast=True)
     assert {r["parameter"] for r in d["evppi"]} <= {"coi_mace", "actionable_rrr"}
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Integration: what value_of_information actually feeds the decision layer
+# ══════════════════════════════════════════════════════════════════════════
+# The unit tests above exercise these functions with synthetic inputs. They
+# cannot see the wiring, which is exactly where an invented multiplier and a
+# gross-vs-net cost mismatch survived several passes.
+
+def _voi(input_type="chip", with_wgs_findings=False):
+    import value_of_information as voi
+    econ = {"findings_with_economics": [
+        {"finding": "CAD polygenic score", "category": "Polygenic Risk",
+         "qaly_gain": 0.5, "confidence": "moderate"},
+        {"finding": "CYP2C19 IM", "category": "Pharmacogenomics",
+         "qaly_gain": 0.3, "confidence": "high"},
+    ]}
+    cvr = None
+    if with_wgs_findings:
+        cvr = {"available": True, "buckets": {
+            "actionable": [{"gene": "BRCA2"}],
+            "carrier": [{"gene": "CFTR"}]}}
+    return voi.analyze_value_of_information(
+        economics_result=econ, clinical_variants_result=cvr,
+        input_type=input_type, n_mc=200, seed=5, log=lambda *a: None)
+
+
+def test_frontier_costs_match_the_headline_incremental_cost():
+    # THE BUG THIS CATCHES. The frontier was built on gross cost while the
+    # CEA card beside it reported net, so the same strategy appeared as
+    # +$2,100 in one table and -$6,440 in the other — same box, same
+    # question, opposite signs.
+    p = _voi()["pooled_economics"]
+    fr = p["decision"]["frontier"]
+    chip = next(s for s in fr["strategies"] if s["name"] == "Genotyping chip")
+    assert chip["cost"] == pytest.approx(p["cea"]["incremental_cost"], abs=2), (
+        f"frontier says {chip['cost']}, CEA card says "
+        f"{p['cea']['incremental_cost']} — the two must share a cost basis")
+    assert chip["qaly"] == pytest.approx(p["cea"]["incremental_qaly"], abs=1e-3)
+
+
+def test_no_sequencing_arm_is_invented_from_chip_input():
+    # The WGS arm was previously manufactured by multiplying the chip result
+    # by 1.35 QALYs and 1.6 cost — two numbers typed into wiring code that
+    # between them decided which strategy the report recommended.
+    fr = _voi(input_type="chip")["pooled_economics"]["decision"]["frontier"]
+    names = {s["name"] for s in fr["strategies"]}
+    assert "Whole-genome sequencing" not in names, (
+        "a sequencing arm cannot be estimated from chip input — only asserted")
+    assert fr.get("wgs_not_estimable"), "the omission must be explained"
+
+
+def test_sequencing_arm_appears_only_when_sequencing_findings_do():
+    fr = _voi(with_wgs_findings=True)["pooled_economics"]["decision"]["frontier"]
+    names = {s["name"] for s in fr["strategies"]}
+    assert "Whole-genome sequencing" in names
+    assert not fr.get("wgs_not_estimable")
+
+
+def test_every_decision_layer_constant_is_registered():
+    # A default argument that decides the sign of a reported result is a
+    # parameter, and belongs in the registry with the rest of them.
+    import inspect
+    for fn in (ed.budget_impact, ed.distributional_cea, ed.subgroup_analysis):
+        for name, prm in inspect.signature(fn).parameters.items():
+            if name in ("offset_realised_in_horizon", "inequality_aversion",
+                        "annual_incidence"):
+                assert prm.default is None, (
+                    f"{fn.__name__}({name}=...) still carries a literal "
+                    f"default; it should read from econ_params so it appears "
+                    f"in the provenance count and the sensitivity analysis")
+
+
+def test_registered_decision_parameters_drive_the_functions():
+    with ep.overridden({"budget_offset_realised_in_horizon": 0.9}):
+        generous = ed.budget_impact(per_person_cost=100,
+                                    per_person_offset=1_000, population=1_000)
+    with ep.overridden({"budget_offset_realised_in_horizon": 0.01}):
+        stingy = ed.budget_impact(per_person_cost=100,
+                                  per_person_offset=1_000, population=1_000)
+    assert generous["total_net"] < stingy["total_net"]
+
+
+def test_subgroup_table_follows_the_dominant_condition():
+    d = ed.analyze_decision_layer(_build((("Alzheimer", 1.0),)),
+                                  test_cost=100, fast=True)
+    assert d["subgroups"]["condition"] == "Alzheimer", (
+        "the subgroup table should describe the person's own dominant "
+        "condition, not always CAD")
+
+
+def test_subgroup_table_declares_itself_illustrative():
+    s = ed.subgroup_analysis(ages=(40, 60), sexes=("Female",))
+    assert s.get("illustrative") is True
+    assert "not a personalised risk estimate" in s["note"]

@@ -912,15 +912,45 @@ def analyze_value_of_information(economics_result: Optional[Dict] = None,
                 _rebuild, tornado_rows=_pooled["tornado"],
                 test_cost=test_cost, wtp=wtp, age=_age,
                 fast=(n_mc < 1000))
-            _pooled["decision"]["frontier"] = _ed.efficiency_frontier([
-                {"name": "No testing", "cost": 0.0, "qaly": 0.0},
-                {"name": "Genotyping chip",
-                 "cost": TEST_COST["chip"] + _pooled["cea"]["intervention_cost"],
-                 "qaly": _pooled["cea"]["incremental_qaly"]},
-                {"name": "Whole-genome sequencing",
-                 "cost": TEST_COST["wgs"] + _pooled["cea"]["intervention_cost"] * 1.6,
-                 "qaly": _pooled["cea"]["incremental_qaly"] * 1.35},
-            ], wtp=wtp)
+            # Build each arm from the findings that arm would actually
+            # return, on the SAME net-cost basis as the CEA card above.
+            #
+            # This previously multiplied the chip result by 1.35 and 1.6 to
+            # invent a WGS arm. Those two numbers decided which strategy the
+            # report recommended, and they were typed here rather than
+            # derived from anything — the precise defect this whole exercise
+            # set out to remove. The costs were also gross rather than net,
+            # so the frontier said the chip cost $2,100 while the card beside
+            # it said the same strategy SAVED $6,440.
+            def _arm(name, findings, test_cost_arm):
+                pools = _ee.pool_findings(findings)
+                if not pools:
+                    return None
+                cea = _ee.evaluate_pools(pools, wtp=wtp,
+                                         test_cost=test_cost_arm)["cea"]
+                return {"name": name, "cost": float(cea["incremental_cost"]),
+                        "qaly": float(cea["incremental_qaly"])}
+
+            _all = _ee_findings
+            _chip_only = [f for f, src in zip(_ee_findings, findings)
+                          if not src.get("wgs_only")]
+            _wgs_extra = len(_all) - len(_chip_only)
+            _arms = [{"name": "No testing", "cost": 0.0, "qaly": 0.0}]
+            _chip_arm = _arm("Genotyping chip", _chip_only, TEST_COST["chip"])
+            if _chip_arm:
+                _arms.append(_chip_arm)
+            if _wgs_extra:
+                _wgs_arm = _arm("Whole-genome sequencing", _all,
+                                TEST_COST["wgs"])
+                if _wgs_arm:
+                    _arms.append(_wgs_arm)
+            _fr = _ed.efficiency_frontier(_arms, wtp=wtp)
+            if not _wgs_extra:
+                _fr["wgs_not_estimable"] = (
+                    "No whole-genome-only findings are present in this input, "
+                    "so a sequencing arm cannot be estimated from it — only "
+                    "asserted. It is left out rather than invented.")
+            _pooled["decision"]["frontier"] = _fr
         except Exception as _de:
             _pooled["decision"] = {"available": False, "reason": repr(_de)}
             _degraded.append(("decision_layer", repr(_de)))

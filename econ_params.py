@@ -493,6 +493,40 @@ _REGISTRY: List[Param] = [
        citation="PMID:16855125 doi:10.1177/0272989X06290495", year=2006,
        dist="gamma", low=0.5, high=6.0),
 
+    # ── Decision-layer parameters ─────────────────────────────────────────
+    # These sat as default arguments in econ_decision.py, where each one
+    # decided the sign or the substance of a reported result while being
+    # invisible to the provenance count, the tornado and EVPPI. By the standard
+    # applied to the rest of the model they belong here.
+    _p("budget_offset_realised_in_horizon", 0.15, "fraction", "assumption",
+       note="Share of modelled averted cost that lands inside a five-year "
+            "budget window. Prevention savings accrue over decades, so most "
+            "fall outside it; crediting them in full turns a programme that "
+            "costs a payer money into one that appears self-financing. Set "
+            "low deliberately. Judgement — no published schedule of when "
+            "genomic-prevention savings are realised covers this model's mix "
+            "of conditions.",
+       dist="beta", low=0.02, high=0.50),
+
+    _p("inequality_aversion", 11.0, "Atkinson parameter", "assumption",
+       note="Strength of preference for reducing health inequality in the "
+            "distributional analysis. Values around this magnitude appear in "
+            "the English distributional cost-effectiveness literature, which "
+            "elicits far stronger aversion than economic intuition suggests; "
+            "this is recorded as a judgement rather than cited because the "
+            "figure is carried here from memory of that literature and has "
+            "not been verified against a specific paper. The result is "
+            "sensitive to it, so it is reported as an input.",
+       dist="gamma", low=0.0, high=30.0),
+
+    _p("subgroup_annual_incidence", 0.01, "probability per year", "assumption",
+       note="Annual incidence used for the illustrative age-and-sex subgroup "
+            "table. The table exists to show how competing mortality changes "
+            "the value of prevention with age, which it does at any plausible "
+            "incidence; it is not a personalised risk estimate and is labelled "
+            "as illustrative in the report.",
+       dist="beta", low=0.001, high=0.05),
+
     # ── Default finding parameters ────────────────────────────────────────
     # The entire benefit side of the pooled model runs on these two numbers.
     # They were bare literals in value_of_information._collect, which meant

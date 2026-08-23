@@ -321,7 +321,8 @@ def efficiency_frontier(strategies: Sequence[Dict],
 def budget_impact(*, per_person_cost: float, per_person_offset: float,
                   population: int = 10_000,
                   uptake: Sequence[float] = (0.05, 0.10, 0.15, 0.20, 0.25),
-                  years: int = 5, offset_realised_in_horizon: float = 0.15) -> Dict:
+                  years: int = 5,
+                  offset_realised_in_horizon: Optional[float] = None) -> Dict:
     """Undiscounted cash flow to a payer over a short horizon.
 
     Deliberately not a cost-effectiveness analysis. Budget impact asks
@@ -337,6 +338,8 @@ def budget_impact(*, per_person_cost: float, per_person_offset: float,
     into one that appears to save tens of millions. An earlier version of this
     function did exactly that.
     """
+    if offset_realised_in_horizon is None:
+        offset_realised_in_horizon = ep.value("budget_offset_realised_in_horizon")
     offset_share = max(0.0, min(1.0, float(offset_realised_in_horizon)))
     rows: List[Dict] = []
     cumulative = 0.0
@@ -376,7 +379,7 @@ def budget_impact(*, per_person_cost: float, per_person_offset: float,
 # ══════════════════════════════════════════════════════════════════════════
 
 def subgroup_analysis(*, coi_key: str = "CAD", rrr: Optional[float] = None,
-                      annual_incidence: float = 0.01,
+                      annual_incidence: Optional[float] = None,
                       ages: Sequence[int] = (30, 40, 50, 60, 70, 80),
                       sexes: Sequence[str] = ("Female", "Male"),
                       wtp: Optional[float] = None) -> Dict:
@@ -389,6 +392,8 @@ def subgroup_analysis(*, coi_key: str = "CAD", rrr: Optional[float] = None,
     the model.
     """
     rrr = ep.value("actionable_rrr") if rrr is None else float(rrr)
+    if annual_incidence is None:
+        annual_incidence = ep.value("subgroup_annual_incidence")
     wtp = ep.value("wtp_per_qaly") if wtp is None else float(wtp)
     rows: List[Dict] = []
     for sex in sexes:
@@ -413,15 +418,20 @@ def subgroup_analysis(*, coi_key: str = "CAD", rrr: Optional[float] = None,
         "rows": rows,
         "best": best, "worst": worst,
         "spread": (round(best["inmb"] - worst["inmb"]) if best and worst else 0),
-        "note": ("Differences across age come mostly from competing mortality "
-                 "— a prevented event is worth less to someone less likely to "
-                 "survive to experience it."),
+        "illustrative": True,
+        "annual_incidence": annual_incidence,
+        "note": (f"Illustrative, at {annual_incidence:.1%} annual incidence — "
+                 f"this shows how the value of prevention changes with age, "
+                 f"not a personalised risk estimate. Differences across age "
+                 f"come mostly from competing mortality: a prevented event is "
+                 f"worth less to someone less likely to survive to "
+                 f"experience it."),
     }
 
 
 def distributional_cea(baseline_qaly_by_group: Dict[str, float],
                        gain_by_group: Dict[str, float],
-                       *, inequality_aversion: float = 11.0) -> Dict:
+                       *, inequality_aversion: Optional[float] = None) -> Dict:
     """Equity-weighted analysis using an Atkinson social welfare function.
 
     Standard cost-effectiveness is distribution-blind: a QALY counts the same
@@ -434,6 +444,8 @@ def distributional_cea(baseline_qaly_by_group: Dict[str, float],
     preference for reducing health inequality. It is reported as an input
     because the result is sensitive to it and reasonable people disagree.
     """
+    if inequality_aversion is None:
+        inequality_aversion = ep.value("inequality_aversion")
     groups = sorted(set(baseline_qaly_by_group) | set(gain_by_group))
     if not groups:
         return {"available": False}
@@ -521,7 +533,13 @@ def analyze_decision_layer(rebuild: Callable[[], Dict], *,
                                    wtp=wtp, steps=30 if fast else 60)
                          for k in keys[:4]) if b.get("available")]
 
-    out["subgroups"] = subgroup_analysis(wtp=wtp)
+    # Use the person's own dominant condition where there is one, rather
+    # than always showing CAD regardless of what their findings say.
+    _top = max(ee.evaluate_pools(rebuild(), wtp=wtp,
+                                 test_cost=test_cost)["conditions"],
+               key=lambda c: c.get("inmb", 0), default=None)
+    out["subgroups"] = subgroup_analysis(
+        coi_key=(_top or {}).get("condition") or "CAD", wtp=wtp)
 
     # Budget impact for a mid-sized payer, using this report's own test cost
     # and the pooled cost offset per person.

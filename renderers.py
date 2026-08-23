@@ -2107,7 +2107,10 @@ def _render_decision_layer(d: Optional[Dict]) -> str:
     <th>Status</th></tr></thead><tbody>{srows}</tbody></table>
 <div style="font-size:.8em;color:#8a94a3;margin-top:4px">
   Recommended at this threshold: <strong>{_esc(fr.get('recommended',''))}</strong>.
-  {_esc(fr.get('note',''))}</div></div>"""
+  Costs are net of averted cost, on the same basis as the incremental-cost
+  figure above. {_esc(fr.get('note',''))}
+  {f"<div style='margin-top:4px;color:#b06a00'>{_esc(fr['wgs_not_estimable'])}</div>"
+   if fr.get('wgs_not_estimable') else ""}</div></div>"""
 
     # ── Budget impact ──
     bi = d.get("budget_impact") or {}
