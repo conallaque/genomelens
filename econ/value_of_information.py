@@ -67,6 +67,14 @@ COI: dict[str, dict] = {
     "IronOverload":   {"cost": 40_000,  "src": "hereditary haemochromatosis — lifetime cost "
                                                "with organ involvement; phlebotomy is cheap, "
                                                "late cirrhosis/cardiomyopathy is not"},
+    # Read from the registry rather than written here. This dict predates the
+    # provenance registry, and every figure in it is a second copy of a number
+    # the registry also holds — a standing invitation for the two to drift.
+    # New anchors take the registry value so there is only one of each.
+    "Coeliac":        {"cost": _econ_params.value("coi_coeliac"),
+                       "src": "econ.params: coi_coeliac (declared assumption; "
+                              "diet-managed, so far below the procedural and "
+                              "biologic anchors above)"},
 }
 
 # MARGINAL vs AVERAGE COST (honesty correction).
@@ -336,6 +344,12 @@ def _classify_category(category: str | None, label: str = "") -> tuple[str, str]
         return ("coi", "Urologic")
     if "metal" in cat or "oxidative" in cat:
         return ("coi", "IronOverload")
+    # Gut health reaches the model through its one costable trait: the
+    # coeliac-permissive HLA haplotype, which drives a serology decision. The
+    # module's other five traits are reported as signals and emit nothing, so
+    # anything arriving here is the coeliac record.
+    if "gut" in cat or "coeliac" in cat or "celiac" in cat:
+        return ("coi", "Coeliac")
 
     # ── Mendelian randomisation and PheWAS biomarkers are trait-directed: route
     #    on the trait named in the finding, defaulting to the cardiometabolic

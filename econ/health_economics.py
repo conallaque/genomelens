@@ -1495,6 +1495,165 @@ def _top_drugs_findings(top_drugs_result: dict | None) -> list[dict]:
 
 # ─── Scaling ───────────────────────────────────────────────────────────────
 
+
+# ── Gut health ────────────────────────────────────────────────────────────
+# The gut-health module produced insight and no economics until now. Of its six
+# traits only one earns a dollar figure, and the reasons the other five do not
+# are worth stating rather than leaving as an absence:
+#
+#   Coeliac (HLA-DQ2.5/DQ8)  VALUED. There is a real chain: the haplotype
+#                            informs a serology decision, a positive serology
+#                            gives a diagnosis, and the diet prevents anaemia,
+#                            bone loss and the small-bowel complications of
+#                            untreated disease. Valued through the registry's
+#                            Coeliac anchor, with the conversion rate applied —
+#                            30-40% of Europeans carry a permissive haplotype
+#                            and only about 1% develop the disease.
+#   NOD2 (Crohn's)           SIGNAL ONLY. The risk association is strong and
+#                            old, but there is no proven preventive
+#                            intervention for an asymptomatic carrier. Pricing
+#                            it would mean inventing a risk reduction. High
+#                            risk with no costed prevention is a real finding,
+#                            not a gap to fill with a number.
+#   IL23R (protective)       SIGNAL ONLY. Nothing to act on.
+#   FUT2 secretor            SIGNAL ONLY. Shapes the microbiome; no costed
+#                            intervention follows.
+#   Lactase non-persistence  SIGNAL ONLY, deliberately — see the note on the
+#                            routing table above. Worth roughly $250 and 0.05
+#                            QALYs, which is not worth two unsourced registry
+#                            parameters.
+#   Histamine / DAO          SIGNAL ONLY. Dietary, weakly evidenced.
+GUT_ECONOMICS: dict[str, dict] = {
+    "Coeliac HLA-DQ2.5 / DQ8 Risk": {
+        "finding": "Coeliac-permissive HLA haplotype (DQ2.5/DQ8) — serology decision",
+        "clinical_benefit": ("tTG-IgA serology if symptomatic, before any gluten "
+                             "withdrawal; diagnosis prevents the anaemia, bone "
+                             "loss and malabsorption of untreated coeliac disease"),
+        "cost": 150,             # serology plus the consultation that orders it
+        "outcome_value": 0,      # unused: valued through the Coeliac anchor
+        "prevalence": 0.35,      # permissive-haplotype carrier frequency
+        "qaly_gain": 0.0,        # unused: valued through the Coeliac anchor
+        "src": ("Valued through the registry Coeliac anchor rather than a "
+                "hand-written figure, with penetrance_coeliac_given_dq applied"),
+    },
+}
+
+
+def _gut_findings(gut_health_result: dict | None) -> list[dict]:
+    """Economics for the gut-health module's one costable trait.
+
+    Only the coeliac haplotype is priced, and only when it is actually carried.
+    A negative call is clinically useful — it very nearly rules the disease out —
+    but ruling something out that you were never going to treat has no modelled
+    economic value, and claiming one would be the same overreach as pricing NOD2.
+    """
+    preds = ((gut_health_result or {}).get("predictions") or [])
+    out: list[dict] = []
+    for p in preds:
+        econ = GUT_ECONOMICS.get(p.get("trait", ""))
+        if econ is None:
+            continue
+        # Only a POSITIVE call is actionable. The module words the positive case
+        # as "Carries a coeliac-permissive HLA haplotype tag".
+        if "carries a coeliac-permissive" not in str(p.get("result", "")).lower():
+            continue
+        out.append(_econ_record(
+            finding=econ["finding"],
+            clinical_benefit=econ["clinical_benefit"],
+            cost=econ["cost"], outcome_value=econ["outcome_value"],
+            confidence=p.get("confidence", "moderate"),
+            source="Gut Health",
+            prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
+            evidence=str(p.get("evidence") or ""),
+        ))
+    return out
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Curated finding -> condition anchor
+# ══════════════════════════════════════════════════════════════════════════
+#
+# THE DEFECT THIS ADDRESSES. The curated tables carry two incompatible kinds of
+# ``outcome_value``. Ten pharmacogenomic entries are decomposed and already
+# conditional — p_rx x p_adr x rrr x adr_cost, which for warfarin comes to about
+# $180. Seventy others carry a flat figure, and thirty-six of those are >= $50k
+# because they are the RAW lifetime cost of the event: APOE at $250,000 is the
+# cost of a myocardial infarction, not the expected value of preventing one.
+#
+# Applying a raw event cost to every carrier skips the two steps that make it an
+# expected value: the probability the event happens at all, and the share of it
+# the intervention actually prevents. The pooled engine has always done this
+# correctly -- cases_averted = p_event x rrr, then cost_averted = cases_averted x
+# cost_of_illness, with all three read from the provenance registry. The cohort
+# views had no such step, which is why one plan member appeared to save $16,174.
+#
+# Routing a finding to a condition anchor here makes it use the registry values
+# instead of its hand-written figure. Findings with no anchor keep the curated
+# figure and are counted separately, so the share of the total still on the old
+# basis is reported rather than hidden.
+_COI_ROUTES: tuple[tuple[str, str], ...] = (
+    # (lowercase substring of the finding text, condition anchor)
+    # ── cardiometabolic ────────────────────────────────────────────────────
+    ("coronary-artery-disease", "CAD"),
+    ("ischemic-stroke", "CAD"),
+    ("hypertension polygenic", "CAD"),
+    ("atrial-fibrillation", "CAD"),
+    ("ldlr", "CAD"), ("pcsk9", "CAD"), ("apob", "CAD"),
+    ("scn5a", "CAD"), ("kcnq1", "CAD"), ("kcnh2", "CAD"),
+    ("myh7", "CAD"), ("mybpc3", "CAD"),
+    ("extreme-tier lipid", "CAD"),
+    ("extreme-tier cardiovascular", "CAD"),
+    ("factor v leiden", "CAD"),
+    # ── metabolic ─────────────────────────────────────────────────────────
+    ("type-2-diabetes", "T2D"),
+    ("extreme-tier glucose", "T2D"),
+    # ── neurodegenerative ─────────────────────────────────────────────────
+    # APOE before Alzheimer, deliberately. The APOE finding text names both
+    # cardiovascular and Alzheimer risk, but the intervention the table
+    # actually prices is a statin to prevent an MI, so CAD is the anchor whose
+    # cost of illness and effect size apply.
+    ("apoe", "CAD"),
+    ("alzheimer", "Alzheimer"),
+    # ── oncology ──────────────────────────────────────────────────────────
+    ("brca1", "BreastOvarian"), ("brca2", "BreastOvarian"),
+    ("breast-cancer", "BreastOvarian"),
+    ("mlh1", "Colorectal"), ("msh2", "Colorectal"),
+    ("msh6", "Colorectal"), ("pms2", "Colorectal"),
+    ("lynch", "Colorectal"),
+    ("tp53", "Pathogenic"), ("ret ", "Pathogenic"), ("rb1", "Pathogenic"),
+    ("chek2", "Pathogenic"),
+    ("cystic fibrosis", "Pathogenic"),
+    # ── iron ──────────────────────────────────────────────────────────────
+    ("hemochromatosis", "IronOverload"),
+    ("hfe c282y", "IronOverload"),
+    # ── urologic ──────────────────────────────────────────────────────────
+    ("prostate", "Urologic"),
+    ("kidney-stone", "Urologic"),
+    ("overactive-bladder", "Urologic"),
+    # ── gut (new anchors, see registry) ───────────────────────────────────
+    ("coeliac", "Coeliac"), ("celiac", "Coeliac"),
+    # Lactase non-persistence is deliberately NOT routed. It is genuinely
+    # actionable but worth roughly $250 and 0.05 QALYs, and anchoring it would
+    # have cost two unsourced registry parameters to move the total by a
+    # rounding error — dropping the model under its own sourcing gate. It is
+    # reported as a signal instead, which is the honest place for it.
+)
+
+
+def coi_key_for_finding(finding: str, category: str = "") -> str:
+    """Condition anchor for a curated finding, or "" if it has none.
+
+    Matching is on explicit substrings rather than a general gene regex: a
+    regex for gene-shaped words reads "MI", "MACE" and "B12" as genes, which is
+    the mistake the correlated-target pooling already had to unlearn.
+    """
+    hay = f"{finding} {category}".lower()
+    for needle, key in _COI_ROUTES:
+        if needle in hay:
+            return key
+    return ""
+
+
 def _corrected_cohort_items(findings_econ: dict) -> tuple[list[dict], dict]:
     """Put the raw curated finding list through the same corrections the
     individual sheet applies, so the cohort views are a *view* of one
@@ -1521,11 +1680,42 @@ def _corrected_cohort_items(findings_econ: dict) -> tuple[list[dict], dict]:
         prev = max(0.0, min(1.0, float(f.get("prevalence") or 0.0)))
         if prev <= 0.0:
             continue
+
+        # ── expected value, not raw event cost ────────────────────────────
+        # A finding routed to a condition anchor is valued the way the pooled
+        # engine values it: the probability the event happens at all, times the
+        # share of it the intervention prevents, times the registry's cost of
+        # illness. Without those two probabilities a $250,000 myocardial
+        # infarction was charged in full to every carrier, which is what made
+        # one plan member appear to save $16,174.
+        coi_key = coi_key_for_finding(str(f.get("finding") or ""), cat)
+        anchored = False
+        if coi_key:
+            try:
+                from . import engine as _eng
+                from . import params as _ep
+                cost_param, qaly_param = _eng.COI_KEY_TO_PARAM[coi_key]
+                p_event = _ep.value("baseline_event_probability")
+                rrr = _ep.value("actionable_rrr")
+                # Coeliac is the case that proves the point: the HLA haplotype
+                # is necessary but only a few percent of carriers convert, so
+                # the conversion rate replaces the generic event probability.
+                if coi_key == "Coeliac":
+                    p_event = _ep.value("penetrance_coeliac_given_dq")
+                cases = p_event * rrr
+                raw_avoided = cases * _ep.value(cost_param)
+                raw_qaly = cases * _ep.value(qaly_param)
+                anchored = True
+            except Exception:
+                anchored = False
+        if not anchored:
+            raw_avoided = float(f.get("outcome_value") or 0.0)
+            raw_qaly = float(f.get("qaly_gain") or 0.0)
+
         # Cash side: only the marginal share of an average cost is freed, and
         # the event lands at an unmodelled point inside the horizon.
-        avoided = (float(f.get("outcome_value") or 0.0)
-                   * _MARGINAL_COST_FRACTION * _MIDPOINT_DISCOUNT * adh)
-        qaly = float(f.get("qaly_gain") or 0.0) * _MIDPOINT_DISCOUNT * adh
+        avoided = raw_avoided * _MARGINAL_COST_FRACTION * _MIDPOINT_DISCOUNT * adh
+        qaly = raw_qaly * _MIDPOINT_DISCOUNT * adh
         spend = float(f.get("intervention_cost") or 0.0) * adh
         items.append({
             "finding": f.get("finding", ""),
@@ -1539,6 +1729,8 @@ def _corrected_cohort_items(findings_econ: dict) -> tuple[list[dict], dict]:
             "net": avoided + qaly * VALUE_PER_QALY - spend,
             "confidence": f.get("confidence", "moderate"),
             "pool_hint": f.get("pool_hint", ""),
+            "coi_key": coi_key,
+            "registry_anchored": anchored,
         })
 
     # Correlated-target pooling: the same gene surfacing through two panels is
@@ -1575,6 +1767,15 @@ def _corrected_cohort_items(findings_econ: dict) -> tuple[list[dict], dict]:
         "n_pooled_targets": len(pooled_targets),
         "pooled_targets": pooled_targets,
         "n_findings_before_pooling": n_before,
+        # How much of the total still rests on a hand-written figure rather
+        # than on the registry. Reported rather than hidden: the routing table
+        # does not yet cover every condition (chronic kidney disease,
+        # Parkinson's, Wilson's disease and prostate cancer have no anchor), and
+        # those findings keep their curated value.
+        "n_registry_anchored": sum(1 for i in items if i.get("registry_anchored")),
+        "n_curated_basis": sum(1 for i in items if not i.get("registry_anchored")),
+        "anchored_conditions": sorted({i["coi_key"] for i in items
+                                       if i.get("coi_key")}),
         "note": ("Cohort figures apply the marginal-cost fraction, midpoint "
                  "discounting, real-world adherence and correlated-target "
                  "pooling that the individual sheet applies. Earlier versions "
@@ -1829,7 +2030,8 @@ def analyze_health_economics(findings: dict, snps_df: pd.DataFrame,
                              wellness_result: dict | None = None,
                              detox_result: dict | None = None,
                              family_planning_result: dict | None = None,
-                             top_drugs_result: dict | None = None) -> dict:
+                             top_drugs_result: dict | None = None,
+                             gut_health_result: dict | None = None) -> dict:
     """Compute clinical & payer ROI for genomic interventions.
 
     Accepts results from all pipeline analysis modules and produces
@@ -1858,6 +2060,7 @@ def analyze_health_economics(findings: dict, snps_df: pd.DataFrame,
         econ_findings += _detox_findings(detox_result)
         econ_findings += _family_planning_findings(family_planning_result)
         econ_findings += _top_drugs_findings(top_drugs_result)
+        econ_findings += _gut_findings(gut_health_result)
     except Exception as e:  # never raise from the pipeline
         return {"status": "error", "error": str(e),
                 "findings_with_economics": [], "disclaimer": DISCLAIMER}

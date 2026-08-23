@@ -111,7 +111,16 @@ def test_most_of_the_model_is_sourced():
     # registry exists to prevent. The proportional bound above is the one that
     # matters and it did not move — this count is a ratchet on carelessness,
     # not a budget to spend.
-    assert burden["n_assumption"] <= 13, (
+    # Then connecting the gut-health module took it to 16. THE TENSION WORTH
+    # NAMING: every new condition anchored in this model costs two or three
+    # unsourced parameters — a cost of illness, a quality-of-life decrement,
+    # and often a penetrance — unless costing studies are in hand for it. So
+    # broadening coverage and improving provenance pull against each other, and
+    # the honest response is to let the count rise while the proportional gate
+    # above holds, rather than to retier judgement as evidence to keep a number
+    # flat. The coeliac anchors are the three in question and they are the
+    # first candidates for real sourcing.
+    assert burden["n_assumption"] <= 16, (
         "declared assumptions are allowed but should stay few and "
         "individually justified")
     for p in ep.assumptions():

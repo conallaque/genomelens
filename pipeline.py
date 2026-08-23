@@ -45,6 +45,7 @@ from analyze import (
     analyze_expanded_pgs,
     analyze_family_planning,
     analyze_genetic_age,
+    analyze_gut_health,
     analyze_health_economics,
     analyze_hla,
     analyze_holistic_synthesis,
@@ -732,6 +733,22 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Urologic module failed: {e}")
 
+    # ── Gut health (lactase, secretor, coeliac HLA tags, DAO, NOD2/IL23R) ──
+    # THE MODULE THAT NEVER RAN. gut_health.py has existed with a registry
+    # consistency test and no caller, so 327 lines of analysis produced nothing
+    # in any report and could not reach the economic model no matter how the
+    # economics were wired. Its coeliac haplotype call is the one trait with a
+    # costable action behind it.
+    gut_health_result: dict | None = None
+    if analyze_gut_health is not None:
+        try:
+            gut_health_result = analyze_gut_health(snps_df)
+            log(f"  Gut health: {gut_health_result.get('n_predictions', 0)} "
+                f"predictions across "
+                f"{len(gut_health_result.get('categories', []))} categories")
+        except Exception as e:
+            log(f"  WARNING: Gut-health module failed: {e}")
+
     # ── Deep ancestry (Neanderthal + ancient-pop + N/S Europe + timelines) ──
     deep_ancestry_result: dict | None = None
     if analyze_deep_ancestry is not None:
@@ -999,7 +1016,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 wellness_result=wellness_result,
                 detox_result=detox_result,
                 family_planning_result=family_planning_result,
-                top_drugs_result=top_drugs_result)
+                top_drugs_result=top_drugs_result,
+                    gut_health_result=gut_health_result)
             log(f"  Health economics: {economics_result.get('n_findings', 0)} findings "
                 f"with modeled ROI")
         except Exception as e:

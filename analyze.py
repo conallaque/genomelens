@@ -177,6 +177,10 @@ try:
 except ImportError:
     analyze_urologic = None
 try:
+    from gut_health import analyze_gut_health
+except ImportError:
+    analyze_gut_health = None
+try:
     from deep_ancestry import analyze_deep_ancestry
 except ImportError:
     analyze_deep_ancestry = None

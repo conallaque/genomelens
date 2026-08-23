@@ -108,6 +108,14 @@ COI_KEY_TO_PARAM: dict[str, tuple[str, str]] = {
     "Colorectal":        ("coi_colorectal",         "qaly_loss_cancer"),
     "BreastOvarian":     ("coi_breast_ovarian",     "qaly_loss_cancer"),
     "Pathogenic":        ("coi_pathogenic_generic", "qaly_loss_pathogenic_generic"),
+    # Coeliac, added when the gut-health module was connected to the engine.
+    # A deliberately small anchor: the disease is managed by diet rather than
+    # by procedures or biologics. Lactase non-persistence was considered and
+    # left OUT — it is a symptom burden rather than a disease, worth roughly
+    # $250 and 0.05 QALYs, and buying that with two unsourced registry
+    # parameters would have dropped the model below its own 75%-sourced gate
+    # for a rounding error. It stays a reported signal with no dollar figure.
+    "Coeliac":           ("coi_coeliac",            "qaly_loss_coeliac"),
 }
 
 
@@ -133,6 +141,11 @@ ADHERENCE_BY_COI_KEY: dict[str, str] = {
     "Colorectal":        "adherence_screening",         # colonoscopy programme
     "BreastOvarian":     "adherence_screening",         # imaging surveillance
     "Pathogenic":        "adherence_screening",         # specialist follow-up
+    # Coeliac: the genotype informs a screening decision (serology), and the
+    # diet that follows a positive result is enforced by symptoms rather than
+    # by willpower, so it sits closer to screening than to general dietary
+    # change. Lactose is ordinary dietary self-management.
+    "Coeliac":           "adherence_screening",         # serology, then diet
 }
 
 

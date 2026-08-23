@@ -781,6 +781,44 @@ _REGISTRY: list[Param] = [
             "treated no more optimistically than a mapped one. A condition "
             "reaching this parameter is a gap in the mapping, not a finding.",
        dist="beta", low=0.30, high=0.75),
+
+    # ── Gut conditions (new anchors) ──────────────────────────────────────
+    _p("coi_coeliac", 14_000.0, "$ per case", "assumption",
+       note="Ten-year cost of undiagnosed or poorly-managed coeliac disease: "
+            "repeat investigation of anaemia and GI symptoms, iron and vitamin "
+            "repletion, bone-density loss, and the documented gluten-free food "
+            "premium once diagnosed. Much smaller than the cancer and cardiac "
+            "anchors in this registry because the disease is managed by diet "
+            "rather than by procedures or biologics. No single costing study is "
+            "being followed, so this is declared as judgement.",
+       dist="gamma", low=6_000.0, high=30_000.0),
+
+    _p("qaly_loss_coeliac", 0.6, "QALYs", "assumption",
+       note="Quality-of-life decrement over the horizon from untreated coeliac "
+            "disease — fatigue, GI symptoms and the consequences of "
+            "malabsorption. Set well below the cancer and dementia decrements "
+            "because the condition is controllable once identified. Judgement.",
+       dist="beta", low=0.2, high=1.5),
+
+    _p("penetrance_coeliac_given_dq", 0.03, "proportion", "assumption",
+       note="THE FIGURE THAT KEEPS THIS FINDING HONEST. Derived as population "
+            "prevalence divided by carrier frequency: coeliac disease affects "
+            "about 1% of people of European ancestry, while roughly 30-40% "
+            "carry an HLA-DQ2.5/DQ8 susceptibility haplotype. So the haplotype "
+            "is necessary but nowhere near sufficient, and only a few percent "
+            "of carriers ever convert. Applying a coeliac cost of illness to "
+            "every carrier — the error the raw curated figures make elsewhere "
+            "in this model — would overstate the finding by more than an order "
+            "of magnitude.\n\nTiered as an assumption, not derived: the "
+            "reasoning is sound and the two input figures are widely reported, "
+            "but neither is carried here with a verifiable identifier, and a "
+            "tier claiming provenance it cannot show is worse than one that "
+            "admits the gap. Sourcing this against a prevalence meta-analysis "
+            "would move it to derived and lift the whole registry's sourced "
+            "share.",
+       dist="beta", low=0.01, high=0.08),
+
+
 ]
 
 PARAMS: dict[str, Param] = {p.key: p for p in _REGISTRY}
