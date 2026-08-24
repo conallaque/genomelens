@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import html as _h
 import json
 import os
 import sys
@@ -247,6 +248,91 @@ def _stamp_html(html: str) -> str:
            f'font-family:ui-monospace,Menlo,monospace">{marker}</div>')
     return (html.replace("</body>", tag + "</body>", 1)
             if "</body>" in html else html + tag)
+
+
+def _build_consolidated_econ_page(report_html: str, sheet_html: str,
+                                  file_label: str) -> str:
+    """One page carrying every economic result the run produced.
+
+    WHY THIS EXISTS. The economics were split across two artefacts: the pooled
+    payer analysis, the correction banners, the CEAC, the statistical-correction
+    chain and the cohort projection all rendered inside ``report.html``, while
+    the individual's sheet was its own two-page ``economic_analysis.html``.
+    Anyone opening the sheet saw a correct but partial picture and had no way to
+    know the rest existed — a reader cannot be expected to grep a 750 KB report
+    for the other half of an answer.
+
+    Sections are LIFTED from the generated report rather than re-rendered, which
+    matters: re-rendering would create a second code path that could drift from
+    the report, and drift between two views of one number is the exact defect
+    this project spent a long time removing. Here there is one computation and
+    two presentations of it, so they cannot disagree.
+    """
+    import re as _re
+
+    def _section(html: str, sec_id: str) -> str:
+        m = _re.search(rf'<section[^>]*id="{_re.escape(sec_id)}"', html)
+        if not m:
+            return ""
+        i, depth = m.start(), 0
+        for t in _re.finditer(r"<section\b|</section>", html[i:]):
+            depth += 1 if t.group(0).startswith("<section") else -1
+            if depth == 0:
+                return html[i:i + t.end()]
+        return ""
+
+    styles = "\n".join(m.group(0) for m in
+                       _re.finditer(r"<style[^>]*>.*?</style>", report_html, _re.S))
+    sheet_styles = "\n".join(m.group(0) for m in
+                             _re.finditer(r"<style[^>]*>.*?</style>", sheet_html, _re.S))
+    voi = _section(report_html, "value-of-information")
+    econ = _section(report_html, "health-economics")
+    body = _re.search(r"<body[^>]*>(.*)</body>", sheet_html, _re.S)
+    sheet_body = body.group(1) if body else ""
+
+    nav = """
+<div style="background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;
+     padding:12px 16px;margin:16px 0">
+  <strong style="color:#12467a">What is on this page</strong>
+  <ol style="margin:6px 0 0 18px;padding:0;color:#48545f;line-height:1.7">
+    <li><a href="#econ-payer" style="color:#12467a">Pooled cost-effectiveness</a>
+      &mdash; the payer view: findings combined once per condition, adherence
+      charged, every correction shown beside the figure it replaced</li>
+    <li><a href="#econ-personal" style="color:#12467a">Your economic sheet</a>
+      &mdash; the same genome from your own perspective, health value kept
+      separate from cash</li>
+    <li><a href="#econ-detail" style="color:#12467a">Per-finding detail and
+      cohort projection</a></li>
+  </ol>
+</div>"""
+
+    return f"""<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Health economics &mdash; {_h.escape(str(file_label))}</title>
+{styles}{sheet_styles}
+<style>
+  @media print {{ details > summary {{ display:none }}
+    .econ-break {{ break-before:page; page-break-before:always }}
+    table, svg {{ break-inside:avoid }} thead {{ display:table-header-group }} }}
+  .econ-h2 {{ font-size:19px; margin:20px 0 4px; padding-bottom:5px;
+              border-bottom:2px solid #e3e7ec }}
+</style></head>
+<body class="wrap" style="max-width:1080px;margin:0 auto;padding:20px">
+<h1 style="margin:0">Health economics</h1>
+<div style="color:#57606a;font-size:13px;margin-top:4px">
+  Every economic result from this run, in one place. Source:
+  <code>{_h.escape(str(file_label))}</code></div>
+{nav}
+<h2 class="econ-h2" id="econ-payer">1 &middot; Pooled cost-effectiveness</h2>
+{voi}
+<div class="econ-break"></div>
+<h2 class="econ-h2" id="econ-personal">2 &middot; Your economic sheet</h2>
+{sheet_body}
+<div class="econ-break"></div>
+<h2 class="econ-h2" id="econ-detail">3 &middot; Per-finding detail and cohort projection</h2>
+{econ}
+</body></html>"""
 
 
 def run_pipeline(args: argparse.Namespace) -> int:
@@ -1468,6 +1554,19 @@ def run_pipeline(args: argparse.Namespace) -> int:
                     _stamp_html(render_economic_analysis_html(personal_econ, file_label=file_label)),
                     encoding="utf-8",
                 )
+                # One consolidated page carrying every economic result, so
+                # the pooled analysis and the individual sheet are no longer in
+                # two separate artefacts a reader has to know to look for.
+                try:
+                    _all_econ = output_path.parent / "economics.html"
+                    _all_econ.write_text(_stamp_html(
+                        _build_consolidated_econ_page(
+                            output_path.read_text(encoding="utf-8"),
+                            econ_path.read_text(encoding="utf-8"),
+                            file_label)), encoding="utf-8")
+                    log(f"  Consolidated economics saved: {_all_econ}")
+                except Exception as _ce:
+                    log(f"  WARNING: consolidated economics page failed: {_ce}")
                 log(f"  Economic-impact analysis saved: {econ_path} "
                     f"(modeled net benefit {personal_econ['total_net']:,} "
                     f"= {personal_econ['total_qaly_value']:,} health value + "
