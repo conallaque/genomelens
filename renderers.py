@@ -31,6 +31,8 @@ import math
 import re
 from pathlib import Path
 
+import build_stamp
+
 # Late import — analyze.py finishes loading before any of these renderer
 # functions are called at runtime, so circular-import issues do not arise.
 from analyze import (
@@ -5249,7 +5251,7 @@ def build_economics_html(economics_result: dict | None) -> str:
     if clinic.get("n_findings"):
         clinic_html = f"""
 <div class="econ-panel">
-  <h3>Clinic ROI Dashboard <span class="econ-pop">{clinic.get('patient_count')} patients</span></h3>
+  <h3>Clinic Cohort <span class="econ-pop">{clinic.get('patient_count')} patients</span></h3>
   <div class="econ-cards">
     <div class="econ-card"><div class="econ-card-v">{_money(clinic.get('avg_cost_per_patient'))}</div><div class="econ-card-l">Avg cost / patient</div></div>
     <div class="econ-card"><div class="econ-card-v">{_money(clinic.get('avg_benefit_per_patient'))}</div><div class="econ-card-l">Avg benefit / patient</div></div>
@@ -5345,9 +5347,9 @@ def build_economics_html(economics_result: dict | None) -> str:
 
     return f"""
 <section class="econ-section" id="health-economics">
-<h2>Health Economics <span class="pro-pill">ROI</span></h2>
+<h2>Health Economics <span class="pro-pill">per finding</span></h2>
 <p class="econ-intro">
-Clinical and payer return-on-investment for acting on your genomic findings.
+Per-finding economics, and the same figures scaled to a cohort. Health value and cash are reported separately rather than combined into a single return-on-investment number.
 Each intervention's cost is weighed against the modeled value of the adverse
 outcome it averts, with payback period and 3-year NPV (discounted at 3%). The
 outcome value is credited <em>once</em>, at the horizon midpoint: it is the value
@@ -6895,6 +6897,13 @@ details.phewas-cat summary::-webkit-details-marker{{display:none}}
     <div class="hdr-title">DNA Analysis Report <span class="hdr-version">v{REPORT_VERSION}</span></div>
     <div class="hdr-meta">Generated: {report_date}&nbsp;&middot;&nbsp;
     Source: {dna_filename}&nbsp;&middot;&nbsp;{ai_tier_note}{qc_chip}</div>
+    <!-- Build provenance. One grep-able line naming the commit this report came
+         from, so a stale artefact can never again be mistaken for a current one
+         by inspection. "+dirty" means the working tree had uncommitted edits,
+         i.e. this report reflects code that is in no commit. -->
+    <div class="hdr-build" style="font-size:.72em;color:#8a94a3;margin-top:3px;
+         font-family:ui-monospace,SFMono-Regular,Menlo,monospace">
+      {build_stamp.build_stamp()["marker"]}</div>
   </div>
 </div>
 </header>
