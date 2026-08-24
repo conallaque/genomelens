@@ -90,7 +90,7 @@ it tries to invent (see [Engineering notes](#engineering-notes)).
 >
 > By using this software you accept that it is provided for education and research
 > **"as is", without warranty of any kind**, and that you are solely responsible for any
-> decisions you make. See the [LICENSE](LICENSE) and the disclaimers throughout this
+> decisions you make. See the [LICENSE](../LICENSE) and the disclaimers throughout this
 > document.
 
 ### Using a whole genome instead of a chip?
@@ -516,7 +516,7 @@ set grows as legacy modules are cleaned up.
 
 ### CI
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push and
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs on every push and
 pull request:
 
 - **tests** — the full suite on Python 3.10 / 3.11 / 3.12, then an import of the

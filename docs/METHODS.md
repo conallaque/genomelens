@@ -382,7 +382,7 @@ change and re-run; none of it is a slogan.
 **20 · Markov cohort model and budget impact — the two standard HEOR deliverables**
 
 A static decision model cannot answer "what happens over 40 years?" or "can a payer afford
-this?" Both canonical structures are implemented in [`econ/markov.py`](econ/markov.py).
+this?" Both canonical structures are implemented in [`econ/markov.py`](../econ/markov.py).
 
 **There are two cohort models, and they answer different questions.** This is deliberate,
 and worth stating plainly because an unexplained pair looks like duplication:
