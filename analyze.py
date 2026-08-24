@@ -243,7 +243,7 @@ except ImportError:
     render_multi_person_html = None
 
 SCRIPT_DIR = Path(__file__).parent
-DB_PATH = SCRIPT_DIR / "snp_database.json"
+DB_PATH = SCRIPT_DIR / "data/snp_database.json"
 OLLAMA_URL = "http://localhost:11434/api/chat"
 OLLAMA_MODEL = "qwen3:14b"
 REPORT_VERSION = "6.23.0"

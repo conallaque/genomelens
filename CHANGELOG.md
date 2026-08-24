@@ -966,7 +966,7 @@ No new genotype rules and no invented data. A systematic audit of all ~29
 compute (and route to the renderer) but the renderer silently discarded. This
 pass surfaces the high-value ones and fixes one live rendering bug. Every value
 below is produced by an existing module from the sample's own genotype or is
-author-curated in `snp_database.json` — nothing is synthesised.
+author-curated in `data/snp_database.json` — nothing is synthesised.
 
 ### Fixed
 
@@ -1039,11 +1039,11 @@ author-curated in `snp_database.json` — nothing is synthesised.
 
 ### Added — top prescribed-drugs pharmacogenomic screen
 
-- **`top_prescribed_drugs.json` + `top_drugs_screen.py` + a new report section.**
+- **`data/top_prescribed_drugs.json` + `top_drugs_screen.py` + a new report section.**
   A curated menu of the ~630 most commonly prescribed U.S. medications (generic
   names + class + brand) is screened against the genome. For each drug the
   pharmacogenomic relevance is computed entirely from **real bundled data** —
-  `drug_database.json` (CPIC/DPWG drug↔gene↔marker↔dosing) and
+  `data/drug_database.json` (CPIC/DPWG drug↔gene↔marker↔dosing) and
   `cpic_data/drugs.tsv` (ClinPGx/PharmGKB per-drug CPIC-pair & clinical-
   annotation levels) — cross-referenced with the user's per-gene metabolizer
   phenotypes from `pgx.py`. Drugs are tiered: (1) **genotype-actionable** —
@@ -1099,7 +1099,7 @@ author-curated in `snp_database.json` — nothing is synthesised.
   they are not treated as 0-copy reference, so there is no directional
   "downward bias"; lower coverage simply means a less complete estimate.
 - **Registry mass-migration (58 → 612 records) was scoped and declined.**
-  `snp_database.json` carries no GRCh37/38 coordinates or ancestral/derived
+  `data/snp_database.json` carries no GRCh37/38 coordinates or ancestral/derived
   alleles, so populating the coordinate-based registry from it would require
   unverifiable, fabricated coordinates. Deferred until a verified coordinate
   source (dbSNP/ClinVar dump) can be added offline.

@@ -43,7 +43,7 @@ def build_vcf(dest: pathlib.Path) -> int:
         w.write('##INFO=<ID=AF,Number=A,Type=Float,Description="Allele frequency">\n')
         w.write('##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">\n')
         w.write("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tSAMPLE\n")
-        for line in (ROOT / "test_genome.txt").open(errors="replace"):
+        for line in (ROOT / "data/test_genome.txt").open(errors="replace"):
             if line.startswith("#"):
                 continue
             p = line.rstrip("\n").split("\t")

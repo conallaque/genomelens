@@ -52,11 +52,11 @@ jobs:
         run: python -c "import pipeline, analyze, renderers"
 
       # End-to-end on the repository's own synthetic genome. No personal data:
-      # test_genome.txt is committed, and the report is written to a temporary
+      # data/test_genome.txt is committed, and the report is written to a temporary
       # directory that is never uploaded.
       - name: Generate a report end-to-end
         run: |
-          python analyze.py test_genome.txt --output "${RUNNER_TEMP}/report.html"
+          python analyze.py data/test_genome.txt --output "${RUNNER_TEMP}/report.html"
           test -s "${RUNNER_TEMP}/report.html"
           test -s "${RUNNER_TEMP}/economic_analysis.html"
           test -s "${RUNNER_TEMP}/emergency_card.html"
@@ -99,12 +99,13 @@ jobs:
         run: |
           grep -qx '\*\.csv' .gitignore
           grep -qx '!data/LifeTable_USA_Mx_2015.csv' .gitignore
+          grep -qx '!data/test_genome.txt' .gitignore
 
       - name: Check no unexpected genotype files are tracked
         run: |
           unexpected=$(git ls-files \
             | grep -iE '\.(csv|txt|vcf|vcf\.gz|23andme)$' \
-            | grep -viE '^(requirements.*\.txt|data/LifeTable_USA_Mx_2015\.csv|test_genome\.txt|cpic_drugs_batch1\.csv)$' \
+            | grep -viE '^(requirements.*\.txt|data/[A-Za-z0-9_.-]+\.(csv|txt|json))$' \
             || true)
           if [ -n "$unexpected" ]; then
             echo "Unexpected data files tracked:"; echo "$unexpected"; exit 1

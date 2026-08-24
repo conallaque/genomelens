@@ -234,7 +234,7 @@ flowchart TB
     raw["Raw chip file<br/>(23andMe / Ancestry /<br/>TellmeGen / FTDNA …)"]
     cli["analyze.py<br/>(CLI orchestrator)"]
     snps["snps_df<br/>(pandas DataFrame)"]
-    tier1["Tier 1 lookup<br/>snp_database.json"]
+    tier1["Tier 1 lookup<br/>data/snp_database.json"]
     raw --> cli --> snps --> tier1
 
     subgraph Core["Core analyses (pure functions of snps_df)"]

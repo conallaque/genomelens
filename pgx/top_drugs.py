@@ -1,9 +1,9 @@
 """Screen the most-commonly-prescribed medications against this genome.
 
-Takes the curated `top_prescribed_drugs.json` reference menu and, for each drug,
+Takes the curated `data/top_prescribed_drugs.json` reference menu and, for each drug,
 attaches its pharmacogenomic relevance computed from REAL bundled data:
 
-  * `drug_database.json`  — 217 CPIC/DPWG drug↔gene↔marker↔dosing records.
+  * `data/drug_database.json`  — 217 CPIC/DPWG drug↔gene↔marker↔dosing records.
   * `cpic_data/drugs.tsv` — ClinPGx/PharmGKB per-drug metadata (Top CPIC pair
     level, top clinical-annotation level).
   * the per-gene metabolizer phenotypes from `pgx.analyze_pgx` (the user's
@@ -29,8 +29,8 @@ import pandas as pd
 # it reads stays at the repository root. Left at .parent it would resolve
 # inside pgx/ and the loader degrades quietly on a missing file.
 _DIR = Path(__file__).resolve().parent.parent
-_TOP_PATH = _DIR / "top_prescribed_drugs.json"
-_CPIC_DB_PATH = _DIR / "drug_database.json"
+_TOP_PATH = _DIR / "data/top_prescribed_drugs.json"
+_CPIC_DB_PATH = _DIR / "data/drug_database.json"
 _PGKB_TSV_PATH = _DIR / "cpic_data" / "drugs.tsv"
 
 # Metabolizer phenotypes that can alter standard dosing (from pgx.py).
@@ -117,7 +117,7 @@ def analyze_top_drugs(
     """
     ref = _load_reference()
     if not ref:
-        return {"available": False, "reason": "top_prescribed_drugs.json not present."}
+        return {"available": False, "reason": "data/top_prescribed_drugs.json not present."}
 
     cpic = _load_cpic_db()
     pgkb = _load_pgkb()

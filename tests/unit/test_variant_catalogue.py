@@ -1,7 +1,7 @@
 """Catalogue rendering: the per-variant "Recommendation & context" block.
 
 Locks the depth pass that surfaces `recommendation`, `chip_coverage_note`,
-and `cross_references` (all curated in snp_database.json) in the variant
+and `cross_references` (all curated in data/snp_database.json) in the variant
 tables. The synthetic test genome does not match any coverage-note or
 cross-ref variant, so these paths need crafted records to be exercised.
 """

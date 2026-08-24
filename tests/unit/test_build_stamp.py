@@ -74,7 +74,7 @@ def test_a_rendered_report_carries_the_marker():
     import renderers
     html = renderers.build_html_report(
         tier1_results=[], apoe_genotype=None, ai_results={},
-        exec_summary=None, dna_filepath="test_genome.txt",
+        exec_summary=None, dna_filepath="data/test_genome.txt",
         no_ai=True, model="")
     assert bs.MARKER_PREFIX in html, "the report shipped with no build provenance"
     assert bs.commit_of(html) == bs.build_stamp()["commit"]

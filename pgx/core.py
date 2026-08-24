@@ -30,7 +30,7 @@ import pandas as pd
 # .parent.parent: this module moved into the pgx package, but the data file
 # it reads stays at the repository root. Left at .parent it would resolve
 # inside pgx/ and the loader degrades quietly on a missing file.
-_DRUG_DB_PATH = Path(__file__).resolve().parent.parent / "drug_database.json"
+_DRUG_DB_PATH = Path(__file__).resolve().parent.parent / "data/drug_database.json"
 _DRUG_DB_CACHE: list[dict] | None = None
 
 
@@ -47,7 +47,7 @@ def _load_drug_database() -> list[dict]:
 
 
 def analyze_drug_database(snps_df: pd.DataFrame) -> list[dict]:
-    """For every drug entry in drug_database.json, report a finding if the
+    """For every drug entry in data/drug_database.json, report a finding if the
     user has a called genotype for any of the drug's snp_markers.
 
     Returns one finding per drug entry that has at least one matched SNP.

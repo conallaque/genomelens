@@ -123,7 +123,14 @@ Thumbs.db
 logs/
 
 # ── Allow the small included test genome and SNP DB only ───────────────────
-!test_genome.txt
+# Path-anchored, and the path changed when the data files were consolidated
+# into data/ — an exception left at the old location silently stops matching
+# and the file quietly becomes untracked.
+!data/test_genome.txt
+!data/drug_database.json
+!data/snp_database.json
+!data/top_prescribed_drugs.json
+!data/cpic_drugs_batch1.csv
 !snp_database.json
 
 # Same one-file-at-a-time rule as the LifeTable exception above. The blanket
