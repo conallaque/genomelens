@@ -111,7 +111,7 @@ try:
 except ImportError:
     analyze_mr = None
 try:
-    from genetic_age import analyze_genetic_age
+    from wellness.genetic_age import analyze_genetic_age
 except ImportError:
     analyze_genetic_age = None
 try:
@@ -131,22 +131,22 @@ try:
 except ImportError:
     generate_narrative_report = None
 try:
-    from bloodwork import compare_bloodwork, render_bloodwork_html
+    from wellness.bloodwork import compare_bloodwork, render_bloodwork_html
 except ImportError:
     compare_bloodwork = None
     render_bloodwork_html = None
 try:
-    from supplements import build_supplement_stack, render_supplements_html
+    from wellness.supplements import build_supplement_stack, render_supplements_html
 except ImportError:
     build_supplement_stack = None
     render_supplements_html = None
 try:
-    from exercise import analyze_exercise, render_exercise_html
+    from wellness.exercise import analyze_exercise, render_exercise_html
 except ImportError:
     analyze_exercise = None
     render_exercise_html = None
 try:
-    from nutrition import analyze_nutrition, render_nutrition_html
+    from wellness.nutrition import analyze_nutrition, render_nutrition_html
 except ImportError:
     analyze_nutrition = None
     render_nutrition_html = None
@@ -169,19 +169,19 @@ except ImportError:
     analyze_personal_economics = None
     render_economic_analysis_html = None
 try:
-    from metal_oxidative import analyze_metal_oxidative
+    from wellness.metal_oxidative import analyze_metal_oxidative
 except ImportError:
     analyze_metal_oxidative = None
 try:
-    from detox import analyze_detox
+    from wellness.detox import analyze_detox
 except ImportError:
     analyze_detox = None
 try:
-    from urologic import analyze_urologic
+    from wellness.urologic import analyze_urologic
 except ImportError:
     analyze_urologic = None
 try:
-    from gut_health import analyze_gut_health
+    from wellness.gut_health import analyze_gut_health
 except ImportError:
     analyze_gut_health = None
 try:
@@ -189,11 +189,11 @@ try:
 except ImportError:
     analyze_deep_ancestry = None
 try:
-    from blood_type import analyze_blood_type
+    from wellness.blood_type import analyze_blood_type
 except ImportError:
     analyze_blood_type = None
 try:
-    from immunogenetics import analyze_immunogenetics
+    from wellness.immunogenetics import analyze_immunogenetics
 except ImportError:
     analyze_immunogenetics = None
 try:
@@ -201,15 +201,15 @@ try:
 except ImportError:
     analyze_ancestral_story = None
 try:
-    from neurochemistry import analyze_neurochemistry
+    from wellness.neurochemistry import analyze_neurochemistry
 except ImportError:
     analyze_neurochemistry = None
 try:
-    from holistic_synthesis import analyze_holistic_synthesis
+    from wellness.holistic_synthesis import analyze_holistic_synthesis
 except ImportError:
     analyze_holistic_synthesis = None
 try:
-    from addiction_genetics import analyze_addiction_genetics
+    from wellness.addiction_genetics import analyze_addiction_genetics
 except ImportError:
     analyze_addiction_genetics = None
 try:
@@ -217,11 +217,11 @@ try:
 except ImportError:
     analyze_polygenic_traits = None
 try:
-    from environmental_optimization import analyze_environmental_optimization
+    from wellness.environmental_optimization import analyze_environmental_optimization
 except ImportError:
     analyze_environmental_optimization = None
 try:
-    from life_stage_playbook import analyze_life_stage_playbook
+    from wellness.life_stage_playbook import analyze_life_stage_playbook
 except ImportError:
     analyze_life_stage_playbook = None
 try:

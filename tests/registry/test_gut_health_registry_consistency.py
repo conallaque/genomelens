@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import gut_health
+from wellness import gut_health
 
 
 def test_audit_returns_well_structured_dict() -> None:

@@ -22,11 +22,11 @@ from __future__ import annotations
 import pandas as pd
 
 try:
-    from exercise_advanced import analyze_advanced_exercise
+    from .exercise_advanced import analyze_advanced_exercise
 except ImportError:
     analyze_advanced_exercise = None
 try:
-    from exercise_protocols import analyze_exercise_protocols
+    from .exercise_protocols import analyze_exercise_protocols
 except ImportError:
     analyze_exercise_protocols = None
 

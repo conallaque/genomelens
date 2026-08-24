@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import environmental_optimization as eo
+from wellness import environmental_optimization as eo
 
 
 def _df(g: dict) -> pd.DataFrame:

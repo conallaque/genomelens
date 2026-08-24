@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import exercise as ex
+from wellness import exercise as ex
 
 
 def test_no_data_when_df_is_none() -> None:

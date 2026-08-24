@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import addiction_genetics as ag
+from wellness import addiction_genetics as ag
 
 
 def _df(g: dict) -> pd.DataFrame:

@@ -1145,7 +1145,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                     f"${voi_result.get('marginal_chip_to_wgs', 0):,.0f}")
                 try:
                     import cohort_simulator as _cs
-                    from life_stage_playbook import resolve_age as _resolve_age
+                    from wellness.life_stage_playbook import resolve_age as _resolve_age
                     _pa = _resolve_age(getattr(args, "age", None), bloodwork_result)
                     voi_result["personalized"] = _cs.personalize_for_report(
                         voi_result, age=float(_pa or 40.0))
@@ -1279,7 +1279,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
     if analyze_life_stage_playbook is not None:
         try:
             # Age priority: --age flag, else bloodwork labs age; see resolve_age.
-            from life_stage_playbook import resolve_age
+            from wellness.life_stage_playbook import resolve_age
             _age = resolve_age(getattr(args, "age", None), bloodwork_result)
             life_stage_playbook_result = analyze_life_stage_playbook(
                 age=_age,
@@ -1597,7 +1597,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
 
     # ── Longevity composite & year-long integrated plan ──
     try:
-        from longevity import integrated_longevity_plan
+        from wellness.longevity import integrated_longevity_plan
         if nutrition_result and nutrition_result.get("status") == "ok" \
                 and exercise_result and exercise_result.get("status") == "ok":
             integrated = integrated_longevity_plan(nutrition_result, exercise_result)

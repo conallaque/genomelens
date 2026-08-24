@@ -452,7 +452,7 @@ def test_a_wild_type_genotype_is_not_priced_as_a_finding():
     # None, None is not "neutral", and the guard never fired. OPRM1 A/A —
     # "standard mu-opioid receptor", action "None specific." — was priced at the
     # full $25,000. Nothing crashed; the total was just wrong.
-    import neurochemistry as nc
+    from wellness import neurochemistry as nc
     wild = nc._oprm1(_neuro("rs1799971", "AA"))
     assert wild["impact"] == "neutral", "a typical result must declare itself"
     assert he._neurochemistry_findings({"available": True, "findings": [wild]}) == []
@@ -469,7 +469,7 @@ def test_every_neurochemistry_record_declares_an_impact():
     # out of the guard, which is how the original defect stayed invisible.
     import pandas as pd
 
-    import neurochemistry as nc
+    from wellness import neurochemistry as nc
     probes = [("_comt", nc._comt, "rs4680", "AA"), ("_maoa", nc._maoa, "rs6323", "GG"),
               ("_bdnf", nc._bdnf, "rs6265", "TT"), ("_drd2", nc._drd2, "rs1800497", "TT"),
               ("_drd4", nc._drd4, "rs1800955", "TT"),
@@ -490,7 +490,7 @@ def test_a_compound_locus_label_still_resolves_to_its_econ_entry():
     # reports the Taq1A locus as "DRD2/ANKK1" because it spans both genes. The
     # lookup was exact, so that finding was never priced at all — a suppressed
     # line rather than an inflated one, and equally invisible.
-    import neurochemistry as nc
+    from wellness import neurochemistry as nc
     rec = nc._drd2(_neuro("rs1800497", "TT"))
     assert rec["gene"] == "DRD2/ANKK1"
     priced = he._neurochemistry_findings({"available": True, "findings": [rec]})
@@ -505,7 +505,7 @@ def test_econ_table_keys_resolve_against_the_strings_modules_emit():
     # nothing is a valuation the model silently never computes.
     import pandas as pd
 
-    import neurochemistry as nc
+    from wellness import neurochemistry as nc
     emitted = set()
     for fn, rsid, gt in ((nc._comt, "rs4680", "AA"), (nc._bdnf, "rs6265", "TT"),
                          (nc._drd2, "rs1800497", "TT"), (nc._oprm1, "rs1799971", "GG")):
@@ -540,7 +540,7 @@ def test_verbose_category_labels_resolve_to_short_econ_keys():
 def test_the_addiction_panel_produces_records_again():
     import pandas as pd
 
-    import addiction_genetics as ag
+    from wellness import addiction_genetics as ag
     loci = ["rs110402", "rs1229984", "rs1360780", "rs16969968", "rs1799971",
             "rs1801272", "rs2023239", "rs2031920", "rs27072", "rs279858",
             "rs324420", "rs671"]
@@ -591,7 +591,7 @@ def test_no_priced_gene_bills_its_reference_genotype():
     # population mode), not a homozygote.
     import pandas as pd
 
-    import neurochemistry as nc
+    from wellness import neurochemistry as nc
     reference = {
         "COMT":  (nc._comt,  "rs4680",     "AG"),   # Val/Met — intermediate
         "BDNF":  (nc._bdnf,  "rs6265",     "CC"),   # Val/Val — full secretion
@@ -619,7 +619,7 @@ def test_a_neutral_finding_still_reaches_the_narrative_report():
     # The guard must suppress the *valuation*, not the finding. COMT Val/Met is
     # neutral for economics but is genuinely favourable news the report should
     # still tell the reader, so it keeps its phenotype and its action.
-    import neurochemistry as nc
+    from wellness import neurochemistry as nc
     rec = nc._comt(_neuro("rs4680", "AG"))
     assert rec["impact"] == "neutral"
     assert "heterozygote advantage" in rec["phenotype"]
@@ -644,7 +644,7 @@ def test_neurochemistry_evidence_is_not_silently_empty():
     # addiction_genetics findings (where this block was copy-pasted from) but
     # one neurochemistry never emits. Every evidence string rendered as
     # "COMT AG — " and shipped that way into economic_analysis.html.
-    import neurochemistry as nc
+    from wellness import neurochemistry as nc
     assert "verdict" not in nc._comt(_neuro("rs4680", "GG"))
     for rsid, gt in (("rs4680", "GG"), ("rs6265", "TT"), ("rs1799971", "GG")):
         rec = nc.analyze_neurochemistry(_neuro(rsid, gt))
@@ -658,7 +658,7 @@ def test_the_personal_model_skips_the_reference_comt_class():
     # `comt_class != "normal"`, but _classify_comt returns warrior / middle /
     # worrier / unknown and never "normal" — so the test passed for every
     # genotype and priced COMT for the reference heterozygote too.
-    import neurochemistry as nc
+    from wellness import neurochemistry as nc
     produced = {nc._classify_comt(gt) for gt in ("GG", "AG", "AA", None)}
     assert "normal" not in produced, (
         "if _classify_comt ever emits 'normal' this guard needs revisiting"
@@ -680,7 +680,7 @@ def test_the_personal_model_skips_the_reference_comt_class():
     # "unknown", which was truthy AND != "normal", so a chip that never
     # genotyped COMT still got a COMT valuation. Billing an ungenotyped gene is
     # worse than billing a reference genotype.
-    import neurochemistry as nc2
+    from wellness import neurochemistry as nc2
     df = pd.DataFrame({"genotype": ["TT"]}, index=["rs6265"])   # BDNF only
     df.index.name = "rsid"
     absent = he.analyze_personal_economics(

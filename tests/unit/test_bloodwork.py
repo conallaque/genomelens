@@ -15,7 +15,7 @@ import json
 
 import pytest
 
-import bloodwork as bw
+from wellness import bloodwork as bw
 
 # ── Threshold boundaries ─────────────────────────────────────────────────────
 

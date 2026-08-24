@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import neurochemistry as nc
+from wellness import neurochemistry as nc
 
 
 def _df(g: dict) -> pd.DataFrame:

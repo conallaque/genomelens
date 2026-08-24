@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import holistic_synthesis as hs
+from wellness import holistic_synthesis as hs
 
 
 def test_glucose_hba1c_discordance_detected() -> None:

@@ -31,11 +31,11 @@ from __future__ import annotations
 import pandas as pd
 
 try:
-    from nutrition_advanced import analyze_advanced_nutrition
+    from .nutrition_advanced import analyze_advanced_nutrition
 except ImportError:
     analyze_advanced_nutrition = None
 try:
-    from nutrition_protocols import analyze_nutrition_protocols
+    from .nutrition_protocols import analyze_nutrition_protocols
 except ImportError:
     analyze_nutrition_protocols = None
 

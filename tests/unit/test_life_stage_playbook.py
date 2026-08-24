@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import life_stage_playbook as lsp
+from wellness import life_stage_playbook as lsp
 
 HOLISTIC = {"genome_leverage": {"tier": "Favorable", "score": 74},
             "insights": [{"id": "glucose_hba1c_stress_discordance"}]}

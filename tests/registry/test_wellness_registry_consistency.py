@@ -1,8 +1,8 @@
-"""Cross-module consistency for wellness.py vs snp_registry."""
+"""Cross-module consistency for wellness/core.py vs snp_registry."""
 
 from __future__ import annotations
 
-import wellness
+from wellness import core as wellness
 
 
 def test_audit_returns_well_structured_dict() -> None:

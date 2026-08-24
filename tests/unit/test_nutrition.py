@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import nutrition as nu
+from wellness import nutrition as nu
 
 
 def test_no_data_when_df_is_none() -> None:
@@ -70,7 +70,7 @@ def test_advanced_sections_not_gated_on_polygenic_scores() -> None:
     """Regression: _render_advanced_sections must not drop the whole advanced
     layer (dashboard/inflammation/detox/protocols) when polygenic_scores is
     absent. Each sub-section guards on its own data."""
-    import nutrition as nu
+    from wellness import nutrition as nu
     no_pgs = {
         "detoxification": {
             "phase1_typed": ["CYP1A2 fast"], "phase2_typed": ["GST null"],

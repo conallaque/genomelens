@@ -17,12 +17,12 @@ from __future__ import annotations
 
 import pytest
 
-import bloodwork as bw
-import exercise as ex
 import fhir_export as fx
-import nutrition as nu
 import personalized_plan as pp
-import supplements as sup
+from wellness import bloodwork as bw
+from wellness import exercise as ex
+from wellness import nutrition as nu
+from wellness import supplements as sup
 
 pytestmark = pytest.mark.golden
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import blood_type as bt
+from wellness import blood_type as bt
 
 
 def _df(genotypes: dict, rhd_calls: int = 40, rhd_total: int = 42) -> pd.DataFrame:

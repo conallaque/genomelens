@@ -17,7 +17,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-import supplements as sup
+from wellness import supplements as sup
 
 # ── _risk_dose strand-awareness ──────────────────────────────────────────────
 
