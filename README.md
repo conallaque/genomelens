@@ -65,35 +65,31 @@ direction and review — what is on offer here is the economics and the judgemen
 
 ## Why I built this
 
-I've spent the last five years in health economics — a BA focused on it (with a
-published paper), now finishing a master's at Northeastern — circling one question:
-**what is the actual payoff of understanding your own health, in decisions?**
+I've worked in health economics for five years — a BA focused on it, with a published
+paper, and now a master's at Northeastern. One question keeps coming back: **what is
+understanding your own health actually worth?**
 
-Your genome is the richest, longest-lived input to that question. But the payoff is
-locked behind two barriers. First, **price**: buying the equivalent analyses and
-interpretation piecemeal runs from a few hundred to a few thousand dollars. Second,
-**privacy**: the usual way to unlock them is to hand your genome — the one piece of data
-you can never change or revoke — to a company's cloud, where it can be breached, sold,
-or repurposed.
+Your genome is the best input to that question. Two things block it.
 
-That's a health-economics problem hiding in plain sight. The **value of information** in
-a genome is real but individual — GenomeLens's own model puts it anywhere from negligible
-to tens of thousands of dollars depending on what the file contains, and reports which of
-the two it is rather than assuming the flattering answer — yet access is gated by cost
-and by an unacceptable privacy price. So the *return on health* that genomics promises
-is, in practice, only available to people who can pay and are willing to give themselves
-away.
+**Price.** Buying these analyses and the interpretation separately runs from a few
+hundred to a few thousand dollars.
 
-**GenomeLens removes both barriers at once.** It runs the analysis locally, for free, on
-a laptop someone might already own — and it doesn't just hand you data, it models the
-return on health: what each finding is worth, what *acting* on it is worth, and whether
-it's worth acting at all. That is applied health economics — value of information,
-cost-effectiveness, and access — turned into something one person can run on their own
-DNA, privately, at zero marginal cost.
+**Privacy.** To get them, you hand your genome to a company's cloud — the one piece of
+data you can't change or take back — where it can be breached, sold, or reused.
 
-The point was never a slick genomics toy. It's that the payoff of knowing your own
-biology shouldn't require a big budget or a surrendered genome. On an ordinary laptop,
-it doesn't.
+That's a health-economics problem, not a technical one. The value of information in a
+genome is real but individual: this model puts it anywhere from near zero to tens of
+thousands, depending on what's actually in the file. It reports which one you got instead
+of assuming the better answer. But access is gated by money and by a privacy cost most
+people shouldn't accept, so the return genomics promises only reaches people who can pay
+and are willing to give themselves up.
+
+GenomeLens removes both. It runs locally, for free, on a laptop you already own. And it
+doesn't just list findings — it prices them: what each one is worth, what *acting* on it
+is worth, and whether acting is worth it at all.
+
+I wasn't trying to build a genomics toy. The payoff of understanding your own biology
+shouldn't cost a lot of money or your DNA. On a normal laptop, it doesn't have to.
 
 ---
 
