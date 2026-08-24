@@ -93,6 +93,28 @@ shouldn't cost a lot of money or your DNA. On a normal laptop, it doesn't have t
 
 ---
 
+## What else it tells you
+
+The economics is the headline, but it is computed on top of a full analysis. Briefly,
+what a run actually reports:
+
+| Area | What you get |
+|---|---|
+| **Pharmacogenomics** | CPIC/DPWG star-allele calling across 217 drugs — which medications to avoid, dose-adjust, or expect a poor response from. HLA typing for drug-hypersensitivity risk. Drug–drug and gene–drug interactions. |
+| **Clinical risk** | ClinVar pathogenic/likely-pathogenic screen, ACMG actionable genes, carrier status, and an offline computational screen (AlphaMissense) for rare variants beyond ClinVar. |
+| **Polygenic risk** | PRS and PGS Catalog scores with coverage and an ancestry-transferability caveat, plus PheWAS biomarker predictions. |
+| **Gut health** | Lactase persistence, FUT2 secretor status, coeliac HLA-DQ2.5/DQ8 tags, histamine/DAO clearance, NOD2 and IL23R. |
+| **Fitness** | Power vs endurance lean, strength trainability, recovery speed, VO2max response, plus lift-level protocol cards and HR/FTP zones. |
+| **Nutrition** | Macronutrient pressures, caffeine and alcohol handling, lactose and gluten, folate/B12 methylation, and a 30-day meal plan with a shopping list. |
+| **Supplements** | A ranked stack with the genotype behind each entry, an evidence tier, what to avoid, and a monthly cost. |
+| **Blood work** | Genotype-aware interpretation of a supplied lab panel — clinical *and* optimal ranges, biological age (Levine PhenoAge), AHA PREVENT 10-year ASCVD risk, and longitudinal tracking. |
+| **Ancestry & lineage** | AIM-based population inference, Neanderthal and ancient-population affinity, chromosome painting, and Y-DNA / mtDNA lineage chains showing every branch point and where the chip runs out. |
+| **Other panels** | Detoxification enzymes, metals and oxidative handling, immunogenetics, neurochemistry (COMT/MAOA/BDNF), urologic, addiction genetics, blood type, sleep and chronotype. |
+| **Recommendations** | A master plan tying it together: decade-by-decade priorities, behavioural protocols, a printable emergency card for clinicians, and a plain-language summary of what to actually do first. |
+
+Findings that have a **real signal but no proven intervention** carry no dollar value and
+say so — a risk you cannot act on is reported as exactly that, not priced.
+
 ## Health economics — what the engine actually does
 
 Full derivations, equations and citations: [`docs/METHODS.md`](docs/METHODS.md).

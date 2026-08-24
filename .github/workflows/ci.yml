@@ -82,7 +82,7 @@ jobs:
         run: ruff check .
 
       - name: mypy (strict set)
-        run: mypy snp_registry.py cli.py
+        run: mypy core/snp_registry.py cli.py
 
   dna-guard:
     name: no genotype data in the tree

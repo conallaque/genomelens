@@ -558,7 +558,7 @@ returns a structured dict, then wire it into `analyze.py` behind a
   evaluated.
 - **Document the variance-explained reality.** Common-variant polygenic
   predictions typically explain 5–20% of trait variance; phrase tier labels
-  and thresholds accordingly. "Diverged" in `bloodwork.py` means "non-genetic
+  and thresholds accordingly. "Diverged" in `wellness/bloodwork.py` means "non-genetic
   driver dominating," not "the genetic prediction is wrong."
 - **Add unit tests + a golden snapshot.** New behaviour must be locked
   against regression. See `tests/unit/test_supplements.py` as the template.
