@@ -6,7 +6,7 @@ import random
 
 import pandas as pd
 
-import multi_person_module as mp
+from tools import multi_person as mp
 
 
 def _df(g: dict) -> pd.DataFrame:

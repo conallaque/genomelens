@@ -1144,7 +1144,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                     f"${voi_result.get('voi_expost_mean', 0):,.0f} · chip→WGS marginal ≈ "
                     f"${voi_result.get('marginal_chip_to_wgs', 0):,.0f}")
                 try:
-                    import cohort_simulator as _cs
+                    from tools import cohort_simulator as _cs
                     from wellness.life_stage_playbook import resolve_age as _resolve_age
                     _pa = _resolve_age(getattr(args, "age", None), bloodwork_result)
                     voi_result["personalized"] = _cs.personalize_for_report(

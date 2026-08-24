@@ -26,7 +26,9 @@ import re
 import time
 from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).parent
+# .parent.parent: tier1_results.json is written beside the report at the
+# repository root, not inside this package.
+SCRIPT_DIR = Path(__file__).parent.parent
 DEFAULT_TIER1 = SCRIPT_DIR / "tier1_results.json"
 
 

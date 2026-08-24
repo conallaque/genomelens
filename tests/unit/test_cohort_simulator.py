@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import pytest
 
-import cohort_simulator as cs
+from tools import cohort_simulator as cs
 
 np = pytest.importorskip("numpy")
 

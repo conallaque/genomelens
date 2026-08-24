@@ -74,11 +74,11 @@ except ImportError:
     render_carrier_html = None
     analyze_family_planning = None
 try:
-    from chat import run_chat
+    from tools.chat import run_chat
 except ImportError:
     run_chat = None
 try:
-    from compare import diff_runs, render_diff_text
+    from tools.compare import diff_runs, render_diff_text
 except ImportError:
     diff_runs = None
     render_diff_text = None
@@ -237,7 +237,7 @@ try:
 except ImportError:
     analyze_value_of_information = None
 try:
-    from multi_person_module import analyze_multi_person, render_multi_person_html
+    from tools.multi_person import analyze_multi_person, render_multi_person_html
 except ImportError:
     analyze_multi_person = None
     render_multi_person_html = None
