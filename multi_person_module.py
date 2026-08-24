@@ -39,9 +39,13 @@ all reduce confidence, which is reported.
 Privacy
 -------
 This module never writes a second person's genotypes to disk. Comparison output
-is returned to the caller (rendered into the main report / an explicit --output
-path). Raw genome files stay wherever the user put them; the project .gitignore
-excludes *.csv/*.txt/*.vcf/*.zip so no genome is ever committed.
+is returned to the caller and rendered to a STANDALONE page — it is deliberately
+not threaded into the single-person report, because a second person's results do
+not belong in the first person's document. An earlier version of this paragraph
+claimed the opposite ("rendered into the main report"), contradicting the note
+above ``build_comparison_html`` fifty lines below and describing wiring that has
+never existed. Raw genome files stay wherever the user put them; the project
+.gitignore excludes *.csv/*.txt/*.vcf/*.zip so no genome is ever committed.
 """
 
 from __future__ import annotations
@@ -289,7 +293,11 @@ def render_multi_person_html(result: dict, version: str = "v6.19.0") -> str:
         rows = "".join(
             f"<tr><td><strong>{_esc(i['disease'])}</strong></td>"
             f"<td>{_esc(i['gene'])} {_esc(i['variant'])}</td>"
-            f"<td style='color:#b3261e;font-weight:700'>25% per child</td>"
+            # Use the computed value. Hardcoding 25% here meant a future
+            # inheritance model that yields anything else would be silently
+            # misreported by the display.
+            f"<td style='color:#b3261e;font-weight:700'>"
+            f"{float(i.get('child_affected_risk', 0.25)):.0%} per child</td>"
             f"<td>{_esc(i['note'])}</td></tr>"
             for i in cc["shared_recessive_conditions"])
         couple_html = f"""
@@ -297,7 +305,8 @@ def render_multi_person_html(result: dict, version: str = "v6.19.0") -> str:
 <p>Both individuals carry a recessive variant for the following — each future
 child would have a 25% chance of being affected. Genetic counselling advised.</p>
 <table><thead><tr><th>Condition</th><th>Variant</th><th>Child risk</th><th>Notes</th></tr></thead>
-<tbody>{rows}</tbody></table>"""
+<tbody>{rows}</tbody></table>
+<p style="font-size:.9em;color:#5b6673">{_esc(cc.get("note", ""))}</p>"""
     elif cc:
         couple_html = ("<h2>Couple carrier overlap</h2><p>No shared recessive "
                        "carrier conditions detected among chip-testable variants. "
