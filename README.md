@@ -24,6 +24,13 @@ registry and which do not.
 ![license](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
 [![Buy Me a Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/caque)
 
+### 🔁 [Independent check → `heor-model-replication`](https://github.com/conallaque/heor-model-replication)
+
+Everything on this page is my own model assessing itself. That repo is not: it reproduces
+**three peer-reviewed cohort state-transition models in Python**, matching every printed
+cost, effect, ICER and dominance verdict exactly. If you want to know whether I can build
+a cSTM that agrees with a published one before trusting the numbers here, start there.
+
 **Methods and every equation:** [`docs/METHODS.md`](docs/METHODS.md) ·
 **How to run it:** [`docs/USAGE.md`](docs/USAGE.md)
 
@@ -45,6 +52,7 @@ fake, and each is traceable to a named test.
 | **Parameter provenance, enforced** | Every figure carries a tier. `tier="assumption"` **may not** cite a source — the registry fails to load if it does. 47% of ~350 figures resolve to a PMID or DOI; the model reports its own coverage instead of claiming "sourced". `econ/params.py` |
 | **Knowing what not to monetise** | Reproductive outcomes are never priced — attaching a figure to an affected birth prices a prospective child. Stated in code, enforced by a test, surfaced as a decision rather than an omission. `NOT_VALUED` |
 | **Structural modelling** | Cohort state-transition model against US life-table mortality, Simpson's 1/3 within-cycle correction cross-checked against an independent implementation. `test_within_cycle_weights_match_the_published_implementation` |
+| **Validated against published models** | Three peer-reviewed cohort state-transition models reproduced in Python, every printed cost, effect, ICER and dominance verdict matched exactly — the one claim here that is not self-assessed. [`heor-model-replication`](https://github.com/conallaque/heor-model-replication) |
 
 The recurring theme: the model reports an unflattering answer as readily as a flattering
 one, and several commits above exist because it did.
