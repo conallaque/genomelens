@@ -335,6 +335,14 @@ def calculate_pgs(snps_df: pd.DataFrame, variants: list[dict],
             "pct_callable": round(100 * n_used / total, 1),
         },
         "n_variants_used": n_used,
+        # Per-variant provenance. This list was built and appended to for every
+        # variant and then never placed in either return dict — a dead
+        # computation. Every PGS card runs on thin coverage (9-23% callable) and
+        # prints a z-score whose two inputs were withheld, so the percentile
+        # could not be sanity-checked. Capped: the point is auditability, not a
+        # dump of a whole scoring file.
+        "used": used[:200],
+        "n_used_returned": min(len(used), 200),
     }
 
 

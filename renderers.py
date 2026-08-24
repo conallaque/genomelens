@@ -1462,7 +1462,11 @@ def build_expanded_pgs_html(epgs: dict | None) -> str:
   {low_warn}
   <div class="prs-details">
     <div><span class="prs-lab">Percentile:</span> <strong>{pct:.0f}th</strong></div>
-    <div><span class="prs-lab">Z-score:</span> <strong>{result.get('z_score', 0):+.2f}</strong></div>
+    <div><span class="prs-lab">Z-score:</span> <strong>{result.get('z_score', 0):+.2f}</strong>{
+      f' <span style="color:#8a94a3;font-size:.9em">(raw {result["raw_score"]:.3f} '
+      f'vs expected {result["expected_mean"]:.3f})</span>'
+      if result.get("raw_score") is not None
+      and result.get("expected_mean") is not None else ""}</div>
     <div><span class="prs-lab">Coverage:</span>
       <strong>{cov.get('pct_callable',0)}%</strong>
       ({cov.get('chip',0)} chip + {cov.get('imputed',0)} imputed / {cov.get('total',0)})</div>
@@ -4245,8 +4249,22 @@ def build_ancestry_html(anc: dict | None) -> str:
     margin = anc.get("evidence_margin_nats")
     margin_html = ""
     if margin is not None:
+        _long = {"EUR": "European", "AFR": "African", "EAS": "East Asian",
+                 "SAS": "South Asian", "AMR": "Admixed American"}
+        _props = anc.get("sorted_proportions") or []
+        _best = (_props[0][0] if _props and isinstance(_props[0], list | tuple)
+                 else anc.get("best_population"))
+        _runner = anc.get("runner_up_population") or (
+            _props[1][0] if len(_props) > 1 and isinstance(_props[1], list | tuple)
+            else None)
+        _between = ""
+        if _best and _runner:
+            _between = (f" &mdash; between <strong>"
+                        f"{_esc(_long.get(_best, str(_best)))}</strong> and "
+                        f"<strong>{_esc(_long.get(_runner, str(_runner)))}</strong>")
         margin_html = (
-            f'<div class="anc-margin"><em>Evidence margin:</em> {margin} nats — '
+            f'<div class="anc-margin"><em>Evidence margin:</em> {margin} nats'
+            f'{_between} &mdash; '
             f"the log-likelihood gap between the best and runner-up population "
             f"(larger = more confident; &lt;2.3 nats ≈ within 10×, treated as "
             f"ambiguous).</div>"
@@ -4719,7 +4737,16 @@ def build_roh_html(r: dict | None) -> str:
     ideogram_svg = render_ideogram_svg(runs) if (render_ideogram_svg and runs) else ""
 
     rows = ""
-    for run in sorted(runs, key=lambda x: -x["length_mb"])[:25]:
+    # The table used a flat [:25] by descending length, so 18 of 43 runs were
+    # dropped by SIZE — and disease_genes renders ONLY in this table (the
+    # ideogram encodes position and length as geometry and carries no gene
+    # data). A short run overlapping BRCA1 or APOE therefore appeared nowhere.
+    # Keep the 25 longest AND every annotated run, however short.
+    _ordered = sorted(runs, key=lambda x: -x["length_mb"])
+    _shown = _ordered[:25]
+    _annotated_extra = [r for r in _ordered[25:] if r.get("disease_genes")]
+    _n_hidden = len(_ordered) - len(_shown) - len(_annotated_extra)
+    for run in _shown + _annotated_extra:
         genes = ""
         if run.get("disease_genes"):
             genes = " · " + ", ".join(
@@ -4754,9 +4781,12 @@ extended homozygous segments.
   <div class="roh-stat"><div class="roh-n">{r['n_short']} / {r['n_medium']} / {r['n_long']}</div><div class="roh-l">Short / Med / Long</div></div>
 </div>
 <div class="roh-context">{_esc(r.get("population_context",""))}</div>
+{_roh_params_html(r.get("parameters"))}
 {f'<div class="roh-ideogram">{ideogram_svg}</div>' if ideogram_svg else ''}
 <details class="roh-table">
-  <summary>Largest {min(25, len(runs))} ROH regions</summary>
+  <summary>{len(_shown) + len(_annotated_extra)} of {len(runs)} ROH regions &mdash;
+    the longest, plus every run overlapping a disease-relevant gene{
+    f" ({_n_hidden} shorter unannotated runs not listed)" if _n_hidden > 0 else ""}</summary>
   <div class="tbl-wrap">
   <table class="snp-tbl">
     <thead><tr><th>Chr</th><th>Position</th><th>Length</th><th>SNPs</th><th>Disease-relevant genes</th></tr></thead>
@@ -4766,6 +4796,36 @@ extended homozygous segments.
 </details>
 </section>
 """
+
+
+def _roh_params_html(params: dict | None) -> str:
+    """The detection thresholds behind F_ROH.
+
+    F_ROH is not a portable number: it depends entirely on the minimum run
+    length, SNP density and heterozygote tolerance used to call runs. The module
+    returns all of them and the report showed none, so the figure could not be
+    compared against any published cohort — which is the only thing an F_ROH is
+    for.
+    """
+    if not params:
+        return ""
+    order = ("min_length_mb", "min_snps", "max_het", "window_snps",
+             "max_gap_mb", "min_density_snp_per_mb")
+    cells = "".join(
+        f'<span style="margin-right:12px"><span style="color:#8a94a3">'
+        f'{_esc(k.replace("_", " "))}</span> <strong>{_esc(str(params[k]))}</strong>'
+        f'</span>'
+        for k in order if k in params)
+    extra = "".join(
+        f'<span style="margin-right:12px"><span style="color:#8a94a3">'
+        f'{_esc(k.replace("_", " "))}</span> <strong>{_esc(str(v))}</strong></span>'
+        for k, v in params.items() if k not in order)
+    if not (cells or extra):
+        return ""
+    return (f'<div style="font-size:.8em;color:#5b6673;margin-top:6px">'
+            f'<span style="color:#8a94a3">Detection thresholds &mdash; F_ROH is '
+            f'only comparable between studies that share them:</span><br>'
+            f'{cells}{extra}</div>')
 
 
 def build_local_ancestry_html(la: dict | None) -> str:
