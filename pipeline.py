@@ -231,6 +231,24 @@ where to spend your effort over the next year.
 </body></html>"""
 
 
+def _stamp_html(html: str) -> str:
+    """Append the build marker to a companion page before it is written.
+
+    Every companion page lands in the same directory as the main report, and
+    the pipeline does not clear that directory — deleting a user's files to
+    guarantee freshness would be a worse cure than the disease. So instead each
+    page says which commit produced it, and a leftover from an earlier run is
+    identifiable by reading it rather than by trusting the timestamp. This is
+    the write chokepoint: one place, so a page added later cannot miss it.
+    """
+    import build_stamp
+    marker = build_stamp.build_stamp()["marker"]
+    tag = (f'<div style="font-size:11px;color:#8a94a3;margin-top:18px;'
+           f'font-family:ui-monospace,Menlo,monospace">{marker}</div>')
+    return (html.replace("</body>", tag + "</body>", 1)
+            if "</body>" in html else html + tag)
+
+
 def run_pipeline(args: argparse.Namespace) -> int:
     """Execute the analysis pipeline against parsed CLI args.
 
@@ -1294,7 +1312,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 version=f"v{REPORT_VERSION}",
             )
             cr_path = output_path.parent / "carrier_report.html"
-            cr_path.write_text(cr_html, encoding="utf-8")
+            cr_path.write_text(_stamp_html(cr_html), encoding="utf-8")
             log(f"  Carrier report saved: {cr_path}")
             if args.pdf and html_to_pdf is not None and weasyprint_available():
                 cr_pdf = cr_path.with_suffix(".pdf")
@@ -1326,7 +1344,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                     report_link=str(output_path.name),
                 )
                 ec_path = output_path.parent / "emergency_card.html"
-                ec_path.write_text(ec_html, encoding="utf-8")
+                ec_path.write_text(_stamp_html(ec_html), encoding="utf-8")
                 log(f"  Emergency card saved: {ec_path}")
                 if args.pdf and html_to_pdf is not None and weasyprint_available():
                     ec_pdf = ec_path.with_suffix(".pdf")
@@ -1384,7 +1402,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         try:
             supp_path = output_path.parent / "supplements.html"
             supp_path.write_text(
-                render_supplements_html(supplement_result, file_label=file_label),
+                _stamp_html(render_supplements_html(supplement_result, file_label=file_label)),
                 encoding="utf-8",
             )
             log(f"  Supplements page saved: {supp_path}")
@@ -1395,7 +1413,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         try:
             ex_path = output_path.parent / "exercise.html"
             ex_path.write_text(
-                render_exercise_html(exercise_result, file_label=file_label),
+                _stamp_html(render_exercise_html(exercise_result, file_label=file_label)),
                 encoding="utf-8",
             )
             log(f"  Exercise page saved: {ex_path}")
@@ -1406,7 +1424,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         try:
             nu_path = output_path.parent / "nutrition.html"
             nu_path.write_text(
-                render_nutrition_html(nutrition_result, file_label=file_label),
+                _stamp_html(render_nutrition_html(nutrition_result, file_label=file_label)),
                 encoding="utf-8",
             )
             log(f"  Nutrition page saved: {nu_path}")
@@ -1417,7 +1435,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         try:
             bw_path = output_path.parent / "bloodwork.html"
             bw_path.write_text(
-                render_bloodwork_html(bloodwork_result, file_label=file_label),
+                _stamp_html(render_bloodwork_html(bloodwork_result, file_label=file_label)),
                 encoding="utf-8",
             )
             log(f"  Bloodwork comparison saved: {bw_path}")
@@ -1447,7 +1465,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             if personal_econ.get("available"):
                 econ_path = output_path.parent / "economic_analysis.html"
                 econ_path.write_text(
-                    render_economic_analysis_html(personal_econ, file_label=file_label),
+                    _stamp_html(render_economic_analysis_html(personal_econ, file_label=file_label)),
                     encoding="utf-8",
                 )
                 log(f"  Economic-impact analysis saved: {econ_path} "
@@ -1470,8 +1488,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
             )
             plan_path = output_path.parent / "personalized_plan.html"
             plan_path.write_text(
-                render_plan_html(plan, file_label=file_label,
-                                 report_link=output_path.name),
+                _stamp_html(render_plan_html(plan, file_label=file_label,
+                                 report_link=output_path.name)),
                 encoding="utf-8",
             )
             log(f"  Master plan dashboard saved: {plan_path}")
@@ -1485,7 +1503,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 and exercise_result and exercise_result.get("status") == "ok":
             integrated = integrated_longevity_plan(nutrition_result, exercise_result)
             long_path = output_path.parent / "longevity.html"
-            long_path.write_text(_render_longevity_html(integrated, file_label),
+            long_path.write_text(_stamp_html(_render_longevity_html(integrated, file_label)),
                                   encoding="utf-8")
             log(f"  Longevity composite + year-long plan saved: {long_path}")
     except Exception as e:
