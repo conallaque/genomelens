@@ -3182,6 +3182,89 @@ def build_voi_html(voi: dict | None) -> str:
   <div style="font-size:.78em;color:#9aa4b0;margin-top:6px">Health information is a
     variance-reducing asset; that is why insurance markets exist (Arrow 1963).</div>
 </div>"""
+        gc = voi.get("genomic_corrections") or {}
+        if gc.get("available"):
+            # BEFORE -> AFTER per correction, not one descending column. The
+            # three steps measure different quantities: the liability-threshold
+            # row is the absolute risk of a 90th-percentile carrier, the
+            # portability row rescales that same risk, and the competing-
+            # mortality row corrects a lifetime penetrance. Stacking their final
+            # values implied a single sequence that got smaller each time, and
+            # the third value is LARGER than the second because it is not the
+            # same number continued. Each correction is now shown against the
+            # figure it replaced, which is how the rest of this report reports
+            # corrections.
+            _lt = gc.get("liability_threshold") or {}
+            _po = gc.get("portability") or {}
+            _ag = gc.get("age_dependent") or {}
+
+            def _pct(v):
+                try:
+                    return f"{float(v):.1%}"
+                except (TypeError, ValueError):
+                    return "&mdash;"
+
+            _rows = [
+                ("Relative risk &rarr; absolute risk<br>"
+                 "<span style='color:#8a94a3'>Falconer liability threshold</span>",
+                 f"RR {_lt.get('relative_risk', '&mdash;')}&times;",
+                 _pct(_lt.get("absolute_risk")),
+                 "A relative risk with no base rate reads as alarming; the "
+                 "absolute risk is usually far smaller."),
+                # A European-ancestry sample against a European-calibrated
+                # score is a no-op, and saying "only 100% of the variance
+                # transfers, so the risk is attenuated" over an unchanged pair
+                # is nonsense. State that no adjustment was needed instead.
+                ("European-calibrated &rarr; ancestry-adjusted<br>"
+                 f"<span style='color:#8a94a3'>portability, "
+                 f"{_esc(str(_po.get('ancestry', '')))}</span>",
+                 _pct(_po.get("risk_if_european_calibrated")),
+                 _pct(_po.get("risk_ancestry_adjusted")),
+                 ("No adjustment: the score is calibrated in this ancestry, so "
+                  "its full predictive variance transfers. This correction bites "
+                  "for non-European ancestries, where much of it does not."
+                  if float(_po.get("r2_retained_fraction") or 0) >= 0.999 else
+                  f"Only {_pct(_po.get('r2_retained_fraction'))} of the score's "
+                  f"variance transfers, so the risk it implies is attenuated.")),
+                ("Naive survival &rarr; competing-risk<br>"
+                 "<span style='color:#8a94a3'>cumulative incidence</span>",
+                 _pct(_ag.get("naive_km_risk")),
+                 _pct(_ag.get("remaining_lifetime_risk")),
+                 "Ignoring the chance of dying of something else inflates a "
+                 "lifetime risk, and every dollar figure downstream of it."),
+            ]
+            _tbl = "".join(
+                f'<tr style="border-bottom:1px solid #eef2f6">'
+                f'<td style="padding:5px 4px">{lbl}</td>'
+                f'<td style="text-align:right;padding:5px 4px;color:#8a94a3;'
+                f'text-decoration:line-through">{before}</td>'
+                f'<td style="text-align:right;padding:5px 4px;font-weight:700">'
+                f'{after}</td>'
+                f'<td style="padding:5px 8px;font-size:.92em;color:#5b6673">'
+                f'{why}</td></tr>'
+                for lbl, before, after, why in _rows)
+            _inp = gc.get("inputs") or {}
+            blocks += f"""
+<div style="flex:1 1 100%;background:#f7fafd;border:1px solid #d8e2ee;
+     border-radius:10px;padding:12px 14px">
+  <div style="font-weight:700;color:#2f5d8a">Statistical corrections applied to the
+    genetics, before any economics</div>
+  <div style="font-size:.85em;color:#425468;margin-top:4px">
+    Three independent corrections, each shown against the figure it replaced.
+    All three move risk <em>down</em>, which is why they matter: an inflated
+    risk estimate inflates every dollar figure derived from it.</div>
+  <table style="width:100%;border-collapse:collapse;font-size:.85em;margin-top:8px">
+    <thead><tr style="text-align:left;color:#8a94a3;font-size:.92em">
+      <th style="padding:3px 4px">Correction</th>
+      <th style="text-align:right">Before</th>
+      <th style="text-align:right">After</th>
+      <th style="padding:3px 8px">Why</th></tr></thead>
+    <tbody>{_tbl}</tbody>
+  </table>
+  <div style="font-size:.78em;color:#7b8794;margin-top:6px">
+    {_esc(_inp.get("note", ""))}</div>
+</div>"""
+
         pc = voi.get("penetrance_correction") or {}
         if pc.get("available"):
             blocks += f"""

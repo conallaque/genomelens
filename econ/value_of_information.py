@@ -828,6 +828,42 @@ def analyze_value_of_information(economics_result: dict | None = None,
     except Exception as _e:
         _degraded.append(("penetrance_correction", repr(_e)))
 
+    # ── Statistical correction chain ──────────────────────────────────────
+    # genomic_statistics implements three corrections that the README has always
+    # listed as capabilities, and none of them had a production caller: the
+    # Falconer liability-threshold conversion from percentile to absolute risk,
+    # the ancestry-transferability decay of a EUR-derived score, and the
+    # competing-mortality adjustment of a lifetime penetrance. Implemented,
+    # tested, and never run — so the report claimed corrections it did not make.
+    #
+    # Every step in the chain moves the risk DOWN, which is why surfacing it is
+    # the conservative direction rather than a new claim.
+    try:
+        import genomic_statistics as _gstat
+        _prs_pct, _prev = 0.90, 0.06
+        _anc = "european"
+        try:
+            _ap = ((economics_result or {}).get("ancestry")
+                   or (economics_result or {}).get("ancestry_group"))
+            if isinstance(_ap, str) and _ap.strip():
+                _anc = _ap.strip().lower()
+        except Exception:
+            pass
+        result["genomic_corrections"] = _gstat.summarise_genomic_corrections(
+            prs_percentile=_prs_pct, prevalence=_prev,
+            lifetime_penetrance=_econ_params.value("penetrance_brca2_population")
+            if "penetrance_brca2_population" in _econ_params.PARAMS else 0.55,
+            ancestry=_anc, current_age=_resolve_age(genetic_age_result))
+        result["genomic_corrections"]["inputs"] = {
+            "prs_percentile": _prs_pct, "prevalence": _prev, "ancestry": _anc,
+            "note": ("Illustrative inputs: a 90th-percentile score against a 6% "
+                     "population prevalence. The chain shows how much each "
+                     "correction moves a risk of that shape, not this person's "
+                     "risk for a named disease."),
+        }
+    except Exception as _e:
+        _degraded.append(("genomic_corrections", repr(_e)))
+
     # ROH -> carrier-panel prior. Deliberately qualitative: it names a decision
     # and a direction, contributes nothing to any dollar total, and is kept out
     # of the NMB table entirely so it cannot be mistaken for a valued finding.
