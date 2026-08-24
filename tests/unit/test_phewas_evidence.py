@@ -7,7 +7,7 @@ surface an auditable breakdown instead of only a coverage count.
 
 import pandas as pd
 
-import phewas
+from risk import phewas
 
 
 def _df_for_trait(trait_name):

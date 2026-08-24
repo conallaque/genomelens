@@ -336,7 +336,7 @@ def setup_clinvar(force: bool = False) -> None:
     clinvar_dir = REF_DIR / "clinvar"
     clinvar_dir.mkdir(parents=True, exist_ok=True)
     try:
-        from clinical_variants import distill_clinvar_vcf
+        from risk.clinical_variants import distill_clinvar_vcf
     except Exception as e:
         log(f"  ERROR: cannot import distiller: {e}")
         return

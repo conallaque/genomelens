@@ -919,7 +919,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
     # ── TNRC18 rs117910193 novelty marker (single-variant genotype read-out) ──
     tnrc18_result: dict | None = None
     try:
-        from tnrc18_marker import analyze_tnrc18_marker
+        from risk.tnrc18_marker import analyze_tnrc18_marker
         tnrc18_result = analyze_tnrc18_marker(snps_df)
         if tnrc18_result.get("available"):
             log(f"  TNRC18 marker (rs117910193): {tnrc18_result['genotype_oriented']} "

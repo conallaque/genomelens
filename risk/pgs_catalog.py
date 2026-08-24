@@ -28,7 +28,11 @@ from pathlib import Path
 
 import pandas as pd
 
-SCRIPT_DIR = Path(__file__).parent
+# .parent.parent: moved into the risk package, but reference/ stays at the
+# repository root. Left at .parent these resolve inside risk/ and every
+# consumer degrades quietly on a missing directory — so nothing raises
+# and the screen silently reports no findings.
+SCRIPT_DIR = Path(__file__).parent.parent
 PGS_DIR = SCRIPT_DIR / "reference" / "pgs_scores"
 
 

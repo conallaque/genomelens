@@ -49,7 +49,7 @@ except ImportError:  # references module optional
         return ""
 
 try:
-    from roh import render_ideogram_svg
+    from risk.roh import render_ideogram_svg
 except ImportError:
     render_ideogram_svg = None  # type: ignore[assignment]
 
@@ -6126,7 +6126,7 @@ def build_html_report(
     voi_html = build_voi_html(voi_result)
     polygenic_traits_html = build_polygenic_traits_html(polygenic_traits_result)
     try:
-        from tnrc18_marker import build_tnrc18_html as _build_tnrc18
+        from risk.tnrc18_marker import build_tnrc18_html as _build_tnrc18
         tnrc18_html = _build_tnrc18(tnrc18_result)
     except Exception:
         tnrc18_html = ""

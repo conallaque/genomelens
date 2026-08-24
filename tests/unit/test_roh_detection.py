@@ -21,7 +21,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-import roh
+from risk import roh
 
 
 def _hom_array(n):

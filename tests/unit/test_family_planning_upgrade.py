@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import family_planning as fp
+from risk import family_planning as fp
 
 
 def _carrier(gene, variant, disease, inheritance, status="carrier"):

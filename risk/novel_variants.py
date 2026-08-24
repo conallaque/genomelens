@@ -29,9 +29,13 @@ from pathlib import Path
 
 # Reuse the strand/indel-normalisation + zygosity helpers from Phase 2 so the two
 # modules agree on what "the same variant" and "carries this allele" mean.
-from clinical_variants import _norm_chrom, norm_key, zygosity_for_alt
+from .clinical_variants import _norm_chrom, norm_key, zygosity_for_alt
 
-SCRIPT_DIR = Path(__file__).parent
+# .parent.parent: moved into the risk package, but reference/ stays at the
+# repository root. Left at .parent these resolve inside risk/ and every
+# consumer degrades quietly on a missing directory — so nothing raises
+# and the screen silently reports no findings.
+SCRIPT_DIR = Path(__file__).parent.parent
 REFERENCE_DIR = SCRIPT_DIR / "reference"
 
 try:                                    # pysam ships arm64 wheels; optional dep.

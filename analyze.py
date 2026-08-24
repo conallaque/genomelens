@@ -26,14 +26,14 @@ except ImportError:
 
 # Professional-grade analysis modules
 try:
-    from carrier import analyze_carriers
     from counseling import evaluate_counseling_triggers
     from pgx.core import analyze_pgx
     from pgx.interactions import detect_interactions
-    from prs import analyze_polygenic_scores
     from qc import run_qc
     from references import collect_references_used, get_reference, level_class
-    from traits import predict_traits
+    from risk.carrier import analyze_carriers
+    from risk.prs import analyze_polygenic_scores
+    from risk.traits import predict_traits
     PROFESSIONAL_MODULES_LOADED = True
 except ImportError as _e:
     PROFESSIONAL_MODULES_LOADED = False
@@ -46,7 +46,7 @@ except ImportError:
     impute_genotypes = None
     imputation_available = None
 try:
-    from pgs_catalog import analyze_expanded_pgs
+    from risk.pgs_catalog import analyze_expanded_pgs
 except ImportError:
     analyze_expanded_pgs = None
 try:
@@ -64,7 +64,11 @@ try:
 except ImportError:
     analyze_medications = None
 try:
-    from family_planning import analyze_family_planning, build_carrier_report, render_carrier_html
+    from risk.family_planning import (
+        analyze_family_planning,
+        build_carrier_report,
+        render_carrier_html,
+    )
 except ImportError:
     build_carrier_report = None
     render_carrier_html = None
@@ -89,7 +93,7 @@ try:
 except ImportError:
     analyze_hla = None
 try:
-    from roh import detect_roh, render_ideogram_svg
+    from risk.roh import detect_roh, render_ideogram_svg
 except ImportError:
     detect_roh = None
     render_ideogram_svg = None
@@ -99,11 +103,11 @@ except ImportError:
     analyze_local_ancestry = None
     render_chromosome_painting_svg = None
 try:
-    from phewas import analyze_phewas
+    from risk.phewas import analyze_phewas
 except ImportError:
     analyze_phewas = None
 try:
-    from mendelian_randomization import analyze_mr
+    from risk.mendelian_randomization import analyze_mr
 except ImportError:
     analyze_mr = None
 try:
@@ -115,7 +119,7 @@ try:
 except ImportError:
     simulate_pgx = None
 try:
-    from reproductive import analyze_reproductive
+    from risk.reproductive import analyze_reproductive
 except ImportError:
     analyze_reproductive = None
 try:
@@ -209,7 +213,7 @@ try:
 except ImportError:
     analyze_addiction_genetics = None
 try:
-    from polygenic_traits import analyze_polygenic_traits
+    from risk.polygenic_traits import analyze_polygenic_traits
 except ImportError:
     analyze_polygenic_traits = None
 try:
@@ -221,11 +225,11 @@ try:
 except ImportError:
     analyze_life_stage_playbook = None
 try:
-    from clinical_variants import analyze_clinical_variants
+    from risk.clinical_variants import analyze_clinical_variants
 except ImportError:
     analyze_clinical_variants = None
 try:
-    from novel_variants import analyze_novel_variants
+    from risk.novel_variants import analyze_novel_variants
 except ImportError:
     analyze_novel_variants = None
 try:

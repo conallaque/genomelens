@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-import clinical_variants as cv
+from risk import clinical_variants as cv
 
 # ── pure helpers ──────────────────────────────────────────────────────────────
 

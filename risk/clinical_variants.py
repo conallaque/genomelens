@@ -42,7 +42,11 @@ from __future__ import annotations
 import gzip
 from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).parent
+# .parent.parent: moved into the risk package, but reference/ stays at the
+# repository root. Left at .parent these resolve inside risk/ and every
+# consumer degrades quietly on a missing directory — so nothing raises
+# and the screen silently reports no findings.
+SCRIPT_DIR = Path(__file__).parent.parent
 CLINVAR_DIR = SCRIPT_DIR / "reference" / "clinvar"
 
 # ── ClinVar review status → star rating (verified against real ClinVar data) ──

@@ -7,10 +7,9 @@ from __future__ import annotations
 import pandas as pd
 
 import environmental_optimization
-import family_planning
 import life_stage_playbook
-import polygenic_traits
 import renderers
+from risk import family_planning, polygenic_traits
 
 
 def _min_tier1():

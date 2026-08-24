@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import polygenic_traits as pt
+from risk import polygenic_traits as pt
 
 
 def _df(g: dict) -> pd.DataFrame:

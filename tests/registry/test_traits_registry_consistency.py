@@ -9,7 +9,7 @@ GRCh37/38 coordinates before joining the registry.
 
 from __future__ import annotations
 
-import traits
+from risk import traits
 
 
 def test_audit_shape() -> None:

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import tnrc18_marker as tm
+from risk import tnrc18_marker as tm
 
 
 def _rsid(gt):

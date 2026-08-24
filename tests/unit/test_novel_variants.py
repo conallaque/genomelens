@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import pytest
 
-import novel_variants as nv
+from risk import novel_variants as nv
 
 pysam = pytest.importorskip("pysam")
 

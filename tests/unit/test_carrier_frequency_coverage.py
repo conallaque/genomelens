@@ -9,8 +9,8 @@ eczema only.
 """
 from __future__ import annotations
 
-import carrier
-import family_planning as fp
+from risk import carrier
+from risk import family_planning as fp
 
 
 def _recessive_genes_detectable():

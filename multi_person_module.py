@@ -197,7 +197,7 @@ def couple_carrier_risk(df_a: pd.DataFrame, df_b: pd.DataFrame) -> dict | None:
     """If both individuals are carriers of the same recessive condition, a child
     has a 25% risk of being affected. Uses the project carrier module if present."""
     try:
-        from carrier import analyze_carriers
+        from risk.carrier import analyze_carriers
     except Exception:
         return None
     try:

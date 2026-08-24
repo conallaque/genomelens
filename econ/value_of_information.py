@@ -836,7 +836,7 @@ def analyze_value_of_information(economics_result: dict | None = None,
     # ── Longevity sensitivity: rising life expectancy raises realised genetic risk
     #    AND lengthens the payoff horizon, so it raises the value of information. ──
     try:
-        import genomic_statistics as _gstat
+        from risk import genomic_statistics as _gstat
         result["longevity"] = _gstat.longevity_sensitivity(current_age=_age)
     except Exception as _e:
         result["longevity"] = {"available": False}
@@ -868,7 +868,7 @@ def analyze_value_of_information(economics_result: dict | None = None,
     # Every step in the chain moves the risk DOWN, which is why surfacing it is
     # the conservative direction rather than a new claim.
     try:
-        import genomic_statistics as _gstat
+        from risk import genomic_statistics as _gstat
         _prs_pct, _prev = 0.90, 0.06
         _anc = "european"
         try:

@@ -10,7 +10,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-import roh
+from risk import roh
 
 _FULL_KEYS = {"runs", "n_runs", "total_roh_mb", "f_roh", "short", "medium", "long",
               "n_short", "n_medium", "n_long", "population_context", "context_tier"}

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import phewas
+from risk import phewas
 
 
 def _score(rsid_to_gt, trait_name):

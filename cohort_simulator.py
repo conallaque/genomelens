@@ -47,7 +47,7 @@ from econ.value_of_information import (
 )
 
 try:
-    from genomic_statistics import PORTABILITY
+    from risk.genomic_statistics import PORTABILITY
 except Exception:                       # pragma: no cover
     PORTABILITY = {"european": 1.0, "african": 0.25, "east_asian": 0.5,
                    "south_asian": 0.65, "hispanic_latino": 0.55}

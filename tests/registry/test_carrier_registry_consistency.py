@@ -9,7 +9,7 @@ breaks the reconciliation, this test fails loudly.
 
 from __future__ import annotations
 
-import carrier
+from risk import carrier
 
 
 def test_carrier_audit_passes_at_import() -> None:

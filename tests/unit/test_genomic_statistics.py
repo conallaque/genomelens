@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import pytest
 
-import genomic_statistics as gs
+from risk import genomic_statistics as gs
 
 np = pytest.importorskip("numpy")
 
