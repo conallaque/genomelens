@@ -5518,6 +5518,7 @@ def build_economics_html(economics_result: dict | None) -> str:
     _nreg = economics_result.get("n_registry_valued", 0)
     _ncur = economics_result.get("n_curated_valued", 0)
     _nsig = economics_result.get("n_signal_only", 0)
+    _nhyp = economics_result.get("n_hypothetical", 0)
     basis_html = ""
     if _nreg or _ncur or _nsig:
         basis_html = f"""
@@ -5535,6 +5536,12 @@ def build_economics_html(economics_result: dict | None) -> str:
   <strong>{_nsig}</strong> are reported with no dollar value at all — a real
   risk signal with no intervention proven to change the outcome for an
   asymptomatic carrier. Pricing those would mean inventing an effect size.
+  {f"<strong>{_nhyp}</strong> more are marked <em>hypothetical / awareness</em>: "
+   "the addiction and top-prescribed-drug panels, which were wired at every "
+   "layer and silently producing nothing until a set of string mismatches was "
+   "found. They now appear, but they are awareness rather than costed "
+   "interventions — and the one genuine prescribing decision among them is "
+   "already priced under pharmacogenomics — so they contribute zero." if _nhyp else ""}
 </div>"""
 
     disclaimer = _esc(economics_result.get("disclaimer", ""))

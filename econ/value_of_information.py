@@ -309,6 +309,14 @@ def _classify_category(category: str | None, label: str = "") -> tuple[str, str]
     if not cat:
         return ("", "")
 
+    # NOT_VALUED is authoritative and checked first. A source registered there
+    # must not also resolve to a condition anchor: "Addiction Genetics" matched
+    # the "addiction" token below AND its NOT_VALUED entry, so it was counted
+    # twice and the coverage invariant broke. One answer per source, decided in
+    # one place.
+    if (category or "").strip() in NOT_VALUED:
+        return ("", "")
+
     # ── Pharmacogenomics: anything whose decision is "change or dose-adjust a
     #    prescription" — including drug-interaction, top-drug and HLA screens,
     #    and the phase-I/II metabolising-enzyme (detoxification) panel.
@@ -410,6 +418,27 @@ def _evidence_haircut(category: str | None) -> float:
 # is a decision. Findings from these sources still appear in the report — they
 # are excluded from the economic model only.
 NOT_VALUED: dict[str, str] = {
+    "Addiction Genetics": (
+        "Surfaced as hypothetical / awareness, not valued. The panel was dead "
+        "for a long time — three independent string mismatches meant it "
+        "produced nothing while being plumbed at every layer, down to a "
+        "registered condition anchor. Repairing that resurrects real findings, "
+        "but most of what they support is awareness rather than a costed "
+        "intervention: a CRHR1 stress-reactivity locus has no "
+        "genotype-contingent action, the alcohol filter admits only "
+        "susceptibility so the protective ADH1B/ALDH2 variants never qualify, "
+        "and CHRNA5 cannot condition on smoking status because the module takes "
+        "none. OPRM1 is the one real prescribing decision and the "
+        "neurochemistry panel already prices that same rs1799971. So the "
+        "findings appear, labelled, contributing nothing to any total."),
+    "Top-Drugs PGx Screen": (
+        "Surfaced as hypothetical / awareness, not valued. This screen is a "
+        "p_rx refinement of a record the pharmacogenomics panel already emits "
+        "for the same gene — it raises the assumed probability of ever being "
+        "prescribed the drug, it does not find a new benefit. Valuing it "
+        "separately would count one pharmacogenomic benefit twice. Knowing "
+        "that a commonly-prescribed drug touches a gene already flagged is "
+        "genuinely useful, and it is worth zero dollars on top."),
     "Longevity": (
         "The longevity composite is a summary of variants this module already "
         "values individually, so monetising it counts the same genotypes "

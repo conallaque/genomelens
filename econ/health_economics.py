@@ -1122,18 +1122,61 @@ def _interaction_findings(interactions_result: dict | None) -> list[dict]:
     return out
 
 
+# Addiction and top-drug findings are surfaced as HYPOTHETICAL / AWARENESS
+# rather than counted as value. See _addiction_findings for why.
+HYPOTHETICAL_SOURCES = ("Addiction Genetics", "Top-Drugs PGx Screen")
+
+
+def _match_econ_category(table: dict, category: str) -> dict | None:
+    """Resolve a module's verbose category label against a short econ key.
+
+    THE BUG THIS FIXES. The lookup was exact. ``ADDICTION_ECONOMICS`` is keyed
+    "Alcohol", "Opioid", "Nicotine"; the module emits
+    "Alcohol — Metabolism & Dependence", "Opioid & Endogenous-reward",
+    "Nicotine & Stimulant". Every lookup returned None and the whole panel
+    produced nothing — while being fully plumbed at every other layer, right
+    down to a registered condition anchor and an evidence haircut. Nothing
+    failed; a wired module was simply silent, which is why no test caught it.
+    """
+    if not category:
+        return None
+    if category in table:
+        return table[category]
+    head = category.split("—")[0].split("&")[0].strip()
+    for key, val in table.items():
+        if key.lower() == head.lower() or head.lower().startswith(key.lower()):
+            return val
+    return None
+
+
 def _addiction_findings(addiction_result: dict | None) -> list[dict]:
+    """Addiction-panel economics, reported as hypothetical rather than valued.
+
+    This panel was dead: three independent string mismatches (the category
+    lookup above, an impact filter expecting "clinically_useful" against the
+    module's "clinically-relevant", and a tier filter in the personal path).
+    Repairing them resurrects real findings — but most of what they support is
+    *awareness*, not a costed intervention: a CRHR1 stress-reactivity locus has
+    no genotype-contingent action, and CHRNA5 cannot condition on smoking status
+    because the module takes none.
+
+    So the records are emitted with ``basis="hypothetical"`` and a zero
+    contribution to every dollar total. They appear in the report, labelled, so
+    the panel stops being invisible without inflating anything.
+    """
     out: list[dict] = []
     if not addiction_result or not addiction_result.get("available"):
         return out
     seen_cats: set = set()
     for finding in (addiction_result.get("findings") or []):
-        if finding.get("impact") not in ("susceptible", "clinically_useful"):
+        # Accept both spellings. The hyphenated form is what the module emits.
+        if str(finding.get("impact", "")).replace("-", "_") not in (
+                "susceptible", "clinically_useful", "clinically_relevant"):
             continue
         cat = finding.get("category", "")
         if not cat or cat in seen_cats:
             continue
-        econ = ADDICTION_ECONOMICS.get(cat)
+        econ = _match_econ_category(ADDICTION_ECONOMICS, cat)
         if econ is None:
             continue
         seen_cats.add(cat)
@@ -1141,10 +1184,11 @@ def _addiction_findings(addiction_result: dict | None) -> list[dict]:
         out.append(_econ_record(
             finding=f"{gene} — {econ['finding']}",
             clinical_benefit=econ["clinical_benefit"],
-            cost=econ["cost"], outcome_value=econ["outcome_value"],
+            # Zeroed on purpose: surfaced, not valued.
+            cost=econ["cost"], outcome_value=0,
             confidence="moderate" if finding.get("confidence") == "high" else "low",
             source="Addiction Genetics",
-            prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
+            prevalence=econ["prevalence"], qaly_gain=0.0,
             evidence=f"{gene} {finding.get('genotype', '')} — {finding.get('verdict', '')}",
         ))
     return out
@@ -1483,27 +1527,38 @@ def _top_drugs_findings(top_drugs_result: dict | None) -> list[dict]:
         return out
     seen_genes: set = set()
     for drug_info in (top_drugs_result.get("actionable") or []):
-        gene = drug_info.get("gene", "")
-        if not gene or gene in seen_genes:
+        # THE BUG. This read drug_info["gene"] and drug_info["drug"]; the module
+        # emits `genes` (a LIST) and `generic`/`brand`. Every entry fell through
+        # the `continue` below, so the screen produced nothing at all — silently,
+        # while fully plumbed. A second defect sat behind it: the anti-double-
+        # count guard compared against econ["outcome_value"], a key no
+        # PGX_ECONOMICS entry has, so it compared against 0 and never fired.
+        genes = drug_info.get("genes") or (
+            [drug_info["gene"]] if drug_info.get("gene") else [])
+        drug_name = (drug_info.get("drug") or drug_info.get("generic")
+                     or drug_info.get("brand") or "")
+        gene = next((g for g in (str(x).strip() for x in genes)
+                     if g and g in PGX_ECONOMICS and g not in seen_genes), "")
+        if not gene:
             continue
         econ = PGX_ECONOMICS.get(gene)
         if econ is None:
             continue
         seen_genes.add(gene)
-        p_adr = econ.get("p_adr", 0.15)
-        rrr = econ.get("rrr", 0.50)
-        adr_cost = econ.get("adr_cost", 10_000)
-        boosted_value = round(0.50 * p_adr * rrr * adr_cost)
-        if boosted_value <= econ.get("outcome_value", 0):
-            continue
         out.append(_econ_record(
-            finding=f"{gene} — top-drug actionable ({drug_info.get('drug', '')})",
+            finding=f"{gene} — top-drug actionable ({drug_name})",
             clinical_benefit=econ["clinical_benefit"],
-            cost=econ["cost"], outcome_value=boosted_value,
+            # Zero. This screen is a p_rx REFINEMENT of a record _pgx_findings
+            # already emits for the same gene — resurrecting it as its own
+            # valued line would double-count the pharmacogenomic benefit. It is
+            # surfaced as awareness that a commonly-prescribed drug touches a
+            # gene already flagged, which is genuinely useful and worth $0.
+            cost=econ["cost"], outcome_value=0,
             confidence="high", source="Top-Drugs PGx Screen",
-            prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
-            evidence=(f"High-prevalence drug {drug_info.get('drug', '')} × "
-                      f"{gene} actionable phenotype (boosted p_rx ≈ 0.50)"),
+            prevalence=econ["prevalence"], qaly_gain=0.0,
+            evidence=(f"High-prevalence drug {drug_name} × {gene} actionable "
+                      f"phenotype — awareness only; the benefit is already "
+                      f"counted once under Pharmacogenomics"),
         ))
     return out
 
@@ -2167,6 +2222,16 @@ def analyze_health_economics(findings: dict, snps_df: pd.DataFrame,
     # the correction is visible rather than banked.
     for f in econ_findings:
         name, cat = str(f.get("finding") or ""), f.get("category", "")
+        if cat in HYPOTHETICAL_SOURCES:
+            # Surfaced, labelled, and contributing nothing. These panels were
+            # silently dead; they are now visible without being counted.
+            f["registry_basis"] = "hypothetical"
+            f["outcome_value"] = 0
+            f["qaly_gain"] = 0.0
+            f["roi"] = None
+            f["npv_3year"] = None
+            f["payback_months"] = None
+            continue
         if is_signal_only(name, cat):
             f["registry_basis"] = "signal-only"
             f["curated_outcome_value"] = f.get("outcome_value")
@@ -2218,6 +2283,8 @@ def analyze_health_economics(findings: dict, snps_df: pd.DataFrame,
         1 for f in econ_findings if f.get("registry_basis") == "curated")
     result["n_signal_only"] = sum(
         1 for f in econ_findings if f.get("registry_basis") == "signal-only")
+    result["n_hypothetical"] = sum(
+        1 for f in econ_findings if f.get("registry_basis") == "hypothetical")
     result["clinic_dashboard"] = scale_to_clinic(result)
     result["payer_impact"] = scale_to_payer(result)
     return result

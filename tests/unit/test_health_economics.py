@@ -516,3 +516,62 @@ def test_econ_table_keys_resolve_against_the_strings_modules_emit():
     unreachable = set(he.NEUROCHEMISTRY_ECONOMICS) - emitted
     assert not unreachable, (
         f"econ entries no module can reach: {sorted(unreachable)}")
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Wired-but-dead panels: revived, labelled, and worth nothing
+# ══════════════════════════════════════════════════════════════════════════
+
+def test_verbose_category_labels_resolve_to_short_econ_keys():
+    # THE BUG. ADDICTION_ECONOMICS is keyed "Alcohol"/"Opioid"/"Nicotine"; the
+    # module emits "Alcohol — Metabolism & Dependence", "Opioid &
+    # Endogenous-reward". The lookup was exact, so every one returned None and
+    # the entire panel produced nothing — while plumbed at every other layer,
+    # down to a registered condition anchor and an evidence haircut. Silent.
+    for verbose in ("Alcohol — Metabolism & Dependence",
+                    "Opioid & Endogenous-reward", "Nicotine & Stimulant",
+                    "Cannabis & Endocannabinoid", "Stress × Substance-use"):
+        assert he._match_econ_category(he.ADDICTION_ECONOMICS, verbose) is not None, (
+            f"{verbose!r} does not resolve to an econ key")
+    # An unrelated label must still miss rather than fuzzy-match something.
+    assert he._match_econ_category(he.ADDICTION_ECONOMICS, "Eye Colour") is None
+
+
+def test_the_addiction_panel_produces_records_again():
+    import pandas as pd
+    import addiction_genetics as ag
+    loci = ["rs110402", "rs1229984", "rs1360780", "rs16969968", "rs1799971",
+            "rs1801272", "rs2023239", "rs2031920", "rs27072", "rs279858",
+            "rs324420", "rs671"]
+    df = pd.DataFrame({"genotype": ["AA"] * len(loci)}, index=loci)
+    recs = he._addiction_findings(ag.analyze_addiction_genetics(df))
+    assert recs, "the panel is dead again"
+    for r in recs:
+        assert r["outcome_value"] == 0 and r["qaly_gain"] == 0.0, (
+            f"{r['finding']} carries value; this panel is awareness only")
+
+
+def test_the_top_drugs_screen_reads_the_keys_the_module_emits():
+    # It read drug_info["gene"] and ["drug"]; the module emits `genes` (a LIST)
+    # plus `generic`/`brand`. Every entry fell through and the screen was silent.
+    recs = he._top_drugs_findings({"available": True, "actionable": [
+        {"genes": ["CYP2C19"], "generic": "clopidogrel"},
+        {"genes": ["SLCO1B1"], "brand": "Lipitor"}]})
+    assert len(recs) == 2, "the screen is dead again"
+    assert all(r["outcome_value"] == 0 for r in recs), (
+        "this screen refines an existing pharmacogenomic record's p_rx; valuing "
+        "it separately counts one benefit twice")
+    # The legacy singular keys must keep working if anything still sends them.
+    assert he._top_drugs_findings({"available": True, "actionable": [
+        {"gene": "CYP2C19", "drug": "clopidogrel"}]})
+
+
+def test_hypothetical_sources_are_excluded_from_valuation_not_from_the_report():
+    from econ import value_of_information as voi
+    for src in he.HYPOTHETICAL_SOURCES:
+        assert voi._not_valued_reason(src), f"{src} carries no documented reason"
+        assert len(voi._not_valued_reason(src)) > 80
+        # NOT_VALUED is authoritative: a registered source must not also
+        # resolve to a condition anchor, or it gets counted twice.
+        assert voi._classify_category(src, "")[0] == "", (
+            f"{src} is both excluded and routed to an anchor")
