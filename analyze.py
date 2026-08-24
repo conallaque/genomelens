@@ -83,7 +83,7 @@ except ImportError:
     diff_runs = None
     render_diff_text = None
 try:
-    from wellness import analyze_wellness
+    from wellness.core import analyze_wellness
 except ImportError:
     analyze_wellness = None
 
