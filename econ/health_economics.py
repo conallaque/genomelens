@@ -39,7 +39,7 @@ from __future__ import annotations
 import pandas as pd
 
 try:
-    import snp_registry  # optional SNP-level confirmation (APOE / ACTN3)
+    from core import snp_registry  # optional SNP-level confirmation (APOE / ACTN3)
 except Exception:  # pragma: no cover - registry should always import
     snp_registry = None  # type: ignore
 

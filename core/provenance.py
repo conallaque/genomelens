@@ -29,7 +29,7 @@ import logging
 
 import pandas as pd
 
-import snp_registry
+from . import snp_registry
 
 logger = logging.getLogger(__name__)
 

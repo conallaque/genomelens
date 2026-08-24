@@ -10,7 +10,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-import snp_registry as reg
+from core import snp_registry as reg
 
 # ── Record-level invariants ──────────────────────────────────────────────────
 

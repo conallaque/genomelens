@@ -37,7 +37,9 @@ from pathlib import Path
 
 import pandas as pd
 
-SCRIPT_DIR = Path(__file__).parent
+# .parent.parent: reference/ and cache/ live at the repository root, not
+# inside this package.
+SCRIPT_DIR = Path(__file__).parent.parent
 REF_DIR = SCRIPT_DIR / "reference"
 BEAGLE_DIR = REF_DIR / "beagle"
 CACHE_DIR = SCRIPT_DIR / "cache"

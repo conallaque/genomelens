@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 
-import fhir_export as fx
+from core import fhir_export as fx
 
 # ── Stub upstream-module data ────────────────────────────────────────────────
 

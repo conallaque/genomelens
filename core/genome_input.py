@@ -57,7 +57,7 @@ import re
 
 import pandas as pd
 
-import snp_registry as _reg
+from . import snp_registry as _reg
 
 # ── Input-type detection ──────────────────────────────────────────────────────
 

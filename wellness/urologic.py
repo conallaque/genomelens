@@ -33,7 +33,7 @@ from pathlib import Path as _Path
 
 import pandas as pd
 
-import snp_registry
+from core import snp_registry
 
 CAT_BLADDER = "Bladder & Detrusor (OAB / continence)"
 CAT_PROSTATE = "Prostate — BPH & Cancer Risk"

@@ -31,7 +31,7 @@ V8.1 SNPRecord schema extension to handle non-SNV variants. See
 
 import pandas as pd
 
-import snp_registry  # V8 cross-check; see audit_against_registry below
+from core import snp_registry  # V8 cross-check; see audit_against_registry below
 
 
 def _dose(snps_df: pd.DataFrame, rsid: str, allele: str) -> int | None:

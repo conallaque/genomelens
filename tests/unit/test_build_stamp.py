@@ -15,7 +15,7 @@ import subprocess
 
 import pytest
 
-import build_stamp as bs
+from core import build_stamp as bs
 
 
 def _head() -> str:
@@ -57,7 +57,7 @@ def test_a_dirty_tree_is_declared_not_hidden():
 def test_the_stamp_degrades_instead_of_raising():
     # A report is worth more than a provenance line; losing the line must not
     # lose the report.
-    import build_stamp
+    from core import build_stamp
     orig = build_stamp._REPO
     try:
         build_stamp._REPO = "/nonexistent-path-for-this-test"

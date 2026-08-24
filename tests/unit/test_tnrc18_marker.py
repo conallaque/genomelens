@@ -87,7 +87,7 @@ def test_registry_entry_enables_wgs_backfill():
     # time, so the marker is only reachable if its coordinate is in the SNP registry
     # (which drives the VCF coordinate back-fill). Without this entry the WGS path
     # silently returned "not typed" even when the variant was in the genome.
-    import snp_registry as reg
+    from core import snp_registry as reg
     rec = [r for r in reg._RECORDS if r.rsid == tm.RSID]
     assert rec, f"{tm.RSID} must be in the registry for WGS coordinate back-fill"
     assert rec[0].chrom == tm.CHROM

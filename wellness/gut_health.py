@@ -50,7 +50,7 @@ from pathlib import Path as _Path
 
 import pandas as pd
 
-import snp_registry  # strand-aware dose + import-time audit (see bottom)
+from core import snp_registry  # strand-aware dose + import-time audit (see bottom)
 
 
 def _gt(snps_df: pd.DataFrame, rsid: str) -> str | None:

@@ -9,8 +9,8 @@ import tempfile
 import pandas as pd
 import pytest
 
-import genome_input as gi
-import snp_registry as reg
+from core import genome_input as gi
+from core import snp_registry as reg
 
 # ── genotype conversion rules (one case per rule) ─────────────────────────────
 

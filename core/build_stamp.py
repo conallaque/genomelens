@@ -26,7 +26,10 @@ import os
 import subprocess
 
 MARKER_PREFIX = "GENOMELENS-BUILD:"
-_REPO = os.path.dirname(os.path.abspath(__file__))
+# The repository root, one level above this package. `git -C` walks upward
+# so pointing at core/ happened to work, but the name would be a lie and
+# the next reader would trust it.
+_REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def _git(*args: str) -> str:

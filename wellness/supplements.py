@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import snp_registry  # V7: single source of truth for rsID metadata + strand-aware dose
+from core import snp_registry  # V7: single source of truth for rsID metadata + strand-aware dose
 
 # ── Low-level genotype helpers ──────────────────────────────────────────────
 #

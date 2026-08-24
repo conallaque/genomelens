@@ -51,7 +51,7 @@ def test_no_registry_record_missing_position() -> None:
     """Every carrier rsID we added to the registry must carry both build
     coordinates — they're needed for chip-build auto-detection later."""
     audit = carrier.audit_against_registry()
-    import snp_registry as reg
+    from core import snp_registry as reg
     for rsid in audit["agreed"] + audit["strand_flipped"]:
         rec = reg.get(rsid)
         assert rec is not None

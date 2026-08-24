@@ -44,7 +44,7 @@ from pathlib import Path as _Path
 
 import pandas as pd
 
-import snp_registry  # cross-check via audit_against_registry below
+from core import snp_registry  # cross-check via audit_against_registry below
 
 
 def _gt(snps_df: pd.DataFrame, rsid: str) -> str | None:

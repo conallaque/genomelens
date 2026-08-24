@@ -242,7 +242,7 @@ def _stamp_html(html: str) -> str:
     identifiable by reading it rather than by trusting the timestamp. This is
     the write chokepoint: one place, so a page added later cannot miss it.
     """
-    import build_stamp
+    from core import build_stamp
     marker = build_stamp.build_stamp()["marker"]
     tag = (f'<div style="font-size:11px;color:#8a94a3;margin-top:18px;'
            f'font-family:ui-monospace,Menlo,monospace">{marker}</div>')
@@ -391,7 +391,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
         log(f"  Build forced by --assume-build: {detected_build}")
     elif detected_build not in ("grch37", "grch38"):
         try:
-            import genome_input as _gi_hdr
+            from core import genome_input as _gi_hdr
             if _gi_hdr.looks_like_vcf(args.dna_file):
                 _hb = _gi_hdr.detect_build_from_vcf_header(args.dna_file)
                 if _hb in ("grch37", "grch38"):
@@ -405,7 +405,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
     #    dropped, and profile what the file contains that we can't yet interpret.
     vcf_profile = None
     try:
-        import genome_input
+        from core import genome_input
         if genome_input.looks_like_vcf(args.dna_file):
             log(f"Input detected as VCF (build: {detected_build}). Enriching + profiling ...")
             snps_df, vcf_profile = genome_input.enrich_and_profile_vcf(
@@ -947,7 +947,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
     clinical_variants_result: dict | None = None
     if analyze_clinical_variants is not None:
         try:
-            import genome_input as _gi
+            from core import genome_input as _gi
             if _gi.looks_like_vcf(args.dna_file):
                 clinical_variants_result = analyze_clinical_variants(
                     args.dna_file, detected_build,
@@ -966,7 +966,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
     novel_variants_result: dict | None = None
     if analyze_novel_variants is not None:
         try:
-            import genome_input as _gi3
+            from core import genome_input as _gi3
             if _gi3.looks_like_vcf(args.dna_file):
                 novel_variants_result = analyze_novel_variants(
                     args.dna_file, detected_build,
@@ -1130,7 +1130,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
     # ── Value of Information (health economics — runs for chip AND WGS) ──
     if analyze_value_of_information is not None:
         try:
-            import genome_input as _gi4
+            from core import genome_input as _gi4
             _input_type = "wgs" if _gi4.looks_like_vcf(args.dna_file) else "chip"
             voi_result = analyze_value_of_information(
                 economics_result=economics_result,

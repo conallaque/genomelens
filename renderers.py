@@ -31,8 +31,6 @@ import math
 import re
 from pathlib import Path
 
-import build_stamp
-
 # Late import — analyze.py finishes loading before any of these renderer
 # functions are called at runtime, so circular-import issues do not arise.
 from analyze import (
@@ -41,9 +39,10 @@ from analyze import (
     REPORT_VERSION,
     build_category_map,
 )
+from core import build_stamp
 
 try:
-    from references import level_class
+    from core.references import level_class
 except ImportError:  # references module optional
     def level_class(_) -> str:
         return ""

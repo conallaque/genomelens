@@ -26,11 +26,11 @@ except ImportError:
 
 # Professional-grade analysis modules
 try:
+    from core.qc import run_qc
+    from core.references import collect_references_used, get_reference, level_class
     from counseling import evaluate_counseling_triggers
     from pgx.core import analyze_pgx
     from pgx.interactions import detect_interactions
-    from qc import run_qc
-    from references import collect_references_used, get_reference, level_class
     from risk.carrier import analyze_carriers
     from risk.prs import analyze_polygenic_scores
     from risk.traits import predict_traits
@@ -41,7 +41,7 @@ except ImportError as _e:
 
 # v3 modules (graceful degradation when missing)
 try:
-    from imputation import imputation_available, impute_genotypes
+    from core.imputation import imputation_available, impute_genotypes
 except ImportError:
     impute_genotypes = None
     imputation_available = None
@@ -54,7 +54,7 @@ try:
 except ImportError:
     analyze_ancestry = None
 try:
-    from pdf_export import html_to_pdf, weasyprint_available
+    from core.pdf_export import html_to_pdf, weasyprint_available
 except ImportError:
     html_to_pdf = None
     def weasyprint_available() -> bool:
@@ -123,7 +123,7 @@ try:
 except ImportError:
     analyze_reproductive = None
 try:
-    from emergency_card import build_emergency_card
+    from core.emergency_card import build_emergency_card
 except ImportError:
     build_emergency_card = None
 try:
@@ -151,7 +151,7 @@ except ImportError:
     analyze_nutrition = None
     render_nutrition_html = None
 try:
-    from fhir_export import export_fhir
+    from core.fhir_export import export_fhir
 except ImportError:
     export_fhir = None
 try:
@@ -496,7 +496,7 @@ def parse_dna_file(filepath: str):
         # back-fills registry positions by coordinate. So for a VCF, proceed with an
         # empty-but-valid frame instead of aborting.
         try:
-            import genome_input as _gi
+            from core import genome_input as _gi
             is_vcf = _gi.looks_like_vcf(str(path))
         except Exception:
             is_vcf = False
@@ -519,7 +519,7 @@ def parse_dna_file(filepath: str):
     # overwrites imputed rows later. `attrs["build"]` is one of
     # grch37 / grch38 / mixed / unknown — surfaced by the QC card.
     try:
-        from provenance import annotate_parsed
+        from core.provenance import annotate_parsed
         snps_df = annotate_parsed(s.snps)
         log(f"  Build auto-detected: {snps_df.attrs.get('build', 'unknown')}")
     except ImportError:

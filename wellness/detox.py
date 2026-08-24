@@ -39,7 +39,7 @@ from pathlib import Path as _Path
 
 import pandas as pd
 
-import snp_registry
+from core import snp_registry
 
 # ── genotype helpers (strand-aware via the registry) ──────────────────────────
 
