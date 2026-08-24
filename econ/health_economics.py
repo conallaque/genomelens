@@ -1623,6 +1623,14 @@ _COI_ROUTES: tuple[tuple[str, str], ...] = (
     ("tp53", "Pathogenic"), ("ret ", "Pathogenic"), ("rb1", "Pathogenic"),
     ("chek2", "Pathogenic"),
     ("cystic fibrosis", "Pathogenic"),
+    # No anchor of their own. Both are serious chronic conditions, and creating
+    # a dedicated cost-of-illness and decrement for each would have cost four
+    # unsourced registry parameters and dropped the model under its own
+    # 75%-sourced gate. The generic pathogenic-finding anchor is a declared
+    # simplification and, at $100k against their raw $100k-$180k figures run
+    # through an expected-value calculation, a conservative one.
+    ("chronic-kidney-disease", "Pathogenic"),
+    ("atp7b", "Pathogenic"), ("wilson", "Pathogenic"),
     # ── iron ──────────────────────────────────────────────────────────────
     ("hemochromatosis", "IronOverload"),
     ("hfe c282y", "IronOverload"),
@@ -1638,6 +1646,26 @@ _COI_ROUTES: tuple[tuple[str, str], ...] = (
     # rounding error — dropping the model under its own sourcing gate. It is
     # reported as a signal instead, which is the honest place for it.
 )
+
+
+# Findings with a real risk signal and NO proven preventive intervention for an
+# asymptomatic carrier. Anchoring these would mean inventing a risk reduction,
+# so they are reported and valued at zero. "High risk, nothing proven to do
+# about it yet" is a finding; a fabricated effect size is not.
+_COI_SIGNAL_ONLY: tuple[str, ...] = (
+    "lrrk2",        # Parkinson's — no disease-modifying therapy exists
+    "parkinson",
+    "nod2",         # Crohn's — no preventive intervention for a carrier
+    "il23r",        # protective variant; nothing to act on
+    "fut2",         # microbiome shaping; no costed intervention
+    "ccr5",         # HIV resistance; not an intervention decision
+)
+
+
+def is_signal_only(finding: str, category: str = "") -> bool:
+    """True when a finding is reported but deliberately carries no dollar value."""
+    hay = f"{finding} {category}".lower()
+    return any(n in hay for n in _COI_SIGNAL_ONLY)
 
 
 def coi_key_for_finding(finding: str, category: str = "") -> str:
@@ -1688,6 +1716,9 @@ def _corrected_cohort_items(findings_econ: dict) -> tuple[list[dict], dict]:
         # illness. Without those two probabilities a $250,000 myocardial
         # infarction was charged in full to every carrier, which is what made
         # one plan member appear to save $16,174.
+        if is_signal_only(str(f.get("finding") or ""), cat):
+            # Reported elsewhere in the report; contributes no economics.
+            continue
         coi_key = coi_key_for_finding(str(f.get("finding") or ""), cat)
         anchored = False
         if coi_key:
@@ -1943,6 +1974,26 @@ def scale_to_payer(findings_econ: dict,
     t = _cohort_totals(findings_econ, member_population)
     return {
         "member_population": member_population,
+        # WHAT THIS BLOCK ACTUALLY COMPUTES. Not a real plan. It takes ONE
+        # person's findings and asks what a cohort of this size would look like
+        # if each member carried these same variants at their population
+        # frequencies. That is why it is exactly 1,000x the 100-patient clinic
+        # block: both scale the same per-affected values by the same
+        # prevalences, so the two are proportional by construction.
+        "scope": (f"{member_population:,} members with this genomic profile, "
+                  f"each finding weighted by its population frequency"),
+        "scope_note": (
+            "This is a projection from one genome, not a plan actuarial "
+            "estimate: a real plan's members carry different variants. It "
+            "answers 'what would a cohort like this person look like', which is "
+            "the question a payer asks about a screening programme, and it is "
+            "proportional to the clinic block above by design."),
+        "intervention_events_note": (
+            f"{t['intervention_events']:,} intervention-events across "
+            f"{t['unique_members_affected']:,} members: each finding is counted "
+            f"once per member who carries it, and one member can carry several. "
+            f"The prevalences sum past 1.0, so the event count exceeds the "
+            f"headcount — it is a count of actions, not of people."),
         **{k: v for k, v in t.items() if k != "cohort_size"},
         "affected_members": t["unique_members_affected"],
         "total_cost": round(t["total_intervention_cost"], 2),
@@ -2090,6 +2141,68 @@ def analyze_health_economics(findings: dict, snps_df: pd.DataFrame,
         "high_confidence": [f for f in econ_findings if f["confidence"] == "high"],
         "disclaimer": DISCLAIMER,
     }
+    # ── Gate the per-finding table behind the registry ────────────────────
+    # The aggregate corrections landed but the TABLE still printed the raw
+    # curated figures, so APOE showed a 1.5-QALY gain and a $250,000 outcome
+    # value in Section 3 while the pooled analysis two pages earlier reported
+    # 0.05 QALYs for the same variant. One document, one variant, two answers
+    # thirty-fold apart. Where a finding routes to a condition anchor, the
+    # displayed value is now recomputed from the registry the same way the
+    # pooled engine computes it, and the curated figure is kept beside it so
+    # the correction is visible rather than banked.
+    for f in econ_findings:
+        name, cat = str(f.get("finding") or ""), f.get("category", "")
+        if is_signal_only(name, cat):
+            f["registry_basis"] = "signal-only"
+            f["curated_outcome_value"] = f.get("outcome_value")
+            f["curated_qaly_gain"] = f.get("qaly_gain")
+            f["outcome_value"] = 0
+            f["qaly_gain"] = 0.0
+            f["roi"] = None
+            f["npv_3year"] = None
+            f["payback_months"] = None
+            continue
+        key = coi_key_for_finding(name, cat)
+        if not key:
+            f["registry_basis"] = "curated"
+            continue
+        try:
+            from . import engine as _eng
+            from . import params as _ep
+            cost_param, qaly_param = _eng.COI_KEY_TO_PARAM[key]
+            p_event = (_ep.value("penetrance_coeliac_given_dq")
+                       if key == "Coeliac"
+                       else _ep.value("baseline_event_probability"))
+            # Adherence too, so the table and the pooled analysis agree
+            # exactly rather than differing by a factor nobody can see. Without
+            # it the table read 0.09 QALYs against the pooled 0.05, and a
+            # reader would have no way to tell which was wrong.
+            adh = _eng.adherence_for(key)
+            cases = p_event * _ep.value("actionable_rrr") * adh
+            f["curated_outcome_value"] = f.get("outcome_value")
+            f["curated_qaly_gain"] = f.get("qaly_gain")
+            f["adherence"] = round(adh, 3)
+            f["outcome_value"] = round(cases * _ep.value(cost_param))
+            f["qaly_gain"] = round(cases * _ep.value(qaly_param), 3)
+            f["coi_key"] = key
+            f["registry_basis"] = "registry"
+            f["roi"] = calculate_roi(f["intervention_cost"], f["outcome_value"])
+            f["payback_months"] = calculate_payback_months(
+                f["intervention_cost"], f["outcome_value"],
+                recurring_cost=f.get("cost_basis") == "annual")
+            f["npv_3year"] = calculate_npv(
+                f["intervention_cost"], f["outcome_value"],
+                recurring_cost=f.get("cost_basis") == "annual")
+        except Exception:
+            f["registry_basis"] = "curated"
+
+    econ_findings.sort(key=lambda f: (f.get("roi") or 0), reverse=True)
+    result["n_registry_valued"] = sum(
+        1 for f in econ_findings if f.get("registry_basis") == "registry")
+    result["n_curated_valued"] = sum(
+        1 for f in econ_findings if f.get("registry_basis") == "curated")
+    result["n_signal_only"] = sum(
+        1 for f in econ_findings if f.get("registry_basis") == "signal-only")
     result["clinic_dashboard"] = scale_to_clinic(result)
     result["payer_impact"] = scale_to_payer(result)
     return result

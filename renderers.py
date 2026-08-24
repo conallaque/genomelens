@@ -5303,17 +5303,42 @@ def build_economics_html(economics_result: dict | None) -> str:
   </div>"""
         payer_html = f"""
 <div class="econ-panel">
-  <h3>Payer Impact <span class="econ-pop">{payer.get('member_population'):,} members</span></h3>
+  <h3>Cohort Projection <span class="econ-pop">{_esc(payer.get('scope', ''))}</span></h3>
+  <p class="econ-model" style="color:#8a94a3;margin-top:2px">
+    {_esc(payer.get('scope_note', ''))}</p>
   <div class="econ-cards">
     <div class="econ-card"><div class="econ-card-v">{payer.get('affected_members'):,}</div><div class="econ-card-l">Members affected</div></div>
     <div class="econ-card"><div class="econ-card-v">{_money(payer.get('total_cost'))}</div><div class="econ-card-l">Total intervention cost</div></div>
     <div class="econ-card"><div class="econ-card-v">{_money(payer.get('total_benefit'))}</div><div class="econ-card-l">Modeled savings</div></div>
-    <div class="econ-card"><div class="econ-card-v">{payer.get('roi')}:1</div><div class="econ-card-l">Aggregate ROI</div></div>
+    <div class="econ-card"><div class="econ-card-v">{payer.get('roi')}:1</div><div class="econ-card-l">Health value per $ spent</div></div>
     <div class="econ-card"><div class="econ-card-v">{cpq_txt}</div><div class="econ-card-l">Cost per QALY</div></div>
     <div class="econ-card"><div class="econ-card-v">{_money(payer.get('net_savings'))}</div><div class="econ-card-l">Net cash</div></div>
     <div class="econ-card"><div class="econ-card-v">{payer.get('intervention_events', 0):,}</div><div class="econ-card-l">Intervention-events</div></div>
   </div>
+  <p class="econ-model" style="color:#8a94a3">{_esc(payer.get('intervention_events_note', ''))}</p>
   {corr_html}
+</div>"""
+
+    _nreg = economics_result.get("n_registry_valued", 0)
+    _ncur = economics_result.get("n_curated_valued", 0)
+    _nsig = economics_result.get("n_signal_only", 0)
+    basis_html = ""
+    if _nreg or _ncur or _nsig:
+        basis_html = f"""
+<div style="border:1px solid #dfe4ea;background:#f8f9fb;border-radius:9px;
+     padding:10px 13px;margin-top:12px;font-size:.85em;color:#57606a">
+  <strong>What each figure rests on.</strong>
+  <strong>{_nreg}</strong> finding(s) here are valued from the parameter
+  registry — probability of the event, share of it the intervention prevents,
+  and cost of illness, each carrying its own source and provenance tier, and
+  computed the same way as the pooled analysis above so the two agree.
+  <strong>{_ncur}</strong> are still valued from the curated per-finding tables,
+  which carry a literature attribution but are <em>not</em> on the registry:
+  they are part of the 313 unregistered figures, and no anchor exists for their
+  condition yet.
+  <strong>{_nsig}</strong> are reported with no dollar value at all — a real
+  risk signal with no intervention proven to change the outcome for an
+  asymptomatic carrier. Pricing those would mean inventing an effect size.
 </div>"""
 
     disclaimer = _esc(economics_result.get("disclaimer", ""))
@@ -5330,6 +5355,7 @@ of preventing one event, and an earlier version accrued it every year, which
 tripled it.
 </p>
 {headline_html}
+{basis_html}
 <div class="tbl-wrap">
 <table class="econ-tbl"><thead><tr>
 <th>Finding &amp; intervention</th><th>Cost</th><th>Outcome value</th>

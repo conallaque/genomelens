@@ -43,38 +43,31 @@ DISCOUNT_SENSITIVITY = (0.0, 0.03, 0.05)
 TEST_COST = {"chip": 100.0, "wgs": 300.0}                 # consumer chip vs WGS promo
 
 # Cost-of-Illness: lifetime, direct + indirect, present-ish value (illustrative).
+# Condition anchors this module values, mapped to their registry parameters.
+# Imported from the engine rather than restated so a new anchor cannot be added
+# in one place and forgotten in the other.
+def _coi_param_source() -> dict[str, tuple[str, str]]:
+    from .engine import COI_KEY_TO_PARAM
+    return dict(COI_KEY_TO_PARAM)
+
+
+_COI_PARAM_SOURCE = _coi_param_source()
+
+# ONE SOURCE OF TRUTH. This dict predated the provenance registry and held its
+# own copy of every cost-of-illness figure. Five of the twelve had already
+# drifted from the registry by the time anyone checked — Alzheimer's worst, at
+# $350,000 here against $200,000 there, a 75% overstatement in whichever path
+# read this copy. The costs now come from the registry, so the tier, source and
+# distribution travel with the value and there is only one of each number.
+#
+# Aligning moved three anchors UP (breast/ovarian, colorectal, generic
+# pathogenic) and two DOWN, for a net of about -$105,000. The registry figure is
+# the sourced one in both directions; keeping a known-too-low number to satisfy
+# a "corrections must reduce" rule would be its own distortion.
 COI: dict[str, dict] = {
-    "CAD":            {"cost": 90_000,  "src": "AHA — lifetime CVD direct+indirect"},
-    "T2D":            {"cost": 85_000,  "src": "ADA 2018 — lifetime excess cost"},
-    "Alzheimer":      {"cost": 350_000, "src": "Alz. Assoc. 2023 — incl. long-term care"},
-    "BreastOvarian":  {"cost": 130_000, "src": "hereditary breast/ovarian treatment"},
-    "Colorectal":     {"cost": 110_000, "src": "Lynch-spectrum CRC treatment"},
-    "Pathogenic":     {"cost": 80_000,  "src": "illustrative avg for a pathogenic finding"},
-    # ── Conditions covered by the modules wired in 2026-08-22 ────────────────
-    # Each entry is a published lifetime or episode cost-of-illness figure for
-    # the condition the module actually speaks to. These exist so those modules
-    # can enter the economic model on a real anchor rather than being dropped
-    # or, worse, mapped onto an unrelated cardiometabolic proxy.
-    "SubstanceUse":   {"cost": 60_000,  "src": "NIDA/NIAAA — lifetime excess medical cost, "
-                                               "alcohol/nicotine use disorder (excludes "
-                                               "criminal-justice and productivity terms)"},
-    "Depression":     {"cost": 55_000,  "src": "Greenberg 2021 PharmacoEconomics — lifetime "
-                                               "direct medical cost, major depressive disorder"},
-    "Autoimmune":     {"cost": 95_000,  "src": "lifetime direct cost, immune-mediated "
-                                               "inflammatory disease (RA/IBD/psoriasis avg)"},
-    "Urologic":       {"cost": 25_000,  "src": "lifetime direct cost, benign urologic disease "
-                                               "(BPH, recurrent nephrolithiasis)"},
-    "IronOverload":   {"cost": 40_000,  "src": "hereditary haemochromatosis — lifetime cost "
-                                               "with organ involvement; phlebotomy is cheap, "
-                                               "late cirrhosis/cardiomyopathy is not"},
-    # Read from the registry rather than written here. This dict predates the
-    # provenance registry, and every figure in it is a second copy of a number
-    # the registry also holds — a standing invitation for the two to drift.
-    # New anchors take the registry value so there is only one of each.
-    "Coeliac":        {"cost": _econ_params.value("coi_coeliac"),
-                       "src": "econ.params: coi_coeliac (declared assumption; "
-                              "diet-managed, so far below the procedural and "
-                              "biologic anchors above)"},
+    key: {"cost": _econ_params.value(params[0]),
+          "src": f"econ.params: {params[0]} ({_econ_params.PARAMS[params[0]].tier})"}
+    for key, params in _COI_PARAM_SOURCE.items()
 }
 
 # MARGINAL vs AVERAGE COST (honesty correction).
