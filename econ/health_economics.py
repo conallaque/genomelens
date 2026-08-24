@@ -1272,16 +1272,25 @@ def _mr_findings(mr_result: dict | None) -> list[dict]:
 def _neurochemistry_findings(neurochemistry_result: dict | None) -> list[dict]:
     """Economics for the neurochemistry panel.
 
-    TWO STRING BUGS LIVED HERE, both silent. The ``impact`` guard below read a
-    key the module never emitted, so it never fired and a wild-type genotype
-    reporting "None specific." was priced at the gene's full value. And the
-    table lookup was exact, so the DRD2 entry never matched: the module emits
-    the gene as "DRD2/ANKK1" (the Taq1A locus spans both) while the table is
-    keyed "DRD2", meaning that finding has never been priced at all.
+    THREE STRING BUGS LIVED HERE, all silent. (1) The ``impact`` guard below
+    read a key the module never emitted, so it never fired and a wild-type
+    genotype reporting "None specific." was priced at the gene's full value.
+    (2) The table lookup was exact, so the DRD2 entry never matched: the module
+    emits the gene as "DRD2/ANKK1" (the Taq1A locus spans both) while the table
+    is keyed "DRD2", meaning that finding was never priced at all. (3) The
+    ``evidence`` line read ``verdict`` — a real key on *addiction_genetics*
+    findings, from which this block was copy-pasted, but never emitted by
+    neurochemistry. Every evidence string was silently truncated to
+    "COMT AG — ". The neurochemistry equivalent is ``phenotype``.
 
-    Neither failed loudly. One inflated the total, one suppressed a line, and
-    the only way to see either was to compare the table's keys against the
-    strings the module actually produces.
+    Fixing (1) took two passes: adding the field caught DRD2 and OPRM1, whose
+    reference genotype asks for nothing, but COMT and BDNF kept defaulting to
+    "informative" and stayed priced on the reference genotype. See ``_find``
+    in neurochemistry.py for the discriminator.
+
+    None of the three failed loudly. Two inflated the total, one suppressed a
+    line, and the only way to see any of them was to compare the table's keys
+    against the strings the module actually produces.
     """
     out: list[dict] = []
     if not neurochemistry_result or not neurochemistry_result.get("available"):
@@ -1305,7 +1314,8 @@ def _neurochemistry_findings(neurochemistry_result: dict | None) -> list[dict]:
             cost=econ["cost"], outcome_value=econ["outcome_value"],
             confidence="low", source="Neurochemistry",
             prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
-            evidence=f"{gene} {finding.get('genotype', '')} — {finding.get('verdict', '')}",
+            evidence=f"{gene} {finding.get('genotype', '')} — "
+                     f"{finding.get('phenotype', '')}",
         ))
     return out
 
@@ -2626,7 +2636,11 @@ def analyze_personal_economics(economics_result: dict | None = None,
     if neurochemistry_result and neurochemistry_result.get("available"):
         composite = neurochemistry_result.get("composite", {})
         comt = composite.get("comt_class", "")
-        if comt and comt != "normal":
+        # _classify_comt returns warrior / middle / worrier / unknown — never
+        # "normal", so the old `!= "normal"` test passed for every genotype and
+        # priced COMT even for the reference heterozygote. "middle" is that
+        # reference; keep this in step with _comt's own `impact` branch.
+        if comt and comt not in ("middle", "unknown"):
             econ = NEUROCHEMISTRY_ECONOMICS.get("COMT", {})
             if econ:
                 avoided = econ["outcome_value"] * 0.10

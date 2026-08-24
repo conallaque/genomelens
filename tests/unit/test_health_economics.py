@@ -576,3 +576,116 @@ def test_hypothetical_sources_are_excluded_from_valuation_not_from_the_report():
         # resolve to a condition anchor, or it gets counted twice.
         assert voi._classify_category(src, "")[0] == "", (
             f"{src} is both excluded and routed to an anchor")
+
+
+def test_no_priced_gene_bills_its_reference_genotype():
+    # The generalisation of the wild-type bug, scoped to where it costs money.
+    # The pre-existing "declares an impact" test is satisfied by _find's
+    # impact="informative" DEFAULT, so a branch that never mentions impact
+    # passes it while still being priced — which is exactly how COMT and BDNF
+    # stayed billed on the reference genotype for a whole extra fix cycle.
+    # This asserts on the priced outcome instead of the field's presence.
+    #
+    # The reference genotype is the one the econ entry's intervention does not
+    # apply to. For COMT that is the HETEROZYGOTE (intermediate clearance, the
+    # population mode), not a homozygote.
+    import pandas as pd
+
+    import neurochemistry as nc
+    reference = {
+        "COMT":  (nc._comt,  "rs4680",     "AG"),   # Val/Met — intermediate
+        "BDNF":  (nc._bdnf,  "rs6265",     "CC"),   # Val/Val — full secretion
+        "DRD2":  (nc._drd2,  "rs1800497",  "CC"),   # A2/A2  — typical density
+        "OPRM1": (nc._oprm1, "rs1799971",  "AA"),   # A/A    — standard receptor
+    }
+    assert set(reference) == set(he.NEUROCHEMISTRY_ECONOMICS), (
+        "a priced gene has no declared reference genotype — add one here, "
+        "or it will be billed on every genotype without any test noticing"
+    )
+    for gene, (fn, rsid, gt) in reference.items():
+        rec = fn(pd.DataFrame({"genotype": [gt]}, index=[rsid]))
+        assert rec["impact"] == "neutral", (
+            f"{gene} {gt} is the reference genotype but declares "
+            f"impact={rec['impact']!r}, so it gets priced"
+        )
+        priced = he._neurochemistry_findings({"available": True, "findings": [rec]})
+        assert priced == [], (
+            f"{gene} {gt} carries no signal but was priced at "
+            f"${priced[0]['outcome_value']:,}"
+        )
+
+
+def test_a_neutral_finding_still_reaches_the_narrative_report():
+    # The guard must suppress the *valuation*, not the finding. COMT Val/Met is
+    # neutral for economics but is genuinely favourable news the report should
+    # still tell the reader, so it keeps its phenotype and its action.
+    import neurochemistry as nc
+    rec = nc._comt(_neuro("rs4680", "AG"))
+    assert rec["impact"] == "neutral"
+    assert "heterozygote advantage" in rec["phenotype"]
+    assert rec["action"] and rec["action"] != "None specific."
+
+    # And assert the RENDERER actually emits it. Keeping the keys on the dict
+    # proves nothing if the panel's own renderer filters neutral rows out --
+    # the neurochemistry section is not covered by tests/snapshots/, so nothing
+    # else here would notice COMT Val/Met silently vanishing from the report.
+    import renderers
+    html = renderers.build_neurochemistry_html(
+        nc.analyze_neurochemistry(_neuro("rs4680", "AG")))
+    assert "heterozygote advantage" in html, (
+        "a neutral finding must still reach the narrative report -- `impact` "
+        "gates the economics only"
+    )
+    assert "Genuinely favourable" in html
+
+
+def test_neurochemistry_evidence_is_not_silently_empty():
+    # THE THIRD STRING BUG. The evidence line read `verdict`, a real key on
+    # addiction_genetics findings (where this block was copy-pasted from) but
+    # one neurochemistry never emits. Every evidence string rendered as
+    # "COMT AG — " and shipped that way into economic_analysis.html.
+    import neurochemistry as nc
+    assert "verdict" not in nc._comt(_neuro("rs4680", "GG"))
+    for rsid, gt in (("rs4680", "GG"), ("rs6265", "TT"), ("rs1799971", "GG")):
+        rec = nc.analyze_neurochemistry(_neuro(rsid, gt))
+        for priced in he._neurochemistry_findings(rec):
+            tail = priced["evidence"].split("—", 1)[-1].strip()
+            assert tail, f"{priced['finding']!r} shipped an empty evidence tail"
+
+
+def test_the_personal_model_skips_the_reference_comt_class():
+    # Same defect class, second surface. The personal-economics path filtered
+    # `comt_class != "normal"`, but _classify_comt returns warrior / middle /
+    # worrier / unknown and never "normal" — so the test passed for every
+    # genotype and priced COMT for the reference heterozygote too.
+    import neurochemistry as nc
+    produced = {nc._classify_comt(gt) for gt in ("GG", "AG", "AA", None)}
+    assert "normal" not in produced, (
+        "if _classify_comt ever emits 'normal' this guard needs revisiting"
+    )
+    assert produced == {"warrior", "middle", "worrier", "unknown"}
+
+    def comt_lines(gt):
+        df = pd.DataFrame({"genotype": [gt]}, index=["rs4680"])
+        df.index.name = "rsid"
+        model = he.analyze_personal_economics(
+            neurochemistry_result=nc.analyze_neurochemistry(df))
+        return [i for i in (model.get("items") or [])
+                if "COMT" in str(i.get("finding", ""))]
+
+    assert comt_lines("AG") == [], "the reference heterozygote must not be priced"
+    assert comt_lines("GG"), "warrior must still be priced"
+
+    # Distinct error class, same guard: with rs4680 absent the class is
+    # "unknown", which was truthy AND != "normal", so a chip that never
+    # genotyped COMT still got a COMT valuation. Billing an ungenotyped gene is
+    # worse than billing a reference genotype.
+    import neurochemistry as nc2
+    df = pd.DataFrame({"genotype": ["TT"]}, index=["rs6265"])   # BDNF only
+    df.index.name = "rsid"
+    absent = he.analyze_personal_economics(
+        neurochemistry_result=nc2.analyze_neurochemistry(df))
+    assert [i for i in (absent.get("items") or [])
+            if "COMT" in str(i.get("finding", ""))] == [], (
+        "COMT was priced on a chip that never genotyped rs4680"
+    )

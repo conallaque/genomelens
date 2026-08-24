@@ -87,8 +87,21 @@ def _find(category, name, gene, rsid, genotype, phenotype, mechanism, action,
     this function never emitted, so ``finding.get("impact")`` was always None,
     the "skip neutral calls" guard never fired, and a wild-type genotype with
     action "None specific." was priced at the gene's full economic value —
-    $43,000 across DRD2 and OPRM1 for a person typical at both. Set it to
-    "neutral" on any branch that reports a typical result and asks for nothing.
+    $43,000 across DRD2 and OPRM1 for a person typical at both.
+
+    The discriminator is NOT "does this branch have advice in it". COMT Val/Met
+    and BDNF Val/Val both carry a real phenotype and a real action, and both are
+    still "neutral": the test is whether the genotype changes *the intervention
+    the economics entry prices*. COMT prices catecholamine-clearance-guided
+    SSRI/SNRI selection, so the intermediate-clearance heterozygote is the
+    reference; BDNF prices exercise-first therapy selection, which exists for
+    reduced-secretion Met carriers, so full-secretion Val/Val is the reference.
+    Reference genotype → "neutral"; anything that moves the intervention →
+    "informative". `impact` gates the economics only: a "neutral" finding still
+    appears in the neurochemistry report with its phenotype and action intact.
+
+    Any branch that leaves this defaulted is opting out of the guard silently,
+    which is how COMT and BDNF stayed priced for a whole extra fix cycle.
     """
     return {
         "category": category, "name": name, "gene": gene, "rsid": rsid,
@@ -107,6 +120,7 @@ def _comt(df):
         return None
     # G = Val (fast enzyme, ~3-4× activity); A = Met (slow enzyme)
     n_val = gt.count("G")
+    impact = "informative"
     if n_val == 2:
         ph = ("Warrior (Val/Val) — fast prefrontal dopamine clearance")
         mech = ("Homozygous Val158Met = ~3-4× COMT enzyme activity in the "
@@ -139,9 +153,17 @@ def _comt(df):
         action = ("Genuinely favourable for high-performance / high-pressure "
                   "cognitive work. Handles acute stress well without paying the "
                   "sustained-cognition tax of Val/Val.")
+        # NOTE: COMT's reference genotype is the HETEROZYGOTE, not a homozygote.
+        # Val/Met is the population mode (~50%) with intermediate clearance, so
+        # there is no COMT-guided SSRI/SNRI dose adjustment to price here; both
+        # homozygotes are the informative extremes. This branch still carries a
+        # phenotype and an action for the report — `impact` gates the economics
+        # only. Do not "correct" this to n_val == 2.
+        impact = "neutral"
     return _find(CAT_DOPAMINE, "COMT Val158Met", "COMT", "rs4680", gt, ph,
                  mech, action, "high",
-                 "Egan 2001 PNAS; Diamond 2007; Meyer-Lindenberg 2006")
+                 "Egan 2001 PNAS; Diamond 2007; Meyer-Lindenberg 2006",
+                 impact=impact)
 
 
 # ── MAOA — X-linked monoamine turnover ────────────────────────────────────────
@@ -192,6 +214,7 @@ def _bdnf(df):
     if gt is None:
         return None
     n_T = gt.count("T")   # T = Met allele; C = Val (favorable)
+    impact = "informative"
     if n_T == 0:
         ph = "BDNF Val/Val — full activity-dependent BDNF secretion"
         mech = ("Both alleles encode the Val66 form of pro-BDNF, which is "
@@ -202,6 +225,10 @@ def _bdnf(df):
         action = ("Genuinely favourable for skill acquisition. Time invested in "
                   "deliberate practice pays off more than average — spend the "
                   "reps in the domains you care about.")
+        # Full activity-dependent secretion is the reference: the econ entry
+        # prices exercise-first / BDNF-aware therapy selection, which exists for
+        # reduced-secretion Met carriers. Nothing to adjust for Val/Val.
+        impact = "neutral"
         conf = "high"
     elif n_T == 1:
         ph = "BDNF Val/Met heterozygous — modestly reduced activity-dependent secretion"
@@ -225,7 +252,8 @@ def _bdnf(df):
         conf = "high"
     return _find(CAT_PLASTICITY, "BDNF Val66Met", "BDNF", "rs6265", gt,
                  ph, mech, action, conf,
-                 "Egan 2003 Cell; Chen 2006 Science")
+                 "Egan 2003 Cell; Chen 2006 Science",
+                 impact=impact)
 
 
 # ── DRD2/ANKK1 Taq1A ─────────────────────────────────────────────────────────
