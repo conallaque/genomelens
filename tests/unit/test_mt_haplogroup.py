@@ -8,7 +8,7 @@ wrong haplogroup. Both existed in this module before these tests.
 
 import pandas as pd
 
-import mt_haplogroup as mt
+from ancestry import mt_haplogroup as mt
 
 
 def _df(rows):

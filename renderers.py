@@ -54,7 +54,7 @@ except ImportError:
     render_ideogram_svg = None  # type: ignore[assignment]
 
 try:
-    from local_ancestry import render_chromosome_painting_svg
+    from ancestry.local import render_chromosome_painting_svg
 except ImportError:
     render_chromosome_painting_svg = None  # type: ignore[assignment]
 

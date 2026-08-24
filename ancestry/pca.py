@@ -35,7 +35,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-SCRIPT_DIR = Path(__file__).parent
+# One level up: this module moved into the ancestry package but the
+# reference panel stays at the repository root. Left as .parent it
+# resolved to ancestry/reference/ancestry, which simply does not exist —
+# and the full-PCA path degrades silently when the panel is missing, so
+# nothing would have raised.
+SCRIPT_DIR = Path(__file__).parent.parent
 REF_DIR = SCRIPT_DIR / "reference" / "ancestry"
 
 

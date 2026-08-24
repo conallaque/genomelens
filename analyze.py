@@ -17,10 +17,10 @@ from pathlib import Path
 # surface from analyze. An unused-import autofix removed this line and the
 # pipeline stopped starting, while all 749 tests still passed — the suite
 # imports the modules directly and never exercises the facade.
-from y_haplogroup import analyze_y_haplogroup
+from ancestry.y_haplogroup import analyze_y_haplogroup
 
 try:
-    from mt_haplogroup import analyze_mt_haplogroup
+    from ancestry.mt_haplogroup import analyze_mt_haplogroup
 except ImportError:
     analyze_mt_haplogroup = None
 
@@ -50,7 +50,7 @@ try:
 except ImportError:
     analyze_expanded_pgs = None
 try:
-    from ancestry_pca import analyze_ancestry
+    from ancestry.pca import analyze_ancestry
 except ImportError:
     analyze_ancestry = None
 try:
@@ -94,7 +94,7 @@ except ImportError:
     detect_roh = None
     render_ideogram_svg = None
 try:
-    from local_ancestry import analyze_local_ancestry, render_chromosome_painting_svg
+    from ancestry.local import analyze_local_ancestry, render_chromosome_painting_svg
 except ImportError:
     analyze_local_ancestry = None
     render_chromosome_painting_svg = None
@@ -181,7 +181,7 @@ try:
 except ImportError:
     analyze_gut_health = None
 try:
-    from deep_ancestry import analyze_deep_ancestry
+    from ancestry.deep import analyze_deep_ancestry
 except ImportError:
     analyze_deep_ancestry = None
 try:
@@ -193,7 +193,7 @@ try:
 except ImportError:
     analyze_immunogenetics = None
 try:
-    from ancestral_story import analyze_ancestral_story
+    from ancestry.story import analyze_ancestral_story
 except ImportError:
     analyze_ancestral_story = None
 try:

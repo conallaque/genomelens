@@ -239,7 +239,7 @@ def _count_derived(snps_df: pd.DataFrame, alleles: list[tuple[str, str]]) -> dic
     carried = 0
     n_max = 0
     per: list[dict] = []
-    from ancestry_pca import _dosage  # reuse strand-aware helper
+    from .pca import _dosage  # reuse strand-aware helper
     for rsid, allele in alleles:
         if rsid not in snps_df.index:
             per.append({"rsid": rsid, "typed": False, "dose": None})
@@ -249,7 +249,7 @@ def _count_derived(snps_df: pd.DataFrame, alleles: list[tuple[str, str]]) -> dic
             row = row.iloc[0]
         info = None
         try:
-            from ancestry_pca import AIMS_PRIORS
+            from .pca import AIMS_PRIORS
             info = AIMS_PRIORS.get(rsid)
         except Exception:
             info = None
@@ -328,7 +328,7 @@ _NS_EUROPE_AXIS: list[dict] = [
 
 def analyze_north_south_europe(snps_df: pd.DataFrame) -> dict:
     """Compute a soft Northern-vs-Southern European axis score."""
-    from ancestry_pca import AIMS_PRIORS, _dosage
+    from .pca import AIMS_PRIORS, _dosage
     score = 0.0
     max_score = 0.0
     used: list[dict] = []

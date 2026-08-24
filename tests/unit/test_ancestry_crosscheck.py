@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import ancestry_pca as ap
+from ancestry import pca as ap
 
 
 def test_dosage_is_strand_aware() -> None:

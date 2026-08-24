@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import deep_ancestry as da
+from ancestry import deep as da
 
 
 def test_neanderthal_scores_present_alleles() -> None:

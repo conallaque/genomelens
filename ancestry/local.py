@@ -36,7 +36,7 @@ import pandas as pd
 
 # Reuse the AIMs panel + superpop allele frequencies from ancestry_pca.py
 try:
-    from ancestry_pca import AIMS_PRIORS, SUPERPOP_LONG, SUPERPOPS
+    from .pca import AIMS_PRIORS, SUPERPOP_LONG, SUPERPOPS
 except Exception:
     AIMS_PRIORS = {}
     SUPERPOPS = ["EUR", "AFR", "EAS", "SAS", "AMR"]
