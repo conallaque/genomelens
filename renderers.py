@@ -350,12 +350,34 @@ def build_ydna_html(y_result: dict) -> str:
         )
 
     # ── Migration narrative ──
+    # Fall back through the path when the terminal clade has no migration prose
+    # of its own. Twelve of the thirty-one tree nodes carry it and only the
+    # terminal was read, so a deep call like T1a1a produced an EMPTY block and
+    # the whole Migration History section vanished — discarding the CT, F, K and
+    # T narratives that are on that very path. The ancient-DNA box beside this
+    # one has always walked ancestors for exactly this reason; this now matches.
+    migration_from = terminal
+    if not migration:
+        for node in reversed(path or []):
+            if node.get("migration"):
+                migration = node["migration"]
+                migration_from = node.get("haplogroup", "")
+                break
+
     migration_html = ""
     if migration:
+        # Say whose story it is. Presenting an ancestral clade's migration under
+        # the terminal label would imply a precision the data does not carry.
+        attrib = ("" if migration_from == terminal else
+                  f'<div class="ydna-migration-attrib" style="font-size:.82em;'
+                  f'color:#8a94a3;margin-bottom:4px">Nearest branch point on your '
+                  f'path with a documented migration record: '
+                  f'<strong>{_esc(migration_from)}</strong>. Clades below it are '
+                  f'younger than the events described here.</div>')
         migration_html = (
             f'<div class="ydna-migration">'
             f'<div class="ydna-migration-title">Migration History</div>'
-            f"<p>{migration}</p>"
+            f"{attrib}<p>{migration}</p>"
             f"</div>"
         )
 
@@ -456,8 +478,18 @@ def build_mtdna_html(mt_result: dict) -> str:
     conf_badge_cls = "mtdna-badge-pink" if confidence == "high" else "mtdna-badge-gray"
     conf_label = f"{haplogroup} ({confidence} confidence)"
 
+    # DERIVED vs ANCESTRAL. mt_haplogroup computes this per marker and the table
+    # dropped it, so an ancestral call rendered identically to a derived one —
+    # "C7028T -> H" sat beside "the most common European haplogroup" while the
+    # genotype was in fact the ancestral state, which is precisely WHY the call
+    # is not H. Without the column the table reads as a list of assertions
+    # rather than as evidence, and the reader cannot see that the majority of
+    # rows are exclusions. Y-DNA's equivalent table has always shown status.
     matched_rows = ""
     for m in matched[:15]:
+        derived = bool(m.get("is_derived"))
+        badge = ('<span class="badge badge-low">derived</span>' if derived else
+                 '<span class="badge badge-moderate">ancestral</span>')
         matched_rows += (
             f"<tr>"
             f'<td class="rsid-cell">'
@@ -465,15 +497,24 @@ def build_mtdna_html(mt_result: dict) -> str:
             f'target="_blank" rel="noopener">{m.get("rsid","")}</a></td>'
             f"<td>{m.get('haplogroup_marker','')}</td>"
             f'<td class="gt-cell">{m.get("genotype","")}</td>'
+            f"<td>{badge}</td>"
             f"<td>{m.get('description','')}</td>"
             f"</tr>\n"
         )
     matched_table = ""
     if matched_rows:
+        n_der = sum(1 for m in matched if m.get("is_derived"))
         matched_table = (
             '<div class="tbl-wrap" style="margin-top:14px"><table class="snp-tbl">'
+            f'<caption style="caption-side:top;text-align:left;font-size:.84em;'
+            f'color:#5b6673;padding:0 0 6px">'
+            f'<strong>{n_der}</strong> of <strong>{len(matched)}</strong> matched '
+            f'markers carry the derived state. An <em>ancestral</em> call is an '
+            f'exclusion — it is why the lineage does NOT continue down that '
+            f'branch, and it is as informative as a derived one.</caption>'
             "<thead><tr>"
-            "<th>rsID</th><th>Marker</th><th>Genotype</th><th>Haplogroup association</th>"
+            "<th>rsID</th><th>Marker</th><th>Genotype</th><th>State</th>"
+            "<th>Haplogroup association</th>"
             "</tr></thead>"
             f"<tbody>{matched_rows}</tbody></table></div>"
         )
@@ -1603,19 +1644,29 @@ def build_holistic_synthesis_html(hs: dict | None) -> str:
     for i in hs.get("insights", []):
         impact_color = {"actionable": "#b3261e", "caution": "#d29922",
                         "informational": "#2b5f8e"}.get(i.get("impact"), "#41505f")
-        ev = "".join(
-            f'<span style="background:#eef4fb;color:#12467a;border:1px solid #dbe3ec;'
-            f'border-radius:14px;padding:2px 8px;margin:0 3px 0 0;font-size:.72em">'
-            f'{_esc(e.get("module",""))}</span>'
-            for e in i.get("evidence", [])
-        )
+        # Show the MEASUREMENT, not just which module supplied it. Each evidence
+        # entry carries a `value` or `finding` — "hs-CRP 2.1 mg/L", "Ferritin
+        # 180", "Yamnaya 48% · EEF 31%", "COMT met/met · MAOA low" — and the pill
+        # printed only e["module"], so the reader saw "bloodwork" where the
+        # actual number was already computed and sitting in the dict.
+        def _pill(e: dict) -> str:
+            detail = e.get("value") or e.get("finding") or ""
+            mod = e.get("module", "")
+            label = f"{mod} · {detail}" if (mod and detail) else (detail or mod)
+            return (f'<span style="background:#eef4fb;color:#12467a;'
+                    f'border:1px solid #dbe3ec;border-radius:14px;padding:2px 8px;'
+                    f'margin:0 3px 3px 0;font-size:.72em;display:inline-block">'
+                    f'{_esc(label)}</span>')
+
+        ev = "".join(_pill(e) for e in i.get("evidence", []))
         insights_html += f"""
 <div style="border:1px solid #e3e7ec;border-left:4px solid {impact_color};
      border-radius:8px;padding:12px 14px;margin:8px 0;background:#fff;break-inside:avoid">
   <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap">
     <span style="font-weight:700;color:#12467a">{_esc(i['title'])}</span>
     <span style="font-size:.78em;color:{impact_color};font-weight:600">
-      {_esc(i.get('impact','—'))} · sev {i.get('severity',1)}</span>
+      {_esc(i.get('impact','—'))} · sev {i.get('severity',1)}{
+        " · " + _esc(str(i.get("confidence"))) if i.get("confidence") else ""}</span>
   </div>
   <div style="line-height:1.55;color:#33404d;margin:6px 0">{_esc(i['explanation'])}</div>
   <div style="line-height:1.55;color:#2b5f8e;font-size:.9em">
