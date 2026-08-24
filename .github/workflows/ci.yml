@@ -49,7 +49,7 @@ jobs:
       # starts. An unused-import autofix once deleted a re-export and every
       # test still passed while the pipeline would not run.
       - name: Check the CLI entry point loads
-        run: python -c "import pipeline, analyze, renderers"
+        run: python -c "import pipeline, analyze; from report import renderers; import ancestry, core, econ, pgx, risk, tools, wellness"
 
       # End-to-end on the repository's own synthetic genome. No personal data:
       # data/test_genome.txt is committed, and the report is written to a temporary
