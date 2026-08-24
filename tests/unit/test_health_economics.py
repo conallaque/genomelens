@@ -539,6 +539,7 @@ def test_verbose_category_labels_resolve_to_short_econ_keys():
 
 def test_the_addiction_panel_produces_records_again():
     import pandas as pd
+
     import addiction_genetics as ag
     loci = ["rs110402", "rs1229984", "rs1360780", "rs16969968", "rs1799971",
             "rs1801272", "rs2023239", "rs2031920", "rs27072", "rs279858",
