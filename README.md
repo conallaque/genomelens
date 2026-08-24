@@ -38,6 +38,29 @@ Unauthorized copying, modification, or distribution is prohibited.
 
 ---
 
+## 📄 Look at the output first
+
+### **[→ `docs/samples/econ-output-sample.pdf`](docs/samples/econ-output-sample.pdf)** — 26 pages, real output
+
+Faster than reading this page. **Synthetic input — no human genome, no personal health
+data** was used to produce it.
+
+| In the sample | Why it matters |
+|---|---|
+| Cost and QALYs reported **separately**, ICER **withheld** under dominance | a negative ICER is ambiguous; reporting one is the classic error |
+| A **double-counting correction**, stating what the naive figure claimed and how much came out | the model shows the size of its own correction instead of banking it |
+| An **adherence discount** charged to benefit *and* ongoing cost | trial efficacy is not real-world effectiveness |
+| Three statistical corrections shown **before → after** | liability threshold, ancestry portability, competing-risk incidence |
+| A footnote saying which figures rest on the sourced registry and which do not | you can see exactly how much of the answer is evidence |
+
+Reproduce it end to end — no genome required:
+
+```bash
+python scripts/make_econ_sample.py /tmp/econ-sample
+```
+
+---
+
 > **An applied health-economics engine that treats your health like a portfolio —
 > running entirely on your own machine.**
 > GenomeLens reads a consumer DNA file (23andMe, AncestryDNA, MyHeritage, FTDNA, …)
@@ -52,9 +75,9 @@ Unauthorized copying, modification, or distribution is prohibited.
 ![status](https://img.shields.io/badge/status-active-brightgreen)
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![privacy](https://img.shields.io/badge/privacy-100%25%20local%20%C2%B7%20offline-purple)
-![code](https://img.shields.io/badge/code-~54.8k%20lines%20%C2%B7%2079%20modules-orange)
+![modules](https://img.shields.io/badge/modules-79%20%C2%B7%20one%20econ%20package-orange)
 [![CI](https://github.com/conallaque/genomelens/actions/workflows/ci.yml/badge.svg)](https://github.com/conallaque/genomelens/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-749%20passing-brightgreen)
+![tests](https://img.shields.io/badge/tests-780%20passing-brightgreen)
 ![input](https://img.shields.io/badge/input-chip%20%2B%20whole--genome%20VCF-blue)
 ![license](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
 [![Buy Me a Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/caque)
@@ -168,7 +191,7 @@ Disk/RAM/runtime for both input types are in **Runs on any laptop**, below.
 ## Why I built this
 
 I've spent the last five years in health economics — a BA focused on it (with a
-published paper), now a master's in financial economics — circling one question:
+published paper), now finishing a master's at Northeastern — circling one question:
 **what is the actual payoff of understanding your own health, in decisions?**
 
 Your genome is the richest, longest-lived input to that question. But the payoff is
@@ -220,7 +243,7 @@ readily as a flattering one, and several of the commits above exist because it d
 ## What it does
 
 GenomeLens runs **79 interlocking analysis modules** (≈54,800 lines of Python, a
-386-test suite) entirely offline — across two input tiers: a consumer chip file
+780-test suite) entirely offline — across two input tiers: a consumer chip file
 or a whole-genome / exome **VCF**.
 
 **Health economics — the headline capability**
@@ -358,7 +381,7 @@ medical advice.*
 - **KING-robust relationship inference** — a proper kinship estimator (not naive percent-identity), IBS0-refined for parent-child vs full-sibling.
 - **No fabricated figures** — no invented polygenic percentiles; transmission ≠ disease penetrance; ClinVar review-star confidence; Phase-3 findings are labelled computational predictions, never clinical calls; and a **grounding guardrail rejects any AI-introduced figure absent from the deterministic data**, so the local LLM cannot invent a risk or a statistic.
 - **Runs cleanly end-to-end on a public genome** — a *functional* end-to-end test (not a clinical accuracy validation): the full **GIAB HG001 (NA12878)** reference genome runs through build detection, Phase-2 ClinVar, the Phase-3 predictor screen, and the health-ROI engine with **no runtime errors** — 3 ClinVar pathogenic (incl. a carrier), 141 predicted-damaging rare variants, and a modelled ROI reported with a confidence interval. (Functional check — outputs are computational estimates, not accuracy-validated against a clinical truth set.)
-- **386-test suite**, reference-build auto-detection (GRCh37/38 incl. rsID-less whole-genome VCFs), and graceful degradation when optional data or models are absent.
+- **780-test suite**, reference-build auto-detection (GRCh37/38 incl. rsID-less whole-genome VCFs), and graceful degradation when optional data or models are absent.
 
 ## Runs on any laptop — no expensive setup
 
@@ -770,14 +793,36 @@ server, no build step, no network. Every one opens in a browser on its own.
 | `longevity.html` | Longevity composite and a quarterly year-long plan. |
 | `personalized_plan.html` | The master dashboard tying the other pages together. |
 
-Screenshots are not committed. This tool reads a genome, so the only reports
-that exist are of somebody's real data or of the synthetic `test_genome.txt`
-in this repository — and a screenshot of synthetic data illustrates the layout
-while telling you nothing true about the analysis. To see it for yourself, run
-it on `test_genome.txt`:
+| `economics.html` | **Every economic result in one place** — the pooled payer analysis, the individual sheet, and the per-finding detail, assembled from one computation so the three views cannot disagree. |
+
+### 📄 [See the actual output → `docs/samples/econ-output-sample.pdf`](docs/samples/econ-output-sample.pdf)
+
+**26 pages of real output from a synthetic whole genome.** No human genome and no
+personal health data were used to produce it — the input is a constructed VCF
+(200,023 chip-equivalent variants plus 8 rare missense variants in genes the model
+has cost anchors for, scored offline against AlphaMissense).
+
+It is the fastest way to judge whether this is HEOR work or vocabulary. What is in it:
+
+- the disaggregated headline — **cost and QALYs reported separately**, with the ICER
+  *withheld* rather than reported as a negative number, because a ratio in the
+  dominance quadrants is ambiguous
+- a **double-counting correction** stating what the naive additive figure would have
+  claimed and how much was removed
+- an **adherence card** charging the efficacy-to-effectiveness gap to both the benefit
+  *and* the ongoing cost, and naming the fixed cost that does not scale
+- three **statistical corrections** shown before → after: Falconer liability threshold,
+  ancestry portability, competing-risk incidence
+- a **CEAC**, one-way tornado, EVPI/EVPPI, a Second Panel dual perspective, and CHEERS
+  2022 reporting
+- a footnote stating, for every figure, whether it rests on the provenance registry or
+  on a curated table that is **not** on it
+
+Reproduce it end to end:
 
 ```bash
-python analyze.py test_genome.txt --output /tmp/genomelens/report.html
+python scripts/make_econ_sample.py /tmp/econ-sample
+# then print /tmp/econ-sample/economics.html to PDF
 ```
 
 ---
@@ -826,7 +871,7 @@ pytest --cov --cov-report=term-missing  # with coverage
 pytest --snapshot-update tests/golden/  # regenerate golden snapshots (review the diff!)
 ```
 
-The suite ships **749 tests** across:
+The suite ships **780 tests** across:
 
 - `tests/unit/` — per-module behavioural tests (strand-handling, threshold
   boundaries, render smoke tests).
@@ -868,7 +913,9 @@ files, collapsing hand-aligned parameter tables and comment blocks that carry
 most of this codebase's explanation. Lint catches defects; the formatter has an
 opinion about layout, and here the layout is load-bearing.
 
-### Contributing
+### Extending it
+
+*(The licence is All Rights Reserved, so this is a note on how the code is organised rather than an invitation for pull requests.)*
 
 The project is structured so each analysis module is independent — the
 easiest way to extend it is to add a new module that takes `snps_df` and
@@ -915,7 +962,7 @@ If this tool informs research or teaching material, please cite it as:
 
 ```bibtex
 @software{dna_analysis_tool,
-  title  = {DNA Analysis Tool — local, privacy-first genomics pipeline},
+  title  = {GenomeLens — a local, privacy-first health-economics engine for consumer genomics},
   author = {Aque, Conall R.},
   year   = {2026},
   url    = {https://github.com/conallaque/genomelens},

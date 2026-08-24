@@ -50,6 +50,11 @@ nutrition.html
 bloodwork.html
 longevity.html
 economic_analysis.html
+# Consolidated economics page. Added 2026-08-24 after this file was committed by
+# accident: the pipeline writes it beside the report, a run had been pointed at
+# the repo directory, and the filename was new so no existing rule covered it.
+# The blanket DNA rules match *.csv/*.txt/*.vcf; generated HTML needs naming.
+economics.html
 personalized_plan.html
 genome_comparison.html
 fhir_bundle.json
