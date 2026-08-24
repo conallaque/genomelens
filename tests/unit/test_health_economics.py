@@ -468,6 +468,7 @@ def test_every_neurochemistry_record_declares_an_impact():
     # The economics layer reads this field. A record without it silently opts
     # out of the guard, which is how the original defect stayed invisible.
     import pandas as pd
+
     import neurochemistry as nc
     probes = [("_comt", nc._comt, "rs4680", "AA"), ("_maoa", nc._maoa, "rs6323", "GG"),
               ("_bdnf", nc._bdnf, "rs6265", "TT"), ("_drd2", nc._drd2, "rs1800497", "TT"),
@@ -503,6 +504,7 @@ def test_econ_table_keys_resolve_against_the_strings_modules_emit():
     # useful if some module actually emits that symbol; a key that matches
     # nothing is a valuation the model silently never computes.
     import pandas as pd
+
     import neurochemistry as nc
     emitted = set()
     for fn, rsid, gt in ((nc._comt, "rs4680", "AA"), (nc._bdnf, "rs6265", "TT"),
