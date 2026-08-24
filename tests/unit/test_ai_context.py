@@ -4,7 +4,7 @@ AI specs, and the section AI-callout injector."""
 from __future__ import annotations
 
 import analyze
-import renderers
+from report import renderers
 
 
 def _sample_results():

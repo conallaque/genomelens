@@ -71,7 +71,7 @@ def test_the_stamp_degrades_instead_of_raising():
 def test_a_rendered_report_carries_the_marker():
     # THE ACTUAL GUARD. Render the report header and confirm the marker is in
     # the output — not just that build_stamp() works in isolation.
-    import renderers
+    from report import renderers
     html = renderers.build_html_report(
         tier1_results=[], apoe_genotype=None, ai_results={},
         exec_summary=None, dna_filepath="data/test_genome.txt",

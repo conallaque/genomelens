@@ -831,7 +831,7 @@ def test_the_life_table_stays_at_the_repository_root():
 def test_ceac_svg_is_wellformed_and_monotone_in_x():
     import xml.etree.ElementTree as ET
 
-    import renderers
+    from report import renderers
     curve = [{"wtp": w, "p_cost_effective": p} for w, p in
              [(0, 0.0), (50_000, 0.2), (100_000, 0.76), (200_000, 1.0)]]
     svg = renderers._ceac_svg(curve)
@@ -843,7 +843,7 @@ def test_ceac_svg_is_wellformed_and_monotone_in_x():
 
 
 def test_ceac_svg_puts_higher_probability_higher_up():
-    import renderers
+    from report import renderers
     svg = renderers._ceac_svg([{"wtp": 0, "p_cost_effective": 0.0},
                                {"wtp": 100_000, "p_cost_effective": 1.0}])
     ys = [float(p.split(",")[1]) for p in
@@ -853,7 +853,7 @@ def test_ceac_svg_puts_higher_probability_higher_up():
 
 
 def test_ceac_svg_degrades_rather_than_drawing_a_meaningless_chart():
-    import renderers
+    from report import renderers
     assert renderers._ceac_svg([]) == ""
     assert renderers._ceac_svg([{"wtp": 0, "p_cost_effective": 0.5}]) == "", \
         "one point is not a curve"
@@ -863,7 +863,7 @@ def test_ceac_numbers_remain_available_alongside_the_chart():
     # The table was the only representation; it is now behind a disclosure.
     # Removing it entirely would make the figures unreadable to anyone who
     # needs the exact values.
-    import renderers
+    from report import renderers
     fs = [ee.Finding(label="a", coi_key="CAD", p_event=0.2, rrr=0.27,
                      haircut=1.0, intervention_cost=9000.0, adherence=0.5)]
     pools = ee.pool_findings(fs)

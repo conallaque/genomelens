@@ -672,7 +672,7 @@ def test_realised_wgs_findings_are_flagged_not_forecast():
 
 
 def test_the_realised_flag_reaches_the_rendered_card():
-    import renderers
+    from report import renderers
     html_out = renderers._render_wgs_decision(
         ed.wgs_marginal_value(wgs_only_findings_value=3475,
                               n_wgs_only_findings=2))

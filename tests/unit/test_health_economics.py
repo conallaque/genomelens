@@ -20,8 +20,8 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-import renderers
 from econ import health_economics as he
+from report import renderers
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
@@ -629,7 +629,7 @@ def test_a_neutral_finding_still_reaches_the_narrative_report():
     # proves nothing if the panel's own renderer filters neutral rows out --
     # the neurochemistry section is not covered by tests/snapshots/, so nothing
     # else here would notice COMT Val/Met silently vanishing from the report.
-    import renderers
+    from report import renderers
     html = renderers.build_neurochemistry_html(
         nc.analyze_neurochemistry(_neuro("rs4680", "AG")))
     assert "heterozygote advantage" in html, (

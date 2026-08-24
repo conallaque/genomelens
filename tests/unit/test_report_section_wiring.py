@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-import renderers
+from report import renderers
 from risk import family_planning, polygenic_traits
 from wellness import environmental_optimization, life_stage_playbook
 

@@ -30,14 +30,14 @@ def test_no_chrom_column_result_has_full_schema():
 
 
 def test_build_roh_html_survives_empty_result():
-    renderers = pytest.importorskip("renderers")
+    renderers = pytest.importorskip("report.renderers")
     # must not raise, even on the degenerate result
     html = renderers.build_roh_html(roh.detect_roh(pd.DataFrame()))
     assert isinstance(html, str)
 
 
 def test_build_roh_html_skips_partial_result_without_crashing():
-    renderers = pytest.importorskip("renderers")
+    renderers = pytest.importorskip("report.renderers")
     # A malformed partial dict (missing core stats) must degrade, not crash.
     html = renderers.build_roh_html({"runs": [], "f_roh": 0.0})
     assert html == ""

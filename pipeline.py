@@ -117,7 +117,7 @@ from analyze import (
 # analyze.py) and "orchestration" (this file) is intentional — analyze.py
 # remains the canonical home for the small, well-tested helpers; pipeline.py
 # owns the long sequencing logic.
-from renderers import build_html_report
+from report.renderers import build_html_report
 
 # Capture the module-load error for the PROFESSIONAL_MODULES_LOADED branch.
 try:

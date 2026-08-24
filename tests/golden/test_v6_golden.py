@@ -17,8 +17,8 @@ from __future__ import annotations
 
 import pytest
 
-import personalized_plan as pp
 from core import fhir_export as fx
+from report import personalized_plan as pp
 from wellness import bloodwork as bw
 from wellness import exercise as ex
 from wellness import nutrition as nu

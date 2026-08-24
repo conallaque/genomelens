@@ -28,9 +28,9 @@ except ImportError:
 try:
     from core.qc import run_qc
     from core.references import collect_references_used, get_reference, level_class
-    from counseling import evaluate_counseling_triggers
     from pgx.core import analyze_pgx
     from pgx.interactions import detect_interactions
+    from report.counseling import evaluate_counseling_triggers
     from risk.carrier import analyze_carriers
     from risk.prs import analyze_polygenic_scores
     from risk.traits import predict_traits
@@ -127,7 +127,7 @@ try:
 except ImportError:
     build_emergency_card = None
 try:
-    from narrative import generate_narrative_report
+    from report.narrative import generate_narrative_report
 except ImportError:
     generate_narrative_report = None
 try:
@@ -155,7 +155,7 @@ try:
 except ImportError:
     export_fhir = None
 try:
-    from personalized_plan import build_personalized_plan, render_plan_html
+    from report.personalized_plan import build_personalized_plan, render_plan_html
 except ImportError:
     build_personalized_plan = None
     render_plan_html = None
@@ -1624,7 +1624,7 @@ def retry_failed_categories(model: str, override_report: Path | None = None) -> 
     # These renderer helpers are re-exported via this module's __getattr__ shim
     # for external callers, but bare-name lookups inside this function do not
     # trigger module __getattr__ — import them explicitly to avoid NameError.
-    from renderers import _cat_id, _patch_ai_section_in_html, md_to_html
+    from report.renderers import _cat_id, _patch_ai_section_in_html, md_to_html
 
     still_failed: list[dict] = []
     patched = 0
@@ -1713,7 +1713,7 @@ _RENDERER_NAMES = frozenset({
 def __getattr__(name):
     """Lazy back-compat: resolve renderer names on first access only."""
     if name in _RENDERER_NAMES:
-        import renderers
+        from report import renderers
         return getattr(renderers, name)
     raise AttributeError(f"module 'analyze' has no attribute {name!r}")
 

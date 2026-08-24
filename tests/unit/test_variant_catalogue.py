@@ -6,7 +6,7 @@ tables. The synthetic test genome does not match any coverage-note or
 cross-ref variant, so these paths need crafted records to be exercised.
 """
 
-from renderers import build_html_report
+from report.renderers import build_html_report
 
 
 def _record(**overrides):
