@@ -2138,6 +2138,22 @@ def _render_wgs_decision(w: dict | None) -> str:
         return f"-${abs(v):,}" if v < 0 else f"${v:,}"
 
     accent = "#177a54" if w.get("worth_it") else "#b06a00"
+
+    # When sequencing has ALREADY found something an array could not, that is
+    # the headline — not the population probability of finding it. The card
+    # previously surfaced the retrospective figure only when it was ZERO, so a
+    # genome carrying two sequencing-only findings was shown a "1 in 56 chance"
+    # of carrying one and nothing else: a forecast about a settled fact.
+    realised_note = ""
+    if w.get("realised"):
+        realised_note = f"""
+  <div style="border:1.5px solid #177a54;background:#f2faf6;border-radius:8px;
+              padding:11px 13px;margin:10px 0;font-size:.88em;color:#14533b">
+    <strong>&#9873; Flagged in this genome &mdash;
+    {w.get('n_wgs_only_findings', 0)} sequencing-only finding(s),
+    {money(w.get('retrospective_value'))} modelled net benefit.</strong><br>
+    {_esc(w.get('realised_headline', ''))}</div>"""
+
     zero_note = ""
     if w.get("why_retrospective_is_zero"):
         zero_note = f"""
@@ -2153,14 +2169,15 @@ def _render_wgs_decision(w: dict | None) -> str:
   <div style="display:flex;justify-content:space-between;align-items:baseline;
               gap:12px;flex-wrap:wrap">
     <div style="font-weight:700;color:{accent}">
-      Is whole-genome sequencing worth buying?</div>
+      {"Sequencing already found what an array could not"
+        if w.get("realised") else "Is whole-genome sequencing worth buying?"}</div>
     <div style="font-size:.72em;color:#8a94a3;border:1px solid #dfe4ea;
                 border-radius:20px;padding:2px 9px;white-space:nowrap">
       prospective &middot; before testing</div>
   </div>
   <div style="font-size:.95em;color:#2b3440;margin-top:8px">
     {_esc(w.get('plain',''))}</div>
-  {zero_note}
+  {realised_note}{zero_note}
   <table style="width:100%;border-collapse:collapse;font-size:.87em;margin-top:8px">
     <tr style="border-bottom:1px solid #f0f2f5">
       <td style="padding:4px">Chance of a serious actionable finding your array missed</td>

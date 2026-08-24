@@ -646,3 +646,44 @@ def test_penetrance_used_is_ascertainment_corrected():
            * ep.value("marginal_cost_fraction") * 0.45)
     assert w["value_per_finding"] < raw * 2, (
         "value per finding looks too high for a shrunk penetrance")
+
+
+def test_realised_wgs_findings_are_flagged_not_forecast():
+    # THE BUG. The card reported only the population probability, and surfaced
+    # the retrospective figure ONLY when it was zero. So a genome carrying two
+    # sequencing-only findings was shown a "1 in 56 chance" of carrying one —
+    # a forecast about a fact already settled — and the findings it had were
+    # never mentioned.
+    none = ed.wgs_marginal_value()
+    assert none["basis"] == "prospective" and not none["realised"]
+    assert none["realised_headline"] == ""
+    assert none["why_retrospective_is_zero"], (
+        "with no findings the $0 still needs explaining")
+
+    found = ed.wgs_marginal_value(wgs_only_findings_value=3475,
+                                  n_wgs_only_findings=2)
+    assert found["basis"] == "realised" and found["realised"]
+    h = found["realised_headline"]
+    assert "already found 2 findings" in h
+    assert "$3,475" in h
+    assert "already settled" in h, "must not read as a forecast"
+    assert not found["why_retrospective_is_zero"], (
+        "nothing to explain away when the figure is non-zero")
+
+
+def test_the_realised_flag_reaches_the_rendered_card():
+    import renderers
+    html_out = renderers._render_wgs_decision(
+        ed.wgs_marginal_value(wgs_only_findings_value=3475,
+                              n_wgs_only_findings=2))
+    assert "Flagged in this genome" in html_out
+    assert "2 sequencing-only finding" in html_out
+    # and the prospective case must not claim a finding it does not have
+    plain = renderers._render_wgs_decision(ed.wgs_marginal_value())
+    assert "Flagged in this genome" not in plain
+
+
+def test_singular_and_plural_read_correctly():
+    one = ed.wgs_marginal_value(wgs_only_findings_value=100,
+                                n_wgs_only_findings=1)["realised_headline"]
+    assert "found 1 finding in" in one and "1 findings" not in one

@@ -608,9 +608,29 @@ def wgs_marginal_value(*, chip_findings_present: bool = True,
     net = gross - incremental_cost
 
     nns = (1.0 / incremental_yield) if incremental_yield > 0 else None
+    # REALISED vs PROSPECTIVE. The prospective figure answers "should I buy
+    # sequencing", which is the right question BEFORE testing. Once a VCF is in
+    # hand the question has changed: sequencing already happened, and either it
+    # found something an array could not or it did not. Reporting only the
+    # population probability then buries the answer — a genome carrying two
+    # sequencing-only findings was told it had a "1 in 56 chance" of carrying
+    # one, which reads as a forecast about a fact already settled.
+    realised = int(n_wgs_only_findings) > 0
     return {
         "available": True,
-        "basis": "prospective",
+        "basis": "realised" if realised else "prospective",
+        "realised": realised,
+        "realised_headline": (
+            f"Sequencing has already found {int(n_wgs_only_findings)} finding"
+            f"{'' if int(n_wgs_only_findings) == 1 else 's'} in this genome "
+            f"that a genotyping array cannot produce, carrying "
+            f"${round(wgs_only_findings_value):,} of modelled net benefit "
+            f"between them. The prospective figures below describe the "
+            f"population this genome was drawn from"
+            + (f" — roughly 1 person in {round(nns):,} carries such a finding"
+               if nns else "")
+            + ". For this input that question is already settled: this genome "
+              "is one of them." if realised else ""),
         "expected_incremental_yield": round(incremental_yield, 5),
         "number_needed_to_sequence": (round(nns) if nns else None),
         "value_per_finding": round(value_per_finding),
