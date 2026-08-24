@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-import pharmgkb_clinical as pg
+from pgx import pharmgkb as pg
 
 
 def test_no_data_returns_unavailable():

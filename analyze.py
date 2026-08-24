@@ -28,8 +28,8 @@ except ImportError:
 try:
     from carrier import analyze_carriers
     from counseling import evaluate_counseling_triggers
-    from interactions import detect_interactions
-    from pgx import analyze_pgx
+    from pgx.core import analyze_pgx
+    from pgx.interactions import detect_interactions
     from prs import analyze_polygenic_scores
     from qc import run_qc
     from references import collect_references_used, get_reference, level_class
@@ -60,7 +60,7 @@ except ImportError:
     def weasyprint_available() -> bool:
         return False
 try:
-    from medications import analyze_medications
+    from pgx.medications import analyze_medications
 except ImportError:
     analyze_medications = None
 try:
@@ -85,7 +85,7 @@ except ImportError:
 
 # V5 modules
 try:
-    from hla import analyze_hla
+    from pgx.hla import analyze_hla
 except ImportError:
     analyze_hla = None
 try:
@@ -111,7 +111,7 @@ try:
 except ImportError:
     analyze_genetic_age = None
 try:
-    from pgx_simulation import simulate_pgx
+    from pgx.simulation import simulate_pgx
 except ImportError:
     simulate_pgx = None
 try:

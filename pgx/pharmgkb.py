@@ -28,7 +28,11 @@ from pathlib import Path
 
 import pandas as pd
 
-_TSV_PATH = Path(__file__).resolve().parent / "cpic_data" / "clinicalVariants.tsv"
+# .parent.parent: this module moved into the pgx package, but the data file
+# it reads stays at the repository root. Left at .parent it would resolve
+# inside pgx/ and the loader degrades quietly on a missing file.
+_TSV_PATH = (Path(__file__).resolve().parent.parent
+             / "cpic_data" / "clinicalVariants.tsv")
 _RSID_RE = re.compile(r"rs\d+")
 
 # ClinPGx clinical-annotation level ordering (lower rank = stronger evidence).

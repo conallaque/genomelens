@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-import top_drugs_screen as t
+from pgx import top_drugs as t
 
 
 def test_reference_list_present_and_sane():

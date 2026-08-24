@@ -126,12 +126,12 @@ except ImportError:
     _MODULE_LOAD_ERROR = ""
 
 try:
-    from pharmgkb_clinical import analyze_pharmgkb_clinical
+    from pgx.pharmgkb import analyze_pharmgkb_clinical
 except ImportError:
     analyze_pharmgkb_clinical = None
 
 try:
-    from top_drugs_screen import analyze_top_drugs
+    from pgx.top_drugs import analyze_top_drugs
 except ImportError:
     analyze_top_drugs = None
 

@@ -27,7 +27,10 @@ from pathlib import Path
 
 import pandas as pd
 
-_DRUG_DB_PATH = Path(__file__).resolve().parent / "drug_database.json"
+# .parent.parent: this module moved into the pgx package, but the data file
+# it reads stays at the repository root. Left at .parent it would resolve
+# inside pgx/ and the loader degrades quietly on a missing file.
+_DRUG_DB_PATH = Path(__file__).resolve().parent.parent / "drug_database.json"
 _DRUG_DB_CACHE: list[dict] | None = None
 
 
