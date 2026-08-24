@@ -80,12 +80,22 @@ def _gt(df, rsid: str) -> str | None:
 
 
 def _find(category, name, gene, rsid, genotype, phenotype, mechanism, action,
-          confidence, citation):
+          confidence, citation, impact="informative"):
+    """One neurochemistry call.
+
+    ``impact`` exists because the economics layer reads it. It was reading a key
+    this function never emitted, so ``finding.get("impact")`` was always None,
+    the "skip neutral calls" guard never fired, and a wild-type genotype with
+    action "None specific." was priced at the gene's full economic value —
+    $43,000 across DRD2 and OPRM1 for a person typical at both. Set it to
+    "neutral" on any branch that reports a typical result and asks for nothing.
+    """
     return {
         "category": category, "name": name, "gene": gene, "rsid": rsid,
         "genotype": genotype or "—", "phenotype": phenotype,
         "mechanism": mechanism, "action": action,
         "confidence": confidence, "citation": citation,
+        "impact": impact,
     }
 
 
@@ -224,6 +234,7 @@ def _drd2(df):
     gt = _gt(df, "rs1800497")
     if gt is None:
         return None
+    impact = "informative"
     # T = A1 allele (fewer D2 receptors); C = A2 (normal)
     n_T = gt.count("T")
     if n_T >= 1:
@@ -241,10 +252,12 @@ def _drd2(df):
         ph = "DRD2/ANKK1 Taq1A A2/A2 — typical striatal D2 receptor density"
         mech = "Standard dopamine receptor density and reward-sensitivity."
         action = "None specific."
+        impact = "neutral"   # typical result, nothing to act on
         conf = "moderate"
     return _find(CAT_REWARD, "DRD2 / ANKK1 Taq1A", "DRD2/ANKK1", "rs1800497",
                  gt, ph, mech, action, conf,
-                 "Blum 1990 JAMA; Neville 2004")
+                 "Blum 1990 JAMA; Neville 2004",
+                 impact=impact)
 
 
 # ── DRD4 -521 ────────────────────────────────────────────────────────────────
@@ -277,6 +290,7 @@ def _oprm1(df):
     gt = _gt(df, "rs1799971")
     if gt is None:
         return None
+    impact = "informative"
     n_G = gt.count("G")
     if n_G >= 1:
         ph = f"OPRM1 A118G G-carrier ({n_G}× G) — altered opioid receptor affinity"
@@ -295,10 +309,12 @@ def _oprm1(df):
         ph = "OPRM1 A118G A/A — standard mu-opioid receptor"
         mech = "Standard opioid receptor kinetics."
         action = "None specific."
+        impact = "neutral"   # typical result, nothing to act on
         conf = "high"
     return _find(CAT_REWARD, "OPRM1 A118G (mu-opioid receptor)", "OPRM1",
                  "rs1799971", gt, ph, mech, action, conf,
-                 "Bond 1998; Way & Taylor 2010; Anton 2008 (naltrexone)")
+                 "Bond 1998; Way & Taylor 2010; Anton 2008 (naltrexone)",
+                 impact=impact)
 
 
 # ── 5-HTTLPR proxy ────────────────────────────────────────────────────────────
@@ -356,6 +372,7 @@ def _cacna1c(df):
     gt = _gt(df, "rs1006737")
     if gt is None:
         return None
+    impact = "informative"
     n_A = gt.count("A")
     if n_A >= 1:
         ph = f"CACNA1C rs1006737 A-carrier ({n_A}× A) — common cross-psychiatric variant"
@@ -376,10 +393,12 @@ def _cacna1c(df):
         ph = "CACNA1C rs1006737 G/G — reference genotype"
         mech = "Standard L-type calcium channel expression."
         action = "None specific."
+        impact = "neutral"   # typical result, nothing to act on
         conf = "low"
     return _find(CAT_MOOD, "CACNA1C rs1006737 (cross-psychiatric)",
                  "CACNA1C", "rs1006737", gt, ph, mech, action, conf,
-                 "PGC 2011 & 2013; Green 2013")
+                 "PGC 2011 & 2013; Green 2013",
+                 impact=impact)
 
 
 # ── CHRNA5 — nicotine addiction / lung cancer ─────────────────────────────────
@@ -388,6 +407,7 @@ def _chrna5(df):
     gt = _gt(df, "rs16969968")
     if gt is None:
         return None
+    impact = "informative"
     n_A = gt.count("A")
     if n_A >= 1:
         ph = f"CHRNA5 rs16969968 A-carrier ({n_A}× A) — heavy-smoker + lung-cancer risk allele"
@@ -406,10 +426,12 @@ def _chrna5(df):
         ph = "CHRNA5 rs16969968 G/G — standard α5 nAChR"
         mech = "Standard α5 nicotinic acetylcholine receptor function."
         action = "None specific."
+        impact = "neutral"   # typical result, nothing to act on
         conf = "high"
     return _find(CAT_ADDICTION, "CHRNA5 nicotine dependence + lung cancer",
                  "CHRNA5", "rs16969968", gt, ph, mech, action, conf,
-                 "Thorgeirsson 2008 Nature; Bertelsen 2015")
+                 "Thorgeirsson 2008 Nature; Bertelsen 2015",
+                 impact=impact)
 
 
 # ══════════════════════════════════════════════════════════════════════════

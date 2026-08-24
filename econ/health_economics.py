@@ -1226,6 +1226,19 @@ def _mr_findings(mr_result: dict | None) -> list[dict]:
 
 
 def _neurochemistry_findings(neurochemistry_result: dict | None) -> list[dict]:
+    """Economics for the neurochemistry panel.
+
+    TWO STRING BUGS LIVED HERE, both silent. The ``impact`` guard below read a
+    key the module never emitted, so it never fired and a wild-type genotype
+    reporting "None specific." was priced at the gene's full value. And the
+    table lookup was exact, so the DRD2 entry never matched: the module emits
+    the gene as "DRD2/ANKK1" (the Taq1A locus spans both) while the table is
+    keyed "DRD2", meaning that finding has never been priced at all.
+
+    Neither failed loudly. One inflated the total, one suppressed a line, and
+    the only way to see either was to compare the table's keys against the
+    strings the module actually produces.
+    """
     out: list[dict] = []
     if not neurochemistry_result or not neurochemistry_result.get("available"):
         return out
@@ -1236,7 +1249,9 @@ def _neurochemistry_findings(neurochemistry_result: dict | None) -> list[dict]:
         gene = finding.get("gene", "")
         if not gene or gene in seen:
             continue
-        econ = NEUROCHEMISTRY_ECONOMICS.get(gene)
+        # Match on the primary symbol so a compound locus label still resolves.
+        econ = NEUROCHEMISTRY_ECONOMICS.get(gene) or NEUROCHEMISTRY_ECONOMICS.get(
+            gene.split("/")[0].strip())
         if econ is None:
             continue
         seen.add(gene)

@@ -435,3 +435,82 @@ def test_family_planning_is_pooled_against_carrier_screening_not_dropped():
 
 def test_longevity_stays_out_because_it_re_aggregates_priced_variants():
     assert "Longevity" in he.COHORT_NOT_VALUED
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# Silent string mismatches between a module and its economics table
+# ══════════════════════════════════════════════════════════════════════════
+
+def _neuro(rsid, gt):
+    import pandas as pd
+    return pd.DataFrame({"genotype": [gt]}, index=[rsid])
+
+
+def test_a_wild_type_genotype_is_not_priced_as_a_finding():
+    # THE BUG. _neurochemistry_findings guards on finding["impact"] == "neutral",
+    # but neurochemistry.py never emitted an "impact" key, so .get() returned
+    # None, None is not "neutral", and the guard never fired. OPRM1 A/A —
+    # "standard mu-opioid receptor", action "None specific." — was priced at the
+    # full $25,000. Nothing crashed; the total was just wrong.
+    import neurochemistry as nc
+    wild = nc._oprm1(_neuro("rs1799971", "AA"))
+    assert wild["impact"] == "neutral", "a typical result must declare itself"
+    assert he._neurochemistry_findings({"available": True, "findings": [wild]}) == []
+
+    carrier = nc._oprm1(_neuro("rs1799971", "GG"))
+    assert carrier["impact"] == "informative"
+    priced = he._neurochemistry_findings({"available": True, "findings": [carrier]})
+    assert len(priced) == 1 and priced[0]["outcome_value"] > 0, (
+        "the guard must suppress non-findings without suppressing real ones")
+
+
+def test_every_neurochemistry_record_declares_an_impact():
+    # The economics layer reads this field. A record without it silently opts
+    # out of the guard, which is how the original defect stayed invisible.
+    import pandas as pd
+    import neurochemistry as nc
+    probes = [("_comt", nc._comt, "rs4680", "AA"), ("_maoa", nc._maoa, "rs6323", "GG"),
+              ("_bdnf", nc._bdnf, "rs6265", "TT"), ("_drd2", nc._drd2, "rs1800497", "TT"),
+              ("_drd4", nc._drd4, "rs1800955", "TT"),
+              ("_oprm1", nc._oprm1, "rs1799971", "GG"),
+              ("_cacna1c", nc._cacna1c, "rs1006737", "AA"),
+              ("_chrna5", nc._chrna5, "rs16969968", "AA")]
+    for name, fn, rsid, gt in probes:
+        rec = fn(pd.DataFrame({"genotype": [gt]}, index=[rsid]))
+        if rec is None:
+            continue
+        assert "impact" in rec, f"{name} emits no impact field"
+        assert rec["impact"] in ("informative", "neutral"), (
+            f"{name} impact={rec['impact']!r} is not a value the guard understands")
+
+
+def test_a_compound_locus_label_still_resolves_to_its_econ_entry():
+    # THE OTHER BUG, opposite direction. The table is keyed "DRD2"; the module
+    # reports the Taq1A locus as "DRD2/ANKK1" because it spans both genes. The
+    # lookup was exact, so that finding was never priced at all — a suppressed
+    # line rather than an inflated one, and equally invisible.
+    import neurochemistry as nc
+    rec = nc._drd2(_neuro("rs1800497", "TT"))
+    assert rec["gene"] == "DRD2/ANKK1"
+    priced = he._neurochemistry_findings({"available": True, "findings": [rec]})
+    assert len(priced) == 1, "a compound gene label must resolve to its entry"
+    assert priced[0]["outcome_value"] == \
+        he.NEUROCHEMISTRY_ECONOMICS["DRD2"]["outcome_value"]
+
+
+def test_econ_table_keys_resolve_against_the_strings_modules_emit():
+    # Generalises both bugs. An economics table keyed on a gene symbol is only
+    # useful if some module actually emits that symbol; a key that matches
+    # nothing is a valuation the model silently never computes.
+    import pandas as pd
+    import neurochemistry as nc
+    emitted = set()
+    for fn, rsid, gt in ((nc._comt, "rs4680", "AA"), (nc._bdnf, "rs6265", "TT"),
+                         (nc._drd2, "rs1800497", "TT"), (nc._oprm1, "rs1799971", "GG")):
+        rec = fn(pd.DataFrame({"genotype": [gt]}, index=[rsid]))
+        if rec:
+            emitted.add(rec["gene"])
+            emitted.add(rec["gene"].split("/")[0].strip())
+    unreachable = set(he.NEUROCHEMISTRY_ECONOMICS) - emitted
+    assert not unreachable, (
+        f"econ entries no module can reach: {sorted(unreachable)}")
