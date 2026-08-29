@@ -1,25 +1,39 @@
 # GenomeLens
 
-**An applied health-economics engine that answers one question: what is knowing your
-genome actually worth, in decisions?** Cost-utility analysis, value of information and
-budget impact — computed on real genomic data, entirely on your own machine.
+**A privacy-preserving genomic decision engine that connects genetic evidence to
+actionable decisions, uncertainty, and health-economic consequences.** Cost-utility
+analysis, value of information and budget impact — computed on real genomic data,
+entirely on your own machine.
 
-### 📄 [See 26 pages of real output → `docs/samples/econ-output-sample.pdf`](docs/samples/econ-output-sample.pdf)
+### 📄 [See the 8-page report → `docs/samples/econ-output-sample.pdf`](docs/samples/econ-output-sample.pdf)
+
+**What it can be trusted to do, and the evidence.** Findings first, economics
+second: what was found, what it could change, how strong the evidence is, and
+what the model estimates. Every figure on those pages comes from one canonical
+payload ([`econ-payload-sample.json`](docs/samples/econ-payload-sample.json)),
+checked by a validator that **blocks the PDF** on any broken arithmetic identity.
+Each parameter carries a provenance tier; each finding carries its evidence
+grade; the corrections that reduce the estimate sit beside the figures they
+replaced. Independently developed — see [PROVENANCE.md](PROVENANCE.md).
+
+    1 Summary   2 Findings at a glance   3 Medication-genotype   4 Risk & prevention
+    5 How findings combine   6 Uncertainty & evidence   7 Testing decision   8 Methods
 
 Faster than reading this page. **Synthetic input — no human genome and no personal health
 data** were used to make it. Reproduce it with `python scripts/make_econ_sample.py`.
 
 In it: cost and QALYs reported **separately** with the ICER *withheld* under dominance ·
-a **double-counting correction** stating what the naive figure claimed and how much came
-out · an **adherence discount** charged to benefit *and* ongoing cost · three statistical
-corrections shown **before → after** · a footnote saying which figures rest on the sourced
-registry and which do not.
+a **double-counting correction** showing what naive addition claimed and how much came out ·
+an **adherence discount** charged to benefit *and* ongoing cost · findings with no
+registry-backed pathway shown as *"not yet standardised"* rather than assigned an invented
+value · probability reported as *"cost-effective in 1,498 of 1,500 simulations"* rather than
+a rounded 100%.
 
 ![status](https://img.shields.io/badge/status-active-brightgreen)
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![privacy](https://img.shields.io/badge/privacy-100%25%20local%20%C2%B7%20offline-purple)
 [![CI](https://github.com/conallaque/genomelens/actions/workflows/ci.yml/badge.svg)](https://github.com/conallaque/genomelens/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-780%20passing-brightgreen)
+![tests](https://img.shields.io/badge/tests-849%20passing-brightgreen)
 ![input](https://img.shields.io/badge/input-chip%20%2B%20whole--genome%20VCF-blue)
 ![license](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
 [![Buy Me a Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/caque)
@@ -118,7 +132,8 @@ say so — a risk you cannot act on is reported as exactly that, not priced.
 ## Health economics — what the engine actually does
 
 Full derivations, equations and citations: [`docs/METHODS.md`](docs/METHODS.md).
-26 pages of output: [`docs/samples/econ-output-sample.pdf`](docs/samples/econ-output-sample.pdf).
+The 8-page report: [`docs/samples/econ-output-sample.pdf`](docs/samples/econ-output-sample.pdf) ·
+the payload it renders from: [`econ-payload-sample.json`](docs/samples/econ-payload-sample.json).
 
 **Cost-utility analysis.** Cost, QALYs, ICER and INMB reported separately. 3% discounting
 on both costs and QALYs (0/3/5% in sensitivity). The ICER is **withheld** in the dominance
