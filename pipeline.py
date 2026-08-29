@@ -244,8 +244,18 @@ def _stamp_html(html: str) -> str:
     """
     from core import build_stamp
     marker = build_stamp.build_stamp()["marker"]
-    tag = (f'<div style="font-size:11px;color:#8a94a3;margin-top:18px;'
-           f'font-family:ui-monospace,Menlo,monospace">{marker}</div>')
+    if 'class="sheet"' in html:
+        # A fixed-pagination document. Appending a visible block after the last
+        # page box adds a blank ninth page to an eight-page report, so the
+        # marker goes in as a comment: still the first thing `marker_in` finds
+        # when the file is read, which is what the stamp is for. Those
+        # documents already print the build id in their own audit section.
+        # Marker on its own line so `marker_in` returns it clean,
+        # without the comment terminator trailing behind it.
+        tag = f"<!--\n{marker}\n-->"
+    else:
+        tag = (f'<div style="font-size:11px;color:#8a94a3;margin-top:18px;'
+               f'font-family:ui-monospace,Menlo,monospace">{marker}</div>')
     return (html.replace("</body>", tag + "</body>", 1)
             if "</body>" in html else html + tag)
 
@@ -1368,8 +1378,75 @@ def run_pipeline(args: argparse.Namespace) -> int:
             dna_file=args.dna_file,
         )
 
+    # ── Report consistency gate ─────────────────────────────────────────────
+    # ERROR -> no PDF. A contradiction published as a polished document is worse
+    # than no document: the polish is what makes it convincing. Warnings and
+    # info findings never block — a valid but conceptually different number is
+    # not an error, and suppressing those would train the gate to be ignored.
+    #
+    # personal_econ is computed here rather than at its rendering site further
+    # down, because the gate has to run before the first PDF is written and the
+    # per-finding net-cash identity cannot be checked without it. The rendering
+    # block below reuses this value instead of recomputing it.
+    econ_gate_errors: list[dict] = []
+    econ_payload = None
+    personal_econ: dict | None = None
+    if analyze_personal_economics is not None:
+        try:
+            personal_econ = analyze_personal_economics(
+                economics_result=economics_result,
+                bloodwork_result=bloodwork_result,
+                genetic_age_result=genetic_age_result,
+                meta={"sex": (qc_result or {}).get("inferred_sex")},
+                carrier_result=carrier_result, hla_result=hla_result,
+                interactions_result=interactions_result,
+                expanded_pgs_result=expanded_pgs_result,
+                addiction_result=addiction_genetics_result,
+                neurochemistry_result=neurochemistry_result,
+                mr_result=mr_result,
+                clinical_variants_result=clinical_variants_result,
+                family_planning_result=family_planning_result,
+                phewas_result=phewas_result,
+                wellness_result=wellness_result)
+        except Exception as _peo:
+            log(f"  WARNING: personal economics failed: {_peo}")
+    try:
+        from core import build_stamp as _bs
+        from core import genome_input as _gi5
+        from econ.frontier import cost_effectiveness_frontier
+        from report.payload import build_report_payload
+        from report.validate import format_report, validate_payload
+
+        econ_payload = build_report_payload(
+            economics_result, voi_result, personal_econ,
+            cost_effectiveness_frontier(),
+            metadata={
+                "build_id": _bs.build_stamp(),
+                "input_type": ("wgs" if _gi5.looks_like_vcf(args.dna_file)
+                               else "chip"),
+                "input_label": Path(args.dna_file).name,
+                "is_synthetic": any(k in str(args.dna_file).lower()
+                                    for k in ("synthetic", "test_genome")),
+            })
+        econ_payload.report_validation = validate_payload(econ_payload)
+        econ_gate_errors = [f for f in econ_payload.report_validation
+                            if f["severity"] == "ERROR"]
+        _w = [f for f in econ_payload.report_validation
+              if f["severity"] == "WARNING"]
+        log(f"  Report consistency: {len(econ_gate_errors)} error(s), "
+            f"{len(_w)} warning(s)")
+        if econ_gate_errors:
+            log("  PDF BLOCKED — the report would publish a contradiction:")
+            for _line in format_report(econ_gate_errors).splitlines():
+                log(f"    {_line}")
+    except Exception as _ve:
+        log(f"  WARNING: report consistency check failed: {_ve}")
+
     # ── v3: optional PDF export ──
-    if args.pdf:
+    if args.pdf and econ_gate_errors:
+        log("  PDF skipped: report consistency errors above must be "
+            "resolved first.")
+    elif args.pdf:
         if html_to_pdf is None or not weasyprint_available():
             log("  PDF skipped: weasyprint not installed. `pip install weasyprint`")
         else:
@@ -1400,7 +1477,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
             cr_path = output_path.parent / "carrier_report.html"
             cr_path.write_text(_stamp_html(cr_html), encoding="utf-8")
             log(f"  Carrier report saved: {cr_path}")
-            if args.pdf and html_to_pdf is not None and weasyprint_available():
+            if (args.pdf and not econ_gate_errors and html_to_pdf is not None
+                        and weasyprint_available()):
                 cr_pdf = cr_path.with_suffix(".pdf")
                 msg = html_to_pdf(
                     html_path=cr_path, pdf_path=cr_pdf,
@@ -1432,7 +1510,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 ec_path = output_path.parent / "emergency_card.html"
                 ec_path.write_text(_stamp_html(ec_html), encoding="utf-8")
                 log(f"  Emergency card saved: {ec_path}")
-                if args.pdf and html_to_pdf is not None and weasyprint_available():
+                if (args.pdf and not econ_gate_errors and html_to_pdf is not None
+                        and weasyprint_available()):
                     ec_pdf = ec_path.with_suffix(".pdf")
                     msg = html_to_pdf(html_path=ec_path, pdf_path=ec_pdf,
                                       file_label=Path(args.dna_file).name,
@@ -1471,7 +1550,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
                     counseling_result=counseling_result,
                 )
                 log(f"  Narrative report saved: {narrative_path}")
-                if args.pdf and html_to_pdf is not None and weasyprint_available():
+                if (args.pdf and not econ_gate_errors and html_to_pdf is not None
+                        and weasyprint_available()):
                     np_pdf = narrative_path.with_suffix(".pdf")
                     msg = html_to_pdf(html_path=narrative_path, pdf_path=np_pdf,
                                       file_label=Path(args.dna_file).name,
@@ -1529,25 +1609,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Bloodwork HTML failed: {e}")
 
     # Personal economic-impact sheet — standalone economic_analysis.html
-    if analyze_personal_economics is not None and render_economic_analysis_html is not None:
+    if personal_econ is not None and render_economic_analysis_html is not None:
         try:
-            personal_econ = analyze_personal_economics(
-                economics_result=economics_result,
-                bloodwork_result=bloodwork_result,
-                genetic_age_result=genetic_age_result,
-                meta={"sex": (qc_result or {}).get("inferred_sex")},
-                carrier_result=carrier_result,
-                hla_result=hla_result,
-                interactions_result=interactions_result,
-                expanded_pgs_result=expanded_pgs_result,
-                addiction_result=addiction_genetics_result,
-                neurochemistry_result=neurochemistry_result,
-                mr_result=mr_result,
-                clinical_variants_result=clinical_variants_result,
-                family_planning_result=family_planning_result,
-                phewas_result=phewas_result,
-                wellness_result=wellness_result,
-            )
             if personal_econ.get("available"):
                 econ_path = output_path.parent / "economic_analysis.html"
                 econ_path.write_text(
@@ -1567,6 +1630,43 @@ def run_pipeline(args: argparse.Namespace) -> int:
                     log(f"  Consolidated economics saved: {_all_econ}")
                 except Exception as _ce:
                     log(f"  WARNING: consolidated economics page failed: {_ce}")
+
+                # The canonical report payload, serialised beside the HTML.
+                # Built and validated above, before any PDF was written, so what
+                # is written here is exactly what the gate ran against.
+                try:
+                    if econ_payload is not None:
+                        from report.payload import payload_to_json
+                        from report.reconcile import (
+                            format_reconciliation,
+                            reconcile_paths,
+                        )
+                        _pj = output_path.parent / "economics-payload.json"
+                        _pj.write_text(payload_to_json(econ_payload),
+                                       encoding="utf-8")
+                        # The findings-first pages, rendered from the same
+                        # payload the gate ran against. Written beside the
+                        # legacy economics page rather than replacing it while
+                        # the remaining pages are still being built.
+                        from report.findings_first import (
+                            render_findings_first,
+                        )
+                        _ff = output_path.parent / "economics-findings-first.html"
+                        _ff.write_text(_stamp_html(
+                            render_findings_first(econ_payload)),
+                            encoding="utf-8")
+                        log(f"  Findings-first economics: {_ff}")
+
+                        _rec = reconcile_paths(econ_payload)
+                        (output_path.parent / "economics-reconciliation.txt"
+                         ).write_text(format_reconciliation(_rec) + "\n",
+                                      encoding="utf-8")
+                        log(f"  Economics payload saved: {_pj} "
+                            f"({len(econ_payload.findings)} findings · "
+                            f"{len(_rec)} reconciled pathway(s))")
+                except Exception as _pe:
+                    log(f"  WARNING: economics payload failed: {_pe}")
+
                 log(f"  Economic-impact analysis saved: {econ_path} "
                     f"(modeled net benefit {personal_econ['total_net']:,} "
                     f"= {personal_econ['total_qaly_value']:,} health value + "

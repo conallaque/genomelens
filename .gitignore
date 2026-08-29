@@ -141,3 +141,12 @@ logs/
 !requirements.txt
 !requirements-dev.txt
 .preview/
+
+# Economics run artefacts. Genotype-derived: written beside whatever genome was
+# analysed, so they must never be committed from a real run. The committed
+# samples under docs/samples/ come from the synthetic fixture and are added
+# explicitly by scripts/make_econ_sample.py.
+economics-payload.json
+economics-findings-first.html
+economics-reconciliation.txt
+economics-validation.txt
