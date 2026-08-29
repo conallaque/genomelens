@@ -33,7 +33,7 @@ a rounded 100%.
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![privacy](https://img.shields.io/badge/privacy-100%25%20local%20%C2%B7%20offline-purple)
 [![CI](https://github.com/conallaque/genomelens/actions/workflows/ci.yml/badge.svg)](https://github.com/conallaque/genomelens/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-849%20passing-brightgreen)
+![tests](https://img.shields.io/badge/tests-885%20passing-brightgreen)
 ![input](https://img.shields.io/badge/input-chip%20%2B%20whole--genome%20VCF-blue)
 ![license](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
 [![Buy Me a Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/caque)
@@ -61,9 +61,9 @@ fake, and each is traceable to a named test.
 | Competency | Evidence |
 |---|---|
 | **Cost–utility analysis done properly** | Cost, QALYs, ICER and INMB reported separately, never blended into one "value" figure. ICER suppressed in the dominance quadrants, because a negative ratio is ambiguous. `econ.engine.CEAResult` |
-| **Finding my own errors** | Eight of twenty-one finding sources routed onto one cardiometabolic anchor and were **summed** — a 79% risk reduction, which is not a probability. Fixed by pooling on the risk scale; the report shows the size of its own correction. `test_stacked_findings_do_not_sum_their_risk_reductions` |
+| **Finding my own errors** | Eight findings routed onto one cardiometabolic anchor and were **summed** — a 240% risk reduction, which is not a probability. Fixed by pooling on the risk scale; the report shows the size of its own correction. `test_stacked_findings_do_not_sum_their_risk_reductions` |
 | **Uncertainty that is real** | An earlier version reported a strategy cost-saving in **100% of simulations** — the finding-level parameters were pinned outside the sampling loop. `test_psa_without_rebuild_understates_uncertainty` |
-| **Parameter provenance, enforced** | Every figure carries a tier. `tier="assumption"` **may not** cite a source — the registry fails to load if it does. 47% of ~350 figures resolve to a PMID or DOI; the model reports its own coverage instead of claiming "sourced". `econ/params.py` |
+| **Parameter provenance, enforced** | Every figure carries a tier. `tier="assumption"` **may not** cite a source — the registry fails to load if it does. 47% of ~380 figures resolve to a PMID or DOI; the model reports its own coverage instead of claiming "sourced". `econ/params.py` |
 | **Knowing what not to monetise** | Reproductive outcomes are never priced — attaching a figure to an affected birth prices a prospective child. Stated in code, enforced by a test, surfaced as a decision rather than an omission. `NOT_VALUED` |
 | **Structural modelling** | Cohort state-transition model against US life-table mortality, Simpson's 1/3 within-cycle correction cross-checked against an independent implementation. `test_within_cycle_weights_match_the_published_implementation` |
 | **Validated against published models** | Three peer-reviewed cohort state-transition models reproduced in Python, every printed cost, effect, ICER and dominance verdict matched exactly — the one claim here that is not self-assessed. [`heor-model-replication`](https://github.com/conallaque/heor-model-replication) |
@@ -139,10 +139,11 @@ the payload it renders from: [`econ-payload-sample.json`](docs/samples/econ-payl
 on both costs and QALYs (0/3/5% in sensitivity). The ICER is **withheld** in the dominance
 quadrants rather than reported as a negative number.
 
-**Findings pooled, not summed.** Twenty-one finding sources feed the model and eight route
-onto the same cardiometabolic anchor. Summing them claimed a 79% risk reduction — not a
-probability. Pooling is complement-of-products on the risk scale with a correlated-signal
-penalty, and each condition's cost of illness is charged once.
+**Findings pooled, not summed.** Twenty-one finding sources feed the model and seven route
+onto the same cardiometabolic anchor. Summing the findings they produce claimed a risk
+reduction above 100% — not a probability. Pooling is complement-of-products on the risk
+scale with a correlated-signal penalty, and each condition's cost of illness is charged
+once.
 
 **Trial efficacy discounted to real-world effectiveness.** Adherence enters inside the
 pooling product, keyed on what acting asks of the person rather than which organ is
@@ -163,8 +164,9 @@ population-scaled, undiscounted, uptake phased in, reported PMPM.
 
 **Provenance.** Every parameter carries a tier. `tier="assumption"` **may not** cite a
 source — the registry fails to load if it does, which makes anti-assumption-laundering a
-machine-checked rule rather than a promise. The report states which figures rest on the
-registry and which rest on curated tables that do not.
+machine-checked rule rather than a promise. The main report shows only registry-backed
+expected net monetary benefit; the older curated per-finding figures are kept in
+the payload for audit and are no longer presented as comparable estimates.
 
 **Reporting.** Second Panel dual perspective with an impact inventory, and a CHEERS 2022
 checklist that names the items *not* addressed as well as those that are.
@@ -174,8 +176,8 @@ checklist that names the items *not* addressed as well as those that are.
 - **Unified, strand-aware SNP registry** — one source of truth for GRCh37/38 coordinates and ancestral/derived alleles; caught and fixed palindrome/strand bugs that silently mis-call ancestry.
 - **KING-robust relationship inference** — a proper kinship estimator (not naive percent-identity), IBS0-refined for parent-child vs full-sibling.
 - **No fabricated figures** — no invented polygenic percentiles; transmission ≠ disease penetrance; ClinVar review-star confidence; Phase-3 findings are labelled computational predictions, never clinical calls; and a **grounding guardrail rejects any AI-introduced figure absent from the deterministic data**, so the local LLM cannot invent a risk or a statistic.
-- **Runs cleanly end-to-end on a public genome** — a *functional* end-to-end test (not a clinical accuracy validation): the full **GIAB HG001 (NA12878)** reference genome runs through build detection, Phase-2 ClinVar, the Phase-3 predictor screen, and the health-ROI engine with **no runtime errors** — 3 ClinVar pathogenic (incl. a carrier), 141 predicted-damaging rare variants, and a modelled ROI reported with a confidence interval. (Functional check — outputs are computational estimates, not accuracy-validated against a clinical truth set.)
-- **780-test suite**, reference-build auto-detection (GRCh37/38 incl. rsID-less whole-genome VCFs), and graceful degradation when optional data or models are absent.
+- **Runs cleanly end-to-end on a public genome** — a *functional* end-to-end test (not a clinical accuracy validation): the full **GIAB HG001 (NA12878)** reference genome runs through build detection, Phase-2 ClinVar, the Phase-3 predictor screen, and the health-economics engine with **no runtime errors** — 3 ClinVar pathogenic (incl. a carrier), 141 predicted-damaging rare variants, and a modelled net monetary benefit reported with a confidence interval. (Functional check — outputs are computational estimates, not accuracy-validated against a clinical truth set.)
+- **885-test suite**, reference-build auto-detection (GRCh37/38 incl. rsID-less whole-genome VCFs), and graceful degradation when optional data or models are absent.
 
 ## Output files
 
