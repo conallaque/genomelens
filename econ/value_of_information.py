@@ -192,6 +192,7 @@ def _collect(economics_result: dict | None,
     for f in (econ.get("findings_with_economics") or []):
         kind, coi_key = _classify_category(f.get("category"), f.get("finding", ""))
         label = f.get("finding", "genetic finding")
+        pid = f.get("economic_pathway_id", "")
         conf = f.get("confidence", "moderate")
         if kind not in ("pgx", "coi") and unvalued is not None:
             _cat = f.get("category") or "(none)"
@@ -203,7 +204,7 @@ def _collect(economics_result: dict | None,
                                        "category — likely an oversight."})
         _hc = _evidence_haircut(f.get("category"))
         if kind == "pgx":
-            out.append({"label": label, "kind": "pgx",
+            out.append({"label": label, "economic_pathway_id": pid, "kind": "pgx",
                         "pgx_key": _match_pgx(label),
                         "intervention": _econ_params.value(
                             "intervention_cost_pgx"), "wgs_only": False,
@@ -216,7 +217,8 @@ def _collect(economics_result: dict | None,
             # constants they could not be varied in sensitivity analysis and
             # never appeared in any provenance count, which made the most
             # load-bearing figures in the model also the least visible.
-            out.append({"label": label, "kind": "coi", "coi_key": coi_key,
+            out.append({"label": label, "economic_pathway_id": pid, "kind": "coi",
+                        "coi_key": coi_key,
                         "p_event": _econ_params.value(
                             "baseline_event_probability_dementia"
                             if coi_key == "Alzheimer"
@@ -286,7 +288,20 @@ def _collect(economics_result: dict | None,
                         "horizon": 25,
                         "wgs_only": True,
                         "haircut": max(0.1, float(am)),   # scale value by AM confidence
-                        "confidence": f.get("confidence", "low")})
+                        "confidence": f.get("confidence", "low"),
+                        # THE ACTION THIS PATHWAY PRICES. Without it the report
+                        # showed a four-figure value beside "no action mapped",
+                        # which is the worst of both: a number the reader cannot
+                        # act on and cannot check. It is not invented here — it
+                        # is what `intervention_cost_predicted_variant` is
+                        # defined to pay for, in the registry's own words: "a
+                        # cautious confirmatory workup", there being no standard
+                        # pathway for a computationally predicted variant.
+                        "action": ("Confirm the predicted variant clinically, "
+                                   "then surveillance if it is real"),
+                        "action_caveat": ("Predicted by sequence model, not "
+                                          "observed in ClinVar — confirmation "
+                                          "is the action, not treatment")})
     return out
 
 
@@ -702,7 +717,11 @@ def analyze_value_of_information(economics_result: dict | None = None,
     nmb_rows = []
     for f in findings:
         nmb, dcost, dqaly, _iv = _finding_nmb(f, wtp, rate)
-        nmb_rows.append({"label": f["label"], "confidence": f["confidence"],
+        nmb_rows.append({"label": f["label"],
+                         "economic_pathway_id": f.get("economic_pathway_id", ""),
+                         "action": f.get("action", ""),
+                         "action_caveat": f.get("action_caveat", ""),
+                         "confidence": f["confidence"],
                          "wgs_only": f["wgs_only"], "nmb": round(nmb),
                          "dcost_averted": round(dcost), "dqaly": round(dqaly, 3)})
     nmb_rows.sort(key=lambda r: -r["nmb"])

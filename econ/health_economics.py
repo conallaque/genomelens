@@ -38,6 +38,8 @@ from __future__ import annotations
 
 import pandas as pd
 
+from econ import identity as _identity
+
 try:
     from core import snp_registry  # optional SNP-level confirmation (APOE / ACTN3)
 except Exception:  # pragma: no cover - registry should always import
@@ -824,6 +826,27 @@ def calculate_npv(
     return round(benefit - spend, 2)
 
 
+def _pathway_ids(*, kind, gene, drug, phenotype, condition, variant,
+                 finding, source, pool_hint) -> dict:
+    """Semantic ids when the extractor supplied components; legacy slug if not."""
+    if not (kind and (gene or drug or condition or variant)):
+        legacy = _identity.legacy_pathway_id(finding, source, pool_hint)
+        return {"economic_pathway_id": legacy, "finding_id": legacy,
+                "action_id": "", "condition_id": _identity.condition_id(
+                    condition) if condition else "",
+                "pathway_id_is_legacy": True}
+    return {
+        "economic_pathway_id": _identity.economic_pathway_id(
+            kind=kind, gene=gene, drug=drug, condition=condition,
+            phenotype=phenotype, variant=variant),
+        "finding_id": _identity.finding_id(
+            kind=kind, gene=gene, phenotype=phenotype, variant=variant),
+        "action_id": _identity.action_id(kind=kind, drug=drug),
+        "condition_id": _identity.condition_id(condition) if condition else "",
+        "pathway_id_is_legacy": False,
+    }
+
+
 def _econ_record(
     finding: str,
     clinical_benefit: str,
@@ -837,9 +860,30 @@ def _econ_record(
     prevalence: float = 0.0,
     qaly_gain: float = 0.0,
     evidence: str = "",
+    kind: str = "",
+    gene: str = "",
+    drug: str = "",
+    phenotype: str = "",
+    condition: str = "",
+    variant: str = "",
 ) -> dict:
     """Assemble one finding's economics record with derived metrics."""
     return {
+        # The join key. Both downstream pricing paths read this same record —
+        # the value-of-information path takes `finding`, the curated path takes
+        # `clinical_benefit` — so emitting the id here is what lets the two
+        # dollar figures for one finding finally be compared. Identity only:
+        # nothing below this line changed when it was added.
+        # THE JOIN KEY. Both pricing paths read this same record — the
+        # parametric path takes `finding`, the curated path takes
+        # `clinical_benefit` — so emitting semantic ids here is what finally
+        # lets their two dollar figures be compared. Built from components,
+        # never from display text: rewording a finding must not change its id.
+        # Extractors that do not yet supply components fall back to a slug,
+        # flagged `legacy:` and asserted against in the tests.
+        **_pathway_ids(kind=kind, gene=gene, drug=drug, phenotype=phenotype,
+                       condition=condition, variant=variant,
+                       finding=finding, source=source, pool_hint=pool_hint),
         "finding": finding,
         "clinical_benefit": clinical_benefit,
         "intervention_cost": cost,
@@ -861,6 +905,20 @@ def _econ_record(
 
 
 # ─── Finding extractors ────────────────────────────────────────────────────
+
+
+# The condition each pharmacogenomic pathway acts on. Declared rather than
+# parsed out of `clinical_benefit`, which is prose and may be reworded — an
+# identifier that moves when wording changes is not an identifier.
+PGX_CONDITION = {
+    "CYP2C19": "mace", "CYP2C9": "bleeding", "VKORC1": "bleeding",
+    "CYP2D6": "opioid_toxicity", "CYP3A5": "graft_rejection",
+    "TPMT": "myelosuppression", "NUDT15": "myelosuppression",
+    "SLCO1B1": "myopathy", "UGT1A1": "neutropenia",
+    "HLA-B*57:01": "hypersensitivity", "HLA-B*58:01": "sjs_ten",
+    "HLA-B*15:02": "sjs_ten", "HLA-A*31:01": "dress",
+    "DPYD": "fluoropyrimidine_toxicity",
+}
 
 def _is_actionable_pgx(phenotype: str) -> bool:
     p = (phenotype or "").lower()
@@ -894,6 +952,8 @@ def _pgx_findings(pgx_summary: dict) -> list[dict]:
             clinical_benefit=econ["clinical_benefit"],
             cost=econ["cost"], outcome_value=conditional_value,
             confidence="high", source="Pharmacogenomics",
+            kind="pgx", gene=gene, drug=econ["drug"], phenotype=phenotype,
+            condition=PGX_CONDITION.get(gene, "adverse_drug_event"),
             prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
             evidence=(f"{gene} phenotype: {phenotype} — "
                       f"p_rx={p_rx} × p_adr={p_adr} × rrr={rrr} × ${adr_cost:,}"),
@@ -2441,7 +2501,8 @@ def analyze_personal_economics(economics_result: dict | None = None,
     # visible in the report as a choice instead of looking like an omission.
     not_monetised: list[dict] = []
 
-    def add(category, finding, avoided, qaly, intervention, confidence, basis):
+    def add(category, finding, avoided, qaly, intervention, confidence, basis,
+            economic_pathway_id="", pathway_id_is_legacy=True):
         # REAL-WORLD ADHERENCE. Everything below is trial efficacy: the benefit
         # if the person does the thing. The pooled payer analysis in
         # value_of_information already charges the efficacy-to-effectiveness
@@ -2465,6 +2526,11 @@ def analyze_personal_economics(economics_result: dict | None = None,
         avoided, qv = avoided * _adh, qv * _adh
         qaly, intervention = qaly * _adh, intervention * _adh
         items.append({
+            # Empty for items this function synthesises from module results
+            # that never passed through _econ_record; those have no counterpart
+            # on the other pricing path, so there is nothing to reconcile.
+            "economic_pathway_id": economic_pathway_id,
+            "pathway_id_is_legacy": pathway_id_is_legacy,
             "category": category, "finding": finding,
             "avoided": round(avoided), "qaly": round(qaly, 2),
             "qaly_value": round(qv), "intervention": round(intervention),
@@ -2490,7 +2556,10 @@ def analyze_personal_economics(economics_result: dict | None = None,
                 continue
             add("Pharmacogenomic / genomic", label, avoided, qaly, cost,
                 f.get("confidence", "moderate"),
-                "Avoided adverse event × probability of relevant exposure (curated per-condition model).")
+                "Avoided adverse event × probability of relevant exposure "
+                "(curated per-condition model).",
+                economic_pathway_id=f.get("economic_pathway_id", ""),
+                pathway_id_is_legacy=f.get("pathway_id_is_legacy", True))
 
     # ── Blood-work derived ──
     adv = ((bloodwork_result or {}).get("clinical") or {}).get("advanced") or {}

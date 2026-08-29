@@ -309,6 +309,14 @@ def budget_impact(plan_members: int = 1_000_000,
         "eligible_population": round(eligible),
         "horizon_years": horizon_years,
         "rows": rows,
+        # "Peak" alone does not say peak *what*, and the figure is not the
+        # largest number in the series — once the programme turns cost-saving
+        # the last year is bigger in magnitude and smaller in burden. The name
+        # states which: the worst year for the payer, selected on signed net
+        # spend per ISPOR convention. Old keys retained; renderers migrate.
+        "maximum_budget_burden_year": peak["year"],
+        "maximum_budget_burden_net": peak["net_budget_impact"],
+        "maximum_budget_burden_pmpm": peak["pmpm"],
         "peak_year": peak["year"],
         "peak_net_budget_impact": peak["net_budget_impact"],
         "peak_pmpm": peak["pmpm"],
