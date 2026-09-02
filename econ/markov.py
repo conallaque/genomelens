@@ -150,6 +150,16 @@ def run_markov(strategy: str = "standard_care",
         "final_distribution": {"well": round(cohort[0], 5),
                                "disease": round(cohort[1], 5),
                                "dead": round(cohort[2], 5)},
+        # Unrounded totals, for the same reason cohort_sum_exact is unrounded:
+        # display precision must not leak into arithmetic. Differencing the
+        # rounded totals above and then multiplying the QALY delta by a
+        # $100,000 threshold turns a 4dp rounding into ~$5 of net monetary
+        # benefit — small, but it is noise reported as signal, and an HTA
+        # reviewer recomputing NMB by hand will not reproduce the figure.
+        # markov_cost_effectiveness differences THESE and rounds for display.
+        "total_cost_exact": tot_cost,
+        "total_qaly_exact": tot_qaly,
+        "total_life_years_exact": tot_ly,
         # Unrounded sum, so validation tests the model rather than the display
         # precision (three values rounded to 5dp can sum to 1.00001).
         "cohort_sum_exact": sum(cohort),
@@ -168,9 +178,15 @@ def markov_cost_effectiveness(wtp: float = 100_000.0, **kwargs) -> dict:
     sc = run_markov(strategy="standard_care", **kwargs)
     gg = run_markov(strategy="genomic_guided", **kwargs)
 
-    d_cost = gg["total_cost"] - sc["total_cost"]
-    d_qaly = gg["total_qaly"] - sc["total_qaly"]
-    d_ly = gg["total_life_years"] - sc["total_life_years"]
+    # Difference the UNROUNDED totals. Taking these from the rounded display
+    # values (2dp cost, 4dp QALY) put the rounding inside the arithmetic: NMB
+    # multiplies the QALY delta by the willingness-to-pay threshold, so a 5e-5
+    # rounding became ~$5 at $100,000/QALY. The reported incrementals below are
+    # still rounded — rounding for display is fine, rounding before the
+    # multiply is not.
+    d_cost = gg["total_cost_exact"] - sc["total_cost_exact"]
+    d_qaly = gg["total_qaly_exact"] - sc["total_qaly_exact"]
+    d_ly = gg["total_life_years_exact"] - sc["total_life_years_exact"]
     # An ICER is only meaningful when cost and effect move in the SAME
     # direction. In the dominance quadrants the ratio is negative, and a
     # negative ICER is ambiguous by construction — "-$6,054/QALY" reads as a
