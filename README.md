@@ -135,7 +135,9 @@ say so — a risk you cannot act on is reported as exactly that, not priced.
 
 Full derivations, equations and citations: [`docs/METHODS.md`](docs/METHODS.md).
 The 8-page report: [`docs/samples/econ-output-sample.pdf`](docs/samples/econ-output-sample.pdf) ·
-the payload it renders from: [`econ-payload-sample.json`](docs/samples/econ-payload-sample.json).
+the payload it renders from: [`econ-payload-sample.json`](docs/samples/econ-payload-sample.json) ·
+the Markov model as a **live Excel workbook** — inputs editable, every result a formula:
+[`cea-model-sample.xlsx`](docs/samples/cea-model-sample.xlsx).
 
 **Cost-utility analysis.** Cost, QALYs, ICER and INMB reported separately. 3% discounting
 on both costs and QALYs (0/3/5% in sensitivity). The ICER is **withheld** in the dominance
