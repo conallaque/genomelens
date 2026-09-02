@@ -185,25 +185,34 @@ check("incremental QALYs",   d_qaly,  exp_num("incremental_qaly"), tol = 1e-4)
 cat(strrep("-", 74), "\n")
 
 # ── the one real disagreement ────────────────────────────────────────────────
-# Python computes NMB from its ROUNDED per-arm totals (total_qaly is rounded to
-# 4dp before the delta is taken), then multiplies the QALY delta by the WTP
-# threshold. At $100k/QALY a 5e-5 rounding becomes ~$5 of NMB. Reproducing the
-# engine's rounding here recovers its exact figure, which identifies the cause
-# as display-precision leaking into the arithmetic rather than a model error.
+# The engine used to compute NMB from its ROUNDED per-arm totals (total_qaly
+# rounded to 4dp before the delta was taken), then multiply the QALY delta by
+# the WTP threshold — turning a 5e-5 rounding into ~$5 of NMB at $100k/QALY.
+# Fixed; run_markov now also returns *_exact totals. Emulating the old rounding
+# is kept as a regression guard: if it ever matches Python again while
+# full-precision does not, the mistake is back.
 nmb_py         <- exp_num("nmb_at_wtp")
 nmb_emulated   <- wtp * (round(gg$qaly, 4) - round(sc$qaly, 4)) -
                         (round(gg$cost, 2) - round(sc$cost, 2))
+regressed <- abs(nmb_emulated - nmb_py) <= 0.01 && abs(nmb - nmb_py) > 0.01
 cat(sprintf("%-22s %14.2f\n", "NMB (R, full prec.)", nmb))
 cat(sprintf("%-22s %14.2f\n", "NMB (Python)",        nmb_py))
-cat(sprintf("%-22s %14.2f   <- reproduces Python exactly\n",
-            "NMB (R, engine round)", nmb_emulated))
-if (abs(nmb_emulated - nmb_py) <= 0.01 && abs(nmb - nmb_py) > 0.01) {
+# Label this honestly in both states. Saying "reproduces Python exactly"
+# unconditionally was false once the engine was fixed.
+cat(sprintf("%-22s %14.2f   <- %s\n", "NMB (pre-fix rounding)", nmb_emulated,
+            if (regressed) "matches Python: the rounding bug is BACK"
+            else "what Python would report if the rounding regressed"))
+if (regressed) {
   cat("\nFINDING: markov_cost_effectiveness() derives its incremental values from\n")
   cat("per-arm totals that have already been rounded (2dp cost, 4dp QALY), so NMB\n")
   cat(sprintf("carries ~$%.2f of rounding noise at a $%s/QALY threshold. Both\n",
               abs(nmb - nmb_py), format(wtp, big.mark = ",", scientific = FALSE)))
   cat("implementations agree on the model; they disagree only on when to round.\n")
   cat("Fix: take the deltas from unrounded totals and round for display only.\n")
+  # This has to count as a failure. Reporting the regression and then exiting 0
+  # with "PASS" is how a guard gets ignored in CI -- the first version of this
+  # script did exactly that, and running it is what caught the omission.
+  fails <- fails + 1L
 } else {
   check("NMB at WTP", nmb, nmb_py)
 }
