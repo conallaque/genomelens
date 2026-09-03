@@ -451,6 +451,8 @@ def distributional_cea(baseline_qaly_by_group: dict[str, float],
     mean_after = sum(after) / len(after)
     return {
         "available": True,
+        "method": "atkinson_ede",
+        "dimension": "age",
         "inequality_aversion": inequality_aversion,
         "groups": [
             {"group": g, "baseline_qaly": round(b, 3),

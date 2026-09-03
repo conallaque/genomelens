@@ -954,7 +954,7 @@ def _pgx_findings(pgx_summary: dict) -> list[dict]:
             confidence="high", source="Pharmacogenomics",
             kind="pgx", gene=gene, drug=econ["drug"], phenotype=phenotype,
             condition=PGX_CONDITION.get(gene, "adverse_drug_event"),
-            prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
+            prevalence=econ["prevalence"], qaly_gain=round(p_rx * p_adr * rrr * econ["qaly_gain"], 4),
             evidence=(f"{gene} phenotype: {phenotype} — "
                       f"p_rx={p_rx} × p_adr={p_adr} × rrr={rrr} × ${adr_cost:,}"),
         ))

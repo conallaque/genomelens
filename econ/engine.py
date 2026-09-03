@@ -1151,7 +1151,7 @@ def run_psa(pools: dict[str, ConditionPool], *, n: int = 2000,
 def ceac(pools: dict[str, ConditionPool], *,
          thresholds: Sequence[float] = (0, 25_000, 50_000, 75_000, 100_000,
                                         150_000, 200_000),
-         n: int = 800, seed: int = 20260822,
+         n: int = 2000, seed: int = 20260822,
          test_cost: float = 0.0, rebuild=None) -> list[dict]:
     """Cost-effectiveness acceptability curve from the pooled model.
 

@@ -6030,25 +6030,228 @@ def build_html_report(
             "</section>"
         )
 
-    # ── Recommendations section ──
+    # ── Recommendations section (with economics hero banner) ──
+    _voi = voi_result or {}
+    _pooled = _voi.get("pooled_economics") or {}
+    _plain = _pooled.get("plain") or {}
+    _price = _voi.get("price") or {}
+    _ra = _voi.get("risk_adjusted") or {}
+    _ro = _voi.get("real_option") or {}
+
+    # --- Economics hero banner ---
+    _hero_tiles = []
+
+    # Consumer surplus tile: market-price equivalent vs consolidated
+    _alc = _price.get("a_la_carte_total")
+    _con = _price.get("consolidated")
+    if _alc is not None and _con is not None:
+        try:
+            _alc_f, _con_f = float(_alc), float(_con)
+            if _alc_f > _con_f > 0:
+                _hero_tiles.append(
+                    '<div style="flex:1;min-width:180px;background:#f0faf5;'
+                    'border:1px solid #b8e0cc;border-radius:10px;padding:13px 15px">'
+                    '<div style="font-size:.76em;color:#177a54;text-transform:uppercase;'
+                    'letter-spacing:.04em">Market-price equivalent</div>'
+                    f'<div style="font-size:1.25em;font-weight:700;color:#177a54">'
+                    f'${_alc_f:,.0f} of testing for ${_con_f:,.0f}</div>'
+                    '<div style="font-size:.76em;color:#5b6673">'
+                    'Retail cost of ordering these panels separately vs. one '
+                    'consolidated run</div></div>')
+        except (TypeError, ValueError):
+            pass
+
+    # ROI tile
+    _roi = _ra.get("roi_multiple") if _ra.get("available") else None
+    if _roi is not None:
+        try:
+            _roi_f = float(_roi)
+            if _roi_f > 0:
+                _hero_tiles.append(
+                    '<div style="flex:1;min-width:180px;background:#f7f9fb;'
+                    'border:1px solid #e3e7ec;border-radius:10px;padding:13px 15px">'
+                    '<div style="font-size:.76em;color:#5b6673;text-transform:uppercase;'
+                    'letter-spacing:.04em">Modelled return</div>'
+                    f'<div style="font-size:1.25em;font-weight:700;color:#2b3440">'
+                    f'{_roi_f:.1f}×</div>'
+                    '<div style="font-size:.76em;color:#5b6673">'
+                    'For every $1 spent, the model estimates this much '
+                    'in health-economic value</div></div>')
+        except (TypeError, ValueError):
+            pass
+
+    # Verdict headline tile
+    _verdict = _plain.get("verdict") or {} if _plain.get("available") else {}
+    _headline = _verdict.get("headline")
+    if _headline:
+        _tone = _verdict.get("tone", "neutral")
+        _tone_bg = {"positive": "#f0faf5", "negative": "#fdf4f4"}.get(_tone, "#f7f9fb")
+        _tone_bdr = {"positive": "#b8e0cc", "negative": "#e8c4c4"}.get(_tone, "#e3e7ec")
+        _tone_clr = {"positive": "#177a54", "negative": "#a33"}.get(_tone, "#2b3440")
+        _hero_tiles.append(
+            f'<div style="flex:1;min-width:180px;background:{_tone_bg};'
+            f'border:1px solid {_tone_bdr};border-radius:10px;padding:13px 15px">'
+            f'<div style="font-size:.76em;color:{_tone_clr};text-transform:uppercase;'
+            f'letter-spacing:.04em">Overall verdict</div>'
+            f'<div style="font-size:1.1em;font-weight:700;color:{_tone_clr}">'
+            f'{_esc(_headline)}</div>'
+            f'<div style="font-size:.76em;color:#5b6673">Model estimate &mdash; '
+            f'not a clinical recommendation</div></div>')
+
+    _hero_html = ""
+    if _hero_tiles:
+        _hero_html = (
+            '<div style="display:flex;gap:12px;flex-wrap:wrap;margin:14px 0">'
+            + "".join(_hero_tiles)
+            + "</div>")
+
+    # --- Gene/variant recommendation list (existing logic preserved) ---
     rec_items = ""
     for r in high_risk_list[:12]:
         rec_items += (
-            f"<li><strong>{r['gene']} ({r['variant_name']})</strong>: "
-            f"{r['recommendation']}</li>\n"
+            f"<li><strong>{_esc(r.get('gene', ''))}"
+            f" ({_esc(r.get('variant_name', ''))})</strong>: "
+            f"{_esc(r.get('recommendation', ''))}</li>\n"
         )
     for r in moderate_risk_list[:10]:
         rec_items += (
-            f"<li>{r['gene']} ({r['variant_name']}): "
-            f"{r['recommendation']}</li>\n"
+            f"<li>{_esc(r.get('gene', ''))}"
+            f" ({_esc(r.get('variant_name', ''))}): "
+            f"{_esc(r.get('recommendation', ''))}</li>\n"
         )
+
+    # --- Confidence and NNS aggregate block ---
+    _econ_addendum = ""
+
+    # NNS aggregate
+    _nns_list = _plain.get("number_needed_to_screen") or [] if _plain.get("available") else []
+    if _nns_list:
+        _nns_items = ""
+        for _n in _nns_list[:5]:
+            _nns_plain = _n.get("plain", "")
+            if _nns_plain:
+                _nns_items += f'<li style="margin-bottom:4px">{_esc(_nns_plain)}</li>'
+        if _nns_items:
+            _econ_addendum += (
+                '<div style="margin:12px 0;padding:10px 14px;background:#f7f9fb;'
+                'border:1px solid #e3e7ec;border-radius:10px">'
+                '<div style="font-weight:700;color:#2b3440;font-size:.92em;'
+                'margin-bottom:6px">Number needed to screen</div>'
+                f'<ul style="margin:0;padding-left:18px;color:#5b6673;'
+                f'font-size:.87em">{_nns_items}</ul></div>')
+
+    # Confidence (n-in-100)
+    _conf = _plain.get("confidence") or {} if _plain.get("available") else {}
+    _n100 = _conf.get("n_in_100") if _conf.get("available") else None
+    if _n100 is not None:
+        _econ_addendum += (
+            '<div style="margin:10px 0;padding:10px 14px;background:#f7f9fb;'
+            'border:1px solid #e3e7ec;border-radius:10px;font-size:.87em;'
+            'color:#5b6673">'
+            f'<strong style="color:#2b3440">Confidence:</strong> '
+            f'Acting on these findings was worth doing in '
+            f'<strong>{_esc(str(_n100))}</strong> of every 100 runs of the model.'
+            '</div>')
+
+    # --- Cost of Waiting nudge ---
+    _wait_html = ""
+    if _ro.get("available"):
+        _ro_rec = _ro.get("recommendation", "")
+        if _ro_rec:
+            _wait_html = (
+                '<div style="margin:12px 0;padding:10px 14px;background:#fffaf2;'
+                'border:1px solid #f0dcc0;border-radius:10px;font-size:.87em;'
+                'color:#6b5330">'
+                '<strong style="color:#8a5a00">Testing now vs. waiting:</strong> '
+                f'{_esc(_ro_rec)}</div>')
+
+    # --- Behavioral nudge: loss framing for highest-value findings ---
+    _loss_html = ""
+    _nmb_rows = (_pooled.get("findings") or []) if _pooled.get("available") else []
+    _top_loss = [r for r in _nmb_rows if r.get("nmb", 0) > 500][:3]
+    if _top_loss:
+        _loss_items = ""
+        for _lf in _top_loss:
+            _loss_items += (
+                f'<li style="margin-bottom:4px"><strong>{_esc(_lf.get("label", ""))}'
+                f'</strong>: not acting costs an estimated '
+                f'<strong>${_lf["nmb"]:,.0f}</strong> in expected health value</li>')
+        _loss_html = (
+            '<div style="margin:12px 0;padding:10px 14px;background:#fdf4f4;'
+            'border:1px solid #e8c4c4;border-radius:10px">'
+            '<div style="font-weight:700;color:#a33;font-size:.92em;'
+            'margin-bottom:6px">Cost of inaction</div>'
+            f'<ul style="margin:0;padding-left:18px;color:#5b6673;'
+            f'font-size:.87em">{_loss_items}</ul></div>')
+
+    # --- Family cascade value ---
+    _cascade_html = ""
+    _cascade = _voi.get("cascade_value") or {}
+    if _cascade.get("n_cascade_findings", 0) > 0:
+        _cascade_plain = _cascade.get("plain", "")
+        _cascade_mult = _cascade.get("cascade_multiplier")
+        _mult_str = f" ({_cascade_mult}× individual value)" if _cascade_mult else ""
+        _cascade_html = (
+            '<div style="margin:12px 0;padding:10px 14px;background:#f0f5fa;'
+            'border:1px solid #c4d4e8;border-radius:10px;font-size:.87em;'
+            'color:#2b4060">'
+            f'<strong style="color:#1a3050">Family cascade testing:</strong> '
+            f'{_esc(_cascade_plain)}{_esc(_mult_str)}</div>')
+
+    # --- Employer / insurer value proposition ---
+    _employer_html = ""
+    _employer = _voi.get("employer_value") or {}
+    if _employer.get("available"):
+        _emp_items = _employer.get("items", [])
+        if _emp_items:
+            _emp_li = "".join(
+                f'<li style="margin-bottom:4px">{_esc(i)}</li>' for i in _emp_items)
+            _employer_html = (
+                '<div style="margin:12px 0;padding:10px 14px;background:#f5f0fa;'
+                'border:1px solid #d4c4e8;border-radius:10px">'
+                '<div style="font-weight:700;color:#4a2b60;font-size:.92em;'
+                'margin-bottom:6px">Employer &amp; insurer perspective</div>'
+                f'<ul style="margin:0;padding-left:18px;color:#5b6673;'
+                f'font-size:.87em">{_emp_li}</ul></div>')
+
+    # --- Retention / reanalysis value ---
+    _retention_html = (
+        '<div style="margin:12px 0;padding:10px 14px;background:#f7f9fb;'
+        'border:1px solid #e3e7ec;border-radius:10px;font-size:.85em;'
+        'color:#5b6673">'
+        '<strong style="color:#2b3440">Reanalysis value:</strong> '
+        'As genomic science advances, the same raw data can be reanalyzed '
+        'against updated variant databases and new polygenic scores &mdash; '
+        'a one-time test with compounding returns over your lifetime.</div>')
+
+    # --- Competitive positioning footer (credence-good signaling) ---
+    _footer_html = (
+        '<div style="margin:14px 0;padding:10px 14px;background:#f7f9fb;'
+        'border:1px solid #e3e7ec;border-radius:10px;font-size:.78em;'
+        'color:#8a94a3">'
+        'Genomic testing is a <em>credence good</em> &mdash; quality cannot '
+        'be evaluated even after consumption. This report includes '
+        'cost-effectiveness analysis with probabilistic sensitivity analysis, '
+        'a CHEERS 2022 reporting checklist, a parameter provenance registry '
+        'that tracks sourced vs. assumption parameters, and reproducible '
+        'economic models &mdash; a methodological framework not available in '
+        'standard consumer genomics reports.'
+        '</div>')
 
     rec_section = (
         '<section class="rec-section" id="recommendations">'
         "<h2>Actionable Recommendations Summary</h2>"
         "<p>Based on Tier 1 deterministic lookup. High-significance findings first.</p>"
-        f'<ul class="rec-list">{rec_items}</ul>'
-        "</section>"
+        + _hero_html
+        + f'<ul class="rec-list">{rec_items}</ul>'
+        + _econ_addendum
+        + _loss_html
+        + _cascade_html
+        + _wait_html
+        + _employer_html
+        + _retention_html
+        + _footer_html
+        + "</section>"
     )
 
     # ── TOC nav ──

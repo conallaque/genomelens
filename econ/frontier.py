@@ -293,24 +293,42 @@ def distributional_cea(groups: list[dict] | None = None,
     most value to the already-best-served group. Equity weighting makes that
     visible rather than hiding it.
 
-    Each group: ``{name, population_share, baseline_health, qaly_gain}``.
+    Each group: ``{name, group_key, population_share, baseline_health, qaly_gain}``.
     """
     if not _HAVE_NP:
         return {"available": False}
     if groups is None:
+        # Derive QALY gains dynamically from the PORTABILITY dict so the
+        # distributional analysis stays in sync with genomic_statistics
+        # rather than hardcoding values that duplicate it.
+        try:
+            from risk.genomic_statistics import PORTABILITY as _PORTABILITY
+        except Exception:
+            # Fallback: identical to the canonical dict so an import failure
+            # is a numeric no-op, not a crash.
+            _PORTABILITY = {
+                "european": 1.00, "south_asian": 0.65, "hispanic_latino": 0.55,
+                "east_asian": 0.50, "african": 0.25,
+            }
+        _EUR_QALY = 0.120  # base QALY gain at full (European) portability
         # Illustrative: PRS value by ancestry, with baseline health as remaining
         # quality-adjusted life expectancy (lower = worse off).
         groups = [
-            {"name": "European ancestry", "population_share": 0.62,
-             "baseline_health": 68.0, "qaly_gain": 0.120},
-            {"name": "Hispanic/Latino", "population_share": 0.15,
-             "baseline_health": 66.0, "qaly_gain": 0.066},
-            {"name": "African ancestry", "population_share": 0.12,
-             "baseline_health": 64.0, "qaly_gain": 0.030},
-            {"name": "East Asian ancestry", "population_share": 0.06,
-             "baseline_health": 69.0, "qaly_gain": 0.060},
-            {"name": "South Asian ancestry", "population_share": 0.05,
-             "baseline_health": 67.0, "qaly_gain": 0.078},
+            {"name": "European ancestry", "group_key": "european",
+             "population_share": 0.62, "baseline_health": 68.0,
+             "qaly_gain": _EUR_QALY * _PORTABILITY.get("european", 1.00)},
+            {"name": "Hispanic/Latino", "group_key": "hispanic_latino",
+             "population_share": 0.15, "baseline_health": 66.0,
+             "qaly_gain": _EUR_QALY * _PORTABILITY.get("hispanic_latino", 0.55)},
+            {"name": "African ancestry", "group_key": "african",
+             "population_share": 0.12, "baseline_health": 64.0,
+             "qaly_gain": _EUR_QALY * _PORTABILITY.get("african", 0.25)},
+            {"name": "East Asian ancestry", "group_key": "east_asian",
+             "population_share": 0.06, "baseline_health": 69.0,
+             "qaly_gain": _EUR_QALY * _PORTABILITY.get("east_asian", 0.50)},
+            {"name": "South Asian ancestry", "group_key": "south_asian",
+             "population_share": 0.05, "baseline_health": 67.0,
+             "qaly_gain": _EUR_QALY * _PORTABILITY.get("south_asian", 0.65)},
         ]
     eps = float(inequality_aversion)
     # Power-law equity weight (social welfare function): worse-off groups
@@ -355,8 +373,42 @@ def distributional_cea(groups: list[dict] | None = None,
                      "that barely reaches some groups")
     close_phrase = (f"nowhere near enough to close a {benefit_gap_ratio:.0f}x gap"
                     if benefit_gap_ratio else "nowhere near enough to close a gap that large")
+
+    # ── Portability gap cost ─────────────────────────────────────────────────
+    # Monetise the gap between full-portability benefit and each group's actual
+    # benefit. This is NOT an equity weight — it is the dollar cost of doing
+    # genomic research predominantly in European cohorts.
+    _max_gain = max(gains) if gains else 0.0
+    _gap_rows = []
+    _total_gap_cost = 0.0
+    for g in groups:
+        _gap = _max_gain - g["qaly_gain"]
+        if _gap > 0:
+            _group_gap_cost = _gap * g["population_share"] * wtp
+            _total_gap_cost += _group_gap_cost
+            _gap_rows.append({
+                "group": g["name"],
+                "qaly_gap": round(_gap, 4),
+                "gap_cost": round(_group_gap_cost),
+            })
+    _gap_plain = (
+        f"The lack of diverse genomic research costs an estimated "
+        f"${_total_gap_cost:,.0f} per person tested"
+    ) if _total_gap_cost > 0 else (
+        "No portability gap detected — all groups receive equal benefit."
+    )
+    portability_gap_cost = {
+        "total_gap_cost": round(_total_gap_cost),
+        "per_group": _gap_rows,
+        "plain": _gap_plain,
+        "src": ("Martin et al. (2019) Nat Genet — polygenic score portability; "
+                "gap cost = (max_qaly_gain − group_gain) × population_share × WTP."),
+    }
+
     return {
         "available": True,
+        "method": "power_law_equity",
+        "dimension": "ancestry",
         "inequality_aversion": eps,
         "groups": rows,
         "population_qaly_unweighted": round(unweighted, 4),
@@ -379,6 +431,7 @@ def distributional_cea(groups: list[dict] | None = None,
                 "index. For the full EDE-based DCEA framework, see Asaria, Griffin "
                 "& Cookson (2016) Med Decis Making. Ancestry-portability: Martin "
                 "et al. (2019) Nat Genet."),
+        "portability_gap_cost": portability_gap_cost,
         "caveat": "Baseline-health and QALY-gain inputs are illustrative; the "
                   "framework, not the values, is what transfers.",
     }

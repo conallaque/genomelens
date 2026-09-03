@@ -605,7 +605,7 @@ def _match_pgx(label: str) -> str:
         if "/" not in key:                     # the generic fallback entry
             continue
         gene, drug = key.split("/", 1)
-        gene_token = gene.lower().replace("*", "").split("-")[0]
+        gene_token = gene.lower().replace("*", "")
         if (gene_token and gene_token in low) or (drug and drug.lower() in low):
             return key
     return "PGx-generic"
@@ -984,7 +984,7 @@ def analyze_value_of_information(economics_result: dict | None = None,
 
         _pooled["psa"] = _ee.run_psa(_pools, n=1500, test_cost=test_cost,
                                      wtp=wtp, rebuild=_rebuild)
-        _pooled["ceac"] = _ee.ceac(_pools, n=600, test_cost=test_cost,
+        _pooled["ceac"] = _ee.ceac(_pools, n=1500, test_cost=test_cost,
                                    rebuild=_rebuild)
         _pooled["tornado"] = _ee.tornado(_pools, test_cost=test_cost, wtp=wtp,
                                          rebuild=_rebuild)
@@ -1089,6 +1089,123 @@ def analyze_value_of_information(economics_result: dict | None = None,
     except Exception as _e:
         result["pooled_economics"] = {"available": False, "reason": repr(_e)}
         _degraded.append(("pooled_economics", repr(_e)))
+
+    # ── Family cascade testing value ─────────────────────────────────────────
+    # One pathogenic/monogenic finding implies a 50% probability for each
+    # first-degree relative. The cascade testing literature (Hampel 2016,
+    # Caswell-Jin 2019) shows family value at multiples of individual value.
+    try:
+        _CASCADE_COI_KEYS = {"BreastOvarian", "Colorectal", "Pathogenic"}
+        _n_relatives = 3  # first-degree relatives assumed
+        _p_relative = 0.5  # autosomal dominant inheritance probability
+
+        _cascade_findings = [
+            f for f in findings
+            if f.get("coi_key") in _CASCADE_COI_KEYS
+        ]
+        _n_cascade = len(_cascade_findings)
+
+        if _n_cascade > 0:
+            # Per-finding NMB for the cascade-eligible findings only.
+            _nmb_by_label = {r["label"]: r["nmb"] for r in nmb_rows}
+            _cascade_nmbs = [
+                _nmb_by_label.get(f["label"], _finding_nmb(f, wtp, rate)[0])
+                for f in _cascade_findings
+            ]
+            _individual_cascade_value = sum(_cascade_nmbs)
+            _total_cascade_value = (
+                _n_relatives * _p_relative * _individual_cascade_value
+            )
+            _cascade_multiplier = (
+                round(_total_cascade_value / _individual_cascade_value, 2)
+                if _individual_cascade_value > 0 else None
+            )
+
+            # Extract a representative label for the plain-language summary.
+            # ClinVar labels are "GENE pathogenic (ClinVar)"; the first token
+            # is the gene name. Economics-path labels vary, so fall back to
+            # the full label.
+            _first_label = _cascade_findings[0]["label"].split()[0]
+            if _n_cascade == 1:
+                _cascade_plain = (
+                    f"Your {_first_label} finding could inform testing for "
+                    f"approximately {_n_relatives} first-degree relatives, "
+                    f"each with a 50% chance of carrying the same variant."
+                )
+            else:
+                _others = _n_cascade - 1
+                _other_word = "finding" if _others == 1 else "findings"
+                _cascade_plain = (
+                    f"Your {_first_label} finding and {_others} other "
+                    f"monogenic {_other_word} could inform testing for "
+                    f"approximately {_n_relatives} first-degree relatives, "
+                    f"each with a 50% chance of carrying the same variant."
+                )
+            # The multiplier is n_relatives * p_relative by construction
+            # (1.5 at default values); it is not a fitted parameter.
+            result["cascade_value"] = {
+                "n_cascade_findings": _n_cascade,
+                "n_assumed_relatives": _n_relatives,
+                "cascade_multiplier": _cascade_multiplier,
+                "total_cascade_value": round(_total_cascade_value),
+                "plain": _cascade_plain,
+                "src": ("Hampel et al. 2016; Caswell-Jin et al. 2019 — "
+                        "cascade testing yields"),
+            }
+        else:
+            result["cascade_value"] = {
+                "n_cascade_findings": 0,
+                "n_assumed_relatives": _n_relatives,
+                "cascade_multiplier": None,
+                "total_cascade_value": 0,
+                "plain": ("No monogenic or carrier findings eligible for "
+                          "cascade testing were identified."),
+                "src": ("Hampel et al. 2016; Caswell-Jin et al. 2019 — "
+                        "cascade testing yields"),
+            }
+    except Exception as _ce:
+        result["cascade_value"] = {"available": False, "reason": repr(_ce)}
+        _degraded.append(("cascade_value", repr(_ce)))
+
+    # ── Employer / insurer value proposition ────────────────────────────────
+    # Reframes the individual economics as an employer-benefit or insurer-benefit
+    # case: PGx reduces medication errors, monogenic findings enable early
+    # intervention, and the total NMB maps to avoidable claims.
+    try:
+        _pgx_count = sum(1 for f in findings if _classify_category(f.get("category"), f.get("finding", ""))[0] == "pgx")
+        _mono_count = sum(1 for f in findings if f.get("coi_key") in {"BreastOvarian", "Colorectal", "Pathogenic"})
+        _total_nmb = sum(max(r["nmb"], 0) for r in nmb_rows)
+
+        _employer_items = []
+        if _pgx_count:
+            _employer_items.append(
+                f"{_pgx_count} pharmacogenomic finding(s) reduce adverse drug "
+                f"reaction risk — fewer sick days and lower treatment costs."
+            )
+        if _mono_count:
+            _employer_items.append(
+                f"{_mono_count} monogenic finding(s) enable early surveillance — "
+                f"catching disease at a stage where treatment costs a fraction "
+                f"of late-stage care."
+            )
+        if _total_nmb > 0:
+            _employer_items.append(
+                f"Modelled net monetary benefit: ${_total_nmb:,.0f} per employee "
+                f"tested, which maps directly to avoidable claims and reduced "
+                f"absenteeism."
+            )
+        result["employer_value"] = {
+            "available": bool(_employer_items),
+            "pgx_findings": _pgx_count,
+            "monogenic_findings": _mono_count,
+            "total_nmb": round(_total_nmb),
+            "items": _employer_items,
+            "plain": (" ".join(_employer_items) if _employer_items
+                      else "No employer-relevant findings identified."),
+        }
+    except Exception as _ev:
+        result["employer_value"] = {"available": False, "reason": repr(_ev)}
+        _degraded.append(("employer_value", repr(_ev)))
 
     # Surface any degradation rather than letting a failed sub-analysis disappear.
     result["degraded_components"] = [{"component": k, "error": e} for k, e in _degraded]
@@ -1500,22 +1617,18 @@ def analyze_evppi(findings: list[dict], n: int = 3000, seed: int = 777) -> dict:
     # sitting unused beside the distribution that replaced it.
 
     # Sample NMB per finding while recording the driving parameter draws.
+    # NOTE: Per-finding parameters (event_probability, treatment_effect,
+    # cost_of_illness) are sampled *inside* _finding_nmb and cannot be
+    # recovered here.  Their EVPPI is computed correctly by decision.py's
+    # two-level Monte Carlo (via ep.overridden).  Only willingness_to_pay
+    # is genuinely coupled in this single-level loop.
     nmb = np.zeros((n, len(findings)))
-    params = {"willingness_to_pay": np.zeros(n), "event_probability": np.zeros(n),
-              "treatment_effect": np.zeros(n), "cost_of_illness": np.zeros(n)}
+    params = {"willingness_to_pay": np.zeros(n)}
     for j in range(n):
         w = float(rng.triangular(WTP["low"], WTP["base"], WTP["high"]))
         params["willingness_to_pay"][j] = w
-        pr = et = co = 0.0
         for i, f in enumerate(findings):
             nmb[j, i] = _finding_nmb(f, w, DISCOUNT_RATE, rng=rng)[0]
-            pr += float(f.get("p_event", 0.2))
-            et += float(f.get("rrr", 0.3))
-            co += float(COI.get(f.get("coi_key", ""), {}).get("cost", 0.0))
-        # Record perturbed versions so each parameter has draw-to-draw variation.
-        params["event_probability"][j] = pr * float(rng.beta(8, 8)) * 2.0
-        params["treatment_effect"][j] = et * float(rng.beta(8, 8)) * 2.0
-        params["cost_of_illness"][j] = co * float(rng.gamma(6.25, 0.16))
 
     baseline = float(np.sum(np.maximum(nmb.mean(axis=0), 0.0)))
     rows = []
