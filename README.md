@@ -69,6 +69,9 @@ fake, and each is traceable to a named test.
 | **Knowing what not to monetise** | Reproductive outcomes are never priced — attaching a figure to an affected birth prices a prospective child. Stated in code, enforced by a test, surfaced as a decision rather than an omission. `NOT_VALUED` |
 | **Structural modelling** | Cohort state-transition model against US life-table mortality, Simpson's 1/3 within-cycle correction cross-checked against an independent implementation. `test_within_cycle_weights_match_the_published_implementation` |
 | **Validated against published models** | Three peer-reviewed cohort state-transition models reproduced in Python, every printed cost, effect, ICER and dominance verdict matched exactly — the one claim here that is not self-assessed. [`heor-model-replication`](https://github.com/conallaque/heor-model-replication) |
+| **Distributional equity analysis** | Two complementary methods — Atkinson EDE (age-based) and power-law equity weights (ancestry-based with explicit portability discounts) — so the model can show *who* benefits, not just how much. `econ.decision.distributional_cea`, `econ.frontier.distributional_cea` |
+| **Family cascade value** | Monogenic findings (BRCA, Lynch) are worth more than individual NMB because first-degree relatives share a 50% carrier probability. The model computes cascade testing value explicitly rather than ignoring it. `analyze_value_of_information` |
+| **Real options framing** | Dixit–Pindyck test-now vs. defer decision — the cost of waiting is computed as foregone preventive value, not assumed to be zero. `econ.value_of_information` |
 
 The recurring theme: the model reports an unflattering answer as readily as a flattering
 one, and several commits above exist because it did.
@@ -174,6 +177,55 @@ the payload for audit and are no longer presented as comparable estimates.
 
 **Reporting.** Second Panel dual perspective with an impact inventory, and a CHEERS 2022
 checklist that names the items *not* addressed as well as those that are.
+
+**Employer / insurer perspective.** The report translates individual NMB into an
+employer-benefit case: PGx findings reduce adverse drug reaction risk (fewer sick days,
+lower treatment costs), monogenic findings enable early surveillance, and the aggregate
+maps to avoidable claims. This is a reframing exercise, not a separate model — the
+economics are the same CEA seen from the payer's side.
+
+**Behavioural nudge.** High-value findings are loss-framed — "Cost of inaction: $X over
+Y years" — because the behavioural economics literature shows loss framing moves
+health decisions when gain framing does not (Kahneman & Tversky, 1979; Rothman & Salovey,
+1997). Low-value findings are not nudged.
+
+**Cascade testing.** For monogenic pathogenic findings, the model estimates family
+cascade value: N first-degree relatives × 50% carrier probability × individual NMB ×
+a cascade multiplier. A BRCA2 finding is worth more than its individual NMB because
+relatives can be tested.
+
+**Reanalysis value.** The report notes that genomic data compounds in value — the same
+raw file can be reanalysed against updated variant databases, new polygenic scores, and
+future pharmacogenomic guidelines. A one-time test with recurring returns.
+
+## Known limitations
+
+This model reports its own gaps rather than hiding them.
+
+- **Parameter provenance is incomplete.** The registry enforces tiers (published / derived
+  / assumption) and blocks assumption-laundering, but ~47% of registered parameters
+  resolve to a PMID or DOI. The rest are stated assumptions. The report prints its own
+  coverage percentage rather than claiming "fully sourced."
+- **Ancestry portability.** PRS transferability from European-ancestry GWAS to other
+  populations is discounted (African: 0.25, East Asian: 0.60, etc.) but the discount
+  factors themselves are rough estimates. The model surfaces the portability gap as a
+  cost rather than ignoring it.
+- **Not a formal economic evaluation.** This is an illustrative decision-analytic model
+  built to demonstrate HEOR competency. Dollar figures are model estimates, not clinical
+  recommendations.
+
+## Verification
+
+The things you can check without trusting the model's own output:
+
+| Check | What it proves |
+|---|---|
+| [`heor-model-replication`](https://github.com/conallaque/heor-model-replication) | Three published cSTMs reproduced exactly — cost, effect, ICER, dominance verdict. The one claim here that is not self-assessed. |
+| `tools/markov_check.R` | Independent base-R implementation of the Markov cohort trace. If the Python and R answers disagree, something is wrong. |
+| [`cea-model-sample.xlsx`](docs/samples/cea-model-sample.xlsx) | The CEA as a live Excel workbook — every cell is a formula, every input is editable. You can change assumptions and watch the ICER move. |
+| `econ/params.py` | The provenance registry. `tier="assumption"` **may not** cite a source — the loader rejects it. Grep for `tier=` to see exactly which parameters are sourced and which are not. |
+| Consistency gate | The PDF renderer **blocks** on broken arithmetic identities — costs must decompose, QALYs must sum, the ICER must match. `test_pdf_blocked_on_arithmetic_violation` |
+| 885-test suite | Includes `test_psa_without_rebuild_understates_uncertainty`, `test_stacked_findings_do_not_sum_their_risk_reductions`, and `test_voi_no_silent_drops`. |
 
 ## Engineering notes
 
