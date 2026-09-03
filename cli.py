@@ -106,7 +106,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--pdf",
         action="store_true",
-        help="Also emit a paginated PDF report (requires weasyprint).",
+        help="Also emit a paginated PDF report (uses Playwright or weasyprint).",
+    )
+    parser.add_argument(
+        "--pdf-desktop",
+        action="store_true",
+        help="Like --pdf but also copies the PDF to ~/Desktop.",
     )
     parser.add_argument(
         "--medications",

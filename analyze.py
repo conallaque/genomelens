@@ -54,10 +54,16 @@ try:
 except ImportError:
     analyze_ancestry = None
 try:
-    from core.pdf_export import html_to_pdf, weasyprint_available
+    from core.pdf_export import (
+        html_to_pdf, weasyprint_available,
+        pdf_backend_available, smart_html_to_pdf,
+    )
 except ImportError:
     html_to_pdf = None
+    smart_html_to_pdf = None
     def weasyprint_available() -> bool:
+        return False
+    def pdf_backend_available() -> bool:
         return False
 try:
     from pgx.medications import analyze_medications

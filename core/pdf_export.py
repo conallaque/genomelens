@@ -33,6 +33,18 @@ def weasyprint_available() -> bool:
         return False
 
 
+def playwright_available() -> bool:
+    try:
+        from playwright.sync_api import sync_playwright  # noqa: F401
+        return True
+    except Exception:
+        return False
+
+
+def pdf_backend_available() -> bool:
+    return weasyprint_available() or playwright_available()
+
+
 # ── PDF-specific CSS overrides ────────────────────────────────────────────────
 PDF_CSS = """
 @page {
@@ -250,3 +262,87 @@ def html_to_pdf(
         return f"PDF written: {pdf_path} ({size/1e6:.1f} MB)"
     except Exception as e:
         return f"PDF render failed: {e}"
+
+
+def html_to_pdf_playwright(
+    html_path: Path,
+    pdf_path: Path,
+    file_label: str = "",
+    file_hash: str = "",
+    version: str = "",
+    qc_grade: str = "",
+) -> str:
+    """Render using Playwright's Chromium — works without system pango/cairo."""
+    if not playwright_available():
+        return ("playwright not installed. Install via: "
+                "pip install playwright && python -m playwright install chromium")
+    from playwright.sync_api import sync_playwright
+
+    html = Path(html_path).read_text()
+    report_date = datetime.datetime.now().strftime("%B %d, %Y at %H:%M")
+    cover = _build_cover_page(
+        file_label=file_label or "raw DNA file",
+        file_hash=file_hash or "n/a",
+        version=version or "v3.0.0",
+        report_date=report_date,
+        qc_grade=qc_grade,
+    )
+    toc = _build_toc(html)
+    html_modified = re.sub(
+        r"(<body[^>]*>)",
+        lambda m: m.group(1) + cover + toc,
+        html, count=1, flags=re.IGNORECASE,
+    )
+
+    tmp_html = Path(html_path).with_suffix(".pdf_tmp.html")
+    try:
+        tmp_html.write_text(html_modified, encoding="utf-8")
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            page.goto(f"file://{tmp_html.resolve()}")
+            page.wait_for_load_state("networkidle")
+            page.pdf(
+                path=str(pdf_path), format="A4", print_background=True,
+                margin={"top": "18mm", "bottom": "22mm",
+                        "left": "14mm", "right": "14mm"},
+            )
+            browser.close()
+        size = pdf_path.stat().st_size
+        return f"PDF written: {pdf_path} ({size/1e6:.1f} MB)"
+    except Exception as e:
+        return f"PDF render failed (playwright): {e}"
+    finally:
+        tmp_html.unlink(missing_ok=True)
+
+
+def smart_html_to_pdf(
+    html_path: Path,
+    pdf_path: Path,
+    file_label: str = "",
+    file_hash: str = "",
+    version: str = "",
+    qc_grade: str = "",
+    desktop_copy: bool = False,
+) -> str:
+    """Try WeasyPrint first, fall back to Playwright. Optionally copy to Desktop."""
+    kwargs = dict(html_path=html_path, pdf_path=pdf_path, file_label=file_label,
+                  file_hash=file_hash, version=version, qc_grade=qc_grade)
+    if weasyprint_available():
+        msg = html_to_pdf(**kwargs)
+    elif playwright_available():
+        msg = html_to_pdf_playwright(**kwargs)
+    else:
+        return ("No PDF backend available. Install one of:\n"
+                "  pip install weasyprint  (+ brew install pango libffi)\n"
+                "  pip install playwright && python -m playwright install chromium")
+
+    if desktop_copy and pdf_path.exists():
+        desktop = Path.home() / "Desktop"
+        if desktop.is_dir():
+            dest = desktop / pdf_path.name
+            import shutil
+            shutil.copy2(pdf_path, dest)
+            msg += f"\n  Desktop copy: {dest}"
+
+    return msg

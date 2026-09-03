@@ -87,6 +87,8 @@ from analyze import (
     export_fhir,
     generate_narrative_report,
     html_to_pdf,
+    pdf_backend_available,
+    smart_html_to_pdf,
     imputation_available,
     impute_genotypes,
     load_snp_database,
@@ -1443,13 +1445,26 @@ def run_pipeline(args: argparse.Namespace) -> int:
         log(f"  WARNING: report consistency check failed: {_ve}")
 
     # ── v3: optional PDF export ──
-    if args.pdf and econ_gate_errors:
+    _want_pdf = args.pdf or getattr(args, "pdf_desktop", False)
+    _desktop_copy = getattr(args, "pdf_desktop", False)
+    if _want_pdf and econ_gate_errors:
         log("  PDF skipped: report consistency errors above must be "
             "resolved first.")
-    elif args.pdf:
-        if html_to_pdf is None or not weasyprint_available():
-            log("  PDF skipped: weasyprint not installed. `pip install weasyprint`")
-        else:
+    elif _want_pdf:
+        if smart_html_to_pdf is not None and pdf_backend_available():
+            pdf_path = output_path.with_suffix(".pdf")
+            log(f"  Rendering PDF -> {pdf_path} ...")
+            msg = smart_html_to_pdf(
+                html_path=output_path,
+                pdf_path=pdf_path,
+                file_label=Path(args.dna_file).name,
+                file_hash=(qc_result or {}).get("file_hash", "n/a"),
+                version=f"v{REPORT_VERSION}",
+                qc_grade=(qc_result or {}).get("grade", ""),
+                desktop_copy=_desktop_copy,
+            )
+            log(f"  {msg}")
+        elif html_to_pdf is not None and weasyprint_available():
             pdf_path = output_path.with_suffix(".pdf")
             log(f"  Rendering PDF -> {pdf_path} ...")
             msg = html_to_pdf(
@@ -1461,6 +1476,10 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 qc_grade=(qc_result or {}).get("grade", ""),
             )
             log(f"  {msg}")
+        else:
+            log("  PDF skipped: no PDF backend available.\n"
+                "    pip install playwright && python -m playwright install chromium\n"
+                "    OR: pip install weasyprint (+ brew install pango libffi)")
 
     # ── v3: optional standalone Carrier Report ──
     if args.carrier_report:
