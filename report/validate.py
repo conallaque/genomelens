@@ -405,9 +405,33 @@ def _check_one_gene_one_finding(p: EconomicsReportPayload) -> list[Finding]:
     from display text, so rewording a finding produced a new id and two records
     for one gene looked like two findings.
     """
+    # A GATE KEYED ON IDENTITY IS BLIND TO RECORDS THAT LACK IT, which is the
+    # population it most needs to see. When this check first shipped, gene was
+    # populated on 3 of 49 findings, so the duplicate it was written to catch —
+    # one threaded copy of LDLR and one untraced copy — sat directly underneath
+    # it and did not fire. The six ERRORs it raised against reconstructed
+    # pre-fix state gave a misleading impression of its reach.
+    #
+    # So identity falls back to the gene symbol recoverable from the display
+    # name. That is the same text-sniffing this codebase is removing elsewhere,
+    # and it is the right call *here* specifically because a validator's job is
+    # to catch records that are malformed. Refusing to look at a record until it
+    # is well-formed makes the check agree with the bug.
+    def _identity(f) -> str:
+        g = (f.gene or "").strip().upper()
+        if g:
+            return g
+        name = (f.display_name or f.finding_id or "")
+        for tok in name.replace("/", " ").replace("-", " ").split():
+            t = tok.strip("().,").upper()
+            if len(t) >= 3 and t.isalnum() and any(c.isdigit() for c in t) \
+                    and t[0].isalpha():
+                return t          # gene-shaped: letters then digits, e.g. MLH1
+        return ""
+
     by_gene: dict[str, list[str]] = {}
     for f in p.findings:
-        g = (f.gene or "").strip().upper()
+        g = _identity(f)
         if not g or not f.is_monetized:
             continue
         by_gene.setdefault(g, []).append(f.display_name or f.finding_id or "?")

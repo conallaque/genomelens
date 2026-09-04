@@ -1459,6 +1459,12 @@ def _clinical_variant_findings(clinical_variants_result: dict | None) -> list[di
             qaly_gain=decrement,
             gene=gene, condition=anchor["coi_key"],
             variant=f"{v.get('ref', '')}{v.get('pos', '')}",
+            # `kind` is what makes _pathway_ids emit a SEMANTIC id
+            # ("monogenic:mlh1:colorectal") instead of a slug of the display
+            # name. Without it the curated record and its parametric twin got
+            # different ids for the same variant, so the payload could not join
+            # them and rendered one gene as two monetised findings.
+            kind="monogenic",
             pool_hint=gene,
             evidence=(f"{gene} {v.get('ref', '')}{v.get('pos', '')} → ClinVar "
                       f"{sig}; penetrance {p_lit:.2f} corrected to {p_corr:.2f} "

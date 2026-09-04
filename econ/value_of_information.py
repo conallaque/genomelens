@@ -29,6 +29,7 @@ import math
 
 from . import engine as _ee
 from . import gene_anchors as _ga
+from . import identity as _identity
 from . import params as _econ_params
 
 try:
@@ -192,7 +193,9 @@ def _collect(economics_result: dict | None,
 
     econ = economics_result or {}
     for f in (econ.get("findings_with_economics") or []):
-        kind, coi_key = _classify_category(f.get("category"), f.get("finding", ""))
+        kind, coi_key = _classify_category(f.get("category"),
+                                           f.get("finding", ""),
+                                           gene=f.get("gene", ""))
         label = f.get("finding", "genetic finding")
         pid = f.get("economic_pathway_id", "")
         conf = f.get("confidence", "moderate")
@@ -224,11 +227,24 @@ def _collect(economics_result: dict | None,
             # load-bearing figures in the model also the least visible.
             out.append({"label": label, "economic_pathway_id": pid, "kind": "coi",
                         "coi_key": coi_key,
-                        "p_event": _econ_params.value(
+                        # Gene-specific epidemiology when the gene supplies
+                        # it; the registry default otherwise, recorded as a
+                        # default rather than applied invisibly. The curated
+                        # tables carry POPULATION frequencies (prev_carrier,
+                        # prev_affected) and no P(condition | carrier), so for
+                        # most sources there is genuinely nothing to substitute
+                        # — see `penetrance_basis` on the pathway.
+                        "p_event": _gene_penetrance(f.get("gene", "")) or
+                        _econ_params.value(
                             "baseline_event_probability_dementia"
                             if coi_key == "Alzheimer"
                             else "baseline_event_probability"),
-                        "rrr": _econ_params.value("actionable_rrr"),
+                        "rrr": _gene_rrr(f.get("gene", "")) or
+                        _econ_params.value("actionable_rrr"),
+                        "penetrance_basis": (
+                            "gene_specific"
+                            if _gene_penetrance(f.get("gene", ""))
+                            else "model_default_no_condition_specific_estimate"),
                         "qaly": float(f.get("qaly_gain") or 0.5),
                         # Whether the SOURCE supplied a QALY figure or this is
                         # the 0.5 fallback. The pooling engine needs to tell
@@ -246,10 +262,20 @@ def _collect(economics_result: dict | None,
                         "source_category": f.get("category") or ""})
 
     # Phase-2 clinical variants (WGS-only) — actionable + carrier + affected.
+    #
+    # Genes already valued above are skipped. `_acmg_findings` emits an ACMG
+    # gene into findings_with_economics with full identity, corrected
+    # penetrance and the registry decrement; building a second pathway for the
+    # same gene here made one variant carry two dollar figures. They are not a
+    # curated/parametric pair to be reconciled — they are two pathways for one
+    # variant, which is the double-count `_check_one_gene_one_finding` forbids.
+    _valued_genes = {str(o.get("gene", "")).upper() for o in out if o.get("gene")}
     cvr = clinical_variants_result or {}
     if cvr.get("available"):
         buckets = cvr.get("buckets", {})
         for f in (buckets.get("actionable") or []):
+            if str(f.get("gene", "")).upper() in _valued_genes:
+                continue
             coi_key, p_lit, rrr, qaly = _gene_to_econ(f.get("gene", ""))
             # ASCERTAINMENT DE-BIASING, APPLIED (not merely displayed).
             # _gene_to_econ holds clinically ascertained literature penetrance
@@ -264,6 +290,13 @@ def _collect(economics_result: dict | None,
                                                family_history=False)
             p = float(_pc.get("posterior_penetrance", p_lit))
             out.append({"label": f"{f.get('gene','?')} pathogenic (ClinVar)",
+                        # Same semantic id the curated record emits, so the
+                        # payload joins them as one finding priced two ways
+                        # rather than two findings.
+                        "economic_pathway_id": _identity.economic_pathway_id(
+                            kind="monogenic", gene=f.get("gene", ""), drug="",
+                            condition=coi_key, phenotype="", variant=""),
+                        "gene": f.get("gene", ""), "condition": coi_key,
                         "kind": "coi", "coi_key": coi_key, "p_event": p,
                         "penetrance_literature": round(p_lit, 4),
                         "penetrance_corrected": round(p, 4),
@@ -313,8 +346,44 @@ def _collect(economics_result: dict | None,
     return out
 
 
-def _classify_category(category: str | None, label: str = "") -> tuple[str, str]:
+
+def _gene_penetrance(gene: str) -> float:
+    """Gene-specific penetrance, or 0.0 when none is known.
+
+    0.0 is falsy so callers can fall through to the registry default with an
+    `or`, and the fall-through is recorded on the pathway as
+    `penetrance_basis` rather than left invisible. An acknowledged default is
+    defensible; an invisible one is what let sixteen pathways share two
+    constants without anyone noticing.
+    """
+    a = _ga.anchor_for(gene)
+    return float(a["penetrance"]) if a else 0.0
+
+
+def _gene_rrr(gene: str) -> float:
+    """Gene-specific risk reduction, or 0.0 when none is known."""
+    a = _ga.anchor_for(gene)
+    return float(a["rrr"]) if a else 0.0
+
+
+def _classify_category(category: str | None, label: str = "",
+                       gene: str = "") -> tuple[str, str]:
     """Map a health-economics finding onto ('pgx'|'coi'|'', coi_key).
+
+    THE GENE WINS WHEN THERE IS ONE. A gene symbol identifies the condition; a
+    category string is a human-readable source label that happens to be nearby.
+    Routing off the label sent LDLR and APOB familial hypercholesterolaemia and
+    MLH1 Lynch syndrome to the generic "Pathogenic" bucket — because their
+    source label reads "Clinical Variant (ClinVar)" — while the same variants,
+    reached through the gene-aware path, resolved correctly to CAD and
+    Colorectal. One variant, two anchors, and the difference decided by which
+    string a consumer happened to read.
+
+    Consulting the gene first also supplies real penetrance instead of the
+    model-wide default, because gene_anchors carries both. The two were never
+    separate problems: what looked like sixteen pathways running on uniform
+    p_event/rrr was in large part identity failing to arrive, not epidemiology
+    being unavailable.
 
     ``health_economics.py`` labels findings with human-readable sources
     ("Pharmacogenomics", "Polygenic Risk", "Addiction Genetics", ...). Matching
@@ -329,6 +398,18 @@ def _classify_category(category: str | None, label: str = "") -> tuple[str, str]
     """
     cat = (category or "").strip().lower()
     text = f"{cat} {(label or '').lower()}"
+
+    # Structured identity outranks every string match below.
+    if gene:
+        a = _ga.anchor_for(gene)
+        if a is not None:
+            return ("coi", a["coi_key"])
+        if _ga.not_valued_reason(gene):
+            # A gene deliberately not priced. Returning ("", "") routes it to
+            # unvalued_findings with its reason, rather than to a bucket that
+            # would give it a plausible figure it has no basis for.
+            return ("", "")
+
     if not cat:
         return ("", "")
 
