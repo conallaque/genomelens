@@ -193,6 +193,21 @@ def _collect(economics_result: dict | None,
 
     econ = economics_result or {}
     for f in (econ.get("findings_with_economics") or []):
+        # An extractor that declined to price this finding decides for BOTH
+        # pricing paths. Enforcing it only on the curated path left the
+        # parametric figure standing, which is how a reproductive action kept
+        # a $2,247 canonical NMB after the curated side had already withheld
+        # one — the policy held in one place and not the other.
+        if f.get("not_valued_reason"):
+            if unvalued is not None:
+                unvalued.append({
+                    "finding": f.get("finding", "genetic finding"),
+                    "category": f.get("category", ""),
+                    "reason": f["not_valued_reason"],
+                    "intentional": True,
+                })
+            continue
+
         kind, coi_key = _classify_category(f.get("category"),
                                            f.get("finding", ""),
                                            gene=f.get("gene", ""))

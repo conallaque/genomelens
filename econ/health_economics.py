@@ -843,6 +843,7 @@ def _econ_record(
     phenotype: str = "",
     condition: str = "",
     variant: str = "",
+    not_valued_reason: str = "",
 ) -> dict:
     """Assemble one finding's economics record with derived metrics."""
     return {
@@ -893,6 +894,7 @@ def _econ_record(
         "drug": drug,
         "phenotype": phenotype,
         "kind": kind,
+        "not_valued_reason": not_valued_reason,
     }
 
 
@@ -1112,6 +1114,26 @@ def _hla_findings(hla_result: dict | None) -> list[dict]:
     return out
 
 
+
+# Actions whose value is a reproductive decision. NOT_VALUED forbids pricing
+# these — attaching a figure to an affected birth prices a prospective child —
+# but enforcement used to key on the CATEGORY STRING, and a carrier record
+# reaches the model labelled "Carrier Screening", not "Family Planning". So the
+# HFE C282Y record, whose priced action is partner testing, carried $2,247 and
+# nothing objected: the policy was real, the check was looking at the wrong
+# field, and the finding routed around it.
+#
+# Keyed on the action actually being priced, which is the thing the policy is
+# about. Detectable only now that identity survives to this point.
+_REPRODUCTIVE_ACTION_TOKENS = ("partner testing", "partner screening",
+                               "offspring risk", "reproductive risk")
+
+
+def _is_reproductive_action(clinical_benefit: str) -> bool:
+    b = (clinical_benefit or "").lower()
+    return any(t in b for t in _REPRODUCTIVE_ACTION_TOKENS)
+
+
 def _carrier_findings(carrier_result: dict | None) -> list[dict]:
     """Economic findings from carrier screening — both affected (homozygous)
     and carrier (heterozygous) states with distinct valuations."""
@@ -1128,6 +1150,12 @@ def _carrier_findings(carrier_result: dict | None) -> list[dict]:
             clinical_benefit=econ["clinical_benefit_affected"],
             cost=econ["cost_affected"], outcome_value=econ["outcome_affected"],
             confidence="high", source="Carrier Screening",
+            # Identity was sitting in the evidence string and nowhere else: the
+            # gene and variant were interpolated into prose and dropped as
+            # structured fields, so downstream every carrier finding arrived
+            # anonymous and had to be re-identified from its display name.
+            kind="carrier", gene=record.get("gene", ""),
+            variant=record.get("variant", ""), condition=disease,
             prevalence=econ.get("prev_affected", 0.005),
             qaly_gain=econ["qaly_affected"],
             evidence=f"{record.get('gene', '?')} {record.get('variant', '')} — homozygous affected",
@@ -1145,6 +1173,18 @@ def _carrier_findings(carrier_result: dict | None) -> list[dict]:
             # Same reproductive decision the Family Planning record prices,
             # from the other side. Pooled so it is valued once.
             pool_hint=f"reproductive:{disease}",
+            kind="carrier", gene=record.get("gene", ""),
+            variant=record.get("variant", ""), condition=disease,
+            # The finding is reported; the value is withheld when what is being
+            # priced is a reproductive decision.
+            not_valued_reason=(
+                "Reproductive outcomes are deliberately not monetised: the "
+                "action this finding prices is partner testing, and attaching "
+                "a figure to it prices a prospective child and embeds one set "
+                "of reproductive preferences as universal. The carrier result "
+                "and the testing decision are reported without a value."
+                if _is_reproductive_action(econ["clinical_benefit_carrier"])
+                else ""),
             prevalence=econ.get("prev_carrier", 0.04),
             qaly_gain=econ["qaly_carrier"],
             evidence=f"{record.get('gene', '?')} {record.get('variant', '')} — heterozygous carrier",
@@ -1240,6 +1280,9 @@ def _addiction_findings(addiction_result: dict | None) -> list[dict]:
             cost=econ["cost"], outcome_value=0,
             confidence="moderate" if finding.get("confidence") == "high" else "low",
             source="Addiction Genetics",
+            # Identity carried, not left to be parsed back out of
+            # the display name downstream.
+            kind="addiction", gene=gene,
             prevalence=econ["prevalence"], qaly_gain=0.0,
             evidence=f"{gene} {finding.get('genotype', '')} — {finding.get('verdict', '')}",
         ))
@@ -1274,6 +1317,9 @@ def _metal_oxidative_findings(metal_oxidative_result: dict | None) -> list[dict]
             cost=econ["cost"], outcome_value=econ["outcome_value"],
             confidence="moderate" if pred.get("confidence") == "high" else "low",
             source="Metal/Oxidative",
+            # Identity carried, not left to be parsed back out of
+            # the display name downstream.
+            kind="metal", gene=gene,
             prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
             evidence=f"{pred.get('trait', '')} — {pred.get('result', '')}",
         ))
@@ -1365,6 +1411,9 @@ def _neurochemistry_findings(neurochemistry_result: dict | None) -> list[dict]:
             clinical_benefit=econ["clinical_benefit"],
             cost=econ["cost"], outcome_value=econ["outcome_value"],
             confidence="low", source="Neurochemistry",
+            # Identity carried, not left to be parsed back out of
+            # the display name downstream.
+            kind="neurochem", gene=gene,
             prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
             evidence=f"{gene} {finding.get('genotype', '')} — "
                      f"{finding.get('phenotype', '')}",
@@ -1524,6 +1573,9 @@ def _immunogenetics_findings(immunogenetics_result: dict | None) -> list[dict]:
             cost=econ["cost"], outcome_value=econ["outcome_value"],
             confidence="moderate" if finding.get("confidence") == "high" else "low",
             source="Immunogenetics",
+            # Identity carried, not left to be parsed back out of
+            # the display name downstream.
+            kind="immune", gene=gene,
             prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
             evidence=f"{gene} {finding.get('genotype', '')} — {finding.get('verdict', '')}",
         ))
@@ -1579,6 +1631,9 @@ def _detox_findings(detox_result: dict | None) -> list[dict]:
                 cost=econ["cost"], outcome_value=econ["outcome_value"],
                 confidence="low" if finding.get("confidence") != "high" else "moderate",
                 source="Detoxification",
+                # Identity carried, not left to be parsed back out of
+                # the display name downstream.
+                kind="detox", gene=gene,
                 prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
                 evidence=f"{finding.get('trait', '')} — {finding.get('result', '')}",
             ))
@@ -1663,6 +1718,9 @@ def _top_drugs_findings(top_drugs_result: dict | None) -> list[dict]:
             # gene already flagged, which is genuinely useful and worth $0.
             cost=econ["cost"], outcome_value=0,
             confidence="high", source="Top-Drugs PGx Screen",
+            # Identity carried, not left to be parsed back out of
+            # the display name downstream.
+            kind="pgx", gene=gene,
             prevalence=econ["prevalence"], qaly_gain=0.0,
             evidence=(f"High-prevalence drug {drug_name} × {gene} actionable "
                       f"phenotype — awareness only; the benefit is already "
@@ -2614,6 +2672,21 @@ def analyze_personal_economics(economics_result: dict | None = None,
             # This is also the mechanism by which "findings without a
             # registry-backed pathway are reported without a value rather than
             # assigned one" stopped being true — the default WAS the value.
+            # A finding the producing extractor marked unvaluable. Checked
+            # before the completeness gate because "we decline to price this"
+            # is a different statement from "this record is malformed", and
+            # the reader deserves the real reason.
+            if f.get("not_valued_reason"):
+                not_monetised.append({
+                    "category": f.get("category") or "Carrier Screening",
+                    "finding": label,
+                    "decision": f.get("clinical_benefit")
+                    or "Reported without a value.",
+                    "indicative_cost": f.get("intervention_cost"),
+                    "reason": f["not_valued_reason"],
+                })
+                continue
+
             missing = [k for k in ("prevalence", "cost") if f.get(k) is None]
             if missing:
                 not_monetised.append({
