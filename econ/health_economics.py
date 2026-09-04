@@ -311,6 +311,34 @@ HLA_ECONOMICS: dict[str, dict] = {
 }
 
 # ─── Carrier-screening economics (per condition affected/carrier) ────────────
+#
+# FIELD CONTRACTS. Stated because a field name is not a contract, and this
+# codebase has now been bitten by that three times: `qaly_gain` meant different
+# things to two consumers and neither was documented; `prevalence` was read as
+# though it were `p_event`; and the two fields below were read as though they
+# answered "how likely is this person to develop the condition".
+#
+#   prev_carrier    — fraction of a GENERAL POPULATION carrying one copy.
+#                     A population frequency for payer scaling. NOT
+#                     P(condition | carrier), and not usable as `p_event`,
+#                     which is this individual's penetrance given that they
+#                     have already been found to carry the variant. For an
+#                     identified carrier the population rate is the wrong
+#                     question entirely: they are not a random draw.
+#   prev_affected   — fraction of a general population who are homozygous
+#                     affected. Also a population frequency, and likewise not
+#                     a penetrance.
+#   qaly_affected   — QALYs lost per affected case. A per-case decrement; the
+#                     consumer applies probability and effectiveness.
+#   qaly_carrier    — as above for a heterozygous carrier.
+#   cost_*          — one-time cost of the action named in clinical_benefit_*.
+#   outcome_*       — lifetime value of the averted outcome for ONE affected
+#                     person. The consumer applies penetrance, not this table.
+#
+# There is deliberately no penetrance column: no condition-specific
+# P(condition | carrier) is available for these entries, so findings from this
+# table record `penetrance_basis="model_default_no_condition_specific_estimate"`
+# rather than borrowing one of the frequencies above and calling it penetrance.
 CARRIER_ECONOMICS: dict[str, dict] = {
     "Hereditary Hemochromatosis (HH, type 1)": {
         "finding_affected": "HFE C282Y homozygous — hemochromatosis monitoring",
