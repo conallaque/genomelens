@@ -27,6 +27,8 @@ from __future__ import annotations
 
 import math
 
+from . import engine as _ee
+from . import gene_anchors as _ga
 from . import params as _econ_params
 
 try:
@@ -209,6 +211,9 @@ def _collect(economics_result: dict | None,
                         "intervention": _econ_params.value(
                             "intervention_cost_pgx"), "wgs_only": False,
                         "haircut": _hc, "confidence": conf,
+                        # Identity carried, not re-derived downstream.
+                        "gene": f.get("gene", ""),
+                        "condition": f.get("condition", ""),
                         "source_category": f.get("category") or ""})
         elif kind == "coi":
             # Baseline risk, effect size and intervention cost come from the
@@ -235,6 +240,9 @@ def _collect(economics_result: dict | None,
                             "intervention_cost_standard"),
                         "horizon": 25, "wgs_only": False,
                         "haircut": _hc, "confidence": conf,
+                        # Identity carried, not re-derived downstream.
+                        "gene": f.get("gene", ""),
+                        "condition": f.get("condition", ""),
                         "source_category": f.get("category") or ""})
 
     # Phase-2 clinical variants (WGS-only) — actionable + carrier + affected.
@@ -612,26 +620,78 @@ def _match_pgx(label: str) -> str:
 
 
 def _gene_to_econ(gene: str) -> tuple[str, float, float, float]:
-    """(coi_key, penetrance, screening/prophylaxis RRR, QALY gain) for a gene."""
-    g = (gene or "").upper()
-    table = {
-        "BRCA1": ("BreastOvarian", 0.60, 0.45, 1.5),
-        "BRCA2": ("BreastOvarian", 0.55, 0.45, 1.4),
-        "PALB2": ("BreastOvarian", 0.40, 0.40, 1.2),
-        "MLH1": ("Colorectal", 0.50, 0.50, 1.3),
-        "MSH2": ("Colorectal", 0.45, 0.50, 1.3),
-        "MSH6": ("Colorectal", 0.30, 0.45, 1.0),
-        "LDLR": ("CAD", 0.50, 0.50, 1.5),
-        "APOB": ("CAD", 0.40, 0.45, 1.2),
-    }
-    return table.get(g, ("Pathogenic", 0.30, 0.35, 0.8))
+    """(coi_key, penetrance, RRR, QALY decrement) for a gene.
+
+    Reads :mod:`econ.gene_anchors`, the single gene→economics source, and takes
+    the QALY decrement from the parameter registry via ``coi_key`` rather than
+    from a per-gene literal. The literal that used to live here disagreed with
+    the one in ``ACMG_GENE_ECONOMICS`` on every shared gene, because
+    ``qaly_gain`` there had no stated contract and each consumer applied a
+    different weighting to it.
+
+    Returns ``("", 0.0, 0.0, 0.0)`` for a gene with no defensible anchor. That
+    is a real answer: the caller must report the finding and withhold the
+    value. It is deliberately NOT the old ``("Pathogenic", 0.30, 0.35, 0.8)``
+    fallback, which priced every unmapped gene off one generic bucket and was
+    how nine unrelated findings came to report the same averted cost.
+    """
+    a = _ga.anchor_for(gene)
+    if a is None:
+        return ("", 0.0, 0.0, 0.0)
+    return (a["coi_key"], a["penetrance"], a["rrr"],
+            float(_qaly_decrement_for(a["coi_key"])))
+
+
+def _qaly_decrement_for(coi_key: str) -> float:
+    """Registry QALY decrement for a condition anchor, via COI_KEY_TO_PARAM."""
+    entry = _ee.COI_KEY_TO_PARAM.get(coi_key)
+    return float(_econ_params.value(entry[1])) if entry else 0.0
 
 
 # ── per-finding NMB ───────────────────────────────────────────────────────────
 
+# The fields a costed pathway must carry ITSELF. Anything missing here used to
+# fall to a module-level default inside _finding_nmb, and the consequence was not
+# a slightly-wrong number but an identical one: every finding that arrived
+# incomplete took the same p_event, the same rrr and the same generic
+# "Pathogenic" anchor, so nine findings from two different curated tables all
+# reported exactly $2,579 of averted cost. The curated path valued those same
+# variants at $239,149, $212,739 and $183,022 — two orders of magnitude apart,
+# for the same variants, because their identity did not survive the call.
+#
+# Defaults are what made that invisible. One wrong finding is conspicuous; nine
+# findings agreeing to the dollar looks like a working model.
+_REQUIRED_COI_FIELDS = ("p_event", "rrr", "qaly", "coi_key")
+_REQUIRED_PGX_FIELDS = ("pgx_key",)
+
+
+def missing_pathway_fields(f: dict) -> list[str]:
+    """Which required fields this pathway dict does not carry on its own.
+
+    Checked at the boundary rather than inside the arithmetic so an incomplete
+    pathway is reported as unvaluable instead of being priced off a constant.
+    """
+    required = (_REQUIRED_PGX_FIELDS if f.get("kind") == "pgx"
+                else _REQUIRED_COI_FIELDS)
+    return [k for k in required if f.get(k) in (None, "")]
+
+
 def _finding_nmb(f: dict, wtp: float, rate: float, rng=None) -> tuple[float, float, float]:
     """Return (nmb, dcost_averted, dqaly) for one finding. If rng is given, sample
-    uncertain parameters (PSA); else use point estimates."""
+    uncertain parameters (PSA); else use point estimates.
+
+    Raises ``ValueError`` if the pathway is missing a field it must supply
+    itself. Callers route incomplete pathways to ``unvalued_findings`` before
+    reaching here; this assertion exists so a future code path cannot reintroduce
+    silent defaulting by constructing a pathway dict some other way.
+    """
+    if _missing := missing_pathway_fields(f):
+        raise ValueError(
+            f"pathway {f.get('label', '?')!r} reached _finding_nmb without "
+            f"{', '.join(_missing)}; pricing it would substitute a constant for "
+            f"its own economics, which is how nine unrelated findings once "
+            f"reported the same averted cost. Route it to unvalued_findings "
+            f"instead.")
     disc = _annuity_pv(f.get("horizon", 20), rate) / max(1e-9,
                                                           f.get("horizon", 20)) \
         if f.get("horizon") else 1.0
@@ -703,6 +763,29 @@ def analyze_value_of_information(economics_result: dict | None = None,
     _unvalued: list[dict] = []
     findings = _collect(economics_result, clinical_variants_result,
                         novel_variants_result, unvalued=_unvalued)
+
+    # A pathway that cannot supply its own risk, effect and condition anchor is
+    # reported, not priced. Previously these were priced off module defaults,
+    # which is what collapsed unrelated findings onto one shared figure.
+    _complete = []
+    for f in findings:
+        gaps = missing_pathway_fields(f)
+        if gaps:
+            _unvalued.append({
+                "finding": f.get("label", "genetic finding"),
+                "category": f.get("source_category", "") or "unmapped pathway",
+                "reason": (
+                    f"No standardised economic pathway: the finding reached the "
+                    f"model without {', '.join(gaps)}. Valuing it would mean "
+                    f"substituting a model-wide constant for its own "
+                    f"epidemiology, which produces a figure that looks "
+                    f"specific and is not. Reported without a value."),
+                "intentional": False,
+            })
+            continue
+        _complete.append(f)
+    findings = _complete
+
     if not findings:
         return {"available": False,
                 "reason": "No economically-modellable findings yet "
@@ -722,6 +805,14 @@ def analyze_value_of_information(economics_result: dict | None = None,
                          "action": f.get("action", ""),
                          "action_caveat": f.get("action_caveat", ""),
                          "confidence": f["confidence"],
+                         "gene": f.get("gene", ""),
+                         "condition": f.get("condition", "") or f.get("coi_key", ""),
+                         # The intervention THIS pathway was charged. The report
+                         # took cost-to-act from a curated twin and showed $0
+                         # when no twin existed, while the model had charged
+                         # $500 — so a reader checking the arithmetic saw a
+                         # benefit with no cost set against it.
+                         "intervention_charged": round(_iv),
                          "wgs_only": f["wgs_only"], "nmb": round(nmb),
                          "dcost_averted": round(dcost), "dqaly": round(dqaly, 3)})
     nmb_rows.sort(key=lambda r: -r["nmb"])

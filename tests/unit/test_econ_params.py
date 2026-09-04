@@ -256,10 +256,11 @@ def test_resolution_map_keys_match_real_source_strings():
     # transcribing the src string.
     from econ import health_economics as he
     live = set()
-    for name in dir(he):
-        if not (name.endswith("_ECONOMICS") or name.endswith("_COSTS")):
-            continue
-        table = getattr(he, name, None)
+    # Same discovery the audit uses, so a table cannot pass this test while
+    # being invisible to the provenance count. Suffix-matching over
+    # health_economics alone silently dropped every gene citation when the gene
+    # table moved into econ.gene_anchors.
+    for _name, table in ep._curated_tables(he):
         if isinstance(table, dict):
             for entry in table.values():
                 if isinstance(entry, dict) and entry.get("src"):

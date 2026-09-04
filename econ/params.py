@@ -1079,6 +1079,31 @@ def resolve_curated_source(src: str) -> dict[str, str]:
     return {"text": text, "identifier": "", "state": "attributed"}
 
 
+
+def _curated_tables(_he) -> list[tuple[str, dict]]:
+    """Every curated per-finding table whose entries carry a free-text ``src``.
+
+    Name-suffix discovery over ``health_economics`` alone used to be enough.
+    It stopped being enough when the gene table moved into
+    ``econ.gene_anchors``: the suffix filter did not match ``GENE_ANCHORS``, so
+    51 curated figures — every gene citation in the model — silently left the
+    provenance audit and the reported coverage rose because the denominator
+    shrank. Discovery is explicit here so a table cannot leave the audit by
+    being renamed or relocated.
+    """
+    out: list[tuple[str, dict]] = []
+    for name in sorted(dir(_he)):
+        if name.endswith("_ECONOMICS") or name.endswith("_COSTS"):
+            out.append((name, getattr(_he, name, None)))
+    try:
+        from . import gene_anchors as _ga
+        out.append(("GENE_ANCHORS", _ga.GENE_ANCHORS))
+        out.append(("NOT_VALUED_GENES", _ga.NOT_VALUED_GENES))
+    except Exception:
+        pass
+    return out
+
+
 def audit_curated_tables() -> dict:
     """Provenance state of every numeric field in the curated econ tables.
 
@@ -1092,14 +1117,11 @@ def audit_curated_tables() -> dict:
     except Exception:
         return {"available": False, "n_params": 0}
     fields = ("cost", "outcome_value", "prevalence", "qaly_gain",
-              "adr_cost", "rrr")
+              "adr_cost", "rrr", "penetrance")
     counts = {"resolvable": 0, "attributed": 0, "missing": 0}
     unresolved: dict[str, int] = {}
     tables: list[dict] = []
-    for name in sorted(dir(_he)):
-        if not (name.endswith("_ECONOMICS") or name.endswith("_COSTS")):
-            continue
-        table = getattr(_he, name, None)
+    for name, table in _curated_tables(_he):
         if not isinstance(table, dict):
             continue
         t_counts = {"resolvable": 0, "attributed": 0, "missing": 0}
@@ -1141,7 +1163,7 @@ def count_unregistered_parameters() -> int:
     """How many load-bearing numbers still live outside the registry.
 
     The curated per-finding tables in ``health_economics`` (``PGX_ECONOMICS``,
-    ``ACMG_GENE_ECONOMICS``, ``PHEWAS_CATEGORY_ECONOMICS`` and the rest) each
+    ``PHEWAS_CATEGORY_ECONOMICS``) and ``gene_anchors.GENE_ANCHORS`` each
     carry ``cost`` / ``outcome_value`` / ``prevalence`` / ``qaly_gain`` fields,
     and every one of them reaches a dollar figure. They are not in the registry
     yet. Counting them is what keeps :func:`assumption_burden` from reporting a
@@ -1154,12 +1176,9 @@ def count_unregistered_parameters() -> int:
     except Exception:
         return 0
     fields = ("cost", "outcome_value", "prevalence", "qaly_gain",
-              "adr_cost", "rrr")
+              "adr_cost", "rrr", "penetrance")
     total = 0
-    for name in dir(_he):
-        if not (name.endswith("_ECONOMICS") or name.endswith("_COSTS")):
-            continue
-        table = getattr(_he, name, None)
+    for _name, table in _curated_tables(_he):
         if not isinstance(table, dict):
             continue
         for entry in table.values():

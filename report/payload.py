@@ -575,6 +575,13 @@ class EconomicsReportPayload:
 
 # ── builder ───────────────────────────────────────────────────────────────────
 
+
+def _iv_charged(row: dict, curated_fallback: float) -> float:
+    """The intervention cost the model actually charged for this pathway."""
+    v = row.get("intervention_charged")
+    return float(v) if v is not None else float(curated_fallback)
+
+
 def build_report_payload(
     economics_result: dict | None = None,
     voi_result: dict | None = None,
@@ -717,10 +724,18 @@ def build_report_payload(
             evidence_confidence=normalise_confidence(r.get("confidence")),
             raw_evidence_confidence=_s(r.get("confidence")),
             pricing_path=PricingPath.VOI_PARAMETRIC,
+            gene=_s(r.get("gene")),
+            condition_id=_s(r.get("condition")),
             expected_qaly_gain=_f(r.get("dqaly")),
             medical_cost_averted=_f(r.get("dcost_averted")),
-            intervention_cost=c_iv,
-            net_cash=_f(r.get("dcost_averted")) - c_iv,
+            # Cost to act comes from the pathway that was actually priced. It
+            # used to be taken from the curated twin, so a parametric finding
+            # with no twin reported $0 while the model had charged its full
+            # intervention. That is the one wrong direction for this field:
+            # free-to-act inflates net benefit for any reader doing their own
+            # arithmetic off the page.
+            intervention_cost=_iv_charged(r, c_iv),
+            net_cash=_f(r.get("dcost_averted")) - _iv_charged(r, c_iv),
             canonical_expected_nmb=nmb,
             economic_value_basis="parametric_expected_nmb",
             legacy_curated_value=(c_net if cur else None),
@@ -786,6 +801,14 @@ def build_report_payload(
             pathway_id_is_legacy=bool(it.get("pathway_id_is_legacy", True)),
             display_name=_s(it.get("finding")),
             category=_s(it.get("category")),
+            # Real identity, carried from the source record rather than
+            # re-derived from the display name. Every finding used to arrive
+            # here with gene="" and condition_id="", so the validator's
+            # gene-keyed checks had nothing to key on and two records for one
+            # gene were indistinguishable from two findings.
+            gene=_s(it.get("gene")),
+            condition_id=_s(it.get("condition")),
+            variant=_s(it.get("variant")),
             action_summary=_s(it.get("basis")),
             evidence_confidence=normalise_confidence(it.get("confidence")),
             raw_evidence_confidence=_s(it.get("confidence")),

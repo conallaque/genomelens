@@ -731,3 +731,105 @@ def test_budget_validator_still_accepts_the_legacy_name():
     p.advanced.budget_impact = {"available": True, "rows": _budget_rows(),
                                 "peak_pmpm": 0.1167, "peak_year": 1}
     assert errors_in(validate_payload(p)) == []
+
+
+def test_readme_quantitative_claims_match_the_current_commit():
+    """Every counted figure on the README recomputed and compared.
+
+    Three separate figures drifted in one day: "47% of ~380" when the truth was
+    41% of 317, then 41% of 317 when a table moved and it became 43.8% of 306,
+    and "twenty-one finding sources" when there were twenty-two. Each was true
+    when written. A number that was true three weeks ago and is not true now is
+    worse than no number, because it is the claim a reviewer checks first.
+
+    Hand-correcting them is what produced the drift. This recomputes each from
+    the code and fails when the page and the model disagree, which is the only
+    mechanism that survives someone adding a parameter on a Friday.
+    """
+    import csv
+    import pathlib
+    import re
+
+    from econ import params as ep
+    from econ import value_of_information as voi
+
+    root = pathlib.Path(__file__).resolve().parents[2]
+    readme = (root / "README.md").read_text(encoding="utf-8")
+
+    # 1. registry provenance
+    P = ep.PARAMS
+    n_reg, n_srcd = len(P), sum(1 for p in P.values() if p.sourced)
+    pct_reg = 100.0 * n_srcd / n_reg
+    assert f"**{n_srcd} of {n_reg}**" in readme or \
+           f"**{n_srcd} of {n_reg} ({pct_reg:.1f}%)**" in readme, (
+        f"README registry provenance is stale: model says {n_srcd} of {n_reg} "
+        f"({pct_reg:.1f}%)")
+    assert f"{pct_reg:.1f}%" in readme, f"registry pct stale: {pct_reg:.1f}%"
+
+    # 2. curated-table provenance
+    a = ep.audit_curated_tables()
+    assert f"{a['n_resolvable']} of {a['n_params']}" in readme, (
+        f"README curated provenance is stale: model says "
+        f"{a['n_resolvable']} of {a['n_params']} ({a['pct_resolvable']}%)")
+    assert f"{a['pct_resolvable']}%" in readme, (
+        f"curated pct stale: {a['pct_resolvable']}%")
+
+    # 3. finding-source count, and how many route onto the cardiometabolic anchor
+    he_src = (root / "econ" / "health_economics.py").read_text(encoding="utf-8")
+    cats = sorted(set(re.findall(r'source="([^"]+)"', he_src)))
+    n_cad = len([c for c in cats if voi._classify_category(c, "")[1] == "CAD"])
+    words = {21: "Twenty-one", 22: "Twenty-two", 23: "Twenty-three",
+             24: "Twenty-four", 25: "Twenty-five"}
+    assert f"{words.get(len(cats), len(cats))} finding sources" in readme, (
+        f"README finding-source count is stale: {len(cats)} sources")
+    nwords = {5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine"}
+    assert f"{nwords.get(n_cad, n_cad)} route" in readme, (
+        f"README CAD-routing count is stale: {n_cad} route onto CAD")
+
+    # 4. CPIC drug count
+    with (root / "data" / "cpic_drugs_batch1.csv").open() as fh:
+        n_cpic = len(list(csv.DictReader(fh)))
+    assert f"{n_cpic} drugs" in readme, f"CPIC count stale: {n_cpic}"
+
+    # 5. the PSA sentence, against the committed payload it describes
+    payload = json.loads(
+        (root / "docs" / "samples" / "econ-payload-sample.json")
+        .read_text(encoding="utf-8"))
+    u = payload["uncertainty"]
+    n_it = int(u["psa_iterations"])
+    n_ce = round(float(u["probability_cost_effective"]) * n_it)
+    assert f"{n_ce:,} of {n_it:,} simulations" in readme, (
+        f"README PSA sentence is stale: committed payload says {n_ce:,} of "
+        f"{n_it:,}")
+
+
+def test_curated_table_discovery_finds_a_newly_added_table():
+    """A table must not be able to leave the provenance audit by moving.
+
+    Discovery used to be name-suffix matching over `health_economics` alone.
+    When the gene table moved into `econ.gene_anchors` the suffix stopped
+    matching, 51 curated figures silently left the audit, and reported coverage
+    ROSE — because the denominator shrank. A provenance metric that improves by
+    losing sight of its own inputs is worse than no metric.
+
+    This asserts discovery picks up a table that was not there when the
+    discovery function was written.
+    """
+    from econ import health_economics as he
+    from econ import params as ep
+
+    found = dict(ep._curated_tables(he))
+    # The relocated table is discovered from its new module.
+    assert "GENE_ANCHORS" in found, (
+        "gene_anchors.GENE_ANCHORS is not discovered by the provenance audit; "
+        "its citations are invisible to the coverage figure")
+    assert found["GENE_ANCHORS"], "GENE_ANCHORS discovered but empty"
+
+    # A table added to health_economics after the fact is discovered too.
+    sentinel = {"X": {"cost": 1, "src": "Sentinel et al. (2026) Nature"}}
+    he._SENTINEL_ECONOMICS = sentinel
+    try:
+        assert "_SENTINEL_ECONOMICS" in dict(ep._curated_tables(he))
+        assert ep.count_unregistered_parameters() > 0
+    finally:
+        del he._SENTINEL_ECONOMICS

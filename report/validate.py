@@ -87,6 +87,8 @@ def validate_payload(p: EconomicsReportPayload) -> list[dict[str, Any]]:
     out += _check_structural_crosscheck(p)
     out += _check_pricing_path_divergence(p)
     out += _check_provenance(p)
+    out += _check_one_gene_one_finding(p)
+    out += _check_render_identity(p)
     out += _note_legitimate_differences(p)
 
     order = {Severity.ERROR: 0, Severity.WARNING: 1, Severity.INFO: 2}
@@ -386,6 +388,79 @@ def _check_budget_impact(p: EconomicsReportPayload) -> list[Finding]:
             f"reported peak year {reported_year} does not match the year of "
             f"the maximum PMPM ({actual_year})",
             "advanced.budget_impact.peak_year"))
+    return out
+
+
+def _check_one_gene_one_finding(p: EconomicsReportPayload) -> list[Finding]:
+    """A gene must not resolve to more than one monetised finding.
+
+    Two valuation paths used to price ACMG genes independently and disagree by
+    200x on the same gene in the same run — one passed the curated QALY figure
+    through raw, the other multiplied it by a 0.005 population frequency. Both
+    rendered, on different pages, each internally consistent, so nothing
+    compared them. The report said two different things about one variant and
+    the gate had no opinion.
+
+    Keyed on gene rather than on pathway id deliberately: the ids were derived
+    from display text, so rewording a finding produced a new id and two records
+    for one gene looked like two findings.
+    """
+    by_gene: dict[str, list[str]] = {}
+    for f in p.findings:
+        g = (f.gene or "").strip().upper()
+        if not g or not f.is_monetized:
+            continue
+        by_gene.setdefault(g, []).append(f.display_name or f.finding_id or "?")
+    out: list[Finding] = []
+    for gene, names in sorted(by_gene.items()):
+        if len(names) > 1:
+            out.append(Finding(
+                Severity.ERROR, "Gene valued more than once",
+                f"{gene} resolves to {len(names)} monetised findings "
+                f"({'; '.join(n[:44] for n in names)}). One variant cannot "
+                f"carry two dollar figures — one of the paths is "
+                f"double-counting it",
+                "findings.gene"))
+    return out
+
+
+def _check_render_identity(p: EconomicsReportPayload) -> list[Finding]:
+    """A finding rendered in more than one place must render identical values.
+
+    Page 3 and page 4 of one report showed $2,579 vs $6,891 averted, 0.004 vs
+    0.124 QALYs, and $100 vs $0 to act for what a reader would read as the same
+    finding — while the model had charged $500. Three values for one field, none
+    of them the one used. The $0 was the damaging one: it reads as "free to act"
+    and inflates net benefit for anyone checking the arithmetic themselves.
+
+    Enforced on identity rather than on position, so it holds however the pages
+    are laid out: two records claiming the same gene AND the same condition must
+    agree on every reported figure, including intervention cost.
+    """
+    seen: dict[tuple[str, str], object] = {}
+    out: list[Finding] = []
+    for f in p.findings:
+        key = ((f.gene or "").strip().upper(),
+               (f.condition_id or "").strip().lower())
+        if not key[0]:
+            continue
+        prev = seen.get(key)
+        if prev is None:
+            seen[key] = f
+            continue
+        for field, label in (("medical_cost_averted", "averted cost"),
+                             ("expected_qaly_gain", "QALY gain"),
+                             ("intervention_cost", "cost to act"),
+                             ("canonical_expected_nmb", "expected NMB")):
+            a, b = getattr(prev, field, None), getattr(f, field, None)
+            if a is None or b is None or a == b:
+                continue
+            out.append(Finding(
+                Severity.ERROR, "Same finding rendered with different values",
+                f"{key[0]} reports {label} as {a} and {b} in the same report; "
+                f"a reader comparing two pages would see two answers for one "
+                f"finding",
+                f"findings.{field}"))
     return out
 
 

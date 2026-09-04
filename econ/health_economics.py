@@ -40,6 +40,8 @@ import pandas as pd
 
 from econ import identity as _identity
 
+from . import gene_anchors as _ga
+
 try:
     from core import snp_registry  # optional SNP-level confirmation (APOE / ACTN3)
 except Exception:  # pragma: no cover - registry should always import
@@ -572,60 +574,35 @@ UROLOGIC_ECONOMICS: dict[str, dict] = {
     },
 }
 
-# ─── ACMG actionable gene economics (ClinVar P/LP → intervention) ─────────
-ACMG_GENE_ECONOMICS: dict[str, dict] = {
-    "BRCA1": {"finding": "BRCA1 pathogenic variant", "cost": 2_000, "outcome_value": 150_000,
-              "qaly_gain": 3.00, "clinical_benefit": "Enhanced screening + risk-reducing surgery option",
-              "src": "Manchanda et al. (2015) J Clin Oncol"},
-    "BRCA2": {"finding": "BRCA2 pathogenic variant", "cost": 2_000, "outcome_value": 140_000,
-              "qaly_gain": 2.80, "clinical_benefit": "Enhanced screening + risk-reducing surgery",
-              "src": "Manchanda et al. (2015) J Clin Oncol"},
-    "MLH1": {"finding": "MLH1 Lynch syndrome variant", "cost": 1_500, "outcome_value": 100_000,
-             "qaly_gain": 2.50, "clinical_benefit": "Annual colonoscopy from age 25 + aspirin",
-             "src": "Ladabaum et al. (2011) Ann Intern Med"},
-    "MSH2": {"finding": "MSH2 Lynch syndrome variant", "cost": 1_500, "outcome_value": 100_000,
-             "qaly_gain": 2.50, "clinical_benefit": "Annual colonoscopy + gynecologic surveillance",
-             "src": "Ladabaum et al. (2011) Ann Intern Med"},
-    "MSH6": {"finding": "MSH6 Lynch syndrome variant", "cost": 1_500, "outcome_value": 80_000,
-             "qaly_gain": 2.00, "clinical_benefit": "Enhanced colonoscopy + endometrial screening",
-             "src": "Ladabaum et al. (2011) Ann Intern Med"},
-    "PMS2": {"finding": "PMS2 Lynch syndrome variant", "cost": 1_500, "outcome_value": 60_000,
-             "qaly_gain": 1.50, "clinical_benefit": "Colonoscopy surveillance program",
-             "src": "Ladabaum et al. (2011) Ann Intern Med"},
-    "LDLR": {"finding": "LDLR familial hypercholesterolemia", "cost": 500, "outcome_value": 200_000,
-             "qaly_gain": 3.50, "clinical_benefit": "High-intensity statin + cascade screening",
-             "src": "Nherera et al. (2011) Heart — FH CEA"},
-    "APOB": {"finding": "APOB familial hypercholesterolemia", "cost": 500, "outcome_value": 180_000,
-             "qaly_gain": 3.00, "clinical_benefit": "High-intensity statin therapy",
-             "src": "Nherera et al. (2011) Heart — FH CEA"},
-    "PCSK9": {"finding": "PCSK9 familial hypercholesterolemia", "cost": 3_000, "outcome_value": 200_000,
-              "qaly_gain": 3.50, "clinical_benefit": "PCSK9 inhibitor + cascade screening",
-              "src": "Kazi et al. (2017) JAMA Cardiol"},
-    "SCN5A": {"finding": "SCN5A channelopathy", "cost": 1_000, "outcome_value": 120_000,
-              "qaly_gain": 4.00, "clinical_benefit": "Cardiac monitoring + beta-blocker/ICD",
-              "src": "Kaufman et al. (2014) Circ Cardiovasc Genet"},
-    "KCNQ1": {"finding": "KCNQ1 long-QT syndrome", "cost": 800, "outcome_value": 110_000,
-              "qaly_gain": 3.80, "clinical_benefit": "Beta-blocker + activity restriction",
-              "src": "Kaufman et al. (2014) Circ Cardiovasc Genet"},
-    "KCNH2": {"finding": "KCNH2 long-QT syndrome", "cost": 800, "outcome_value": 110_000,
-              "qaly_gain": 3.80, "clinical_benefit": "Beta-blocker + QT-prolonging drug avoidance",
-              "src": "Kaufman et al. (2014) Circ Cardiovasc Genet"},
-    "RET": {"finding": "RET MEN2 variant", "cost": 5_000, "outcome_value": 250_000,
-            "qaly_gain": 5.00, "clinical_benefit": "Prophylactic thyroidectomy + calcitonin",
-            "src": "Wells et al. (2015) Thyroid; Brandi (2001) JCEM"},
-    "TP53": {"finding": "TP53 Li-Fraumeni variant", "cost": 3_000, "outcome_value": 200_000,
-             "qaly_gain": 4.00, "clinical_benefit": "Annual whole-body MRI (Toronto protocol)",
-             "src": "Villani et al. (2016) Lancet Oncol"},
-    "RB1": {"finding": "RB1 retinoblastoma variant", "cost": 500, "outcome_value": 80_000,
-            "qaly_gain": 3.00, "clinical_benefit": "Pediatric eye exams + family screening",
-            "src": "Soliman et al. (2016) J AAPOS"},
-    "MYH7": {"finding": "MYH7 hypertrophic cardiomyopathy", "cost": 1_200, "outcome_value": 90_000,
-             "qaly_gain": 2.50, "clinical_benefit": "Echo surveillance + exercise restriction",
-             "src": "Maron et al. (2014) Circulation — HCM guidelines"},
-    "MYBPC3": {"finding": "MYBPC3 hypertrophic cardiomyopathy", "cost": 1_200, "outcome_value": 90_000,
-               "qaly_gain": 2.50, "clinical_benefit": "Echo surveillance + cascade screening",
-               "src": "Maron et al. (2014) Circulation"},
-}
+
+def _qaly_decrement_for(coi_key: str) -> float:
+    """Registry QALY decrement for a condition anchor, via COI_KEY_TO_PARAM.
+
+    One source per quantity: the decrement is a registered, tiered parameter
+    rather than a per-gene literal. Per-gene literals are what let the two
+    gene tables drift apart, and they never entered the provenance count.
+    """
+    from . import engine as _ee
+    from . import params as _ep
+    entry = _ee.COI_KEY_TO_PARAM.get(coi_key)
+    return float(_ep.value(entry[1])) if entry else 0.0
+
+
+def _pen_posterior(**kw) -> dict:
+    """Ascertainment-corrected penetrance (see value_of_information)."""
+    from .value_of_information import analyze_penetrance_posterior
+    return analyze_penetrance_posterior(**kw)
+
+
+# ACMG_GENE_ECONOMICS lived here. It is superseded by econ.gene_anchors,
+# which holds one gene -> economics mapping with a stated contract per
+# field. The table disagreed with value_of_information._gene_to_econ on
+# every shared gene because its `qaly_gain` had no documented semantics
+# and each consumer applied a different weighting to it. The QALY
+# decrement now comes from the parameter registry via the condition
+# anchor, so it is tiered and appears in the tornado; the seven genes
+# with no defensible anchor are listed in gene_anchors.NOT_VALUED_GENES
+# with their reasons rather than priced off a generic bucket.
 
 # ─── PheWAS extreme-tier category economics ───────────────────────────────
 PHEWAS_CATEGORY_ECONOMICS: dict[str, dict] = {
@@ -901,6 +878,21 @@ def _econ_record(
         "prevalence": prevalence,
         "qaly_gain": qaly_gain,
         "evidence": evidence,
+        # STRUCTURED IDENTITY. These were accepted as parameters and then
+        # dropped: the signature took `gene`, `condition` and `variant`, and the
+        # returned record carried none of them. Identity died at the first hop,
+        # so every consumer downstream recovered it by parsing display text —
+        # `_classify_category` matched category strings, pathway ids were
+        # slugified from finding names. That single omission is the cause behind
+        # the section mis-routing, the duplicate per-gene valuations, the
+        # collapsed cost side and the NOT_VALUED bypass: four symptoms of one
+        # field that was never emitted.
+        "gene": gene,
+        "condition": condition,
+        "variant": variant,
+        "drug": drug,
+        "phenotype": phenotype,
+        "kind": kind,
     }
 
 
@@ -1417,21 +1409,61 @@ def _clinical_variant_findings(clinical_variants_result: dict | None) -> list[di
         sig = (v.get("significance") or "").lower()
         if "pathogenic" not in sig:
             continue
-        gene = v.get("gene", "")
+        gene = (v.get("gene") or "").upper()
         if not gene or gene in seen_genes:
             continue
-        econ = ACMG_GENE_ECONOMICS.get(gene)
-        if econ is None:
+        anchor = _ga.anchor_for(gene)
+        if anchor is None:
+            # No defensible condition anchor. The finding is reported by the
+            # clinical-variant panel either way; what is withheld is the dollar
+            # figure. Previously an unmapped gene silently produced nothing here
+            # and a generic-bucket figure elsewhere.
             continue
         seen_genes.add(gene)
         zyg = v.get("zygosity", "heterozygous")
+
+        # PENETRANCE AND EFFECTIVENESS, APPLIED.
+        #
+        # This block used to pass the curated `qaly_gain` straight through with
+        # `prevalence=0.005` attached, and the parallel block in
+        # analyze_personal_economics passed the same field through with no
+        # weighting at all. Two consumers of one undocumented field, 200x apart
+        # on the same gene in the same run — 4.0 QALYs raw against 4.0 x 0.005.
+        #
+        # Both were wrong in opposite directions. 0.005 is a POPULATION
+        # frequency (the field documentation calls it "payer scaling"), and
+        # multiplying one identified carrier's benefit by the population rate of
+        # carrying the finding answers a question nobody asked. The other omitted
+        # penetrance and effectiveness entirely, so it answered "QALYs if you
+        # have the disease and treatment is perfect".
+        #
+        # What an identified carrier's expected benefit actually needs:
+        #   penetrance (ascertainment-corrected) x effectiveness x decrement
+        # The decrement comes from the registry via the condition anchor, so it
+        # is tiered and appears in the tornado.
+        p_lit = float(anchor["penetrance"])
+        p_corr = float(_pen_posterior(prior_penetrance=p_lit, gene=gene,
+                                      family_history=False)
+                       .get("posterior_penetrance", p_lit))
+        rrr = float(anchor["rrr"])
+        decrement = _qaly_decrement_for(anchor["coi_key"])
+        zyg_factor = 0.50 if "homo" in str(zyg).lower() else 0.25
+
         out.append(_econ_record(
-            finding=f"{econ['finding']} ({zyg})",
-            clinical_benefit=econ["clinical_benefit"],
-            cost=econ["cost"], outcome_value=econ["outcome_value"],
+            finding=f"{anchor['finding']} ({zyg})",
+            clinical_benefit=anchor["clinical_benefit"],
+            cost=anchor["cost"],
+            outcome_value=anchor["outcome_value"] * zyg_factor,
             confidence="high", source="Clinical Variant (ClinVar)",
-            prevalence=0.005, qaly_gain=econ["qaly_gain"],
-            evidence=f"{gene} {v.get('ref', '')}{v.get('pos', '')} → ClinVar {sig}",
+            prevalence=p_corr * rrr,
+            qaly_gain=decrement,
+            gene=gene, condition=anchor["coi_key"],
+            variant=f"{v.get('ref', '')}{v.get('pos', '')}",
+            pool_hint=gene,
+            evidence=(f"{gene} {v.get('ref', '')}{v.get('pos', '')} → ClinVar "
+                      f"{sig}; penetrance {p_lit:.2f} corrected to {p_corr:.2f} "
+                      f"× RRR {rrr:.2f} × {decrement:.2f} QALY "
+                      f"({anchor['coi_key']} registry decrement)"),
         ))
     return out
 
@@ -1912,7 +1944,8 @@ def _corrected_cohort_items(findings_econ: dict) -> tuple[list[dict], dict]:
         from . import engine as _ee
         _vocab = frozenset(_ee.DEFAULT_GENE_VOCABULARY) | frozenset(
             k.split("*")[0].split(":")[0].upper()
-            for d in (ACMG_GENE_ECONOMICS, PGX_ECONOMICS, HLA_ECONOMICS,
+            for d in (_ga.GENE_ANCHORS, _ga.NOT_VALUED_GENES,
+                      PGX_ECONOMICS, HLA_ECONOMICS,
                       NEUROCHEMISTRY_ECONOMICS, METAL_OXIDATIVE_ECONOMICS,
                       IMMUNOGENETICS_ECONOMICS, DETOX_ECONOMICS)
             for k in d
@@ -2502,7 +2535,21 @@ def analyze_personal_economics(economics_result: dict | None = None,
     not_monetised: list[dict] = []
 
     def add(category, finding, avoided, qaly, intervention, confidence, basis,
-            economic_pathway_id="", pathway_id_is_legacy=True):
+            economic_pathway_id="", pathway_id_is_legacy=True,
+            gene="", condition="", variant=""):
+        # IDENTITY, CARRIED NOT RE-DERIVED. `add` used to take no gene, so every
+        # record it emitted reached the payload with gene="" and condition_id=""
+        # and downstream code recovered identity by sniffing display text —
+        # `_classify_category` matched category strings, pathway ids were
+        # slugified from finding names. That is why a monogenic surveillance
+        # finding was routed to the medication section, why one gene resolved to
+        # two anchors, and why a reproductive finding escaped NOT_VALUED: each
+        # consumer guessed identity from a label rather than being told it.
+        #
+        # Silent defaults on identity fields are more dangerous than silent
+        # defaults on values: a wrong number is one wrong number, whereas a
+        # wrong identity selects a different parameter set and yields a figure
+        # that is internally consistent and about the wrong thing.
         # REAL-WORLD ADHERENCE. Everything below is trial efficacy: the benefit
         # if the person does the thing. The pooled payer analysis in
         # value_of_information already charges the efficacy-to-effectiveness
@@ -2532,6 +2579,7 @@ def analyze_personal_economics(economics_result: dict | None = None,
             "economic_pathway_id": economic_pathway_id,
             "pathway_id_is_legacy": pathway_id_is_legacy,
             "category": category, "finding": finding,
+            "gene": gene, "condition": condition, "variant": variant,
             "avoided": round(avoided), "qaly": round(qaly, 2),
             "qaly_value": round(qv), "intervention": round(intervention),
             "net": round(avoided + qv - intervention),
@@ -2584,12 +2632,15 @@ def analyze_personal_economics(economics_result: dict | None = None,
             avoided = outcome * prev
             if avoided <= 0 and qaly <= 0:
                 continue
-            add("Pharmacogenomic / genomic", label, avoided, qaly, cost,
+            add(f.get("category") or "Pharmacogenomic / genomic",
+                label, avoided, qaly, cost,
                 f.get("confidence", "moderate"),
                 "Avoided adverse event × probability of relevant exposure "
                 "(curated per-condition model).",
                 economic_pathway_id=f.get("economic_pathway_id", ""),
-                pathway_id_is_legacy=f.get("pathway_id_is_legacy", True))
+                pathway_id_is_legacy=f.get("pathway_id_is_legacy", True),
+                gene=f.get("gene", ""), condition=f.get("condition", ""),
+                variant=f.get("variant", ""))
 
     # ── Blood-work derived ──
     adv = ((bloodwork_result or {}).get("clinical") or {}).get("advanced") or {}
@@ -2774,22 +2825,23 @@ def analyze_personal_economics(economics_result: dict | None = None,
                     f"Causal projection: reducing {exposure} lowers {outcome} risk "
                     f"(MR RR {rr:.2f}, {f.get('n_used', 0)} instruments).")
 
-    # ── Clinical variants (personal) ──
-    if clinical_variants_result and clinical_variants_result.get("available"):
-        for v in (clinical_variants_result.get("findings") or []):
-            sig = (v.get("significance") or "").lower()
-            if "pathogenic" not in sig:
-                continue
-            gene = v.get("gene", "")
-            econ = ACMG_GENE_ECONOMICS.get(gene)
-            if econ is None:
-                continue
-            zyg = v.get("zygosity", "het")
-            avoided = econ["outcome_value"] * (0.50 if "homo" in zyg else 0.25)
-            add("Clinical Variant", f"{econ['finding']} ({zyg})",
-                avoided, econ["qaly_gain"], econ["cost"], "high",
-                f"ClinVar {sig} in {gene} — {econ['clinical_benefit']} "
-                f"({econ.get('src', '')}).")
+    # ── Clinical variants (personal) — VALUED UPSTREAM, NOT HERE ──
+    #
+    # SUB-PATH COLLAPSED. This block valued ACMG genes a second time,
+    # independently of `_acmg_findings`, and the two disagreed by 200x on the
+    # same gene in the same run: this one passed the curated `qaly_gain`
+    # through raw, the other multiplied it by a hardcoded 0.005 population
+    # frequency. Neither applied penetrance or effectiveness, so both were
+    # wrong — in opposite directions, which is how they partially masked each
+    # other in the aggregate and why one gene appeared twice with unrelated
+    # values.
+    #
+    # `_acmg_findings` is now the single ACMG valuation path. It applies
+    # ascertainment-corrected penetrance, effectiveness, and the registry QALY
+    # decrement selected by the gene's condition anchor, and its records arrive
+    # here through `findings_with_economics` like every other source. Valuing
+    # them again would be the double-count that
+    # `test_one_gene_resolves_to_one_monetised_finding` now forbids.
 
     # ── Family planning (personal) — NOT MONETISED ──
     # This block used to add $5,000 and 0.1 QALY per carrier condition. That
@@ -2887,7 +2939,8 @@ def analyze_personal_economics(economics_result: dict | None = None,
         # and "B12" as genes and invents targets that do not exist.
         _vocab = frozenset(_ee.DEFAULT_GENE_VOCABULARY) | frozenset(
             k.split("*")[0].split(":")[0].upper()
-            for d in (ACMG_GENE_ECONOMICS, PGX_ECONOMICS, HLA_ECONOMICS,
+            for d in (_ga.GENE_ANCHORS, _ga.NOT_VALUED_GENES,
+                      PGX_ECONOMICS, HLA_ECONOMICS,
                       NEUROCHEMISTRY_ECONOMICS, METAL_OXIDATIVE_ECONOMICS,
                       IMMUNOGENETICS_ECONOMICS, DETOX_ECONOMICS)
             for k in d
