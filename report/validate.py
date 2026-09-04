@@ -88,6 +88,7 @@ def validate_payload(p: EconomicsReportPayload) -> list[dict[str, Any]]:
     out += _check_pricing_path_divergence(p)
     out += _check_provenance(p)
     out += _check_monetised_flag_matches_the_value(p)
+    out += _check_withheld_findings_carry_no_value(p)
     out += _check_one_gene_one_finding(p)
     out += _check_render_identity(p)
     out += _note_legitimate_differences(p)
@@ -423,6 +424,68 @@ def _check_monetised_flag_matches_the_value(
                 f"but carries no figure in any value field; the report would "
                 f"present it as priced and have nothing to print",
                 "findings.is_monetized"))
+    return out
+
+
+def _check_withheld_findings_carry_no_value(
+        p: EconomicsReportPayload) -> list[Finding]:
+    """A finding the model declined to price must not be priced anywhere.
+
+    NOT_VALUED was enforced at each pricing path in turn, and each time the next
+    path reached monetisation without it. HFE C282Y was withheld by the carrier
+    extractor — partner testing is a reproductive action, and pricing one
+    prices a prospective child — and simultaneously valued at $5,576 by a second
+    carrier block that passed no identity, so the two records could not even be
+    linked to notice the contradiction.
+
+    Checked here because the assembled payload is the one place every pricing
+    path has already converged. Enforcement at a call site protects that call
+    site; enforcement at the point of monetisation protects the report.
+
+    Matching is on the pooling target and the display name as well as the gene,
+    because a withheld record and its priced twin frequently carry neither the
+    same name nor any gene at all — which is precisely how this survived.
+    """
+    def _keys(f) -> set[str]:
+        out = set()
+        for v in ((f.gene or ""), (f.pool_target or ""),
+                  (f.condition_id or "")):
+            v = str(v).strip().upper()
+            if v:
+                out.add(v)
+        return out
+
+    withheld = [f for f in p.findings if (f.reason_not_monetized or "").strip()]
+    if not withheld:
+        return []
+    withheld_keys: set[str] = set()
+    for f in withheld:
+        withheld_keys |= _keys(f)
+
+    out: list[Finding] = []
+    for f in p.findings:
+        if (f.reason_not_monetized or "").strip():
+            # The withheld record itself must carry no figure either.
+            vals = [("canonical_expected_nmb", f.canonical_expected_nmb),
+                    ("legacy_curated_value", f.legacy_curated_value),
+                    ("health_economic_value", f.health_economic_value)]
+            live = [n for n, v in vals if v]
+            if live:
+                out.append(Finding(
+                    Severity.ERROR, "Withheld finding carries a value",
+                    f"{f.display_name or '?'} states a reason for not being "
+                    f"monetised but still reports {', '.join(live)}",
+                    "findings.reason_not_monetized"))
+            continue
+        shared = _keys(f) & withheld_keys
+        if shared and (f.canonical_expected_nmb or f.legacy_curated_value
+                       or f.health_economic_value):
+            out.append(Finding(
+                Severity.ERROR, "Withheld finding priced by another path",
+                f"{f.display_name or '?'} is priced while a finding sharing "
+                f"{'/'.join(sorted(shared))} was withheld from monetisation; "
+                f"one path declined to value this and another valued it anyway",
+                "findings.health_economic_value"))
     return out
 
 

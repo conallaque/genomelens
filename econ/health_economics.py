@@ -2761,28 +2761,21 @@ def analyze_personal_economics(economics_result: dict | None = None,
                 f"{allele} carrier — published cost-effectiveness for pre-prescription testing "
                 f"({econ.get('src', 'CPIC')}).")
 
-    # ── Carrier screening (personal) ──
-    if carrier_result:
-        for record in (carrier_result.get("affected") or []):
-            disease = record.get("disease", "")
-            econ = CARRIER_ECONOMICS.get(disease)
-            if econ is None:
-                continue
-            add("Carrier Screening", econ["finding_affected"],
-                econ["outcome_affected"] * 0.30, econ["qaly_affected"],
-                econ["cost_affected"], "high",
-                f"{record.get('gene', '?')} homozygous — {econ['clinical_benefit_affected']} "
-                f"({econ.get('src', '')}).")
-        for record in (carrier_result.get("carriers") or []):
-            disease = record.get("disease", "")
-            econ = CARRIER_ECONOMICS.get(disease)
-            if econ is None:
-                continue
-            add("Carrier Screening", econ["finding_carrier"],
-                econ["outcome_carrier"] * 0.05, econ["qaly_carrier"],
-                econ["cost_carrier"], "moderate",
-                f"{record.get('gene', '?')} heterozygous carrier — "
-                f"{econ['clinical_benefit_carrier']}.")
+    # ── Carrier screening (personal) — VALUED UPSTREAM, NOT HERE ──
+    #
+    # SECOND CARRIER PATH COLLAPSED. This block valued every carrier result a
+    # second time, in parallel with `_carrier_findings`, using different
+    # multipliers (0.30 / 0.05 against that function's prevalence weighting) and
+    # passing neither gene nor pathway id. So one HFE C282Y carrier result was
+    # simultaneously withheld by `_carrier_findings` — which correctly marks
+    # partner testing as a reproductive action NOT_VALUED forbids pricing — and
+    # priced at $5,576 here, arriving in the payload with gene='' and no
+    # pathway id, therefore unlinkable to the record that had refused it.
+    #
+    # The general shape, and this is its fourth instance in this file: a policy
+    # enforced at a call site is bypassed by the next path that reaches
+    # monetisation. `_carrier_findings` emits into findings_with_economics like
+    # every other extractor and is now the single carrier valuation path.
 
     # ── Compound interactions (personal) ──
     if interactions_result:
