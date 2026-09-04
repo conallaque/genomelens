@@ -35,7 +35,7 @@ a rounded 100%.
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![privacy](https://img.shields.io/badge/privacy-100%25%20local%20%C2%B7%20offline-purple)
 [![CI](https://github.com/conallaque/genomelens/actions/workflows/ci.yml/badge.svg)](https://github.com/conallaque/genomelens/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-885%20passing-brightgreen)
+![tests](https://img.shields.io/badge/tests-800%2B%20passing-brightgreen)
 ![input](https://img.shields.io/badge/input-chip%20%2B%20whole--genome%20VCF-blue)
 ![license](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
 [![Buy Me a Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-support-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/caque)
@@ -65,9 +65,11 @@ fake, and each is traceable to a named test.
 | **Cost–utility analysis done properly** | Cost, QALYs, ICER and INMB reported separately, never blended into one "value" figure. ICER suppressed in the dominance quadrants, because a negative ratio is ambiguous. `econ.engine.CEAResult` |
 | **Finding my own errors** | Eight findings routed onto one cardiometabolic anchor and were **summed** — a 240% risk reduction, which is not a probability. Fixed by pooling on the risk scale; the report shows the size of its own correction. `test_stacked_findings_do_not_sum_their_risk_reductions` |
 | **Uncertainty that is real** | An earlier version reported a strategy cost-saving in **100% of simulations** — the finding-level parameters were pinned outside the sampling loop. `test_psa_without_rebuild_understates_uncertainty` |
-| **Parameter provenance, enforced** | Every figure carries a tier. `tier="assumption"` **may not** cite a source — the registry fails to load if it does. 47% of ~380 figures resolve to a PMID or DOI; the model reports its own coverage instead of claiming "sourced". `econ/params.py` |
+| **A cited test that did not exist** | This table cited `test_pdf_blocked_on_arithmetic_violation` as proof of the consistency gate. The gate was real, but the test was not — the name appeared nowhere except this README, citing itself. Found by auditing every claim on this page against the current commit. The gate is now asserted, and a second test checks that every test name cited here resolves to a real one. `test_readme_cites_only_tests_that_exist` |
+| **Artifacts that contradicted each other** | The committed sample PDF was rendered from a chip run while the payload beside it came from a whole-genome run, so the two described different inputs while this page claimed both resolved to one canonical payload. The consistency gate passed on each, because each was internally valid — nothing compared them. `658d5e4` |
+| **Parameter provenance, enforced** | Every figure carries a tier. `tier="assumption"` **may not** cite a source — the registry fails to load if it does. Two populations, reported separately rather than blended: **49 of 65** registry parameters are sourced (75.4%), and **130 of 317** curated-table figures resolve to a PMID or DOI (41%). The model prints its own coverage instead of claiming "sourced". `econ/params.py` |
 | **Knowing what not to monetise** | Reproductive outcomes are never priced — attaching a figure to an affected birth prices a prospective child. Stated in code, enforced by a test, surfaced as a decision rather than an omission. `NOT_VALUED` |
-| **Structural modelling** | Cohort state-transition model against US life-table mortality, Simpson's 1/3 within-cycle correction cross-checked against an independent implementation. `test_within_cycle_weights_match_the_published_implementation` |
+| **Structural modelling** | Cohort state-transition model against US life-table mortality, Simpson's 1/3 within-cycle correction cross-checked against an independent implementation. The cross-check runs only where [`heor-model-replication`](https://github.com/conallaque/heor-model-replication) is checked out alongside; it **skips on CI**, where only the endpoint weights are asserted. `test_within_cycle_weights_match_the_published_implementation` |
 | **Validated against published models** | Three peer-reviewed cohort state-transition models reproduced in Python, every printed cost, effect, ICER and dominance verdict matched exactly — the one claim here that is not self-assessed. [`heor-model-replication`](https://github.com/conallaque/heor-model-replication) |
 | **Distributional equity analysis** | Two complementary methods — Atkinson EDE (age-based) and power-law equity weights (ancestry-based with explicit portability discounts) — so the model can show *who* benefits, not just how much. `econ.decision.distributional_cea`, `econ.frontier.distributional_cea` |
 | **Family cascade value** | Monogenic findings (BRCA, Lynch) are worth more than individual NMB because first-degree relatives share a 50% carrier probability. The model computes cascade testing value explicitly rather than ignoring it. `analyze_value_of_information` |
@@ -146,7 +148,7 @@ the Markov model as a **live Excel workbook** — inputs editable, every result 
 on both costs and QALYs (0/3/5% in sensitivity). The ICER is **withheld** in the dominance
 quadrants rather than reported as a negative number.
 
-**Findings pooled, not summed.** Twenty-one finding sources feed the model and seven route
+**Findings pooled, not summed.** Twenty-two finding sources feed the model and seven route
 onto the same cardiometabolic anchor. Summing the findings they produce claimed a risk
 reduction above 100% — not a probability. Pooling is complement-of-products on the risk
 scale with a correlated-signal penalty, and each condition's cost of illness is charged
@@ -203,9 +205,15 @@ future pharmacogenomic guidelines. A one-time test with recurring returns.
 This model reports its own gaps rather than hiding them.
 
 - **Parameter provenance is incomplete.** The registry enforces tiers (published / derived
-  / assumption) and blocks assumption-laundering, but ~47% of registered parameters
-  resolve to a PMID or DOI. The rest are stated assumptions. The report prints its own
-  coverage percentage rather than claiming "fully sourced."
+  / assumption) and blocks assumption-laundering. Coverage differs by population and the
+  two are not interchangeable: **49 of 65 (75.4%)** registry parameters are sourced, but
+  only **130 of 317 (41%)** figures in the curated clinical tables resolve to a PMID or
+  DOI. The rest are stated assumptions. The report prints its own coverage rather than
+  claiming "fully sourced."
+- **Two gene-anchor tables disagree.** `ACMG_GENE_ECONOMICS` and `_gene_to_econ` both
+  hold per-gene QALY anchors and give different values for the same gene (LDLR 3.5 vs
+  1.5), so a finding's worth depends on which code path reaches it. The provenance
+  registry cannot detect this because each table is internally consistent. Not yet fixed.
 - **Ancestry portability.** PRS transferability from European-ancestry GWAS to other
   populations is discounted (African: 0.25, East Asian: 0.60, etc.) but the discount
   factors themselves are rough estimates. The model surfaces the portability gap as a
@@ -225,15 +233,21 @@ The things you can check without trusting the model's own output:
 | [`cea-model-sample.xlsx`](docs/samples/cea-model-sample.xlsx) | The CEA as a live Excel workbook — every cell is a formula, every input is editable. You can change assumptions and watch the ICER move. |
 | `econ/params.py` | The provenance registry. `tier="assumption"` **may not** cite a source — the loader rejects it. Grep for `tier=` to see exactly which parameters are sourced and which are not. |
 | Consistency gate | The PDF renderer **blocks** on broken arithmetic identities — costs must decompose, QALYs must sum, the ICER must match. `test_pdf_blocked_on_arithmetic_violation` |
-| 885-test suite | Includes `test_psa_without_rebuild_understates_uncertainty`, `test_stacked_findings_do_not_sum_their_risk_reductions`, and `test_voi_no_silent_drops`. |
+| Test suite | Includes `test_psa_without_rebuild_understates_uncertainty` (rebuilding pools inside each PSA draw widens the interval) and `test_stacked_findings_do_not_sum_their_risk_reductions` (eight CAD findings sum to 2.4 and must pool below that). `test_voi_no_silent_drops` is narrower than its name: it asserts that a finding whose *source label* is unrecognised is recorded as unvalued rather than dropped — it does not cover a finding lost upstream of the economics, or one routed to the wrong anchor. |
+| `test_readme_cites_only_tests_that_exist` | Asserts every test name cited on this page resolves to a real test. Added because one cited here did not — see "finding my own errors". |
+
+**What the CI badge covers.** The badge attests to all but **two** of the tests. Those two
+skip on the runner every run: the within-cycle cross-check above (no replication repo
+present) and a `tier1_results.json` integration check. Both pass locally with those
+artefacts available. The badge is not evidence for those two.
 
 ## Engineering notes
 
 - **Unified, strand-aware SNP registry** — one source of truth for GRCh37/38 coordinates and ancestral/derived alleles; caught and fixed palindrome/strand bugs that silently mis-call ancestry.
 - **KING-robust relationship inference** — a proper kinship estimator (not naive percent-identity), IBS0-refined for parent-child vs full-sibling.
 - **No fabricated figures** — no invented polygenic percentiles; transmission ≠ disease penetrance; ClinVar review-star confidence; Phase-3 findings are labelled computational predictions, never clinical calls; and a **grounding guardrail rejects any AI-introduced figure absent from the deterministic data**, so the local LLM cannot invent a risk or a statistic.
-- **Runs cleanly end-to-end on a public genome** — a *functional* end-to-end test (not a clinical accuracy validation): the full **GIAB HG001 (NA12878)** reference genome runs through build detection, Phase-2 ClinVar, the Phase-3 predictor screen, and the health-economics engine with **no runtime errors** — 3 ClinVar pathogenic (incl. a carrier), 141 predicted-damaging rare variants, and a modelled net monetary benefit reported with a confidence interval. (Functional check — outputs are computational estimates, not accuracy-validated against a clinical truth set.)
-- **885-test suite**, reference-build auto-detection (GRCh37/38 incl. rsID-less whole-genome VCFs), and graceful degradation when optional data or models are absent.
+- **Runs end-to-end on a public genome** — a *functional* check, not a clinical accuracy validation: the full **GIAB HG001 (NA12878)** reference genome ran through build detection, Phase-2 ClinVar, the Phase-3 predictor screen and the health-economics engine with no runtime errors. **This run has not been repeated since, so no counts from it are quoted here.** The per-variant figures it produced were withdrawn rather than restated (see `CHANGELOG.md`), because the model has changed substantially since and a number that was true then is not evidence now.
+- **800+ tests**, reference-build auto-detection (GRCh37/38 incl. rsID-less whole-genome VCFs), and graceful degradation when optional data or models are absent.
 
 ## Output files
 

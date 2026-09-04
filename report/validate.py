@@ -40,7 +40,8 @@ from report.payload import (
     PricingPath,
 )
 
-__all__ = ["Finding", "Severity", "errors_in", "format_report", "validate_payload"]
+__all__ = ["Finding", "Severity", "errors_in", "format_report", "pdf_is_blocked",
+           "validate_payload"]
 
 
 class Severity:
@@ -95,6 +96,20 @@ def validate_payload(p: EconomicsReportPayload) -> list[dict[str, Any]]:
 
 def errors_in(findings: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [f for f in findings if f.get("severity") == Severity.ERROR]
+
+
+def pdf_is_blocked(findings: list[dict[str, Any]]) -> bool:
+    """Whether these validation findings must stop the PDF from being written.
+
+    The policy — any ERROR blocks, warnings never do — used to live as an
+    inline comprehension inside the pipeline, which meant the README could
+    claim "the renderer blocks on broken arithmetic identities" with nothing
+    asserting it. The behaviour was real; it was simply unreachable from a
+    test without running the whole pipeline. Naming it here gives the claim
+    something to point at, and `test_pdf_blocked_on_arithmetic_violation`
+    exercises the same predicate the pipeline branches on.
+    """
+    return bool(errors_in(findings))
 
 
 # ── identities ────────────────────────────────────────────────────────────────

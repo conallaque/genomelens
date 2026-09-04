@@ -1417,7 +1417,11 @@ def run_pipeline(args: argparse.Namespace) -> int:
         from core import genome_input as _gi5
         from econ.frontier import cost_effectiveness_frontier
         from report.payload import build_report_payload
-        from report.validate import format_report, validate_payload
+        from report.validate import (
+            errors_in,
+            format_report,
+            validate_payload,
+        )
 
         econ_payload = build_report_payload(
             economics_result, voi_result, personal_econ,
@@ -1431,8 +1435,10 @@ def run_pipeline(args: argparse.Namespace) -> int:
                                     for k in ("synthetic", "test_genome")),
             })
         econ_payload.report_validation = validate_payload(econ_payload)
-        econ_gate_errors = [f for f in econ_payload.report_validation
-                            if f["severity"] == "ERROR"]
+        # The gate policy lives in report.validate.pdf_is_blocked, so a test can
+        # branch on the same predicate the pipeline does rather than reproducing
+        # it — see test_pdf_blocked_on_arithmetic_violation.
+        econ_gate_errors = errors_in(econ_payload.report_validation)
         _w = [f for f in econ_payload.report_validation
               if f["severity"] == "WARNING"]
         log(f"  Report consistency: {len(econ_gate_errors)} error(s), "

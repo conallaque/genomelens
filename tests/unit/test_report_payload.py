@@ -29,7 +29,13 @@ from report.payload import (
     build_report_payload,
     payload_to_json,
 )
-from report.validate import Severity, errors_in, format_report, validate_payload
+from report.validate import (
+    Severity,
+    errors_in,
+    format_report,
+    pdf_is_blocked,
+    validate_payload,
+)
 
 
 def _checks(payload, name):
@@ -103,6 +109,78 @@ def test_nmb_identity_tolerates_engine_rounding():
     p = _coherent()
     p.reference_case.nmb = 7423.0 - 4.0
     assert errors_in(validate_payload(p)) == []
+
+
+def test_pdf_blocked_on_arithmetic_violation():
+    """The consistency gate the README cites by name.
+
+    The README states the renderer "blocks the PDF on any broken arithmetic
+    identity". That was true — `pipeline.py` skips the export when the payload
+    validates with an ERROR — but nothing asserted it, and the test name the
+    README cited did not exist anywhere in the repository. The behaviour was
+    real and the citation was not, which is a worse failure than a missing
+    feature: it invites a reviewer to check the one thing that will not
+    check out.
+
+    This pins the policy rather than the log line: a broken identity must set
+    `pdf_is_blocked`, and a payload carrying only warnings must not, because a
+    gate that also blocks on warnings would make the report unpublishable for
+    reasons the model itself calls acceptable.
+    """
+    # A coherent payload publishes.
+    coherent = _coherent()
+    assert errors_in(validate_payload(coherent)) == []
+    assert pdf_is_blocked(validate_payload(coherent)) is False
+
+    # λ·ΔQALY − ΔCost no longer equals the reported NMB: the report would
+    # publish a total that contradicts its own components.
+    broken = _coherent()
+    broken.reference_case.nmb = 9999.0
+    findings = validate_payload(broken)
+    assert any(f["check"] == "NMB identity" for f in errors_in(findings)), \
+        format_report(findings)
+    assert pdf_is_blocked(findings) is True
+
+    # Warnings alone must never block. The committed sample carries five.
+    warnings_only = [f for f in validate_payload(_coherent())
+                     if f["severity"] != Severity.ERROR]
+    warnings_only.append({"severity": Severity.WARNING, "check": "synthetic",
+                          "detail": "not an error", "field": "x"})
+    assert pdf_is_blocked(warnings_only) is False
+
+
+def test_readme_cites_only_tests_that_exist():
+    """Every test name the README cites must resolve to a real test.
+
+    This is the check that would have caught
+    `test_pdf_blocked_on_arithmetic_violation` being fictional. A repository
+    whose argument is "the claims are checkable" cannot cite a test that does
+    not exist, and the failure is invisible to every other test in the suite —
+    nothing else reads the README.
+
+    Names are accepted as either a test function (`def test_x`) or a test
+    module (`test_x.py`), since the verification table cites both.
+    """
+    import pathlib
+    import re
+
+    root = pathlib.Path(__file__).resolve().parents[2]
+    readme = (root / "README.md").read_text(encoding="utf-8")
+    cited = sorted(set(re.findall(r"`(test_[A-Za-z0-9_]+)`", readme)))
+    assert cited, "expected the README to cite test names"
+
+    tests_dir = root / "tests"
+    haystack = "\n".join(
+        p.read_text(encoding="utf-8", errors="replace")
+        for p in tests_dir.rglob("test_*.py"))
+    modules = {p.stem for p in tests_dir.rglob("test_*.py")}
+    defined = set(re.findall(r"^def (test_[A-Za-z0-9_]+)", haystack, re.M))
+
+    missing = [n for n in cited if n not in defined and n not in modules]
+    assert not missing, (
+        f"README cites test name(s) that do not exist: {missing}. "
+        f"Either add the test or remove the citation — a cited test that "
+        f"is not there is the first thing a reviewer checks.")
 
 
 # ── 3. dominance ──────────────────────────────────────────────────────────────
