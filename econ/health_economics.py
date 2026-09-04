@@ -2546,12 +2546,42 @@ def analyze_personal_economics(economics_result: dict | None = None,
     if economics_result:
         for f in economics_result.get("findings_with_economics", []):
             outcome = f.get("outcome_value") or f.get("benefit") or 0
-            prev = f.get("prevalence", 0.15)
-            qaly = (f.get("qaly_gain") or f.get("qaly") or 0) * prev
-            cost = f.get("cost", 200)
-            avoided = outcome * prev
             label = (f.get("clinical_benefit") or f.get("finding")
                      or f.get("drug") or "Genomic finding")
+
+            # REFUSE, DO NOT DEFAULT. This read `f.get("prevalence", 0.15)` and
+            # `f.get("cost", 200)`, so a record that omitted either was priced
+            # off a constant instead of being reported as unvaluable. The
+            # failure was invisible by construction: every record missing both
+            # produced the SAME plausible-looking figure, so seven findings
+            # across four genes all reported $2,579 averted, 0.004 QALY and
+            # $100 to act, and nothing looked broken enough to check.
+            #
+            # This is also the mechanism by which "findings without a
+            # registry-backed pathway are reported without a value rather than
+            # assigned one" stopped being true — the default WAS the value.
+            missing = [k for k in ("prevalence", "cost") if f.get(k) is None]
+            if missing:
+                not_monetised.append({
+                    "category": "Unvaluable — incomplete economics",
+                    "finding": label,
+                    "decision": "Reported as a genomic finding; no dollar "
+                                "figure attached.",
+                    "indicative_cost": None,
+                    "reason": (
+                        f"The source record reached the valuation step without "
+                        f"{' and without '.join(missing)}. Pricing it would "
+                        f"mean substituting a constant for the missing input, "
+                        f"which is how this path previously produced identical "
+                        f"figures for unrelated findings. The finding is "
+                        f"reported; the value is not invented."),
+                })
+                continue
+
+            prev = float(f["prevalence"])
+            qaly = (f.get("qaly_gain") or f.get("qaly") or 0) * prev
+            cost = float(f["cost"])
+            avoided = outcome * prev
             if avoided <= 0 and qaly <= 0:
                 continue
             add("Pharmacogenomic / genomic", label, avoided, qaly, cost,
@@ -3088,7 +3118,10 @@ def _render_not_monetised_html(rows: list[dict] | None) -> str:
         <div style="font-size:.88em;color:#48545f;margin-top:3px">
           <strong>Decision:</strong> {_esc_econ(r.get('decision',''))}</div>
         <div style="font-size:.85em;color:#6a7683;margin-top:3px">
-          Indicative cost of acting: {_money(r.get('indicative_cost', 0))}
+          Indicative cost of acting: {
+              _money(r['indicative_cost'])
+              if r.get('indicative_cost') is not None
+              else 'not established'}
           &middot; no benefit figure attached</div>
         <div style="font-size:.82em;color:#8a94a3;margin-top:4px;font-style:italic">
           {_esc_econ(r.get('reason',''))}</div>

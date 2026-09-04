@@ -689,3 +689,79 @@ def test_the_personal_model_skips_the_reference_comt_class():
             if "COMT" in str(i.get("finding", ""))] == [], (
         "COMT was priced on a chip that never genotyped rs4680"
     )
+
+
+# ── silent numeric fallbacks in the valuation path ────────────────────────────
+#
+# THE DEFECT THESE PIN. analyze_personal_economics read
+#   prev = f.get("prevalence", 0.15)
+#   cost = f.get("cost", 200)
+# so a record arriving without either was priced off a constant rather than
+# reported as unvaluable. The failure mode is what made it survive: every record
+# missing both produced the SAME plausible figure, so seven findings across four
+# unrelated genes each reported $2,579 averted / 0.004 QALY / $100 to act, and
+# no single number looked wrong enough to check. Two pages of one report then
+# disagreed, and the consistency gate passed because each page was internally
+# valid.
+#
+# It is also the mechanism by which the stated policy — a finding without a
+# registry-backed pathway is reported without a value rather than assigned one —
+# stopped holding. The default WAS the value.
+
+def _rec(**kw):
+    r = {"finding": "synthetic finding", "outcome_value": 10_000,
+         "qaly_gain": 0.2, "prevalence": 0.10, "cost": 300,
+         "confidence": "moderate"}
+    r.update(kw)
+    return r
+
+
+def test_record_missing_prevalence_is_refused_not_defaulted():
+    r = he.analyze_personal_economics({"findings_with_economics": [
+        _rec(finding="no prevalence", prevalence=None)]})
+    labels = [n["finding"] for n in r["not_monetised"]]
+    assert "no prevalence" in labels, r["not_monetised"]
+    assert not any(i.get("finding") == "no prevalence"
+                   for i in r["items"]), \
+        "a record without prevalence must not be priced"
+    reason = next(n["reason"] for n in r["not_monetised"]
+                  if n["finding"] == "no prevalence")
+    assert "prevalence" in reason
+
+
+def test_record_missing_cost_is_refused_not_defaulted():
+    r = he.analyze_personal_economics({"findings_with_economics": [
+        _rec(finding="no cost", cost=None)]})
+    labels = [n["finding"] for n in r["not_monetised"]]
+    assert "no cost" in labels, r["not_monetised"]
+    reason = next(n["reason"] for n in r["not_monetised"]
+                  if n["finding"] == "no cost")
+    assert "cost" in reason
+
+
+def test_incomplete_records_do_not_collapse_onto_one_shared_figure():
+    """The observable symptom, asserted directly.
+
+    Four unrelated findings, none carrying prevalence or cost. Previously they
+    were all valued off the same two constants and emitted four identical
+    figures. Now none of them is valued at all, so there is no shared figure to
+    mistake for a result.
+    """
+    recs = [_rec(finding=f"gene{i} finding", prevalence=None, cost=None)
+            for i in range(4)]
+    r = he.analyze_personal_economics({"findings_with_economics": recs})
+    assert r["n_not_monetised"] >= 4
+    valued = [i for i in r["items"]
+              if str(i.get("finding", "")).endswith("finding")]
+    assert valued == [], f"none should be priced; got {valued}"
+    assert r["n_items"] == 0 and r["total_avoided"] == 0
+
+
+def test_complete_records_are_still_valued():
+    # REGRESSION: the guard must reject incomplete records, not all records.
+    r = he.analyze_personal_economics({"findings_with_economics": [
+        _rec(finding="complete finding")]})
+    assert not any(n["finding"] == "complete finding"
+                   for n in r["not_monetised"])
+    assert r["n_items"] == 1
+    assert r["total_avoided"] > 0 and r["total_qaly"] > 0
