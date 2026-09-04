@@ -87,6 +87,7 @@ def validate_payload(p: EconomicsReportPayload) -> list[dict[str, Any]]:
     out += _check_structural_crosscheck(p)
     out += _check_pricing_path_divergence(p)
     out += _check_provenance(p)
+    out += _check_monetised_flag_matches_the_value(p)
     out += _check_one_gene_one_finding(p)
     out += _check_render_identity(p)
     out += _note_legitimate_differences(p)
@@ -388,6 +389,40 @@ def _check_budget_impact(p: EconomicsReportPayload) -> list[Finding]:
             f"reported peak year {reported_year} does not match the year of "
             f"the maximum PMPM ({actual_year})",
             "advanced.budget_impact.peak_year"))
+    return out
+
+
+def _check_monetised_flag_matches_the_value(
+        p: EconomicsReportPayload) -> list[Finding]:
+    """`is_monetized` must be false when there is no figure to show.
+
+    The flag was set to a literal True at construction, so a finding whose value
+    had been withheld upstream still arrived claiming to be monetised. HFE
+    C282Y reported is_monetized=True with canonical_expected_nmb=None after
+    NOT_VALUED correctly withheld its figure — the amount was gone and the flag
+    still promised one.
+
+    The general shape, which this file now has three instances of: a policy
+    enforced at a call site rather than at the point of monetisation is bypassed
+    by the next path that reaches monetisation. Duplicate valuation, NOT_VALUED,
+    and the curated/parametric split were all the same defect wearing different
+    labels. An invariant checked on the assembled payload is enforced once,
+    wherever the value came from.
+    """
+    out: list[Finding] = []
+    for f in p.findings:
+        if not f.is_monetized:
+            continue
+        has = any(v for v in (f.canonical_expected_nmb, f.medical_cost_averted,
+                              f.monetized_qaly_value, f.legacy_curated_value,
+                              f.health_economic_value, f.net_cash))
+        if not has:
+            out.append(Finding(
+                Severity.ERROR, "Monetised flag without a value",
+                f"{f.display_name or f.finding_id or '?'} is flagged monetised "
+                f"but carries no figure in any value field; the report would "
+                f"present it as priced and have nothing to print",
+                "findings.is_monetized"))
     return out
 
 

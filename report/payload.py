@@ -576,6 +576,21 @@ class EconomicsReportPayload:
 # ── builder ───────────────────────────────────────────────────────────────────
 
 
+
+def _has_value(it: dict) -> bool:
+    """Whether this record carries an actual monetary figure.
+
+    `is_monetized` must never be true while every value field is empty: the
+    report renders the flag and the figure in different places, so a stale flag
+    shows a reader a finding that claims a value it cannot display.
+    """
+    for k in ("net", "avoided", "qaly_value"):
+        v = it.get(k)
+        if v is not None and float(v) != 0.0:
+            return True
+    return False
+
+
 def _iv_charged(row: dict, curated_fallback: float) -> float:
     """The intervention cost the model actually charged for this pathway."""
     v = row.get("intervention_charged")
@@ -826,7 +841,15 @@ def build_report_payload(
             adherence=(None if it.get("adherence") is None
                        else _f(it.get("adherence"))),
             pool_target=_s(it.get("pool_target")),
-            is_monetized=True,
+            # DERIVED, NOT ASSERTED. This was a literal True, so a finding whose
+            # value had been withheld upstream still arrived flagged as
+            # monetised — HFE reported is_monetized=True with
+            # canonical_expected_nmb=None after NOT_VALUED withheld its figure.
+            # The dollar amount was correctly gone and the flag still claimed
+            # there was one, which is the same class of contradiction as every
+            # other defect in this file: two fields describing one fact,
+            # maintained separately.
+            is_monetized=_has_value(it),
         ))
 
     # 3. Findings deliberately carrying no dollar figure.
