@@ -89,6 +89,7 @@ def validate_payload(p: EconomicsReportPayload) -> list[dict[str, Any]]:
     out += _check_provenance(p)
     out += _check_monetised_flag_matches_the_value(p)
     out += _check_withheld_findings_carry_no_value(p)
+    out += _check_path_reconciliation(p)
     out += _check_one_gene_one_finding(p)
     out += _check_render_identity(p)
     out += _note_legitimate_differences(p)
@@ -424,6 +425,53 @@ def _check_monetised_flag_matches_the_value(
                 f"but carries no figure in any value field; the report would "
                 f"present it as priced and have nothing to print",
                 "findings.is_monetized"))
+    return out
+
+
+# Divergence between the curated and parametric pricing paths. The two model
+# different things — curated is a prevalence-weighted lifetime cost of illness,
+# parametric a discounted expected NMB over a stated horizon — so a small gap is
+# structural and expected. Two orders of magnitude is not.
+#
+# 3x matches the tolerance _check_structural_crosscheck already applies to the
+# Markov cross-check in this file, so the two divergence checks agree on what
+# counts as "worth telling the reader". 10x is an order of magnitude above that
+# and an order below what was actually observed: the reconciliation file has
+# been reporting 97.7x, 93.6x, 80.5x and 59.0x for the same variants, computed
+# correctly, written to disk, and recorded as informational. A check that
+# measures a discrepancy and does not act on it is worse than no check, because
+# it produces the appearance of verification without the substance.
+_RECONCILE_ERROR_RATIO = 10.0
+_RECONCILE_WARN_RATIO = 3.0
+
+
+def _check_path_reconciliation(p: EconomicsReportPayload) -> list[Finding]:
+    """Curated and parametric prices for one pathway must not diverge wildly."""
+    try:
+        from report.reconcile import reconcile_paths
+    except Exception:
+        return []
+    out: list[Finding] = []
+    for r in reconcile_paths(p):
+        if not r.ratio:
+            continue
+        name = (r.curated_name or r.pathway_id or "?")[:52]
+        if r.ratio >= _RECONCILE_ERROR_RATIO:
+            out.append(Finding(
+                Severity.ERROR, "Pricing paths diverge beyond reconciliation",
+                f"{name}: curated ${r.curated_value:,.0f} against parametric "
+                f"${r.parametric_value:,.0f} ({r.ratio:.1f}x apart). The two "
+                f"paths model different things, but not by this much — one of "
+                f"them is wrong about this finding",
+                "findings.legacy_curated_value"))
+        elif r.ratio >= _RECONCILE_WARN_RATIO:
+            out.append(Finding(
+                Severity.WARNING, "Pricing paths diverge",
+                f"{name}: curated ${r.curated_value:,.0f} against parametric "
+                f"${r.parametric_value:,.0f} ({r.ratio:.1f}x apart); reported "
+                f"rather than reconciled, because the paths weight prevalence "
+                f"and horizon differently",
+                "findings.legacy_curated_value"))
     return out
 
 
