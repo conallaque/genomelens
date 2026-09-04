@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "build_id": "GENOMELENS-BUILD: 8205ac1+dirty 2026-08-29T13:03:34-04:00",
-    "generated_at": "2026-08-29T13:03:34-04:00",
+    "build_id": "GENOMELENS-BUILD: ebf92a5+dirty 2026-09-04T13:20:05-04:00",
+    "generated_at": "2026-09-04T13:20:05-04:00",
     "input_type": "wgs",
     "input_label": "synthetic_wgs.vcf",
     "is_synthetic": true,
@@ -31,9 +31,9 @@
     "medical_cost_avoided": 1221.0,
     "intervention_cost": 720.0,
     "net_cash": 501.0,
-    "qaly_gain": 0.22,
-    "monetized_qaly_value": 18125.0,
-    "total_health_economic_value": 18625.0,
+    "qaly_gain": 0.12,
+    "monetized_qaly_value": 9487.0,
+    "total_health_economic_value": 9989.0,
     "horizon_years": 10.0,
     "mean_adherence": 0.5,
     "n_items": 8,
@@ -42,8 +42,8 @@
     "canonical_total_expected_nmb": 10072.0,
     "n_findings_standardised": 8,
     "n_findings_not_standardised": 1,
-    "legacy_curated_total": 18625.0,
-    "value_per_dollar_of_testing": 26.6
+    "legacy_curated_total": 9989.0,
+    "value_per_dollar_of_testing": 14.3
   },
   "findings": [
     {
@@ -221,7 +221,7 @@
       "net_cash": 200.0,
       "canonical_expected_nmb": 490.0,
       "economic_value_basis": "parametric_expected_nmb",
-      "legacy_curated_value": 4452.0,
+      "legacy_curated_value": -31.0,
       "legacy_curated_value_basis": "curated_prevalence_weighted_mixture",
       "health_economic_value": 490.0,
       "monetized_qaly_value": 0.0,
@@ -259,7 +259,7 @@
       "net_cash": 20.0,
       "canonical_expected_nmb": 210.0,
       "economic_value_basis": "parametric_expected_nmb",
-      "legacy_curated_value": 2500.0,
+      "legacy_curated_value": -52.0,
       "legacy_curated_value_basis": "curated_prevalence_weighted_mixture",
       "health_economic_value": 210.0,
       "monetized_qaly_value": 0.0,
@@ -297,7 +297,7 @@
       "net_cash": -40.0,
       "canonical_expected_nmb": 90.0,
       "economic_value_basis": "parametric_expected_nmb",
-      "legacy_curated_value": 1521.0,
+      "legacy_curated_value": -80.0,
       "legacy_curated_value_basis": "curated_prevalence_weighted_mixture",
       "health_economic_value": 90.0,
       "monetized_qaly_value": 0.0,
@@ -544,23 +544,23 @@
     "ceac": [
       {
         "wtp": 0,
-        "p_cost_effective": 0.96
+        "p_cost_effective": 0.956
       },
       {
         "wtp": 25000,
-        "p_cost_effective": 0.985
+        "p_cost_effective": 0.98
       },
       {
         "wtp": 50000,
-        "p_cost_effective": 0.9917
+        "p_cost_effective": 0.9913
       },
       {
         "wtp": 75000,
-        "p_cost_effective": 0.995
+        "p_cost_effective": 0.998
       },
       {
         "wtp": 100000,
-        "p_cost_effective": 0.9967
+        "p_cost_effective": 0.9987
       },
       {
         "wtp": 150000,
@@ -696,22 +696,10 @@
     },
     "evppi": {
       "available": true,
-      "baseline_nb": 10252,
+      "baseline_nb": 10271,
       "by_parameter": [
         {
           "parameter": "willingness_to_pay",
-          "evppi": 0
-        },
-        {
-          "parameter": "event_probability",
-          "evppi": 0
-        },
-        {
-          "parameter": "treatment_effect",
-          "evppi": 0
-        },
-        {
-          "parameter": "cost_of_illness",
           "evppi": 0
         }
       ],
@@ -901,9 +889,9 @@
     "available": true,
     "is_reference_case": false,
     "markov_incremental_cost": -2660.67,
-    "markov_qaly_gain": 0.4364,
+    "markov_qaly_gain": 0.4363,
     "markov_incremental_life_years": 0.3218,
-    "markov_nmb": 46300.67,
+    "markov_nmb": 46293.48,
     "markov_icer": null,
     "markov_verdict": "dominant (cheaper and more effective)",
     "standard_care": {
@@ -918,6 +906,9 @@
         "disease": 0.14634,
         "dead": 0.32249
       },
+      "total_cost_exact": 29386.631318062744,
+      "total_qaly_exact": 20.004141035465004,
+      "total_life_years_exact": 22.825439936625344,
       "cohort_sum_exact": 1.0,
       "trace": [
         {
@@ -1041,6 +1032,9 @@
         "disease": 0.11108,
         "dead": 0.28064
       },
+      "total_cost_exact": 26725.959431821204,
+      "total_qaly_exact": 20.440469118523584,
+      "total_life_years_exact": 23.147245834210022,
       "cohort_sum_exact": 1.0000000000000002,
       "trace": [
         {
@@ -1816,7 +1810,7 @@
       "prevalence_sum_exceeds_cohort": true,
       "total_intervention_cost": 29815000,
       "total_cost_averted": 102206000,
-      "total_qalys": 11772.8,
+      "total_qalys": 3132.3,
       "incremental_cost": -72391000,
       "dominant": true,
       "cost_per_qaly": null,
@@ -1853,7 +1847,7 @@
           "adherence": 0.5,
           "total_cost": 3750000,
           "total_benefit": 2340000,
-          "total_qalys": 4530.0
+          "total_qalys": 45.0
         },
         {
           "finding": "CYP2D6 Intermediate Metabolizer (IM) (codeine / antidepressants)",
@@ -1861,7 +1855,7 @@
           "adherence": 0.5,
           "total_cost": 3750000,
           "total_benefit": 1260000,
-          "total_qalys": 2589.0
+          "total_qalys": 36.0
         },
         {
           "finding": "SLCO1B1 Intermediate Function (IM-like) (simvastatin)",
@@ -1869,7 +1863,7 @@
           "adherence": 0.5,
           "total_cost": 1875000,
           "total_benefit": 400000,
-          "total_qalys": 1617.5
+          "total_qalys": 15.0
         },
         {
           "finding": "CYP2C19 \u2014 top-drug actionable (amitriptyline)",
@@ -1907,9 +1901,9 @@
       "legacy": {
         "total_intervention_cost": 68800000,
         "total_benefit": 319110000,
-        "total_qalys": 25925.0,
+        "total_qalys": 5898.5,
         "intervention_events": 263000,
-        "cost_per_qaly": 2654,
+        "cost_per_qaly": 11664,
         "cost_per_qaly_was": "gross intervention spend divided by QALYs \u2014 no cost offsets and no comparator, so not an ICER despite being labelled one"
       },
       "benefit_reduction": 216904000,
@@ -1939,7 +1933,7 @@
       "total_benefit": 102206000,
       "roi": 3.4,
       "net_savings": 72391000,
-      "summary": "Across 100,000 members: 100,000 members affected across 263,000 intervention-events, cost $29,815,000, cost averted $102,206,000, 11,772.8 QALYs. Corrections removed $216,904,000 (68.0%)."
+      "summary": "Across 100,000 members: 100,000 members affected across 263,000 intervention-events, cost $29,815,000, cost averted $102,206,000, 3,132.3 QALYs. Corrections removed $216,904,000 (68.0%)."
     }
   },
   "plain_language": {
@@ -2124,19 +2118,19 @@
     {
       "severity": "INFO",
       "check": "Legacy curated value diverges",
-      "detail": "'CYP2C19 Intermediate Metabolizer (IM) (clopidogrel)': canonical expected NMB $490, legacy curated figure $4,452. The curated figure is retained for audit only and is not an alternative NMB: it conditions on genotype prevalence rather than event probability. See report/reconcile.py",
+      "detail": "'CYP2C19 Intermediate Metabolizer (IM) (clopidogrel)': canonical expected NMB $490, legacy curated figure $-31 \u2014 opposite signs. The curated figure is retained for audit only and is not an alternative NMB: it conditions on genotype prevalence rather than event probability. See report/reconcile.py",
       "field": "findings[pgx:cyp2c19:clopidogrel:mace]"
     },
     {
       "severity": "INFO",
       "check": "Legacy curated value diverges",
-      "detail": "'CYP2D6 Intermediate Metabolizer (IM) (codeine / antidepressants)': canonical expected NMB $210, legacy curated figure $2,500. The curated figure is retained for audit only and is not an alternative NMB: it conditions on genotype prevalence rather than event probability. See report/reconcile.py",
+      "detail": "'CYP2D6 Intermediate Metabolizer (IM) (codeine / antidepressants)': canonical expected NMB $210, legacy curated figure $-52 \u2014 opposite signs. The curated figure is retained for audit only and is not an alternative NMB: it conditions on genotype prevalence rather than event probability. See report/reconcile.py",
       "field": "findings[pgx:cyp2d6:codeine_antidepressants:opioid_toxicity]"
     },
     {
       "severity": "INFO",
       "check": "Legacy curated value diverges",
-      "detail": "'SLCO1B1 Intermediate Function (IM-like) (simvastatin)': canonical expected NMB $90, legacy curated figure $1,521. The curated figure is retained for audit only and is not an alternative NMB: it conditions on genotype prevalence rather than event probability. See report/reconcile.py",
+      "detail": "'SLCO1B1 Intermediate Function (IM-like) (simvastatin)': canonical expected NMB $90, legacy curated figure $-80 \u2014 opposite signs. The curated figure is retained for audit only and is not an alternative NMB: it conditions on genotype prevalence rather than event probability. See report/reconcile.py",
       "field": "findings[pgx:slco1b1:simvastatin:myopathy]"
     },
     {
