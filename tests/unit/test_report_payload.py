@@ -754,7 +754,11 @@ def test_readme_quantitative_claims_match_the_current_commit():
     from econ import value_of_information as voi
 
     root = pathlib.Path(__file__).resolve().parents[2]
-    readme = (root / "README.md").read_text(encoding="utf-8")
+    # Whitespace-normalised: the README is hard-wrapped prose, so a figure and
+    # its unit routinely straddle a line break. A drift check that fails on
+    # reflow gets disabled, and a disabled check is how the figures drifted.
+    readme = " ".join((root / "README.md")
+                      .read_text(encoding="utf-8").split())
 
     # 1. registry provenance
     P = ep.PARAMS

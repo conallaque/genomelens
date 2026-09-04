@@ -32,18 +32,20 @@ sample in `data/test_genome.txt`; nothing in it derives from that file, and the 
 not be confused. Deriving it from the chip export is what produced the reference-build
 defect described below.
 
-> **The committed PDF predates that change and is being regenerated.** It was produced
-> from the old mislabelled input, so re-running the generator today yields a different —
-> and more complete — report than the one committed here. Regenerating it surfaced
-> finding-routing defects that are being fixed first; publishing a sample with those
-> visible would trade one wrong artifact for another.
+The committed PDF and payload come from **one run** of that command and share a build
+stamp. The input carries two real ClinVar pathogenic variants — LDLR familial
+hypercholesterolaemia and TP53 Li-Fraumeni — a configuration occurring in **roughly 1 in
+3,000,000** people (approximate, assuming independence; pathogenic-variant heterozygote
+prevalence, not carrier frequency). TP53 is reported and deliberately **not priced**: no
+registry anchor describes a multi-site cancer syndrome.
 
 In it: cost and QALYs reported **separately** with the ICER *withheld* under dominance ·
 a **double-counting correction** showing what naive addition claimed and how much came out ·
 an **adherence discount** charged to benefit *and* ongoing cost · findings with no
 registry-backed pathway shown as *"not yet standardised"* rather than assigned an invented
-value · probability reported as *"cost-effective in 1,498 of 1,500 simulations"* rather than
-a rounded 100%.
+value · probability reported as a **count** — *"cost-effective in 1,500 of 1,500
+simulations"* — beside its 95% interval, because a bare percentage cannot be told apart
+from a model whose parameters stopped varying.
 
 ![status](https://img.shields.io/badge/status-active-brightgreen)
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
