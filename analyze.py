@@ -55,8 +55,10 @@ except ImportError:
     analyze_ancestry = None
 try:
     from core.pdf_export import (
-        html_to_pdf, weasyprint_available,
-        pdf_backend_available, smart_html_to_pdf,
+        html_to_pdf,
+        pdf_backend_available,
+        smart_html_to_pdf,
+        weasyprint_available,
     )
 except ImportError:
     html_to_pdf = None
