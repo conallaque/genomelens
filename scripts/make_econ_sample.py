@@ -69,11 +69,63 @@ GRCH38_CONTIGS = [
 # NOT fabricated: each is a catalogued human variant. The genome carrying all of
 # them is synthetic, and its joint prevalence is reported by the profile that
 # uses it rather than left implied.
+# Approximate pathogenic-variant HETEROZYGOTE prevalence, order of magnitude,
+# from published condition prevalence. NOT carrier frequency: familial
+# hypercholesterolaemia and the hereditary cancer syndromes are dominant, so a
+# heterozygote is at risk rather than a silent carrier, and calling these
+# "carrier frequencies" would misdescribe what the person has.
+#
+# Used to print each configuration's joint prevalence. Joint figures assume
+# independence, which is an approximation in two known directions: in a
+# sequenced cohort the joint rate EXCEEDS the product, because ascertainment
+# biases toward people with family history. The exclusion argument for
+# multi-gene stacks survives that — a product of 1 in 10^9 is not rescued by a
+# correction of this size — but the printed figure is an estimate, and it is
+# labelled as one wherever it appears.
+HET_PREVALENCE = {
+    "LDLR":  1/300,      # FH overall ~1/250; LDLR the commonest cause
+    "APOB":  1/1_000,
+    "PCSK9": 1/10_000,
+    "BRCA1": 1/400,
+    "BRCA2": 1/400,
+    "MLH1":  1/2_000,    # Lynch overall ~1/300 across MMR genes
+    "MSH2":  1/2_000,
+    "TP53":  1/10_000,   # Li-Fraumeni
+    "RET":   1/30_000,   # MEN2
+    "KCNQ1": 1/4_000,
+}
+
+# The sample's pathogenic variants. Real ClinVar P/LP records at real GRCh38
+# coordinates; the genome carrying them is synthetic.
+#
+# DELIBERATELY SHORT. An earlier version carried four ACMG pathogenic variants
+# at once, whose joint prevalence is past 1 in 10^12 — more than a hundred
+# times the number of humans who have ever lived. A configuration whose printed
+# prevalence is absurd is disqualified by that fact alone, however good its
+# economics look, and printing the figure is what makes the disqualification
+# automatic rather than a matter of taste.
+#
+# LDLR is valued (CAD anchor, ~1 in 300 — commoner than most single findings a
+# report of this kind describes). TP53 is deliberately NOT valued: no registry
+# anchor describes a multi-site cancer syndrome, so the report shows the finding
+# and withholds the figure. Keeping it in the sample is the point — it
+# demonstrates the withholding on the gene that used to carry the largest QALY
+# anchor in the model.
 CLINVAR_PLP = [
-    ("17", 7670669,  "G", "T", "TP53"),    # Pathogenic 3* Li-Fraumeni
     ("19", 11089549, "A", "C", "LDLR"),    # Pathogenic 3* familial hypercholesterolaemia
-    ("3",  36993548, "A", "G", "MLH1"),    # Pathogenic 3* Lynch syndrome
+    ("17", 7670669,  "G", "T", "TP53"),    # Pathogenic 3* Li-Fraumeni — WITHHELD, no anchor
 ]
+
+
+def joint_prevalence(genes) -> tuple[float, str]:
+    """(probability, "roughly 1 in N") for carrying all of `genes` at once."""
+    pr = 1.0
+    for g in genes:
+        pr *= HET_PREVALENCE.get(g.upper(), 1 / 1_000)
+    if pr <= 0:
+        return 0.0, "not estimable"
+    n = round(1 / pr)
+    return pr, f"roughly 1 in {n:,}"
 
 
 def _registry_rows() -> list[tuple[str, int, str, str, str]]:
@@ -128,7 +180,17 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
     vcf = out / "synthetic_wgs.vcf"
     n_reg, n_plp = build_vcf(vcf)
+    genes = [g for *_r, g in CLINVAR_PLP]
+    _pr, phrase = joint_prevalence(genes)
     print(f"synthetic GRCh38 VCF: {n_reg} registry + {n_plp} ClinVar P/LP -> {vcf}")
+    print(f"  pathogenic variants : {', '.join(genes)}")
+    print(f"  joint prevalence    : {phrase} "
+          f"(approximate, assuming independence)")
+    print("  NOTE: pathogenic-variant heterozygote prevalence, not carrier "
+          "frequency —")
+    print("        FH and the hereditary cancer syndromes are dominant, so a "
+          "heterozygote")
+    print("        is at risk rather than a silent carrier.")
     r = subprocess.run([sys.executable, str(ROOT / "analyze.py"), str(vcf),
                         "--output", str(out / "report.html")], cwd=ROOT)
     if r.returncode:

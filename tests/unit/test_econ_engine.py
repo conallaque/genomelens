@@ -874,3 +874,48 @@ def test_ceac_numbers_remain_available_alongside_the_chart():
     assert "<svg" in html
     assert "the same curve as numbers" in html
     assert "/QALY</td>" in html
+
+
+def test_ceac_at_zero_threshold_is_below_certainty():
+    """A dominant profile and pinned parameters both report 100%. This tells
+    them apart.
+
+    The README's self-caught error describes a version that reported a strategy
+    cost-saving in 100% of simulations because the finding-level parameters were
+    pinned outside the sampling loop. The committed sample currently reports
+    100% as well — for an entirely different reason: it carries an LDLR familial
+    hypercholesterolaemia finding whose whole distribution sits above zero, with
+    a $9,194-$43,181 interval across 61 varied parameters.
+
+    The discriminator is the CEAC at a willingness-to-pay of ZERO. At that
+    threshold a strategy is cost-effective only if it is cost-SAVING in that
+    draw, so any genuine uncertainty about the cash arm must show up as a
+    probability below one. Pinned parameters produced 1.0 at every threshold
+    including zero, which is the impossible part — that says the cash arm has no
+    uncertainty at all.
+
+    Asserted at the engine rather than on the committed payload so it holds for
+    any genome, not just the sample.
+    """
+    from econ import value_of_information as voi
+
+    econ = {"findings_with_economics": [
+        {"finding": "CAD polygenic risk elevated", "category": "Polygenic Risk",
+         "confidence": "moderate", "qaly_gain": 1.5, "prevalence": 0.1,
+         "cost": 200},
+    ]}
+    r = voi.analyze_value_of_information(econ, input_type="chip",
+                                        n_mc=2000, seed=11)
+    ceac = r.get("ceac") or []
+    assert ceac, "expected a CEAC"
+
+    at_zero = [pt for pt in ceac if float(pt.get("lam", pt.get("wtp", -1))) == 0]
+    assert at_zero, f"CEAC has no zero-threshold point: {ceac[:2]}"
+    p0 = float(at_zero[0].get("prob", at_zero[0].get("p_cost_effective", 1.0)))
+
+    assert p0 < 1.0, (
+        f"CEAC reports p={p0} at a willingness-to-pay of $0, meaning the model "
+        f"believes the strategy saves money in every single draw. That is what "
+        f"pinning the finding-level parameters outside the sampling loop looks "
+        f"like — the cash arm stops varying. A genuinely dominant profile still "
+        f"has draws where it costs money.")

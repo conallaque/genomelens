@@ -483,11 +483,28 @@ def render_page_one(p: EconomicsReportPayload) -> str:
         unc_val = fmt.simulation_count(
             u.probability_cost_effective, u.psa_iterations
         ).replace(" simulations", "").replace("all ", "")
+        # THE INTERVAL SITS BESIDE THE PROBABILITY, DELIBERATELY.
+        #
+        # A profile whose whole distribution lies above zero reports the same
+        # 100% that a bug reports when the finding-level parameters are pinned
+        # outside the sampling loop — and this report leads with that bug as a
+        # self-caught error. The two are distinguishable only by whether the
+        # spread is real, so the spread is printed in the same block rather
+        # than elsewhere on the page: 100% next to a $9k-$43k interval reads as
+        # a confident model, 100% next to no interval reads as a broken one.
+        # `test_ceac_at_zero_threshold_is_below_certainty` is the machine
+        # version of the same check.
+        _ci = ""
+        if u.nmb_ci_low or u.nmb_ci_high:
+            _ci = (f" &middot; 95% interval {fmt.money(u.nmb_ci_low)} to "
+                   f"{fmt.money(u.nmb_ci_high)} across "
+                   f"{fmt.count(u.n_parameters_varied)} varied parameters")
         unc_cap = (f"modelled simulations cost-effective "
                    f"({fmt.probability(u.probability_cost_effective)}); "
                    f"cost-saving in "
                    f"{fmt.simulation_count(u.probability_cost_saving, u.psa_iterations)}"
-                   f" ({fmt.probability(u.probability_cost_saving)})")
+                   f" ({fmt.probability(u.probability_cost_saving)})"
+                   f"{_ci}")
     else:
         unc_val, unc_cap = fmt.MISSING, "no probabilistic analysis available"
 
