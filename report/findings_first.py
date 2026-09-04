@@ -897,6 +897,19 @@ def render_page_five(p: EconomicsReportPayload) -> str:
         <td class="n">{fmt.money(cond.cost_averted)}</td>
         <td class="n">{fmt.qaly(cond.qaly_gain)}</td>
         <td class="n b">{fmt.money(cond.nmb)}</td></tr>"""
+    # THE LABEL IS THE FIX, NOT SUPPRESSION. The Raw column adds the risk
+    # reductions of findings that share a condition, which for a well-populated
+    # pool exceeds 100% — 290% here, 475% before the duplicate paths were
+    # collapsed. That is not a result the model reports; it is the artifact the
+    # pooling correction exists to remove, and hiding it would leave the
+    # correction unevidenced. Naming it is what turns the number into an
+    # argument for the pooling logic instead of against it.
+    raw_note = ("<p class=\"note\"><strong>Raw is an uncorrected sum, not a "
+                "modelled result.</strong> It adds the risk reductions of "
+                "findings that share a condition, which is not how "
+                "probabilities combine. Any value above 100% is the artifact "
+                "this correction removes. The pooled figure beside it is the "
+                "model&rsquo;s answer.</p>")
     overlap = c.naive_cost_averted - c.efficacy_cost_averted
     adher = c.efficacy_cost_averted - c.effectiveness_cost_averted
     pct = (overlap / c.naive_cost_averted) if c.naive_cost_averted else 0.0
@@ -928,11 +941,13 @@ def render_page_five(p: EconomicsReportPayload) -> str:
   <h2 class="sec">Condition pools &mdash; combined before value is credited</h2>
   <table class="t">
     <thead><tr><th>Condition</th><th style="text-align:right">Findings</th>
-      <th style="text-align:right">Baseline</th><th style="text-align:right">Raw</th>
+      <th style="text-align:right">Baseline</th>
+      <th style="text-align:right">Raw<br><span class="thsub">uncorrected</span></th>
       <th style="text-align:right">Pooled</th><th style="text-align:right">Adherence</th>
       <th style="text-align:right">Realised</th><th style="text-align:right">Cost averted</th>
       <th style="text-align:right">QALYs</th><th style="text-align:right">NMB</th>
     </tr></thead><tbody>{rows}</tbody></table>
+  {raw_note}
   <div class="flow">
     <h3>Two corrections, applied in order</h3>
     <p class="sub">The engine reports these as one combined reduction. They rest

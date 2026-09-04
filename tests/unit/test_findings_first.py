@@ -123,10 +123,25 @@ def test_a_negative_finding_is_not_dropped(html_out):
 # ── uncertainty ───────────────────────────────────────────────────────────────
 
 def test_uncertainty_reports_a_count_not_a_bare_hundred_percent(html_out):
+    """The PROBABILITY must be a count, not a rounded 100%.
+
+    Originally asserted that the string "100%" appeared nowhere in the report,
+    which was a proxy for the real rule and too blunt to survive: the page-5
+    pooling note now says "any value above 100% is the artifact this correction
+    removes", where 100% is the name of a boundary, not a reported probability.
+    Suppressing that sentence to satisfy a string match would have removed an
+    explanation to protect a proxy for the thing it explains.
+
+    Pinned on the uncertainty block specifically, which is where a rounded
+    probability would actually mislead.
+    """
     txt = _text(html_out)
     assert "1,498 of 1,500" in txt
     assert ">99%" in txt
-    assert "100%" not in txt
+    # No bare "100%" presented AS the probability of cost-effectiveness.
+    for phrase in ("cost-effective (100%)", "cost-effective in 100%",
+                   "100% of simulations", "cost-saving (100%)"):
+        assert phrase not in txt, f"probability rendered as a bare {phrase!r}"
 
 
 # ── reference case ────────────────────────────────────────────────────────────

@@ -105,6 +105,28 @@ h2 {
 """
 
 
+
+def _document_has_its_own_cover(html: str) -> bool:
+    """Whether this document already opens with a masthead of its own.
+
+    The generic cover is written for `report.html`, which is a DNA analysis
+    report and has no front page of its own. It was prepended unconditionally,
+    so printing the eight-page economics report produced a stray "DNA Analysis
+    Report v3.0.0" page in front of a document that has its own masthead,
+    its own title, and its own page-1 design — branding it as a different
+    document than the one that follows.
+
+    Detected from the <title>, which the economics report sets to "GenomeLens
+    economics"; anything self-titled that way supplies its own front matter.
+    """
+    import re as _re
+    m = _re.search(r"<title>(.*?)</title>", html, _re.I | _re.S)
+    if not m:
+        return False
+    t = m.group(1).lower()
+    return "genomelens economics" in t or "findings-first" in t
+
+
 def _build_cover_page(file_label: str, file_hash: str, version: str,
                       report_date: str, qc_grade: str = "") -> str:
     return f"""
@@ -237,7 +259,7 @@ def html_to_pdf(
 
     html = Path(html_path).read_text()
     report_date = datetime.datetime.now().strftime("%B %d, %Y at %H:%M")
-    cover = _build_cover_page(
+    cover = "" if _document_has_its_own_cover(html) else _build_cover_page(
         file_label=file_label or "raw DNA file",
         file_hash=file_hash or "n/a",
         version=version or "v3.0.0",
@@ -280,7 +302,7 @@ def html_to_pdf_playwright(
 
     html = Path(html_path).read_text()
     report_date = datetime.datetime.now().strftime("%B %d, %Y at %H:%M")
-    cover = _build_cover_page(
+    cover = "" if _document_has_its_own_cover(html) else _build_cover_page(
         file_label=file_label or "raw DNA file",
         file_hash=file_hash or "n/a",
         version=version or "v3.0.0",
