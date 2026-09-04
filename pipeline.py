@@ -413,6 +413,38 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as _e:
             log(f"  WARNING: header-based build detection failed: {_e}")
 
+    # ── Build-consistency gate ──────────────────────────────────────────────
+    # Detection above is sound; what was missing is anyone checking it against
+    # what the file CLAIMS. When probe detection resolves, the ``##reference``
+    # line is never read, so a VCF whose header says one build while its
+    # coordinates are on another ran without comment — and every coordinate
+    # lookup downstream (ClinVar, the predictor tables) silently answered about
+    # the wrong positions. Refuse rather than score: a wrong-build lookup is not
+    # a degraded answer, it is an answer about different variants.
+    if not _assume:
+        try:
+            from core import genome_input as _gi_chk
+            if _gi_chk.looks_like_vcf(args.dna_file):
+                _declared = _gi_chk.declared_build_from_vcf_header(args.dna_file)
+                if (_declared in ("grch37", "grch38")
+                        and detected_build in ("grch37", "grch38")
+                        and _declared != detected_build):
+                    log("")
+                    log("  BUILD MISMATCH — refusing to analyse this file.")
+                    log(f"    The header declares {_declared}, but the "
+                        f"coordinates are {detected_build}.")
+                    log("    One of the two is wrong, and every position "
+                        "lookup downstream depends on which.")
+                    log(f"    Override with --assume-build {detected_build} "
+                        f"if you know the coordinates are right and only the "
+                        f"header is stale.")
+                    log("")
+                    raise SystemExit(2)
+        except SystemExit:
+            raise
+        except Exception as _e:
+            log(f"  WARNING: build-consistency check failed: {_e}")
+
     # ── Whole-genome VCF: back-fill curated registry positions the rsID reader
     #    dropped, and profile what the file contains that we can't yet interpret.
     vcf_profile = None

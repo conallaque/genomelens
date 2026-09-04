@@ -71,6 +71,42 @@ _DISCLAIMER = (
 
 # ── predictor registry ────────────────────────────────────────────────────────
 
+# Filename tokens that identify which reference build a predictor table is keyed
+# on. Every table this module reads is coordinate-keyed, so a table for the wrong
+# build does not degrade gracefully — it answers a different question. A GRCh37
+# position looked up in an hg38 table returns None wherever the coordinate is
+# unused (silent under-detection) and, where the coordinate happens to be valid
+# in hg38 for some other variant, returns THAT variant's score. Nothing about the
+# result says it is misattributed.
+#
+# Worked example from this repository's own tables — APOE rs429358, whose GRCh37
+# and GRCh38 positions are both real coordinates:
+#     lookup 19:45411941 (its GRCh37 position) in AlphaMissense_hg38 -> None
+#     lookup 19:44908684 (its GRCh38 position) in AlphaMissense_hg38 -> 0.0365
+# Before this map existed, ``resolve()`` took the first glob hit and the ``build``
+# argument was checked for membership in ("grch37","grch38") and then never used,
+# so a GRCh37 whole genome was scored against whichever table happened to be on
+# disk. The only table setup.py downloads by default is hg38.
+_BUILD_TOKENS: dict[str, tuple[str, ...]] = {
+    "grch37": ("hg19", "grch37", "b37"),
+    "grch38": ("hg38", "grch38", "b38"),
+}
+
+
+def table_build(path: str) -> str | None:
+    """Which build a predictor table filename declares, or None if it is silent.
+
+    A table that names no build cannot be checked, which is itself worth
+    distinguishing from one that names a conflicting build: the first is
+    unverifiable, the second is wrong.
+    """
+    low = str(path).lower()
+    for build, tokens in _BUILD_TOKENS.items():
+        if any(t in low for t in tokens):
+            return build
+    return None
+
+
 class Predictor:
     """One pluggable pathogenicity predictor backed by a tabix-indexed table."""
 
@@ -87,26 +123,65 @@ class Predictor:
         self.remote_url = remote_url
         self._tabix = None               # (TabixFile, chrom_fmt) once opened
         self.source = ""
+        self.build = ""                  # build of the resolved table, if declared
+        self.reject_reason = ""          # why resolve() refused, for the caller
 
     # -- table resolution + open ------------------------------------------------
-    def resolve(self) -> bool:
-        """Locate + open the table (local file preferred, else a remote URL for
-        CADD demos). Returns True if a usable tabix handle is available."""
+    def resolve(self, build: str = "") -> bool:
+        """Locate + open the table for ``build``, refusing a mismatched one.
+
+        ``build`` is the reference build of the *input genome*. A table keyed on
+        a different build is not a degraded answer, it is an answer about other
+        variants, so this refuses instead of scoring and records why in
+        ``reject_reason``. Passing no build keeps the old first-hit behaviour,
+        which only the licence manifest needs.
+        """
+        self.reject_reason = ""
         if not _HAVE_PYSAM:
+            self.reject_reason = "pysam not installed"
             return False
         path = None
         d = REFERENCE_DIR / self.subdir
         if d.is_dir() and self.glob:
-            hits = sorted(d.glob(self.glob))
-            if hits:
-                path = str(hits[0])
+            hits = sorted(str(h) for h in d.glob(self.glob))
+            if build and hits:
+                # Prefer a table whose filename declares the input's build. A
+                # table that declares nothing stays eligible — unverifiable is
+                # not the same as wrong — but a declared conflict is fatal.
+                matching = [h for h in hits if table_build(h) == build]
+                silent = [h for h in hits if table_build(h) is None]
+                if matching:
+                    path = matching[0]
+                elif silent:
+                    path = silent[0]
+                else:
+                    wrong = sorted({table_build(h) or "?" for h in hits})
+                    self.reject_reason = (
+                        f"{self.name} table on disk is keyed on "
+                        f"{'/'.join(wrong)} but the input genome is {build}; "
+                        f"refusing to score coordinates against the wrong "
+                        f"build (run `python setup.py --predictors "
+                        f"--build {build}`)")
+                    return False
+            elif hits:
+                path = hits[0]
         if path is None and self.remote_url:
+            if build and table_build(self.remote_url) not in (None, build):
+                self.reject_reason = (
+                    f"{self.name} remote table is keyed on "
+                    f"{table_build(self.remote_url)}, input genome is {build}")
+                return False
             path = self.remote_url          # pysam/htslib can open http(s) + .tbi
         if path is None:
+            self.reject_reason = f"no {self.name} table found"
             return False
         self._tabix = _open_tabix(path)
         self.source = path
-        return self._tabix is not None
+        self.build = table_build(path) or ""
+        if self._tabix is None:
+            self.reject_reason = f"could not open {path}"
+            return False
+        return True
 
     def lookup(self, chrom: str, pos: int, ref: str, alt: str) -> float | None:
         if self._tabix is None:
@@ -294,9 +369,12 @@ def analyze_novel_variants(vcf_path: str, build: str,
         return _unavailable(f"Build '{build}' — cannot select predictor tables "
                             "safely (try --assume-build grch38).")
 
-    # Resolve which predictor tables are actually available.
+    # Resolve which predictor tables are actually available FOR THIS BUILD.
+    # A table keyed on the other build is refused rather than used: see
+    # _BUILD_TOKENS for why a wrong-build lookup is worse than no lookup.
     predictors: list[Predictor] = []
     dropped_nc: list[str] = []
+    dropped_build: list[str] = []
     for p in _registry():
         if commercial_safe and not p.commercial_ok:
             dropped_nc.append(p.name)
@@ -306,11 +384,19 @@ def analyze_novel_variants(vcf_path: str, build: str,
         # Only fall back to a remote table (CADD demo) when explicitly allowed.
         if not local_exists and not (p.remote_url and allow_remote):
             continue
-        if p.resolve():
+        if p.resolve(build):
             predictors.append(p)
-            _log(f"  Predictor ready: {p.name} ({p.license})")
+            _log(f"  Predictor ready: {p.name} ({p.license})"
+                 + (f" [{p.build}]" if p.build else ""))
+        elif p.reject_reason:
+            dropped_build.append(p.reject_reason)
+            _log(f"  Predictor REFUSED: {p.reject_reason}")
 
     if not predictors:
+        if dropped_build:
+            return _unavailable(
+                "No predictor table matches this genome's reference build. "
+                + " · ".join(dropped_build))
         return _unavailable(
             "No Phase-3 predictor tables found — run `python setup.py --predictors` "
             "(AlphaMissense + REVEL + gnomAD). Falls back cleanly; no screen performed.")
@@ -365,9 +451,16 @@ def analyze_novel_variants(vcf_path: str, build: str,
 
     result = _classify(findings, n_scanned, n_queried, gnomad_present)
     result["predictors_used"] = [{"name": p.name, "license": p.license,
-                                  "commercial_ok": p.commercial_ok} for p in predictors]
+                                  "commercial_ok": p.commercial_ok,
+                                  "table_build": p.build,
+                                  "table": p.source} for p in predictors]
     result["commercial_safe"] = commercial_safe
     result["dropped_noncommercial"] = dropped_nc
+    # Which predictors were refused for being keyed on the wrong build. Reported
+    # rather than dropped silently: a screen that skipped half its predictors is
+    # a different screen, and the reader has to be able to see that it did.
+    result["input_build"] = build
+    result["dropped_build_mismatch"] = dropped_build
     # Name only the pathogenicity predictors actually used in the disclaimer, so a
     # --commercial-safe report never even mentions the non-commercial ones.
     used = ", ".join(p.name for p in predictors if p.axis != "rarity") or "AlphaMissense"

@@ -622,10 +622,19 @@ def setup_cadd(force: bool = False) -> None:
         "(allow_remote=True) — no bulk download.")
 
 
-def setup_predictors(commercial_safe: bool = False, force: bool = False) -> None:
+def setup_predictors(commercial_safe: bool = False, force: bool = False,
+                     build: str = "hg38") -> None:
     """Run the auto-downloadable predictor set. Commercial-safe = AlphaMissense +
-    gnomAD only; otherwise also REVEL (SpliceAI/CADD stay manual)."""
-    setup_alphamissense(force=force)
+    gnomAD only; otherwise also REVEL (SpliceAI/CADD stay manual).
+
+    ``build`` selects which AlphaMissense table to fetch. It was unreachable
+    before: ``_AM_URLS`` has held an hg19 entry all along and
+    ``setup_alphamissense`` has always taken a ``build`` argument, but nothing
+    passed one — so only the hg38 table could be downloaded, and the predictor
+    screen now refuses to run on a GRCh37 genome for want of a table that was
+    one argument away.
+    """
+    setup_alphamissense(force=force, build=build)
     setup_gnomad(force=force)
     if not commercial_safe:
         setup_revel(force=force)
@@ -694,6 +703,12 @@ def main() -> None:
                          "predictors only (AlphaMissense + gnomAD).")
     ap.add_argument("--predictors-refresh", action="store_true",
                     help="Force a re-download/rebuild of predictor tables.")
+    ap.add_argument("--build", choices=("hg38", "hg19", "grch38", "grch37"),
+                    default="hg38",
+                    help="Reference build for the AlphaMissense table. The "
+                         "predictor screen refuses to score a genome against a "
+                         "table keyed on the other build, so a GRCh37 genome "
+                         "needs --build hg19.")
     ap.add_argument("--all", action="store_true",
                     help="Run --beagle, --pgs, --ancestry and --clinvar")
     args = ap.parse_args()
@@ -727,10 +742,14 @@ def main() -> None:
         setup_clinvar(force=args.clinvar_refresh)
 
     _pf = args.predictors_refresh
+    # grch37/grch38 accepted as aliases so the same spelling works here as in
+    # --assume-build, where the pipeline names builds grch37/grch38.
+    _am_build = {"grch38": "hg38", "grch37": "hg19"}.get(args.build, args.build)
     if args.predictors:
-        setup_predictors(commercial_safe=args.commercial_safe, force=_pf)
+        setup_predictors(commercial_safe=args.commercial_safe, force=_pf,
+                         build=_am_build)
     if args.alphamissense:
-        setup_alphamissense(force=_pf)
+        setup_alphamissense(force=_pf, build=_am_build)
     if args.revel:
         setup_revel(force=_pf)
     if args.gnomad:

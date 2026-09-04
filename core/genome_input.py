@@ -135,6 +135,44 @@ def detect_build_from_vcf_header(path: str, max_header_lines: int = 5000) -> str
     return ref_hint or "unknown"
 
 
+def declared_build_from_vcf_header(path: str,
+                                   max_header_lines: int = 5000) -> str:
+    """The build a VCF *claims* in its ``##reference`` line, or ``"unknown"``.
+
+    Deliberately separate from :func:`detect_build_from_vcf_header`, which
+    answers "what build is this file actually on" by voting on ``##contig``
+    lengths and only falls back to the ``##reference`` hint. That fallback
+    ordering is right for detection and wrong for verification: when the contig
+    votes resolve, the declared build is never read, so a file whose header
+    claims one build while its coordinates are on another passes without
+    comment.
+
+    That is not hypothetical. ``scripts/make_econ_sample.py`` wrote
+    ``##reference=GRCh38`` onto a VCF built from a GRCh37 chip export, probe
+    detection correctly returned grch37, the declared build was never consulted,
+    and the injected variants silently matched nothing in the GRCh37 ClinVar
+    table for as long as the script existed.
+    """
+    p = str(path)
+    opener = gzip.open if p.lower().endswith((".gz", ".bgz")) else open
+    try:
+        with opener(p, "rt", errors="ignore") as f:
+            for i, line in enumerate(f):
+                if not line.startswith("#"):
+                    break
+                if i > max_header_lines:
+                    break
+                low = line.lower()
+                if low.startswith("##reference"):
+                    if any(t in low for t in ("grch38", "hg38", "b38")):
+                        return "grch38"
+                    if any(t in low for t in ("grch37", "hg19", "b37")):
+                        return "grch37"
+    except Exception:
+        return "unknown"
+    return "unknown"
+
+
 # ── Genotype conversion ───────────────────────────────────────────────────────
 
 _ACGT = set("ACGT")

@@ -108,6 +108,81 @@ def test_build_gate(tmp_path, monkeypatch):
     assert "assume-build" in r["reason"] or "Build" in r["reason"]
 
 
+# ── predictor-table build guard ───────────────────────────────────────────────
+#
+# THE DEFECT THESE PIN. `resolve()` took the first glob hit, and the `build`
+# argument was checked for membership in ("grch37","grch38") and then never used
+# again — so a GRCh37 genome was scored against whichever table happened to be on
+# disk, and the only table setup.py downloaded by default was hg38. A lookup
+# against the wrong build is not a degraded answer: it returns None where the
+# coordinate is unused, and some OTHER variant's score where the coordinate is
+# also valid in the other build. Nothing in the result said so.
+
+def test_table_build_reads_the_build_from_a_filename():
+    assert nv.table_build("AlphaMissense_hg38.tsv.gz") == "grch38"
+    assert nv.table_build("AlphaMissense_hg19.tsv.gz") == "grch37"
+    assert nv.table_build("gnomad.af_only.hg38.vcf.gz") == "grch38"
+    # Declaring no build is "unverifiable", deliberately distinguished from
+    # declaring the wrong one — the first stays eligible, the second is fatal.
+    assert nv.table_build("revel_all_chromosomes.tsv.gz") is None
+
+
+def test_predictor_refuses_a_table_keyed_on_the_other_build(tmp_path, monkeypatch):
+    monkeypatch.setattr(nv, "REFERENCE_DIR", tmp_path)
+    _make_am_table(tmp_path, [("1", "1000", "C", "T", "0.97", "likely_pathogenic")])
+    vcf = _write_vcf(tmp_path, [("1", "1000", "C", "T", "0/1")])
+
+    # hg38 table on disk, GRCh37 genome in hand: refuse rather than score.
+    r = nv.analyze_novel_variants(vcf, "grch37")
+    assert r["available"] is False, "a wrong-build table must not be scored"
+    assert "build" in r["reason"].lower()
+    assert "grch38" in r["reason"], "the reason must name the table's own build"
+    assert "setup.py" in r["reason"], "and say how to get the right table"
+
+    # Same file, same table, on the build they belong to: still works. So the
+    # guard rejects the mismatch, not the table.
+    ok = nv.analyze_novel_variants(vcf, "grch38")
+    assert ok["available"] is True
+    assert ok["n_predicted_pathogenic"] == 1
+
+
+def test_matching_build_table_is_selected_over_a_mismatched_one(tmp_path, monkeypatch):
+    """With both tables present, selection must be by build, not sort order.
+
+    'hg19' sorts before 'hg38', so the previous first-glob-hit behaviour would
+    have handed a GRCh38 genome the hg19 table.
+    """
+    monkeypatch.setattr(nv, "REFERENCE_DIR", tmp_path)
+    _make_am_table(tmp_path, [("1", "1000", "C", "T", "0.97", "likely_pathogenic")])
+    d = tmp_path / "alphamissense"
+    raw = d / "AlphaMissense_hg19.tsv"
+    raw.write_text("1\t1000\tC\tT\thg19\tU1\tT1\tp.X\t0.99\tlikely_pathogenic\n")
+    gz = str(raw) + ".gz"
+    pysam.tabix_compress(str(raw), gz, force=True)
+    pysam.tabix_index(gz, seq_col=0, start_col=1, end_col=1, force=True)
+
+    for build in ("grch38", "grch37"):
+        r = nv.analyze_novel_variants(
+            _write_vcf(tmp_path, [("1", "1000", "C", "T", "0/1")]), build)
+        assert r["available"] is True, f"{build}: {r.get('reason')}"
+        used = [p for p in r["predictors_used"] if p["name"] == "AlphaMissense"]
+        assert used, f"{build}: AlphaMissense not used"
+        assert used[0]["table_build"] == build, (
+            f"input {build} must select the {build} table, got "
+            f"{used[0]['table_build']}")
+
+
+def test_input_build_is_reported_on_the_result(tmp_path, monkeypatch):
+    # The screen has to say which build it ran on, so a reader can tell whether
+    # the coordinates it reports mean what they appear to mean.
+    monkeypatch.setattr(nv, "REFERENCE_DIR", tmp_path)
+    _make_am_table(tmp_path, [("1", "1000", "C", "T", "0.97", "likely_pathogenic")])
+    vcf = _write_vcf(tmp_path, [("1", "1000", "C", "T", "0/1")])
+    r = nv.analyze_novel_variants(vcf, "grch38")
+    assert r["input_build"] == "grch38"
+    assert r["dropped_build_mismatch"] == []
+
+
 def test_commercial_safe_drops_noncommercial(tmp_path, monkeypatch):
     monkeypatch.setattr(nv, "REFERENCE_DIR", tmp_path)
     _make_am_table(tmp_path, [("1", "1000", "C", "T", "0.97", "likely_pathogenic")])

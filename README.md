@@ -22,7 +22,21 @@ replaced. Independently developed — see [PROVENANCE.md](PROVENANCE.md).
     5 How findings combine   6 Uncertainty & evidence   7 Testing decision   8 Methods
 
 Faster than reading this page. **Synthetic input — no human genome and no personal health
-data** were used to make it. Reproduce it with `python scripts/make_econ_sample.py`.
+data** were used to make it. Reproduce it with
+`python scripts/make_econ_sample.py out/ --refresh-committed`.
+
+The generator now builds a **purpose-built synthetic whole genome on GRCh38** — the
+curated SNP registry at its GRCh38 positions, plus a few real ClinVar pathogenic variants
+at their real GRCh38 coordinates. It is **not** a lifted-over copy of the GRCh37 chip
+sample in `data/test_genome.txt`; nothing in it derives from that file, and the two should
+not be confused. Deriving it from the chip export is what produced the reference-build
+defect described below.
+
+> **The committed PDF predates that change and is being regenerated.** It was produced
+> from the old mislabelled input, so re-running the generator today yields a different —
+> and more complete — report than the one committed here. Regenerating it surfaced
+> finding-routing defects that are being fixed first; publishing a sample with those
+> visible would trade one wrong artifact for another.
 
 In it: cost and QALYs reported **separately** with the ICER *withheld* under dominance ·
 a **double-counting correction** showing what naive addition claimed and how much came out ·
@@ -65,6 +79,8 @@ fake, and each is traceable to a named test.
 | **Cost–utility analysis done properly** | Cost, QALYs, ICER and INMB reported separately, never blended into one "value" figure. ICER suppressed in the dominance quadrants, because a negative ratio is ambiguous. `econ.engine.CEAResult` |
 | **Finding my own errors** | Eight findings routed onto one cardiometabolic anchor and were **summed** — a 240% risk reduction, which is not a probability. Fixed by pooling on the risk scale; the report shows the size of its own correction. `test_stacked_findings_do_not_sum_their_risk_reductions` |
 | **Uncertainty that is real** | An earlier version reported a strategy cost-saving in **100% of simulations** — the finding-level parameters were pinned outside the sampling loop. `test_psa_without_rebuild_understates_uncertainty` |
+| **Predictor tables were never checked against the input's build** | `resolve()` took the first predictor table on disk and the `build` argument was checked for membership in `("grch37","grch38")` and then never used again. So a **GRCh37 genome was scored against the hg38 AlphaMissense table** — the only one `setup.py` downloaded by default. That is not a degraded answer: it returns nothing where the coordinate is unused, and **another variant's score** where the coordinate is also valid in the other build. From this repo's own tables, APOE rs429358 — whose GRCh37 and GRCh38 positions are both real coordinates: `19:45411941` (its GRCh37 position) → `None`; `19:44908684` (its GRCh38 position) → `0.0365`. Silent misattribution on a path that runs against real user data. Now refuses instead of scoring. `test_predictor_refuses_a_table_keyed_on_the_other_build` |
+| **A sample generator whose feature never worked** | `make_econ_sample.py` built its VCF from the GRCh37 chip export, injected rare variants at **GRCh38** coordinates, and wrote `##reference=GRCh38` over the result. Build detection read the bulk and correctly said GRCh37, loaded the GRCh37 ClinVar table, and matched none of the injected variants — so the ClinVar screen resolved **zero** pathogenic variants for as long as the script existed. Nothing complained, because nothing compared the declared build against the detected one. The symptom read as a modelling defect for two rounds before the cause turned out to be coordinates; a parameter sweep exposed it because four pathogenic variants scored identically to one. `test_declared_and_detected_build_can_disagree` |
 | **A cited test that did not exist** | This table cited `test_pdf_blocked_on_arithmetic_violation` as proof of the consistency gate. The gate was real, but the test was not — the name appeared nowhere except this README, citing itself. Found by auditing every claim on this page against the current commit. The gate is now asserted, and a second test checks that every test name cited here resolves to a real one. `test_readme_cites_only_tests_that_exist` |
 | **Artifacts that contradicted each other** | The committed sample PDF was rendered from a chip run while the payload beside it came from a whole-genome run, so the two described different inputs while this page claimed both resolved to one canonical payload. The consistency gate passed on each, because each was internally valid — nothing compared them. `658d5e4` |
 | **Parameter provenance, enforced** | Every figure carries a tier. `tier="assumption"` **may not** cite a source — the registry fails to load if it does. Two populations, reported separately rather than blended: **49 of 65** registry parameters are sourced (75.4%), and **130 of 317** curated-table figures resolve to a PMID or DOI (41%). The model prints its own coverage instead of claiming "sourced". `econ/params.py` |

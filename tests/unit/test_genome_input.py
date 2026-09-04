@@ -116,3 +116,74 @@ def test_profile_counts_total_and_acmg():
         assert prof["acmg_gene_variants"] == 1
     finally:
         os.unlink(vcf)
+
+
+# ── declared vs detected build ────────────────────────────────────────────────
+#
+# THE GAP THESE PIN. `detect_build_from_vcf_header` answers "what build is this
+# file on" by voting on ##contig lengths and only falls back to the ##reference
+# hint. That ordering is right for detection and useless for verification: when
+# the votes resolve, the declared build is never read, so a file claiming one
+# build while carrying another passed without comment — and every coordinate
+# lookup downstream then answered about the wrong positions.
+#
+# Not hypothetical. scripts/make_econ_sample.py wrote "##reference=GRCh38" onto
+# a VCF built from a GRCh37 chip export; probe detection correctly said grch37;
+# the declared build was never consulted; the injected variants matched nothing
+# in the GRCh37 ClinVar table for as long as the script existed.
+
+def _header_vcf(lines):
+    f = tempfile.NamedTemporaryFile(  # noqa: SIM115
+        "w", suffix=".vcf", delete=False)
+    f.write("\n".join(["##fileformat=VCFv4.2", *lines,
+                       "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tS1",
+                       "1\t100\t.\tA\tG\t.\tPASS\t.\tGT\t0/1"]) + "\n")
+    f.close()
+    return f.name
+
+
+def test_declared_build_reads_only_the_reference_line():
+    for ref, want in (("GRCh38", "grch38"), ("hg38", "grch38"),
+                      ("GRCh37", "grch37"), ("hg19", "grch37")):
+        vcf = _header_vcf([f"##reference={ref}"])
+        try:
+            assert gi.declared_build_from_vcf_header(vcf) == want
+        finally:
+            os.unlink(vcf)
+
+
+def test_declared_build_is_unknown_when_the_header_is_silent():
+    vcf = _header_vcf(["##contig=<ID=1,length=249250621>"])
+    try:
+        assert gi.declared_build_from_vcf_header(vcf) == "unknown"
+    finally:
+        os.unlink(vcf)
+
+
+def test_declared_and_detected_build_can_disagree():
+    """The exact shape of the sample-generator bug, as a fixture.
+
+    Contig lengths say GRCh37 (chr1 = 249,250,621); the reference line claims
+    GRCh38. Detection follows the contigs and is right to. The point is that the
+    two functions now return different answers, so a caller can compare them --
+    which is what nothing was doing.
+    """
+    vcf = _header_vcf(["##reference=GRCh38",
+                       "##contig=<ID=1,length=249250621>"])   # GRCh37 length
+    try:
+        assert gi.detect_build_from_vcf_header(vcf) == "grch37"
+        assert gi.declared_build_from_vcf_header(vcf) == "grch38"
+        assert (gi.detect_build_from_vcf_header(vcf)
+                != gi.declared_build_from_vcf_header(vcf))
+    finally:
+        os.unlink(vcf)
+
+
+def test_declared_and_detected_agree_on_a_consistent_file():
+    vcf = _header_vcf(["##reference=GRCh38",
+                       "##contig=<ID=1,length=248956422>"])   # GRCh38 length
+    try:
+        assert gi.detect_build_from_vcf_header(vcf) == "grch38"
+        assert gi.declared_build_from_vcf_header(vcf) == "grch38"
+    finally:
+        os.unlink(vcf)
