@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "build_id": "GENOMELENS-BUILD: 36379c1+dirty 2026-09-05T08:59:30-04:00",
-    "generated_at": "2026-09-05T08:59:30-04:00",
+    "build_id": "GENOMELENS-BUILD: 2b67527 2026-09-05T09:50:48-04:00",
+    "generated_at": "2026-09-05T09:50:48-04:00",
     "input_type": "wgs",
     "input_label": "synthetic_wgs.vcf",
     "is_synthetic": true,
@@ -13,12 +13,12 @@
   },
   "reference_case": {
     "strategy": "Act on genomic findings vs. usual care",
-    "incremental_cost": -27492.0,
+    "incremental_cost": -27378.0,
     "incremental_qalys": 0.0626,
-    "medical_cost_averted": 31067.0,
+    "medical_cost_averted": 30953.0,
     "intervention_cost": 3275.0,
     "test_cost": 300.0,
-    "nmb": 33757.0,
+    "nmb": 33637.0,
     "icer": null,
     "icer_note": "not defined \u2014 strategy dominates or is dominated",
     "dominance_status": "dominant (more health, lower cost)",
@@ -37,10 +37,10 @@
     "horizon_years": 10.0,
     "mean_adherence": 0.35,
     "n_items": 1,
-    "n_not_monetized": 30,
+    "n_not_monetized": 29,
     "verdict": "cost-saving",
-    "canonical_total_expected_nmb": 48032.0,
-    "n_findings_standardised": 20,
+    "canonical_total_expected_nmb": 48154.0,
+    "n_findings_standardised": 19,
     "n_findings_not_standardised": 1,
     "legacy_curated_total": 3639.0,
     "value_per_dollar_of_testing": 5.2
@@ -727,46 +727,6 @@
       "sources": []
     },
     {
-      "finding_id": "HLA-DQ2/DQ8 carrier \u2014 celiac rule-out capability",
-      "economic_pathway_id": "carrier:hla_dqa1:celiac_disease_susceptibility",
-      "pathway_id_is_legacy": false,
-      "action_id": "",
-      "condition_id": "Celiac Disease Susceptibility",
-      "display_name": "HLA-DQ2/DQ8 carrier \u2014 celiac rule-out capability",
-      "gene": "HLA-DQA1",
-      "variant": "",
-      "category": "",
-      "condition": "",
-      "action_summary": "Negative DQ2/DQ8 rules out celiac",
-      "action_caveat": "",
-      "evidence_confidence": "moderate",
-      "raw_evidence_confidence": "moderate",
-      "provenance_tier": "",
-      "pricing_path": "voi_parametric",
-      "expected_qaly_gain": 0.0,
-      "medical_cost_averted": 361.0,
-      "intervention_cost": 500.0,
-      "intervention_cost_basis": "registry_default_no_gene_specific_cost",
-      "net_cash": -139.0,
-      "canonical_expected_nmb": -122.0,
-      "economic_value_basis": "parametric_expected_nmb",
-      "legacy_curated_value": null,
-      "legacy_curated_value_basis": "",
-      "health_economic_value": -122.0,
-      "monetized_qaly_value": 0.0,
-      "event_probability": null,
-      "effect_size": null,
-      "adherence": null,
-      "horizon_years": null,
-      "pool_target": "",
-      "is_monetized": true,
-      "reason_not_monetized": "",
-      "value_withheld_by_policy": false,
-      "is_hypothetical_or_awareness": false,
-      "is_wgs_only": false,
-      "sources": []
-    },
-    {
       "finding_id": "Coeliac-permissive HLA haplotype (DQ2.5/DQ8) \u2014 serology decision",
       "economic_pathway_id": "haplotype:hla_dqa1_hla_dqb1:coeliac",
       "pathway_id_is_legacy": false,
@@ -1137,7 +1097,7 @@
       "variant": "",
       "category": "Top-Drugs PGx Screen",
       "condition": "",
-      "action_summary": "The Dutch Pharmacogenetics Working Group Guideline for atomoxetine states for CYP2D6 ultrarapid metabolizers, to be alert to reduced efficacy of\u2026",
+      "action_summary": "Genotype-guided prescribing decision for atomoxetine (CYP2D6)",
       "action_caveat": "",
       "evidence_confidence": "",
       "raw_evidence_confidence": "",
@@ -1177,7 +1137,7 @@
       "variant": "",
       "category": "Top-Drugs PGx Screen",
       "condition": "",
-      "action_summary": "Choose an alternative for patients with the SLCO1B1 521 CC or TC (rs4149056) genotype and with ADDITIONAL SIGNIFICANT RISK FACTORS for statin-induced\u2026",
+      "action_summary": "Genotype-guided prescribing decision for atorvastatin (SLCO1B1)",
       "action_caveat": "",
       "evidence_confidence": "",
       "raw_evidence_confidence": "",
@@ -1440,19 +1400,18 @@
     },
     {
       "condition": "Coeliac",
-      "n_contributing_findings": 2,
+      "n_contributing_findings": 1,
       "contributing_findings": [],
       "baseline_risk": 0.2,
-      "naive_additive_rrr": 0.6,
-      "pooled_efficacy_rrr": 0.405,
-      "adherence_adjusted_rrr": 0.2735,
+      "naive_additive_rrr": 0.3,
+      "pooled_efficacy_rrr": 0.3,
+      "adherence_adjusted_rrr": 0.195,
       "adherence": 0.65,
       "adherence_archetype": "adherence_screening",
-      "cost_averted": 396.0,
-      "qaly_gain": 0.0002,
-      "nmb": 90.0,
+      "cost_averted": 283.0,
+      "qaly_gain": 0.0001,
+      "nmb": -29.0,
       "sources": [
-        "Carrier Screening",
         "Gut Health"
       ]
     },
@@ -1562,11 +1521,11 @@
     "psa_available": true,
     "psa_iterations": 1500,
     "n_parameters_varied": 62,
-    "psa_mean_nmb": 34058.0,
-    "psa_mean_incremental_cost": -27742.0,
-    "psa_mean_incremental_qalys": 0.0632,
-    "nmb_ci_low": 14199.0,
-    "nmb_ci_high": 64458.0,
+    "psa_mean_nmb": 33943.0,
+    "psa_mean_incremental_cost": -27631.0,
+    "psa_mean_incremental_qalys": 0.0631,
+    "nmb_ci_low": 14123.0,
+    "nmb_ci_high": 64129.0,
     "probability_cost_effective": 1.0,
     "probability_cost_saving": 1.0,
     "ceac": [
@@ -1606,9 +1565,9 @@
         "tier": "derived",
         "low_value": 60000.0,
         "high_value": 300000.0,
-        "inmb_at_low": 23654,
-        "inmb_at_high": 50595,
-        "base_inmb": 33757,
+        "inmb_at_low": 23535,
+        "inmb_at_high": 50476,
+        "base_inmb": 33637,
         "swing": 26941
       },
       {
@@ -1617,10 +1576,10 @@
         "tier": "assumption",
         "low_value": 0.05,
         "high_value": 0.55,
-        "inmb_at_low": 23183,
-        "inmb_at_high": 45876,
-        "base_inmb": 33757,
-        "swing": 22693
+        "inmb_at_low": 23159,
+        "inmb_at_high": 45702,
+        "base_inmb": 33637,
+        "swing": 22543
       },
       {
         "parameter": "marginal_cost_fraction",
@@ -1628,10 +1587,10 @@
         "tier": "derived",
         "low_value": 0.4,
         "high_value": 0.8,
-        "inmb_at_low": 23401,
-        "inmb_at_high": 44112,
-        "base_inmb": 33757,
-        "swing": 20711
+        "inmb_at_low": 23320,
+        "inmb_at_high": 43955,
+        "base_inmb": 33637,
+        "swing": 20635
       },
       {
         "parameter": "baseline_event_probability",
@@ -1639,10 +1598,10 @@
         "tier": "assumption",
         "low_value": 0.05,
         "high_value": 0.45,
-        "inmb_at_low": 28222,
-        "inmb_at_high": 42981,
-        "base_inmb": 33757,
-        "swing": 14759
+        "inmb_at_low": 28192,
+        "inmb_at_high": 42712,
+        "base_inmb": 33637,
+        "swing": 14520
       },
       {
         "parameter": "adherence_screening",
@@ -1650,10 +1609,10 @@
         "tier": "assumption",
         "low_value": 0.45,
         "high_value": 0.85,
-        "inmb_at_low": 27200,
-        "inmb_at_high": 40019,
-        "base_inmb": 33757,
-        "swing": 12819
+        "inmb_at_low": 27111,
+        "inmb_at_high": 39875,
+        "base_inmb": 33637,
+        "swing": 12764
       },
       {
         "parameter": "intervention_cost_standard",
@@ -1661,9 +1620,9 @@
         "tier": "derived",
         "low_value": 100.0,
         "high_value": 2000.0,
-        "inmb_at_low": 36377,
-        "inmb_at_high": 23932,
-        "base_inmb": 33757,
+        "inmb_at_low": 36257,
+        "inmb_at_high": 23812,
+        "base_inmb": 33637,
         "swing": 12445
       },
       {
@@ -1672,10 +1631,10 @@
         "tier": "assumption",
         "low_value": 5.0,
         "high_value": 30.0,
-        "inmb_at_low": 36620,
-        "inmb_at_high": 24203,
-        "base_inmb": 33757,
-        "swing": 12417
+        "inmb_at_low": 36491,
+        "inmb_at_high": 24115,
+        "base_inmb": 33637,
+        "swing": 12376
       },
       {
         "parameter": "coi_mace",
@@ -1683,9 +1642,9 @@
         "tier": "derived",
         "low_value": 40000.0,
         "high_value": 150000.0,
-        "inmb_at_low": 29834,
-        "inmb_at_high": 39423,
-        "base_inmb": 33757,
+        "inmb_at_low": 29715,
+        "inmb_at_high": 39304,
+        "base_inmb": 33637,
         "swing": 9589
       },
       {
@@ -1694,10 +1653,10 @@
         "tier": "published",
         "low_value": 0.0,
         "high_value": 0.05,
-        "inmb_at_low": 39703,
-        "inmb_at_high": 30334,
-        "base_inmb": 33757,
-        "swing": 9369
+        "inmb_at_low": 39564,
+        "inmb_at_high": 30226,
+        "base_inmb": 33637,
+        "swing": 9338
       },
       {
         "parameter": "correlated_signal_penalty",
@@ -1705,30 +1664,30 @@
         "tier": "assumption",
         "low_value": 0.25,
         "high_value": 0.8,
-        "inmb_at_low": 30141,
-        "inmb_at_high": 38250,
-        "base_inmb": 33757,
-        "swing": 8109
+        "inmb_at_low": 30081,
+        "inmb_at_high": 38059,
+        "base_inmb": 33637,
+        "swing": 7978
       }
     ],
     "evpi": {
       "available": true,
-      "evpi": 473,
-      "nb_current_information": 48585,
-      "nb_perfect_information": 49058,
-      "share_of_information_captured": 0.99,
-      "prob_decision_reversal": 0.898,
+      "evpi": 431,
+      "nb_current_information": 48503,
+      "nb_perfect_information": 48933,
+      "share_of_information_captured": 0.991,
+      "prob_decision_reversal": 0.872,
       "decision_robust": true,
       "interpretation": "EVPI is the maximum ANY further research could be worth \u2014 the value of resolving all remaining uncertainty. It is small here, which is itself the finding: the recommended actions stay optimal across essentially the whole uncertainty range, so the decisions are robust and more data would not change them. Low EVPI means 'act', not 'the analysis is weak'.",
       "src": "Raiffa & Schlaifer (1961); Claxton (1999), J. Health Econ."
     },
     "evppi": {
       "available": true,
-      "baseline_nb": 48705,
+      "baseline_nb": 48678,
       "by_parameter": [
         {
           "parameter": "willingness_to_pay",
-          "evppi": 6
+          "evppi": 9
         }
       ],
       "highest_value_parameter": "willingness_to_pay",
@@ -1739,13 +1698,13 @@
     "note": "Parameters without a published spread are held fixed; the interval below therefore understates true uncertainty rather than overstating it."
   },
   "corrections": {
-    "naive_cost_averted": 70404.0,
-    "pooled_cost_averted": 31067.0,
-    "duplicate_signal_removed": 39337.0,
-    "duplicate_signal_pct": 55.9,
-    "efficacy_cost_averted": 50770.0,
-    "effectiveness_cost_averted": 31067.0,
-    "adherence_reduction": 19703.0,
+    "naive_cost_averted": 69970.0,
+    "pooled_cost_averted": 30953.0,
+    "duplicate_signal_removed": 39016.0,
+    "duplicate_signal_pct": 55.8,
+    "efficacy_cost_averted": 50618.0,
+    "effectiveness_cost_averted": 30953.0,
+    "adherence_reduction": 19664.0,
     "adherence_qaly_reduction": 0.0413,
     "adherence_pct_of_benefit_lost": 39.7,
     "marginal_cost_fraction": 0.6,
@@ -2270,13 +2229,13 @@
     },
     "societal": {
       "healthcare_sector": {
-        "cost_averted": 31067,
+        "cost_averted": 30953,
         "qaly_gained": 0.0626,
         "monetised_health": 6260,
         "note": "Payer/provider costs only \u2014 the reference case."
       },
       "societal": {
-        "cost_averted": 33473,
+        "cost_averted": 33359,
         "qaly_gained": 0.0626,
         "monetised_health": 6260,
         "note": "Adds productivity and unpaid caregiving, itemised below."
@@ -2569,9 +2528,9 @@
     },
     "real_options": {
       "available": true,
-      "value_test_now": 48001,
+      "value_test_now": 48324,
       "optimal_defer_years": 0,
-      "value_at_optimum": 48001,
+      "value_at_optimum": 48324,
       "option_value_of_waiting": 0,
       "recommendation": "test now \u2014 waiting forfeits more value than the price decline recovers",
       "assumed_cost_decline": 0.1,
@@ -2579,39 +2538,39 @@
       "schedule": [
         {
           "defer_years": 0,
-          "net_value": 48001,
+          "net_value": 48324,
           "test_cost_then": 300,
-          "interpretable_value_then": 48301
+          "interpretable_value_then": 48624
         },
         {
           "defer_years": 1,
-          "net_value": 45694,
+          "net_value": 46001,
           "test_cost_then": 270,
-          "interpretable_value_then": 47335
+          "interpretable_value_then": 47652
         },
         {
           "defer_years": 2,
-          "net_value": 43478,
+          "net_value": 43770,
           "test_cost_then": 243,
-          "interpretable_value_then": 46369
+          "interpretable_value_then": 46679
         },
         {
           "defer_years": 3,
-          "net_value": 41350,
+          "net_value": 41628,
           "test_cost_then": 219,
-          "interpretable_value_then": 45403
+          "interpretable_value_then": 45707
         },
         {
           "defer_years": 4,
-          "net_value": 39307,
+          "net_value": 39571,
           "test_cost_then": 197,
-          "interpretable_value_then": 44437
+          "interpretable_value_then": 44734
         },
         {
           "defer_years": 5,
-          "net_value": 37346,
+          "net_value": 37596,
           "test_cost_then": 177,
-          "interpretable_value_then": 43471
+          "interpretable_value_then": 43762
         }
       ],
       "src": "Dixit & Pindyck (1994), Investment under Uncertainty",
@@ -2619,26 +2578,26 @@
     },
     "risk_preferences": {
       "available": true,
-      "mean": 48001,
-      "sd": 11646,
+      "mean": 48324,
+      "sd": 11733,
       "wealth_base": 60000.0,
       "by_gamma": [
         {
           "gamma": 1.0,
-          "certainty_equivalent": 47373,
-          "risk_premium": 628,
+          "certainty_equivalent": 47689,
+          "risk_premium": 635,
           "label": "log utility (mild)"
         },
         {
           "gamma": 2.0,
-          "certainty_equivalent": 46745,
-          "risk_premium": 1256,
+          "certainty_equivalent": 47053,
+          "risk_premium": 1271,
           "label": "moderate"
         },
         {
           "gamma": 4.0,
-          "certainty_equivalent": 45489,
-          "risk_premium": 2512,
+          "certainty_equivalent": 45782,
+          "risk_premium": 2542,
           "label": "high risk aversion"
         }
       ],
@@ -2646,13 +2605,13 @@
     },
     "behavioural": {
       "available": true,
-      "prospect_theory_value": 26133,
+      "prospect_theory_value": 26311,
       "loss_aversion_lambda": 2.25,
       "probability_weight_applied": 0.611,
-      "pv_exponential": 31361,
-      "pv_hyperbolic": 21953,
+      "pv_exponential": 31572,
+      "pv_hyperbolic": 22101,
       "present_bias_beta": 0.7,
-      "adoption_gap": 9408,
+      "adoption_gap": 9472,
       "interpretation": "Under prospect theory the certain, up-front test cost is felt ~2.25x more than an equivalent uncertain future health gain, and present bias further discounts prevention that pays off decades away. Together these explain why a test with clearly positive expected value still goes unbought \u2014 an adoption problem, not a valuation problem.",
       "src": "Kahneman & Tversky (1979); Tversky & Kahneman (1992); Laibson (1997)"
     },
@@ -2661,7 +2620,7 @@
       "adverse_selection_note": "Private knowledge of elevated risk without insurer knowledge creates adverse selection (Akerlof 1970; Rothschild\u2013Stiglitz 1976).",
       "discrimination_note": "Where insurers can underwrite on genotype, the fear of discrimination suppresses testing \u2014 information that is socially valuable goes unacquired. In the US, GINA (2008) restricts health-insurance and employment use but NOT life, disability, or long-term-care insurance.",
       "privacy_as_economic_design": "Local-only analysis is an economic design choice, not just a privacy one: it lets the individual capture the decision value of the information without disclosing it into a market that would price against them.",
-      "chilling_effect_cost": "If disclosure risk deters testing, the social loss is on the order of the foregone value of information \u2014 here modelled at $48,001 per person, with a research ceiling (EVPI) of $473.",
+      "chilling_effect_cost": "If disclosure risk deters testing, the social loss is on the order of the foregone value of information \u2014 here modelled at $48,324 per person, with a research ceiling (EVPI) of $431.",
       "src": "Akerlof (1970); Rothschild & Stiglitz (1976); GINA (2008)"
     },
     "genomic_corrections": {
@@ -2837,19 +2796,19 @@
       "member_population": 100000,
       "scope": "100,000 members with this genomic profile, each finding weighted by its population frequency",
       "scope_note": "This is a projection from one genome, not a plan actuarial estimate: a real plan's members carry different variants. It answers 'what would a cohort like this person look like', which is the question a payer asks about a screening programme, and it is proportional to the clinic block above by design.",
-      "intervention_events_note": "527,932 intervention-events across 100,000 members: each finding is counted once per member who carries it, and one member can carry several. The prevalences sum past 1.0, so the event count exceeds the headcount \u2014 it is a count of actions, not of people.",
-      "n_findings": 28,
-      "intervention_events": 527932,
+      "intervention_events_note": "497,932 intervention-events across 100,000 members: each finding is counted once per member who carries it, and one member can carry several. The prevalences sum past 1.0, so the event count exceeds the headcount \u2014 it is a count of actions, not of people.",
+      "n_findings": 27,
+      "intervention_events": 497932,
       "unique_members_affected": 100000,
       "prevalence_sum_exceeds_cohort": true,
-      "total_intervention_cost": 79354688,
-      "total_cost_averted": 710707470,
-      "total_qalys": 22698.3,
-      "incremental_cost": -631352782,
+      "total_intervention_cost": 78394688,
+      "total_cost_averted": 709447470,
+      "total_qalys": 22608.3,
+      "incremental_cost": -631052782,
       "dominant": true,
       "cost_per_qaly": null,
       "cost_per_qaly_note": "suppressed \u2014 the strategy is modelled as dominant (frees more cash than it costs), and a ratio in that quadrant is ambiguous",
-      "net_cash": 631352782,
+      "net_cash": 631052782,
       "per_finding": [
         {
           "finding": "NAT2 \u2014 NAT2 slow acetylator \u2014 occupational cancer risk awareness",
@@ -2972,14 +2931,6 @@
           "total_qalys": 45.0
         },
         {
-          "finding": "HLA-DQ2/DQ8 carrier \u2014 celiac rule-out capability",
-          "affected_members": 30000,
-          "adherence": 0.65,
-          "total_cost": 960000,
-          "total_benefit": 1260000,
-          "total_qalys": 90.0
-        },
-        {
           "finding": "CYP2D6 Intermediate Metabolizer (IM) (codeine / antidepressants)",
           "affected_members": 30000,
           "adherence": 0.5,
@@ -3010,22 +2961,30 @@
           "total_cost": 21000,
           "total_benefit": 326100,
           "total_qalys": 11.97
+        },
+        {
+          "finding": "OPRM1 \u2014 Opioid-response pharmacogenomic variant",
+          "affected_members": 5000,
+          "adherence": 0.35,
+          "total_cost": 175000,
+          "total_benefit": 0,
+          "total_qalys": 0.0
         }
       ],
       "legacy": {
-        "total_intervention_cost": 164288750,
-        "total_benefit": 2977760375,
-        "total_qalys": 56652.1,
-        "intervention_events": 528932,
-        "cost_per_qaly": 2900,
+        "total_intervention_cost": 162788750,
+        "total_benefit": 2975300375,
+        "total_qalys": 56532.1,
+        "intervention_events": 498932,
+        "cost_per_qaly": 2880,
         "cost_per_qaly_was": "gross intervention spend divided by QALYs \u2014 no cost offsets and no comparator, so not an ICER despite being labelled one"
       },
-      "benefit_reduction": 2267052905,
-      "benefit_reduction_pct": 76.1,
+      "benefit_reduction": 2265852905,
+      "benefit_reduction_pct": 76.2,
       "correction": {
         "marginal_cost_fraction": 0.6,
         "midpoint_discount": 0.8626,
-        "mean_adherence": 0.5,
+        "mean_adherence": 0.494,
         "n_excluded_not_valued": 0,
         "pooling_applied": true,
         "n_pooled_targets": 4,
@@ -3035,8 +2994,8 @@
           "OPRM1",
           "SLCO1B1"
         ],
-        "n_findings_before_pooling": 28,
-        "n_registry_anchored": 10,
+        "n_findings_before_pooling": 27,
+        "n_registry_anchored": 9,
         "n_curated_basis": 18,
         "anchored_conditions": [
           "BreastOvarian",
@@ -3048,11 +3007,11 @@
         "note": "Cohort figures apply the marginal-cost fraction, midpoint discounting, real-world adherence and correlated-target pooling that the individual sheet applies. Earlier versions of this block applied none of them and reported an undiscounted, unpooled, full-adherence sum."
       },
       "affected_members": 100000,
-      "total_cost": 79354688,
-      "total_benefit": 710707470,
+      "total_cost": 78394688,
+      "total_benefit": 709447470,
       "roi": 9.0,
-      "net_savings": 631352782,
-      "summary": "Across 100,000 members: 100,000 members affected across 527,932 intervention-events, cost $79,354,688, cost averted $710,707,470, 22,698.3 QALYs. Corrections removed $2,267,052,905 (76.1%)."
+      "net_savings": 631052782,
+      "summary": "Across 100,000 members: 100,000 members affected across 497,932 intervention-events, cost $78,394,688, cost averted $709,447,470, 22,608.3 QALYs. Corrections removed $2,265,852,905 (76.2%)."
     }
   },
   "plain_language": {
@@ -3098,20 +3057,20 @@
         "plain": "If the model's assumptions hold, roughly 1 in 6 people with this pattern of results would avoid heart attack or stroke by acting on it."
       },
       {
-        "condition": "Coeliac",
-        "condition_plain": "Coeliac",
-        "absolute_risk_reduction": 0.0547,
-        "number_needed_to_screen": 18,
-        "baseline_is_assumed": true,
-        "plain": "If the model's assumptions hold, roughly 1 in 18 people with this pattern of results would avoid Coeliac by acting on it."
-      },
-      {
         "condition": "Autoimmune",
         "condition_plain": "an autoimmune condition",
         "absolute_risk_reduction": 0.039,
         "number_needed_to_screen": 26,
         "baseline_is_assumed": true,
         "plain": "If the model's assumptions hold, roughly 1 in 26 people with this pattern of results would avoid an autoimmune condition by acting on it."
+      },
+      {
+        "condition": "Coeliac",
+        "condition_plain": "Coeliac",
+        "absolute_risk_reduction": 0.039,
+        "number_needed_to_screen": 26,
+        "baseline_is_assumed": true,
+        "plain": "If the model's assumptions hold, roughly 1 in 26 people with this pattern of results would avoid Coeliac by acting on it."
       },
       {
         "condition": "Pathogenic",
@@ -3191,7 +3150,7 @@
       }
     ],
     "what_would_change_it": "A meaningful share of this answer rests on judgement rather than published evidence. The direction is more trustworthy than the exact numbers.",
-    "assumption_share": 47.2,
+    "assumption_share": 47.1,
     "bottom_line": "Worth doing \u2014 and it saves money. About 23 extra days of healthy life, on average. In about 100 of every 100 runs of the model, acting was worth it.",
     "disclaimer": "These are model estimates for someone with your genetic results, using population-average figures. They are not medical advice, not a prediction about you specifically, and not a substitute for talking to a clinician."
   },
@@ -3233,7 +3192,7 @@
     {
       "check": "Pooling reduces rather than inflates the total",
       "pass": true,
-      "detail": "pooled $31,067 vs naive $70,404"
+      "detail": "pooled $30,953 vs naive $69,970"
     },
     {
       "check": "Cross-validation: statin primary prevention ICER is plausible",
@@ -3280,13 +3239,13 @@
     {
       "severity": "INFO",
       "check": "Deterministic vs probabilistic NMB",
-      "detail": "reference-case NMB is $33,757; the mean across 1,500 probabilistic simulations is $34,058. Both are correct. Neither may be labelled 'Net monetary benefit' without a qualifier",
+      "detail": "reference-case NMB is $33,637; the mean across 1,500 probabilistic simulations is $33,943. Both are correct. Neither may be labelled 'Net monetary benefit' without a qualifier",
       "field": "reference_case.nmb vs uncertainty.psa_mean_nmb"
     },
     {
       "severity": "INFO",
       "check": "Per-finding vs pooled totals",
-      "detail": "per-finding values sum to $48,032; the pooled condition results sum to $34,056. Correlated findings are combined on the risk scale and each condition is charged one cost of illness, so per-finding values are not additive and must not be presented as though they were",
+      "detail": "per-finding values sum to $48,154; the pooled condition results sum to $33,937. Correlated findings are combined on the risk scale and each condition is charged one cost of illness, so per-finding values are not additive and must not be presented as though they were",
       "field": "findings vs condition_results"
     }
   ]
