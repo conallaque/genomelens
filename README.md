@@ -9,9 +9,9 @@ entirely on your own machine.
 
 ### 📄 [See the full report → `docs/samples/econ-output-sample.pdf`](docs/samples/econ-output-sample.pdf)
 
-[<img src="docs/samples/econ-output-sample-p1.png" width="420" alt="Page one of the sample economics report: incremental QALYs, incremental healthcare cost, net monetary benefit and the findings that drive them">](docs/samples/econ-output-sample.pdf)
+[<img src="docs/samples/econ-output-sample-summary.png" width="460" alt="Summary sheet of the sample economics report: health gain in days, healthcare cost change, modelled net benefit, decision uncertainty, and the findings ranked by expected net monetary benefit">](docs/samples/econ-output-sample.pdf)
 
-*Eleven pages, generated from a synthetic genome. Click through for the rest.*
+*The summary sheet. Eleven pages in all, generated from a synthetic genome — click through for the rest.*
 
 **What it can be trusted to do, and the evidence.** Findings first, economics
 second: what was found, what it could change, how strong the evidence is, and
