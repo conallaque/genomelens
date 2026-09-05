@@ -117,13 +117,19 @@ h2.sec{font-size:20px;font-weight:700;color:var(--teal-900);margin:0;
 .mcard{border:1px solid var(--mint-line);background:var(--mint);
   border-radius:13px;padding:15px 16px 13px;break-inside:avoid;
   page-break-inside:avoid;display:flex;flex-direction:column}
+/* 2.9em, not 2.6. At 9.5px/1.4 a two-line label is 26.6px while the old
+   reserve was 24.7px, so "Healthcare cost change" overflowed it and sat
+   its value 2px below the other three. The reserve exists to line the
+   four figures up, so it has to clear the tallest label. */
 .mcard .lbl{font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;
-  font-weight:800;color:var(--ink-3);line-height:1.4;min-height:2.6em}
+  font-weight:800;color:var(--ink-3);line-height:1.4;min-height:2.9em}
 .mcard .val{font-size:29px;font-weight:750;letter-spacing:-.03em;
   line-height:1.08;color:var(--teal-900);margin-top:2px}
 .mcard .val.pos{color:var(--green)}
 .mcard .val.neg{color:var(--red)}
 .mcard .val.sm{font-size:19px;line-height:1.2;letter-spacing:-.02em}
+.mcard .unit{font-size:10.5px;font-weight:600;color:var(--ink-2);
+  line-height:1.35;margin-top:5px;letter-spacing:.005em}
 .mcard .cap{font-size:11px;color:var(--ink-2);line-height:1.5;margin-top:8px}
 
 /* breadth banner */
@@ -537,19 +543,22 @@ def render_page_one(p: EconomicsReportPayload) -> str:
   adherence and the real cost of acting are all accounted for.</p>
 
   <div class="metrics">
-    <div class="mcard"><div class="lbl">Incremental QALYs</div>
-      <div class="val pos">{fmt.qaly(r.incremental_qalys)}</div>
-      <div class="cap">about {fmt.healthy_days(r.incremental_qalys)} of healthy
-        life, on average, for a person with this pattern of findings</div></div>
-    <div class="mcard"><div class="lbl">Incremental healthcare cost</div>
+    <div class="mcard"><div class="lbl">Health gain</div>
+      <div class="val pos">~{fmt.healthy_days(r.incremental_qalys)}</div>
+      <div class="unit">{fmt.qaly(r.incremental_qalys)} incremental QALYs</div>
+      <div class="cap">of healthy life, on average, for a person with this
+        pattern of findings</div></div>
+    <div class="mcard"><div class="lbl">Healthcare cost change</div>
       <div class="val {'pos' if r.incremental_cost < 0 else 'neg'}"
         >{fmt.signed_money(r.incremental_cost)}</div>
-      <div class="cap">healthcare-sector perspective; negative means the
-        modelled programme saves money</div></div>
-    <div class="mcard"><div class="lbl">Reference-case NMB</div>
+      <div class="unit">healthcare-sector perspective</div>
+      <div class="cap">negative means the modelled programme spends less than
+        usual care</div></div>
+    <div class="mcard"><div class="lbl">Modelled net benefit</div>
       <div class="val">{fmt.money(r.nmb)}</div>
-      <div class="cap">deterministic, at {fmt.money(r.wtp)} per QALY &mdash;
-        health valued at that threshold, not cash</div></div>
+      <div class="unit">reference-case NMB</div>
+      <div class="cap">at {fmt.money(r.wtp)} per QALY. This values health at
+        the threshold; it is not cash.</div></div>
     <div class="mcard"><div class="lbl">Decision uncertainty</div>
       <div class="val sm">{_e(unc_val)}</div>
       <div class="cap">{_e(unc_cap)}</div></div>
