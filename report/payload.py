@@ -824,7 +824,12 @@ def build_report_payload(
             gene=_s(it.get("gene")),
             condition_id=_s(it.get("condition")),
             variant=_s(it.get("variant")),
-            action_summary=_s(it.get("basis")),
+            # The DECISION, not the method. `basis` describes how the figure
+            # was computed ("avoided adverse event x probability of relevant
+            # exposure"), which is not what a reader scanning page 2 needs in a
+            # column headed by the decision. `action` carries the clinical
+            # benefit the finding actually bears on.
+            action_summary=_s(it.get("action")) or _s(it.get("basis")),
             evidence_confidence=normalise_confidence(it.get("confidence")),
             raw_evidence_confidence=_s(it.get("confidence")),
             pricing_path=PricingPath.CURATED_TABLE,

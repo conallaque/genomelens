@@ -2628,7 +2628,7 @@ def analyze_personal_economics(economics_result: dict | None = None,
 
     def add(category, finding, avoided, qaly, intervention, confidence, basis,
             economic_pathway_id="", pathway_id_is_legacy=True,
-            gene="", condition="", variant=""):
+            gene="", condition="", variant="", action=""):
         # IDENTITY, CARRIED NOT RE-DERIVED. `add` used to take no gene, so every
         # record it emitted reached the payload with gene="" and condition_id=""
         # and downstream code recovered identity by sniffing display text —
@@ -2676,6 +2676,12 @@ def analyze_personal_economics(economics_result: dict | None = None,
             "qaly_value": round(qv), "intervention": round(intervention),
             "net": round(avoided + qv - intervention),
             "confidence": confidence, "basis": basis,
+            # THE DECISION THIS FINDING BEARS ON, as opposed to `basis`, which
+            # describes the METHOD used to value it. Page 2 renders the decision
+            # in its middle column; with only `basis` available it fell through
+            # to an em-dash on 42 of 43 findings, so the column that answers
+            # "what would I do about this" was blank for everything.
+            "action": action,
             "adherence": round(_adh, 3),
         })
 
@@ -2747,7 +2753,8 @@ def analyze_personal_economics(economics_result: dict | None = None,
                 economic_pathway_id=f.get("economic_pathway_id", ""),
                 pathway_id_is_legacy=f.get("pathway_id_is_legacy", True),
                 gene=f.get("gene", ""), condition=f.get("condition", ""),
-                variant=f.get("variant", ""))
+                variant=f.get("variant", ""),
+                action=f.get("clinical_benefit", ""))
 
     # ── Blood-work derived ──
     adv = ((bloodwork_result or {}).get("clinical") or {}).get("advanced") or {}

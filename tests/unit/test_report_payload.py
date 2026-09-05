@@ -509,11 +509,21 @@ def test_synthetic_labelling_comes_from_metadata_not_prose():
 
 
 def test_provenance_floor_breach_is_an_error():
+    # The fixture used 74.2%, which became the LIVE value when the floor moved
+    # to 74% — so it stopped being a breach and the test would have passed for
+    # the wrong reason. Pinned below the floor rather than at it.
     p = _coherent()
     p.provenance.registry_n_parameters = 66
-    p.provenance.registry_pct_sourced = 74.2
+    p.provenance.registry_pct_sourced = 70.0
     errs = errors_in(validate_payload(p))
     assert any(e["check"] == "Registry provenance floor" for e in errs)
+
+    # And the live value must NOT breach, or the sample cannot be published.
+    ok = _coherent()
+    ok.provenance.registry_n_parameters = 66
+    ok.provenance.registry_pct_sourced = 74.2
+    assert not [e for e in errors_in(validate_payload(ok))
+                if e["check"] == "Registry provenance floor"]
 
 
 def test_two_provenance_denominators_are_reported_not_merged():
@@ -837,3 +847,52 @@ def test_curated_table_discovery_finds_a_newly_added_table():
         assert ep.count_unregistered_parameters() > 0
     finally:
         del he._SENTINEL_ECONOMICS
+
+
+def test_chip_and_wgs_summaries_are_distinguishable():
+    """The chip/whole-genome contrast is a reported economic result.
+
+    "What does sequencing add over an array" is the question page 7 answers,
+    and it used to be answered with one real artifact plus a population
+    average. `make_econ_sample.py --profiles` runs both committed inputs and
+    reports the marginal figure directly. This pins the two quantities that a
+    reader is most likely to conflate.
+    """
+    import importlib.util
+    import pathlib
+
+    root = pathlib.Path(__file__).resolve().parents[2]
+    spec = importlib.util.spec_from_file_location(
+        "_mk", root / "scripts" / "make_econ_sample.py")
+    mk = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mk)
+
+    assert hasattr(mk, "emit_profiles")
+    assert hasattr(mk, "_summarise")
+
+    # A chip payload reports no sequencing-only findings, by construction.
+    chip = {"metadata": {"input_type": "chip"},
+            "reference_case": {"nmb": 3367.0, "incremental_qalys": 0.0044,
+                               "incremental_cost": -2931.0},
+            "findings": [{"is_monetized": True}],
+            "testing_decision": {"observed_wgs_only_findings": 0,
+                                 "observed_wgs_only_value": 0.0}}
+    s = mk._summarise(chip)
+    assert s["input_type"] == "chip"
+    assert s["observed_wgs_only_findings"] == 0
+    assert s["observed_wgs_only_value"] == 0.0
+
+    # And the two quantities are separate fields, so the report cannot present
+    # the marginal figure as though it were the sequencing-only total.
+    wgs = {"metadata": {"input_type": "wgs"},
+           "reference_case": {"nmb": 21343.0, "incremental_qalys": 0.082,
+                              "incremental_cost": -13146.0},
+           "findings": [{"is_monetized": True}],
+           "testing_decision": {"observed_wgs_only_findings": 4,
+                                "observed_wgs_only_value": 6340.0}}
+    w = mk._summarise(wgs)
+    marginal = w["nmb"] - s["nmb"]
+    assert marginal != w["observed_wgs_only_value"], (
+        "the marginal value of sequencing and the sequencing-only total are "
+        "different quantities; a test that let them coincide would not catch "
+        "one being printed for the other")
