@@ -69,6 +69,69 @@ _DISCLAIMER = (
     "discussed with a board-certified genetic counselor.")
 
 
+
+# ── gene assignment for predicted variants ────────────────────────────────────
+#
+# A predicted variant used to reach the economics with no gene symbol, so every
+# one of them routed to the same generic bucket regardless of where it landed.
+# The gene is recoverable two ways, and they are NOT equally good:
+#
+#   1. UniProt accession, carried in the AlphaMissense row itself. This is a
+#      real assignment: the predictor scored a specific protein and says which.
+#   2. Coordinate falling inside a gene's span. This is a GUESS. Gene spans are
+#      not exon models, so an intronic position, or one inside an overlapping
+#      gene, is assigned confidently and wrongly.
+#
+# Both are recorded, and which one answered is recorded with them, because a
+# reader deciding whether to trust a gene label needs to know whether it came
+# from the predictor or from arithmetic on an interval.
+#
+# The accession map is DERIVED, not transcribed. It comes from joining this
+# repository's own ClinVar and AlphaMissense tables on coordinates and taking
+# the most frequent accession per gene over ~60 supporting positions — first-hit
+# picked a non-canonical MLH1 isoform, majority vote gives P40692. Every entry
+# below reproduces from local data; none is from memory.
+UNIPROT_TO_GENE: dict[str, str] = {
+    'P04114': 'APOB',
+    'P38398': 'BRCA1',
+    'P51587': 'BRCA2',
+    'Q12809': 'KCNH2',
+    'P51787': 'KCNQ1',
+    'P01130': 'LDLR',
+    'P40692': 'MLH1',
+    'P43246': 'MSH2',
+    'P52701': 'MSH6',
+    'Q14896': 'MYBPC3',
+    'P12883': 'MYH7',
+    'Q86YC2': 'PALB2',
+    'Q8NBP7': 'PCSK9',
+    'P54278': 'PMS2',
+    'P06400': 'RB1',
+    'P07949': 'RET',
+    'Q14524': 'SCN5A',
+    'P04637': 'TP53',
+}
+
+
+def gene_for_uniprot(uniprot: str) -> str:
+    """Gene symbol for a UniProt accession, or "" if it is not one we anchor."""
+    return UNIPROT_TO_GENE.get((uniprot or "").strip().upper(), "")
+
+
+def _window_gene(build: str, chrom: str, pos: int) -> str:
+    """Gene whose span contains this position, or "". A guess, not an assignment."""
+    try:
+        from core.genome_input import _build_acmg_index
+    except Exception:
+        return ""
+    idx = _build_acmg_index(build)
+    c = chrom[3:] if str(chrom).lower().startswith("chr") else str(chrom)
+    for (start, end, gene) in idx.get(c, ()):
+        if start <= int(pos) <= end:
+            return gene
+    return ""
+
+
 # ── predictor registry ────────────────────────────────────────────────────────
 
 # Filename tokens that identify which reference build a predictor table is keyed
@@ -242,6 +305,7 @@ def _parse_alphamissense(rows, ref, alt):
     pathogenicity (returned as a (score, class) tuple)."""
     best_s: float | None = None
     best_c = ""
+    best_u = ""
     for c in rows:
         if len(c) < 10 or c[2].upper() != ref or c[3].upper() != alt:
             continue
@@ -250,10 +314,14 @@ def _parse_alphamissense(rows, ref, alt):
         except ValueError:
             continue
         if best_s is None or s > best_s:
-            best_s, best_c = s, c[9]
+            # The UniProt accession travels with the score. It was being read
+            # past and dropped, which is why a predicted variant reached the
+            # economics anonymous: the predictor knew which protein it had
+            # scored and nothing asked.
+            best_s, best_c, best_u = s, c[9], c[5]
     if best_s is None:
         return None
-    return (best_s, best_c)
+    return (best_s, best_c, best_u)
 
 
 def _parse_revel(rows, ref, alt):
@@ -449,7 +517,7 @@ def analyze_novel_variants(vcf_path: str, build: str,
                             "ref": ref.upper(), "alt": alt, "zygosity": zyg})
                 findings.append(rec)
 
-    result = _classify(findings, n_scanned, n_queried, gnomad_present)
+    result = _classify(findings, n_scanned, n_queried, gnomad_present, build)
     result["predictors_used"] = [{"name": p.name, "license": p.license,
                                   "commercial_ok": p.commercial_ok,
                                   "table_build": p.build,
@@ -473,13 +541,14 @@ def _score_variant(predictors: list[Predictor], chrom, pos, ref, alt) -> dict | 
     """Query every predictor; return a finding dict only if the ensemble flags the
     variant as damaging or splice-altering. Otherwise None."""
     am_score = am_class = None
+    uniprot = ""
     revel = cadd = splice = af = None
     for p in predictors:
         v = p.lookup(chrom, pos, ref, alt)
         if v is None:
             continue
         if p.name == "AlphaMissense":
-            am_score, am_class = v
+            am_score, am_class, uniprot = v
         elif p.name == "REVEL":
             revel = v
         elif p.name == "CADD":
@@ -503,7 +572,7 @@ def _score_variant(predictors: list[Predictor], chrom, pos, ref, alt) -> dict | 
         return None
 
     return {
-        "am_score": am_score, "am_class": am_class,
+        "am_score": am_score, "am_class": am_class, "uniprot": uniprot,
         "revel": revel, "cadd_phred": cadd, "spliceai_delta": splice,
         "gnomad_af": af, "consensus": missense_hits,
         "n_missense_hits": len(missense_hits), "splice_hit": splice_hit,
@@ -533,7 +602,7 @@ def _confidence(rec: dict) -> str:
 
 
 def _classify(findings: list[dict], n_scanned: int, n_queried: int,
-              gnomad_present: bool) -> dict:
+              gnomad_present: bool, build: str = "") -> dict:
     buckets: dict[str, list[dict]] = {
         "predicted_splice_disrupting": [], "predicted_pathogenic_rare": [],
         "predicted_pathogenic_uncommon": [], "predicted_pathogenic_common": [],
@@ -543,7 +612,21 @@ def _classify(findings: list[dict], n_scanned: int, n_queried: int,
         rar = _rarity(f.get("gnomad_af"))
         f["rarity"] = rar
         f["confidence"] = _confidence(f)
+        # GENE ASSIGNMENT, WITH ITS PROVENANCE. The UniProt accession comes
+        # from the predictor and names the protein it actually scored; a
+        # coordinate falling inside a gene's span is a guess, because spans are
+        # not exon models. Both are usable, they are not equally trustworthy,
+        # and which one answered is recorded so a reader can tell.
+        if not f.get("gene"):
+            g = gene_for_uniprot(f.get("uniprot", ""))
+            if g:
+                f["gene"], f["gene_basis"] = g, "uniprot_accession"
+            else:
+                g = _window_gene(build, f.get("chrom", ""), f.get("pos", 0))
+                if g:
+                    f["gene"], f["gene_basis"] = g, "coordinate_window"
         f["gene"] = f.get("gene", "")
+        f.setdefault("gene_basis", "unassigned")
         parts = []
         if f.get("am_class"):
             parts.append(f"AlphaMissense {f['am_class'].replace('_', ' ')} "

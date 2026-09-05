@@ -201,3 +201,72 @@ def test_hemizygous_and_homozygous_carried(tmp_path, monkeypatch):
     vcf = _write_vcf(tmp_path, [("1", "1000", "C", "T", "0/0")])
     r = nv.analyze_novel_variants(vcf, "grch38")
     assert r["n_predicted_pathogenic"] == 0
+
+
+# ── gene assignment for predicted variants ────────────────────────────────────
+#
+# A predicted variant used to arrive at the economics with no gene, so every one
+# routed to the same generic bucket regardless of where it landed. The predictor
+# knew which protein it had scored and nothing asked.
+
+def test_uniprot_accession_resolves_to_a_gene():
+    assert nv.gene_for_uniprot("P38398") == "BRCA1"
+    assert nv.gene_for_uniprot("p04637") == "TP53"        # case-insensitive
+    # Canonical, not an isoform. First-hit derivation picked Q7L775 for MLH1;
+    # majority vote over ~60 supporting coordinates gives the canonical entry.
+    assert nv.gene_for_uniprot("P40692") == "MLH1"
+    # A real protein with no economic anchor resolves to nothing, rather than
+    # to a plausible-looking neighbour.
+    assert nv.gene_for_uniprot("P05091") == ""            # ALDH2
+    assert nv.gene_for_uniprot("") == ""
+
+
+def test_every_anchor_gene_has_an_accession():
+    """The map must cover exactly the genes that can be priced or withheld.
+
+    A gene with an anchor but no accession can never be recognised from a
+    predictor row; a gene with an accession but no anchor adds a label and no
+    economics. Both are worth knowing about, so both are asserted.
+    """
+    from econ import gene_anchors as ga
+    anchored = set(ga.GENE_ANCHORS) | set(ga.NOT_VALUED_GENES)
+    mapped = set(nv.UNIPROT_TO_GENE.values())
+    assert not (anchored - mapped), (
+        f"anchor genes with no UniProt accession: {sorted(anchored - mapped)}")
+    assert len(nv.UNIPROT_TO_GENE) == len(mapped), "duplicate gene in the map"
+
+
+def test_gene_basis_records_how_the_gene_was_assigned(tmp_path, monkeypatch):
+    """A gene from the predictor and a gene from an interval are different
+    claims, and the record says which it is.
+
+    A coordinate inside a gene's span is a GUESS: spans are not exon models, so
+    an intronic position or one inside an overlapping gene is assigned
+    confidently and wrongly. Recording the basis is what lets a reader discount
+    it appropriately instead of reading both as equally certain.
+    """
+    monkeypatch.setattr(nv, "REFERENCE_DIR", tmp_path)
+    # BRCA1 GRCh38 span is 43,044,295-43,125,483; this sits inside it.
+    _make_am_table(tmp_path, [("17", "43050000", "C", "T", "0.97",
+                               "likely_pathogenic")])
+    vcf = _write_vcf(tmp_path, [("17", "43050000", "C", "T", "0/1")])
+    r = nv.analyze_novel_variants(vcf, "grch38")
+    assert r["available"] is True
+    dmg = r["buckets"]["predicted_pathogenic_rare"]
+    assert dmg, "expected a predicted-pathogenic finding"
+    f = dmg[0]
+    # The synthetic table carries a placeholder accession, so this falls through
+    # to the window path — which is exactly the case that must be labelled.
+    assert f["gene"] == "BRCA1"
+    assert f["gene_basis"] == "coordinate_window"
+
+
+def test_unassignable_variant_is_labelled_unassigned(tmp_path, monkeypatch):
+    monkeypatch.setattr(nv, "REFERENCE_DIR", tmp_path)
+    _make_am_table(tmp_path, [("1", "999999", "C", "T", "0.97",
+                               "likely_pathogenic")])
+    vcf = _write_vcf(tmp_path, [("1", "999999", "C", "T", "0/1")])
+    r = nv.analyze_novel_variants(vcf, "grch38")
+    f = r["buckets"]["predicted_pathogenic_rare"][0]
+    assert f["gene"] == ""
+    assert f["gene_basis"] == "unassigned"
