@@ -50,6 +50,7 @@ from dataclasses import dataclass
 
 __all__ = [
     "CURATED_SOURCE_IDS",
+    "DEFAULT_SEED",
     "PARAMS",
     "TIERS",
     "Param",
@@ -67,6 +68,23 @@ __all__ = [
     "validate_registry",
     "value",
 ]
+
+
+# ── determinism ───────────────────────────────────────────────────────────────
+#
+# ONE SEED, NAMED ONCE. Six different magic numbers used to sit in six default
+# arguments — 20260822, 20260823, 90210, 4242, 777, 12345 — so "is this run
+# deterministic, and by what" could only be answered by grepping. The sample
+# artifacts committed to this repository are byte-identical between runs BY
+# DESIGN: a committed demo that changed every time it was regenerated could not
+# be diffed, and a reader could not tell a real change from sampling noise.
+#
+# Determinism is not a claim about certainty. The probabilistic analysis varies
+# 61 parameters per draw; fixing the seed fixes WHICH draws are taken, not
+# whether they vary. Two different seeds must give different answers, and
+# `test_different_seeds_give_different_results` asserts exactly that — the half
+# of the property that would actually catch a regression to pinned parameters.
+DEFAULT_SEED = 20260822
 
 TIERS = ("published", "derived", "assumption")
 
@@ -652,6 +670,26 @@ _REGISTRY: list[Param] = [
             "category — so this is a judgement about what a cautious "
             "confirmatory workup would cost.",
        dist="gamma", low=200.0, high=3_000.0),
+
+    _p("predictor_ppv_no_clinvar", 0.20, "probability", "assumption",
+       note="Probability that a variant flagged pathogenic by a sequence "
+            "model, with no ClinVar assertion, is genuinely pathogenic. This "
+            "is what separates a prediction from a finding: ACMG/AMP treats "
+            "in-silico evidence as PP3 — supporting strength only, never "
+            "sufficient alone to classify a variant — so a predictor call "
+            "cannot carry the same weight as a curated assertion. Published "
+            "predictor precision is measured on ClinVar-enriched benchmark "
+            "sets; in opportunistic screening the prior that a rare missense "
+            "in a disease gene is truly pathogenic is low, so the screening "
+            "PPV sits well below benchmark precision. PPV also depends on the "
+            "prior probability of pathogenicity in context, so any single "
+            "fixed value is itself an assumption. No population-screening PPV "
+            "is available to cite, so this is judgement, not an "
+            "epidemiological estimate, and the range spans mostly-false-"
+            "positive to near-even odds rather than defending the point "
+            "value. It gates the entire predicted-variant pathway, so it is "
+            "varied widely in sensitivity analysis.",
+       dist="beta", low=0.05, high=0.50),
 
     # ── Penetrance / ascertainment ────────────────────────────────────────
     _p("ascertainment_shrinkage", 0.60, "multiplier on penetrance", "derived",

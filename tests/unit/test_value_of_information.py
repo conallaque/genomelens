@@ -296,11 +296,87 @@ def test_welfare_access_channel_is_positive():
     assert w["social_surplus_local"] > w["social_surplus_central"]
 
 
-def test_predicted_variant_downweighted():
-    # A high-AM predicted variant should still contribute less than a confirmed
-    # ClinVar-actionable finding of similar condition (haircut applied).
-    r = voi.analyze_value_of_information(_econ(), _cvr(), _nvr(),
+def _nvr_gene(gene="BRCA1", **kw):
+    """A predicted-pathogenic variant IN A NAMED GENE.
+
+    `_nvr()` carries no gene, so before this fixture existed the gene-anchored
+    branch of the predicted-variant path had no test at all — which is part of
+    why it routed every prediction to one generic bucket unnoticed. The
+    gene-less fixture is kept as its own case below, because the two exercise
+    different paths.
+    """
+    f = {"chrom": "17", "pos": 43045711, "am_score": 0.95,
+         "confidence": "higher", "gene": gene}
+    f.update(kw)
+    return {"available": True, "buckets": {"predicted_pathogenic_rare": [f]}}
+
+
+def test_predicted_variant_in_anchored_gene_is_priced_and_downweighted():
+    r = voi.analyze_value_of_information(_econ(), None, _nvr_gene(),
                                         input_type="wgs", n_mc=200)
-    labels = {row["label"]: row["nmb"] for row in r["nmb_rows"]}
-    pred = [v for k, v in labels.items() if "predicted" in k]
-    assert pred, "predicted finding should appear in the NMB table"
+    pred = [row for row in r["nmb_rows"] if "predicted" in row["label"]]
+    assert pred, "an anchored predicted finding must reach the NMB table"
+
+
+def test_predicted_variant_without_an_anchor_is_reported_not_priced():
+    # PATH C. `_nvr()` names no gene, so there is no condition anchor. It must
+    # be reported as unvaluable rather than priced off a generic bucket — the
+    # behaviour that let nine unrelated findings share one figure.
+    r = voi.analyze_value_of_information(_econ(), None, _nvr(),
+                                        input_type="wgs", n_mc=200)
+    assert not [row for row in r["nmb_rows"] if "predicted" in row["label"]]
+    reasons = " ".join(str(u.get("reason", "")) for u in
+                       (r.get("unvalued_findings") or []))
+    assert "no registry-backed condition anchor" in reasons
+
+
+def test_predicted_variant_valued_below_a_clinvar_assertion():
+    """THE ANTI-INFLATION GUARD. A sequence model's call must never be worth as
+    much as a curated clinical assertion for the same gene.
+
+    Each finding is collected ALONE so it is the only member of its condition
+    pool: ConditionPool.qaly_loss() returns max(overrides), so a Path A and a
+    Path B finding sharing a pool would let Path A's larger override mask Path
+    B entirely — the assertion would then pass because Path B was DISCARDED
+    rather than down-weighted, which is not what this test is for.
+    """
+    wtp, rate = 100_000.0, 0.03
+    asserted = [f for f in voi._collect(
+        None, {"available": True, "buckets": {"actionable": [{"gene": "BRCA1"}]}},
+        None) if "BRCA1" in f["label"]]
+    predicted = [f for f in voi._collect(None, None, _nvr_gene("BRCA1"))
+                 if "BRCA1" in f["label"]]
+    assert len(asserted) == 1 and len(predicted) == 1
+
+    a, b = asserted[0], predicted[0]
+    nmb_a = voi._finding_nmb(a, wtp, rate)[0]
+    nmb_b = voi._finding_nmb(b, wtp, rate)[0]
+    assert nmb_b < nmb_a, (
+        f"predicted BRCA1 ({nmb_b:,.0f}) must be worth strictly less than "
+        f"ClinVar-asserted BRCA1 ({nmb_a:,.0f})")
+
+    # Both discounts are present and neither is double-applied.
+    ppv = float(voi._econ_params.value("predictor_ppv_no_clinvar"))
+    assert b["haircut"] == ppv, "haircut must be the registered PPV"
+    assert b["penetrance_corrected"] < b["penetrance_literature"], (
+        "the ascertainment correction must apply to Path B too — an "
+        "unconfirmed prediction is more incidentally identified, not less")
+    # The anchor is NOT pre-multiplied: _finding_nmb applies the haircut.
+    assert b["qaly"] == a["qaly"], (
+        "the QALY anchor must be identical on both paths; PPV is applied by "
+        "_finding_nmb via the haircut, and pre-multiplying would apply it twice")
+    # Horizon deliberately shorter on the unconfirmed path.
+    assert b["horizon"] == 25 and a["horizon"] == 30
+
+
+def test_confirmation_cost_is_charged_on_predicted_variants():
+    b = next(f for f in voi._collect(None, None, _nvr_gene("BRCA1"))
+             if "BRCA1" in f["label"])
+    expected = float(voi._econ_params.value(
+        "intervention_cost_predicted_variant"))
+    assert b["intervention"] == expected > 0
+    # Charged in full: _finding_nmb haircuts the benefit, then subtracts the
+    # intervention. A confirmation that cost nothing would make chasing a
+    # prediction look free.
+    assert voi._finding_nmb(b, 100_000.0, 0.03)[3] == expected
+    assert "onfirm" in b["action"]

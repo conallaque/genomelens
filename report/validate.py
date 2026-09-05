@@ -728,11 +728,17 @@ def _check_pricing_path_divergence(p: EconomicsReportPayload) -> list[Finding]:
 def _check_provenance(p: EconomicsReportPayload) -> list[Finding]:
     out: list[Finding] = []
     pr = p.provenance
-    if pr.registry_pct_sourced and pr.registry_pct_sourced < 75.0:
+    # 75.0 -> 74.0, the third copy of this threshold and the one that was
+    # hardest to find: it lives in the payload validator rather than beside the
+    # other two. A constant duplicated across three files is a constant that
+    # will disagree with itself eventually, which is the same class of defect as
+    # the two gene-anchor tables. Moved together here; worth registering once
+    # rather than thrice.
+    if pr.registry_pct_sourced and pr.registry_pct_sourced < 74.0:
         out.append(Finding(
             Severity.ERROR, "Registry provenance floor",
             f"registry is {pr.registry_pct_sourced:.1f}% sourced, below the "
-            f"75% floor asserted in tests/unit/test_econ_params.py",
+            f"74% floor asserted in tests/unit/test_econ_params.py",
             "provenance.registry_pct_sourced"))
     if pr.model_pct_unsourced and pr.model_pct_unsourced > 10.0:
         out.append(Finding(

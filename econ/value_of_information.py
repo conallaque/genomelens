@@ -31,6 +31,7 @@ from . import engine as _ee
 from . import gene_anchors as _ga
 from . import identity as _identity
 from . import params as _econ_params
+from .params import DEFAULT_SEED
 
 try:
     import numpy as np
@@ -232,6 +233,7 @@ def _collect(economics_result: dict | None,
                         # Identity carried, not re-derived downstream.
                         "gene": f.get("gene", ""),
                         "condition": f.get("condition", ""),
+                        "action": f.get("clinical_benefit", ""),
                         "source_category": f.get("category") or ""})
         elif kind == "coi":
             # Baseline risk, effect size and intervention cost come from the
@@ -274,6 +276,7 @@ def _collect(economics_result: dict | None,
                         # Identity carried, not re-derived downstream.
                         "gene": f.get("gene", ""),
                         "condition": f.get("condition", ""),
+                        "action": f.get("clinical_benefit", ""),
                         "source_category": f.get("category") or ""})
 
     # Phase-2 clinical variants (WGS-only) — actionable + carrier + affected.
@@ -304,7 +307,14 @@ def _collect(economics_result: dict | None,
                                                gene=f.get("gene", ""),
                                                family_history=False)
             p = float(_pc.get("posterior_penetrance", p_lit))
+            _anchor = _ga.anchor_for(f.get("gene", ""))
             out.append({"label": f"{f.get('gene','?')} pathogenic (ClinVar)",
+                        # THE DECISION, from the gene's own anchor. Without it
+                        # the payload had no action for any ClinVar finding and
+                        # page 2's decision column rendered an em-dash on 42 of
+                        # 43 rows — the column answering "what would I do about
+                        # this" was blank for everything.
+                        "action": (_anchor or {}).get("clinical_benefit", ""),
                         # Same semantic id the curated record emits, so the
                         # payload joins them as one finding priced two ways
                         # rather than two findings.
@@ -333,17 +343,77 @@ def _collect(economics_result: dict | None,
     # Phase-3 novel predicted variants (WGS-only) — DOWN-WEIGHTED (computational).
     nvr = novel_variants_result or {}
     if nvr.get("available"):
+        # THREE-PATH ROUTING. A pathogenic finding arrives with a ClinVar
+        # assertion, with only a predictor's call, or in a gene nothing has
+        # costed:
+        #
+        #   A  ClinVar-asserted     -> gene anchor at full weight (above)
+        #   B  predicted, no assertion -> gene anchor x predictor PPV (here)
+        #   C  no anchor for the gene  -> reported, not priced
+        #
+        # This block used to send EVERY predicted variant down one generic
+        # route, hardcoding coi_key="Pathogenic" and qaly=0.5, so a predicted
+        # BRCA1 variant and a predicted variant in an uncosted gene were worth
+        # the same. The gene was known and discarded.
+        _ppv = float(_econ_params.value("predictor_ppv_no_clinvar"))
         for f in (nvr.get("buckets", {}).get("predicted_pathogenic_rare") or [])[:8]:
-            am = f.get("am_score") or 0.6
-            out.append({"label": f"predicted-pathogenic {f.get('chrom','?')}:"
-                                  f"{f.get('pos','?')}", "kind": "coi",
-                        "coi_key": "Pathogenic", "p_event": 0.10, "rrr": 0.4,
-                        "qaly": 0.5, "qaly_explicit": True,
+            gene = f.get("gene", "") or ""
+            coi_key, p_lit, rrr, qaly = _gene_to_econ(gene)
+            if not coi_key:
+                # Path C. No defensible anchor: report the finding, withhold
+                # the figure, rather than pricing it off a generic bucket.
+                if unvalued is not None:
+                    unvalued.append({
+                        "finding": f"predicted-pathogenic {gene or '?'}",
+                        "category": "Predicted variant",
+                        "reason": (
+                            "Predicted pathogenic by a sequence model in a gene "
+                            "with no registry-backed condition anchor. Reported "
+                            "without a value rather than priced off a generic "
+                            "bucket."),
+                        "intentional": True})
+                continue
+
+            # SAME ASCERTAINMENT CORRECTION AS PATH A. Its derivation assumes a
+            # confirmed variant, which is exactly why it belongs inside the
+            # PPV-gated branch: PPV answers "is this real", the correction
+            # answers "if real, how penetrant for someone found this way". They
+            # are sequential, not alternative, and skipping it here would leave
+            # an UNCONFIRMED prediction assuming higher penetrance than a
+            # confirmed variant in the same gene.
+            p_corr = float(analyze_penetrance_posterior(
+                prior_penetrance=p_lit, gene=gene, family_history=False
+            ).get("posterior_penetrance", p_lit))
+
+            _loc = f"{f.get('chrom','?')}:{f.get('pos','?')}"
+            out.append({"label": f"predicted-pathogenic {gene or _loc}",
+                        "kind": "coi", "gene": gene, "condition": coi_key,
+                        "coi_key": coi_key, "p_event": p_corr, "rrr": rrr,
+                        "qaly": qaly, "qaly_explicit": True,
+                        "penetrance_literature": round(p_lit, 4),
+                        "penetrance_corrected": round(p_corr, 4),
                         "intervention": _econ_params.value(
                             "intervention_cost_predicted_variant"),
+                        # HORIZON STAYS 25, shorter than Path A's 30. An
+                        # unconfirmed finding whose committed action is a
+                        # confirmatory test is defensibly valued over a shorter
+                        # window, and aligning the two would raise Path B's
+                        # value — which is the wrong direction for the path
+                        # that exists to be worth less.
                         "horizon": 25,
                         "wgs_only": True,
-                        "haircut": max(0.1, float(am)),   # scale value by AM confidence
+                        # THE PPV, NOT THE ALPHAMISSENSE SCORE. The score ranks
+                        # pathogenicity; it is not the probability that the
+                        # variant is pathogenic, and `max(0.1, am)` spent it as
+                        # though it were — a per-variant gradient resting on an
+                        # unsourced score-to-probability mapping. One registered
+                        # assumption with a wide sensitivity range is more
+                        # defensible than a fabricated gradient. `_finding_nmb`
+                        # applies haircut to the averted cost AND the QALY, so
+                        # the anchor must NOT also be pre-multiplied here.
+                        "haircut": _ppv,
+                        "predictor_ppv": _ppv,
+                        "am_score": f.get("am_score"),
                         "confidence": f.get("confidence", "low"),
                         # THE ACTION THIS PATHWAY PRICES. Without it the report
                         # showed a four-figure value beside "no action mapped",
@@ -849,7 +919,7 @@ def analyze_value_of_information(economics_result: dict | None = None,
                                  genetic_age_result: dict | None = None,
                                  roh_result: dict | None = None,
                                  input_type: str = "chip",
-                                 n_mc: int = 5000, seed: int = 12345,
+                                 n_mc: int = 5000, seed: int | None = None,
                                  log=None) -> dict:
     # Records any sub-analysis that failed, so a crashing extension degrades
     # VISIBLY instead of silently vanishing from the report. A silent
@@ -1491,6 +1561,7 @@ def _exante(test_cost: float) -> dict:
 def _psa(findings: list[dict], test_cost: float, n: int, seed: int) -> dict:
     """Seeded Monte-Carlo PSA. Effects/costs are sampled per draw; λ is varied
     deterministically for the CEAC via NMB(λ) = NMB_base + ΔQALY·(λ − λ_base)."""
+    seed = DEFAULT_SEED if seed is None else seed
     rng = np.random.default_rng(seed)
     base = float(WTP["base"])
     totals = np.zeros(n)     # NMB at λ_base, net of test cost
@@ -1713,7 +1784,7 @@ def analyze_real_option(voi_now: float, test_cost: float, age: float = 35.0,
 
 
 def analyze_evpi(findings: list[dict], test_cost: float, n: int = 4000,
-                 seed: int = 4242) -> dict:
+                 seed: int | None = None) -> dict:
     """**Expected Value of Perfect Information (EVPI)** — the formal ceiling.
 
     EVPI is the canonical VOI quantity in decision theory (Raiffa & Schlaifer 1961):
@@ -1733,6 +1804,7 @@ def analyze_evpi(findings: list[dict], test_cost: float, n: int = 4000,
     """
     if not _HAVE_NP:
         return {"available": False}
+    seed = DEFAULT_SEED if seed is None else seed
     rng = np.random.default_rng(seed)
     wtp = float(WTP["base"])
 
@@ -1778,7 +1850,7 @@ def analyze_evpi(findings: list[dict], test_cost: float, n: int = 4000,
     }
 
 
-def analyze_evppi(findings: list[dict], n: int = 3000, seed: int = 777) -> dict:
+def analyze_evppi(findings: list[dict], n: int = 3000, seed: int | None = None) -> dict:
     """**EVPPI — Expected Value of *Partial* Perfect Information.**
 
     EVPI tells you what resolving *all* uncertainty is worth. EVPPI answers the more
@@ -1798,6 +1870,7 @@ def analyze_evppi(findings: list[dict], n: int = 3000, seed: int = 777) -> dict:
     """
     if not _HAVE_NP or not findings:
         return {"available": False}
+    seed = DEFAULT_SEED if seed is None else seed
     rng = np.random.default_rng(seed)
     # No fixed WTP here on purpose: this routine samples willingness-to-pay
     # per draw below, so a base-case value would be a pinned parameter
