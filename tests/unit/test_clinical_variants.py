@@ -137,12 +137,53 @@ def test_build_gate_refuses_unknown(clinvar_table, tmp_path):
 
 
 def test_missing_table_degrades_gracefully(tmp_path, monkeypatch):
+    # BOTH sources suppressed. There are now two: the full distilled table and
+    # the committed two-record sample subset. The premise of this test is that
+    # no table exists at all, so both have to be absent for it to test that.
     monkeypatch.setattr(cv, "CLINVAR_DIR", tmp_path / "nonexistent")
+    monkeypatch.setattr(cv, "SAMPLE_SUBSETS", {})
     user = _write_user_vcf(tmp_path, [("1", "1", "C", "T", "0/1")])
     r = cv.analyze_clinical_variants(user, "grch38")
     assert r["available"] is False
     assert "setup.py" in r["reason"]
     assert r["negative_disclaimer"]
+
+
+def test_sample_subset_is_used_only_as_a_fallback_and_says_so(tmp_path, monkeypatch):
+    """The committed subset makes the sample reproducible without pretending
+    to be a genome-wide screen.
+
+    `reference/` is gitignored, so a clean clone has no ClinVar table and the
+    documented `make_econ_sample.py` command produced a report that rendered
+    correctly and disagreed with the committed sample — the screen matched
+    nothing and everything fell through to the generic bucket. Silent fallback
+    is the unacceptable outcome, so the fallback announces itself.
+    """
+    monkeypatch.setattr(cv, "CLINVAR_DIR", tmp_path / "nonexistent")
+    # Both builds ship a subset: the sample is GRCh37, and the GRCh38 one is
+    # kept for a GRCh38 input.
+    for b, path in cv.SAMPLE_SUBSETS.items():
+        assert path.exists(), f"the {b} subset must be committed"
+
+    table = cv.load_clinvar_table("grch37")
+    assert table, "the subset must load when the full table is absent"
+    assert cv.subset_in_use() is True
+    assert len(table) <= 25, ("the subset must stay minimal — it covers only the\n        variants this repository's own sample input can match, not a panel")
+
+    # It covers the sample's own variants and nothing more.
+    assert cv.norm_key("19", 11200225, "A", "C") in table   # LDLR, GRCh37
+    assert cv.norm_key("17", 41197728, "G", "C") in table   # BRCA1, GRCh37
+
+    # A build with no committed subset gets no fallback: screening a genome
+    # against another build's coordinates is the defect the build guard exists
+    # to prevent.
+    assert cv.load_clinvar_table("hg99") is None
+
+    # And a run that used it must say the coverage is partial.
+    user = _write_user_vcf(tmp_path, [("19", "11200225", "A", "C", "0/1")])
+    r = cv.analyze_clinical_variants(user, "grch37")
+    assert r.get("clinvar_subset_only") is True
+    assert "NOT a genome-wide screen" in r.get("coverage_note", "")
 
 
 def test_freshness_fields_surface_and_flag_stale(clinvar_table, tmp_path, monkeypatch):

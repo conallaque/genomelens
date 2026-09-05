@@ -40,6 +40,7 @@ Educational screening, NOT a clinical diagnostic test.
 from __future__ import annotations
 
 import gzip
+import pathlib
 from pathlib import Path
 
 # .parent.parent: moved into the risk package, but reference/ stays at the
@@ -188,12 +189,54 @@ def distill_clinvar_vcf(in_path: str, out_path: str, log=print) -> int:
 
 # ── table loading (with truncation guard) ─────────────────────────────────────
 
+# A two-record subset of the distilled ClinVar table, committed so that a clean
+# clone can reproduce the documented sample. ClinVar is an NCBI resource in the
+# public domain, so vendoring records is licence-clean.
+#
+# WHY IT EXISTS. `reference/` is gitignored, so the full distilled table is not
+# in the repository. Without this, `scripts/make_econ_sample.py` on a fresh
+# clone found no ClinVar table, matched none of its pathogenic variants, and
+# fell through to the generic bucket — producing a report that rendered
+# perfectly and disagreed with the committed one. Silent fallback is the one
+# unacceptable outcome here: a sample that is quietly wrong is worse than a
+# sample that refuses to build.
+#
+# It covers ONLY the sample's own variants. Any real genome needs the full
+# table via `python setup.py --clinvar`, and `subset_in_use()` reports which
+# one answered so a caller can say so rather than imply full coverage.
+_SUBSET_DIR = pathlib.Path(__file__).resolve().parent.parent / "data"
+SAMPLE_SUBSETS = {
+    "grch37": _SUBSET_DIR / "clinvar_sample_subset_grch37.tsv.gz",
+    "grch38": _SUBSET_DIR / "clinvar_sample_subset_grch38.tsv.gz",
+}
+SAMPLE_SUBSET = SAMPLE_SUBSETS["grch37"]
+
+_USING_SUBSET = {"value": False}
+
+
+def subset_in_use() -> bool:
+    """Whether the last load fell back to the committed two-record subset."""
+    return _USING_SUBSET["value"]
+
+
 def load_clinvar_table(build: str) -> dict[tuple, dict] | None:
     """Load the distilled table for a build into {norm_key: record}, or None if
-    absent. Refuses a truncated/headerless table."""
+    absent. Refuses a truncated/headerless table.
+
+    Falls back to the committed sample subset only for GRCh38, and records that
+    it did so. The fallback is deliberately narrow: it makes the documented
+    sample reproducible on a clean clone without ever letting a real genome be
+    screened against two records while appearing fully covered.
+    """
+    _USING_SUBSET["value"] = False
     path = CLINVAR_DIR / f"clinvar_plp_{build}.tsv.gz"
     if not path.exists():
-        return None
+        _sub = SAMPLE_SUBSETS.get(build)
+        if _sub is not None and _sub.exists():
+            path = _sub
+            _USING_SUBSET["value"] = True
+        else:
+            return None
     table: dict[tuple, dict] = {}
     try:
         with gzip.open(path, "rt") as f:
@@ -320,6 +363,17 @@ def analyze_clinical_variants(vcf_path: str, build: str,
     result = _classify(findings, n_scanned, inferred_sex)
     result["clinvar_date"] = clinvar_date
     result["clinvar_stale"] = stale
+    # Say which table answered. A screen run against the two-record sample
+    # subset is not a genome-wide screen, and a report that does not say so
+    # implies coverage it does not have.
+    result["clinvar_subset_only"] = subset_in_use()
+    if subset_in_use():
+        result["coverage_note"] = (
+            "Screened against the committed two-record ClinVar subset, which "
+            "covers only the variants in this repository's own sample. This is "
+            "NOT a genome-wide screen. Run `python setup.py --clinvar` for the "
+            "full distilled table before reading any absence of findings as "
+            "meaningful.")
     return result
 
 
