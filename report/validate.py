@@ -605,6 +605,19 @@ def _check_action_is_not_a_finding(
     return out
 
 
+def _gene_tokens(gene: str) -> set[str]:
+    """A gene field as the SET of symbols it names.
+
+    Two tables spelled one HLA haplotype "HLA-DQA1" and "HLA-DQA1/HLA-DQB1".
+    Compared as strings those are different genes, so the duplicate they
+    described went undetected while both rows printed identical economics.
+    """
+    raw = str(gene or "").upper()
+    for sep in ("/", ",", "+", ";", " AND "):
+        raw = raw.replace(sep, "|")
+    return {t.strip() for t in raw.split("|") if t.strip()}
+
+
 def _check_one_gene_one_finding(p: EconomicsReportPayload) -> list[Finding]:
     """A gene must not resolve to more than one monetised finding.
 
@@ -632,9 +645,13 @@ def _check_one_gene_one_finding(p: EconomicsReportPayload) -> list[Finding]:
     # to catch records that are malformed. Refusing to look at a record until it
     # is well-formed makes the check agree with the bug.
     def _identity(f) -> str:
-        g = (f.gene or "").strip().upper()
-        if g:
-            return g
+        # A SET, so a compound symbol is compared by the genes it names. Two
+        # tables spelled one HLA haplotype "HLA-DQA1" and "HLA-DQA1/HLA-DQB1";
+        # as strings those never collided, so the duplicate they described
+        # printed twice with identical economics and this check stayed silent.
+        toks = _gene_tokens(f.gene)
+        if toks:
+            return "|".join(sorted(toks))
         name = (f.display_name or f.finding_id or "")
         for tok in name.replace("/", " ").replace("-", " ").split():
             t = tok.strip("().,").upper()
@@ -649,6 +666,21 @@ def _check_one_gene_one_finding(p: EconomicsReportPayload) -> list[Finding]:
         if not g or not f.is_monetized:
             continue
         by_gene.setdefault(g, []).append(f.display_name or f.finding_id or "?")
+
+    # OVERLAPPING SYMBOL SETS COUNT AS THE SAME GENE. "HLA-DQA1" is a subset of
+    # "HLA-DQA1|HLA-DQB1", and a finding keyed on each is one finding described
+    # two ways, not two findings.
+    keys = sorted(by_gene, key=lambda k: (-len(k.split("|")), k))
+    merged: dict[str, list[str]] = {}
+    for k in keys:
+        toks = set(k.split("|"))
+        host = next((m for m in merged if set(m.split("|")) & toks), None)
+        if host is None:
+            merged[k] = list(by_gene[k])
+        else:
+            merged[host].extend(by_gene[k])
+    by_gene = merged
+
     out: list[Finding] = []
     for gene, names in sorted(by_gene.items()):
         if len(names) > 1:
