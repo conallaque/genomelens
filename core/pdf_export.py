@@ -127,6 +127,35 @@ def _document_has_its_own_cover(html: str) -> bool:
     return "genomelens economics" in t or "findings-first" in t
 
 
+
+# A document that paginates ITSELF needs the page to match its own geometry.
+#
+# `economics-findings-first.html` lays out fixed 960x1240px `.sheet` blocks and
+# breaks between them. PDF_CSS above sets A4 with 14mm side margins, leaving
+# roughly 688px of printable width — so 960px of content was being squeezed into
+# it and overflowed by about 40%. Both stylesheets were individually correct:
+# PDF_CSS is written for report.html, which is flowing content and wants
+# margins, and the sheet geometry is right for a document that draws its own
+# pages. Applying one to the other is what broke.
+#
+# 960 x 1240 px at 96dpi = 254mm x 328mm. Margin is zero because the sheet
+# already carries its own padding (62px sides, 74px bottom); adding page margins
+# on top would inset it twice.
+SELF_PAGINATED_CSS = """
+@page {
+    size: 254mm 328mm;
+    margin: 0;
+}
+html, body { background: #ffffff !important; margin: 0 !important; padding: 0 !important; }
+.sheet { break-after: page; page-break-after: always; overflow: visible !important; }
+.sheet:last-of-type { break-after: auto; page-break-after: auto; }
+"""
+
+
+def _is_self_paginated(html: str) -> bool:
+    """Whether the document lays out its own fixed-size pages."""
+    return ".sheet{" in html.replace(" ", "") or "class=\"sheet\"" in html
+
 def _build_cover_page(file_label: str, file_hash: str, version: str,
                       report_date: str, qc_grade: str = "") -> str:
     return f"""
@@ -276,9 +305,11 @@ def html_to_pdf(
     )
 
     try:
+        _css = (SELF_PAGINATED_CSS if _is_self_paginated(html)
+                else PDF_CSS)
         HTML(string=html_modified, base_url=str(html_path.parent)).write_pdf(
             str(pdf_path),
-            stylesheets=[CSS(string=PDF_CSS)],
+            stylesheets=[CSS(string=_css)],
         )
         size = pdf_path.stat().st_size
         return f"PDF written: {pdf_path} ({size/1e6:.1f} MB)"
@@ -324,11 +355,21 @@ def html_to_pdf_playwright(
             page = browser.new_page()
             page.goto(f"file://{tmp_html.resolve()}")
             page.wait_for_load_state("networkidle")
-            page.pdf(
-                path=str(pdf_path), format="A4", print_background=True,
-                margin={"top": "18mm", "bottom": "22mm",
-                        "left": "14mm", "right": "14mm"},
-            )
+            if _is_self_paginated(html):
+                # The document draws its own 960x1240px pages. Match the paper
+                # to the sheet and zero the margins, or 960px of content is
+                # squeezed into A4's ~688px printable width and overflows.
+                page.add_style_tag(content=SELF_PAGINATED_CSS)
+                page.pdf(path=str(pdf_path), width="254mm", height="328mm",
+                         print_background=True,
+                         margin={"top": "0", "bottom": "0",
+                                 "left": "0", "right": "0"})
+            else:
+                page.pdf(
+                    path=str(pdf_path), format="A4", print_background=True,
+                    margin={"top": "18mm", "bottom": "22mm",
+                            "left": "14mm", "right": "14mm"},
+                )
             browser.close()
         size = pdf_path.stat().st_size
         return f"PDF written: {pdf_path} ({size/1e6:.1f} MB)"

@@ -37,7 +37,11 @@ __all__ = ["CSS", "MAIN_REPORT_PAGES", "page_count",
            "render_findings_first"]
 
 MAIN_REPORT_PAGES = 8
-"""The findings-first report is exactly this many pages. Asserted in tests."""
+"""Sheets a typical genome renders to, and the floor for any genome.
+
+Not a fixed total: the glance page continues onto further sheets when a genome
+carries more findings than one holds. ``page_count`` reports the real number.
+"""
 
 
 def _e(s) -> str:
@@ -417,54 +421,26 @@ def _confidence_mix(p: EconomicsReportPayload) -> str:
     return (", ".join(parts) + ".") if parts else ""
 
 
-def _page_one_flow(p: EconomicsReportPayload) -> str:
-    """The pooling correction, at summary depth.
-
-    Page 5 shows both corrections separately with their own justifications.
-    Here it is the one-line version: what naive addition claimed, what pooling
-    left, and an explicit warning that avoided cost is not net monetary
-    benefit. Repeating the full decomposition on both pages would waste the
-    reader's second look.
-    """
-    c = p.corrections
-    naive, pooled = c.naive_cost_averted, c.pooled_cost_averted
-    if not (naive and pooled):
-        return ""
-    removed = naive - pooled
-    pct = removed / naive if naive else 0.0
-    return f"""
-  <div class="flow">
-    <h3>How GenomeLens avoids counting the same benefit twice</h3>
-    <p class="sub">Several genetic signals can describe one underlying
-      liability. Findings bearing on the same condition are combined on the risk
-      scale and that condition's cost of illness is charged once, before any
-      value is credited.</p>
-    <div class="steps">
-      <div class="step"><div class="sl">Naive avoided cost</div>
-        <div class="sv">{fmt.money(naive)}</div>
-        <div class="sn">each finding's avoided cost, simply added up</div></div>
-      <div class="arrow"><div class="amt">&minus;{fmt.money(removed)}</div>
-        <div class="gl">condition-level pooling<br>and adherence</div>
-        <div class="bar"></div></div>
-      <div class="step"><div class="sl">Pooled avoided cost</div>
-        <div class="sv">{fmt.money(pooled)}</div>
-        <div class="sn">{fmt.percentage(pct, places=1)} removed &mdash; page 5
-          separates the overlap and adherence steps</div></div>
-    </div>
-    <div class="tail"><div class="k">The reference-case NMB is calculated after
-      pooling, adherence, costs and discounting. <b>Avoided cost and net
-      monetary benefit are different quantities</b> and are not
-      interchangeable.</div></div>
-  </div>"""
-
 
 def render_page_one(p: EconomicsReportPayload) -> str:
     r = p.reference_case
     priced = [f for f in p.findings if f.canonical_expected_nmb is not None]
     top = sorted(priced, key=lambda f: -(f.canonical_expected_nmb or 0))[:4]
 
+    # BOUNDED. This rendered one pill per finding with no limit, so a genome
+    # with forty-three of them produced a 470px block that pushed "What rises to
+    # the top" off the bottom of the cover page — the four headline figures the
+    # page exists to show. The pills are a texture of what was found, not a
+    # list to be read: past a couple of dozen they stop being scannable and
+    # start being a wall. The remainder is counted, and every finding is listed
+    # in full on the glance pages.
+    _MAX_PILLS = 22
+    _shown = p.findings[:_MAX_PILLS]
     pills = "".join(f'<span class="pill">{_e(f.short_name)}</span>'
-                    for f in p.findings)
+                    for f in _shown)
+    if len(p.findings) > _MAX_PILLS:
+        pills += (f'<span class="pill">and {len(p.findings) - _MAX_PILLS} '
+                  f'more</span>')
 
     tops = ""
     for f in top:
@@ -496,7 +472,7 @@ def render_page_one(p: EconomicsReportPayload) -> str:
         # version of the same check.
         _ci = ""
         if u.nmb_ci_low or u.nmb_ci_high:
-            _ci = (f" &middot; 95% interval {fmt.money(u.nmb_ci_low)} to "
+            _ci = (f" \u00b7 95% interval {fmt.money(u.nmb_ci_low)} to "
                    f"{fmt.money(u.nmb_ci_high)} across "
                    f"{fmt.count(u.n_parameters_varied)} varied parameters")
         unc_cap = (f"modelled simulations cost-effective "
@@ -558,7 +534,6 @@ def render_page_one(p: EconomicsReportPayload) -> str:
   </div>
   <div class="tops">{tops}</div>
 
-  {_page_one_flow(p)}
 
   {_foot(p, 1)}
 </section>"""
@@ -646,31 +621,65 @@ def _decision_label(f: FindingEconomics) -> str:
     return _clip(f.category, 40) or "\u2014"
 
 
-def render_page_two(p: EconomicsReportPayload) -> str:
-    """At a glance. Scanning, not explanation."""
-    rows = ""
-    for group, items in p.findings_page_groups():
-        rows += (f'<div class="grouplabel">{_e(group)}'
-                 f'<span>{len(items)} finding'
-                 f'{"" if len(items) == 1 else "s"}</span></div>'
-                 f'<div class="glance">')
-        for f in items:
-            if f.canonical_expected_nmb is None:
-                cell = ('<div class="m na">Not monetised</div>'
-                        if not f.is_monetized
-                        else '<div class="m na">Not yet standardised</div>')
-            else:
-                v = f.canonical_expected_nmb
-                cell = (f'<div class="m{" neg" if v < 0 else ""}">'
-                        f'{fmt.money(v)}</div>')
-            rows += f"""
+# How many finding rows fit on one glance sheet. The sheet is a fixed
+# 960x1240px block with an absolutely-positioned footer, so content past this
+# does not push the page taller — it runs underneath the footer and the page
+# number. A genome with twenty findings printed its last rows with "Synthetic
+# whole-genome input" struck through them, and the three closing notes ran 162px
+# off the bottom entirely.
+#
+# Measured rather than guessed: rows render at ~50.6px, and the closing notes
+# plus footer need ~250px, leaving room for twelve rows on the first sheet and
+# a full sheet's worth on any continuation.
+#
+# OVERFLOW CONTINUES ONTO ANOTHER SHEET, it is not dropped. Truncating would
+# have been easier and would have meant the summary page silently stopped
+# listing findings once a genome had enough of them — on the page whose whole
+# job is to show what was found. The report is 8 pages for a typical genome and
+# longer for one carrying more; that is the correct direction for a document
+# whose length should reflect its input.
+_GLANCE_ROWS_FIRST_SHEET = 12
+_GLANCE_ROWS_PER_SHEET = 16
+
+
+def _glance_row(f) -> str:
+    """One scannable row: finding, decision, evidence grade, standalone value."""
+    if f.canonical_expected_nmb is None:
+        cell = ('<div class="m na">Not monetised</div>' if not f.is_monetized
+                else '<div class="m na">Not yet standardised</div>')
+    else:
+        v = f.canonical_expected_nmb
+        cell = (f'<div class="m{" neg" if v < 0 else ""}">{fmt.money(v)}</div>')
+    return f"""
       <div class="grow">
         <div class="n">{_e(_clip(f.display_name, 72))}</div>
         <div class="d">{_e(_decision_label(f))}</div>
         <div>{_badge(f.evidence_confidence)}</div>
         {cell}
       </div>"""
-        rows += "</div>"
+
+
+def render_page_two(p: EconomicsReportPayload) -> str:
+    """At a glance. Scanning, not explanation.
+
+    Emits one sheet, or more when the genome carries more findings than a sheet
+    holds. Every finding appears; none is dropped to make the page fit.
+    """
+    # Flatten to (group, finding) so a group can straddle a sheet boundary and
+    # be re-labelled "continued" rather than forcing an early break.
+    flat: list[tuple[str, object]] = []
+    for group, items in p.findings_page_groups():
+        for f in items:
+            flat.append((group, f))
+
+    pages: list[list[tuple[str, object]]] = []
+    i, budget = 0, _GLANCE_ROWS_FIRST_SHEET
+    while i < len(flat):
+        pages.append(flat[i:i + budget])
+        i += budget
+        budget = _GLANCE_ROWS_PER_SHEET
+    if not pages:
+        pages = [[]]
 
     n_unstd = sum(1 for f in p.findings if f.canonical_expected_nmb is None)
     unstd = ""
@@ -680,15 +689,30 @@ def render_page_two(p: EconomicsReportPayload) -> str:
                  f'expected NMB rather than being assigned a value the model '
                  f'cannot support.</div>')
 
-    return f"""
-<section class="sheet">
-  {_mast(p, "Your findings at a glance")}
-  <h1 class="head">Findings that could change a decision</h1>
-  <p class="intro">Every finding the model examined, the decision it bears on,
-  the strength of the evidence, and what it is worth on its own. No dollar
-  figure appears without the genomic result that produced it &mdash; the detail
-  behind each figure is on pages 3 and 4.</p>
-  {rows}
+    out = ""
+    seen_groups: set[str] = set()
+    for idx, chunk in enumerate(pages):
+        rows, cur = "", None
+        for group, f in chunk:
+            if group != cur:
+                if cur is not None:
+                    rows += "</div>"
+                n_in_group = sum(1 for g, _ in flat if g == group)
+                cont = " (continued)" if group in seen_groups else ""
+                rows += (f'<div class="grouplabel">{_e(group)}{cont}'
+                         f'<span>{n_in_group} finding'
+                         f'{"" if n_in_group == 1 else "s"}</span></div>'
+                         f'<div class="glance">')
+                seen_groups.add(group)
+                cur = group
+            rows += _glance_row(f)
+        if cur is not None:
+            rows += "</div>"
+
+        last = idx == len(pages) - 1
+        tail = ""
+        if last:
+            tail = f"""
   <div class="info" style="margin-top:16px">
     <b>Finding-level values are standalone expected values. They are not
     additive.</b> The reference-case total is calculated separately after
@@ -697,9 +721,23 @@ def render_page_two(p: EconomicsReportPayload) -> str:
     {fmt.money(p.metadata.willingness_to_pay)} per QALY and is
     <b>not cash returned to anyone</b>. Ordering is by clinical group first and
     expected NMB second.</div>
-  {unstd}
-  {_foot(p, 2)}
+  {unstd}"""
+        head = ("Findings that could change a decision" if idx == 0
+                else "Findings that could change a decision, continued")
+        intro = ("""<p class="intro">Every finding the model examined, the
+  decision it bears on, the strength of the evidence, and what it is worth on
+  its own. No dollar figure appears without the genomic result that produced it
+  &mdash; the detail behind each figure is on the pages that follow.</p>"""
+                 if idx == 0 else "")
+        out += f"""
+<section class="sheet">
+  {_mast(p, "Your findings at a glance")}
+  <h1 class="head">{head}</h1>
+  {intro}
+  {rows}{tail}
+  {_foot(p, 2 + idx)}
 </section>"""
+    return out
 
 
 # ── pages 3 and 4: the detail ────────────────────────────────────────────────
@@ -776,7 +814,7 @@ def render_page_three(p: EconomicsReportPayload) -> str:
              f"than assuming it."),
         ], source="Expected NMB = exposure probability x adverse-event "
                   "probability x relative risk reduction x cost of the avoided "
-                  "event, less the cost of acting. Provenance on page 8.")
+                  "event, less the cost of acting. Provenance on the methods page.")
     if not cards:
         cards = ('<div class="info">This run produced no medication-genotype '
                  'findings with a standardised economic pathway.</div>')
@@ -845,26 +883,42 @@ def render_page_four(p: EconomicsReportPayload) -> str:
     unpriced = [f for f in items if f.canonical_expected_nmb is None]
 
     cards = ""
+    generic = 0
     for f in priced[:5]:
+        fields = [("Potential decision",
+                   f.action_summary or "No standardised action pathway "
+                                       "recorded.")]
         if f.action_caveat:
-            assumption = f.action_caveat
+            fields.append(("Key assumption", f.action_caveat))
         else:
-            assumption = ("Baseline event probability and the effect of acting "
-                          "are registered assumptions varied in the sensitivity "
-                          "analysis; neither is measured for this individual.")
-        cards += _compact_card(f, [
-            ("Potential decision",
-             f.action_summary or "No standardised action pathway recorded."),
-            ("Key assumption", assumption)])
+            generic += 1
+        cards += _compact_card(f, fields)
+    shared = ""
+    if generic:
+        shared = ('<p class="intro" style="font-size:10px;margin-top:9px">'
+                  "Where no finding-specific caveat is shown: baseline event "
+                  "probability and the effect of acting are registered "
+                  "assumptions varied in the sensitivity analysis, and neither "
+                  "is measured for this individual.</p>")
 
     tail = ""
     if unpriced:
-        names = ", ".join(_clip(f.display_name, 46) for f in unpriced)
+        # BOUNDED. This listed every unpriced finding by name, so a genome with
+        # twenty of them produced a paragraph that ran off the bottom of the
+        # sheet and under the footer. The count is what carries the meaning —
+        # "none of these was invented a value" — and the names are recoverable
+        # in full on the glance pages, so the list is capped and the remainder
+        # counted rather than the sentence being allowed to grow without limit.
+        _SHOW = 6
+        names = ", ".join(_clip(f.display_name, 40) for f in unpriced[:_SHOW])
+        more = len(unpriced) - _SHOW
+        if more > 0:
+            names += f", and {more} more"
         tail = (f'<div class="info" style="margin-top:11px"><b>Reported without '
-                f'a standardised value:</b> {_e(names)}. No registry-backed '
-                f'economic pathway exists for these yet, so none is invented. '
-                f'They appear with their decision and evidence grade on page 2.'
-                f'</div>')
+                f'a standardised value ({len(unpriced)}):</b> {_e(names)}. No '
+                f'registry-backed economic pathway exists for these yet, so '
+                f'none is invented. Each appears with its decision and evidence '
+                f'grade on the glance pages.</div>')
 
     return f"""
 <section class="sheet">
@@ -874,8 +928,8 @@ def render_page_four(p: EconomicsReportPayload) -> str:
   whether it is shown. A negative expected NMB means the modelled cost of acting
   exceeds the modelled benefit &mdash; useful information, not an error. Evidence
   grade reflects the strength of the association, not the size of the value;
-  provenance is on page 8.</p>
-  {cards}{tail}
+  provenance is on the methods page.</p>
+  {cards}{shared}{tail}
   {_foot(p, 4)}
 </section>"""
 
@@ -914,6 +968,12 @@ def render_page_five(p: EconomicsReportPayload) -> str:
     adher = c.efficacy_cost_averted - c.effectiveness_cost_averted
     pct = (overlap / c.naive_cost_averted) if c.naive_cost_averted else 0.0
     apct = (adher / c.efficacy_cost_averted) if c.efficacy_cost_averted else 0.0
+    # A second naive-to-realised walkthrough used to render here. It made the
+    # same trip in one combined step; the "two
+    # corrections" block below walks the same $60,291 to the same $28,824 and
+    # additionally splits the reduction into its structural (pooling) and
+    # behavioural (adherence) halves. Showing both put 1,293px on a 1,240px
+    # sheet and printed the same journey twice, once less informatively.
     return f"""
 <section class="sheet">
   {_mast(p, "How the findings combine")}
@@ -1140,7 +1200,12 @@ def render_page_seven(p: EconomicsReportPayload) -> str:
       </dl>
       <p style="margin-top:9px">A count of findings this genome contains, not an
         expectation. For this input the population question is already
-        settled.</p></div>
+        settled.</p>
+      <p style="margin-top:7px"><b>Not the same as the value of sequencing.</b>
+        This line counts only findings an array <i>cannot</i> report. Sequencing
+        also recovers findings an array could have carried and did not, which is
+        the larger effect &mdash; so the full chip-to-whole-genome difference is
+        bigger than the figure above.</p></div>
   </div>
   <div class="info"><b>Separation rule.</b> The prospective figures describe the
     population this genome was drawn from; the observed figure describes the
@@ -1199,7 +1264,7 @@ def render_page_eight(p: EconomicsReportPayload) -> str:
 <section class="sheet">
   {_mast(p, "Methods & provenance")}
   <h1 class="head">What was assumed, where it came from, what was checked</h1>
-  <p class="intro">The first seven pages tell the story; this page is their
+  <p class="intro">The pages before this one tell the story; this page is their
   audit trail. Full parameter tables, references and the advanced analyses
   follow in the technical appendix.</p>
   <div class="split">
@@ -1249,16 +1314,47 @@ def render_page_eight(p: EconomicsReportPayload) -> str:
 # ── document ──────────────────────────────────────────────────────────────────
 
 def page_count(p: EconomicsReportPayload) -> int:
-    """Always eight. A function so callers read intent rather than a literal."""
-    return MAIN_REPORT_PAGES
+    """Sheets this payload actually renders to.
+
+    MAIN_REPORT_PAGES is the floor, not the answer: the glance page continues
+    onto extra sheets when a genome carries more findings than one holds, and
+    _renumber_footers already stamps the true total. Returning the constant
+    here gave the document two different page counts.
+    """
+    return render_findings_first(p).count('<section class="sheet">')
+
+
+def _renumber_footers(html: str) -> str:
+    """Number the footers by the sheets that actually exist.
+
+    Each page function stamps its own number, which was correct while the report
+    was exactly eight fixed sheets. Page 2 now continues onto another sheet when
+    a genome carries more findings than one holds, so the hardcoded numbers
+    collide — two sheets both claiming "3 / 8" — and the total is wrong besides.
+    Counting after assembly is the only place that knows how many sheets there
+    turned out to be.
+    """
+    import re as _re
+    total = html.count('<section class="sheet">')
+    n = 0
+
+    def _sub(m):
+        nonlocal n
+        n += 1
+        return f'<div>{n} / {total}</div></div>'
+
+    return _re.sub(r"<div>\d+ / \d+</div></div>", _sub, html)
 
 
 def render_findings_first(p: EconomicsReportPayload) -> str:
-    """The eight-page findings-first report."""
+    """The findings-first report. Eight sheets for a typical genome, more when
+    one carries enough findings that the glance page continues — the committed
+    sample renders eleven."""
     label = p.metadata.input_label or "genome"
     pages = "\n".join(r(p) for r in (
         render_page_one, render_page_two, render_page_three, render_page_four,
         render_page_five, render_page_six, render_page_seven, render_page_eight))
+    pages = _renumber_footers(pages)
     return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
