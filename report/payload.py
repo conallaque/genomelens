@@ -216,6 +216,15 @@ class FindingEconomics:
     expected_qaly_gain: float = 0.0
     medical_cost_averted: float = 0.0
     intervention_cost: float = 0.0
+    intervention_cost_basis: str = ""
+    """'gene_specific', or the marker for the registered fallback.
+
+    Eleven findings share the registered $500 default because no gene-specific
+    cost of acting exists for them. That is one declared, sensitivity-varied
+    parameter, not eleven independent estimates, and the page has to say which
+    it is — otherwise risk-reducing surgery and passive symptom awareness read
+    as though they were separately costed at the same price.
+    """
     net_cash: float = 0.0
     """medical_cost_averted - intervention_cost. Actual modelled money."""
 
@@ -269,6 +278,17 @@ class FindingEconomics:
 
     is_monetized: bool = True
     reason_not_monetized: str = ""
+    value_withheld_by_policy: bool = False
+    """True when the model REFUSED to price this, false when it COULD NOT.
+
+    "Reproductive outcomes are deliberately not monetised" and "the source
+    record reached the valuation step without cost" are different statements.
+    Only the first makes it a contradiction for another path to price the same
+    gene: a PGx gene legitimately carries one priced drug-level finding and a
+    second, different drug whose record is incomplete. The withheld-vs-priced
+    check read any stated reason as a refusal and reported four false
+    contradictions on exactly that pattern.
+    """
     is_hypothetical_or_awareness: bool = False
     is_wgs_only: bool = False
     sources: list[str] = field(default_factory=list)
@@ -750,6 +770,7 @@ def build_report_payload(
             # free-to-act inflates net benefit for any reader doing their own
             # arithmetic off the page.
             intervention_cost=_iv_charged(r, c_iv),
+            intervention_cost_basis=_s(r.get("intervention_basis")),
             net_cash=_f(r.get("dcost_averted")) - _iv_charged(r, c_iv),
             canonical_expected_nmb=nmb,
             economic_value_basis="parametric_expected_nmb",
@@ -858,18 +879,35 @@ def build_report_payload(
         ))
 
     # 3. Findings deliberately carrying no dollar figure.
+    #
+    # A finding that another path already priced is NOT one of these. The same
+    # record reaches the curated path without `prevalence`/`cost` and is
+    # correctly refused a value there, but it already has one from the
+    # parametric path — so emitting it here published a second row asserting
+    # the report cannot value what it valued two pages earlier. The sample
+    # carried 23 such rows against 8 genuinely unvaluable findings, and they
+    # inflated the "reported without a value" headline by a factor of four.
     for nm in (personal_econ.get("not_monetised") or []):
+        _pid = _s(nm.get("economic_pathway_id"))
+        if _pid and _pid in seen:
+            continue
         findings.append(FindingEconomics(
             finding_id=_s(nm.get("id") or nm.get("finding")),
+            economic_pathway_id=_pid,
+            pathway_id_is_legacy=(_identity_is_legacy(_pid) if _pid else True),
             display_name=_s(nm.get("finding") or nm.get("label")),
             category=_s(nm.get("category")),
-            action_summary=_s(nm.get("action")),
+            gene=_s(nm.get("gene")),
+            condition_id=_s(nm.get("condition")),
+            action_summary=_s(nm.get("action")) or _s(nm.get("decision")),
             evidence_confidence=_s(nm.get("confidence")),
             pricing_path=PricingPath.CURATED_TABLE,
             canonical_expected_nmb=None,
             economic_value_basis="not_monetised",
             is_monetized=False,
             reason_not_monetized=_s(nm.get("reason")),
+            value_withheld_by_policy=bool(
+                nm.get("withheld_by_policy", False)),
             is_hypothetical_or_awareness=True,
         ))
 

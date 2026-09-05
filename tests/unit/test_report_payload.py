@@ -896,3 +896,102 @@ def test_chip_and_wgs_summaries_are_distinguishable():
         "the marginal value of sequencing and the sequencing-only total are "
         "different quantities; a test that let them coincide would not catch "
         "one being printed for the other")
+
+
+def test_an_action_is_never_published_as_a_finding():
+    """The blocker: monetised findings reappeared as unvaluable duplicates.
+
+    `clinical_benefit` led the label precedence on the not-monetised path, so a
+    record that reached the curated valuation step without prevalence/cost was
+    published under the name of its own action. The sample carried 23 of these
+    against 8 genuinely unvaluable findings: BRCA1 was valued at $18,808 for
+    "Enhanced screening + risk-reducing surgery option" while that same string
+    appeared four pages earlier as a finding the report could not value.
+    """
+    from report.payload import build_report_payload
+    from report.validate import validate_payload
+
+    p = build_report_payload(
+        None,
+        {"nmb_rows": [{"label": "BRCA1 pathogenic variant",
+                       "economic_pathway_id": "clinvar:brca1:breastovarian",
+                       "action": "Enhanced screening + risk-reducing surgery",
+                       "confidence": "high", "gene": "BRCA1",
+                       "nmb": 18808, "dcost_averted": 17412, "dqaly": 0.019,
+                       "intervention_charged": 2000, "wgs_only": False}]},
+        {"not_monetised": [{
+            "finding": "Enhanced screening + risk-reducing surgery.",
+            # Same gene: the check requires it, because the defect is one
+            # source record reaching two paths. A trailing period is added
+            # deliberately — exact string equality was defeated by punctuation
+            # alone, so the normalisation is part of what is under test.
+            "gene": "BRCA1",
+            "category": "Unvaluable — incomplete economics",
+            "reason": "reached the valuation step without cost",
+            "withheld_by_policy": False}]},
+    )
+    names = [f.display_name for f in p.findings]
+    assert "Enhanced screening + risk-reducing surgery." in names, (
+        "fixture must reproduce the defect before the check is exercised")
+    errs = [f for f in validate_payload(p) if f["severity"] == "ERROR"]
+    assert any("Action published as a finding" in f["check"] for f in errs), (
+        f"an action published as its own finding must be an ERROR; got {errs}")
+
+
+def test_an_incomplete_record_is_not_a_withheld_one():
+    """A missing input is a data gap; NOT_VALUED is a policy refusal.
+
+    Reading any stated reason as a refusal made the withheld-vs-priced check
+    report four false contradictions on PGx genes, where one drug's finding is
+    priced and a DIFFERENT drug's record for the same gene is incomplete.
+    """
+    from report.payload import build_report_payload
+    from report.validate import validate_payload
+
+    p = build_report_payload(
+        None,
+        {"nmb_rows": [{"label": "CYP2C19 IM (clopidogrel)",
+                       "economic_pathway_id": "pgx:cyp2c19:clopidogrel",
+                       "confidence": "high", "gene": "CYP2C19", "nmb": 490,
+                       "dcost_averted": 500, "dqaly": 0.001,
+                       "intervention_charged": 10, "wgs_only": False}]},
+        {"not_monetised": [{
+            "finding": "CYP2C19 — top-drug actionable (amitriptyline)",
+            "gene": "CYP2C19", "economic_pathway_id": "pgx:cyp2c19",
+            "reason": "reached the valuation step without cost",
+            "withheld_by_policy": False}]},
+    )
+    errs = [f for f in validate_payload(p) if f["severity"] == "ERROR"]
+    assert not any("Withheld finding priced" in f["check"] for f in errs), (
+        f"an incomplete record is not a withheld one; got {errs}")
+
+
+def test_an_unvaluable_row_is_named_by_its_finding_not_its_action():
+    """The upstream half of the blocker, tested at the source.
+
+    `_econ_record`'s label precedence put `clinical_benefit` first, so a record
+    that reached the curated valuation step without `cost` was published under
+    the name of its own action. Asserted here rather than only at the validator
+    because the validator catches the contradiction while this catches the
+    cause: if precedence regresses, this fails first and names the reason.
+    """
+    from econ.health_economics import analyze_personal_economics
+
+    r = analyze_personal_economics({"findings_with_economics": [{
+        "finding": "BRCA1 pathogenic variant (heterozygous)",
+        "clinical_benefit": "Enhanced screening + risk-reducing surgery option",
+        "category": "Risk & prevention", "confidence": "high",
+        "outcome_value": 100_000, "prevalence": 0.001, "cost": None,
+        "gene": "BRCA1", "economic_pathway_id": "clinvar:brca1:breastovarian",
+    }]})
+    rows = r.get("not_monetised") or []
+    assert rows, "a record missing cost must be reported, not dropped"
+    row = rows[0]
+    assert row["finding"] == "BRCA1 pathogenic variant (heterozygous)", (
+        f"named by its action instead of itself: {row['finding']!r}")
+    # Identity has to travel with it, or the payload cannot tell this row and a
+    # priced row apart well enough to drop the duplicate.
+    assert row.get("gene") == "BRCA1"
+    assert row.get("economic_pathway_id") == "clinvar:brca1:breastovarian"
+    # A missing input is a data gap, not a policy refusal.
+    assert row.get("withheld_by_policy") is False

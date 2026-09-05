@@ -90,6 +90,7 @@ def validate_payload(p: EconomicsReportPayload) -> list[dict[str, Any]]:
     out += _check_monetised_flag_matches_the_value(p)
     out += _check_withheld_findings_carry_no_value(p)
     out += _check_path_reconciliation(p)
+    out += _check_action_is_not_a_finding(p)
     out += _check_one_gene_one_finding(p)
     out += _check_render_identity(p)
     out += _note_legitimate_differences(p)
@@ -503,7 +504,10 @@ def _check_withheld_findings_carry_no_value(
                 out.add(v)
         return out
 
-    withheld = [f for f in p.findings if (f.reason_not_monetized or "").strip()]
+    # Policy refusals only. A record that merely lacked an input is not a
+    # withheld finding, and treating it as one made this check fire on four
+    # PGx genes where a second, DIFFERENT drug's record was incomplete.
+    withheld = [f for f in p.findings if f.value_withheld_by_policy]
     if not withheld:
         return []
     withheld_keys: set[str] = set()
@@ -512,7 +516,7 @@ def _check_withheld_findings_carry_no_value(
 
     out: list[Finding] = []
     for f in p.findings:
-        if (f.reason_not_monetized or "").strip():
+        if f.value_withheld_by_policy:
             # The withheld record itself must carry no figure either.
             vals = [("canonical_expected_nmb", f.canonical_expected_nmb),
                     ("legacy_curated_value", f.legacy_curated_value),
@@ -534,6 +538,70 @@ def _check_withheld_findings_carry_no_value(
                 f"{'/'.join(sorted(shared))} was withheld from monetisation; "
                 f"one path declined to value this and another valued it anyway",
                 "findings.health_economic_value"))
+    return out
+
+
+def _check_action_is_not_a_finding(
+        p: EconomicsReportPayload) -> list[Finding]:
+    """No unvaluable finding may be named after a monetised finding's action.
+
+    THE CHECK THAT WOULD HAVE CAUGHT IT. `clinical_benefit` led the label
+    precedence on the not-monetised path, so a record that reached the curated
+    valuation step without `prevalence`/`cost` was published under the name of
+    its own action. The sample carried 23 of these against 8 genuinely
+    unvaluable findings: BRCA1 was valued at $18,808 for "Enhanced screening +
+    risk-reducing surgery option" on page 7, and that same string appeared on
+    page 3 as a finding the report said it could not value.
+
+    ERROR rather than WARNING. It is a self-contradiction visible on the page —
+    the report both prices something and disclaims being able to price it — and
+    it inflates the "reported without a value" headline, which is one of the
+    honesty claims the document makes about itself.
+    """
+    def _norm(v: str) -> str:
+        # Punctuation and dash variants are stripped, not just whitespace. On
+        # exact-match-after-whitespace alone, a single trailing period defeated
+        # this check completely (0 of 23 known phantoms caught) and swapping an
+        # en-dash for a hyphen halved it.
+        t = str(v or "").lower()
+        t = t.replace("\u2014", " ").replace("\u2013", " ").replace("-", " ")
+        t = t.replace("\u00a0", " ")
+        t = "".join(c for c in t if c.isalnum() or c.isspace())
+        return " ".join(t.split())
+
+    priced = [f for f in p.findings if f.canonical_expected_nmb is not None]
+    actions: dict[str, object] = {}
+    for f in priced:
+        key = _norm(f.action_summary)
+        if len(key) > 12:
+            actions.setdefault(key, f)
+
+    out: list[Finding] = []
+    for f in p.findings:
+        if f.canonical_expected_nmb is not None:
+            continue
+        name = _norm(f.display_name)
+        owner = actions.get(name)
+        if owner is None:
+            continue
+        # SAME SOURCE RECORD, or it is not this defect. The failure mode is one
+        # record reaching two paths, so the gene must agree. Without this, an
+        # unrelated finding whose name happens to read like a generic action
+        # ("Enhanced screening + specialist referral") raises an ERROR, and an
+        # ERROR here blocks the PDF entirely — a false positive costs the whole
+        # document.
+        if (f.gene or "").strip().upper() != (owner.gene or "").strip().upper():
+            continue
+        out.append(Finding(
+            severity=Severity.ERROR,
+            check="Action published as a finding",
+            detail=(f"{f.display_name!r} is reported as a finding carrying no "
+                    f"value, but it is the ACTION of {owner.display_name!r}, "
+                    f"which the same report prices at "
+                    f"{owner.canonical_expected_nmb:,.0f}. An action is an "
+                    f"attribute of a finding, not a finding"),
+            field="findings.display_name",
+        ))
     return out
 
 
