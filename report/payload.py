@@ -911,6 +911,33 @@ def build_report_payload(
             is_hypothetical_or_awareness=True,
         ))
 
+    # 4. Findings the value-of-information layer declined to price.
+    #
+    # SILENTLY DROPPED UNTIL NOW. `unvalued_findings` was populated on every
+    # run and read by nothing in `report/`, so a finding the model deliberately
+    # declined to price disappeared from the document instead of appearing
+    # without a figure. Withholding a number is a decision the reader is
+    # entitled to see; withholding the finding is just a missing finding, and
+    # it is the failure mode this report exists to avoid.
+    _seen_names = {(f.display_name or "").strip().lower() for f in findings}
+    for uv in (voi_result.get("unvalued_findings") or []):
+        _label = _s(uv.get("label"))
+        if not _label or _label.strip().lower() in _seen_names:
+            continue
+        _seen_names.add(_label.strip().lower())
+        findings.append(FindingEconomics(
+            finding_id=_label,
+            display_name=_label,
+            category=_s(uv.get("category")),
+            pricing_path=PricingPath.VOI_PARAMETRIC,
+            canonical_expected_nmb=None,
+            economic_value_basis="not_monetised",
+            is_monetized=False,
+            reason_not_monetized=_s(uv.get("reason")),
+            value_withheld_by_policy=bool(uv.get("intentional")),
+            is_hypothetical_or_awareness=True,
+        ))
+
     # Canonical personal totals, derived from the merged findings rather than
     # from the curated sheet. Reported beside the legacy total, not instead of
     # it, because they are different quantities.
