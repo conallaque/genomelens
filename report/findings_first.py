@@ -285,6 +285,7 @@ h2.sec{font-size:20px;font-weight:700;color:var(--teal-900);margin:0;
 .dcard.c .estrip .ev.neg{color:var(--red)}
 .dcard.c .estrip .ev.na{font-size:12px;color:var(--ink-3);font-weight:650}
 .dcard.c .estrip .es{font-size:10px;color:var(--ink-2)}
+.dflt{font-size:9px;letter-spacing:.02em;color:var(--ink-3,#8a8f98);border:1px solid var(--rule,#e3e6ea);border-radius:3px;padding:0 3px;margin-left:3px;white-space:nowrap}
 .dcard.c .estrip .es b{color:var(--ink);font-weight:700;
   font-variant-numeric:tabular-nums}
 .dcard.c .estrip .el{font-size:8.5px;letter-spacing:.11em;text-transform:uppercase;
@@ -410,9 +411,21 @@ def _verdict(p: EconomicsReportPayload) -> str:
             "reduce healthcare spending.")
 
 
-def _confidence_mix(p: EconomicsReportPayload) -> str:
+def _confidence_mix(priced: list[FindingEconomics]) -> str:
+    """Grade breakdown of the findings the caller counted in its headline.
+
+    This used to take the whole payload and count every finding in it, while
+    the headline above it counted only the priced ones — 6 high + 9 moderate +
+    8 low against a headline of 22, plus 30 "ungraded" that were mostly the
+    action-string phantoms. Two populations described by one sentence, with no
+    way for a reader to reconcile them.
+
+    It now takes THE LIST THE HEADLINE COUNTED. Sharing the list is what makes
+    the totals agree; an assertion that they agree would only have restated the
+    bug's absence, and this function cannot see the headline to check against.
+    """
     counts: dict[str, int] = {}
-    for f in p.findings:
+    for f in priced:
         key = (f.evidence_confidence or "ungraded").lower()
         counts[key] = counts.get(key, 0) + 1
     order = {"high": 0, "moderate": 1, "low": 2, "ungraded": 3}
@@ -521,7 +534,7 @@ def render_page_one(p: EconomicsReportPayload) -> str:
     <div class="count">{n_priced}</div>
     <div class="btxt">
       <div class="bh">findings carry a standardised economic estimate</div>
-      <div class="bs">{_e(_confidence_mix(p))}{_e(unstd_line)}</div>
+      <div class="bs">{_e(_confidence_mix(priced))}{_e(unstd_line)}</div>
       <div class="pills">{pills}</div>
     </div>
   </div>
@@ -672,12 +685,32 @@ def render_page_two(p: EconomicsReportPayload) -> str:
         for f in items:
             flat.append((group, f))
 
+    # EVEN SPLIT, not fixed budgets. Filling each sheet to its cap and letting
+    # the remainder fall onto the last one left a final sheet holding five rows
+    # and 55% white space once the phantom action-rows were removed and the
+    # count dropped from 53 findings to 33. The caps still decide HOW MANY
+    # sheets are needed; the rows are then spread across those sheets so the
+    # last one is never nearly empty.
+    n = len(flat)
+    if n <= _GLANCE_ROWS_FIRST_SHEET:
+        n_sheets = 1
+    else:
+        rest = n - _GLANCE_ROWS_FIRST_SHEET
+        n_sheets = 1 + -(-rest // _GLANCE_ROWS_PER_SHEET)   # ceil
+
     pages: list[list[tuple[str, object]]] = []
-    i, budget = 0, _GLANCE_ROWS_FIRST_SHEET
-    while i < len(flat):
-        pages.append(flat[i:i + budget])
-        i += budget
-        budget = _GLANCE_ROWS_PER_SHEET
+    i = 0
+    for sheet in range(n_sheets):
+        # Spread what remains over the sheets that remain, capped so the first
+        # sheet (which carries the page heading) never exceeds its own budget.
+        left = n_sheets - sheet
+        take = -(-(n - i) // left)
+        cap = _GLANCE_ROWS_FIRST_SHEET if sheet == 0 else _GLANCE_ROWS_PER_SHEET
+        take = min(take, cap)
+        pages.append(flat[i:i + take])
+        i += take
+    if i < n:                     # never drop a finding to make the page fit
+        pages[-1].extend(flat[i:])
     if not pages:
         pages = [[]]
 
@@ -698,10 +731,23 @@ def render_page_two(p: EconomicsReportPayload) -> str:
                 if cur is not None:
                     rows += "</div>"
                 n_in_group = sum(1 for g, _ in flat if g == group)
+                n_here = sum(1 for g, _ in chunk if g == group)
                 cont = " (continued)" if group in seen_groups else ""
+                # THE REMAINDER, NOT THE TOTAL. A continuation header repeated
+                # the group's full count — "Risk & prevention, 12 findings" on
+                # the sheet showing 12 and again on the sheet showing the last
+                # 4 — so the same twelve looked like twenty-four.
+                if cont:
+                    shown = sum(1 for pg in pages[:idx] for g, _ in pg
+                                if g == group)
+                    label = (f'{n_here} of {n_in_group} finding'
+                             f'{"" if n_in_group == 1 else "s"}'
+                             f' &middot; {shown} shown earlier')
+                else:
+                    label = (f'{n_in_group} finding'
+                             f'{"" if n_in_group == 1 else "s"}')
                 rows += (f'<div class="grouplabel">{_e(group)}{cont}'
-                         f'<span>{n_in_group} finding'
-                         f'{"" if n_in_group == 1 else "s"}</span></div>'
+                         f'<span>{label}</span></div>'
                          f'<div class="glance">')
                 seen_groups.add(group)
                 cur = group
@@ -758,14 +804,24 @@ def _econ_box(f: FindingEconomics) -> str:
         <dl>
           <dt>Medical cost averted</dt><dd>{fmt.money(f.medical_cost_averted)}</dd>
           <dt>Health gain</dt><dd>{fmt.qaly(f.expected_qaly_gain)} QALY</dd>
-          <dt>Cost to act</dt><dd>{fmt.money(f.intervention_cost)}</dd>
+          <dt>Cost to act</dt>
+          <dd>{fmt.money(f.intervention_cost)}{_cost_basis_note(f)}</dd>
         </dl></div>"""
+
+
+# The medication sheet bounds its CARD COUNT but never bounded its TEXT, so it
+# sat 24px clear of the footer and adding ~60 characters to each of the three
+# PGx action strings pushed it 9px past — a bleed onto the next page's
+# masthead, which is the defect this document has already shipped once. The
+# title was clipped at 62; the field values were not clipped at all.
+_DETAIL_FIELD_CHARS = 230
 
 
 def _detail_card(f: FindingEconomics, *, fields: list, source: str) -> str:
     body = "".join(
         f'<div class="dfield"><div class="fl">{_e(k)}</div>'
-        f'<div class="fv">{_e(v)}</div></div>' for k, v in fields if v)
+        f'<div class="fv">{_e(_clip(str(v), _DETAIL_FIELD_CHARS))}</div></div>'
+        for k, v in fields if v)
     sub = _drug_of(f)
     return f"""
   <div class="dcard">
@@ -851,7 +907,21 @@ def _estrip(f: FindingEconomics) -> str:
             f'<span class="es">health gain '
             f'<b>{fmt.qaly(f.expected_qaly_gain)} QALY</b></span>'
             f'<span class="es">cost to act '
-            f'<b>{fmt.money(f.intervention_cost)}</b></span></div>')
+            f'<b>{fmt.money(f.intervention_cost)}</b>'
+            f'{_cost_basis_note(f)}</span></div>')
+
+
+def _cost_basis_note(f: FindingEconomics) -> str:
+    """Mark a cost of acting that is the registered default, not this gene's.
+
+    Eleven findings printed the same $500 with nothing to distinguish them, so
+    risk-reducing surgery and passive symptom awareness read as separately
+    costed at an identical price. They are one declared parameter used eleven
+    times, and saying so is the difference between a default and a claim.
+    """
+    if f.intervention_cost_basis and f.intervention_cost_basis != "gene_specific":
+        return ' <span class="dflt">registry default</span>'
+    return ""
 
 
 def _compact_card(f: FindingEconomics, fields: list) -> str:
@@ -923,12 +993,15 @@ def render_page_four(p: EconomicsReportPayload) -> str:
     return f"""
 <section class="sheet">
   {_mast(p, "Risk, prevention & exploratory findings")}
-  <h1 class="head">Findings with weaker evidence, reported anyway</h1>
-  <p class="intro">Lower confidence changes how a finding should be read, not
-  whether it is shown. A negative expected NMB means the modelled cost of acting
-  exceeds the modelled benefit &mdash; useful information, not an error. Evidence
-  grade reflects the strength of the association, not the size of the value;
-  provenance is on the methods page.</p>
+  <h1 class="head">Risk and prevention findings, in detail</h1>
+  <p class="intro">The findings above carry an evidence grade rather than a
+  single standard of proof: this page runs from well-established variants to
+  exploratory ones, and the badge on each card says which is which. Lower
+  confidence changes how a finding should be read, not whether it is shown. A
+  negative expected NMB means the modelled cost of acting exceeds the modelled
+  benefit &mdash; useful information, not an error. Evidence grade reflects the
+  strength of the association, not the size of the value; provenance is on the
+  methods page.</p>
   {cards}{shared}{tail}
   {_foot(p, 4)}
 </section>"""
@@ -1042,6 +1115,28 @@ def render_page_five(p: EconomicsReportPayload) -> str:
 
 # ── page 6 ────────────────────────────────────────────────────────────────────
 
+def _ceac_at_zero_line(p: EconomicsReportPayload) -> str:
+    """State the zero-threshold probability explicitly, whatever it is.
+
+    At a willingness-to-pay of $0 a strategy is cost-effective only if it is
+    cost-SAVING in that draw, so this is the number that distinguishes a
+    genuinely dominant profile from one whose parameters stopped varying. It
+    was computed and never printed, which meant the page showed the reassuring
+    figure and withheld the diagnostic one.
+    """
+    pts = [c for c in (p.uncertainty.ceac or [])
+           if float(c.get("wtp", c.get("lam", -1))) == 0]
+    if not pts:
+        return ""
+    p0 = float(pts[0].get("p_cost_effective", pts[0].get("prob", 0.0)))
+    if p0 >= 1.0:
+        return ("At a $0 threshold this is still 100%, which on a dominant "
+                "profile is expected rather than reassuring — read it with "
+                "the interval above, not on its own.")
+    return (f"At a $0 threshold it is {p0:.2%}, below certainty — the cash "
+            f"arm genuinely varies.")
+
+
 def _interval_bar(p: EconomicsReportPayload) -> str:
     u = p.uncertainty
     lo, hi, mean = u.nmb_ci_low, u.nmb_ci_high, u.psa_mean_nmb
@@ -1109,13 +1204,20 @@ def render_page_six(p: EconomicsReportPayload) -> str:
         ({fmt.probability(u.probability_cost_effective)}). Reference-case NMB is
         {fmt.money(p.reference_case.nmb)}; the mean across simulations is
         {fmt.money(u.psa_mean_nmb)}. Both are correct and answer slightly
-        different questions.</p></div>
+        different questions.</p>
+      <p style="margin-top:6px"><b>95% interval
+        {fmt.money(u.nmb_ci_low)} to {fmt.money(u.nmb_ci_high)}</b> across
+        {fmt.count(u.n_parameters_varied)} varied parameters. A probability
+        this high is only meaningful beside the spread that produced it:
+        pinned parameters also report certainty, and the way to tell them
+        apart is whether the interval moves.</p></div>
     <div class="panel mint"><h4>Cost-saving</h4>
       <div class="ph">{_e(fmt.simulation_count(u.probability_cost_saving,
                                                u.psa_iterations))}</div>
       <p>the modelled programme costs less than usual care
         ({fmt.probability(u.probability_cost_saving)}).
-        {_e(_clip(u.note, 130))}</p></div>
+        {_e(_clip(u.note, 130))}</p>
+      <p style="margin-top:6px">{_e(_ceac_at_zero_line(p))}</p></div>
   </div>
   <h2 class="sec">What drives the answer</h2>
   <div class="tor">{tor_rows}</div>

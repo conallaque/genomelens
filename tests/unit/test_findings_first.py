@@ -298,3 +298,80 @@ def test_build_stamp_does_not_add_a_ninth_page():
         "</body>", f"<!--\n{marker}\n-->" + "</body>", 1)
     assert bs.marker_in(stamped) == marker
     assert stamped.count('class="sheet"') == 8
+
+
+def test_the_glance_pages_never_drop_or_duplicate_a_finding():
+    """The invariant render_page_two's docstring claims, at every size.
+
+    The sheet split was rewritten to spread rows evenly rather than filling
+    each sheet to its cap — a fixed budget left the last sheet holding five
+    rows and 55% white space once the phantom action-rows were removed. An
+    even split is easy to get subtly wrong at a boundary, and getting it wrong
+    means silently losing a finding, so every size up to a few sheets is
+    checked rather than one representative case.
+    """
+    from report.findings_first import render_page_two
+    from report.payload import EconomicsReportPayload, FindingEconomics
+
+    for n in list(range(0, 40)) + [47, 48, 49, 60, 97]:
+        p = EconomicsReportPayload()
+        p.findings = [FindingEconomics(display_name=f"F{i}",
+                                       canonical_expected_nmb=1.0,
+                                       evidence_confidence="high")
+                      for i in range(n)]
+        html = render_page_two(p)
+        shown = sum(html.count(f">F{i}<") for i in range(n))
+        assert shown == n, f"{n} findings in, {shown} rendered"
+
+
+def test_a_continuation_header_reports_the_remainder_not_the_total():
+    """A group spanning sheets repeated its full count on every sheet.
+
+    "Risk & prevention, 12 findings" appeared on the sheet showing twelve and
+    again on the sheet showing the last four, so the same twelve read as
+    twenty-four to anyone adding up the headers.
+    """
+    import re
+
+    from report.findings_first import render_page_two
+    from report.payload import EconomicsReportPayload, FindingEconomics
+
+    p = EconomicsReportPayload()
+    p.findings = [FindingEconomics(display_name=f"F{i}",
+                                   canonical_expected_nmb=1.0,
+                                   evidence_confidence="high")
+                  for i in range(60)]
+    heads = re.findall(r'<div class="grouplabel">(.*?)</div>',
+                       render_page_two(p))
+    assert len(heads) > 2, "fixture must span at least three sheets"
+    conts = [h for h in heads if "continued" in h]
+    assert conts, "a 60-finding group must continue"
+    for h in conts:
+        assert "of 60 findings" in h, f"continuation repeats the total: {h}"
+    # Each continuation must say how many were already shown, and those
+    # counts must strictly increase down the document.
+    earlier = [int(m) for h in conts
+               for m in re.findall(r"(\d+) shown earlier", h)]
+    assert earlier == sorted(earlier) and len(set(earlier)) == len(earlier), (
+        f"'shown earlier' counts must increase: {earlier}")
+
+
+def test_detail_card_fields_are_bounded():
+    """The medication sheet must not grow with its inputs.
+
+    That sheet bounds how many cards it shows but bounded nothing about their
+    text, and it renders 24px clear of the footer — so ~60 extra characters on
+    each of three PGx action strings pushed it past, onto the next page's
+    masthead. The card title was clipped at 62 characters; the field values
+    were not clipped at all.
+    """
+    from report.findings_first import _DETAIL_FIELD_CHARS, _detail_card
+    from report.payload import FindingEconomics
+
+    long = "extremely verbose clinical qualifier " * 10
+    html = _detail_card(FindingEconomics(display_name="G", evidence_confidence="high"),
+                        fields=[("Potential decision", long)], source="s")
+    assert long not in html, "an unbounded field value reached the card"
+    # The clip keeps it within the budget, plus the ellipsis the clipper adds.
+    body = html.split('class="fv">')[1].split("</div>")[0]
+    assert len(body) <= _DETAIL_FIELD_CHARS + 2, len(body)
