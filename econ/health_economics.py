@@ -1040,6 +1040,12 @@ def _apoe_findings(apoe_genotype: str | None, snps_df) -> list[dict]:
         confidence="moderate", source="Genotype", recurring=e["recurring"],
         prevalence=e["prevalence"], qaly_gain=e["qaly_gain"],
         evidence=f"APOE genotype: {geno}{confirm}",
+        # SEMANTIC COMPONENTS, so the id survives a reword. Without these the
+        # pathway keyed on a slug of the display text, and renaming the finding
+        # would have silently minted a new pathway that no longer joined to its
+        # own history.
+        kind="genotype", gene="APOE", condition="Alzheimer",
+        variant=str(geno or ""),
     )]
 
 
@@ -1633,6 +1639,11 @@ def _wellness_findings(wellness_result: dict | None) -> list[dict]:
                 confidence="low", source="Wellness Prediction",
                 prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
                 evidence=f"{pred.get('trait', '')} — {pred.get('result', '')}",
+                # No gene to key on, so the category — a stable key into
+                # WELLNESS_ECONOMICS — carries the identity instead of a slug
+                # of the trait's prose. `condition` satisfies the semantic-id
+                # guard and keeps the pathway stable across rewording.
+                kind="wellness_trait", phenotype=cat, condition=cat,
             ))
     return out
 
@@ -1829,6 +1840,10 @@ def _gut_findings(gut_health_result: dict | None) -> list[dict]:
             source="Gut Health",
             prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
             evidence=str(p.get("evidence") or ""),
+            # The HLA class II haplotype is the finding; keying on the display
+            # text meant "— serology decision" was load-bearing identity.
+            kind="haplotype", gene="HLA-DQA1/HLA-DQB1", condition="Coeliac",
+            variant=str(p.get("trait") or ""),
         ))
     return out
 
@@ -2692,8 +2707,25 @@ def analyze_personal_economics(economics_result: dict | None = None,
     if economics_result:
         for f in economics_result.get("findings_with_economics", []):
             outcome = f.get("outcome_value") or f.get("benefit") or 0
-            label = (f.get("clinical_benefit") or f.get("finding")
-                     or f.get("drug") or "Genomic finding")
+            # THE FINDING NAMES THE FINDING. `clinical_benefit` is the ACTION
+            # the finding bears on, and it led this precedence — so every
+            # record that fell through to `not_monetised` was titled with its
+            # own action. On the sample that printed "Enhanced screening +
+            # risk-reducing surgery option" as a finding in its own right,
+            # two pages after BRCA1 was valued at $18,808 for that same action.
+            # An action is an attribute of a finding, never a sibling of one.
+            label = (f.get("finding") or f.get("drug")
+                     or f.get("clinical_benefit") or "Genomic finding")
+            # Identity travels with the row so the payload can tell that this
+            # unvaluable record and a priced record are the same finding.
+            _ident = {
+                "economic_pathway_id": f.get("economic_pathway_id", ""),
+                "pathway_id_is_legacy": f.get("pathway_id_is_legacy", True),
+                "gene": f.get("gene", ""),
+                "condition": f.get("condition", ""),
+                "variant": f.get("variant", ""),
+                "action": f.get("clinical_benefit", ""),
+            }
 
             # REFUSE, DO NOT DEFAULT. This read `f.get("prevalence", 0.15)` and
             # `f.get("cost", 200)`, so a record that omitted either was priced
@@ -2712,6 +2744,12 @@ def analyze_personal_economics(economics_result: dict | None = None,
             # the reader deserves the real reason.
             if f.get("not_valued_reason"):
                 not_monetised.append({
+                    **_ident,
+                    # POLICY, not a data gap. This record was refused a value
+                    # on principle; the block below refuses one because an
+                    # input was missing. Only the first is a contradiction if
+                    # another path prices the same gene.
+                    "withheld_by_policy": True,
                     "category": f.get("category") or "Carrier Screening",
                     "finding": label,
                     "decision": f.get("clinical_benefit")
@@ -2721,9 +2759,53 @@ def analyze_personal_economics(economics_result: dict | None = None,
                 })
                 continue
 
+            # ROUTED DELIBERATELY, NOT BY A KEY THAT NEVER MATCHED.
+            #
+            # `_econ_record` emits the cost of acting as `intervention_cost`;
+            # this gate asked for `cost`. No record from that producer carries
+            # `cost`, so `missing` was `["cost"]` for EVERY genomic finding and
+            # the `continue` below fired unconditionally — the curated pricing
+            # path was unreachable, and 28 fully-costed findings (BRCA1, LDLR,
+            # APOB, APOE, CYP2C19 among them) were published as "Unvaluable —
+            # incomplete economics" citing a missing input none of them lacked.
+            #
+            # Making the path reachable is not the fix. When it is reached, the
+            # reconciliation gate rejects nine findings outright: BRCA1 curated
+            # -$41 against parametric $17,308 (422x), APOB -$5 against $6,658
+            # (1,332x), NAT2 $9,642 against $90 (107x). A model nobody could
+            # run is a model nobody maintained, and publishing it would put two
+            # irreconcilable figures on one finding.
+            #
+            # So records from `_econ_record` — the ones the parametric path
+            # already prices — are routed away from the curated model on
+            # purpose and told the truth about why. Records supplied with
+            # `cost` by other producers still go through it; `add()` and its
+            # arithmetic stay live and tested.
+            if f.get("intervention_cost") is not None and f.get("cost") is None:
+                not_monetised.append({
+                    **_ident,
+                    "withheld_by_policy": False,
+                    "category": f.get("category") or "Pharmacogenomic / genomic",
+                    "finding": label,
+                    "decision": f.get("clinical_benefit")
+                    or "Reported as a genomic finding.",
+                    "indicative_cost": f.get("intervention_cost"),
+                    "reason": (
+                        "No second, curated dollar figure is published for "
+                        "this finding. The curated per-condition model is not "
+                        "reconciled with the parametric one — where both can "
+                        "be computed they disagree by two to three orders of "
+                        "magnitude — so the parametric figure is the report's "
+                        "answer, and where that is absent no figure is "
+                        "invented."),
+                })
+                continue
+
             missing = [k for k in ("prevalence", "cost") if f.get(k) is None]
             if missing:
                 not_monetised.append({
+                    **_ident,
+                    "withheld_by_policy": False,
                     "category": "Unvaluable — incomplete economics",
                     "finding": label,
                     "decision": "Reported as a genomic finding; no dollar "
@@ -2966,6 +3048,7 @@ def analyze_personal_economics(economics_result: dict | None = None,
         n_actionable = family_planning_result.get("n_actionable", 0)
         if n_actionable > 0:
             not_monetised.append({
+                "withheld_by_policy": True,
                 "category": "Family Planning",
                 "finding": f"Reproductive genetics — {n_actionable} carrier "
                            f"condition(s) where partner testing would be "

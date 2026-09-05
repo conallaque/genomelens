@@ -765,3 +765,38 @@ def test_complete_records_are_still_valued():
                    for n in r["not_monetised"])
     assert r["n_items"] == 1
     assert r["total_avoided"] > 0 and r["total_qaly"] > 0
+
+
+def test_a_record_from_the_real_producer_is_not_called_incomplete():
+    """Built by `_econ_record`, not by hand. That difference hid a defect.
+
+    Every fixture in this file wrote `"cost": 300` directly, but `_econ_record`
+    emits the cost of acting as `intervention_cost` and never as `cost`. The
+    completeness gate asked for `cost`, so it was "missing" on every real
+    record, and 28 fully-costed genomic findings were published as
+    "Unvaluable — incomplete economics" citing an input none of them lacked.
+    916 tests were green throughout, because the fixtures agreed with the bug.
+
+    Asserted against the producer's own output so the two cannot drift again.
+    """
+    rec = he._econ_record(
+        finding="BRCA1 pathogenic variant", clinical_benefit="Enhanced screening",
+        cost=2_000.0, outcome_value=100_000.0, confidence="high",
+        prevalence=0.001, qaly_gain=0.02, kind="clinvar", gene="BRCA1",
+        condition="BreastOvarian")
+    assert rec.get("cost") is None, (
+        "if _econ_record starts emitting `cost`, the routing below changes "
+        "meaning — update both together")
+    assert rec["intervention_cost"] == 2_000.0
+
+    r = he.analyze_personal_economics({"findings_with_economics": [rec]})
+    rows = r.get("not_monetised") or []
+    assert len(rows) == 1
+    row = rows[0]
+    assert row["finding"] == "BRCA1 pathogenic variant"
+    # It is complete. Whatever reason is given, it must not claim otherwise.
+    assert "incomplete" not in row["category"].lower(), row["category"]
+    assert "without cost" not in row["reason"], row["reason"]
+    assert "reached the valuation step without" not in row["reason"], row["reason"]
+    assert row["indicative_cost"] == 2_000.0, (
+        "the cost is known and must be shown, not reported as absent")
