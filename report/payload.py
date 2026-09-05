@@ -565,7 +565,7 @@ class EconomicsReportPayload:
             "Medication & prescribing": [],
             "Risk & prevention": [],
             "Lower-confidence & exploratory": [],
-            "Awareness — not monetised": [],
+            "Reported, not costed": [],
         }
         for f in self.findings:
             conf = (f.evidence_confidence or "").lower()
@@ -575,7 +575,7 @@ class EconomicsReportPayload:
                       or f.economic_pathway_id.startswith("pgx:")
                       or "metabolizer" in name or "function" in name)
             if not f.is_monetized:
-                groups["Awareness — not monetised"].append(f)
+                groups["Reported, not costed"].append(f)
             elif is_pgx and conf == "high":
                 groups["Medication & prescribing"].append(f)
             elif conf in ("high", "moderate"):

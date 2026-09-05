@@ -11,7 +11,11 @@ import re
 
 import pytest
 
-from report.findings_first import render_findings_first, render_page_two
+from report.findings_first import (
+    MAIN_REPORT_PAGES,
+    render_findings_first,
+    render_page_two,
+)
 from report.payload import (
     EconomicsReportPayload,
     FindingEconomics,
@@ -219,16 +223,27 @@ def test_empty_payload_renders_without_crashing():
 def test_report_declares_eight_pages():
     from report.findings_first import MAIN_REPORT_PAGES, page_count
     assert MAIN_REPORT_PAGES == 8
-    assert page_count(_fixture_like()) == 8
+    # MAIN_REPORT_PAGES is the body count; the report also renders a
+    # cover sheet carrying the synthetic-input and not-medical-advice
+    # statements, so a minimal payload renders one more than the body.
+    assert page_count(_fixture_like()) == MAIN_REPORT_PAGES + 1
 
 
 def test_every_page_renders_and_is_numbered_over_eight():
     """A section that silently disappears would still produce valid HTML, so
-    the numbering is checked rather than the section count."""
+    the numbering is checked rather than the section count.
+
+    The total counts the cover as well. It is a numbered sheet like any other,
+    and a footer reading "11 / 10" is exactly what happens when the two
+    disagree.
+    """
     out = render_findings_first(_fixture_like())
-    for n in range(1, 9):
-        assert f"{n} / 8" in out, f"page {n} footer missing"
-    assert out.count('class="sheet"') == 8
+    total = MAIN_REPORT_PAGES + 1          # body sheets plus the cover
+    for n in range(1, total + 1):
+        assert f"{n} / {total}" in out, f"page {n} footer missing"
+    assert out.count('<section class="sheet') == total
+    # The cover is a sheet of the document, not a bolted-on A4 page.
+    assert '<section class="sheet cover">' in out
 
 
 def test_page_order_matches_the_agreed_structure():

@@ -285,6 +285,31 @@ h2.sec{font-size:20px;font-weight:700;color:var(--teal-900);margin:0;
 .dcard.c .estrip .ev.neg{color:var(--red)}
 .dcard.c .estrip .ev.na{font-size:12px;color:var(--ink-3);font-weight:650}
 .dcard.c .estrip .es{font-size:10px;color:var(--ink-2)}
+.cover{background:#fff}
+.cv-wrap{padding:150px 84px 0 84px;display:flex;flex-direction:column}
+.cv-brand{font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent,#0f6b5c);font-weight:700;margin-bottom:26px}
+.cv-title{font-size:42px;line-height:1.12;letter-spacing:-.02em;margin:0 0 14px;
+  font-weight:700;color:var(--ink,#12181f);max-width:15ch}
+.cv-sub{font-size:15px;line-height:1.55;color:var(--ink-2,#4a5560);margin:0;
+  max-width:52ch}
+.cv-meta{margin-top:44px;border-top:1px solid var(--rule,#e3e6ea);
+  border-bottom:1px solid var(--rule,#e3e6ea);padding:18px 0;
+  display:grid;grid-template-columns:1fr 1fr;gap:11px 40px}
+.cv-meta>div{display:flex;justify-content:space-between;gap:14px;font-size:12px}
+.cv-meta span{color:var(--ink-3,#8a8f98);letter-spacing:.03em}
+.cv-meta b{color:var(--ink,#12181f);text-align:right}
+.cv-meta .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:10px;font-weight:500}
+.cv-note{margin-top:30px;border-left:3px solid var(--accent,#0f6b5c);
+  background:#f2f8f6;padding:13px 16px;font-size:12.5px;line-height:1.6;
+  color:var(--ink-2,#4a5560);border-radius:0 4px 4px 0}
+.cv-note.warn{border-left-color:#b8860b;background:#fdf6e7}
+.cv-note b{color:var(--ink,#12181f);display:block;margin-bottom:3px}
+.cv-disc{margin-top:16px;border:1px solid var(--rule,#e3e6ea);border-radius:4px;
+  padding:14px 16px;font-size:11.5px;line-height:1.62;
+  color:var(--ink-2,#4a5560)}
+.cv-disc b{color:var(--ink,#12181f);display:block;margin-bottom:3px}
 .dflt{font-size:9px;letter-spacing:.02em;color:var(--ink-3,#8a8f98);border:1px solid var(--rule,#e3e6ea);border-radius:3px;padding:0 3px;margin-left:3px;white-space:nowrap}
 .dcard.c .estrip .es b{color:var(--ink);font-weight:700;
   font-variant-numeric:tabular-nums}
@@ -556,7 +581,8 @@ def render_page_one(p: EconomicsReportPayload) -> str:
 
 def _money_cell(f: FindingEconomics) -> str:
     if f.canonical_expected_nmb is None:
-        label = "Not monetised" if not f.is_monetized else "Not yet<br>standardised"
+        label = ("Not routed to the<br>economic engine" if not f.is_monetized
+                 else "No costed<br>pathway yet")
         return f'<div class="vn">Expected NMB</div><div class="v na">{label}</div>'
     v = f.canonical_expected_nmb
     return (f'<div class="vn">Expected NMB</div>'
@@ -658,7 +684,8 @@ _GLANCE_ROWS_PER_SHEET = 16
 def _glance_row(f) -> str:
     """One scannable row: finding, decision, evidence grade, standalone value."""
     if f.canonical_expected_nmb is None:
-        cell = ('<div class="m na">Not monetised</div>' if not f.is_monetized
+        cell = ('<div class="m na">Not routed to the engine</div>'
+                if not f.is_monetized
                 else '<div class="m na">Not yet standardised</div>')
     else:
         v = f.canonical_expected_nmb
@@ -790,7 +817,7 @@ def render_page_two(p: EconomicsReportPayload) -> str:
 
 def _econ_box(f: FindingEconomics) -> str:
     if f.canonical_expected_nmb is None:
-        head = ("Not monetised" if not f.is_monetized
+        head = ("Not routed to the economic engine" if not f.is_monetized
                 else "Economic pathway not yet standardised")
         why = _clip(f.reason_not_monetized, 62) or "no registry-backed pathway"
         return f"""<div class="econbox">
@@ -893,7 +920,7 @@ def render_page_three(p: EconomicsReportPayload) -> str:
 
 def _estrip(f: FindingEconomics) -> str:
     if f.canonical_expected_nmb is None:
-        label = ("Not monetised" if not f.is_monetized
+        label = ("Not routed to the economic engine" if not f.is_monetized
                  else "Economic pathway not yet standardised")
         why = _clip(f.reason_not_monetized, 70)
         return (f'<div class="estrip"><span class="el">Expected NMB</span>'
@@ -943,7 +970,7 @@ def render_page_four(p: EconomicsReportPayload) -> str:
     groups = dict(p.findings_page_groups())
     items: list[FindingEconomics] = []
     for name in ("Risk & prevention", "Lower-confidence & exploratory",
-                 "Awareness — not monetised"):
+                 "Reported, not costed"):
         items.extend(groups.get(name, []))
     # Detail cards are for findings the model can actually explain. The ones
     # with no standardised pathway have nothing to decompose, so a card would
@@ -1137,6 +1164,24 @@ def _ceac_at_zero_line(p: EconomicsReportPayload) -> str:
             f"arm genuinely varies.")
 
 
+def _wgs_zero_note(p: EconomicsReportPayload) -> str:
+    """Say why the observed contribution is zero, rather than printing a bare $0.
+
+    A $0 beside "what did sequencing actually find that an array could not"
+    reads as a failed calculation unless the page says otherwise. It is a real
+    answer here: nothing in this genome is reportable ONLY by sequencing.
+    """
+    t = p.testing_decision
+    if t.observed_wgs_only_findings:
+        return ""
+    return ('<p style="margin-top:7px"><b>Zero is an answer, not a gap.</b> '
+            "Every finding in this genome sits at a position an array could "
+            "have typed, so none of them is reportable only by sequencing. "
+            "That makes the observed contribution genuinely nil for this "
+            "input &mdash; it does not mean sequencing is worthless, which is "
+            "what the prospective column beside it measures.</p>")
+
+
 def _interval_bar(p: EconomicsReportPayload) -> str:
     u = p.uncertainty
     lo, hi, mean = u.nmb_ci_low, u.nmb_ci_high, u.psa_mean_nmb
@@ -1303,6 +1348,7 @@ def render_page_seven(p: EconomicsReportPayload) -> str:
       <p style="margin-top:9px">A count of findings this genome contains, not an
         expectation. For this input the population question is already
         settled.</p>
+      {_wgs_zero_note(p)}
       <p style="margin-top:7px"><b>Not the same as the value of sequencing.</b>
         This line counts only findings an array <i>cannot</i> report. Sequencing
         also recovers findings an array could have carried and did not, which is
@@ -1423,7 +1469,7 @@ def page_count(p: EconomicsReportPayload) -> int:
     _renumber_footers already stamps the true total. Returning the constant
     here gave the document two different page counts.
     """
-    return render_findings_first(p).count('<section class="sheet">')
+    return render_findings_first(p).count('<section class="sheet')
 
 
 def _renumber_footers(html: str) -> str:
@@ -1437,7 +1483,10 @@ def _renumber_footers(html: str) -> str:
     turned out to be.
     """
     import re as _re
-    total = html.count('<section class="sheet">')
+    # PREFIX MATCH. The cover is `<section class="sheet cover">`, so an exact
+    # match on `class="sheet"` counted 10 sheets while 11 footers were being
+    # numbered — the last one would have read "11 / 10".
+    total = html.count('<section class="sheet')
     n = 0
 
     def _sub(m):
@@ -1448,12 +1497,92 @@ def _renumber_footers(html: str) -> str:
     return _re.sub(r"<div>\d+ / \d+</div></div>", _sub, html)
 
 
+def _cover_date(iso: str) -> str:
+    """ISO timestamp as a readable date, or the raw string if it will not parse."""
+    from datetime import datetime
+    t = str(iso or "").strip()
+    if not t:
+        return "\u2014"
+    try:
+        return datetime.fromisoformat(t).strftime("%d %B %Y")
+    except ValueError:
+        return t[:10] or t
+
+
+def render_cover(p: EconomicsReportPayload) -> str:
+    """The title sheet.
+
+    NOT `core.pdf_export._build_cover_page`. That emits flowing-A4 `.pdf-cover`
+    markup, and putting it in front of a self-paginated 960x1240 document is
+    exactly what produced the stray cover and blank trailing page recorded in
+    `core/pdf_export.py` and `pipeline.py` — it was tried and removed. This is
+    a native sheet using the document's own geometry.
+
+    WHAT IT EXISTS TO SAY. That the input is synthetic, and that this is a
+    research and educational model rather than medical or financial advice.
+    Those were carried in 8pt footer text and a corner chip; they are the most
+    load-bearing sentences in the document and belong on the title page.
+    """
+    m = p.metadata
+    synthetic = bool(m.is_synthetic)
+    src = _e(m.input_label or "genome")
+    kind = "whole-genome" if (m.input_type or "").lower() == "wgs" else "array"
+    build = _e((m.build_id or "").replace("GENOMELENS-BUILD:", "").strip())
+    return f"""
+<section class="sheet cover">
+  <div class="topbar"></div>
+  <div class="cv-wrap">
+    <div class="cv-brand">GenomeLens</div>
+    <h1 class="cv-title">Economic analysis of a genomic report</h1>
+    <p class="cv-sub">Cost&ndash;utility model of acting on the findings in one
+      {kind} input, valued at
+      {fmt.money(m.willingness_to_pay)} per QALY from a
+      {_e(m.perspective or 'healthcare sector')} perspective.</p>
+
+    <div class="cv-meta">
+      <div><span>Source input</span><b>{src}</b></div>
+      <div><span>Input type</span><b>{_e((m.input_type or '').upper() or '&mdash;')}</b></div>
+      <div><span>Generated</span><b>{_e(_cover_date(m.generated_at))}</b></div>
+      <div><span>Time horizon</span><b>{fmt.years(m.analysis_horizon_years)}</b></div>
+      <div><span>Discounting</span><b>{fmt.percentage(m.discount_rate)}, costs and QALYs</b></div>
+      <div><span>Build</span><b class="mono">{build or '&mdash;'}</b></div>
+    </div>
+
+    <div class="cv-note{'' if synthetic else ' warn'}">
+      <b>{'Synthetic input &mdash; no human genome was used.' if synthetic
+          else 'Personal genomic input.'}</b>
+      {'Every finding in this report was produced from a purpose-built '
+       'synthetic genome generated by this repository. No personal genomic or '
+       'health data was read, stored or published to produce it.'
+       if synthetic else
+       'This report was produced from a personal genomic file. Treat it as '
+       'health information and share it accordingly.'}
+    </div>
+
+    <div class="cv-disc">
+      <b>Research and educational use &mdash; not medical or financial advice.</b>
+      This is a decision-analytic model, not a clinical or economic evaluation
+      submitted to any authority. Its parameters are population averages
+      applied to one genome: it values the expected consequences of acting on a
+      pattern of findings, and does not predict what will happen to any
+      individual. Monetary figures include health valued at a
+      willingness-to-pay threshold and are not cash returned to anyone.
+      Clinically relevant findings require confirmation by an appropriate
+      professional &mdash; a physician, clinical pharmacist or board-certified
+      genetic counsellor &mdash; before anything follows from them.
+    </div>
+  </div>
+  {_foot(p, 1)}
+</section>"""
+
+
 def render_findings_first(p: EconomicsReportPayload) -> str:
     """The findings-first report. Eight sheets for a typical genome, more when
     one carries enough findings that the glance page continues — the committed
     sample renders eleven."""
     label = p.metadata.input_label or "genome"
     pages = "\n".join(r(p) for r in (
+        render_cover,
         render_page_one, render_page_two, render_page_three, render_page_four,
         render_page_five, render_page_six, render_page_seven, render_page_eight))
     pages = _renumber_footers(pages)
