@@ -1719,6 +1719,19 @@ def _family_planning_findings(family_planning_result: dict | None) -> list[dict]
     return out
 
 
+def _clip_sentence(text: str, n: int) -> str:
+    """Clip to a sentence boundary where possible, else on a word."""
+    t = " ".join(str(text or "").split())
+    if len(t) <= n:
+        return t
+    cut = t[:n]
+    stop = cut.rfind(". ")
+    if stop > n // 2:
+        return cut[:stop + 1]
+    sp = cut.rfind(" ")
+    return (cut[:sp] if sp > 0 else cut).rstrip(",;:") + "\u2026"
+
+
 def _top_drugs_findings(top_drugs_result: dict | None) -> list[dict]:
     """High-value PGx findings from the top-prescribed-drugs screen:
     for drugs that are genotype-actionable, the p_rx is effectively 1.0
@@ -1747,9 +1760,32 @@ def _top_drugs_findings(top_drugs_result: dict | None) -> list[dict]:
         if econ is None:
             continue
         seen_genes.add(gene)
+        # THE ACTION MUST BE ABOUT THE DRUG IN THE NAME.
+        #
+        # This took `clinical_benefit` from PGX_ECONOMICS[gene], which is
+        # written for that gene's CANONICAL drug — so the row read "CYP2C19 —
+        # top-drug actionable (amitriptyline)" with the action "Avoid
+        # clopidogrel non-response". Right gene, wrong drug against wrong
+        # action, and the same mismatch on CYP2D6 (atomoxetine vs opioid
+        # toxicity), SLCO1B1 (atorvastatin vs simvastatin myopathy) and CYP2C9
+        # (fluvastatin vs warfarin bleeding). A pharmacogenomics reader spots
+        # it immediately.
+        #
+        # CPIC guidance for the actual drug is already on this record. It is
+        # keyed per DRUG rather than per (drug, gene), though — fluvastatin's
+        # text is about SLCO1B1 while the gene selected here is CYP2C9 — so it
+        # is only used when it names the gene, and a neutral statement of the
+        # decision is used when it does not. Nothing is asserted about a
+        # gene-drug pair the source does not cover.
+        _dosing = " ".join(str(drug_info.get("dosing") or "").split())
+        if _dosing and gene.upper() in _dosing.upper():
+            _benefit = _clip_sentence(_dosing, 150)
+        else:
+            _benefit = (f"Genotype-guided prescribing decision for "
+                        f"{drug_name or 'this drug'} ({gene})")
         out.append(_econ_record(
             finding=f"{gene} — top-drug actionable ({drug_name})",
-            clinical_benefit=econ["clinical_benefit"],
+            clinical_benefit=_benefit,
             # Zero. This screen is a p_rx REFINEMENT of a record _pgx_findings
             # already emits for the same gene — resurrecting it as its own
             # valued line would double-count the pharmacogenomic benefit. It is
