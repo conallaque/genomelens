@@ -1168,6 +1168,29 @@ def _is_reproductive_action(clinical_benefit: str) -> bool:
     return any(t in b for t in _REPRODUCTIVE_ACTION_TOKENS)
 
 
+# Entries in CARRIER_ECONOMICS that are NOT recessive carrier states, and so
+# must not be emitted by the carrier panel.
+#
+# HLA-DQ2/DQ8 is a susceptibility haplotype, not a carrier result — coeliac is
+# not a recessive condition and there is no such thing as a coeliac carrier.
+# The gut module already models this haplotype, with the serology decision it
+# actually bears on and a semantic pathway id. Emitting it here as well put the
+# SAME haplotype on the page twice with byte-identical economics (NMB -$122,
+# $361 averted, $500 to act), differing only in how the two tables spell the
+# gene — "HLA-DQA1" against "HLA-DQA1/HLA-DQB1", which is precisely why the
+# one-gene-one-finding check could not see it.
+# Matched by PREFIX: risk/carrier.py also emits "Celiac Disease Susceptibility
+# (second-most-common allele)", which is the same haplotype under a second
+# variant and must be excluded on the same grounds.
+_NOT_A_CARRIER_STATE = ("Celiac Disease Susceptibility",)
+
+
+def _is_carrier_state(disease: str) -> bool:
+    """False for entries that are susceptibility haplotypes, not carrier states."""
+    d = (disease or "").strip()
+    return not any(d.startswith(x) for x in _NOT_A_CARRIER_STATE)
+
+
 def _carrier_findings(carrier_result: dict | None) -> list[dict]:
     """Economic findings from carrier screening — both affected (homozygous)
     and carrier (heterozygous) states with distinct valuations."""
@@ -1177,7 +1200,7 @@ def _carrier_findings(carrier_result: dict | None) -> list[dict]:
     for record in (carrier_result.get("affected") or []):
         disease = record.get("disease", "")
         econ = CARRIER_ECONOMICS.get(disease)
-        if econ is None:
+        if econ is None or not _is_carrier_state(disease):
             continue
         out.append(_econ_record(
             finding=econ["finding_affected"],
@@ -1197,7 +1220,7 @@ def _carrier_findings(carrier_result: dict | None) -> list[dict]:
     for record in (carrier_result.get("carriers") or []):
         disease = record.get("disease", "")
         econ = CARRIER_ECONOMICS.get(disease)
-        if econ is None:
+        if econ is None or not _is_carrier_state(disease):
             continue
         out.append(_econ_record(
             finding=econ["finding_carrier"],
@@ -1777,12 +1800,22 @@ def _top_drugs_findings(top_drugs_result: dict | None) -> list[dict]:
         # is only used when it names the gene, and a neutral statement of the
         # decision is used when it does not. Nothing is asserted about a
         # gene-drug pair the source does not cover.
+        # A DECISION LABEL, NOT THE GUIDELINE TEXT. Putting the CPIC prose here
+        # filled a column headed by the decision with "The Dutch
+        # Pharmacogenetics Working Group Guideline for atomoxetine states for
+        # CYP2D6 ultrarapid metabolizers..." — evidence FOR a decision, in the
+        # place the decision goes, in a column that is scanned rather than read.
+        #
+        # Classifying that prose into a verb was tried and abandoned: an
+        # ordered substring scan mapped four of six guidelines to "Consider an
+        # alternative", because most of them mention one somewhere. One label
+        # for everything is not a summary. The decision the reader actually
+        # faces is the same in every case — this drug's dose or choice turns on
+        # this genotype — so that is what the column says, and the guideline
+        # text stays in the evidence field where its detail is readable.
         _dosing = " ".join(str(drug_info.get("dosing") or "").split())
-        if _dosing and gene.upper() in _dosing.upper():
-            _benefit = _clip_sentence(_dosing, 150)
-        else:
-            _benefit = (f"Genotype-guided prescribing decision for "
-                        f"{drug_name or 'this drug'} ({gene})")
+        _benefit = (f"Genotype-guided prescribing decision for "
+                    f"{drug_name or 'this drug'} ({gene})")
         out.append(_econ_record(
             finding=f"{gene} — top-drug actionable ({drug_name})",
             clinical_benefit=_benefit,
@@ -1799,7 +1832,10 @@ def _top_drugs_findings(top_drugs_result: dict | None) -> list[dict]:
             prevalence=econ["prevalence"], qaly_gain=0.0,
             evidence=(f"High-prevalence drug {drug_name} × {gene} actionable "
                       f"phenotype — awareness only; the benefit is already "
-                      f"counted once under Pharmacogenomics"),
+                      f"counted once under Pharmacogenomics."
+                      + (f" {_clip_sentence(_dosing, 240)}"
+                         if _dosing and gene.upper() in _dosing.upper()
+                         else "")),
         ))
     return out
 
@@ -2842,7 +2878,7 @@ def analyze_personal_economics(economics_result: dict | None = None,
                 not_monetised.append({
                     **_ident,
                     "withheld_by_policy": False,
-                    "category": "Unvaluable — incomplete economics",
+                    "category": "No economic pathway routed",
                     "finding": label,
                     "decision": "Reported as a genomic finding; no dollar "
                                 "figure attached.",
