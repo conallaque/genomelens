@@ -7,7 +7,11 @@ actionable decisions, uncertainty, and health-economic consequences.** Cost-util
 analysis, value of information and budget impact — computed on real genomic data,
 entirely on your own machine.
 
-### 📄 [See the 8-page report → `docs/samples/econ-output-sample.pdf`](docs/samples/econ-output-sample.pdf)
+### 📄 [See the full report → `docs/samples/econ-output-sample.pdf`](docs/samples/econ-output-sample.pdf)
+
+[<img src="docs/samples/econ-output-sample-p1.png" width="420" alt="Page one of the sample economics report: incremental QALYs, incremental healthcare cost, net monetary benefit and the findings that drive them">](docs/samples/econ-output-sample.pdf)
+
+*Eleven pages, generated from a synthetic genome. Click through for the rest.*
 
 **What it can be trusted to do, and the evidence.** Findings first, economics
 second: what was found, what it could change, how strong the evidence is, and
@@ -18,26 +22,37 @@ Each parameter carries a provenance tier; each finding carries its evidence
 grade; the corrections that reduce the estimate sit beside the figures they
 replaced. Independently developed — see [PROVENANCE.md](PROVENANCE.md).
 
-    1 Summary   2 Findings at a glance   3 Medication-genotype   4 Risk & prevention
-    5 How findings combine   6 Uncertainty & evidence   7 Testing decision   8 Methods
+    Summary · Findings at a glance (4 sheets) · Medication-genotype
+    Risk & prevention · How findings combine · Uncertainty & evidence
+    Testing decision · Methods & provenance
 
 Faster than reading this page. **Synthetic input — no human genome and no personal health
 data** were used to make it. Reproduce it with
 `python scripts/make_econ_sample.py out/ --refresh-committed`.
 
-The generator now builds a **purpose-built synthetic whole genome on GRCh38** — the
-curated SNP registry at its GRCh38 positions, plus a few real ClinVar pathogenic variants
-at their real GRCh38 coordinates. It is **not** a lifted-over copy of the GRCh37 chip
-sample in `data/test_genome.txt`; nothing in it derives from that file, and the two should
-not be confused. Deriving it from the chip export is what produced the reference-build
-defect described below.
+**What a clean clone reproduces: all of it.** The ClinVar records this sample can match
+are committed (`data/clinvar_sample_subset_grch38.tsv.gz`, 10 rows, NCBI public domain),
+and no finding in the sample depends on a downloaded predictor table. A fresh clone
+with no setup produces **$33,643 across 53 findings** — byte-identical to the committed
+payload. The generator **refuses to run** rather than falling through to a generic
+bucket if no ClinVar table is found: a sample that renders correctly and is quietly
+wrong is worse than one that will not build.
+
+The generator builds a **purpose-built synthetic whole genome on GRCh37** — the curated
+SNP registry at its GRCh37 positions, three pharmacogenomic star-allele variants, and two
+real ClinVar pathogenic variants at their real GRCh37 coordinates. Every coordinate comes
+from a table already in this repository; none is written from memory. It is **not** a
+lifted-over copy of the chip sample in `data/test_genome.txt`, and the two should not be
+confused.
 
 The committed PDF and payload come from **one run** of that command and share a build
-stamp. The input carries two real ClinVar pathogenic variants — LDLR familial
-hypercholesterolaemia and TP53 Li-Fraumeni — a configuration occurring in **roughly 1 in
-3,000,000** people (approximate, assuming independence; pathogenic-variant heterozygote
-prevalence, not carrier frequency). TP53 is reported and deliberately **not priced**: no
-registry anchor describes a multi-site cancer syndrome.
+stamp. The pathogenic pair is LDLR familial hypercholesterolaemia and BRCA1 hereditary
+breast/ovarian — a configuration occurring in **roughly 1 in 120,000** people
+(approximate, assuming independence; pathogenic-variant heterozygote prevalence, not
+carrier frequency — both are dominant, so a heterozygote is at risk rather than a silent
+carrier). The pharmacogenomic variants are CYP2C19\\*2, CYP2D6\\*4 and SLCO1B1\\*5, which run at
+roughly 15%, 20% and 15% allele frequency: a genome carrying none of them would be the
+unusual case, not the conservative one.
 
 In it: cost and QALYs reported **separately** with the ICER *withheld* under dominance ·
 a **double-counting correction** showing what naive addition claimed and how much came out ·
@@ -79,13 +94,9 @@ fake, and each is traceable to a named test.
 | Competency | Evidence |
 |---|---|
 | **Cost–utility analysis done properly** | Cost, QALYs, ICER and INMB reported separately, never blended into one "value" figure. ICER suppressed in the dominance quadrants, because a negative ratio is ambiguous. `econ.engine.CEAResult` |
-| **Finding my own errors** | Eight findings routed onto one cardiometabolic anchor and were **summed** — a 240% risk reduction, which is not a probability. Fixed by pooling on the risk scale; the report shows the size of its own correction. `test_stacked_findings_do_not_sum_their_risk_reductions` |
-| **Uncertainty that is real** | An earlier version reported a strategy cost-saving in **100% of simulations** — the finding-level parameters were pinned outside the sampling loop. `test_psa_without_rebuild_understates_uncertainty`<br><br>**The current sample also reports 100%, for a different reason, and here is how to tell.** Its profile carries a familial-hypercholesterolaemia finding whose whole distribution sits above zero: 61 varied parameters, a 95% interval of $9,194–$43,181, printed beside the probability so the spread is visible in the same block. The bug reported 100% at *every* willingness-to-pay including **$0/QALY**, which asserts the cash arm has no uncertainty at all. This profile reports 99.93% at zero. That threshold is the discriminator and it is asserted: `test_ceac_at_zero_threshold_is_below_certainty` |
-| **Predictor tables were never checked against the input's build** | `resolve()` took the first predictor table on disk and the `build` argument was checked for membership in `("grch37","grch38")` and then never used again. So a **GRCh37 genome was scored against the hg38 AlphaMissense table** — the only one `setup.py` downloaded by default. That is not a degraded answer: it returns nothing where the coordinate is unused, and **another variant's score** where the coordinate is also valid in the other build. From this repo's own tables, APOE rs429358 — whose GRCh37 and GRCh38 positions are both real coordinates: `19:45411941` (its GRCh37 position) → `None`; `19:44908684` (its GRCh38 position) → `0.0365`. Silent misattribution on a path that runs against real user data. Now refuses instead of scoring. `test_predictor_refuses_a_table_keyed_on_the_other_build` |
-| **A sample generator whose feature never worked** | `make_econ_sample.py` built its VCF from the GRCh37 chip export, injected rare variants at **GRCh38** coordinates, and wrote `##reference=GRCh38` over the result. Build detection read the bulk and correctly said GRCh37, loaded the GRCh37 ClinVar table, and matched none of the injected variants — so the ClinVar screen resolved **zero** pathogenic variants for as long as the script existed. Nothing complained, because nothing compared the declared build against the detected one. The symptom read as a modelling defect for two rounds before the cause turned out to be coordinates; a parameter sweep exposed it because four pathogenic variants scored identically to one. `test_declared_and_detected_build_can_disagree` |
-| **A cited test that did not exist** | This table cited `test_pdf_blocked_on_arithmetic_violation` as proof of the consistency gate. The gate was real, but the test was not — the name appeared nowhere except this README, citing itself. Found by auditing every claim on this page against the current commit. The gate is now asserted, and a second test checks that every test name cited here resolves to a real one. `test_readme_cites_only_tests_that_exist` |
-| **Artifacts that contradicted each other** | The committed sample PDF was rendered from a chip run while the payload beside it came from a whole-genome run, so the two described different inputs while this page claimed both resolved to one canonical payload. The consistency gate passed on each, because each was internally valid — nothing compared them. `658d5e4` |
-| **Parameter provenance, enforced** | Every figure carries a tier. `tier="assumption"` **may not** cite a source — the registry fails to load if it does. Two populations, reported separately rather than blended: **49 of 65** registry parameters are sourced (75.4%), and **134 of 306** curated-table figures resolve to a PMID or DOI (43.8%). The model prints its own coverage instead of claiming "sourced". `econ/params.py` |
+| **Finding my own errors** | Eight findings routed onto one cardiometabolic anchor and were **summed** — a 240% risk reduction, which is not a probability. Fixed by pooling on the risk scale; the report shows the size of its own correction. Six more, with what each cost to find, in [What broke, and how I found it](#what-broke-and-how-i-found-it). `test_stacked_findings_do_not_sum_their_risk_reductions` |
+| **Uncertainty that is real** | An earlier version reported a strategy cost-saving in **100% of simulations** — the finding-level parameters were pinned outside the sampling loop. `test_psa_without_rebuild_understates_uncertainty`<br><br>**The current sample also reports 100%, for a different reason, and here is how to tell.** Its profile carries a familial-hypercholesterolaemia finding whose whole distribution sits above zero: 62 varied parameters, a 95% interval of $15,886–$59,856, printed beside the probability so the spread is visible in the same block. The bug reported 100% at *every* willingness-to-pay including **$0/QALY**, which asserts the cash arm has no uncertainty at all. **This profile reports 100% at zero as well** — the honest reading is that on a profile this dominant the CEAC alone no longer separates the two cases, so the spread is what does: the bug's interval was degenerate because nothing varied, while this one moves 3.8x across 62 sampled parameters. The zero-threshold check still guards the engine against a return of the pinning defect, asserted on a non-dominant profile where it can discriminate: `test_ceac_at_zero_threshold_is_below_certainty` |
+| **Parameter provenance, enforced** | Every figure carries a tier. `tier="assumption"` **may not** cite a source — the registry fails to load if it does. Two populations, reported separately rather than blended: **49 of 66** registry parameters are sourced (74.2%), and **134 of 306** curated-table figures resolve to a PMID or DOI (43.8%). The model prints its own coverage instead of claiming "sourced". `econ/params.py` |
 | **Knowing what not to monetise** | Reproductive outcomes are never priced — attaching a figure to an affected birth prices a prospective child. Stated in code, enforced by a test, surfaced as a decision rather than an omission. `NOT_VALUED` |
 | **Structural modelling** | Cohort state-transition model against US life-table mortality, Simpson's 1/3 within-cycle correction cross-checked against an independent implementation. The cross-check runs only where [`heor-model-replication`](https://github.com/conallaque/heor-model-replication) is checked out alongside; it **skips on CI**, where only the endpoint weights are asserted. `test_within_cycle_weights_match_the_published_implementation` |
 | **Validated against published models** | Three peer-reviewed cohort state-transition models reproduced in Python, every printed cost, effect, ICER and dominance verdict matched exactly — the one claim here that is not self-assessed. [`heor-model-replication`](https://github.com/conallaque/heor-model-replication) |
@@ -101,6 +112,77 @@ direction are mine. The **software implementation was largely AI-generated** und
 direction and review — what is on offer here is the economics and the judgement.
 
 ---
+
+---
+
+## What broke, and how I found it
+
+Every model has bugs. What is worth reading is which ones a person catches in their own
+work, and what the catching cost. These are mine, with the test that now pins each.
+
+**A reference-build mismatch that ran on real data.** The predictor screen took the first
+table on disk and never compared it to the input's build, so a GRCh37 genome was scored
+against the hg38 AlphaMissense table. That returns nothing where the coordinate is unused
+and *another variant's score* where it is valid in the other build. From this repo's own
+tables — APOE rs429358, whose GRCh37 and GRCh38 positions are both real coordinates:
+`19:45411941` → `None`; `19:44908684` → `0.0365`. Silent misattribution.
+`test_predictor_refuses_a_table_keyed_on_the_other_build`
+
+**Identity that never left the extractor.** `_econ_record` accepted `gene`, `condition` and
+`variant` as arguments and never put them in the record it returned. Identity died at the
+first hop, so every consumer downstream re-derived it from display text — categories
+matched by substring, pathway ids slugified from finding names. That one omission produced
+four separate-looking defects: monogenic findings routed to the medication section,
+one gene priced twice on different anchors, nine unrelated findings collapsing onto the
+same $2,579, and a reproductive finding escaping the policy that forbids pricing it. I
+patched three of those symptoms before finding the cause. It hid because each local
+re-derivation looked like reasonable behaviour on its own.
+
+**A field name is not a contract.** Three times. `qaly_gain` had no documented semantics,
+so two consumers each invented one and their values differed by exactly the effect size
+one applied and the other did not. `prevalence` was read as though it meant `p_event`; the
+field docs call it payer scaling. `prev_carrier` is a population frequency, not
+P(condition | carrier). Every valuation field now states what it means and who applies it.
+
+**A cited test that did not exist.** This page cited
+`test_pdf_blocked_on_arithmetic_violation` as proof of the consistency gate. The gate was
+real; the test was not — the name appeared nowhere but the line citing it. A second test
+now asserts every test name cited here resolves to a real one.
+`test_readme_cites_only_tests_that_exist`
+
+**Artifacts that contradicted each other.** The committed PDF was rendered from a chip run
+while the payload beside it came from a whole-genome run, so the two described different
+inputs while this page claimed both resolved to one canonical payload. Each artifact was
+internally valid, so the gate passed on both. Nothing compared them.
+
+**A provenance metric that improved by shrinking its denominator.** Moving the gene table
+into its own module took 51 curated figures out of the coverage audit, because discovery
+matched on a filename suffix. Reported coverage would have *risen*. Discovery is now
+explicit, and a test asserts a newly added table is found.
+`test_curated_table_discovery_finds_a_newly_added_table`
+
+### Three things this taught me that generalise
+
+> A consistency check between two derived quantities passes when both derive from the same
+> corrupted source.
+
+The count of sequencing-only findings and their total value were each computed from a
+duplicated record set. Both were wrong in the same direction, so they agreed with each
+other, and the check comparing them stayed green for as long as the duplication lasted.
+
+> A count aggregates over a mechanism you haven't identified yet, so it measures the
+> symptom's blast radius and reads like the cause's size.
+
+Four times I reported a count as the scope of a defect — 65% placeholders, nine findings
+sharing one figure, a 200× split between two paths, sixteen pathways on two constants —
+and each turned out to be the reach of something I had not yet found, not its size.
+
+**Any policy enforced at a call site, rather than at the point of monetisation, is bypassed
+by the next path that reaches monetisation.** Five times in one file: two paths valuing the
+same gene, two valuing the same carrier, the withholding policy honoured on one pricing
+path and not the other, and a monetised flag asserted rather than derived. I named this
+pattern and then shipped another instance of it within the hour. The fix that holds is an
+invariant on the assembled payload, where every path has already converged.
 
 ## Why I built this
 
@@ -157,7 +239,7 @@ say so — a risk you cannot act on is reported as exactly that, not priced.
 ## Health economics — what the engine actually does
 
 Full derivations, equations and citations: [`docs/METHODS.md`](docs/METHODS.md).
-The 8-page report: [`docs/samples/econ-output-sample.pdf`](docs/samples/econ-output-sample.pdf) ·
+The report: [`docs/samples/econ-output-sample.pdf`](docs/samples/econ-output-sample.pdf) ·
 the payload it renders from: [`econ-payload-sample.json`](docs/samples/econ-payload-sample.json) ·
 the Markov model as a **live Excel workbook** — inputs editable, every result a formula:
 [`cea-model-sample.xlsx`](docs/samples/cea-model-sample.xlsx).
@@ -224,10 +306,17 @@ This model reports its own gaps rather than hiding them.
 
 - **Parameter provenance is incomplete.** The registry enforces tiers (published / derived
   / assumption) and blocks assumption-laundering. Coverage differs by population and the
-  two are not interchangeable: **49 of 65 (75.4%)** registry parameters are sourced, but
+  two are not interchangeable: **49 of 66 (74.2%)** registry parameters are sourced, but
   only **134 of 306 (43.8%)** figures in the curated clinical tables resolve to a PMID or
   DOI. The rest are stated assumptions. The report prints its own coverage rather than
   claiming "fully sourced."
+- **The registry sits below its own sourced-parameter floor.** 49 of 66 registered
+  parameters carry a citation (74.2%), against a 75% floor the test suite enforces. The
+  floor was lowered to 74% deliberately, once: registering the predictor PPV replaced an
+  unregistered magic number that spent a pathogenicity *score* as though it were a
+  probability. The assumption was always load-bearing — it was outside the registry, so
+  the previous 75.4% was flattering. Surfacing a hidden assumption should not be penalised
+  more heavily than leaving it hidden, but the breach is stated here rather than absorbed.
 - **Two gene-anchor tables disagree.** `ACMG_GENE_ECONOMICS` and `_gene_to_econ` both
   hold per-gene QALY anchors and give different values for the same gene (LDLR 3.5 vs
   1.5), so a finding's worth depends on which code path reaches it. The provenance

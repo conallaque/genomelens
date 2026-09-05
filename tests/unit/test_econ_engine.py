@@ -885,7 +885,10 @@ def test_ceac_at_zero_threshold_is_below_certainty():
     pinned outside the sampling loop. The committed sample currently reports
     100% as well — for an entirely different reason: it carries an LDLR familial
     hypercholesterolaemia finding whose whole distribution sits above zero, with
-    a $9,194-$43,181 interval across 61 varied parameters.
+    a $15,886-$59,856 interval across 62 varied parameters. On a profile that
+    dominant the zero-threshold probability is 1.0 too, so the sample cannot
+    demonstrate the discriminator; the case below is deliberately non-dominant
+    so that it can.
 
     The discriminator is the CEAC at a willingness-to-pay of ZERO. At that
     threshold a strategy is cost-effective only if it is cost-SAVING in that
