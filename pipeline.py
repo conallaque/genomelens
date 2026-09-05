@@ -1182,7 +1182,8 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 novel_variants_result=novel_variants_result,
                 genetic_age_result=genetic_age_result,
                 roh_result=roh_result,
-                input_type=_input_type, log=log)
+                input_type=_input_type, log=log,
+                seed=getattr(args, "seed", None))
             if voi_result.get("available"):
                 log(f"  Value of Information ({_input_type}): expected genome value ≈ "
                     f"${voi_result.get('voi_expost_mean', 0):,.0f} · chip→WGS marginal ≈ "

@@ -42,6 +42,7 @@ from collections.abc import Callable, Sequence
 
 from . import engine as ee
 from . import params as ep
+from .params import DEFAULT_SEED
 
 __all__ = [
     "analyze_decision_layer",
@@ -68,6 +69,7 @@ def _inmb_draws(rebuild: Callable[[], dict], *, n: int, seed: int,
     ``fixed`` pins named parameters at given values — the mechanism behind
     EVPPI, which asks what happens when one parameter becomes known.
     """
+    seed = DEFAULT_SEED if seed is None else seed
     rng = random.Random(seed)
     out: list[float] = []
     for _ in range(max(1, int(n))):
@@ -80,7 +82,7 @@ def _inmb_draws(rebuild: Callable[[], dict], *, n: int, seed: int,
     return out
 
 
-def evpi(rebuild: Callable[[], dict], *, n: int = 2000, seed: int = 20260823,
+def evpi(rebuild: Callable[[], dict], *, n: int = 2000, seed: int | None = None,
          test_cost: float = 0.0, wtp: float | None = None) -> dict:
     """Expected value of perfect information, per person.
 
@@ -115,7 +117,7 @@ def evpi(rebuild: Callable[[], dict], *, n: int = 2000, seed: int = 20260823,
 
 
 def evppi(rebuild: Callable[[], dict], *, parameters: Sequence[str],
-          n_outer: int = 150, n_inner: int = 50, seed: int = 20260823,
+          n_outer: int = 150, n_inner: int = 50, seed: int | None = None,
           test_cost: float = 0.0, wtp: float | None = None) -> list[dict]:
     """Expected value of partial perfect information, per parameter.
 
@@ -136,11 +138,13 @@ def evppi(rebuild: Callable[[], dict], *, parameters: Sequence[str],
         if key not in ep.PARAMS:
             continue
         param = ep.get(key)
-        rng = random.Random(seed + 1000 + i)
+        rng = random.Random((DEFAULT_SEED if seed is None else seed) + 1000 + i)
         conditional_means: list[float] = []
         for j in range(max(1, int(n_outer))):
             phi = ep.draw(rng, param)
-            inner = _inmb_draws(rebuild, n=n_inner, seed=seed + 50_000 + j,
+            inner = _inmb_draws(rebuild, n=n_inner,
+                                seed=(DEFAULT_SEED if seed is None else seed)
+                                + 50_000 + j,
                                 test_cost=test_cost, wtp=wtp,
                                 fixed={key: phi})
             conditional_means.append(sum(inner) / (len(inner) or 1))

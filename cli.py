@@ -236,6 +236,18 @@ def build_parser() -> argparse.ArgumentParser:
               "the build. Takes precedence over auto-detection."),
     )
     parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help=("Seed for the probabilistic analysis. Defaults to "
+              "econ.params.DEFAULT_SEED, which is why the committed sample is "
+              "byte-identical between runs: a demo that changed every time it "
+              "was regenerated could not be diffed. Determinism is not "
+              "certainty — the PSA still varies 61 parameters per draw; the "
+              "seed fixes which draws are taken. Pass a different value to "
+              "confirm the result is not an artifact of this one."),
+    )
+    parser.add_argument(
         "--commercial-safe",
         action="store_true",
         help=("Restrict the Phase-3 novel-variant predictors to commercially "

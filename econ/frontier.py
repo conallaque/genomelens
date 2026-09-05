@@ -26,6 +26,8 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from .params import DEFAULT_SEED
+
 try:
     import numpy as np
     _HAVE_NP = True
@@ -191,7 +193,7 @@ def cost_effectiveness_frontier(strategies: list[dict] | None = None,
 def frontier_psa(strategies: list[dict] | None = None,
                  wtp_grid: Sequence[float] = (0, 25_000, 50_000, 75_000, 100_000,
                                               150_000, 200_000),
-                 n_mc: int = 4000, seed: int = 90210) -> dict:
+                 n_mc: int = 4000, seed: int | None = None) -> dict:
     """**#7B — Probabilistic frontier: how *sure* are we which strategy wins?**
 
     *In plain English:* the frontier above uses single best-guess numbers. But costs
@@ -214,6 +216,7 @@ def frontier_psa(strategies: list[dict] | None = None,
             {"name": "Targeted clinical panel", "cost": 900.0, "qaly": 20.09},
             {"name": "Whole-genome sequencing", "cost": 600.0, "qaly": 20.12},
         ]
+    seed = DEFAULT_SEED if seed is None else seed
     rng = np.random.default_rng(seed)
     names = [s["name"] for s in strategies]
 
