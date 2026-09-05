@@ -228,7 +228,9 @@ def _collect(economics_result: dict | None,
             out.append({"label": label, "economic_pathway_id": pid, "kind": "pgx",
                         "pgx_key": _match_pgx(label),
                         "intervention": _econ_params.value(
-                            "intervention_cost_pgx"), "wgs_only": False,
+                            "intervention_cost_pgx"),
+                        "intervention_basis": _DEFAULT_COST_BASIS,
+                        "wgs_only": False,
                         "haircut": _hc, "confidence": conf,
                         # Identity carried, not re-derived downstream.
                         "gene": f.get("gene", ""),
@@ -269,8 +271,13 @@ def _collect(economics_result: dict | None,
                         # override would shadow the registry's per-condition
                         # QALY anchors on every finding, leaving them dead.
                         "qaly_explicit": f.get("qaly_gain") is not None,
-                        "intervention": _econ_params.value(
-                            "intervention_cost_standard"),
+                        "intervention": (
+                            _gene_cost(f.get("gene", ""))
+                            or _econ_params.value(
+                                "intervention_cost_standard")),
+                        "intervention_basis": (
+                            "gene_specific" if _gene_cost(f.get("gene", ""))
+                            else _DEFAULT_COST_BASIS),
                         "horizon": 25, "wgs_only": False,
                         "haircut": _hc, "confidence": conf,
                         # Identity carried, not re-derived downstream.
@@ -328,15 +335,35 @@ def _collect(economics_result: dict | None,
                         "rrr": rrr, "qaly": qaly, "qaly_explicit": True,
                         "intervention": _econ_params.value(
                             "intervention_cost_monogenic"),
+                        "intervention_basis": _DEFAULT_COST_BASIS,
                         "horizon": 30, "wgs_only": True, "haircut": 1.0,
                         "confidence": "high"})
-        # carriers: reproductive value (small direct health value to self)
+        # Carriers, valued for the SMALL DIRECT HEALTH VALUE TO THE CARRIER —
+        # not for reproduction. The label read "(reproductive)" while the
+        # figure priced the carrier's own health, which put a dollar amount
+        # next to the word the NOT_VALUED policy exists to keep unpriced. The
+        # quantity was defensible and its name was not.
         for f in (buckets.get("carrier") or [])[:6]:
-            out.append({"label": f"{f.get('gene','?')} carrier (reproductive)",
+            _g = f.get("gene", "") or ""
+            out.append({"label": f"{_g or '?'} carrier — heterozygote health",
+                        # Identity, so this pathway does not key on its own
+                        # display text. Both carrier rows reached the payload
+                        # as `unkeyed:<label>`, meaning a reword would mint a
+                        # new pathway — the same defect just fixed on APOE,
+                        # the coeliac haplotype and the wellness traits.
+                        "economic_pathway_id": _identity.economic_pathway_id(
+                            kind="carrier", gene=_g, drug="",
+                            condition="Pathogenic", phenotype="", variant=""),
+                        "gene": _g, "condition": "Pathogenic",
+                        # The decision column rendered an em-dash for these
+                        # two, because no action was ever attached.
+                        "action": ("Confirm carrier status; no action for the "
+                                   "carrier's own health beyond awareness"),
                         "kind": "coi", "coi_key": "Pathogenic", "p_event": 0.04,
                         "rrr": 0.5, "qaly": 0.2, "qaly_explicit": True,
                         "intervention": _econ_params.value(
                             "cost_genetic_counseling"),
+                        "intervention_basis": _DEFAULT_COST_BASIS,
                         "horizon": 5, "wgs_only": True, "haircut": 1.0,
                         "confidence": "moderate"})
 
@@ -394,6 +421,7 @@ def _collect(economics_result: dict | None,
                         "penetrance_corrected": round(p_corr, 4),
                         "intervention": _econ_params.value(
                             "intervention_cost_predicted_variant"),
+                        "intervention_basis": _DEFAULT_COST_BASIS,
                         # HORIZON STAYS 25, shorter than Path A's 30. An
                         # unconfirmed finding whose committed action is a
                         # confirmatory test is defensibly valued over a shorter
@@ -449,6 +477,45 @@ def _gene_rrr(gene: str) -> float:
     """Gene-specific risk reduction, or 0.0 when none is known."""
     a = _ga.anchor_for(gene)
     return float(a["rrr"]) if a else 0.0
+
+
+_DEFAULT_COST_BASIS = "registry_default_no_gene_specific_cost"
+"""Marker for a cost of acting taken from the registry, not the gene.
+
+Set on every pathway that charges a flat registered constant. It was
+set on one of five, so the other four arrived with an empty basis and
+the report could not distinguish a costed pathway from a default.
+"""
+
+
+def _gene_cost(gene: str) -> float:
+    """Gene-specific cost of acting, or 0.0 when none is known.
+
+    THE ANCHORS ALREADY HELD THESE AND NOTHING READ THEM. Every finding on this
+    path took `intervention_cost_standard` unconditionally, so risk-reducing
+    surgery for BRCA1, a statin for LDLR and passive symptom awareness for
+    PTPN22 all cost $500 to act on — the same constant-collapse shape as the
+    nine findings that once shared one cost-of-illness key. The anchor table
+    distinguishes them ($2,000 / $500 / $3,000); the caller simply never asked.
+
+    A gene with no anchor still falls through to the registered default, which
+    is a declared, tiered parameter that the sensitivity analysis varies —
+    an acknowledged default rather than an invented per-action price.
+    """
+    a = _ga.anchor_for(gene)
+    if not a or a.get("cost") is None:
+        return 0.0
+    # SCALED, NOT PINNED. GENE_ANCHORS is a module literal, so returning its
+    # cost directly took the largest finding's cost of acting OUT of the
+    # sensitivity analysis: BRCA1 went from $100-$2,000 across 1,500 draws to
+    # a fixed $2,000, `intervention_cost_standard` fell out of the tornado
+    # top ten, and the 95% interval narrowed — on the page that argues a
+    # narrow interval is how you spot a pinned parameter. Expressing the
+    # anchor as a ratio of the registered parameter keeps the gene-level
+    # differentiation and puts the uncertainty back.
+    k = "intervention_cost_standard"
+    scale = _econ_params.value(k) / _econ_params.base(k)
+    return float(a["cost"]) * scale
 
 
 def _classify_category(category: str | None, label: str = "",
@@ -979,6 +1046,12 @@ def analyze_value_of_information(economics_result: dict | None = None,
                          # $500 — so a reader checking the arithmetic saw a
                          # benefit with no cost set against it.
                          "intervention_charged": round(_iv),
+                         # Whether that figure is this gene's own cost of
+                         # acting or the registered fallback. Without it a
+                         # reader cannot tell a costed pathway from a default,
+                         # and eleven findings sharing $500 looks like eleven
+                         # estimates rather than one declared parameter.
+                         "intervention_basis": f.get("intervention_basis", ""),
                          "wgs_only": f["wgs_only"], "nmb": round(nmb),
                          "dcost_averted": round(dcost), "dqaly": round(dqaly, 3)})
     nmb_rows.sort(key=lambda r: -r["nmb"])

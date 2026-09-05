@@ -892,6 +892,21 @@ def value(key: str, default: float | None = None) -> float:
     return float(get(key).value)
 
 
+def base(key: str) -> float:
+    """A parameter's DECLARED value, ignoring any sensitivity override.
+
+    `value()` reads PARAMS, which `overridden` swaps during PSA, so it returns
+    the drawn value. `_REGISTRY` is never swapped and still holds the declared
+    one. Needed to express a quantity as a ratio of its registered anchor —
+    scale by `value(k) / base(k)` and the quantity moves with the parameter
+    across draws instead of sitting pinned at a literal.
+    """
+    for p in _REGISTRY:
+        if p.key == key:
+            return float(p.value)
+    raise KeyError(key)
+
+
 def validate_registry(params: Sequence[Param] | None = None) -> list[str]:
     """Return every provenance problem across the registry (empty == clean)."""
     problems: list[str] = []
