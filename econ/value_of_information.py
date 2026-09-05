@@ -211,7 +211,8 @@ def _collect(economics_result: dict | None,
 
         kind, coi_key = _classify_category(f.get("category"),
                                            f.get("finding", ""),
-                                           gene=f.get("gene", ""))
+                                           gene=f.get("gene", ""),
+                                           condition=f.get("condition", ""))
         label = f.get("finding", "genetic finding")
         pid = f.get("economic_pathway_id", "")
         conf = f.get("confidence", "moderate")
@@ -338,34 +339,38 @@ def _collect(economics_result: dict | None,
                         "intervention_basis": _DEFAULT_COST_BASIS,
                         "horizon": 30, "wgs_only": True, "haircut": 1.0,
                         "confidence": "high"})
-        # Carriers, valued for the SMALL DIRECT HEALTH VALUE TO THE CARRIER —
-        # not for reproduction. The label read "(reproductive)" while the
-        # figure priced the carrier's own health, which put a dollar amount
-        # next to the word the NOT_VALUED policy exists to keep unpriced. The
-        # quantity was defensible and its name was not.
+        # Carriers. Reported, never priced — see below.
         for f in (buckets.get("carrier") or [])[:6]:
             _g = f.get("gene", "") or ""
-            out.append({"label": f"{_g or '?'} carrier — heterozygote health",
-                        # Identity, so this pathway does not key on its own
-                        # display text. Both carrier rows reached the payload
-                        # as `unkeyed:<label>`, meaning a reword would mint a
-                        # new pathway — the same defect just fixed on APOE,
-                        # the coeliac haplotype and the wellness traits.
-                        "economic_pathway_id": _identity.economic_pathway_id(
-                            kind="carrier", gene=_g, drug="",
-                            condition="Pathogenic", phenotype="", variant=""),
-                        "gene": _g, "condition": "Pathogenic",
-                        # The decision column rendered an em-dash for these
-                        # two, because no action was ever attached.
-                        "action": ("Confirm carrier status; no action for the "
-                                   "carrier's own health beyond awareness"),
-                        "kind": "coi", "coi_key": "Pathogenic", "p_event": 0.04,
-                        "rrr": 0.5, "qaly": 0.2, "qaly_explicit": True,
-                        "intervention": _econ_params.value(
-                            "cost_genetic_counseling"),
-                        "intervention_basis": _DEFAULT_COST_BASIS,
-                        "horizon": 5, "wgs_only": True, "haircut": 1.0,
-                        "confidence": "moderate"})
+            # NOT PRICED. `p_event=0.04`, `rrr=0.5` and `qaly=0.2` were
+            # hardcoded literals applied to EVERY carrier gene alike, none of
+            # them registered and none of them varied in the sensitivity
+            # analysis. HBB beta-thalassaemia trait and SERPINA1 MZ are
+            # different conditions with different consequences, and both came
+            # out at exactly $1,226 — the same constant-collapse that once had
+            # nine unrelated findings sharing one cost-of-illness key.
+            #
+            # The tell was that the action could not be written honestly: the
+            # row read "no action for the carrier's own health" beside a
+            # four-figure value, because there was no gene-specific evidence
+            # saying what the money bought. This report's rule for that case is
+            # already written down — report the finding, withhold the figure,
+            # invent nothing — and it is what HFE gets two rows below.
+            if unvalued is not None:
+                unvalued.append({
+                    "label": f"{_g or '?'} carrier — heterozygote health",
+                    "category": "Carrier Screening",
+                    "intentional": True,
+                    "reason": (
+                        "Heterozygote health effects are real but not costed "
+                        "per gene. Pricing them would mean applying one "
+                        "generic event probability and risk reduction to every "
+                        "carrier gene, which returns the same figure for "
+                        "unrelated conditions. The finding is reported; no "
+                        "value is invented."),
+                })
+            continue
+
 
     # Phase-3 novel predicted variants (WGS-only) — DOWN-WEIGHTED (computational).
     nvr = novel_variants_result or {}
@@ -518,8 +523,35 @@ def _gene_cost(gene: str) -> float:
     return float(a["cost"]) * scale
 
 
+# Conditions the registry can actually cost, keyed by what carrier records
+# call them. Only registered anchors appear here: a carrier finding whose
+# condition has no cost-of-illness entry stays in the generic bucket rather
+# than being routed to an invented one.
+_CONDITION_TO_COI = (
+    ("celiac", "Coeliac"), ("coeliac", "Coeliac"),
+    ("autoimmun", "Autoimmune"),
+    ("breast", "BreastOvarian"), ("ovarian", "BreastOvarian"),
+    ("colon", "Colorectal"), ("colorectal", "Colorectal"),
+    ("depress", "Depression"), ("mood", "Depression"),
+    ("alzheim", "Alzheimer"), ("dementia", "Alzheimer"),
+    ("iron", "IronOverload"), ("haemochromat", "IronOverload"),
+    ("hemochromat", "IronOverload"),
+)
+
+
+def _coi_for_condition(condition: str) -> str:
+    """A registered cost-of-illness bucket for a stated condition, or ''."""
+    c = (condition or "").strip().lower()
+    if not c:
+        return ""
+    for token, key in _CONDITION_TO_COI:
+        if token in c:
+            return key
+    return ""
+
+
 def _classify_category(category: str | None, label: str = "",
-                       gene: str = "") -> tuple[str, str]:
+                       gene: str = "", condition: str = "") -> tuple[str, str]:
     """Map a health-economics finding onto ('pgx'|'coi'|'', coi_key).
 
     THE GENE WINS WHEN THERE IS ONE. A gene symbol identifies the condition; a
@@ -583,7 +615,15 @@ def _classify_category(category: str | None, label: str = "",
     # ── Monogenic findings: ClinVar-reviewed pathogenic variants and carrier
     #    results both resolve to the high-consequence COI bucket.
     if "clinical variant" in cat or "clinvar" in cat or "carrier" in cat:
-        return ("coi", "Pathogenic")
+        # THE STATED CONDITION BEATS THE GENERIC BUCKET. Every carrier finding
+        # returned "Pathogenic" regardless of what it was about, so PTPN22
+        # (autoimmunity), CHEK2 (cancer), Factor V (thrombosis) and HLA-DQ2/DQ8
+        # (coeliac) were pooled as ONE liability — four unrelated conditions
+        # sharing one cost of illness, and their risk reductions added to a
+        # raw 220%. Each record already carried its real condition and nothing
+        # read it. Only conditions the registry can cost are routed; anything
+        # else stays generic rather than being given an invented anchor.
+        return ("coi", _coi_for_condition(condition) or "Pathogenic")
 
     # ── APOE / dementia is reported under the generic "Genotype" source.
     if "apoe" in text or "alzheim" in text or "dementia" in text:
@@ -1285,10 +1325,20 @@ def analyze_value_of_information(economics_result: dict | None = None,
                                and f.get("qaly") is not None
                                else None))
 
-        def _mk_all(fs):
-            return [_mk(f) for f in fs
+        def _priceable(fs):
+            """The source findings the engine can build a Finding from."""
+            return [f for f in fs
                     if f.get("kind") == "coi" and f.get("coi_key")]
 
+        def _mk_all(fs):
+            return [_mk(f) for f in _priceable(fs)]
+
+        # PAIRED BY CONSTRUCTION. The frontier below zipped the engine findings
+        # against `findings`, but `_mk_all` filters to priceable ones — so the
+        # Nth engine finding was not the Nth source finding and `wgs_only` was
+        # read off the wrong record. It happened to line up while an unpriced
+        # carrier padded the list, and stopped the moment that padding went.
+        _src_findings = _priceable(findings)
         _ee_findings = _mk_all(findings)
         _pools = _ee.pool_findings(_ee_findings)
         _pooled = _ee.evaluate_pools(_pools, wtp=wtp, test_cost=test_cost)
@@ -1351,7 +1401,8 @@ def analyze_value_of_information(economics_result: dict | None = None,
                         "qaly": float(cea["incremental_qaly"])}
 
             _all = _ee_findings
-            _chip_only = [f for f, src in zip(_ee_findings, findings, strict=False)
+            _chip_only = [f for f, src in zip(_ee_findings, _src_findings,
+                                              strict=True)
                           if not src.get("wgs_only")]
             _wgs_extra = len(_all) - len(_chip_only)
             _arms = [{"name": "No testing", "cost": 0.0, "qaly": 0.0}]
