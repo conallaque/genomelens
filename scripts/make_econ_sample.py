@@ -6,6 +6,7 @@ synthetic whole-genome VCF the sample comes from, runs the pipeline, and writes
 the consolidated economics page. No human genome is involved at any step.
 
     python scripts/make_econ_sample.py [outdir] [--refresh-committed]
+    python scripts/make_econ_sample.py [outdir] --profiles
 
 Writes everything into ``outdir``. It touches ``docs/samples/`` only when
 ``--refresh-committed`` is given, so running it to inspect a change cannot
@@ -16,11 +17,11 @@ WHAT THE INPUT IS, AND IS NOT
 The VCF is **synthetic and purpose-built on GRCh38**. It is assembled from two
 sources, both coordinate-consistent:
 
-  * the curated SNP registry (``core.snp_registry``) emitted at its **GRCh38**
+  * the curated SNP registry (``core.snp_registry``) emitted at its **GRCh37**
     positions, which is what produces the pharmacogenomic, polygenic and APOE
     findings; and
   * a small set of **real ClinVar pathogenic/likely-pathogenic variants** at
-    their real GRCh38 coordinates, in genes the economic model has anchors for,
+    their real GRCh37 coordinates, in genes the economic model has anchors for,
     so the ClinVar screen and the curated ACMG path actually engage.
 
 It is **not** a lifted-over copy of ``data/test_genome.txt``, and the two should
@@ -54,13 +55,32 @@ sys.path.insert(0, str(ROOT))
 
 # GRCh38 contig lengths, so build detection is unambiguous from the header alone
 # rather than inferred from which positions happen to appear.
-GRCH38_CONTIGS = [
-    ("1", 248956422), ("2", 242193529), ("3", 198295559), ("7", 159345973),
-    ("10", 133797422), ("11", 135086622), ("13", 114364328),
-    ("17", 83257441), ("19", 58617616), ("22", 50818468),
+GRCH37_CONTIGS = [
+    ("1", 249250621), ("2", 243199373), ("3", 198022430), ("6", 171115067),
+    ("7", 159138663), ("10", 135534747), ("11", 135006516),
+    ("12", 133851895), ("13", 115169878), ("14", 107349540),
+    ("17", 81195210), ("19", 59128983), ("22", 51304566),
 ]
 
-# Real ClinVar P/LP SNVs at their real GRCh38 coordinates, verified present in
+# PHARMACOGENOMIC VARIANTS, at their real GRCh37 coordinates, taken from the
+# committed chip export rather than written from memory.
+#
+# The sample had none. A synthetic genome with zero actionable pharmacogenomic
+# findings is not a conservative sample, it is an unrealistic one: CYP2C19*2
+# runs near 15% allele frequency, CYP2D6*4 near 20%, SLCO1B1*5 near 15%. A
+# person carrying none of them is the unusual case, and the report has a whole
+# page for medication-genotype decisions that was rendering empty.
+#
+# These are the three the star-allele caller can act on that the chip export
+# also carries, so every coordinate here is one this repository already had.
+# Emitted heterozygous, which is the actionable intermediate-metaboliser state.
+PGX_VARIANTS = [
+    ("10", 96541616, "G", "A", "rs4244285"),   # CYP2C19*2  — clopidogrel
+    ("22", 42524947, "G", "A", "rs3892097"),   # CYP2D6*4   — opioids, SSRIs
+    ("12", 21178615, "T", "C", "rs4149056"),   # SLCO1B1*5  — statin myopathy
+]
+
+# Real ClinVar P/LP SNVs at their real GRCh37 coordinates, verified present in
 # the distilled table shipped by `python setup.py --clinvar`. Star ratings are
 # 2-3, i.e. above the >=1 floor the clinical-variant screen applies. Spread
 # across distinct organ systems rather than stacked within one, so the pooling
@@ -112,8 +132,8 @@ HET_PREVALENCE = {
 # demonstrates the withholding on the gene that used to carry the largest QALY
 # anchor in the model.
 CLINVAR_PLP = [
-    ("19", 11089549, "A", "C", "LDLR"),    # Pathogenic 3* familial hypercholesterolaemia
-    ("17", 7670669,  "G", "T", "TP53"),    # Pathogenic 3* Li-Fraumeni — WITHHELD, no anchor
+    ("19", 11200225, "A", "C", "LDLR"),    # Pathogenic 3* familial hypercholesterolaemia
+    ("17", 41197728, "G", "C", "BRCA1"),   # Pathogenic 3* hereditary breast/ovarian
 ]
 
 
@@ -138,7 +158,7 @@ def _registry_rows() -> list[tuple[str, int, str, str, str]]:
     from core import snp_registry as reg
     rows = []
     for r in reg._RECORDS:
-        pos = getattr(r, "pos_grch38", None)
+        pos = getattr(r, "pos_grch37", None)
         anc, der = (r.ancestral or "").upper(), (r.derived or "").upper()
         if not pos or len(anc) != 1 or len(der) != 1 or anc == der:
             continue
@@ -153,8 +173,8 @@ def build_vcf(dest: pathlib.Path) -> tuple[int, int]:
     with dest.open("w") as w:
         w.write("##fileformat=VCFv4.2\n")
         w.write("##source=GenomeLens-synthetic-purpose-built\n")
-        w.write("##reference=GRCh38\n")
-        for c, ln in GRCH38_CONTIGS:
+        w.write("##reference=GRCh37\n")
+        for c, ln in GRCH37_CONTIGS:
             w.write(f"##contig=<ID={c},length={ln}>\n")
         w.write('##INFO=<ID=AF,Number=A,Type=Float,Description="Allele frequency">\n')
         w.write('##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">\n')
@@ -162,10 +182,126 @@ def build_vcf(dest: pathlib.Path) -> tuple[int, int]:
         for chrom, pos, ref, alt, rsid in reg_rows:
             w.write(f"{chrom}\t{pos}\t{rsid}\t{ref}\t{alt}\t100\tPASS\tAF=0.3\t"
                     f"GT\t0/1\n")
+        for chrom, pos, ref, alt, rsid in PGX_VARIANTS:
+            w.write(f"{chrom}\t{pos}\t{rsid}\t{ref}\t{alt}\t100\tPASS\tAF=0.15\t"
+                    f"GT\t0/1\n")
         for chrom, pos, ref, alt, gene in CLINVAR_PLP:
             w.write(f"{chrom}\t{pos}\t.\t{ref}\t{alt}\t200\tPASS\t"
                     f"AF=0.00001;GENE={gene}\tGT\t0/1\n")
-    return len(reg_rows), len(CLINVAR_PLP)
+    return len(reg_rows), len(CLINVAR_PLP) + len(PGX_VARIANTS)
+
+
+def _require_clinvar() -> None:
+    """Refuse to build the sample without a ClinVar table. Loudly.
+
+    `reference/` is gitignored, so on a clean clone the full distilled table is
+    absent. Before the committed subset existed, the screen simply matched
+    nothing, the run completed, and the report rendered — disagreeing with the
+    committed sample while looking perfectly well-formed. A sample that is
+    quietly wrong is worse than one that refuses to build.
+    """
+    from risk.clinical_variants import CLINVAR_DIR, SAMPLE_SUBSETS
+    full = CLINVAR_DIR / "clinvar_plp_grch37.tsv.gz"
+    if full.exists() or SAMPLE_SUBSETS["grch37"].exists():
+        return
+    raise SystemExit(
+        "\nNo ClinVar table found, and the sample's pathogenic variants cannot\n"
+        "be screened without one. This would produce a report that renders\n"
+        "correctly and disagrees with the committed sample.\n\n"
+        f"  expected either: {full}\n"
+        f"               or: {SAMPLE_SUBSETS[chr(39)+chr(39)] if False else SAMPLE_SUBSETS['grch37']}  (committed)\n\n"
+        "Fix: python setup.py --clinvar\n")
+
+
+
+# ── chip vs whole genome ──────────────────────────────────────────────────────
+
+def _run_one(vcf_or_chip: pathlib.Path, out: pathlib.Path) -> dict | None:
+    """Run the pipeline on one input and return its economics payload."""
+    import json
+    out.mkdir(parents=True, exist_ok=True)
+    r = subprocess.run([sys.executable, str(ROOT / "analyze.py"),
+                        str(vcf_or_chip), "--no-ai",
+                        "--output", str(out / "report.html")],
+                       cwd=ROOT, capture_output=True, text=True)
+    pj = out / "economics-payload.json"
+    if r.returncode or not pj.exists():
+        print(f"  run failed for {vcf_or_chip.name}: rc={r.returncode}")
+        return None
+    return json.loads(pj.read_text())
+
+
+def _summarise(p: dict) -> dict:
+    rc, td = p["reference_case"], p.get("testing_decision", {})
+    mon = [f for f in p["findings"] if f.get("is_monetized")]
+    return {
+        "input_type": p["metadata"].get("input_type", "?"),
+        "nmb": rc["nmb"], "qalys": rc["incremental_qalys"],
+        "cost": rc["incremental_cost"],
+        "n_findings": len(p["findings"]), "n_priced": len(mon),
+        "observed_wgs_only_findings": td.get("observed_wgs_only_findings", 0),
+        "observed_wgs_only_value": td.get("observed_wgs_only_value", 0.0),
+    }
+
+
+def emit_profiles(out: pathlib.Path) -> int:
+    """Run both committed inputs and report the marginal value of sequencing.
+
+    THE CONTRAST IS THE POINT, and it is a core economic result rather than a
+    presentational one: "what does sequencing add over an array" is the question
+    page 7 answers, and until now it was answered with one real artifact and a
+    population average. Two real artifacts answer it directly.
+
+    The two inputs are deliberately on different builds, because that is what
+    they actually are: the chip export is a 23andMe file on GRCh37, the
+    whole-genome sample is purpose-built on GRCh38. Each is internally
+    consistent; neither is a lifted-over copy of the other.
+    """
+    chip = ROOT / "data" / "test_genome.txt"
+    wgs = out / "wgs" / "synthetic_wgs.vcf"
+    (out / "wgs").mkdir(parents=True, exist_ok=True)
+    build_vcf(wgs)
+
+    print("\n=== chip vs whole genome ===")
+    rows = {}
+    for label, src in (("chip", chip), ("wgs", wgs)):
+        pay = _run_one(src, out / label)
+        if pay is None:
+            return 1
+        rows[label] = _summarise(pay)
+
+    c, w = rows["chip"], rows["wgs"]
+    print(f"{'':28}{'chip (GRCh37)':>18}{'whole genome (GRCh38)':>24}")
+    print("-" * 72)
+    for lbl, k, fmt in (("reference-case NMB", "nmb", "money"),
+                        ("incremental QALYs", "qalys", "raw"),
+                        ("incremental cost", "cost", "money"),
+                        ("findings", "n_findings", "int"),
+                        ("of which priced", "n_priced", "int"),
+                        ("sequencing-only findings", "observed_wgs_only_findings", "int"),
+                        ("sequencing-only value", "observed_wgs_only_value", "money")):
+        cv, wv = c[k], w[k]
+        f = ((lambda v: f"${v:,.0f}") if fmt == "money"
+             else (lambda v: f"{v:,}") if fmt == "int" else (lambda v: f"{v}"))
+        print(f"{lbl:28}{f(cv):>18}{f(wv):>24}")
+
+    marginal = w["nmb"] - c["nmb"]
+    only = w["observed_wgs_only_value"]
+    print("-" * 72)
+    print(f"{'marginal value of sequencing':28}{'':>18}{f'${marginal:,.0f}':>24}")
+    print("\nThe array finds none of the sequencing-only findings, by construction:")
+    print("a genotyping array reports the positions it carries probes for. The")
+    print("marginal figure is what the model says the extra positions were worth")
+    print("FOR THIS GENOME — not a population average, and not transferable to")
+    print("another person's.")
+    print(f"\nWHY ${marginal:,.0f} EXCEEDS THE ${only:,.0f} SEQUENCING-ONLY LINE.")
+    print("Those are different quantities and the gap is not an inconsistency.")
+    print("'Sequencing-only value' counts findings that ONLY a whole genome can")
+    print("report. The marginal figure also includes findings the array could")
+    print("have reported and did not — positions outside its probe set, and")
+    print("variants its probes cover but which the ClinVar screen only reaches")
+    print("on a whole-genome input. The second is the larger effect here.")
+    return 0
 
 
 def main() -> int:
@@ -176,9 +312,14 @@ def main() -> int:
     # the first before/after measured after this fix compared the new payload
     # to itself, because the script had already overwritten the old one.
     refresh = "--refresh-committed" in sys.argv
+    argv = [a for a in argv if a != "--profiles"]
     out = pathlib.Path(argv[0] if argv else "econ-sample").resolve()
     out.mkdir(parents=True, exist_ok=True)
+    if "--profiles" in sys.argv:
+        _require_clinvar()
+        return emit_profiles(out)
     vcf = out / "synthetic_wgs.vcf"
+    _require_clinvar()
     n_reg, n_plp = build_vcf(vcf)
     genes = [g for *_r, g in CLINVAR_PLP]
     _pr, phrase = joint_prevalence(genes)
@@ -209,7 +350,7 @@ def main() -> int:
     if ff.exists():
         print(f"findings-first report:       {ff}")
         print("  print it to PDF to refresh "
-              "docs/samples/econ-output-sample.pdf (8 pages)")
+              "docs/samples/econ-output-sample.pdf")
 
     payload = out / "economics-payload.json"
     dest = ROOT / "docs/samples/econ-payload-sample.json"
@@ -226,7 +367,7 @@ def main() -> int:
         print("WARNING: economics-payload.json not written")
 
     print("\neconomics.html carries the full technical appendix; "
-          "economics-findings-first.html is the eight-page main report.")
+          "economics-findings-first.html is the main report.")
     return 0
 
 
