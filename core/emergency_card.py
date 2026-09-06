@@ -7,7 +7,7 @@ findings an emergency clinician needs to know. Designed to:
   * Print on a wallet card
   * Be screenshotted on a phone
   * Display in landscape on a tablet
-Print-friendly CSS optimised for laser/inkjet output.
+Print-friendly CSS optimized for laser/inkjet output.
 
 Items shown (in priority order):
   1. Severe drug contraindications (HLA-B*57:01 → abacavir; B*15:02 → carbamazepine;

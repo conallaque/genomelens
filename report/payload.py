@@ -1,4 +1,4 @@
-"""The canonical report payload — one normalised view of every economic result.
+"""The canonical report payload — one normalized view of every economic result.
 
 WHY THIS EXISTS. The economics engine returns nested dictionaries whose keys
 carry no semantics: ``inmb`` appears in the deterministic reference case, in the
@@ -16,7 +16,7 @@ The rules the schema enforces by construction:
 
 * **Deterministic and probabilistic results are different fields.**
   ``reference_case.nmb`` and ``uncertainty.psa_mean_nmb`` are both correct and
-  are not equal. They cannot be swapped, and neither can be labelled "net
+  are not equal. They cannot be swapped, and neither can be labeled "net
   monetary benefit" without a qualifier.
 * **The Markov model is a cross-check, not the answer.** It lives in
   ``structural_crosscheck`` with its own field names, so it cannot be rendered
@@ -119,7 +119,7 @@ def _s(v, default: str = "") -> str:
 # Vocabulary the economics layer understands. Upstream modules emit strings
 # outside it — the novel-variants module reports "higher" for its most confident
 # predictions — and `_CONFIDENCE_CONC` in value_of_information.py silently
-# defaults those to the moderate concentration. Normalising here fixes the
+# defaults those to the moderate concentration. Normalizing here fixes the
 # *display* and grouping only; the PSA spread is a calculation concern and is
 # reported by the validator rather than changed here.
 _CONFIDENCE_VOCABULARY = {"high", "moderate", "low"}
@@ -130,7 +130,7 @@ _CONFIDENCE_ALIASES = {
 }
 
 
-def normalise_confidence(v) -> str:
+def normalize_confidence(v) -> str:
     raw = _s(v).strip().lower()
     if raw in _CONFIDENCE_VOCABULARY:
         return raw
@@ -173,7 +173,7 @@ class FindingEconomics:
     pathway_id_is_legacy: bool = True
     """True when the id was slugified from display text because the producing
     extractor supplies no semantic components yet. Such ids change if the
-    wording changes; no canonical monetised record may rely on one."""
+    wording changes; no canonical monetized record may rely on one."""
     action_id: str = ""
     condition_id: str = ""
     display_name: str = ""
@@ -206,9 +206,9 @@ class FindingEconomics:
     """A qualifier the pathway attaches to its action — e.g. that a predicted
     variant needs confirming before anything follows from it."""
     evidence_confidence: str = ""
-    """Normalised to high / moderate / low for display and grouping."""
+    """Normalized to high / moderate / low for display and grouping."""
     raw_evidence_confidence: str = ""
-    """Exactly what the producing module said, before normalisation. Retained so
+    """Exactly what the producing module said, before normalization. Retained so
     a vocabulary mismatch stays visible instead of being smoothed away."""
     provenance_tier: str = ""
     pricing_path: PricingPath = PricingPath.CURATED_TABLE
@@ -236,7 +236,7 @@ class FindingEconomics:
     as though they were separately costed at the same price.
     """
     net_cash: float = 0.0
-    """medical_cost_averted - intervention_cost. Actual modelled money."""
+    """medical_cost_averted - intervention_cost. Actual modeled money."""
 
     canonical_expected_nmb: float | None = None
     """THE ONE DOLLAR FIGURE THE MAIN REPORT SHOWS.
@@ -246,8 +246,8 @@ class FindingEconomics:
     participate in probabilistic sensitivity analysis; responsive to
     willingness-to-pay, adherence and horizon. ``None`` when no parametric
     pathway exists for this finding yet — in which case the finding still
-    renders, with "not yet standardised" in place of a value. A missing
-    standardised figure must never hide a genomic result."""
+    renders, with "not yet standardized" in place of a value. A missing
+    standardized figure must never hide a genomic result."""
 
     economic_value_basis: str = ""
     """``parametric_expected_nmb`` when canonical_expected_nmb is populated."""
@@ -275,7 +275,7 @@ class FindingEconomics:
 
     monetized_qaly_value: float = 0.0
     """expected_qaly_gain x willingness-to-pay. The health half of
-    health_economic_value, separated so a renderer can keep cash and monetised
+    health_economic_value, separated so a renderer can keep cash and monetized
     health visually distinct."""
 
     event_probability: float | None = None
@@ -291,7 +291,7 @@ class FindingEconomics:
     value_withheld_by_policy: bool = False
     """True when the model REFUSED to price this, false when it COULD NOT.
 
-    "Reproductive outcomes are deliberately not monetised" and "the source
+    "Reproductive outcomes are deliberately not monetized" and "the source
     record reached the valuation step without cost" are different statements.
     Only the first makes it a contradiction for another path to price the same
     gene: a PGx gene legitimately carries one priced drug-level finding and a
@@ -372,13 +372,13 @@ class PersonalView:
     different quantities: this one is registry-backed and standalone, that one
     is a prevalence-weighted mixture. NEITHER is the reference case — see
     ``ReferenceCase.nmb``, which pools overlapping findings first."""
-    n_findings_standardised: int = 0
-    n_findings_not_standardised: int = 0
+    n_findings_standardized: int = 0
+    n_findings_not_standardized: int = 0
     legacy_curated_total: float = 0.0
     """The pre-canonicalisation total, retained for audit."""
 
     value_per_dollar_of_testing: float | None = None
-    """Formerly rendered as "ROI" and "26.7:1". It divides monetised health by
+    """Formerly rendered as "ROI" and "26.7:1". It divides monetized health by
     test cost, so it is not a financial return. Any renderer using it must say
     so."""
 
@@ -465,7 +465,7 @@ class Provenance:
     registry_n_assumption: int = 0
     registry_pct_sourced: float = 0.0
     """Denominator is the registry only. Do not present beside
-    ``model_pct_resolvable`` without labelling both denominators."""
+    ``model_pct_resolvable`` without labeling both denominators."""
     model_n_total_known: int = 0
     model_pct_resolvable: float = 0.0
     model_pct_attributed_or_better: float = 0.0
@@ -516,7 +516,7 @@ class AdvancedAnalyses:
     health_capital: dict[str, Any] = field(default_factory=dict)
     real_options: dict[str, Any] = field(default_factory=dict)
     risk_preferences: dict[str, Any] = field(default_factory=dict)
-    behavioural: dict[str, Any] = field(default_factory=dict)
+    behavioral: dict[str, Any] = field(default_factory=dict)
     privacy_welfare: dict[str, Any] = field(default_factory=dict)
     genomic_corrections: dict[str, Any] = field(default_factory=dict)
     cohort_projection: dict[str, Any] = field(default_factory=dict)
@@ -539,7 +539,7 @@ class EconomicsReportPayload:
     plain_language: dict[str, Any] = field(default_factory=dict)
     """The engine's plain-language translation layer: number-needed-to-screen
     per condition, what would change the answer, the share of the result that
-    rests on judgement. Carried through as-is; its own probability wording is
+    rests on judgment. Carried through as-is; its own probability wording is
     NOT used, because it renders 0.9987 as "about 100 of every 100 runs"."""
     methods: list[str] = field(default_factory=list)
     """Method statements the engine emits for the appendix."""
@@ -566,9 +566,9 @@ class EconomicsReportPayload:
 
         CLINICAL SEMANTICS OUTRANK DOLLARS. Grouping comes first and sorting
         second, so a low-confidence wellness result cannot appear above a
-        high-confidence prescribing finding on the strength of a modelled dollar
+        high-confidence prescribing finding on the strength of a modeled dollar
         estimate. Within a group, ordering is by canonical expected NMB
-        descending; findings with no standardised value sort last but are never
+        descending; findings with no standardized value sort last but are never
         dropped, because a missing dollar figure must not hide a genomic result.
         """
         groups: dict[str, list[FindingEconomics]] = {
@@ -635,7 +635,7 @@ def build_report_payload(
     *,
     metadata: dict | None = None,
 ) -> EconomicsReportPayload:
-    """Normalise the engine's outputs into one typed payload.
+    """Normalize the engine's outputs into one typed payload.
 
     Reads only. Recomputes nothing. Where the engine reports a quantity, that
     quantity is carried through unchanged; where the engine reports two
@@ -707,7 +707,7 @@ def build_report_payload(
         horizon_years=_f(personal_econ.get("horizon_years")),
         mean_adherence=_f(personal_econ.get("mean_adherence")),
         n_items=_i(personal_econ.get("n_items")),
-        n_not_monetized=_i(personal_econ.get("n_not_monetised")),
+        n_not_monetized=_i(personal_econ.get("n_not_monetized")),
         verdict=_s(personal_econ.get("verdict")),
         legacy_curated_total=_f(personal_econ.get("total_net")),
         value_per_dollar_of_testing=(
@@ -766,7 +766,7 @@ def build_report_payload(
             economic_pathway_id=pid,
             pathway_id_is_legacy=_identity_is_legacy(pid),
             display_name=_s(r.get("label")),
-            evidence_confidence=normalise_confidence(r.get("confidence")),
+            evidence_confidence=normalize_confidence(r.get("confidence")),
             raw_evidence_confidence=_s(r.get("confidence")),
             pricing_path=PricingPath.VOI_PARAMETRIC,
             gene=_s(r.get("gene")),
@@ -807,13 +807,13 @@ def build_report_payload(
                        if cur and cur[0].get("adherence") is not None else None),
         ))
 
-    # 2. Curated-only pathways. No standardised value exists, so none is
+    # 2. Curated-only pathways. No standardized value exists, so none is
     #    invented — but the genomic finding still renders.
     # MIGRATION FALLBACK. Some curated items are synthesised inside
     # analyze_personal_economics from module results that never passed through
     # _econ_record, so they carry no pathway id — the carrier-derived "PTPN22
     # R620W carrier" row is one. Without a fallback the page renders PTPN22
-    # twice: once canonical, once unstandardised. Matching on display name is
+    # twice: once canonical, once unstandardized. Matching on display name is
     # display-dependent and therefore explicitly a migration measure, not an
     # identity scheme; it folds the orphan in as a legacy value rather than
     # emitting a second row for one finding.
@@ -862,7 +862,7 @@ def build_report_payload(
             # column headed by the decision. `action` carries the clinical
             # benefit the finding actually bears on.
             action_summary=_s(it.get("action")) or _s(it.get("basis")),
-            evidence_confidence=normalise_confidence(it.get("confidence")),
+            evidence_confidence=normalize_confidence(it.get("confidence")),
             raw_evidence_confidence=_s(it.get("confidence")),
             pricing_path=PricingPath.CURATED_TABLE,
             expected_qaly_gain=_f(it.get("qaly")),
@@ -871,7 +871,7 @@ def build_report_payload(
             net_cash=c_av - c_iv,
             monetized_qaly_value=_f(it.get("qaly_value")),
             canonical_expected_nmb=None,
-            economic_value_basis="not_yet_standardised",
+            economic_value_basis="not_yet_standardized",
             legacy_curated_value=_f(it.get("net")),
             legacy_curated_value_basis="curated_prevalence_weighted_mixture",
             health_economic_value=_f(it.get("net")),
@@ -880,7 +880,7 @@ def build_report_payload(
             pool_target=_s(it.get("pool_target")),
             # DERIVED, NOT ASSERTED. This was a literal True, so a finding whose
             # value had been withheld upstream still arrived flagged as
-            # monetised — HFE reported is_monetized=True with
+            # monetized — HFE reported is_monetized=True with
             # canonical_expected_nmb=None after NOT_VALUED withheld its figure.
             # The dollar amount was correctly gone and the flag still claimed
             # there was one, which is the same class of contradiction as every
@@ -898,7 +898,7 @@ def build_report_payload(
     # the report cannot value what it valued two pages earlier. The sample
     # carried 23 such rows against 8 genuinely unvaluable findings, and they
     # inflated the "reported without a value" headline by a factor of four.
-    for nm in (personal_econ.get("not_monetised") or []):
+    for nm in (personal_econ.get("not_monetized") or []):
         _pid = _s(nm.get("economic_pathway_id"))
         if _pid and _pid in seen:
             continue
@@ -914,7 +914,7 @@ def build_report_payload(
             evidence_confidence=_s(nm.get("confidence")),
             pricing_path=PricingPath.CURATED_TABLE,
             canonical_expected_nmb=None,
-            economic_value_basis="not_monetised",
+            economic_value_basis="not_monetized",
             is_monetized=False,
             reason_not_monetized=_s(nm.get("reason")),
             value_withheld_by_policy=bool(
@@ -946,7 +946,7 @@ def build_report_payload(
             category=_s(uv.get("category")),
             pricing_path=PricingPath.VOI_PARAMETRIC,
             canonical_expected_nmb=None,
-            economic_value_basis="not_monetised",
+            economic_value_basis="not_monetized",
             is_monetized=False,
             reason_not_monetized=_s(uv.get("reason")),
             value_withheld_by_policy=bool(uv.get("intentional")),
@@ -961,8 +961,8 @@ def build_report_payload(
               if f.canonical_expected_nmb is None and f.is_monetized]
     pv.canonical_total_expected_nmb = round(
         sum(f.canonical_expected_nmb or 0.0 for f in _std), 2)
-    pv.n_findings_standardised = len(_std)
-    pv.n_findings_not_standardised = len(_unstd)
+    pv.n_findings_standardized = len(_std)
+    pv.n_findings_not_standardized = len(_unstd)
 
     conditions = [
         ConditionResult(
@@ -1090,7 +1090,7 @@ def build_report_payload(
         health_capital=dict(voi_result.get("health_capital") or {}),
         real_options=dict(voi_result.get("real_option") or {}),
         risk_preferences=dict(voi_result.get("utility") or {}),
-        behavioural=dict(voi_result.get("behavioural") or {}),
+        behavioral=dict(voi_result.get("behavioral") or {}),
         privacy_welfare=dict(voi_result.get("information_economics") or {}),
         genomic_corrections=dict(voi_result.get("genomic_corrections") or {}),
         cohort_projection=dict(economics_result.get("payer_impact") or {}),

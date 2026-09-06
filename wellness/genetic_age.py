@@ -12,7 +12,7 @@ Horvath, GrimAge, PhenoAge are the gold standards there). It is a
 *genetic propensity* score — your underlying tendency before lifestyle.
 Lifestyle (exercise, Mediterranean diet, sleep, social engagement, BP/
 lipid control, no smoking) has 5-10× the impact of these variants and
-can fully override an unfavourable score.
+can fully override an unfavorable score.
 """
 
 from __future__ import annotations
@@ -41,10 +41,10 @@ def _dose(snps_df, rsid, allele):
 # ─── Longevity score panel ────────────────────────────────────────────────────
 LONGEVITY_VARIANTS = [
     # (rsid, effect_allele, beta_sd_units, af, gene, direction)
-    ("rs2802292", "G", 0.10, 0.32, "FOXO3", "longevity favourable"),
-    ("rs7412",    "T", 0.05, 0.08, "APOE ε2", "longevity favourable"),
-    ("rs429358",  "C", -0.10, 0.14, "APOE ε4", "longevity unfavourable"),
-    ("rs5882",    "G", 0.04, 0.32, "CETP I405V", "longevity favourable"),
+    ("rs2802292", "G", 0.10, 0.32, "FOXO3", "longevity favorable"),
+    ("rs7412",    "T", 0.05, 0.08, "APOE ε2", "longevity favorable"),
+    ("rs429358",  "C", -0.10, 0.14, "APOE ε4", "longevity unfavorable"),
+    ("rs5882",    "G", 0.04, 0.32, "CETP I405V", "longevity favorable"),
     ("rs1800795", "C", -0.03, 0.43, "IL6 -174G/C", "inflammaging modifier"),
     ("rs2736100", "C", 0.04, 0.51, "TERT", "telomere length"),
     ("rs9420907", "C", 0.03, 0.65, "OBFC1", "telomere length"),

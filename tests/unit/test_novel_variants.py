@@ -149,7 +149,7 @@ def test_predictor_refuses_a_table_keyed_on_the_other_build(tmp_path, monkeypatc
 def test_matching_build_table_is_selected_over_a_mismatched_one(tmp_path, monkeypatch):
     """With both tables present, selection must be by build, not sort order.
 
-    'hg19' sorts before 'hg38', so the previous first-glob-hit behaviour would
+    'hg19' sorts before 'hg38', so the previous first-glob-hit behavior would
     have handed a GRCh38 genome the hg19 table.
     """
     monkeypatch.setattr(nv, "REFERENCE_DIR", tmp_path)
@@ -226,7 +226,7 @@ def test_uniprot_accession_resolves_to_a_gene():
     assert nv.gene_for_uniprot("P05091") == "ALDH2"
     assert nv.gene_for_uniprot("P38398-2") == "BRCA1"     # isoform suffix
     assert nv.gene_for_uniprot("") == ""
-    # Nonsense accessions still resolve to nothing rather than a near neighbour.
+    # Nonsense accessions still resolve to nothing rather than a near neighbor.
     assert nv.gene_for_uniprot("NOT_AN_ACCESSION") == ""
 
     from econ.value_of_information import _gene_to_econ
@@ -237,7 +237,7 @@ def test_uniprot_accession_resolves_to_a_gene():
 def test_every_anchor_gene_has_an_accession():
     """The map must cover exactly the genes that can be priced or withheld.
 
-    A gene with an anchor but no accession can never be recognised from a
+    A gene with an anchor but no accession can never be recognized from a
     predictor row; a gene with an accession but no anchor adds a label and no
     economics. Both are worth knowing about, so both are asserted.
     """
@@ -269,12 +269,12 @@ def test_gene_basis_records_how_the_gene_was_assigned(tmp_path, monkeypatch):
     assert dmg, "expected a predicted-pathogenic finding"
     f = dmg[0]
     # The synthetic table carries a placeholder accession, so this falls through
-    # to the window path — which is exactly the case that must be labelled.
+    # to the window path — which is exactly the case that must be labeled.
     assert f["gene"] == "BRCA1"
     assert f["gene_basis"] == "coordinate_window"
 
 
-def test_unassignable_variant_is_labelled_unassigned(tmp_path, monkeypatch):
+def test_unassignable_variant_is_labeled_unassigned(tmp_path, monkeypatch):
     monkeypatch.setattr(nv, "REFERENCE_DIR", tmp_path)
     _make_am_table(tmp_path, [("1", "999999", "C", "T", "0.97",
                                "likely_pathogenic")])

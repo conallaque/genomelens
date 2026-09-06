@@ -1,8 +1,8 @@
 """
-Environmental Optimization — behavioural protocols the report should generate
+Environmental Optimization — behavioral protocols the report should generate
 =============================================================================
 
-Cross-panel, *actionable* behavioural protocols derived from genotype — the
+Cross-panel, *actionable* behavioral protocols derived from genotype — the
 "what should I actually do differently" layer that most reports leave implicit.
 Three domains:
 
@@ -126,7 +126,7 @@ def analyze_exercise_modality(df) -> dict | None:
         n_r = actn3.count("C")  # R allele
         if n_r == 2:
             power_score += 1.0
-            a_call = "ACTN3 R/R — functional α-actinin-3; fast-twitch/power favoured"
+            a_call = "ACTN3 R/R — functional α-actinin-3; fast-twitch/power favored"
         elif n_r == 1:
             power_score += 0.5
             endurance_score += 0.5
@@ -157,7 +157,7 @@ def analyze_exercise_modality(df) -> dict | None:
             "You likely see fast gains from strength, power and sprint work — "
             "explosive compound lifts, plyometrics, short high-intensity sprints.",
             "Keep 2-3 zone-2 cardio sessions/week for cardiovascular health — "
-            "your genotype favours power but heart health needs aerobic base.",
+            "your genotype favors power but heart health needs aerobic base.",
             "Higher relative recovery need after heavy eccentric work — program "
             "adequate rest between power sessions.",
         ]
@@ -298,7 +298,7 @@ def analyze_environmental_optimization(df: pd.DataFrame,
         "circadian": circadian,
         "exercise": exercise,
         "vitamin_d": vitamin_d,
-        "note": ("Actionable behavioural protocols from genotype. Latitude is an "
+        "note": ("Actionable behavioral protocols from genotype. Latitude is an "
                  "explicit assumption (default 40°N); pass your real latitude for "
                  "precise vitamin-D seasonality."),
     }

@@ -25,7 +25,7 @@ def test_every_referenced_rsid_is_registered() -> None:
 
 
 def test_panel_genes_all_present() -> None:
-    """Lock the SNP set this section was created to cover. FUT2 and the coeliac
+    """Lock the SNP set this section was created to cover. FUT2 and the celiac
     HLA-DQ tags are reused from existing records; LCT/AOC1/NOD2/IL23R were added
     alongside this module."""
     expected = {"rs4988235", "rs602662", "rs2187668", "rs7454108",
@@ -42,7 +42,7 @@ def test_all_categories_produced_with_genotypes() -> None:
     res = gut_health.analyze_gut_health(df)
     assert res["n_predictions"] == 6
     assert set(res["categories"]) == {
-        "Carbohydrate Digestion", "Microbiome Shaping", "Gluten & Coeliac Risk",
+        "Carbohydrate Digestion", "Microbiome Shaping", "Gluten & Celiac Risk",
         "Food Intolerance", "Inflammatory-Bowel Predisposition",
     }
 

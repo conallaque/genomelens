@@ -36,7 +36,7 @@ proteome. Two tab-separated columns, no header, 20,283 rows, 126 KB gzipped.
   are dropped, and the remainder is sorted and deduplicated. No symbol is
   altered. The retrieval and filter are one shell pipeline, reproducible from
   the URL above.
-* **Licence:** CC BY 4.0 (UniProt). Attribution: The UniProt Consortium.
+* **License:** CC BY 4.0 (UniProt). Attribution: The UniProt Consortium.
   *UniProt: the Universal Protein Knowledgebase in 2025.* Nucleic Acids Res
   2025;53(D1):D609-D617. PMID:39552041, doi:10.1093/nar/gkae1010.
 

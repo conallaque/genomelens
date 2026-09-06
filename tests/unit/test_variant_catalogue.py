@@ -1,4 +1,4 @@
-"""Catalogue rendering: the per-variant "Recommendation & context" block.
+"""Catalog rendering: the per-variant "Recommendation & context" block.
 
 Locks the depth pass that surfaces `recommendation`, `chip_coverage_note`,
 and `cross_references` (all curated in data/snp_database.json) in the variant
@@ -83,7 +83,7 @@ def test_no_context_block_when_all_fields_empty():
 
 def test_imputed_provenance_threads_and_renders():
     """--impute adds source/r2 columns to snps_df; tier1_lookup must record
-    them and the catalogue must flag imputed calls (never mistaking a
+    them and the catalog must flag imputed calls (never mistaking a
     statistical call for a measured one). Chip data is unaffected."""
     import pandas as pd
 

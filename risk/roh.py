@@ -114,7 +114,7 @@ def _detect_roh_one_chrom(positions: np.ndarray, hom: np.ndarray,
 
     The het budget is enforced over a TRAILING WINDOW of ``window_snps`` called
     SNPs, so an isolated het early in a long segment does not terminate it — the
-    behaviour the module docstring has always described. A whole-run counter
+    behavior the module docstring has always described. A whole-run counter
     instead fragments genuine IBD segments into several short runs, which both
     depresses F_ROH and moves length mass out of the long class that
     consanguinity inference depends on.
@@ -323,7 +323,7 @@ def render_ideogram_svg(roh_runs: list[dict], width: int = 720) -> str:
                 continue
             rx = left_margin + (run["start_bp"] / 1e6) * scale
             rw = max((run["length_mb"]) * scale, 1.0)
-            # Colour by ROH length tier
+            # Color by ROH length tier
             if run["length_mb"] >= 8:
                 fill = "#f85149"  # long — recent relatedness
             elif run["length_mb"] >= 2:

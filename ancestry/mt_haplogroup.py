@@ -396,7 +396,7 @@ HAPLOGROUP_INFO: dict[str, dict[str, str]] = {
 
 # ─── Analysis function ────────────────────────────────────────────────────────
 
-def _normalise_genotype(gt: object) -> str | None:
+def _normalize_genotype(gt: object) -> str | None:
     if gt is None:
         return None
     s = str(gt).upper().strip().replace(" ", "").replace("-", "")
@@ -412,7 +412,7 @@ def _find_marker(snps_df: pd.DataFrame, marker: dict) -> dict | None:
     for rsid in marker.get("rsids", []):
         if rsid in snps_df.index:
             row = snps_df.loc[rsid]
-            gt = _normalise_genotype(row.get("genotype"))
+            gt = _normalize_genotype(row.get("genotype"))
             if gt:
                 return {
                     "rsid": rsid,
@@ -426,7 +426,7 @@ def _find_marker(snps_df: pd.DataFrame, marker: dict) -> dict | None:
         hits = mt_df[mt_df["pos"] == pos]
         if not hits.empty:
             row = hits.iloc[0]
-            gt = _normalise_genotype(row.get("genotype"))
+            gt = _normalize_genotype(row.get("genotype"))
             if gt:
                 return {
                     "rsid": str(row.name),

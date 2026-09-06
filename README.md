@@ -7,7 +7,7 @@ entirely on your own machine.
 
 ### 📄 [See the full report → `docs/samples/econ-output-sample.pdf`](docs/samples/econ-output-sample.pdf)
 
-[<img src="docs/samples/econ-output-sample-summary.png" width="460" alt="Summary sheet of the sample economics report: health gain in days, healthcare cost change, modelled net benefit, decision uncertainty, and the findings ranked by expected net monetary benefit">](docs/samples/econ-output-sample.pdf)
+[<img src="docs/samples/econ-output-sample-summary.png" width="460" alt="Summary sheet of the sample economics report: health gain in days, healthcare cost change, modeled net benefit, decision uncertainty, and the findings ranked by expected net monetary benefit">](docs/samples/econ-output-sample.pdf)
 
 *The summary sheet. Eleven pages in all, generated from a synthetic genome — click through for the rest.*
 
@@ -55,7 +55,7 @@ unusual case, not the conservative one.
 In it: cost and QALYs reported **separately** with the ICER *withheld* under dominance ·
 a **double-counting correction** showing what naive addition claimed and how much came out ·
 an **adherence discount** charged to benefit *and* ongoing cost · findings with no
-registry-backed pathway shown as *"not yet standardised"* rather than assigned an invented
+registry-backed pathway shown as *"not yet standardized"* rather than assigned an invented
 value · probability reported as a **count** — *"cost-effective in 1,500 of 1,500
 simulations"* — beside its 95% interval, because a bare percentage cannot be told apart
 from a model whose parameters stopped varying.
@@ -95,8 +95,8 @@ fake, and each is traceable to a named test.
 | **Finding my own errors** | Eight findings routed onto one cardiometabolic anchor and were **summed** — a 240% risk reduction, which is not a probability. Fixed by pooling on the risk scale; the report shows the size of its own correction. Six more, with what each cost to find, in [What broke, and how I found it](#what-broke-and-how-i-found-it). `test_stacked_findings_do_not_sum_their_risk_reductions` |
 | **Uncertainty that is real** | An earlier version reported a strategy cost-saving in **100% of simulations** — the finding-level parameters were pinned outside the sampling loop. `test_psa_without_rebuild_understates_uncertainty`<br><br>**The current sample also reports 100%, for a different reason, and here is how to tell.** Its profile carries a familial-hypercholesterolaemia finding whose whole distribution sits above zero: 68 varied parameters, a 95% interval of $13,171–$61,333, printed beside the probability so the spread is visible in the same block. The bug reported 100% at *every* willingness-to-pay including **$0/QALY**, which asserts the cash arm has no uncertainty at all. **This profile reports 100% at zero as well** — the honest reading is that on a profile this dominant the CEAC alone no longer separates the two cases, so the spread is what does: the bug's interval was degenerate because nothing varied, while this one moves 4.7x across 68 sampled parameters. The zero-threshold check still guards the engine against a return of the pinning defect, asserted on a non-dominant profile where it can discriminate: `test_ceac_at_zero_threshold_is_below_certainty` |
 | **Parameter provenance, enforced** | Every figure carries a tier. `tier="assumption"` **may not** cite a source — the registry fails to load if it does. Two populations, reported separately rather than blended: **58 of 72** registry parameters are sourced (80.6%), and **134 of 306** curated-table figures resolve to a PMID or DOI (43.8%). The model prints its own coverage instead of claiming "sourced". `econ/params.py` |
-| **Knowing what not to monetise** | Reproductive outcomes are never priced — attaching a figure to an affected birth prices a prospective child. Stated in code, enforced by a test, surfaced as a decision rather than an omission. `NOT_VALUED` |
-| **Structural modelling** | Cohort state-transition model against US life-table mortality, Simpson's 1/3 within-cycle correction cross-checked against an independent implementation. The cross-check runs only where [`heor-model-replication`](https://github.com/conallaque/heor-model-replication) is checked out alongside; it **skips on CI**, where only the endpoint weights are asserted. `test_within_cycle_weights_match_the_published_implementation` |
+| **Knowing what not to monetize** | Reproductive outcomes are never priced — attaching a figure to an affected birth prices a prospective child. Stated in code, enforced by a test, surfaced as a decision rather than an omission. `NOT_VALUED` |
+| **Structural modeling** | Cohort state-transition model against US life-table mortality, Simpson's 1/3 within-cycle correction cross-checked against an independent implementation. The cross-check runs only where [`heor-model-replication`](https://github.com/conallaque/heor-model-replication) is checked out alongside; it **skips on CI**, where only the endpoint weights are asserted. `test_within_cycle_weights_match_the_published_implementation` |
 | **Validated against published models** | Three peer-reviewed cohort state-transition models reproduced in Python, every printed cost, effect, ICER and dominance verdict matched exactly — the one claim here that is not self-assessed. [`heor-model-replication`](https://github.com/conallaque/heor-model-replication) |
 | **Distributional equity analysis** | Two complementary methods — Atkinson EDE (age-based) and power-law equity weights (ancestry-based with explicit portability discounts) — so the model can show *who* benefits, not just how much. `econ.decision.distributional_cea`, `econ.frontier.distributional_cea` |
 | **Family cascade value** | Monogenic findings (BRCA, Lynch) are worth more than individual NMB because first-degree relatives share a 50% carrier probability. The model computes cascade testing value explicitly rather than ignoring it. `analyze_value_of_information` |
@@ -105,9 +105,9 @@ fake, and each is traceable to a named test.
 The recurring theme: the model reports an unflattering answer as readily as a flattering
 one, and several commits above exist because it did.
 
-**Authorship, plainly.** The health-economics modelling, scientific decisions and product
+**Authorship, plainly.** The health-economics modeling, scientific decisions and product
 direction are mine. The **software implementation was largely AI-generated** under my
-direction and review — what is on offer here is the economics and the judgement.
+direction and review — what is on offer here is the economics and the judgment.
 
 ---
 
@@ -134,7 +134,7 @@ four separate-looking defects: monogenic findings routed to the medication secti
 one gene priced twice on different anchors, nine unrelated findings collapsing onto the
 same $2,579, and a reproductive finding escaping the policy that forbids pricing it. I
 patched three of those symptoms before finding the cause. It hid because each local
-re-derivation looked like reasonable behaviour on its own.
+re-derivation looked like reasonable behavior on its own.
 
 **A field name is not a contract.** Three times. `qaly_gain` had no documented semantics,
 so two consumers each invented one and their values differed by exactly the effect size
@@ -175,10 +175,10 @@ Four times I reported a count as the scope of a defect — 65% placeholders, nin
 sharing one figure, a 200× split between two paths, sixteen pathways on two constants —
 and each turned out to be the reach of something I had not yet found, not its size.
 
-**Any policy enforced at a call site, rather than at the point of monetisation, is bypassed
-by the next path that reaches monetisation.** Five times in one file: two paths valuing the
+**Any policy enforced at a call site, rather than at the point of monetization, is bypassed
+by the next path that reaches monetization.** Five times in one file: two paths valuing the
 same gene, two valuing the same carrier, the withholding policy honoured on one pricing
-path and not the other, and a monetised flag asserted rather than derived. I named this
+path and not the other, and a monetized flag asserted rather than derived. I named this
 pattern and then shipped another instance of it within the hour. The fix that holds is an
 invariant on the assembled payload, where every path has already converged.
 
@@ -222,14 +222,14 @@ what a run actually reports:
 | **Pharmacogenomics** | CPIC/DPWG star-allele calling across 217 drugs — which medications to avoid, dose-adjust, or expect a poor response from. HLA typing for drug-hypersensitivity risk. Drug–drug and gene–drug interactions. |
 | **Clinical risk** | ClinVar pathogenic/likely-pathogenic screen, ACMG actionable genes, carrier status, and an offline computational screen (AlphaMissense) for rare variants beyond ClinVar. |
 | **Polygenic risk** | PRS and PGS Catalog scores with coverage and an ancestry-transferability caveat, plus PheWAS biomarker predictions. |
-| **Gut health** | Lactase persistence, FUT2 secretor status, coeliac HLA-DQ2.5/DQ8 tags, histamine/DAO clearance, NOD2 and IL23R. |
+| **Gut health** | Lactase persistence, FUT2 secretor status, celiac HLA-DQ2.5/DQ8 tags, histamine/DAO clearance, NOD2 and IL23R. |
 | **Fitness** | Power vs endurance lean, strength trainability, recovery speed, VO2max response, plus lift-level protocol cards and HR/FTP zones. |
 | **Nutrition** | Macronutrient pressures, caffeine and alcohol handling, lactose and gluten, folate/B12 methylation, and a 30-day meal plan with a shopping list. |
 | **Supplements** | A ranked stack with the genotype behind each entry, an evidence tier, what to avoid, and a monthly cost. |
 | **Blood work** | Genotype-aware interpretation of a supplied lab panel — clinical *and* optimal ranges, biological age (Levine PhenoAge), AHA PREVENT 10-year ASCVD risk, and longitudinal tracking. |
 | **Ancestry & lineage** | AIM-based population inference, Neanderthal and ancient-population affinity, chromosome painting, and Y-DNA / mtDNA lineage chains showing every branch point and where the chip runs out. |
 | **Other panels** | Detoxification enzymes, metals and oxidative handling, immunogenetics, neurochemistry (COMT/MAOA/BDNF), urologic, addiction genetics, blood type, sleep and chronotype. |
-| **Recommendations** | A master plan tying it together: decade-by-decade priorities, behavioural protocols, a printable emergency card for clinicians, and a plain-language summary of what to actually do first. |
+| **Recommendations** | A master plan tying it together: decade-by-decade priorities, behavioral protocols, a printable emergency card for clinicians, and a plain-language summary of what to actually do first. |
 
 Findings that have a **real signal but no proven intervention** carry no dollar value and
 say so — a risk you cannot act on is reported as exactly that, not priced.
@@ -284,8 +284,8 @@ lower treatment costs), monogenic findings enable early surveillance, and the ag
 maps to avoidable claims. This is a reframing exercise, not a separate model — the
 economics are the same CEA seen from the payer's side.
 
-**Behavioural nudge.** High-value findings are loss-framed — "Cost of inaction: $X over
-Y years" — because the behavioural economics literature shows loss framing moves
+**Behavioral nudge.** High-value findings are loss-framed — "Cost of inaction: $X over
+Y years" — because the behavioral economics literature shows loss framing moves
 health decisions when gain framing does not (Kahneman & Tversky, 1979; Rothman & Salovey,
 1997). Low-value findings are not nudged.
 
@@ -295,7 +295,7 @@ a cascade multiplier. A BRCA2 finding is worth more than its individual NMB beca
 relatives can be tested.
 
 **Reanalysis value.** The report notes that genomic data compounds in value — the same
-raw file can be reanalysed against updated variant databases, new polygenic scores, and
+raw file can be reanalyzed against updated variant databases, new polygenic scores, and
 future pharmacogenomic guidelines. A one-time test with recurring returns.
 
 ## Known limitations
@@ -311,7 +311,7 @@ This model reports its own gaps rather than hiding them.
 - **The most influential parameter is still an assumption.** `actionable_rrr` — the
   effect of acting where no trial has measured it — is the second-largest driver in the
   tornado and carries no citation. It has been replaced with the measured effect for the
-  conditions where one exists (type 2 diabetes, dementia), which cut the modelled value
+  conditions where one exists (type 2 diabetes, dementia), which cut the modeled value
   of an APOE ε4 finding from $3,514 to $972 once SPRINT MIND's 11% replaced a generic
   30%. The remaining conditions still fall back to it, and the fallback is recorded on
   each pathway as `rrr_basis` rather than left invisible.
@@ -353,7 +353,7 @@ artefacts available. The badge is not evidence for those two.
 
 - **Unified, strand-aware SNP registry** — one source of truth for GRCh37/38 coordinates and ancestral/derived alleles; caught and fixed palindrome/strand bugs that silently mis-call ancestry.
 - **KING-robust relationship inference** — a proper kinship estimator (not naive percent-identity), IBS0-refined for parent-child vs full-sibling.
-- **No fabricated figures** — no invented polygenic percentiles; transmission ≠ disease penetrance; ClinVar review-star confidence; Phase-3 findings are labelled computational predictions, never clinical calls; and a **grounding guardrail rejects any AI-introduced figure absent from the deterministic data**, so the local LLM cannot invent a risk or a statistic.
+- **No fabricated figures** — no invented polygenic percentiles; transmission ≠ disease penetrance; ClinVar review-star confidence; Phase-3 findings are labeled computational predictions, never clinical calls; and a **grounding guardrail rejects any AI-introduced figure absent from the deterministic data**, so the local LLM cannot invent a risk or a statistic.
 - **Runs end-to-end on a public genome** — a *functional* check, not a clinical accuracy validation: the full **GIAB HG001 (NA12878)** reference genome ran through build detection, Phase-2 ClinVar, the Phase-3 predictor screen and the health-economics engine with no runtime errors. **This run has not been repeated since, so no counts from it are quoted here.** The per-variant figures it produced were withdrawn rather than restated (see `CHANGELOG.md`), because the model has changed substantially since and a number that was true then is not evidence now.
 - **800+ tests**, reference-build auto-detection (GRCh37/38 incl. rsID-less whole-genome VCFs), and graceful degradation when optional data or models are absent.
 

@@ -40,7 +40,7 @@ _CACHE: dict[str, object] = {}
 
 
 def _base_name(name: str) -> str:
-    """Normalise a drug name for matching: lowercase, drop combination parts
+    """Normalize a drug name for matching: lowercase, drop combination parts
     and parenthetical qualifiers (e.g. 'duloxetine DR' -> 'duloxetine')."""
     n = name.lower().split("/")[0].split("(")[0].strip()
     # strip common formulation suffixes

@@ -59,7 +59,7 @@ def test_each_additional_correlated_finding_adds_less_than_the_last():
 
 
 def test_a_single_finding_is_unchanged_by_pooling():
-    # The correction must not penalise the ordinary one-finding case.
+    # The correction must not penalize the ordinary one-finding case.
     lone = _f(rrr=0.30, hc=0.5)
     pool = ee.ConditionPool("CAD", [lone])
     assert pool.combined_rrr() == pytest.approx(lone.effective_rrr)
@@ -151,7 +151,7 @@ def test_inmb_follows_the_threshold():
 
 
 def test_costs_and_qalys_are_reported_separately():
-    # The old headline added cash savings to monetised health under one label.
+    # The old headline added cash savings to monetized health under one label.
     ev = ee.evaluate_pools(ee.pool_findings([_f()]), test_cost=100.0)
     cea = ev["cea"]
     for key in ("incremental_cost", "incremental_qaly", "icer", "inmb", "wtp"):
@@ -347,7 +347,7 @@ def test_correlation_penalty_binds_before_the_cap():
     # Worth pinning explicitly: with the penalty compounding, the combined
     # effect converges well below the cap, so the cap is a backstop rather
     # than the operative constraint. If a future penalty change makes the cap
-    # bind instead, that is a real behaviour change and should be noticed.
+    # bind instead, that is a real behavior change and should be noticed.
     many = ee.ConditionPool("CAD", [_f(label=f"f{i}") for i in range(30)])
     assert many.combined_rrr() < ep.value("max_combined_rrr")
 
@@ -712,7 +712,7 @@ def test_report_separates_efficacy_from_effectiveness():
 def test_the_fixed_test_cost_is_what_moves_the_icer():
     # Adherence scales benefit and ongoing cost together, so on its own it
     # leaves cost-per-QALY roughly alone. The one-off test cost does not
-    # scale, so it amortises over fewer realised QALYs. With no test cost the
+    # scale, so it amortises over fewer realized QALYs. With no test cost the
     # ratio should barely move; with one it should get materially worse.
     def ratio(adh, test_cost):
         ev = ee.evaluate_pools(ee.pool_findings(_adh_findings(adh)),

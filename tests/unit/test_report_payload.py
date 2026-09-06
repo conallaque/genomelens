@@ -117,7 +117,7 @@ def test_pdf_blocked_on_arithmetic_violation():
     The README states the renderer "blocks the PDF on any broken arithmetic
     identity". That was true — `pipeline.py` skips the export when the payload
     validates with an ERROR — but nothing asserted it, and the test name the
-    README cited did not exist anywhere in the repository. The behaviour was
+    README cited did not exist anywhere in the repository. The behavior was
     real and the citation was not, which is a worse failure than a missing
     feature: it invites a reviewer to check the one thing that will not
     check out.
@@ -222,7 +222,7 @@ def test_net_cash_identity_per_finding():
 
 def test_health_economic_value_is_not_net_cash():
     """The two must stay distinct: one is money, the other includes health
-    monetised at the threshold. Conflating them is the "your genome is worth $X"
+    monetized at the threshold. Conflating them is the "your genome is worth $X"
     error the report is meant to avoid."""
     f = FindingEconomics(medical_cost_averted=84.0, intervention_cost=65.0,
                          net_cash=19.0, monetized_qaly_value=5607.0,
@@ -367,7 +367,7 @@ def _budget_rows():
 
 def test_peak_budget_impact_is_the_highest_spend_not_the_largest_magnitude():
     """REGRESSION. The validator's first version selected the peak by absolute
-    value and flagged correct engine output as an error: once a programme turns
+    value and flagged correct engine output as an error: once a program turns
     cost-saving, the final year has the largest magnitude and the smallest
     budget impact. Peak means worst year for the payer."""
     p = _coherent()
@@ -460,17 +460,17 @@ def test_canonical_records_on_legacy_identifiers_are_flagged():
         p, "Canonical records on legacy identifiers")
 
 
-def test_unstandardised_findings_are_reported_not_hidden():
+def test_unstandardized_findings_are_reported_not_hidden():
     p = _coherent()
     p.findings = [FindingEconomics(
         display_name="1 actionable wellness variant(s)", is_monetized=True,
         canonical_expected_nmb=None, legacy_curated_value=1767.0)]
     assert errors_in(validate_payload(p)) == []
     assert Severity.WARNING in _severities(
-        p, "Findings without a standardised value")
+        p, "Findings without a standardized value")
 
 
-# ── unmonetised, hypothetical, synthetic ──────────────────────────────────────
+# ── unmonetized, hypothetical, synthetic ──────────────────────────────────────
 
 def test_unmonetized_findings_are_kept_not_dropped():
     p = EconomicsReportPayload(findings=[
@@ -491,7 +491,7 @@ def test_unmonetized_finding_contributes_no_value():
 
 
 def test_hypothetical_findings_are_flagged_distinctly_from_unmonetized():
-    """Awareness findings can carry a modelled value; not-monetised ones carry
+    """Awareness findings can carry a modeled value; not-monetized ones carry
     none. They are different states and the schema keeps them separate."""
     aware = FindingEconomics(display_name="a", is_monetized=True,
                              is_hypothetical_or_awareness=True,
@@ -615,7 +615,7 @@ def test_unmapped_curated_finding_gets_null_not_an_invented_value():
          "avoided": 362, "intervention": 105, "confidence": "low"}]})
     f = p.findings[0]
     assert f.canonical_expected_nmb is None
-    assert f.economic_value_basis == "not_yet_standardised"
+    assert f.economic_value_basis == "not_yet_standardized"
     assert f.legacy_curated_value == 1767.0
     assert f.display_name, "the genomic finding must still render"
 
@@ -630,12 +630,12 @@ def test_findings_sort_by_canonical_with_nulls_last():
     ordered = [f for _g, items in p.findings_page_groups() for f in items]
     vals = [f.canonical_expected_nmb for f in ordered]
     assert vals[0] == 490.0 and vals[1] == 90.0
-    assert vals[-1] is None, "unstandardised findings sort last, never dropped"
+    assert vals[-1] is None, "unstandardized findings sort last, never dropped"
 
 
 def test_clinical_grouping_outranks_dollar_value():
     """A low-confidence finding must not outrank a high-confidence prescribing
-    finding on the strength of a modelled dollar estimate."""
+    finding on the strength of a modeled dollar estimate."""
     p = build_report_payload(None, {"nmb_rows": [
         {"label": "CYP2C19 IM", "economic_pathway_id": "pgx:cyp2c19:c:mace",
          "nmb": 90, "confidence": "high"},
@@ -724,7 +724,7 @@ def test_pgx_extractor_emits_semantic_not_legacy_ids():
 
 # ── confidence vocabulary ─────────────────────────────────────────────────────
 
-def test_unrecognised_confidence_is_normalised_for_display_and_flagged():
+def test_unrecognised_confidence_is_normalized_for_display_and_flagged():
     """The novel-variants module emits "higher" for its most confident
     predictions; _CONFIDENCE_CONC has no such key, so the PSA silently gives it
     the moderate concentration."""
@@ -775,7 +775,7 @@ def test_readme_quantitative_claims_match_the_current_commit():
     from econ import value_of_information as voi
 
     root = pathlib.Path(__file__).resolve().parents[2]
-    # Whitespace-normalised: the README is hard-wrapped prose, so a figure and
+    # Whitespace-normalized: the README is hard-wrapped prose, so a figure and
     # its unit routinely straddle a line break. A drift check that fails on
     # reflow gets disabled, and a disabled check is how the figures drifted.
     readme = " ".join((root / "README.md")
@@ -910,9 +910,9 @@ def test_chip_and_wgs_summaries_are_distinguishable():
 
 
 def test_an_action_is_never_published_as_a_finding():
-    """The blocker: monetised findings reappeared as unvaluable duplicates.
+    """The blocker: monetized findings reappeared as unvaluable duplicates.
 
-    `clinical_benefit` led the label precedence on the not-monetised path, so a
+    `clinical_benefit` led the label precedence on the not-monetized path, so a
     record that reached the curated valuation step without prevalence/cost was
     published under the name of its own action. The sample carried 23 of these
     against 8 genuinely unvaluable findings: BRCA1 was valued at $18,808 for
@@ -930,12 +930,12 @@ def test_an_action_is_never_published_as_a_finding():
                        "confidence": "high", "gene": "BRCA1",
                        "nmb": 18808, "dcost_averted": 17412, "dqaly": 0.019,
                        "intervention_charged": 2000, "wgs_only": False}]},
-        {"not_monetised": [{
+        {"not_monetized": [{
             "finding": "Enhanced screening + risk-reducing surgery.",
             # Same gene: the check requires it, because the defect is one
             # source record reaching two paths. A trailing period is added
             # deliberately — exact string equality was defeated by punctuation
-            # alone, so the normalisation is part of what is under test.
+            # alone, so the normalization is part of what is under test.
             "gene": "BRCA1",
             "category": "Unvaluable — incomplete economics",
             "reason": "reached the valuation step without cost",
@@ -966,7 +966,7 @@ def test_an_incomplete_record_is_not_a_withheld_one():
                        "confidence": "high", "gene": "CYP2C19", "nmb": 490,
                        "dcost_averted": 500, "dqaly": 0.001,
                        "intervention_charged": 10, "wgs_only": False}]},
-        {"not_monetised": [{
+        {"not_monetized": [{
             "finding": "CYP2C19 — top-drug actionable (amitriptyline)",
             "gene": "CYP2C19", "economic_pathway_id": "pgx:cyp2c19",
             "reason": "reached the valuation step without cost",
@@ -995,7 +995,7 @@ def test_an_unvaluable_row_is_named_by_its_finding_not_its_action():
         "outcome_value": 100_000, "prevalence": 0.001, "cost": None,
         "gene": "BRCA1", "economic_pathway_id": "clinvar:brca1:breastovarian",
     }]})
-    rows = r.get("not_monetised") or []
+    rows = r.get("not_monetized") or []
     assert rows, "a record missing cost must be reported, not dropped"
     row = rows[0]
     assert row["finding"] == "BRCA1 pathogenic variant (heterozygous)", (

@@ -242,8 +242,8 @@ def test_evppi_bounded_by_evpi():
         assert row["evppi"] <= max(ev["evpi"], 1) + 50    # tolerance for MC noise
 
 
-def test_behavioural_present_bias_reduces_value():
-    b = voi.analyze_behavioural(mean=40_000, sd=15_000, test_cost=300)
+def test_behavioral_present_bias_reduces_value():
+    b = voi.analyze_behavioral(mean=40_000, sd=15_000, test_cost=300)
     assert b["available"] is True
     assert b["pv_hyperbolic"] <= b["pv_exponential"]     # present bias discounts more
     assert b["adoption_gap"] >= 0
@@ -256,7 +256,7 @@ def test_longevity_wired_into_voi_result():
     lon = r["longevity"]
     assert lon["available"] is True
     blended = [s["blended"] for s in lon["scenarios"]]
-    assert blended == sorted(blended)     # longer life → more realised risk
+    assert blended == sorted(blended)     # longer life → more realized risk
 
 
 def test_welfare_comparison_is_not_assumed_true():
@@ -321,7 +321,7 @@ def test_predicted_variant_in_anchored_gene_is_priced_and_downweighted():
 def test_predicted_variant_without_an_anchor_is_reported_not_priced():
     # PATH C. `_nvr()` names no gene, so there is no condition anchor. It must
     # be reported as unvaluable rather than priced off a generic bucket — the
-    # behaviour that let nine unrelated findings share one figure.
+    # behavior that let nine unrelated findings share one figure.
     r = voi.analyze_value_of_information(_econ(), None, _nvr(),
                                         input_type="wgs", n_mc=200)
     assert not [row for row in r["nmb_rows"] if "predicted" in row["label"]]

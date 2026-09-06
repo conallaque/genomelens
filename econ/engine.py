@@ -16,7 +16,7 @@ scale with a complement-of-products rule, applies a compounding penalty for
 correlated re-measurement, caps the total, and charges the cost of illness
 **once**.
 
-**2. Cash savings and monetised health were added into one headline number.**
+**2. Cash savings and monetized health were added into one headline number.**
 "Net benefit $275,405" blended dollars that a payer would actually not spend
 with quality-adjusted life-years priced at willingness-to-pay. Those are
 different objects and a reviewer needs them apart. Every result here reports
@@ -34,7 +34,7 @@ convention the cited tutorial validates against.
 
 Nothing here invents a parameter. Every constant is fetched from
 :mod:`econ_params` by key, so its provenance tier travels with it and the
-report can state how much of its own output rests on judgement.
+report can state how much of its own output rests on judgment.
 """
 
 from __future__ import annotations
@@ -86,7 +86,7 @@ _LIFE_TABLE_PATH = os.path.join(_DATA_DIR, "LifeTable_USA_Mx_2015.csv")
 
 # Condition anchors used by value_of_information._classify_category, mapped to
 # the registry keys that cost them. A condition with no entry here cannot be
-# valued — which is the intended behaviour, since the alternative is inventing
+# valued — which is the intended behavior, since the alternative is inventing
 # a cost for it.
 #
 # Each condition must name its OWN quality-of-life decrement. For a while
@@ -113,14 +113,14 @@ COI_KEY_TO_PARAM: dict[str, tuple[str, str]] = {
     "Colorectal":        ("coi_colorectal",         "qaly_loss_cancer"),
     "BreastOvarian":     ("coi_breast_ovarian",     "qaly_loss_cancer"),
     "Pathogenic":        ("coi_pathogenic_generic", "qaly_loss_pathogenic_generic"),
-    # Coeliac, added when the gut-health module was connected to the engine.
+    # Celiac, added when the gut-health module was connected to the engine.
     # A deliberately small anchor: the disease is managed by diet rather than
     # by procedures or biologics. Lactase non-persistence was considered and
     # left OUT — it is a symptom burden rather than a disease, worth roughly
     # $250 and 0.05 QALYs, and buying that with two unsourced registry
     # parameters would have dropped the model below its own 75%-sourced gate
     # for a rounding error. It stays a reported signal with no dollar figure.
-    "Coeliac":           ("coi_coeliac",            "qaly_loss_coeliac"),
+    "Celiac":           ("coi_celiac",            "qaly_loss_celiac"),
 }
 
 
@@ -144,14 +144,14 @@ ADHERENCE_BY_COI_KEY: dict[str, str] = {
     "Urologic":          "adherence_lifestyle",         # hydration, diet
     "IronOverload":      "adherence_screening",         # ferritin surveillance
     "Parkinsons":        "adherence_screening",         # neurology follow-up
-    "Colorectal":        "adherence_screening",         # colonoscopy programme
+    "Colorectal":        "adherence_screening",         # colonoscopy program
     "BreastOvarian":     "adherence_screening",         # imaging surveillance
     "Pathogenic":        "adherence_screening",         # specialist follow-up
-    # Coeliac: the genotype informs a screening decision (serology), and the
+    # Celiac: the genotype informs a screening decision (serology), and the
     # diet that follows a positive result is enforced by symptoms rather than
     # by willpower, so it sits closer to screening than to general dietary
     # change. Lactose is ordinary dietary self-management.
-    "Coeliac":           "adherence_screening",         # serology, then diet
+    "Celiac":           "adherence_screening",         # serology, then diet
 }
 
 
@@ -227,7 +227,7 @@ class ConditionPool:
         combined = 1 - Π (1 - rrr_i · penalty^i)
 
     which is what you get if the interventions act independently on the same
-    baseline risk — additive summation, the previous behaviour, can exceed 1.0
+    baseline risk — additive summation, the previous behavior, can exceed 1.0
     and is simply not a probability. The ``penalty^i`` term (i = rank order,
     strongest first) then down-weights each additional signal on the grounds
     that a second measurement of the same liability is mostly the same
@@ -258,7 +258,7 @@ class ConditionPool:
         return min(cap, 1.0 - surviving)
 
     def combined_rrr(self) -> float:
-        """Pooled risk reduction as a real cohort would realise it."""
+        """Pooled risk reduction as a real cohort would realize it."""
         return self._combine([f.effective_rrr for f in self.findings])
 
     def pooled_efficacy_rrr(self) -> float:
@@ -577,7 +577,7 @@ def evaluate_pools(pools: dict[str, ConditionPool],
                else float(horizon_years))
     rate = ep.value("discount_rate")
     mcf = ep.value("marginal_cost_fraction") if marginal_only else 1.0
-    # Events land at an unmodelled point inside the horizon; discount at the
+    # Events land at an unmodeled point inside the horizon; discount at the
     # midpoint. The Markov path below supersedes this for conditions where
     # timing matters, and reports both.
     disc = 1.0 / (1.0 + rate) ** (horizon / 2.0)
@@ -662,7 +662,7 @@ def evaluate_pools(pools: dict[str, ConditionPool],
                 round(100.0 * (tot_efficacy_qaly - tot_qaly) / tot_efficacy_qaly, 1)
                 if tot_efficacy_qaly > 0 else 0.0),
             # The fixed test cost does not shrink with adherence, so it is
-            # spread over fewer realised QALYs. That, not the intervention's
+            # spread over fewer realized QALYs. That, not the intervention's
             # own cost per QALY, is why the ICER moves.
             "fixed_test_cost": round(test_cost),
             "archetypes": sorted({
@@ -888,13 +888,13 @@ def dual_perspective(healthcare_cost_averted: float, qaly_gained: float,
         "healthcare_sector": {
             "cost_averted": round(healthcare_cost_averted),
             "qaly_gained": round(qaly_gained, 4),
-            "monetised_health": round(qaly_gained * wtp),
+            "monetized_health": round(qaly_gained * wtp),
             "note": "Payer/provider costs only — the reference case.",
         },
         "societal": {
             "cost_averted": round(healthcare_cost_averted + societal_extra),
             "qaly_gained": round(qaly_gained, 4),
-            "monetised_health": round(qaly_gained * wtp),
+            "monetized_health": round(qaly_gained * wtp),
             "note": "Adds productivity and unpaid caregiving, itemised below.",
         },
         "societal_additions": [
@@ -914,8 +914,8 @@ def dual_perspective(healthcare_cost_averted: float, qaly_gained: float,
 def impact_inventory(conditions: Sequence[dict]) -> list[dict]:
     """Second Panel impact inventory: what is counted, in which perspective.
 
-    An explicit "counted / not counted" table is the cheapest defence against
-    the accusation that a favourable result comes from a convenient choice of
+    An explicit "counted / not counted" table is the cheapest defense against
+    the accusation that a favorable result comes from a convenient choice of
     what to include.
     """
     return [
@@ -927,19 +927,19 @@ def impact_inventory(conditions: Sequence[dict]) -> list[dict]:
          "note": "Charged once per condition, not once per finding."},
         {"sector": "Patient", "item": "Health-related quality of life",
          "healthcare": "included", "societal": "included",
-         "note": "Reported as QALYs; monetised only at a stated threshold."},
+         "note": "Reported as QALYs; monetized only at a stated threshold."},
         {"sector": "Patient", "item": "Time and travel for care",
          "healthcare": "not counted", "societal": "not counted",
          "note": "No defensible per-person estimate available here."},
         {"sector": "Informal caregiver", "item": "Unpaid caregiving time",
          "healthcare": "not counted", "societal": "included",
          "note": "Dementia only; replacement-wage valuation."},
-        {"sector": "Productivity", "item": "Paid labour output",
+        {"sector": "Productivity", "item": "Paid labor output",
          "healthcare": "not counted", "societal": "included",
          "note": "Partial — working-life share stated, not assumed to be 1."},
         {"sector": "Other", "item": "Reproductive decisions",
          "healthcare": "not counted", "societal": "not counted",
-         "note": "Deliberately never monetised; surfaced as a recommendation."},
+         "note": "Deliberately never monetized; surfaced as a recommendation."},
         {"sector": "Other", "item": "Insurance / discrimination risk",
          "healthcare": "not counted", "societal": "not counted",
          "note": "Real but not quantified; noted as a limitation."},
@@ -980,7 +980,7 @@ def cheers_checklist(*, wtp: float, rate: float, horizon: float,
          "response": "Published relative risk reductions; correlated findings "
                      "pooled on the risk scale, not summed."},
         {"item": "Measurement and valuation of preference-based outcomes",
-         "response": "EQ-5D-based utility weights from a US catalogue."},
+         "response": "EQ-5D-based utility weights from a US catalog."},
         {"item": "Currency, price date, conversion",
          "response": "US dollars; parameter years recorded per parameter in "
                      "the provenance registry. No inflation adjustment is "
@@ -1011,7 +1011,7 @@ def cheers_checklist(*, wtp: float, rate: float, horizon: float,
          "response": "Addressed: results are reported by age and sex through "
                      "life-table mortality, and a distributional analysis "
                      "applies Atkinson equity weights to report whether the "
-                     "programme narrows or widens health inequality."},
+                     "program narrows or widens health inequality."},
         {"item": "Approach to engagement with patients and stakeholders",
          "response": "Not applicable — no stakeholder engagement was conducted."},
         {"item": "Effect of uncertainty",
@@ -1068,7 +1068,7 @@ def validate_model(pools: dict[str, ConditionPool], evaluated: dict) -> list[dic
     icer = xv.get("icer")
     in_range = icer is None or (0 <= icer <= 150_000)
     add("Cross-validation: statin primary prevention ICER is plausible", in_range,
-        (f"modelled ICER ${icer:,.0f}/QALY" if icer is not None
+        (f"modeled ICER ${icer:,.0f}/QALY" if icer is not None
          else "strategy dominant (cost-saving), consistent with published "
               "analyses of generic statins in at-risk primary prevention")
         + " — published analyses of generic statins in primary prevention "

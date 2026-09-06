@@ -419,7 +419,7 @@ _RECORDS: list[SNPRecord] = [
         pos_grch37=32_605_884, pos_grch38=32_638_107,
         ancestral="C", derived="T",
         description="HLA-DQ2.5 tag SNP — T allele in LD with the DQ2.5 "
-                    "haplotype (coeliac-disease risk).",
+                    "haplotype (celiac-disease risk).",
         source="Monsuur 2008 (PLoS One); Karell 2003",
         aliases=("DQ2.5 tag",),
     ),
@@ -428,7 +428,7 @@ _RECORDS: list[SNPRecord] = [
         pos_grch37=32_814_869, pos_grch38=32_847_092,
         ancestral="T", derived="C",
         description="HLA-DQ8 tag SNP — C allele in LD with DQ8 haplotype "
-                    "(coeliac, T1D risk).",
+                    "(celiac, T1D risk).",
         source="Monsuur 2008",
         aliases=("DQ8 tag",),
     ),
@@ -504,7 +504,7 @@ _RECORDS: list[SNPRecord] = [
         pos_grch37=160_113_872, pos_grch38=159_692_840,
         ancestral="T", derived="C",
         description="SOD2 Ala16Val — C allele = mitochondrial-targeting "
-                    "favoured (Ala); T = cytoplasmic (Val), lower mtSOD activity.",
+                    "favored (Ala); T = cytoplasmic (Val), lower mtSOD activity.",
         source="Sutton 2003 (Pharmacogenetics)",
         aliases=("Ala16Val",),
     ),
@@ -786,9 +786,9 @@ _RECORDS: list[SNPRecord] = [
         pos_grch37=17_379_110, pos_grch38=17_339_484,
         ancestral="G", derived="A",
         description="AHR Arg554Lys — modulates aryl-hydrocarbon-receptor "
-                    "signalling that induces the CYP1 enzymes on smoke/dioxin "
+                    "signaling that induces the CYP1 enzymes on smoke/dioxin "
                     "exposure.",
-        source="dbSNP; AhR signalling literature",
+        source="dbSNP; AhR signaling literature",
         aliases=("Arg554Lys", "R554K"),
     ),
     SNPRecord(
@@ -895,7 +895,7 @@ _RECORDS: list[SNPRecord] = [
         pos_grch37=37_823_798, pos_grch38=37_966_280,
         ancestral="A", derived="G",
         description="ADRB3 Trp64Arg — Arg64 (G) alters beta-3 adrenergic "
-                    "receptor signalling; target of mirabegron for OAB.",
+                    "receptor signaling; target of mirabegron for OAB.",
         source="dbSNP; ADRB3 OAB / mirabegron literature",
         aliases=("Trp64Arg", "W64R"),
     ),

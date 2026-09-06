@@ -1,8 +1,8 @@
 """
-Personalised Plan — Master Dashboard
+Personalized Plan — Master Dashboard
 ====================================
 
-Single-page synthesis of the V6 personalisation outputs:
+Single-page synthesis of the V6 personalization outputs:
 
   supplements + exercise + nutrition + bloodwork + headline PheWAS predictions
 
@@ -305,8 +305,8 @@ def render_plan_html(plan: dict, file_label: str = "",
                      report_link: str = "report.html") -> str:
     if not plan or plan.get("status") != "ok":
         return f"""<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Personalised Plan</title>{_CSS}</head><body><div class="pp-wrap">
-<h1>Personalised Plan</h1><p>Insufficient data to build the dashboard.</p>
+<title>Personalized Plan</title>{_CSS}</head><body><div class="pp-wrap">
+<h1>Personalized Plan</h1><p>Insufficient data to build the dashboard.</p>
 </div></body></html>"""
 
     # Pillar cards
@@ -392,10 +392,10 @@ def render_plan_html(plan: dict, file_label: str = "",
         bio_block = ""
 
     return f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
-<title>Personalised Plan{(' — ' + _esc(file_label)) if file_label else ''}</title>
+<title>Personalized Plan{(' — ' + _esc(file_label)) if file_label else ''}</title>
 {_CSS}</head><body><div class="pp-wrap">
 
-<h1>Your Personalised Plan</h1>
+<h1>Your Personalized Plan</h1>
 <p class="pp-sub">
   A one-screen synthesis of your supplement stack, exercise programming,
   nutrition plan, and (when supplied) blood-work comparison. Each pillar
@@ -424,10 +424,10 @@ def render_plan_html(plan: dict, file_label: str = "",
 {bio_block}
 
 <p class="pp-footer">
-  Not medical advice. This dashboard summarises the V6 personalisation
+  Not medical advice. This dashboard summarises the V6 personalization
   modules of the local DNA analysis pipeline; underlying SNPs, doses, and
   caveats are documented on the linked detail pages and in
   <a href="{_esc(report_link)}">the full report</a>. Refine with measured
-  labs and clinical judgement.
+  labs and clinical judgment.
 </p>
 </div></body></html>"""

@@ -395,9 +395,9 @@ PHEWAS_TRAITS: dict[str, dict] = {
         ],
     },
 
-    # ── Behaviour ───────────────────────────────────────────────────────────
+    # ── Behavior ───────────────────────────────────────────────────────────
     "Educational attainment (PRS)": {
-        "category": "Behaviour", "unit": "SD",
+        "category": "Behavior", "unit": "SD",
         "mean": 0, "sd": 1.0,
         "reference": "Okbay 2022 (EA4, 3M variants)",
         "variants": [
@@ -406,7 +406,7 @@ PHEWAS_TRAITS: dict[str, dict] = {
         ],
     },
     "Risk tolerance": {
-        "category": "Behaviour", "unit": "SD",
+        "category": "Behavior", "unit": "SD",
         "mean": 0, "sd": 1.0,
         "reference": "Karlsson Linner 2019",
         "variants": [
@@ -415,7 +415,7 @@ PHEWAS_TRAITS: dict[str, dict] = {
         ],
     },
     "Chronotype (morningness)": {
-        "category": "Behaviour", "unit": "SD",
+        "category": "Behavior", "unit": "SD",
         "mean": 0, "sd": 1.0,
         "reference": "Jones 2019 (UKBB)",
         "variants": [
@@ -424,7 +424,7 @@ PHEWAS_TRAITS: dict[str, dict] = {
         ],
     },
     "Coffee consumption": {
-        "category": "Behaviour", "unit": "SD",
+        "category": "Behavior", "unit": "SD",
         "mean": 0, "sd": 1.0,
         "reference": "Cornelis 2015",
         "variants": [
@@ -432,7 +432,7 @@ PHEWAS_TRAITS: dict[str, dict] = {
         ],
     },
     "Alcohol consumption": {
-        "category": "Behaviour", "unit": "SD",
+        "category": "Behavior", "unit": "SD",
         "mean": 0, "sd": 1.0,
         "reference": "Liu 2019 GSCAN",
         "variants": [
@@ -441,7 +441,7 @@ PHEWAS_TRAITS: dict[str, dict] = {
         ],
     },
     "Smoking initiation": {
-        "category": "Behaviour", "unit": "SD",
+        "category": "Behavior", "unit": "SD",
         "mean": 0, "sd": 1.0,
         "reference": "Liu 2019 GSCAN",
         "variants": [
@@ -551,10 +551,10 @@ def _score_trait(snps_df: pd.DataFrame, trait: dict, sex: str | None) -> dict:
     # beside the percentile is the clinical-AI-evaluation discipline: sensitivity or
     # rank alone overstates usefulness. See docs/METHODS.md §22.
     #
-    # 1) MARKER-SCORE percentile: where you rank on THIS SNP panel, standardised to
+    # 1) MARKER-SCORE percentile: where you rank on THIS SNP panel, standardized to
     #    the panel's own spread. A true fact about your genotype (you carry more/
     #    fewer of these alleles than X% of people). This is what the tool used to
-    #    print — but it was mislabelled as a trait percentile.
+    #    print — but it was mislabeled as a trait percentile.
     z = (raw_score - exp_mean) / sqrt(exp_var)
     marker_percentile = _norm_cdf(z) * 100
 

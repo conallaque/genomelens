@@ -49,7 +49,7 @@ def test_every_prevalence_is_cited():
 def test_prevention_value_declines_with_age(cohort):
     # Grossman: acting earlier protects more remaining healthy years. Measured on
     # the quality-of-life component, where the effect is clean (net value is muddied
-    # by the averted-cost offset, which favours older ages — documented in _score).
+    # by the averted-cost offset, which favors older ages — documented in _score).
     s = cs.segment_analysis(cohort)
     prev = [b["mean_prevention_qol_value"] for b in s["by_age_band"]]
     assert prev[0] >= prev[-1]                 # youngest band >= oldest band
@@ -93,7 +93,7 @@ def test_adoption_is_monotone_and_bounded():
     cum = [r["cumulative_adopters"] for r in a["curve"]]
     assert cum == sorted(cum)                        # cumulative never decreases
     assert a["final_penetration"] <= 1.0
-    assert a["adopters_lost_to_behavioural_drag"] > 0
+    assert a["adopters_lost_to_behavioral_drag"] > 0
 
 
 def test_adoption_word_of_mouth_dominates():

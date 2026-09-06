@@ -7,7 +7,7 @@ Adds:
   * Cover page with title, date, file hash, disclaimer
   * Table of contents (auto-generated from <h2> anchors in the report)
   * Page numbers in the footer
-  * Print-optimised CSS that overrides the on-screen dark theme
+  * Print-optimized CSS that overrides the on-screen dark theme
 
 Requires weasyprint:   pip install weasyprint
 weasyprint also needs system libs (pango, cairo). On macOS:

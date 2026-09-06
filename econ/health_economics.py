@@ -358,7 +358,7 @@ CARRIER_ECONOMICS: dict[str, dict] = {
         "cost_affected": 300, "outcome_affected": 35_000, "qaly_affected": 0.80,
         "cost_carrier": 100, "outcome_carrier": 10_000, "qaly_carrier": 0.30,
         "prev_affected": 0.002, "prev_carrier": 0.05,
-        "src": "Cohn et al. (2013) J Thromb Haemost — FVL screening; Rosendaal (2005) Lancet",
+        "src": "Cohn et al. (2013) J Thromb Hemost — FVL screening; Rosendaal (2005) Lancet",
     },
     "Hereditary Breast/Colon/Prostate/Kidney Cancer Susceptibility": {
         "finding_affected": "CHEK2 I157T homozygous — enhanced cancer surveillance",
@@ -1074,10 +1074,10 @@ def _exercise_longevity_findings(findings: dict) -> list[dict]:
     pct = findings.get("longevity_percentile")
     if isinstance(pct, int | float) and 0 <= pct < 50:
         headroom = 50 - pct  # percentiles of achievable improvement to median
-        # NOT MONETISED, deliberately. This used to be valued at a flat
+        # NOT MONETIZED, deliberately. This used to be valued at a flat
         # $10,000 per percentile of headroom, which made it the single largest
         # line in the report — on one measured genome it produced $431,000 of
-        # claimed benefit and 54% of the entire modelled total. Two independent
+        # claimed benefit and 54% of the entire modeled total. Two independent
         # reasons to stop:
         #
         #   1. The longevity percentile is a COMPOSITE of variants that are
@@ -1093,12 +1093,12 @@ def _exercise_longevity_findings(findings: dict) -> list[dict]:
             finding="Below-median longevity composite (improvement headroom)",
             clinical_benefit=(
                 f"~{headroom:g} percentile points of headroom to the population "
-                f"median. Reported as a signal, not monetised — the composite "
+                f"median. Reported as a signal, not monetized — the composite "
                 f"aggregates variants already valued individually above."),
             cost=0, outcome_value=0,
             confidence="low", source="Longevity", recurring=False,
             prevalence=0.0, qaly_gain=0.0,
-            evidence=f"Longevity percentile: {pct:g} (not monetised)",
+            evidence=f"Longevity percentile: {pct:g} (not monetized)",
         ))
     return out
 
@@ -1154,7 +1154,7 @@ def _hla_findings(hla_result: dict | None) -> list[dict]:
             # Identity, so this stops keying on its own display text. It
             # arrived as `legacy:hla_a_31_01:hla_a_31_01_carrier_carbamaze...`
             # with gene and condition both empty — the same defect fixed on
-            # APOE, the coeliac haplotype, the wellness traits and the carrier
+            # APOE, the celiac haplotype, the wellness traits and the carrier
             # panel, found here only because no synthetic sample carries an
             # HLA risk allele.
             kind="pgx", gene=allele, drug=econ.get("drug", ""),
@@ -1166,7 +1166,7 @@ def _hla_findings(hla_result: dict | None) -> list[dict]:
 # Actions whose value is a reproductive decision. NOT_VALUED forbids pricing
 # these — attaching a figure to an affected birth prices a prospective child —
 # but enforcement used to key on the CATEGORY STRING, and a carrier record
-# reaches the model labelled "Carrier Screening", not "Family Planning". So the
+# reaches the model labeled "Carrier Screening", not "Family Planning". So the
 # HFE C282Y record, whose priced action is partner testing, carried $2,247 and
 # nothing objected: the policy was real, the check was looking at the wrong
 # field, and the finding routed around it.
@@ -1185,8 +1185,8 @@ def _is_reproductive_action(clinical_benefit: str) -> bool:
 # Entries in CARRIER_ECONOMICS that are NOT recessive carrier states, and so
 # must not be emitted by the carrier panel.
 #
-# HLA-DQ2/DQ8 is a susceptibility haplotype, not a carrier result — coeliac is
-# not a recessive condition and there is no such thing as a coeliac carrier.
+# HLA-DQ2/DQ8 is a susceptibility haplotype, not a carrier result — celiac is
+# not a recessive condition and there is no such thing as a celiac carrier.
 # The gut module already models this haplotype, with the serology decision it
 # actually bears on and a semantic pathway id. Emitting it here as well put the
 # SAME haplotype on the page twice with byte-identical economics (NMB -$122,
@@ -1249,7 +1249,7 @@ def _carrier_findings(carrier_result: dict | None) -> list[dict]:
             # The finding is reported; the value is withheld when what is being
             # priced is a reproductive decision.
             not_valued_reason=(
-                "Reproductive outcomes are deliberately not monetised: the "
+                "Reproductive outcomes are deliberately not monetized: the "
                 "action this finding prices is partner testing, and attaching "
                 "a figure to it prices a prospective child and embeds one set "
                 "of reproductive preferences as universal. The carrier result "
@@ -1324,7 +1324,7 @@ def _addiction_findings(addiction_result: dict | None) -> list[dict]:
     because the module takes none.
 
     So the records are emitted with ``basis="hypothetical"`` and a zero
-    contribution to every dollar total. They appear in the report, labelled, so
+    contribution to every dollar total. They appear in the report, labeled, so
     the panel stops being invisible without inflating anything.
     """
     out: list[dict] = []
@@ -1583,7 +1583,7 @@ def _clinical_variant_findings(clinical_variants_result: dict | None) -> list[di
             # ("monogenic:mlh1:colorectal") instead of a slug of the display
             # name. Without it the curated record and its parametric twin got
             # different ids for the same variant, so the payload could not join
-            # them and rendered one gene as two monetised findings.
+            # them and rendered one gene as two monetized findings.
             kind="monogenic",
             pool_hint=gene,
             evidence=(f"{gene} {v.get('ref', '')}{v.get('pos', '')} → ClinVar "
@@ -1862,12 +1862,12 @@ def _top_drugs_findings(top_drugs_result: dict | None) -> list[dict]:
 # traits only one earns a dollar figure, and the reasons the other five do not
 # are worth stating rather than leaving as an absence:
 #
-#   Coeliac (HLA-DQ2.5/DQ8)  VALUED. There is a real chain: the haplotype
+#   Celiac (HLA-DQ2.5/DQ8)  VALUED. There is a real chain: the haplotype
 #                            informs a serology decision, a positive serology
-#                            gives a diagnosis, and the diet prevents anaemia,
+#                            gives a diagnosis, and the diet prevents anemia,
 #                            bone loss and the small-bowel complications of
 #                            untreated disease. Valued through the registry's
-#                            Coeliac anchor, with the conversion rate applied —
+#                            Celiac anchor, with the conversion rate applied —
 #                            30-40% of Europeans carry a permissive haplotype
 #                            and only about 1% develop the disease.
 #   NOD2 (Crohn's)           SIGNAL ONLY. The risk association is strong and
@@ -1885,17 +1885,17 @@ def _top_drugs_findings(top_drugs_result: dict | None) -> list[dict]:
 #                            parameters.
 #   Histamine / DAO          SIGNAL ONLY. Dietary, weakly evidenced.
 GUT_ECONOMICS: dict[str, dict] = {
-    "Coeliac HLA-DQ2.5 / DQ8 Risk": {
-        "finding": "Coeliac-permissive HLA haplotype (DQ2.5/DQ8) — serology decision",
+    "Celiac HLA-DQ2.5 / DQ8 Risk": {
+        "finding": "Celiac-permissive HLA haplotype (DQ2.5/DQ8) — serology decision",
         "clinical_benefit": ("tTG-IgA serology if symptomatic, before any gluten "
-                             "withdrawal; diagnosis prevents the anaemia, bone "
-                             "loss and malabsorption of untreated coeliac disease"),
+                             "withdrawal; diagnosis prevents the anemia, bone "
+                             "loss and malabsorption of untreated celiac disease"),
         "cost": 150,             # serology plus the consultation that orders it
-        "outcome_value": 0,      # unused: valued through the Coeliac anchor
+        "outcome_value": 0,      # unused: valued through the Celiac anchor
         "prevalence": 0.35,      # permissive-haplotype carrier frequency
-        "qaly_gain": 0.0,        # unused: valued through the Coeliac anchor
-        "src": ("Valued through the registry Coeliac anchor rather than a "
-                "hand-written figure, with penetrance_coeliac_given_dq applied"),
+        "qaly_gain": 0.0,        # unused: valued through the Celiac anchor
+        "src": ("Valued through the registry Celiac anchor rather than a "
+                "hand-written figure, with penetrance_celiac_given_dq applied"),
     },
 }
 
@@ -1903,9 +1903,9 @@ GUT_ECONOMICS: dict[str, dict] = {
 def _gut_findings(gut_health_result: dict | None) -> list[dict]:
     """Economics for the gut-health module's one costable trait.
 
-    Only the coeliac haplotype is priced, and only when it is actually carried.
+    Only the celiac haplotype is priced, and only when it is actually carried.
     A negative call is clinically useful — it very nearly rules the disease out —
-    but ruling something out that you were never going to treat has no modelled
+    but ruling something out that you were never going to treat has no modeled
     economic value, and claiming one would be the same overreach as pricing NOD2.
     """
     preds = ((gut_health_result or {}).get("predictions") or [])
@@ -1915,8 +1915,8 @@ def _gut_findings(gut_health_result: dict | None) -> list[dict]:
         if econ is None:
             continue
         # Only a POSITIVE call is actionable. The module words the positive case
-        # as "Carries a coeliac-permissive HLA haplotype tag".
-        if "carries a coeliac-permissive" not in str(p.get("result", "")).lower():
+        # as "Carries a celiac-permissive HLA haplotype tag".
+        if "carries a celiac-permissive" not in str(p.get("result", "")).lower():
             continue
         out.append(_econ_record(
             finding=econ["finding"],
@@ -1928,7 +1928,7 @@ def _gut_findings(gut_health_result: dict | None) -> list[dict]:
             evidence=str(p.get("evidence") or ""),
             # The HLA class II haplotype is the finding; keying on the display
             # text meant "— serology decision" was load-bearing identity.
-            kind="haplotype", gene="HLA-DQA1/HLA-DQB1", condition="Coeliac",
+            kind="haplotype", gene="HLA-DQA1/HLA-DQB1", condition="Celiac",
             variant=str(p.get("trait") or ""),
         ))
     return out
@@ -2004,7 +2004,7 @@ _COI_ROUTES: tuple[tuple[str, str], ...] = (
     ("kidney-stone", "Urologic"),
     ("overactive-bladder", "Urologic"),
     # ── gut (new anchors, see registry) ───────────────────────────────────
-    ("coeliac", "Coeliac"), ("celiac", "Coeliac"),
+    ("celiac", "Celiac"), ("celiac", "Celiac"),
     # Lactase non-persistence is deliberately NOT routed. It is genuinely
     # actionable but worth roughly $250 and 0.05 QALYs, and anchoring it would
     # have cost two unsourced registry parameters to move the total by a
@@ -2067,7 +2067,7 @@ def _corrected_cohort_items(findings_econ: dict) -> tuple[list[dict], dict]:
         cat = f.get("category", "")
         if cat in COHORT_NOT_VALUED:
             # Declined a price elsewhere in the same document; scaling it here
-            # would monetise by the back door.
+            # would monetize by the back door.
             continue
         adh = _adherence_for_category(cat)
         prev = max(0.0, min(1.0, float(f.get("prevalence") or 0.0)))
@@ -2093,11 +2093,11 @@ def _corrected_cohort_items(findings_econ: dict) -> tuple[list[dict], dict]:
                 cost_param, qaly_param = _eng.COI_KEY_TO_PARAM[coi_key]
                 p_event = _ep.value("baseline_event_probability")
                 rrr = _ep.value("actionable_rrr")
-                # Coeliac is the case that proves the point: the HLA haplotype
+                # Celiac is the case that proves the point: the HLA haplotype
                 # is necessary but only a few percent of carriers convert, so
                 # the conversion rate replaces the generic event probability.
-                if coi_key == "Coeliac":
-                    p_event = _ep.value("penetrance_coeliac_given_dq")
+                if coi_key == "Celiac":
+                    p_event = _ep.value("penetrance_celiac_given_dq")
                 cases = p_event * rrr
                 raw_avoided = cases * _ep.value(cost_param)
                 raw_qaly = cases * _ep.value(qaly_param)
@@ -2109,7 +2109,7 @@ def _corrected_cohort_items(findings_econ: dict) -> tuple[list[dict], dict]:
             raw_qaly = float(f.get("qaly_gain") or 0.0)
 
         # Cash side: only the marginal share of an average cost is freed, and
-        # the event lands at an unmodelled point inside the horizon.
+        # the event lands at an unmodeled point inside the horizon.
         avoided = raw_avoided * _MARGINAL_COST_FRACTION * _MIDPOINT_DISCOUNT * adh
         qaly = raw_qaly * _MIDPOINT_DISCOUNT * adh
         spend = float(f.get("intervention_cost") or 0.0) * adh
@@ -2254,7 +2254,7 @@ def _cohort_totals(findings_econ: dict, n: int) -> dict:
         "dominant": dominant,
         "cost_per_qaly": cost_per_qaly,
         "cost_per_qaly_note": (
-            "suppressed — the strategy is modelled as dominant (frees more "
+            "suppressed — the strategy is modeled as dominant (frees more "
             "cash than it costs), and a ratio in that quadrant is ambiguous"
             if dominant else "incremental cost per QALY gained"),
         "net_cash": round(benefit - cost),
@@ -2269,7 +2269,7 @@ def _cohort_totals(findings_econ: dict, n: int) -> dict:
             "cost_per_qaly": legacy_cost_per_qaly,
             "cost_per_qaly_was": ("gross intervention spend divided by QALYs — "
                                   "no cost offsets and no comparator, so not "
-                                  "an ICER despite being labelled one"),
+                                  "an ICER despite being labeled one"),
         },
         "benefit_reduction": round(legacy_benefit - benefit),
         "benefit_reduction_pct": (
@@ -2352,7 +2352,7 @@ def scale_to_payer(findings_econ: dict,
             "This is a projection from one genome, not a plan actuarial "
             "estimate: a real plan's members carry different variants. It "
             "answers 'what would a cohort like this person look like', which is "
-            "the question a payer asks about a screening programme, and it is "
+            "the question a payer asks about a screening program, and it is "
             "proportional to the clinic block above by design."),
         "intervention_events_note": (
             f"{t['intervention_events']:,} intervention-events across "
@@ -2519,7 +2519,7 @@ def analyze_health_economics(findings: dict, snps_df: pd.DataFrame,
     for f in econ_findings:
         name, cat = str(f.get("finding") or ""), f.get("category", "")
         if cat in HYPOTHETICAL_SOURCES:
-            # Surfaced, labelled, and contributing nothing. These panels were
+            # Surfaced, labeled, and contributing nothing. These panels were
             # silently dead; they are now visible without being counted.
             f["registry_basis"] = "hypothetical"
             f["outcome_value"] = 0
@@ -2546,8 +2546,8 @@ def analyze_health_economics(findings: dict, snps_df: pd.DataFrame,
             from . import engine as _eng
             from . import params as _ep
             cost_param, qaly_param = _eng.COI_KEY_TO_PARAM[key]
-            p_event = (_ep.value("penetrance_coeliac_given_dq")
-                       if key == "Coeliac"
+            p_event = (_ep.value("penetrance_celiac_given_dq")
+                       if key == "Celiac"
                        else _ep.value("baseline_event_probability"))
             # Adherence too, so the table and the pooled analysis agree
             # exactly rather than differing by a factor nobody can see. Without
@@ -2591,7 +2591,7 @@ def analyze_health_economics(findings: dict, snps_df: pd.DataFrame,
 # ══════════════════════════════════════════════════════════════════════════
 #
 # Models the individual's 10-year modeled economic impact of ACTING on their
-# results — expected medical-cost avoidance + monetised quality-of-life (QALY)
+# results — expected medical-cost avoidance + monetized quality-of-life (QALY)
 # gains, net of intervention cost — across genomic (PGx / carrier / PRS) and
 # blood-work (PREVENT cardiovascular risk, prediabetes, biological age)
 # findings. All figures are population-average model estimates, not a promise
@@ -2599,10 +2599,10 @@ def analyze_health_economics(findings: dict, snps_df: pd.DataFrame,
 
 VALUE_PER_QALY = 100_000          # standard US cost-effectiveness threshold
 PERSONAL_HORIZON_YEARS = 10
-# Expected event costs below are one-time amounts realised at some point inside
+# Expected event costs below are one-time amounts realized at some point inside
 # PERSONAL_HORIZON_YEARS, not annual flows, so they are discounted to present
 # value at the horizon midpoint — the standard simplification when event timing
-# within a window is unmodelled. Without this the report labels its output
+# within a window is unmodeled. Without this the report labels its output
 # "Over 10 years" while summing undiscounted future dollars as if they were
 # present dollars, which overstates the benefit.
 _MIDPOINT_DISCOUNT = 1.0 / (1.0 + DISCOUNT_RATE) ** (PERSONAL_HORIZON_YEARS / 2.0)
@@ -2677,9 +2677,9 @@ _CATEGORY_ADHERENCE: dict[str, str] = {
     "Family Planning":           "adherence_screening",
 }
 
-# Categories the rest of the model has decided not to monetise. Section 1 keeps
+# Categories the rest of the model has decided not to monetize. Section 1 keeps
 # them in value_of_information.NOT_VALUED and Section 2 lists them under
-# ``not_monetised``; the cohort views below scaled them anyway, so one document
+# ``not_monetized``; the cohort views below scaled them anyway, so one document
 # both declined to price a finding and multiplied it across 100,000 members.
 # Longevity only. Its composite re-aggregates variants that are already priced
 # individually, so giving it a value would double-count by construction — and it
@@ -2723,9 +2723,9 @@ def analyze_personal_economics(economics_result: dict | None = None,
     """Build the personal 10-year economic-impact model from the run's results."""
     items: list[dict] = []
     # Findings that carry a real decision but deliberately no dollar figure.
-    # Kept as a first-class output rather than dropped, so "not monetised" is
+    # Kept as a first-class output rather than dropped, so "not monetized" is
     # visible in the report as a choice instead of looking like an omission.
-    not_monetised: list[dict] = []
+    not_monetized: list[dict] = []
 
     def add(category, finding, avoided, qaly, intervention, confidence, basis,
             economic_pathway_id="", pathway_id_is_legacy=True,
@@ -2795,7 +2795,7 @@ def analyze_personal_economics(economics_result: dict | None = None,
             outcome = f.get("outcome_value") or f.get("benefit") or 0
             # THE FINDING NAMES THE FINDING. `clinical_benefit` is the ACTION
             # the finding bears on, and it led this precedence — so every
-            # record that fell through to `not_monetised` was titled with its
+            # record that fell through to `not_monetized` was titled with its
             # own action. On the sample that printed "Enhanced screening +
             # risk-reducing surgery option" as a finding in its own right,
             # two pages after BRCA1 was valued at $18,808 for that same action.
@@ -2829,7 +2829,7 @@ def analyze_personal_economics(economics_result: dict | None = None,
             # is a different statement from "this record is malformed", and
             # the reader deserves the real reason.
             if f.get("not_valued_reason"):
-                not_monetised.append({
+                not_monetized.append({
                     **_ident,
                     # POLICY, not a data gap. This record was refused a value
                     # on principle; the block below refuses one because an
@@ -2868,7 +2868,7 @@ def analyze_personal_economics(economics_result: dict | None = None,
             # `cost` by other producers still go through it; `add()` and its
             # arithmetic stay live and tested.
             if f.get("intervention_cost") is not None and f.get("cost") is None:
-                not_monetised.append({
+                not_monetized.append({
                     **_ident,
                     "withheld_by_policy": False,
                     "category": f.get("category") or "Pharmacogenomic / genomic",
@@ -2889,7 +2889,7 @@ def analyze_personal_economics(economics_result: dict | None = None,
 
             missing = [k for k in ("prevalence", "cost") if f.get(k) is None]
             if missing:
-                not_monetised.append({
+                not_monetized.append({
                     **_ident,
                     "withheld_by_policy": False,
                     "category": "No economic pathway routed",
@@ -2981,7 +2981,7 @@ def analyze_personal_economics(economics_result: dict | None = None,
     #
     # The general shape, and this is its fourth instance in this file: a policy
     # enforced at a call site is bypassed by the next path that reaches
-    # monetisation. `_carrier_findings` emits into findings_with_economics like
+    # monetization. `_carrier_findings` emits into findings_with_economics like
     # every other extractor and is now the single carrier valuation path.
 
     # ── Compound interactions (personal) ──
@@ -3120,9 +3120,9 @@ def analyze_personal_economics(economics_result: dict | None = None,
     # decrement selected by the gene's condition anchor, and its records arrive
     # here through `findings_with_economics` like every other source. Valuing
     # them again would be the double-count that
-    # `test_one_gene_resolves_to_one_monetised_finding` now forbids.
+    # `test_one_gene_resolves_to_one_monetized_finding` now forbids.
 
-    # ── Family planning (personal) — NOT MONETISED ──
+    # ── Family planning (personal) — NOT MONETIZED ──
     # This block used to add $5,000 and 0.1 QALY per carrier condition. That
     # contradicted the policy stated in value_of_information.NOT_VALUED, which
     # says reproductive findings are deliberately never given a dollar value —
@@ -3137,7 +3137,7 @@ def analyze_personal_economics(economics_result: dict | None = None,
     if family_planning_result and family_planning_result.get("available"):
         n_actionable = family_planning_result.get("n_actionable", 0)
         if n_actionable > 0:
-            not_monetised.append({
+            not_monetized.append({
                 "withheld_by_policy": True,
                 "category": "Family Planning",
                 "finding": f"Reproductive genetics — {n_actionable} carrier "
@@ -3147,7 +3147,7 @@ def analyze_personal_economics(economics_result: dict | None = None,
                             "counselling before conception.",
                 "indicative_cost": PARTNER_TESTING_COST + GENETIC_COUNSELING_COST,
                 "reason": "Reproductive outcomes are deliberately not "
-                          "monetised. The cost of testing is shown because it "
+                          "monetized. The cost of testing is shown because it "
                           "is a real price; no benefit figure is attached "
                           "because valuing one would price a prospective "
                           "child and embed one set of reproductive "
@@ -3249,7 +3249,7 @@ def analyze_personal_economics(economics_result: dict | None = None,
     roi = round((total_net) / _ANALYSIS_COST, 1) if _ANALYSIS_COST else None
 
     # COST-SAVING vs COST-EFFECTIVE (honesty split).
-    # total_net is NET MONETARY BENEFIT — dominated by monetised QALYs (health value
+    # total_net is NET MONETARY BENEFIT — dominated by monetized QALYs (health value
     # you'd pay for), NOT cash returned. Calling total_net/cost "ROI" implies money
     # back. Separate the two: the CASH side is averted cost minus what you spend;
     # only if THAT is positive is the analysis genuinely cost-saving. Most prevention
@@ -3278,8 +3278,8 @@ def analyze_personal_economics(economics_result: dict | None = None,
         "n_items": len(items),
         "horizon_years": PERSONAL_HORIZON_YEARS,
         "items": items,
-        "not_monetised": not_monetised,
-        "n_not_monetised": len(not_monetised),
+        "not_monetized": not_monetized,
+        "n_not_monetized": len(not_monetized),
         # Real-world adherence, reported rather than applied invisibly. The
         # efficacy figure is what this page used to headline; keeping both
         # means the discount is visible instead of just making the number
@@ -3302,7 +3302,7 @@ def analyze_personal_economics(economics_result: dict | None = None,
         "net_low": round(total_net * 0.5),          # ±50% sensitivity band
         "net_high": round(total_net * 1.5),
         "gross_benefit": round(gross_benefit),
-        # Cash side, kept explicitly separate from monetised health value.
+        # Cash side, kept explicitly separate from monetized health value.
         "net_cash": round(net_cash),
         "cash_roi": cash_roi,
         "value_to_cost_ratio": value_to_cost_ratio,
@@ -3337,7 +3337,7 @@ def build_cost_consequence_analysis(econ: dict | None) -> dict:
     """
     if not econ or not econ.get("available"):
         return {"available": False,
-                "reason": "No modelled economic items — needs actionable findings "
+                "reason": "No modeled economic items — needs actionable findings "
                           "and/or a blood-work panel."}
 
     items = econ.get("items", [])
@@ -3348,7 +3348,7 @@ def build_cost_consequence_analysis(econ: dict | None) -> dict:
          "note": "What you pay to obtain the information."},
         {"kind": "Cost", "measure": "Downstream intervention cost",
          "value": econ.get("total_intervention", 0), "unit": f"$ over {econ.get('horizon_years','—')} yr",
-         "note": "Screening, prophylaxis, lifestyle programmes triggered by findings."},
+         "note": "Screening, prophylaxis, lifestyle programs triggered by findings."},
         {"kind": "Consequence", "measure": "Medical costs averted (marginal)",
          "value": econ.get("total_avoided", 0), "unit": f"$ over {econ.get('horizon_years','—')} yr",
          "note": "Marginal, not average, cost of the cases avoided."},
@@ -3357,7 +3357,7 @@ def build_cost_consequence_analysis(econ: dict | None) -> dict:
          "note": "Health gain in its own unit — deliberately NOT converted here."},
         {"kind": "Consequence", "measure": "Actionable findings identified",
          "value": len(items), "unit": "findings",
-         "note": "Count of distinct modelled findings driving the analysis."},
+         "note": "Count of distinct modeled findings driving the analysis."},
         {"kind": "Consequence", "measure": "High-confidence findings",
          "value": sum(1 for i in items if i.get("confidence") == "high"),
          "unit": "findings",
@@ -3384,7 +3384,7 @@ def build_cost_consequence_analysis(econ: dict | None) -> dict:
             "health technologies: it keeps monetary and non-monetary consequences "
             "visible side by side instead of hiding them inside an ICER. It is also "
             "the appropriate format when the underlying parameters are illustrative."),
-        "caveat": ("No summary ratio is given by design. Figures are modelled on "
+        "caveat": ("No summary ratio is given by design. Figures are modeled on "
                    "illustrative parameters — not measurements, not medical advice."),
     }
 
@@ -3436,7 +3436,7 @@ def _esc_econ(s) -> str:
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-def _render_not_monetised_html(rows: list[dict] | None) -> str:
+def _render_not_monetized_html(rows: list[dict] | None) -> str:
     """Findings that carry a real decision but deliberately no dollar figure.
 
     Showing these matters. If a reproductive finding simply vanished from the
@@ -3467,11 +3467,11 @@ def _render_not_monetised_html(rows: list[dict] | None) -> str:
         <div style="font-weight:700;color:#8a5cf6">Reported without a dollar figure</div>
         <div style="font-size:.72em;color:#8a94a3;border:1px solid #dfe4ea;
                     border-radius:20px;padding:2px 9px;white-space:nowrap">
-          deliberately not monetised</div>
+          deliberately not monetized</div>
       </div>
       <div style="font-size:.86em;color:#48545f;margin-top:5px">
         These findings are excluded from every total on this page. That is a
-        modelling decision, not a gap.</div>
+        modeling decision, not a gap.</div>
       {items}
     </div>"""
 
@@ -3496,7 +3496,7 @@ def _render_adherence_basis_html(econ: dict) -> str:
       <strong>These are real-world figures, not trial figures.</strong>
       Every benefit above has been multiplied by the share of people who
       actually keep doing the thing — roughly half for daily preventive
-      medication, less for sustained behaviour change, more for a screening
+      medication, less for sustained behavior change, more for a screening
       appointment you attend once. Ongoing intervention costs are discounted by
       the same factor, because someone who stops taking a statin stops paying
       for it. At full adherence these findings would total
@@ -3505,7 +3505,7 @@ def _render_adherence_basis_html(econ: dict) -> str:
       <strong>{_money(drag)}</strong> ({pct}%).
       <div style="font-size:.92em;color:#7b8794;margin-top:4px">
         WHO (2003), Adherence to Long-Term Therapies. Screening uptake and
-        behavioural maintenance are declared assumptions.</div>
+        behavioral maintenance are declared assumptions.</div>
     </div>"""
 
 
@@ -3599,7 +3599,7 @@ def render_economic_analysis_html(econ: dict, file_label: str = "") -> str:
           <div style="margin-top:10px;padding:8px 12px;background:#fff8e6;
                       border:1px solid #f0e0a8;border-radius:8px;font-size:.85em;color:#6b5a1e">
             <strong>Verdict: {_esc_econ(econ.get('verdict', ''))}.</strong>
-            Most of the headline figure is <em>monetised health</em> (quality-adjusted
+            Most of the headline figure is <em>monetized health</em> (quality-adjusted
             life-years valued at {_money(econ.get('value_per_qaly', 0))}/QALY), not money
             returned to you. Prevention is typically cost-<em>effective</em> — excellent
             value per healthy year — while still costing more cash than it saves. The
@@ -3608,7 +3608,7 @@ def render_economic_analysis_html(econ: dict, file_label: str = "") -> str:
         </div>
         {_render_adherence_basis_html(econ)}
         {_render_cca_html(build_cost_consequence_analysis(econ))}
-        {_render_not_monetised_html(econ.get("not_monetised"))}
+        {_render_not_monetized_html(econ.get("not_monetized"))}
         {top_prev}
         <table style="width:100%;border-collapse:collapse;font-size:.9em;margin-top:8px">
           <thead><tr style="background:#f7f9fb;text-align:right">
@@ -3632,11 +3632,11 @@ td,th{{padding:8px 10px;border-bottom:1px solid #eef1f4;vertical-align:top}}
 </style></head><body>
 <h1>Economic-Impact Analysis</h1>
 <p style="color:#667">A model of the 10-year economic impact of acting on your genomic and
-blood-work results — expected medical-cost avoidance plus monetised quality-of-life gains,
+blood-work results — expected medical-cost avoidance plus monetized quality-of-life gains,
 net of intervention cost.</p>
 <div class="disc">⚠️ <strong>Illustrative model, not financial or medical advice.</strong>
 Figures use population-average cost-of-illness and risk-reduction estimates applied to your
-findings; individual outcomes vary widely. Quality-of-life gains are monetised at the standard
+findings; individual outcomes vary widely. Quality-of-life gains are monetized at the standard
 ${econ.get('value_per_qaly', 100000):,}/QALY threshold. Not a guarantee of savings.</div>
 {body}
 <p style="color:#9aa4b0;font-size:.8em;margin-top:16px">{_esc_econ(econ.get('disclaimer',''))}</p>

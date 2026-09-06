@@ -49,12 +49,12 @@ _SPORTS = [
 ]
 
 
-def _normalise(v: float, lo: float = 0, hi: float = 100) -> float:
+def _normalize(v: float, lo: float = 0, hi: float = 100) -> float:
     return max(0, min(100, (v - lo) * 100 / (hi - lo)))
 
 
 def composite_athletic_profile(base: dict) -> dict:
-    """Synthesise base+advanced exercise data into normalised 0-100 attributes."""
+    """Synthesise base+advanced exercise data into normalized 0-100 attributes."""
     pe = base["power_endurance"]
     recovery_speed = base["recovery"]["speed"]
     injury_risks = base["injury_risk"]["risks"]
@@ -188,7 +188,7 @@ def readiness_formula(base: dict) -> dict:
         "formula": (
             "Daily readiness (0-100) = 0.30·HRV_norm + 0.25·Sleep_norm + "
             "0.15·RestingHR_norm + 0.15·SubjectiveEnergy + 0.10·Soreness_inverse + "
-            "0.05·Mood. Each component normalised vs your 14-day rolling baseline."
+            "0.05·Mood. Each component normalized vs your 14-day rolling baseline."
         ),
         "thresholds": [
             {"range": "85-100", "action": "Green — push hard. PRs encouraged. Heavy day or VO2max."},
@@ -452,7 +452,7 @@ def deload_protocol(base: dict) -> dict:
             "Volume −50% (cut sets in half, keep load).",
             "Intensity −20% on top sets (RPE 6-7 instead of 8-9).",
             "Cut highest-impact work (sprints, plyo, max-effort lifts) first.",
-            "Sleep extension +30 min; emphasise pre-bed nutrition (40 g protein + carbs).",
+            "Sleep extension +30 min; emphasize pre-bed nutrition (40 g protein + carbs).",
             "Mobility/aerobic flush 2-3 sessions; full rest 1-2 days.",
         ],
         "trigger_signals": (

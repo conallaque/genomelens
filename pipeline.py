@@ -228,7 +228,7 @@ th {{ background:#f9f9f9; }}
 
 <p style="margin-top:30px;color:#888;font-size:0.85em">
 Not medical advice. The composite score integrates genetic and capacity inputs only;
-actual longevity outcomes are dominated by behaviour. Use this as a strategic map for
+actual longevity outcomes are dominated by behavior. Use this as a strategic map for
 where to spend your effort over the next year.
 </p>
 </body></html>"""
@@ -430,7 +430,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                         and detected_build in ("grch37", "grch38")
                         and _declared != detected_build):
                     log("")
-                    log("  BUILD MISMATCH — refusing to analyse this file.")
+                    log("  BUILD MISMATCH — refusing to analyze this file.")
                     log(f"    The header declares {_declared}, but the "
                         f"coordinates are {detected_build}.")
                     log("    One of the two is wrong, and every position "
@@ -507,14 +507,14 @@ def run_pipeline(args: argparse.Namespace) -> int:
     tier1_results, apoe_genotype = tier1_lookup(snps_df, database)
 
     # Y-DNA haplogroup analysis
-    log("Analysing Y-DNA haplogroup ...")
+    log("Analyzing Y-DNA haplogroup ...")
     y_result = analyze_y_haplogroup(snps_df)
     log(f"  {y_result['message']}")
 
     # mtDNA haplogroup analysis (maternal lineage)
     mt_result: dict | None = None
     if analyze_mt_haplogroup is not None:
-        log("Analysing mtDNA haplogroup ...")
+        log("Analyzing mtDNA haplogroup ...")
         try:
             mt_result = analyze_mt_haplogroup(snps_df)
             log(f"  {mt_result.get('message', 'mtDNA analysis complete')}")
@@ -583,7 +583,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"  WARNING: Traits failed: {e}")
         try:
             references_used = collect_references_used(tier1_results)
-            log(f"  References: {len(references_used)} catalogued variants matched")
+            log(f"  References: {len(references_used)} cataloged variants matched")
         except Exception as e:
             log(f"  WARNING: References failed: {e}")
         try:
@@ -653,7 +653,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
             log(f"Running medication review for {len(drugs)} drugs ...")
             try:
                 medications_result = analyze_medications(drugs, pgx_result or {})
-                log(f"  Medications: {medications_result['n_known']} catalogued, "
+                log(f"  Medications: {medications_result['n_known']} cataloged, "
                     f"{medications_result['n_unknown']} unknown")
             except Exception as e:
                 log(f"  WARNING: Medications module failed: {e}")
@@ -774,7 +774,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
     supplement_result: dict | None = None
     if build_supplement_stack is not None:
         try:
-            log("Building personalised supplement stack ...")
+            log("Building personalized supplement stack ...")
             supplement_result = build_supplement_stack(
                 snps_df=snps_df,
                 pgx_result=pgx_result,
@@ -792,7 +792,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
     exercise_result: dict | None = None
     if analyze_exercise is not None:
         try:
-            log("Generating personalised exercise programming ...")
+            log("Generating personalized exercise programming ...")
             exercise_result = analyze_exercise(snps_df)
             if exercise_result.get("status") == "ok":
                 log(f"  Exercise: {exercise_result['power_endurance']['bias']}; "
@@ -804,7 +804,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
     nutrition_result: dict | None = None
     if analyze_nutrition is not None:
         try:
-            log("Generating personalised nutrition plan ...")
+            log("Generating personalized nutrition plan ...")
             nutrition_result = analyze_nutrition(snps_df)
             if nutrition_result.get("status") == "ok":
                 m = nutrition_result["macros"]
@@ -881,11 +881,11 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Urologic module failed: {e}")
 
-    # ── Gut health (lactase, secretor, coeliac HLA tags, DAO, NOD2/IL23R) ──
+    # ── Gut health (lactase, secretor, celiac HLA tags, DAO, NOD2/IL23R) ──
     # THE MODULE THAT NEVER RAN. gut_health.py has existed with a registry
     # consistency test and no caller, so 327 lines of analysis produced nothing
     # in any report and could not reach the economic model no matter how the
-    # economics were wired. Its coeliac haplotype call is the one trait with a
+    # economics were wired. Its celiac haplotype call is the one trait with a
     # costable action behind it.
     gut_health_result: dict | None = None
     if analyze_gut_health is not None:
@@ -1203,7 +1203,7 @@ def run_pipeline(args: argparse.Namespace) -> int:
                     log(f"    (personalized panel skipped: {_pe})")
                 _cp = voi_result.get("carrier_panel_prior") or {}
                 if _cp.get("available"):
-                    log(f"    Carrier-panel prior (ROH, not monetised): "
+                    log(f"    Carrier-panel prior (ROH, not monetized): "
                         f"{_cp['recommendation']}")
             else:
                 log(f"  Value of Information: {voi_result.get('reason', 'n/a')}")

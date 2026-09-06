@@ -22,8 +22,8 @@ novelty lookup, not a result to act on.
 Design notes:
   * Looks the variant up by rsID first, then falls back to a chromosome:position match,
     so it works on both chip files (rsID-keyed) and whole-genome VCFs (position-keyed).
-  * Strand-aware: a genotype reported on the opposite strand (C/C or C/T) is recognised
-    and normalised, so a strand flip cannot silently mis-call the marker.
+  * Strand-aware: a genotype reported on the opposite strand (C/C or C/T) is recognized
+    and normalized, so a strand flip cannot silently mis-call the marker.
 """
 
 from __future__ import annotations
@@ -35,12 +35,12 @@ POSITION = 5401412
 REF_ALLELE = "G"       # wild-type / reference
 ALT_ALLELE = "A"       # minor / variant
 
-# Complement, for strand normalisation (the variant may be reported on either strand).
+# Complement, for strand normalization (the variant may be reported on either strand).
 _COMPLEMENT = {"A": "T", "T": "A", "C": "G", "G": "C"}
 
 
 def _norm_chrom(value: object) -> str:
-    """Normalise a chromosome label to a bare number/letter ('chr7' -> '7')."""
+    """Normalize a chromosome label to a bare number/letter ('chr7' -> '7')."""
     s = str(value).strip().lower()
     if s.startswith("chr"):
         s = s[3:]

@@ -489,7 +489,7 @@ CARRIER_VARIANTS: list[dict] = [
 
 
 def analyze_carriers(snps_df: pd.DataFrame) -> dict:
-    """Returns a dict of carrier-status findings, organised by category."""
+    """Returns a dict of carrier-status findings, organized by category."""
     affected: list[dict] = []
     carriers: list[dict] = []
     not_carriers: list[dict] = []
@@ -540,7 +540,7 @@ def audit_against_registry() -> dict[str, list[str]]:
     classic carrier variants (SERPINA1 PiZ, PAH R408W, APOB R3500Q, HBB
     HbS) historically report on the gene's coding strand for human
     interpretability. The registry's invariant is "+ strand"; carrier.py
-    keeps the gene-coding-strand label that clinicians recognise.
+    keeps the gene-coding-strand label that clinicians recognize.
 
     Returns a dict with:
       * ``agreed``         — rsIDs reconciled with no strand flip

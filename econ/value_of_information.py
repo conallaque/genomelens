@@ -83,7 +83,7 @@ COI: dict[str, dict] = {
 # — the "freeing a bed doesn't save its average cost" error.
 #
 # So the averted-cost side is scaled by a conservative marginal-cost fraction. This is
-# a DOCUMENTED ASSUMPTION, not a fitted value, and it only ever REDUCES the modelled
+# a DOCUMENTED ASSUMPTION, not a fitted value, and it only ever REDUCES the modeled
 # saving (the honest direction). Short-run marginal hospital cost is commonly ~50–70%
 # of average; these lifetime COI figures also contain genuinely per-case-avertable
 # components (long-term care, lost productivity), so 0.60 is a deliberately
@@ -119,7 +119,7 @@ PGX_CEA: dict[str, dict] = {
 }
 
 # ── Grossman (1972) health-capital parameters ────────────────────────────────
-# Health is modelled as a depreciating capital stock H_t: you are born with an
+# Health is modeled as a depreciating capital stock H_t: you are born with an
 # endowment, it depreciates at rate δ(age), and you invest (I_t) to offset it.
 # Genomic information does not add health directly — it raises the EFFICIENCY of
 # investment (you target the right interventions), which is exactly why its value
@@ -140,7 +140,7 @@ GROSSMAN = {
 REAL_OPTIONS = {
     "cost_decline": 0.10,       # annual real decline in sequencing price (historic trend, conservative)
     "knowledge_growth": 0.08,   # annual growth in interpretable variants (ClinVar/PGx expansion)
-    "vol": 0.45,                # volatility of the modelled value (σ, from the PSA dispersion)
+    "vol": 0.45,                # volatility of the modeled value (σ, from the PSA dispersion)
     "src": "Dixit & Pindyck (1994), Investment under Uncertainty",
 }
 
@@ -185,7 +185,7 @@ def _collect(economics_result: dict | None,
      wgs_only, haircut, confidence}.
 
     ``unvalued`` (optional, mutated in place) collects findings whose category
-    string ``_classify_category`` does not recognise. Those findings carry no
+    string ``_classify_category`` does not recognize. Those findings carry no
     economic value here, and without this list they leave no trace at all —
     ``health_economics.py`` gains new ``source=`` labels regularly, and a label
     it emits that this module has no mapping for silently disappears from the
@@ -229,7 +229,7 @@ def _collect(economics_result: dict | None,
             # WHICH CEA ANSWERED. PGX_CEA carries five gene-drug pairs; anything
             # else falls through to the generic actionable-PGx flag, which is a
             # defensible published construct but is NOT pair-specific evidence.
-            # Unlabelled, the fallback is invisible: a real whole genome
+            # Unlabeled, the fallback is invisible: a real whole genome
             # surfaced five distinct findings whose pairs the table lacks
             # (HLA-A*31:01/carbamazepine, CYP2D6/codeine,
             # CYP2C9/warfarin, CYP3A5/tacrolimus, UGT1A1/irinotecan), none of
@@ -604,13 +604,13 @@ def _gene_cost(gene: str) -> float:
 # condition has no cost-of-illness entry stays in the generic bucket rather
 # than being routed to an invented one.
 _CONDITION_TO_COI = (
-    ("celiac", "Coeliac"), ("coeliac", "Coeliac"),
+    ("celiac", "Celiac"), ("celiac", "Celiac"),
     ("autoimmun", "Autoimmune"),
     ("breast", "BreastOvarian"), ("ovarian", "BreastOvarian"),
     ("colon", "Colorectal"), ("colorectal", "Colorectal"),
     ("depress", "Depression"), ("mood", "Depression"),
     ("alzheim", "Alzheimer"), ("dementia", "Alzheimer"),
-    ("iron", "IronOverload"), ("haemochromat", "IronOverload"),
+    ("iron", "IronOverload"), ("hemochromat", "IronOverload"),
     ("hemochromat", "IronOverload"),
 )
 
@@ -694,7 +694,7 @@ def _classify_category(category: str | None, label: str = "",
         # THE STATED CONDITION BEATS THE GENERIC BUCKET. Every carrier finding
         # returned "Pathogenic" regardless of what it was about, so PTPN22
         # (autoimmunity), CHEK2 (cancer), Factor V (thrombosis) and HLA-DQ2/DQ8
-        # (coeliac) were pooled as ONE liability — four unrelated conditions
+        # (celiac) were pooled as ONE liability — four unrelated conditions
         # sharing one cost of illness, and their risk reductions added to a
         # raw 220%. Each record already carried its real condition and nothing
         # read it. Only conditions the registry can cost are routed; anything
@@ -719,7 +719,7 @@ def _classify_category(category: str | None, label: str = "",
         # ROUTED BY GENE, NOT BY PANEL. This returned "IronOverload" for the
         # whole metal/oxidative panel, so LRRK2 (Parkinson's), G6PD deficiency
         # and ATP7B (Wilson's disease) were pooled as one liability and priced
-        # against haemochromatosis. Three unrelated conditions in a bucket
+        # against hemochromatosis. Three unrelated conditions in a bucket
         # named after none of them.
         g = (gene or "").strip().upper()
         if g == "LRRK2":
@@ -737,11 +737,11 @@ def _classify_category(category: str | None, label: str = "",
         # disease is not iron overload and must not be priced as though it were.
         return ("coi", "Pathogenic")
     # Gut health reaches the model through its one costable trait: the
-    # coeliac-permissive HLA haplotype, which drives a serology decision. The
+    # celiac-permissive HLA haplotype, which drives a serology decision. The
     # module's other five traits are reported as signals and emit nothing, so
-    # anything arriving here is the coeliac record.
-    if "gut" in cat or "coeliac" in cat or "celiac" in cat:
-        return ("coi", "Coeliac")
+    # anything arriving here is the celiac record.
+    if "gut" in cat or "celiac" in cat or "celiac" in cat:
+        return ("coi", "Celiac")
 
     # ── Mendelian randomisation and PheWAS biomarkers are trait-directed: route
     #    on the trait named in the finding, defaulting to the cardiometabolic
@@ -769,13 +769,13 @@ def _classify_category(category: str | None, label: str = "",
     return ("", "")
 
 
-# How much of a finding's modelled value survives, by evidence strength of the
+# How much of a finding's modeled value survives, by evidence strength of the
 # source module. A finding routed onto a real cost-of-illness anchor can still
 # rest on a weak association, and the honest treatment is to keep it in the
 # model at a discount rather than either dropping it silently or letting it
 # count the same as a ClinVar pathogenic variant.
 #
-# These are judgement calls, not published multipliers, and are labelled as such
+# These are judgment calls, not published multipliers, and are labeled as such
 # in the report. The ordering is what matters: hypothesis-generating panels
 # (PheWAS, wellness) are worth a fraction of a curated clinical finding.
 EVIDENCE_HAIRCUT: dict[str, float] = {
@@ -794,7 +794,7 @@ EVIDENCE_HAIRCUT: dict[str, float] = {
 
 
 def _evidence_haircut(category: str | None) -> float:
-    """Fraction of modelled value retained for this source (1.0 = no discount)."""
+    """Fraction of modeled value retained for this source (1.0 = no discount)."""
     cat = (category or "").strip().lower()
     if cat in EVIDENCE_HAIRCUT:
         return EVIDENCE_HAIRCUT[cat]
@@ -821,7 +821,7 @@ NOT_VALUED: dict[str, str] = {
         "and CHRNA5 cannot condition on smoking status because the module takes "
         "none. OPRM1 is the one real prescribing decision and the "
         "neurochemistry panel already prices that same rs1799971. So the "
-        "findings appear, labelled, contributing nothing to any total."),
+        "findings appear, labeled, contributing nothing to any total."),
     "Top-Drugs PGx Screen": (
         "Surfaced as hypothetical / awareness, not valued. This screen is a "
         "p_rx refinement of a record the pharmacogenomics panel already emits "
@@ -832,15 +832,15 @@ NOT_VALUED: dict[str, str] = {
         "genuinely useful, and it is worth zero dollars on top."),
     "Longevity": (
         "The longevity composite is a summary of variants this module already "
-        "values individually, so monetising it counts the same genotypes "
+        "values individually, so monetizing it counts the same genotypes "
         "twice. It also has no cost of illness to anchor against — a "
         "percentile of a composite score is not a disease — and the flat "
         "per-percentile rate previously used had no published source. On one "
-        "measured genome that single line produced 54% of the entire modelled "
+        "measured genome that single line produced 54% of the entire modeled "
         "benefit. It is reported as a signal worth acting on, without a "
         "dollar figure."),
     "Family Planning": (
-        "Reproductive findings are deliberately never monetised. Attaching a "
+        "Reproductive findings are deliberately never monetized. Attaching a "
         "dollar figure to an affected birth prices a prospective child, and "
         "importing a population uptake rate would embed one set of "
         "reproductive preferences as if it were universal. The module's "
@@ -869,7 +869,7 @@ def _not_valued_reason(category: str | None) -> str:
 # This is the only defensible economic link from runs of homozygosity, and it is
 # deliberately expressed as a recommendation rather than a value.
 #
-# WHY NOT MONETISE IT. A person's own F_ROH describes THEIR PARENTS' relatedness,
+# WHY NOT MONETIZE IT. A person's own F_ROH describes THEIR PARENTS' relatedness,
 # not their children's. If they partner outside the family their child's
 # inbreeding coefficient is ~0 whatever their own F_ROH is, so the intuitive
 # "high F_ROH -> higher offspring risk -> dollar value" model is simply wrong
@@ -926,12 +926,12 @@ def assess_carrier_panel_prior(roh_result: dict | None = None) -> dict:
     """Translate an ROH profile into a CATEGORICAL carrier-panel recommendation.
 
     Returns a dict carrying a tier, a recommendation, the reasoning, and an
-    explicit ``monetised: False``. It never returns a cost, value, multiplier or
+    explicit ``monetized: False``. It never returns a cost, value, multiplier or
     risk score — see the module note above for why a dollar figure here would be
     fabricated rather than estimated.
     """
-    base = {"available": False, "monetised": False,
-            "why_not_monetised": (
+    base = {"available": False, "monetized": False,
+            "why_not_monetized": (
                 "A person's own F_ROH reflects their parents' relatedness, not "
                 "their children's, and no published study maps F_ROH onto "
                 "incremental carrier-panel yield. A dollar figure here would be "
@@ -997,7 +997,7 @@ stated, which is what `_n_pred_total` carries to the aggregate row below.
 """
 
 _PREDICTED_REPORT_CAP = 8
-"""How many unanchored predictions get their own row before they are summarised."""
+"""How many unanchored predictions get their own row before they are summarized."""
 
 
 def _gene_to_econ(gene: str) -> tuple[str, float, float, float]:
@@ -1048,12 +1048,12 @@ _RRR_PARAM_FOR_COI = {
     # iron-overload condition: on the current sample it contains LRRK2
     # (Parkinson's), G6PD deficiency and ATP7B (Wilson's disease). It is a
     # metal/oxidative-stress catch-all that was named for one of its members.
-    # Wiring the haemochromatosis phlebotomy effect to it priced Parkinson's
-    # risk off a 1996 haemochromatosis survival cohort and moved LRRK2 from
+    # Wiring the hemochromatosis phlebotomy effect to it priced Parkinson's
+    # risk off a 1996 hemochromatosis survival cohort and moved LRRK2 from
     # $613 to $2,098. A condition-specific effect applied to the wrong
     # condition is worse than the generic fallback, which at least does not
     # claim to be measured. Map it once the bucket holds hereditary
-    # haemochromatosis and nothing else.
+    # hemochromatosis and nothing else.
 }
 
 
@@ -1201,7 +1201,7 @@ def analyze_value_of_information(economics_result: dict | None = None,
                 "finding": f.get("label", "genetic finding"),
                 "category": f.get("source_category", "") or "unmapped pathway",
                 "reason": (
-                    f"No standardised economic pathway: the finding reached the "
+                    f"No standardized economic pathway: the finding reached the "
                     f"model without {', '.join(gaps)}. Valuing it would mean "
                     f"substituting a model-wide constant for its own "
                     f"epidemiology, which produces a figure that looks "
@@ -1371,17 +1371,17 @@ def analyze_value_of_information(economics_result: dict | None = None,
         result["evppi"] = {"available": False}
         _degraded.append(("evppi", repr(_e)))
 
-    # ── Behavioural: prospect theory + hyperbolic discounting explain the adoption
+    # ── Behavioral: prospect theory + hyperbolic discounting explain the adoption
     #    gap between a positive-EV test and actual uptake. ──
     try:
         _m2 = float(result.get("voi_expost_mean", result.get("voi_expost_point", 0.0)))
         _sd2 = float((result.get("risk_adjusted") or {}).get("sd", 0.0))
-        result["behavioural"] = analyze_behavioural(_m2, _sd2, test_cost)
+        result["behavioral"] = analyze_behavioral(_m2, _sd2, test_cost)
     except Exception as _e:
-        result["behavioural"] = {"available": False}
-        _degraded.append(("behavioural", repr(_e)))
+        result["behavioral"] = {"available": False}
+        _degraded.append(("behavioral", repr(_e)))
 
-    # ── Longevity sensitivity: rising life expectancy raises realised genetic risk
+    # ── Longevity sensitivity: rising life expectancy raises realized genetic risk
     #    AND lengthens the payoff horizon, so it raises the value of information. ──
     try:
         from risk import genomic_statistics as _gstat
@@ -1447,7 +1447,7 @@ def analyze_value_of_information(economics_result: dict | None = None,
     try:
         result["carrier_panel_prior"] = assess_carrier_panel_prior(roh_result)
     except Exception as _e:
-        result["carrier_panel_prior"] = {"available": False, "monetised": False}
+        result["carrier_panel_prior"] = {"available": False, "monetized": False}
         _degraded.append(("carrier_panel_prior", repr(_e)))
 
     # ── Pooled cost-effectiveness (the double-counting correction) ────────
@@ -1730,7 +1730,7 @@ def analyze_value_of_information(economics_result: dict | None = None,
             )
         if _total_nmb > 0:
             _employer_items.append(
-                f"Modelled net monetary benefit: ${_total_nmb:,.0f} per employee "
+                f"Modeled net monetary benefit: ${_total_nmb:,.0f} per employee "
                 f"tested, which maps directly to avoidable claims and reduced "
                 f"absenteeism."
             )
@@ -1753,7 +1753,7 @@ def analyze_value_of_information(economics_result: dict | None = None,
     # so it counts against fully_computed exactly as a crashed component does.
     result["unvalued_findings"] = _unvalued
     result["n_unvalued"] = len(_unvalued)
-    # An intentional exclusion (documented in NOT_VALUED) is a modelling
+    # An intentional exclusion (documented in NOT_VALUED) is a modeling
     # decision, not an incomplete computation. Only genuinely unmapped
     # categories count against fully_computed.
     _oversights = [u for u in _unvalued if not u["intentional"]]
@@ -1786,9 +1786,9 @@ def _resolve_age(genetic_age_result: dict | None, default: float = 35.0) -> floa
 
 
 def _risk_adjusted(result: dict, test_cost: float) -> dict:
-    """Portfolio-style risk-adjusted summaries of the modelled value distribution.
+    """Portfolio-style risk-adjusted summaries of the modeled value distribution.
 
-    * **Return on investment** — modelled value per dollar of test cost.
+    * **Return on investment** — modeled value per dollar of test cost.
     * **Sharpe-style ratio** — mean value per unit of its own standard deviation
       (a reward-to-variability ratio; here there is no risk-free asset, so it is a
       *relative* dispersion measure, not a true Sharpe ratio).
@@ -1974,7 +1974,7 @@ def analyze_health_capital(age: float = 35.0, horizon: int = 50,
         "delta_at_age": round(_delta(age), 4),
         "delta_at_end": round(_delta(age + horizon), 4),
         "pv_health_capital_gain": round(pv_gap, 3),
-        "monetised_gain": round(pv_gap * float(WTP["base"]) * 0.10),
+        "monetized_gain": round(pv_gap * float(WTP["base"]) * 0.10),
         "morbidity_floor": floor,
         "floor_age_uninformed": cross_u,
         "floor_age_informed": cross_i,
@@ -1998,7 +1998,7 @@ def analyze_real_option(voi_now: float, test_cost: float, age: float = 35.0,
     The naive "option to wait" says defer: the test gets cheaper and interpretation
     improves. But two features of *this* asset reverse the usual logic:
 
-      1. **The data is a permanent asset.** Sequence once and you can re-analyse for
+      1. **The data is a permanent asset.** Sequence once and you can re-analyze for
          free forever, so interpretation growth (k) accrues to the early tester too —
          it is *not* a reason to wait.
       2. **The underlying asset depreciates.** Every deferred year is a year you
@@ -2025,7 +2025,7 @@ def analyze_real_option(voi_now: float, test_cost: float, age: float = 35.0,
     # forfeits the T/H share of it outright (you cannot act on what you don't know),
     # and that forfeited benefit is the dominant term — this is what makes waiting
     # expensive for a depreciating asset.
-    # Crucially, sequencing once buys a PERMANENT asset: the data can be re-analysed
+    # Crucially, sequencing once buys a PERMANENT asset: the data can be re-analyzed
     # for free as interpretation improves. So knowledge growth (k) accrues to the
     # early tester too — it is NOT a reason to wait. Deferring therefore captures
     # only the price decline, while forfeiting the T/H share of the benefit stream.
@@ -2054,14 +2054,14 @@ def analyze_real_option(voi_now: float, test_cost: float, age: float = 35.0,
         "option_value_of_waiting": round(option_value),
         "recommendation": ("test now — waiting forfeits more value than the price "
                            "decline recovers" if best_T == 0 else
-                           f"deferring ~{best_T} year(s) is modelled as marginally better"),
+                           f"deferring ~{best_T} year(s) is modeled as marginally better"),
         "assumed_cost_decline": c,
         "assumed_knowledge_growth": k,
         "schedule": rows,
         "src": REAL_OPTIONS["src"],
         "note": ("Illustrative timing model. Assumes today's price trend and "
                  "interpretation-growth rate persist; it ignores the option to "
-                 "re-analyse an existing genome for free, which further favours "
+                 "re-analyze an existing genome for free, which further favors "
                  "sequencing earlier."),
     }
 
@@ -2082,7 +2082,7 @@ def analyze_evpi(findings: list[dict], test_cost: float, n: int = 4000,
       * **EVPI is an upper bound on what ANY further research is worth.** If EVPI is
         small, resolving uncertainty cannot change decisions enough to matter — buying
         more information is irrational at that price.
-      * The genome's realised VOI should be read *against* this ceiling: a test capturing
+      * The genome's realized VOI should be read *against* this ceiling: a test capturing
         a large share of EVPI is doing most of the work information can do.
     """
     if not _HAVE_NP:
@@ -2212,11 +2212,11 @@ def analyze_evppi(findings: list[dict], n: int = 3000, seed: int | None = None) 
     }
 
 
-def analyze_behavioural(mean: float, sd: float, test_cost: float,
+def analyze_behavioral(mean: float, sd: float, test_cost: float,
                         horizon_years: int = 30) -> dict:
-    """**Behavioural economics: prospect theory and hyperbolic discounting.**
+    """**Behavioral economics: prospect theory and hyperbolic discounting.**
 
-    Expected-utility theory says people maximise E[u(w)]. They demonstrably don't, and
+    Expected-utility theory says people maximize E[u(w)]. They demonstrably don't, and
     both deviations matter here because they explain the *adoption gap* — why a test
     with strongly positive expected value still goes unbought.
 
@@ -2230,7 +2230,7 @@ def analyze_behavioural(mean: float, sd: float, test_cost: float,
 
     Consequence: the **certain, immediate** cost of a test is felt roughly 2.25× more
     heavily than an equivalently sized *probabilistic, distant* health gain. That is a
-    behavioural reason to make the test cheap and the framing concrete — not a reason
+    behavioral reason to make the test cheap and the framing concrete — not a reason
     to inflate the value estimate.
 
     **2. Hyperbolic discounting** (Laibson 1997). People discount quasi-hyperbolically,
@@ -2432,7 +2432,7 @@ def analyze_welfare_comparison(voi: float, test_cost: float,
             "letting more people participate at all."),
         "caveat": ("Illustrative welfare arithmetic with assumed parameters, not an "
                    "empirical estimate. The capability premium is deliberately set in "
-                   "favour of the centralised alternative so the comparison is not "
+                   "favor of the centralised alternative so the comparison is not "
                    "assumed true by construction."),
         "src": "Akerlof (1970); Posner (1981) economics of privacy; Acquisti et al. (2016) JEL",
     }
@@ -2469,7 +2469,7 @@ def analyze_insurance_economics(evpi: float, mean_value: float) -> dict:
             "against them."),
         "chilling_effect_cost": (
             "If disclosure risk deters testing, the social loss is on the order of "
-            "the foregone value of information — here modelled at "
+            "the foregone value of information — here modeled at "
             f"${mean_value:,.0f} per person, with a research ceiling (EVPI) of "
             f"${evpi:,.0f}."),
         "src": "Akerlof (1970); Rothschild & Stiglitz (1976); GINA (2008)",
@@ -2581,7 +2581,7 @@ def _methods(rate: float, wtp: float, test_cost: float, input_type: str) -> list
         f"Willingness-to-pay λ = ${wtp:,.0f}/QALY (sensitivity ${WTP['low']:,}–"
         f"${WTP['high']:,}; Neumann et al., NEJM 2014).",
         f"Discounting: {rate:.0%} on both costs and QALYs (sensitivity 0/3/5%).",
-        f"Test cost modelled: ${test_cost:,.0f} ({input_type}).",
+        f"Test cost modeled: ${test_cost:,.0f} ({input_type}).",
         "Cost-of-illness figures: ADA, AHA, Alzheimer's Association (illustrative).",
         "PGx averted-ADR values from published CEA (Schackman 2008; Kazi 2014; "
         "Deenen 2016; CPIC).",

@@ -42,7 +42,7 @@ Measured, not assumed:
   No renderer independently derives NMB, ICER, incremental cost, or QALYs.
 - HTML emission inside `econ/`: confined to `health_economics.py`.
 
-So the spec's mandate — *one calculation layer → one normalised model → many
+So the spec's mandate — *one calculation layer → one normalized model → many
 views* — is already ~80% true. A full `EconomicsReportResult` dataclass
 retro-fitted over 9,606 lines of engine code would be a large typing exercise
 that buys little against the stated goal.
@@ -61,7 +61,7 @@ that buys little against the stated goal.
 
 ## 4. Canonical model — the chosen shape
 
-Rather than re-plumbing the engine, introduce a **normalising view at the report
+Rather than re-plumbing the engine, introduce a **normalizing view at the report
 boundary**:
 
 ```
@@ -73,7 +73,7 @@ to JSON alongside the PDF. This yields the canonical-model benefit (every
 displayed total has one source, and that source is inspectable) and the JSON
 artefact, without changing a single economic calculation.
 
-Section renderers then consume the normalised payload instead of the raw dicts,
+Section renderers then consume the normalized payload instead of the raw dicts,
 and `_build_consolidated_econ_page` calls them directly instead of scraping.
 
 ## 5. Presentation bugs vs calculation bugs
@@ -85,7 +85,7 @@ yet** — documented first, per the brief.
 
 - **P1 — two "Net monetary benefit" values, unqualified.** The deterministic
   reference case reports **$7,410**; the PSA reports **$7,759** (95% interval
-  $1,435–$20,594). Both are labelled "Net monetary benefit". These are
+  $1,435–$20,594). Both are labeled "Net monetary benefit". These are
   legitimately different quantities (point estimate vs mean of the simulated
   distribution) and the difference is small, but nothing on the page says so.
 - **P2 — the Markov model sits beside the reference case at similar visual
@@ -148,7 +148,7 @@ yet** — documented first, per the brief.
   economics are unchanged; a test pins the identity.
 
   What C2 *did* surface is a display defect: `dqaly` of 0.00065 rendered as
-  `0.00` at two decimals, indistinguishable from a finding modelled to
+  `0.00` at two decimals, indistinguishable from a finding modeled to
   contribute nothing. `report/format.py:qaly` now adds digits until the value is
   visible.
 
@@ -190,7 +190,7 @@ yet** — documented first, per the brief.
 - **Registry 75.4% sourced vs report 46.9% verified PMID/DOI.** Different
   denominators: registry-only (65 params) vs whole-model coverage (382). The
   test comment at `tests/unit/test_econ_params.py:88-92` states this explicitly.
-  Both must stay, each labelled with its denominator. Collapsing them into one
+  Both must stay, each labeled with its denominator. Collapsing them into one
   number would create a new inconsistency, not remove one.
 
 ## 6. Constraint carried into implementation
@@ -264,7 +264,7 @@ for audit and calibration; it is never rendered beside the canonical figure.
 **Not claimed:** that every curated number is wrong in every context. The
 per-category tables encode real literature. What is established is that the
 quantity they produce after `analyze_personal_economics` is not an expected NMB
-and must not be labelled as one.
+and must not be labeled as one.
 
 ### Why parametric is canonical
 
@@ -313,7 +313,7 @@ bottom one.
   `_CONFIDENCE_CONC` in `value_of_information.py` has keys `high`/`moderate`/
   `low` only, so `_beta` silently falls back to the **moderate** concentration
   for the run's single most confident computational finding. Display is
-  normalised in the payload; the PSA spread is **not** changed, and the
+  normalized in the payload; the PSA spread is **not** changed, and the
   validator reports it.
 - **D2 — curated sheet double-counts PTPN22.** Two curated records describe one
   pathway ($5,626 carrier row + $174 symptom-awareness row) and both render.

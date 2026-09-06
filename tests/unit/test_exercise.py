@@ -59,7 +59,7 @@ def test_render_html_smoke(synthetic_snps_df) -> None:
     result = ex.analyze_exercise(synthetic_snps_df)
     html = ex.render_exercise_html(result)
     assert "<html" in html.lower()
-    assert "Personalised Exercise" in html
+    assert "Personalized Exercise" in html
     assert result["power_endurance"]["bias"] in html
 
 

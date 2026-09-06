@@ -33,7 +33,7 @@ are trying to value.
 
 MIGRATION FALLBACK. Extractors that do not yet supply semantic components get a
 deterministic slug of the finding text, flagged ``legacy:``. Those ids are
-explicitly unstable, and a test asserts that no canonical monetised record
+explicitly unstable, and a test asserts that no canonical monetized record
 depends on one.
 """
 from __future__ import annotations
@@ -121,7 +121,7 @@ def action_id(*, kind: str, drug: str = "", action: str = "") -> str:
 
 
 def condition_id(condition: str) -> str:
-    """The modelled outcome: ``mace``, ``myopathy``, ``alzheimer``."""
+    """The modeled outcome: ``mace``, ``myopathy``, ``alzheimer``."""
     return slug(condition, max_len=32)
 
 

@@ -59,7 +59,7 @@ def _log(msg: str) -> None:
 # `ld_block`: markers sharing a block are in strong linkage disequilibrium (or
 # are mirror tags of the same locus) and carry essentially the same ancestry
 # signal. The heuristic counts only ONE marker per block so a single locus
-# (e.g. eye-colour HERC2) is not double- or triple-counted. Treating correlated
+# (e.g. eye-color HERC2) is not double- or triple-counted. Treating correlated
 # markers as independent in a naive-Bayes likelihood was the main driver of
 # spurious AMR ("Admixed American") calls for Southern European samples.
 #
@@ -67,7 +67,7 @@ def _log(msg: str) -> None:
 # European + Native American + African), so these are pooled frequencies that
 # do not describe a single panmictic, Hardy-Weinberg population. Under a
 # naive likelihood AMR tends to act as a "central" distribution that is never
-# penalised hard on any one marker, which inflates its score for intermediate
+# penalized hard on any one marker, which inflates its score for intermediate
 # genotypes. We therefore (a) never let this heuristic exceed "moderate"
 # confidence and (b) downgrade to "low" / flag the call as ambiguous whenever
 # the top population's evidence margin over the runner-up is small.
@@ -133,7 +133,7 @@ def _dosage(genotype: object, effect_allele: str,
 
     When `other_allele` is supplied, detect whether the genotype is reported on
     the + or − strand (relative to the table's alleles) and count on the matching
-    strand. This fixes the old `count(effect_allele)` behaviour, which returned 0
+    strand. This fixes the old `count(effect_allele)` behavior, which returned 0
     whenever the chip's strand differed from the table's — silently zeroing out
     strong markers such as LCT rs4988235 on an A/G-strand consumer chip.
 
@@ -327,7 +327,7 @@ def estimate_ancestry_heuristic(snps_df: pd.DataFrame) -> dict:
         "n_aims_redundant": n_redundant,
         "n_aims_palindromic": n_palindromic,
         "n_aims_expected": N_INDEPENDENT_AIMS,
-        # Kept for the transparent per-marker table, clearly labelled as affinity
+        # Kept for the transparent per-marker table, clearly labeled as affinity
         # only — NOT a population identity.
         "marker_best_affinity": primary,
         "marker_affinity_proportions": proportions,

@@ -202,7 +202,7 @@ def _trait_eye_color(snps_df) -> dict:
         # Add gradient via TYR/SLC24A4
         modifier = ""
         if tyr is not None and tyr > 0:
-            modifier = " (with possible lighter/grey gradient via TYR modifier)"
+            modifier = " (with possible lighter/gray gradient via TYR modifier)"
         return {"trait": "Eye Color",
                 "result": f"Blue eyes likely{modifier}",
                 "evidence": "rs12913832: GG (HERC2 blue-eye haplotype)",
@@ -607,7 +607,7 @@ def _trait_novelty_seeking(snps_df) -> dict:
         return {"trait": "Novelty Seeking Tendency",
                 "result": "Higher novelty-seeking trait",
                 "evidence": f"DRD4 rs1800955: {drd4}", "confidence": "low",
-                "detail": "Modest effect; behavioural patterns and context dominate."}
+                "detail": "Modest effect; behavioral patterns and context dominate."}
     return {"trait": "Novelty Seeking Tendency",
             "result": "Lower novelty-seeking tendency",
             "evidence": f"DRD4 rs1800955: {drd4}", "confidence": "low"}
@@ -713,7 +713,7 @@ def _trait_endurance_vo2(snps_df) -> dict:
         return {"trait": "Aerobic Trainability (PPARGC1A)",
                 "result": "Less-responsive PGC-1α — emphasises training consistency",
                 "evidence": f"PPARGC1A Gly482Ser: {g}", "confidence": "moderate",
-                "detail": "Need more total training volume / consistency to maximise adaptation. HIIT effective."}
+                "detail": "Need more total training volume / consistency to maximize adaptation. HIIT effective."}
     return {"trait": "Aerobic Trainability (PPARGC1A)",
             "result": "Responsive PGC-1α — typical aerobic trainability",
             "evidence": f"PPARGC1A: {g}", "confidence": "moderate"}
@@ -785,8 +785,8 @@ def audit_against_registry() -> dict[str, list[str]]:
     """Return ``{"registered": [...], "missing": [...]}`` for every rsID
     referenced anywhere in this module.
 
-    traits.py covers many phenotype SNPs (eye/hair colour, taste, earwax,
-    skin pigmentation, MC1R variants) that are well-characterised in the
+    traits.py covers many phenotype SNPs (eye/hair color, taste, earwax,
+    skin pigmentation, MC1R variants) that are well-characterized in the
     literature but had not been added to the unified registry in V8.
     The 32 deferred rsIDs are documented in ``CHANGELOG.md`` under
     "V8.1 follow-ups" — each needs literature-cited ancestral/derived +

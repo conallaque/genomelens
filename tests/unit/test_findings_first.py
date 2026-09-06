@@ -34,7 +34,7 @@ def _fixture_like() -> EconomicsReportPayload:
             pricing_path=PricingPath.VOI_PARAMETRIC,
             canonical_expected_nmb=nmb,
             economic_value_basis=("parametric_expected_nmb" if nmb is not None
-                                  else "not_yet_standardised"),
+                                  else "not_yet_standardized"),
             legacy_curated_value=legacy,
             evidence_confidence=conf, category=cat, action_summary=action)
 
@@ -78,7 +78,7 @@ def html_out() -> str:
 def _text(html_str: str) -> str:
     """Visible text, with tags collapsed to nothing rather than to a space.
 
-    A label split by <br> — "Not yet<br>standardised" — must still read as one
+    A label split by <br> — "Not yet<br>standardized" — must still read as one
     phrase, or every assertion about wording depends on where the line happens
     to break. The break becomes a space, not nothing: deleting it welds the two
     words together and the assertion fails for a reason that has nothing to do
@@ -150,7 +150,7 @@ def test_uncertainty_reports_a_count_not_a_bare_hundred_percent(html_out):
 
 # ── reference case ────────────────────────────────────────────────────────────
 
-def test_reference_case_is_labelled_and_unambiguous(html_out):
+def test_reference_case_is_labeled_and_unambiguous(html_out):
     txt = _text(html_out)
     assert "7,410" in txt
     assert "Reference-case NMB" in txt
@@ -183,21 +183,21 @@ def test_within_a_group_ordering_is_by_canonical_value_descending(html_out):
     assert txt.index("CYP2C19") < txt.index("CYP2D6") < txt.index("SLCO1B1")
 
 
-def test_unstandardised_findings_render_without_an_invented_value(html_out):
+def test_unstandardized_findings_render_without_an_invented_value(html_out):
     txt = _text(html_out)
     assert "1 actionable wellness variant(s)" in txt
-    assert "Not yet standardised" in txt
+    assert "Not yet standardized" in txt
     assert "no registry-backed" in txt.lower()
 
 
-# ── labelling rules ───────────────────────────────────────────────────────────
+# ── labeling rules ───────────────────────────────────────────────────────────
 
 @pytest.mark.parametrize("banned", ["ROI", "Return on investment", "your genome is worth"])
 def test_forbidden_value_language_is_absent(html_out, banned):
     assert banned.lower() not in _text(html_out).lower()
 
 
-def test_synthetic_input_is_labelled_from_metadata(html_out):
+def test_synthetic_input_is_labeled_from_metadata(html_out):
     assert "synthetic input" in _text(html_out).lower()
 
     p = _fixture_like()
@@ -205,9 +205,9 @@ def test_synthetic_input_is_labelled_from_metadata(html_out):
     assert "synthetic input" not in _text(render_findings_first(p)).lower()
 
 
-def test_evidence_badge_carries_no_economic_colour():
+def test_evidence_badge_carries_no_economic_color():
     """Confidence and economic direction are separate dimensions. A HIGH badge
-    must not be styled with the positive-value colour."""
+    must not be styled with the positive-value color."""
     out = render_page_two(_fixture_like())
     for m in re.finditer(r'<span class="badge[^"]*">', out):
         assert "good" not in m.group(0)

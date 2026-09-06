@@ -367,7 +367,7 @@ CATEGORY_PROMPTS: dict[str, str] = {
         "Focus your interpretation on:\n"
         "  • What this profile suggests about pathways of healthy aging — "
         "stress resistance, inflammaging, telomere biology, lipid metabolism, "
-        "FOXO/IGF-1 signalling.\n"
+        "FOXO/IGF-1 signaling.\n"
         "  • Evidence-based longevity levers most relevant to these variants: "
         "exercise (zone 2 + VO2max + resistance), Mediterranean / "
         "minimally-processed diet, time-restricted eating, sleep, social "
@@ -778,7 +778,7 @@ def _split_evenly(items: list[dict], max_size: int) -> list[list[dict]]:
 
 
 def _split_into_batches(items: list[dict], target_max: int = AI_BATCH_MAX) -> list[list[dict]]:
-    """Back-compat alias for :func:`_split_evenly` (identical behaviour)."""
+    """Back-compat alias for :func:`_split_evenly` (identical behavior)."""
     return _split_evenly(items, target_max)
 
 
@@ -1204,7 +1204,7 @@ _MODULE_AI_SPECS: dict[str, dict[str, str]] = {
     "immunogenetics": {
         "kwarg": "immunogenetics_result", "title": "Immunogenetics",
         "focus": "Explain the headline protective findings and what they mean day "
-                 "to day, then any susceptibilities and their vaccination/behaviour "
+                 "to day, then any susceptibilities and their vaccination/behavior "
                  "implications. Note how notable the overall combination is."},
     "neurochemistry": {
         "kwarg": "neurochemistry_result", "title": "Neurochemistry",
@@ -1215,7 +1215,7 @@ _MODULE_AI_SPECS: dict[str, dict[str, str]] = {
         "kwarg": "addiction_genetics_result", "title": "Addiction Genetics",
         "focus": "Explain the alcohol and overall susceptibility tiers plainly, and "
                  "surface the clinically-useful flags (never-smoke, naltrexone "
-                 "response, opioid dosing). Stress that behaviour dominates."},
+                 "response, opioid dosing). Stress that behavior dominates."},
     "deep-ancestry": {
         "kwarg": "deep_ancestry_result", "title": "Deep Ancestry",
         "focus": "Tell the story of the Neanderthal, ancient-population, and "
@@ -1238,10 +1238,10 @@ _MODULE_AI_SPECS: dict[str, dict[str, str]] = {
     "environmental-optimization": {
         "kwarg": "environmental_optimization_result", "title": "Environmental Optimization",
         "focus": "Turn the chronotype, exercise-modality, and vitamin-D findings into "
-                 "a concise, prioritized set of concrete behavioural recommendations."},
+                 "a concise, prioritized set of concrete behavioral recommendations."},
     "value-of-information": {
         "kwarg": "voi_result", "title": "Value of Information (Health Economics)",
-        "focus": "Explain the expected-value framing in plain terms: what the modelled "
+        "focus": "Explain the expected-value framing in plain terms: what the modeled "
                  "dollar figures mean, that they are ILLUSTRATIVE and UNCERTAIN (cite "
                  "the range, never a single point as fact), and that market price is "
                  "distinct from health-economic value. Use ONLY the numbers shown."},
@@ -1468,7 +1468,7 @@ def cross_category_synthesis(
     """
     log("  AI generating Cross-Category Interactions synthesis ...")
 
-    # Group by category, prioritise risk-carrying variants and any with cross-refs
+    # Group by category, prioritize risk-carrying variants and any with cross-refs
     by_cat: dict[str, list[dict]] = defaultdict(list)
     cross_ref_pairs: list[tuple[str, str, dict]] = []
     for r in tier1_results:
@@ -1524,8 +1524,8 @@ def cross_category_synthesis(
         "**Pattern name** (e.g. 'Methylation × Heavy-Metal Detox')\n"
         "- Which variants from which categories combine\n"
         "- What the combined biology means (mechanism in 1–2 sentences)\n"
-        "- The PRACTICAL implication — what this person should prioritise that "
-        "they would NOT prioritise from a single-category view\n\n"
+        "- The PRACTICAL implication — what this person should prioritize that "
+        "they would NOT prioritize from a single-category view\n\n"
         "Patterns to consider when present:\n"
         "  • Methylation + Heavy-Metal Detox (folate/B12 cycle drives metal excretion)\n"
         "  • Testosterone + Fertility (hormone milieu shapes spermatogenesis)\n"

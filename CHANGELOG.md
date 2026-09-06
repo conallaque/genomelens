@@ -11,7 +11,7 @@ All notable changes to this project are documented here. Format inspired by
 ### Added
 - Adherence layer — trial efficacy discounted to real-world effectiveness on both benefit and ongoing cost
 - Three adherence archetypes keyed on what acting asks of the person; all sampled in PSA
-- Naive, pooled-efficacy and realised-effectiveness reported as three tiers, not one number
+- Naive, pooled-efficacy and realized-effectiveness reported as three tiers, not one number
 - Cost-effectiveness acceptability curve drawn as inline SVG; the table moves behind a disclosure
 - CI workflow — tests on 3.10/3.11/3.12, ruff, mypy, end-to-end report, and a DNA guard
 - `econ/` package grouping the eight health-economics modules
@@ -58,7 +58,7 @@ Most dollar figures changed, several went down substantially.
 - Eight finding sources summed onto one anchor, claiming a 79% risk reduction
 - Same genotype valued twice across panels
 - Unsourced longevity term producing 54% of the total on one genome
-- Reproductive findings monetised against stated policy
+- Reproductive findings monetized against stated policy
 - PSA reported cost-saving in 100% of runs — parameters pinned outside the loop
 - Seven conditions sharing one QALY decrement
 - Negative ICER reported alongside a "dominant" verdict
@@ -78,7 +78,7 @@ Most dollar figures changed, several went down substantially.
 
 - **`novel_variants.py` (Phase 3)** — an offline computational-predictor screen for
   variants *not* in ClinVar. A pluggable predictor registry (AlphaMissense, REVEL, CADD,
-  SpliceAI, gnomAD) is queried by `chrom:pos:ref:alt` via pysam/tabix; findings are labelled
+  SpliceAI, gnomAD) is queried by `chrom:pos:ref:alt` via pysam/tabix; findings are labeled
   computational predictions, deduplicated against the Phase-2 ClinVar screen, and
   independently license-toggleable (`--commercial-safe`). Degrades gracefully when tables or
   `pysam` are absent.
@@ -145,7 +145,7 @@ Most dollar figures changed, several went down substantially.
   * Confidence graded by **ClinVar review stars** (verified `CLNREVSTAT`
     mapping); only ≥1★ P/LP shown; VUS counted but not alarmed (flagged only in
     ACMG genes); 0★ excluded.
-  * **Indel normalisation** so anchor-base/left-alignment representation
+  * **Indel normalization** so anchor-base/left-alignment representation
     differences don't cause false negatives.
   * A **mandatory negative-result disclaimer** — an empty list explicitly does
     NOT mean "clear". Screening, not diagnosis; confirm in an accredited lab.
@@ -159,7 +159,7 @@ Most dollar figures changed, several went down substantially.
 
 - **Per-module AI 500 cascade on the local 30B model.** Changing Ollama
   `num_ctx` between calls forced a model **reload** that intermittently OOM'd
-  → HTTP 500 (reproduced: 16384 OK, 4096 500, 16384 OK). Standardised on a
+  → HTTP 500 (reproduced: 16384 OK, 4096 500, 16384 OK). Standardized on a
   single `AI_NUM_CTX = 16384` for every call (loads once, never reloads), added
   `keep_alive`, and a transient-5xx retry. See `docs/TROUBLESHOOTING.md`.
 - Build detection was lost before the clinical-variants stage because
@@ -168,7 +168,7 @@ Most dollar figures changed, several went down substantially.
 
 ### Tests
 
-- +29 (star/sig parsing, indel-normalised key, ALT-aware zygosity, full
+- +29 (star/sig parsing, indel-normalized key, ALT-aware zygosity, full
   distill+screen across every classification branch, build gate, graceful
   degrade, negative-result disclaimer); 368 passing, 1 skipped.
 
@@ -359,7 +359,7 @@ closures are invoked synchronously within the same iteration.
 ### Added
 
 - **`environmental_optimization.py`** — the "what to actually do differently"
-  behavioural layer, three domains:
+  behavioral layer, three domains:
   * **Circadian light timing** — from CLOCK chronotype, a concrete morning-
     light / evening-dark / melatonin-timing protocol tuned to morning vs
     evening lean.
@@ -386,14 +386,14 @@ closures are invoked synchronously within the same iteration.
 
 - **`polygenic_traits.py`** — genotype-level single-variant trait reporting.
   A deliberate honesty decision: **no polygenic percentiles are invented.** A
-  real trait PGS needs thousands of weighted variants standardised against a
+  real trait PGS needs thousands of weighted variants standardized against a
   reference distribution; no trait PGS scoring files exist locally, so a
   percentile from a handful of SNPs would be fabrication. Instead:
   * **Chronotype & sleep** — CLOCK rs1801260 (morning/evening), PER2, ABCC9
     sleep-duration, DEC2 rare short-sleeper.
   * **Taste, smell & diet** — TAS2R38 bitter (PTC) tasting, OR6A2 cilantro
     soapy-taste, ABCC11 earwax/body-odour, asparagus anosmia, photic sneeze.
-  * **Appearance & physical** — HERC2 eye colour, MC1R red-hair/skin, IRF4
+  * **Appearance & physical** — HERC2 eye color, MC1R red-hair/skin, IRF4
     freckling/photoaging, EDAR hair morphology.
   * **Structural no-score cap** for height (too polygenic to call from a chip),
     cognition and personality (low-signal + socially fraught). These return an
@@ -482,7 +482,7 @@ closures are invoked synchronously within the same iteration.
     poor-sleep morning-of-draw pattern rather than real dysglycemia.
   * **APOE ε4 × elevated LDL/ApoB** — flags the ~2× lipid amplification
     that ε4 carriers face.
-  * **CHRNA5 A-carrier × non-smoker** — recognises an actively realised
+  * **CHRNA5 A-carrier × non-smoker** — recognises an actively realized
     prevention success.
   * **Ancestral diet fit** — European + LCT + Yamnaya × EEF → Mediterranean
     + dairy diet is genetically appropriate, not just generically healthy.
@@ -653,7 +653,7 @@ selection threads into the story no consumer service tells.
 
 ### Tests
 
-- +5 unit tests (registry consistency + panel behaviour); 232 passing.
+- +5 unit tests (registry consistency + panel behavior); 232 passing.
 
 ## [6.7.2-premium] — 2026-07-25 — Fix cross-category synthesis 400 (per-call num_ctx)
 
@@ -732,11 +732,11 @@ selection threads into the story no consumer service tells.
 
 - **`economic_analysis.html`** — a new standalone page written during a full
   run, modeling the individual's 10-year economic impact of acting on their
-  results: expected medical-cost avoidance + monetised quality-of-life (QALY)
+  results: expected medical-cost avoidance + monetized quality-of-life (QALY)
   gains, net of intervention cost, across pharmacogenomic/carrier/PRS findings,
   PREVENT cardiovascular event avoidance, prediabetes→T2D prevention, and
   biological-age. Headline net value, per-finding table, and ROI vs the ~$700
-  one-time analysis cost. QALYs monetised at the standard $100k/QALY threshold;
+  one-time analysis cost. QALYs monetized at the standard $100k/QALY threshold;
   prominent "illustrative model, not financial/medical advice" disclaimer.
 - `analyze_personal_economics()` + `render_economic_analysis_html()` in
   `health_economics.py`; wired into the pipeline and `.gitignore`d as a
@@ -783,7 +783,7 @@ selection threads into the story no consumer service tells.
 
 - **Interactive in-browser biological-age simulator.** Sliders for the nine
   PhenoAge markers, pre-filled with the user's values; the biological age,
-  delta and colour recompute live in the browser using an embedded copy of the
+  delta and color recompute live in the browser using an embedded copy of the
   Levine formula (static fallback in PDF). A hands-on "what moves my age" tool.
 - **Genetics × Aging tie-in.** Reads longevity-associated variants from the
   user's own genome — FOXO3 (rs2802292), APOE ε2/ε4, CETP (rs5882), KLOTHO
@@ -883,7 +883,7 @@ everything below is additive (attached under a new ``clinical`` key).
 
 ### Added
 
-- **Clinical + optimal reference-range engine.** A ~50-biomarker catalogue
+- **Clinical + optimal reference-range engine.** A ~50-biomarker catalog
   (lipids, glycemic, inflammation, liver, kidney, thyroid, iron, CBC,
   electrolytes, hormones, vitamins, blood pressure) classifies each value
   against BOTH standard clinical ranges and tighter functional/optimal ranges
@@ -942,8 +942,8 @@ registry-backed markers.
   GSTM1/T1/P1), the NRF2 antioxidant axis (NFE2L2, SOD2, GPX1, CAT, HMOX1) and
   heavy-metal handling (ALAD, AS3MT, PON1, metallothioneins). Produces a
   composite wildfire-smoke resilience index (the "activate-but-don't-clear"
-  Phase I/II mismatch) and a genotype-personalised protocol (sulforaphane/NRF2,
-  glutathione/NAC, selenium, plus AQI/HEPA/N95 behavioural guidance framed for
+  Phase I/II mismatch) and a genotype-personalized protocol (sulforaphane/NRF2,
+  glutathione/NAC, selenium, plus AQI/HEPA/N95 behavioral guidance framed for
   Great Lakes / Upper-Peninsula wildfire-smoke seasons). 14 new SNPs registered.
 - **Metal Handling, Oxidative Defense & Neurodegeneration section.** Wires the
   previously-orphaned `metal_oxidative.py` (LRRK2/GBA, HFE, G6PD, ATP7B,
@@ -989,7 +989,7 @@ author-curated in `data/snp_database.json` — nothing is synthesised.
 
 ### Added — verified fields now shown
 
-- **Curated variant catalogue** — each row gains an expandable "Recommendation
+- **Curated variant catalog** — each row gains an expandable "Recommendation
   & context" block: `recommendation` (all 612 entries; previously only the
   one-line `summary` showed), `chip_coverage_note` (27 entries — so a chip gap
   isn't read as "confirmed absent"), and `cross_references` (24 entries).
@@ -1011,7 +1011,7 @@ author-curated in `data/snp_database.json` — nothing is synthesised.
   per-finding cost-per-QALY (the standard cost-effectiveness metric), replacing
   reliance on the single payer-level aggregate.
 - **PheWAS** — each biomarker trait gains an expandable "Evidence & contributing
-  variants" block: the GWAS reference, the standardised Z-score against the
+  variants" block: the GWAS reference, the standardized Z-score against the
   reference mean/SD, the driving variants (rsID / effect allele / your copies /
   per-allele β), and the untyped panel SNPs. `phewas._score_trait` now returns
   the `used_variants` / `missing_variants` it already computed (additive
@@ -1066,17 +1066,17 @@ author-curated in `data/snp_database.json` — nothing is synthesised.
   variant on the chip is now cross-referenced against it; positions the user
   carries are reported with gene, genotype, drug(s), evidence level, and
   phenotype. **Accuracy guardrails (deliberate):** (1) evidence tiers are
-  labelled as *ClinPGx/PharmGKB clinical-annotation levels* (per the bundled
+  labeled as *ClinPGx/PharmGKB clinical-annotation levels* (per the bundled
   README), explicitly **not** CPIC guideline strength; (2) high-evidence
   (Level 1A/1B/2A/2B) positions are shown openly, the weak/unreplicated
-  Level 3/4 long tail behind a collapsed, labelled disclosure; (3) framed as
+  Level 3/4 long tail behind a collapsed, labeled disclosure; (3) framed as
   "a genotype at an annotated position," **not** a direction-of-effect call,
   because the source table carries no risk allele — the dedicated `pgx.py`
   star-allele section remains authoritative for the actionable genes (flagged
   ↗ PGx). Wired into the pipeline behind a graceful `try/except ImportError`.
 - **Imputation provenance now flows to results.** `analyze.tier1_lookup` reads
   the `source` (`chip`/`imputed`) and `r2` columns that `--impute` adds to
-  `snps_df`, records them on each variant, and the catalogue flags imputed
+  `snps_df`, records them on each variant, and the catalog flags imputed
   calls with an `imputed r²=…` badge. Audit of the impute path confirmed the
   merged chip+imputed frame is reassigned *before* tier1 matching and every
   analysis (so imputed variants already flow into all modules) and that no
@@ -1087,12 +1087,12 @@ author-curated in `data/snp_database.json` — nothing is synthesised.
 
 - Purely additive: no rows, fields, or sections were removed; existing columns
   are unchanged. Verified by the full suite (**193 passing**, +15 new tests:
-  catalogue context block + imputed-provenance threading, exercise & nutrition
+  catalog context block + imputed-provenance threading, exercise & nutrition
   regression tests, the PheWAS producer contract, the PharmGKB module, and the
   top-prescribed-drugs screen). Each renderer change was additionally exercised
   by calling the
   build function directly with a producer dict. Golden snapshots unaffected
-  (they cover the V6 personalisation dicts, not the report HTML).
+  (they cover the V6 personalization dicts, not the report HTML).
 - The PRS "contributing variants" panel's note on untyped variants was
   corrected after review: untyped panel variants are **excluded** from the
   score (both raw score and expected mean/variance use typed variants only) —
@@ -1107,7 +1107,7 @@ author-curated in `data/snp_database.json` — nothing is synthesised.
   `polygenic_scores[].typed` per-locus genotypes + cycle-phase dosage lines;
   Y-DNA per-node migration narratives + structured `contradictions`; mtDNA
   per-marker derived/ancestral status; traits tested/not-tested counts;
-  medications catalogued/uncatalogued drug counts. All follow the same
+  medications cataloged/uncataloged drug counts. All follow the same
   fabrication-free "surface a computed-but-dropped field" pattern.
 
 ---
@@ -1154,7 +1154,7 @@ No new features — existing outputs made correct and honest about uncertainty.
 
 - **Ancestry AIM heuristic over-weighted AMR for Southern Europeans.** Two
   causes addressed in `ancestry_pca.py`:
-  - LD-correlated AIMs (the HERC2 eye-colour pair, the EDAR pair, and the
+  - LD-correlated AIMs (the HERC2 eye-color pair, the EDAR pair, and the
     perfectly-correlated LCT/MCM6 pair) were treated as independent and
     double-/triple-counted the same signal. They are now grouped by `ld_block`
     and counted once.
@@ -1164,7 +1164,7 @@ No new features — existing outputs made correct and honest about uncertainty.
     are flagged and downgraded to *low*; the heuristic is capped at *moderate*.
     In a sweep of plausible Southern-European genotypes this downgrades ~91% of
     spurious AMR-primary calls to low confidence. The five-way numbers are now
-    labelled *relative affinity*, not admixture proportions.
+    labeled *relative affinity*, not admixture proportions.
 
 ### Changed — explicit confidence + coverage on every score
 
@@ -1189,7 +1189,7 @@ and low-coverage results are downgraded or suppressed:
   only — not a clinical diagnostic" and added a "Reading the results" note on
   confidence/coverage labels (`renderers.py`).
 - Added informational-use disclaimers to the Expanded-PGS and Y-DNA sections;
-  relabelled the ancestry bars as relative affinity.
+  relabeled the ancestry bars as relative affinity.
 
 ---
 
@@ -1226,7 +1226,7 @@ which doesn't exist yet during the second-load of analyze.py as the
 
 | Module | Status | rsIDs registered | Notes |
 |---|---|---|---|
-| `supplements.py` | ✅ full (V7 PoC) | all 16 rule SNPs | proof-of-concept; behaviour byte-preserved |
+| `supplements.py` | ✅ full (V7 PoC) | all 16 rule SNPs | proof-of-concept; behavior byte-preserved |
 | `carrier.py` | ✅ partial | 13 direct + 3 strand-flipped (16 of 49) | 33 deferred (mostly indels) |
 | `wellness.py` | ✅ partial | 25 of 34 | 9 obscure variants deferred |
 | `traits.py` | ✅ partial | 16 of 48 | 32 phenotype SNPs deferred |
@@ -1392,10 +1392,10 @@ See `README.md` "What's new in V7" for the full V7 changelog.
 
 ---
 
-## [6.0.0] — V6 Personalisation
+## [6.0.0] — V6 Personalization
 
 - `bloodwork.py` — `--bloodwork labs.json` for predicted-vs-actual comparison
-- `supplements.py`, `exercise.py`, `nutrition.py` — V6 personalisation
+- `supplements.py`, `exercise.py`, `nutrition.py` — V6 personalization
 - `fhir_export.py` — `--fhir` for HL7 FHIR R4 clinical export
 - `personalized_plan.py` — master dashboard synthesising the V6 outputs
 
@@ -1405,7 +1405,7 @@ See `README.md` "What's new in V7" for the full V7 changelog.
 
 Pre-changelog. See git history for V1-V5 evolution. Major milestones:
 
-- V1: curated SNP catalogue + APOE genotype
+- V1: curated SNP catalog + APOE genotype
 - V2: Y-DNA + mtDNA haplogroup analysis
 - V3: imputation + medications + carrier-report + chat + compare
 - V4: wellness predictions

@@ -124,7 +124,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--carrier-report",
         action="store_true",
         help=("Generate a standalone Carrier Status / Family Planning HTML "
-              "document organised by severity, alongside the main report."),
+              "document organized by severity, alongside the main report."),
     )
     parser.add_argument(
         "--chat",

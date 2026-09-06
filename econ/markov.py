@@ -51,7 +51,7 @@ def rate_to_prob(rate: float, cycle_length: float = 1.0) -> float:
     """Convert a continuous-time rate to a per-cycle probability.
 
     p = 1 − exp(−r·Δt).  Using r·Δt directly is the most common error in applied
-    modelling: it is only accurate for small r, and can exceed 1 for large r.
+    modeling: it is only accurate for small r, and can exceed 1 for large r.
     """
     return 1.0 - math.exp(-max(0.0, float(rate)) * float(cycle_length))
 
@@ -67,7 +67,7 @@ def build_transition_matrix(p_well_to_disease: float, p_disease_death_excess: fl
 
     Competing risks are handled by construction: from **Well** you may develop the
     disease *or* die of something else, and the residual stays well. Rows are
-    normalised so each sums to exactly 1.
+    normalized so each sums to exactly 1.
     """
     p_wd = max(0.0, min(1.0, p_well_to_disease))
     p_bg = max(0.0, min(1.0, p_background_death))
@@ -233,7 +233,7 @@ def markov_cost_effectiveness(wtp: float = 100_000.0, **kwargs) -> dict:
                  "correction, rate-to-probability conversion, age-dependent competing "
                  "mortality, and 3% discounting of both costs and QALYs."),
         "src": ("Sonnenberg & Beck (1993), Med Decis Making; Briggs, Sculpher & "
-                "Claxton (2006), Decision Modelling for Health Economic Evaluation"),
+                "Claxton (2006), Decision Modeling for Health Economic Evaluation"),
     }
 
 
@@ -326,7 +326,7 @@ def budget_impact(plan_members: int = 1_000_000,
         "horizon_years": horizon_years,
         "rows": rows,
         # "Peak" alone does not say peak *what*, and the figure is not the
-        # largest number in the series — once the programme turns cost-saving
+        # largest number in the series — once the program turns cost-saving
         # the last year is bigger in magnitude and smaller in burden. The name
         # states which: the worst year for the payer, selected on signed net
         # spend per ISPOR convention. Old keys retained; renderers migrate.

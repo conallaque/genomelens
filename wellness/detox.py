@@ -19,7 +19,7 @@ master switch driving SOD2, GPX1, catalase, heme-oxygenase). The genotypes that
 matter most are the ones that make Phase I *fast* while Phase II or the
 antioxidant response is *slow* — you generate reactive, carcinogenic
 intermediates but clear them poorly. This module scores that balance and turns
-it into a personalised action plan.
+it into a personalized action plan.
 
 This complements — it does not replace — ``metal_oxidative.py`` (Parkinson's /
 metal-handling / oxidative loci) and ``wellness.py`` (SOD2/GPX1). Genes reused
@@ -28,7 +28,7 @@ metal exposure, never re-declared.
 
 Nothing here is a diagnostic test. Consumer-chip calls are hints; a true
 GSTM1/GSTT1 null needs a PCR/CNV assay, and blood-lead / heavy-metal burden is a
-lab measurement, not a genotype. Every finding is labelled with a confidence
+lab measurement, not a genotype. Every finding is labeled with a confidence
 level and read conservatively.
 """
 
@@ -135,7 +135,7 @@ def _cyp1a2(snps):
                   "smoke-driven induction of this enzyme.")
         impact = "typical"
     action = ("Relevant mainly under exposure — the practical takeaway is the "
-              "same: minimise smoke, and support Phase II clearance.")
+              "same: minimize smoke, and support Phase II clearance.")
     return _finding(CAT_ACTIVATION, "CYP1A2 Inducibility (*1F)", "CYP1A2",
                     "rs762551", _gt(snps, "rs762551"), result, action,
                     "moderate", impact, f"rs762551 A(*1F) dose {a}")
@@ -163,7 +163,7 @@ def _cyp1b1(snps):
 
 
 def _ahr(snps):
-    # rs2066853 Arg554Lys — modifies AhR signalling / CYP1 induction.
+    # rs2066853 Arg554Lys — modifies AhR signaling / CYP1 induction.
     k = _dose(snps, "rs2066853", "A", "G")   # A = Lys554
     if k is None:
         return None
@@ -174,7 +174,7 @@ def _ahr(snps):
                  "Your genotype is the common Arg554 form."))
     action = ("Cruciferous vegetables (indole-3-carbinol / sulforaphane) also "
               "signal through AhR/NRF2 — a food-based lever on this pathway.")
-    return _finding(CAT_ACTIVATION, "AhR Smoke-Sensor Signalling", "AHR",
+    return _finding(CAT_ACTIVATION, "AhR Smoke-Sensor Signaling", "AHR",
                     "rs2066853", _gt(snps, "rs2066853"), result, action,
                     "low", "higher-load" if k >= 1 else "typical",
                     f"rs2066853 Lys554 dose {k}")
@@ -269,7 +269,7 @@ def _nqo1(snps):
         result = ("NQO1 187 Ser/Ser — greatly reduced NQO1 activity. NQO1 "
                   "detoxifies quinones (from benzene and smoke) and regenerates "
                   "antioxidant CoQ10/vitamin E. Low activity is a meaningful gap "
-                  "in defence against combustion by-products.")
+                  "in defense against combustion by-products.")
         impact = "reduced"
         conf = "moderate"
     elif s == 1:
@@ -336,7 +336,7 @@ def _nrf2(snps):
     if t >= 1:
         result = ("NFE2L2/NRF2 promoter variant (-617 T) associated with lower "
                   "baseline expression of NRF2 — the master switch that turns on "
-                  "your entire antioxidant and Phase II defence when it senses "
+                  "your entire antioxidant and Phase II defense when it senses "
                   "oxidative stress from smoke/particulates. A blunted switch "
                   "means a weaker built-in response.")
         impact = "reduced"
@@ -363,7 +363,7 @@ def _sod2(snps):
     if v >= 1:
         result = ("SOD2 Val16 allele — mitochondrial superoxide dismutase is "
                   "imported into mitochondria slightly less efficiently, a small "
-                  "reduction in front-line defence against the superoxide burst "
+                  "reduction in front-line defense against the superoxide burst "
                   "that particulate/oxidative exposure triggers.")
         impact = "reduced"
     else:
@@ -455,7 +455,7 @@ def _alad_lead(snps):
     else:
         result = ("Common ALAD1 genotype — typical lead-binding kinetics.")
         impact = "typical"
-    action = ("Minimise lead exposure (old paint/pipes, some imported ceramics, "
+    action = ("Minimize lead exposure (old paint/pipes, some imported ceramics, "
               "shooting ranges). Adequate iron, calcium and zinc reduce "
               "gut absorption of lead. If exposure is plausible, a blood-lead "
               "test is the actual measurement.")
@@ -503,7 +503,7 @@ def _pon1(snps):
                  "'better' or 'worse'."
                  if g >= 1 else
                  "Your Gln192 genotype is the common form."))
-    action = ("Minimise organophosphate-pesticide exposure (wash produce, "
+    action = ("Minimize organophosphate-pesticide exposure (wash produce, "
               "caution with garden/agricultural chemicals). PON1 activity is "
               "supported by a Mediterranean-style, polyphenol-rich diet.")
     return _finding(CAT_METAL, "PON1 Organophosphate / Oxidised-Lipid Defense",
@@ -545,7 +545,7 @@ def _mt_metals(snps):
 def _smoke_resilience(findings: list[dict]) -> dict:
     """Aggregate the Phase I / Phase II / antioxidant findings into a single
     interpretable susceptibility index. The genotype that matters is FAST Phase I
-    (more activation) combined with SLOW Phase II / weak antioxidant defence
+    (more activation) combined with SLOW Phase II / weak antioxidant defense
     (poor clearance) — that mismatch, not any single gene, is what raises
     smoke-related risk."""
     activation = sum(1 for f in findings
@@ -568,13 +568,13 @@ def _smoke_resilience(findings: list[dict]) -> dict:
             "smoke-exposure precautions.")
     elif raw >= 2:
         tier, color, headline = ("Typical / mixed", "#d29922",
-            "A mixed profile — some steps favourable, some less so. Standard "
-            "smoke-exposure precautions apply, with the personalised emphases "
+            "A mixed profile — some steps favorable, some less so. Standard "
+            "smoke-exposure precautions apply, with the personalized emphases "
             "below.")
     else:
         tier, color, headline = ("Lower susceptibility", "#3fb950",
             "Your genotype shows no strong activate-but-don't-clear mismatch at "
-            "the markers tested. Good baseline resilience — the behavioural "
+            "the markers tested. Good baseline resilience — the behavioral "
             "precautions still matter during heavy smoke.")
 
     return {
@@ -586,10 +586,10 @@ def _smoke_resilience(findings: list[dict]) -> dict:
     }
 
 
-# ─── Personalised protocol ─────────────────────────────────────────────────────
+# ─── Personalized protocol ─────────────────────────────────────────────────────
 
 def _build_protocol(findings: list[dict], score: dict) -> dict:
-    """Turn the genotype picture into a concrete, tiered action plan. Behavioural
+    """Turn the genotype picture into a concrete, tiered action plan. Behavioral
     measures apply to everyone; the nutrient emphases scale with the specific
     deficits found."""
     by_gene = {f["gene"]: f for f in findings}
@@ -625,7 +625,7 @@ def _build_protocol(findings: list[dict], score: dict) -> dict:
         "emphasis": "high" if gst_weak else "standard",
         "detail": (
             "Glutathione is the currency Phase II spends to conjugate smoke "
-            "toxicants. Support it with sulphur-rich foods (garlic, onions, "
+            "toxicants. Support it with sulfur-rich foods (garlic, onions, "
             "eggs) and adequate protein; N-acetylcysteine (NAC) is a direct "
             "cysteine donor worth discussing with a clinician if smoke exposure "
             "is sustained.") +
@@ -657,13 +657,13 @@ def _build_protocol(findings: list[dict], score: dict) -> dict:
     nutrition.append({
         "item": "Antioxidant-rich, polyphenol-heavy diet + hydration",
         "emphasis": "standard",
-        "detail": ("Colourful vegetables/fruit, green tea, olive oil and berries "
+        "detail": ("Colorful vegetables/fruit, green tea, olive oil and berries "
                    "supply the broad antioxidant network (vitamins C/E, "
-                   "polyphenols) that backs up your enzymatic defences. Stay well "
+                   "polyphenols) that backs up your enzymatic defenses. Stay well "
                    "hydrated during smoke events to support clearance."),
     })
 
-    behavioural = [
+    behavioral = [
         {"item": "Track the air quality index (AQI) daily during smoke events",
          "detail": ("Use AirNow.gov or the AirNow app (EPA) for real-time PM2.5 "
                     "and AQI where you are. Wildfire smoke drifting down from "
@@ -710,11 +710,11 @@ def _build_protocol(findings: list[dict], score: dict) -> dict:
                     "ordered by a clinician is the actual test.")},
     ]
 
-    return {"nutrition": nutrition, "behavioural": behavioural, "metal": metal}
+    return {"nutrition": nutrition, "behavioral": behavioral, "metal": metal}
 
 
 MICHIGAN_CONTEXT = (
-    "Why this section is front-and-centre for you: the Upper Peninsula and the "
+    "Why this section is front-and-center for you: the Upper Peninsula and the "
     "wider Great Lakes region have taken repeated hits of drifting Canadian "
     "wildfire smoke over the last few summers, with PM2.5 spikes that pushed "
     "local air into the Unhealthy range for days at a time. Wildfire smoke is "

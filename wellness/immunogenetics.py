@@ -377,7 +377,7 @@ def _erap2_plague(df):
             CAT_BACTERIAL, "Black Death survivor allele — ERAP2", "ERAP2",
             "rs2549794", gt, "protective",
             f"Carries {n_C}× C — allele under strong positive selection during the Black Death",
-            "Klunk et al. (Nature 2022) analysed ancient DNA from pre- and "
+            "Klunk et al. (Nature 2022) analyzed ancient DNA from pre- and "
             "post-plague London and Denmark cemeteries and found rs2549794-C at "
             "much higher frequency in survivors — an ~40% survival advantage per "
             "copy, one of the strongest positive-selection events documented in "
@@ -406,7 +406,7 @@ def _tlr4_sepsis(df):
             "rs4986790+rs4986791", f"{gt790 or '-'} / {gt791 or '-'}",
             "susceptible",
             "Blunted LPS response — raised risk of severe gram-negative sepsis / RSV",
-            "TLR4 Asp299Gly / Thr399Ile carriers have reduced signalling in "
+            "TLR4 Asp299Gly / Thr399Ile carriers have reduced signaling in "
             "response to bacterial lipopolysaccharide. Modestly higher severe "
             "sepsis and RSV bronchiolitis rates.",
             "Awareness only. Standard antibiotic care applies.",
@@ -414,7 +414,7 @@ def _tlr4_sepsis(df):
     return _finding(
         CAT_BACTERIAL, "TLR4 endotoxin response — normal", "TLR4",
         "rs4986790+rs4986791", f"{gt790 or '-'} / {gt791 or '-'}", "neutral",
-        "Normal TLR4 signalling — standard sepsis / RSV response",
+        "Normal TLR4 signaling — standard sepsis / RSV response",
         "Both TLR4 variants are wild-type. Standard endotoxin sensing.",
         "None.", "moderate", "Arbour 2000", None)
 
@@ -469,7 +469,7 @@ def _hbs_sickle(df):
             CAT_PARASITIC, "Sickle-cell disease (HbSS) — homozygous",
             "HBB", "rs334", gt, "susceptible",
             "Homozygous HbS — sickle-cell disease",
-            "Two copies of HbS. Chronic haemolysis, vaso-occlusive crises, "
+            "Two copies of HbS. Chronic hemolysis, vaso-occlusive crises, "
             "organ damage. Would already be under haematology care.",
             "Haematology follow-up.", "high", "Allison 1954", None)
     return None   # HbAA is majority; not worth flagging.

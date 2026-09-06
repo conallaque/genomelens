@@ -57,7 +57,7 @@ def test_signed_money_marks_direction_explicitly():
 def test_small_but_real_qaly_never_renders_as_zero():
     """REGRESSION. Per-finding QALYs rendered at two decimals, so a finding
     contributing 0.00065 displayed as `0.00` — indistinguishable from a finding
-    modelled to contribute nothing, in the table whose job is to tell those
+    modeled to contribute nothing, in the table whose job is to tell those
     apart."""
     assert fmt.qaly(0.00065) not in ("0.00", "0.000")
     assert float(fmt.qaly(0.00065)) > 0
@@ -114,7 +114,7 @@ def test_one_in_n_from_a_probability():
 # ── ratio ─────────────────────────────────────────────────────────────────────
 
 def test_ratio_does_not_render_as_a_return_on_investment():
-    """`26.7:1` reads as money returned. The quantity includes monetised health,
+    """`26.7:1` reads as money returned. The quantity includes monetized health,
     so it is not."""
     assert fmt.ratio(8000, 300) == "26.7x"
     assert ":" not in fmt.ratio(8000, 300)

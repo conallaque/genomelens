@@ -1,5 +1,5 @@
 """
-Personalised Supplement Stack
+Personalized Supplement Stack
 =============================
 
 Generates a ranked, evidence-tagged supplement plan from the genetic profile.
@@ -69,7 +69,7 @@ def _risk_dose(
     """
     Strand-aware risk-allele dosage. **Delegates to the unified SNP registry.**
 
-    Behaviour invariants (covered by tests/unit/test_supplements.py and
+    Behavior invariants (covered by tests/unit/test_supplements.py and
     tests/registry/test_snp_registry.py):
 
       * Returns 0/1/2 regardless of whether the chip reports on + or − strand.
@@ -106,7 +106,7 @@ def _chip_gap(rsid: str, gene_label: str, what_it_would_say: str) -> dict:
     }
 
 
-# ── Supplement catalogue ─────────────────────────────────────────────────────
+# ── Supplement catalog ─────────────────────────────────────────────────────
 #
 # Each `_rule_*` function inspects a slice of the genetic data and returns one
 # or more supplement dicts (or None / []). Rules are kept short and explicit.
@@ -275,7 +275,7 @@ def _rule_vitamin_d(snps_df, wellness, phewas) -> list[dict]:
     else:
         dose = "1000 IU"
         tier = TIER_OPTIONAL
-        reasoning = "Standard maintenance; favourable VDR/CYP2R1/GC genotype."
+        reasoning = "Standard maintenance; favorable VDR/CYP2R1/GC genotype."
 
     return [{
         "name": "Vitamin D3 + K2 (MK-7)",
@@ -727,9 +727,9 @@ def render_supplements_html(result: dict, file_label: str = "") -> str:
           {''.join(sections)}
         """
     return f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
-<title>Personalised Supplement Stack{(' — ' + _esc(file_label)) if file_label else ''}</title>
+<title>Personalized Supplement Stack{(' — ' + _esc(file_label)) if file_label else ''}</title>
 {_SUPP_CSS}</head><body><div class="sp-wrap">
-<h1>Personalised Supplement Stack</h1>
+<h1>Personalized Supplement Stack</h1>
 <p style="color:#666">{_esc(result.get('notes',''))}</p>
 {body}
 <p style="margin-top:30px;color:#888;font-size:0.85em">

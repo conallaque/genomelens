@@ -305,7 +305,7 @@ def _apoe_observation(patient_ref: str, apoe_genotype: str) -> dict:
         "effectiveDateTime": _now_iso(),
         "valueCodeableConcept": _codeable(text=apoe_genotype),
         "note": [{"text": (
-            "APOE genotype is a clinically recognised risk modifier for "
+            "APOE genotype is a clinically recognized risk modifier for "
             "late-onset Alzheimer's disease. ε4/ε4 carries highest lifetime "
             "risk; ε2/ε2 and ε2/ε3 may be protective."
         )}],

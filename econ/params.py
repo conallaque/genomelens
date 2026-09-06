@@ -24,7 +24,7 @@ behind it:
     disagreed with separately from the source.
 
 ``assumption``
-    A judgement call with no published anchor. These are *not* forbidden — some
+    A judgment call with no published anchor. These are *not* forbidden — some
     quantities have no literature — but they are enumerated in the report as
     declared assumptions instead of blending in with sourced values, and
     :func:`assumption_burden` reports how much of the model's output rests on
@@ -32,7 +32,7 @@ behind it:
 
 The registry is validated at import: a ``published`` or ``derived`` parameter
 without a citation is an error, and so is an ``assumption`` without a note
-explaining the judgement. ``test_econ_params.py`` enforces the same rules
+explaining the judgment. ``test_econ_params.py`` enforces the same rules
 against the parameters actually reaching the model, so a new unsourced constant
 cannot quietly appear.
 
@@ -123,7 +123,7 @@ class Param:
         if self.tier == "assumption":
             if not self.note.strip():
                 bad.append(f"{self.key}: tier=assumption requires a note "
-                           f"explaining the judgement")
+                           f"explaining the judgment")
             if self.citation.strip():
                 bad.append(f"{self.key}: tier=assumption must not cite a "
                            f"source — retier it as published/derived")
@@ -189,7 +189,7 @@ _REGISTRY: list[Param] = [
             "used as a uniform conservative haircut on the cash arm, in the "
             "direction that lowers claimed savings. Varied 0.4–0.8 in PSA.",
        source="Drummond MF, Sculpher MJ, Claxton K, Stoddart GL, Torrance GW. "
-              "Methods for the Economic Evaluation of Health Care Programmes, "
+              "Methods for the Economic Evaluation of Health Care Programs, "
               "4th ed. Oxford University Press (ch. 7, marginal vs average "
               "costing)",
        citation="ISBN:9780199665877", year=2015,
@@ -255,9 +255,9 @@ _REGISTRY: list[Param] = [
        dist="gamma", low=200.0, high=2_000.0),
 
     _p("cost_dpp_program", 3_000.0, "$", "derived",
-       note="Cost of delivering a year of the CDC-recognised Diabetes "
+       note="Cost of delivering a year of the CDC-recognized Diabetes "
             "Prevention Program lifestyle intervention per participant; the "
-            "DPP trial's own direct programme cost, inflated to present-day "
+            "DPP trial's own direct program cost, inflated to present-day "
             "dollars as an order-of-magnitude anchor.",
        source="Diabetes Prevention Program Research Group. Within-trial "
               "cost-effectiveness of lifestyle intervention or metformin for "
@@ -366,7 +366,7 @@ _REGISTRY: list[Param] = [
        dist="gamma", low=8_000.0, high=60_000.0),
 
     _p("coi_iron_overload", 40_000.0, "$ per case", "derived",
-       note="Lifetime cost of clinically expressed hereditary haemochromatosis "
+       note="Lifetime cost of clinically expressed hereditary hemochromatosis "
             "including surveillance and phlebotomy; most C282Y homozygotes "
             "never express, which is handled by penetrance upstream, not here.",
        source="Adams PC, Reboussin DM, Barton JC, et al. Hemochromatosis and "
@@ -415,7 +415,7 @@ _REGISTRY: list[Param] = [
        dist="gamma", low=0.5, high=4.0),
 
     _p("qaly_loss_t2d", 2.0, "QALYs per case", "derived",
-       note="QALYs lost to type 2 diabetes over the modelled horizon, from the "
+       note="QALYs lost to type 2 diabetes over the modeled horizon, from the "
             "published per-year utility decrement applied across expected "
             "years with disease.",
        source="Sullivan PW, Ghushchyan V. Preference-Based EQ-5D Index Scores "
@@ -424,7 +424,7 @@ _REGISTRY: list[Param] = [
        dist="gamma", low=0.8, high=5.0),
 
     _p("utility_healthy", 0.85, "utility weight", "published",
-       note="US population mean EQ-5D index for adults without the modelled "
+       note="US population mean EQ-5D index for adults without the modeled "
             "condition; used as the well state in the state-transition model.",
        source="Sullivan PW, Ghushchyan V. Preference-Based EQ-5D Index Scores "
               "for Chronic Conditions in the United States. Med Decis Making",
@@ -495,7 +495,7 @@ _REGISTRY: list[Param] = [
        dist="gamma", low=0.1, high=1.5),
 
     _p("qaly_loss_iron_overload", 1.0, "QALYs per case", "derived",
-       note="Clinically expressed haemochromatosis with organ involvement; "
+       note="Clinically expressed hemochromatosis with organ involvement; "
             "most carriers never express, which is handled by penetrance "
             "upstream rather than by shrinking this figure.",
        source="Sullivan PW, Ghushchyan V. Preference-Based EQ-5D Index Scores "
@@ -504,7 +504,7 @@ _REGISTRY: list[Param] = [
        dist="gamma", low=0.2, high=3.0),
 
     _p("qaly_loss_cancer", 2.5, "QALYs per case", "derived",
-       note="Treated solid-tumour cancer across stages, stage-weighted; "
+       note="Treated solid-tumor cancer across stages, stage-weighted; "
             "applied to the colorectal and breast/ovarian anchors.",
        source="Sullivan PW, Ghushchyan V. Preference-Based EQ-5D Index Scores "
               "for Chronic Conditions in the United States. Med Decis Making",
@@ -562,7 +562,7 @@ _REGISTRY: list[Param] = [
             "at common typed positions, so sequencing adds comparatively "
             "little here — which matters, because pharmacogenomics is the "
             "highest-prevalence category and would otherwise dominate a "
-            "prospective estimate of what sequencing is worth. Judgement: "
+            "prospective estimate of what sequencing is worth. Judgment: "
             "coverage varies by array and by gene, and CYP2D6 in particular "
             "is poorly resolved by both technologies.",
        dist="beta", low=0.50, high=0.98),
@@ -571,7 +571,7 @@ _REGISTRY: list[Param] = [
        note="Probability that an individual carries at least one recessive "
             "condition on an expanded carrier panel. Reported for "
             "completeness only — reproductive findings are deliberately not "
-            "monetised anywhere in this model, so this contributes nothing "
+            "monetized anywhere in this model, so this contributes nothing "
             "to the dollar figure.",
        source="Haque IS, Lazarin GA, Kang HP, Evans EA, Goldberg JD, Wapner "
               "RJ. Modeled Fetal Risk of Genetic Diseases Identified by "
@@ -589,7 +589,7 @@ _REGISTRY: list[Param] = [
             "distributional analysis. Values around this magnitude appear in "
             "the English distributional cost-effectiveness literature, which "
             "elicits far stronger aversion than economic intuition suggests; "
-            "this is recorded as a judgement rather than cited because the "
+            "this is recorded as a judgment rather than cited because the "
             "figure is carried here from memory of that literature and has "
             "not been verified against a specific paper. The result is "
             "sensitive to it, so it is reported as an input.",
@@ -599,7 +599,7 @@ _REGISTRY: list[Param] = [
        note="Annual incidence used for the illustrative age-and-sex subgroup "
             "table. The table exists to show how competing mortality changes "
             "the value of prevention with age, which it does at any plausible "
-            "incidence; it is not a personalised risk estimate and is labelled "
+            "incidence; it is not a personalized risk estimate and is labeled "
             "as illustrative in the report.",
        dist="beta", low=0.001, high=0.05),
 
@@ -611,7 +611,7 @@ _REGISTRY: list[Param] = [
     # also the least visible. Registering them as declared assumptions is the
     # honest description, and it lets the tornado report their influence.
     _p("baseline_event_probability", 0.20, "probability", "assumption",
-       note="Probability, over the modelled horizon, that a person with an "
+       note="Probability, over the modeled horizon, that a person with an "
             "elevated-risk finding experiences the condition it points to, "
             "where no condition-specific estimate is available. A generic "
             "stand-in for a quantity that genuinely varies by condition, age "
@@ -622,7 +622,7 @@ _REGISTRY: list[Param] = [
     _p("baseline_event_probability_dementia", 0.15, "probability", "assumption",
        note="As above, for dementia specifically, set lower than the generic "
             "default to reflect that the horizon ends before most of the "
-            "lifetime risk is realised. Judgement, not an epidemiological "
+            "lifetime risk is realized. Judgment, not an epidemiological "
             "estimate.",
        dist="beta", low=0.03, high=0.35),
 
@@ -693,7 +693,7 @@ _REGISTRY: list[Param] = [
        dist="gamma", low=1.5, high=5.0),
 
     _p("actionable_rrr_t2d", 0.58, "relative risk reduction", "published",
-       note="Structured lifestyle programme (7% weight loss, 150 min/week "
+       note="Structured lifestyle program (7% weight loss, 150 min/week "
             "activity) versus placebo, in adults with impaired glucose "
             "tolerance. This is the action the model prices for a T2D "
             "finding, so the trial's own effect is used rather than a "
@@ -726,7 +726,7 @@ _REGISTRY: list[Param] = [
             "in non-cirrhotic, non-diabetic patients was indistinguishable "
             "from the expected rate, so the effect of acting pre-symptomatically "
             "is large. DERIVED, not published: the source reports survival "
-            "normalisation in a cohort, not a randomised risk reduction for a "
+            "normalization in a cohort, not a randomised risk reduction for a "
             "named event, so the point estimate is a reading of that finding "
             "and the range is deliberately wide.",
        source="Niederau C, Fischer R, Purschel A, et al. Long-term survival "
@@ -767,7 +767,7 @@ _REGISTRY: list[Param] = [
     _p("intervention_cost_predicted_variant", 800.0, "$", "assumption",
        note="Cost of following up a computationally predicted pathogenic "
             "variant. No standard pathway exists — that is the point of the "
-            "category — so this is a judgement about what a cautious "
+            "category — so this is a judgment about what a cautious "
             "confirmatory workup would cost.",
        dist="gamma", low=200.0, high=3_000.0),
 
@@ -784,7 +784,7 @@ _REGISTRY: list[Param] = [
             "PPV sits well below benchmark precision. PPV also depends on the "
             "prior probability of pathogenicity in context, so any single "
             "fixed value is itself an assumption. No population-screening PPV "
-            "is available to cite, so this is judgement, not an "
+            "is available to cite, so this is judgment, not an "
             "epidemiological estimate, and the range spans mostly-false-"
             "positive to near-even odds rather than defending the point "
             "value. It gates the entire predicted-variant pathway, so it is "
@@ -822,7 +822,7 @@ _REGISTRY: list[Param] = [
             "elimination of a common complex disease, and without a cap the "
             "complement-of-products combination drifts toward 1.0 as findings "
             "accumulate. Set at roughly twice the best single-intervention "
-            "effect in the model (statins, 0.27). Judgement, not a published "
+            "effect in the model (statins, 0.27). Judgment, not a published "
             "figure — varied 0.4–0.8 in sensitivity analysis.",
        dist="beta", low=0.40, high=0.80),
 
@@ -832,7 +832,7 @@ _REGISTRY: list[Param] = [
             "score and a PheWAS biomarker for the same trait are not "
             "independent evidence. Each additional finding on a condition is "
             "down-weighted by this factor compounding, so the marginal "
-            "contribution of the fifth CAD signal is small. Judgement; the "
+            "contribution of the fifth CAD signal is small. Judgment; the "
             "alternative in use before this was implicit independence, which "
             "is certainly wrong in the anti-conservative direction.",
        dist="beta", low=0.25, high=0.80),
@@ -882,12 +882,12 @@ _REGISTRY: list[Param] = [
     # effectiveness framing), not the effect alone (intention-to-treat). People
     # who stop taking a statin stop paying for it. The consequence is the
     # interesting one: the fixed test cost does NOT scale, so it amortises over
-    # fewer realised QALYs and the ICER worsens even though the intervention's
+    # fewer realized QALYs and the ICER worsens even though the intervention's
     # own cost per unit of benefit is roughly unchanged.
 
     _p("adherence_pharmacological", 0.50, "proportion", "published",
        note="Long-term persistence with preventive medication. Applied to "
-            "conditions whose modelled intervention is chronic drug therapy "
+            "conditions whose modeled intervention is chronic drug therapy "
             "(statins, metformin, antidepressants). The 50% figure is the "
             "headline finding of the WHO review and is consistent with the "
             "statin discontinuation literature; varied 0.35-0.70.",
@@ -898,12 +898,12 @@ _REGISTRY: list[Param] = [
 
     _p("adherence_screening", 0.65, "fraction", "derived",
        note="Sustained uptake of a recommended screening or surveillance "
-            "programme over the horizon. The source measures 72.2% of US "
+            "program over the horizon. The source measures 72.2% of US "
             "adults UP TO DATE with colorectal screening at a point in time; "
             "this is held BELOW that, because being current on one occasion "
-            "is a weaker commitment than adhering to a programme for ten "
+            "is a weaker commitment than adhering to a program for ten "
             "years, and adopting the cross-sectional figure directly would "
-            "have raised the modelled benefit on a technicality. Derived "
+            "have raised the modeled benefit on a technicality. Derived "
             "rather than published for exactly that reason: the number is "
             "read from the source, not taken from it.",
        source="Sabatino SA, Thompson TD, White MC, et al. Up-to-Date Breast, "
@@ -913,7 +913,7 @@ _REGISTRY: list[Param] = [
        dist="beta", low=0.45, high=0.85),
 
     _p("adherence_lifestyle", 0.35, "fraction", "derived",
-       note="Sustained behaviour change — diet, exercise, alcohol reduction — "
+       note="Sustained behavior change — diet, exercise, alcohol reduction — "
             "maintained across the horizon. The lowest archetype because "
             "maintenance, not initiation, is the binding constraint: the "
             "source's intensive lifestyle arm achieved its weight target in "
@@ -939,30 +939,30 @@ _REGISTRY: list[Param] = [
        dist="beta", low=0.30, high=0.75),
 
     # ── Gut conditions (new anchors) ──────────────────────────────────────
-    _p("coi_coeliac", 14_000.0, "$ per case", "assumption",
-       note="Ten-year cost of undiagnosed or poorly-managed coeliac disease: "
-            "repeat investigation of anaemia and GI symptoms, iron and vitamin "
+    _p("coi_celiac", 14_000.0, "$ per case", "assumption",
+       note="Ten-year cost of undiagnosed or poorly-managed celiac disease: "
+            "repeat investigation of anemia and GI symptoms, iron and vitamin "
             "repletion, bone-density loss, and the documented gluten-free food "
             "premium once diagnosed. Much smaller than the cancer and cardiac "
             "anchors in this registry because the disease is managed by diet "
             "rather than by procedures or biologics. No single costing study is "
-            "being followed, so this is declared as judgement.",
+            "being followed, so this is declared as judgment.",
        dist="gamma", low=6_000.0, high=30_000.0),
 
-    _p("qaly_loss_coeliac", 0.6, "QALYs", "assumption",
-       note="Quality-of-life decrement over the horizon from untreated coeliac "
+    _p("qaly_loss_celiac", 0.6, "QALYs", "assumption",
+       note="Quality-of-life decrement over the horizon from untreated celiac "
             "disease — fatigue, GI symptoms and the consequences of "
             "malabsorption. Set well below the cancer and dementia decrements "
-            "because the condition is controllable once identified. Judgement.",
+            "because the condition is controllable once identified. Judgment.",
        dist="beta", low=0.2, high=1.5),
 
-    _p("penetrance_coeliac_given_dq", 0.03, "proportion", "assumption",
+    _p("penetrance_celiac_given_dq", 0.03, "proportion", "assumption",
        note="THE FIGURE THAT KEEPS THIS FINDING HONEST. Derived as population "
-            "prevalence divided by carrier frequency: coeliac disease affects "
+            "prevalence divided by carrier frequency: celiac disease affects "
             "about 1% of people of European ancestry, while roughly 30-40% "
             "carry an HLA-DQ2.5/DQ8 susceptibility haplotype. So the haplotype "
             "is necessary but nowhere near sufficient, and only a few percent "
-            "of carriers ever convert. Applying a coeliac cost of illness to "
+            "of carriers ever convert. Applying a celiac cost of illness to "
             "every carrier — the error the raw curated figures make elsewhere "
             "in this model — would overstate the finding by more than an order "
             "of magnitude.\n\nTiered as an assumption, not derived: the "
@@ -1359,7 +1359,7 @@ def count_unregistered_parameters() -> int:
 
 
 def assumption_burden() -> dict[str, float]:
-    """How much of the registry rests on judgement rather than literature.
+    """How much of the registry rests on judgment rather than literature.
 
     Reports registry coverage AND how much of the model the registry does not
     yet reach. Quoting only the first would be the same species of error the

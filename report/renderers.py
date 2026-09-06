@@ -11,9 +11,9 @@ lines pre-decomposition). The split is:
     tests/        — pytest suite (golden snapshots lock byte-equivalence)
 
 The extraction is **deliberately verbatim** — every function below preserves
-the exact behaviour it had inside analyze.py, with no whitespace or naming
+the exact behavior it had inside analyze.py, with no whitespace or naming
 changes. The V6 module golden snapshots verify byte-level equivalence; if a
-snapshot drifts, the extraction was not behaviour-preserving and should be
+snapshot drifts, the extraction was not behavior-preserving and should be
 investigated as a bug, not bumped.
 
 External symbols this module references from `analyze.py` (`build_category_map`,
@@ -866,7 +866,7 @@ def build_prs_html(prs: dict | None) -> str:
 <p class="prs-intro">
 Curated-variant polygenic risk scores derived from genome-wide significant,
 replicated GWAS hits. Each score sums log(OR) across called variants, is
-standardised against an expected Hardy-Weinberg distribution (European
+standardized against an expected Hardy-Weinberg distribution (European
 reference allele frequencies), and reported as a Z-score and percentile.
 Tier classification: Low (&lt;5th) · Below Average (5–20th) · Average
 (20–80th) · Elevated (80–95th) · High (≥95th).
@@ -1343,7 +1343,7 @@ def build_references_html(refs: list[dict] | None) -> str:
         if r.get("guidelines"):
             guidelines = "<br>" + "; ".join(_esc(g) for g in r["guidelines"])
         # ClinVar clinical-significance assertion, curated per reference but
-        # previously dropped. Shown as a labelled tag in the evidence cell.
+        # previously dropped. Shown as a labeled tag in the evidence cell.
         clinvar = ""
         if r.get("clinvar"):
             clinvar = f'<br><span class="ref-clinvar">ClinVar: {_esc(r["clinvar"])}</span>'
@@ -1360,13 +1360,13 @@ def build_references_html(refs: list[dict] | None) -> str:
 <section class="ref-section" id="references">
 <h2>References & Evidence <span class="pro-pill">PRO</span></h2>
 <p class="ref-intro">
-Per-variant evidence levels and primary literature for the catalogued
+Per-variant evidence levels and primary literature for the cataloged
 findings in this report. Levels: <strong>CPIC A/B/C</strong> (pharmacogenomic
 clinical practice guidelines), <strong>Clinical-Validated</strong> (single-
 variant disease association at clinical-grade evidence), <strong>GWAS-A</strong>
 (genome-wide significant, replicated in meta-analysis),
 <strong>Population-Validated</strong> (population-genetic studies),
-<strong>Catalogued</strong> (peer-reviewed GWAS or clinical literature; not
+<strong>Cataloged</strong> (peer-reviewed GWAS or clinical literature; not
 in this report's curated reference catalog).
 </p>
 <div class="tbl-wrap">
@@ -1694,14 +1694,14 @@ def build_holistic_synthesis_html(hs: dict | None) -> str:
 <p class="anc-intro">
 The synthesis layer: patterns that only exist when you look across panels.
 No single module can catch these — they emerge from the interaction of
-genotype, labs, ancestry, neurochemistry, and behaviour. A Genome Leverage
+genotype, labs, ancestry, neurochemistry, and behavior. A Genome Leverage
 Score summarises the overall pattern; specific cross-panel insights follow,
 each cited to the underlying findings that triggered it.
 </p>
 {leverage_hero}
 <h3 style="margin:18px 0 6px">Cross-panel insights ({hs['n_insights']})</h3>
 {insights_html or '<p style="color:var(--muted)">No cross-panel patterns detected.</p>'}
-{f'<h3 style="margin:18px 0 6px">Prioritised actions</h3><ol style="line-height:1.55;padding-left:22px">{priority_html}</ol>' if priority_html else ''}
+{f'<h3 style="margin:18px 0 6px">Prioritized actions</h3><ol style="line-height:1.55;padding-left:22px">{priority_html}</ol>' if priority_html else ''}
 <div class="anc-caveat" style="margin-top:14px">
 This is a heuristic synthesis layer; each individual insight is grounded in the
 underlying modules but the composite is judgment, not clinical guidance.
@@ -1781,7 +1781,7 @@ specific genetic risk profile (every genome-driven item is tagged to its source)
 {lev}
 {decades_html}
 <div class="anc-caveat" style="margin-top:12px">
-General preventive-medicine framework personalised by genotype — not a
+General preventive-medicine framework personalized by genotype — not a
 substitute for a primary-care physician's individualised screening schedule.
 Screening ages follow current US guidelines and may differ by family history
 and evolving recommendations.
@@ -1859,7 +1859,7 @@ def build_environmental_optimization_html(eo: dict | None) -> str:
 <section class="env-optimization-section" id="environmental-optimization">
 <h2>Environmental Optimization <span class="pro-pill">V6.17</span></h2>
 <p class="anc-intro">
-Actionable behavioural protocols from your genotype — the "what to actually do
+Actionable behavioral protocols from your genotype — the "what to actually do
 differently" layer. Light timing tuned to your chronotype, training emphasis
 tuned to your muscle/power genetics, and vitamin-D supplementation tuned to
 your pathway variants × latitude (assumed {eo['latitude_assumed']:.0f}°N —
@@ -1916,7 +1916,7 @@ def build_polygenic_traits_html(pt: dict | None) -> str:
 <h2>Trait Genetics <span class="pro-pill">V6.16</span></h2>
 <p class="anc-intro">
 Genotype-level trait calls for traits where a <em>single variant</em> genuinely
-carries signal — taste, smell, hair, eye colour, chronotype. {pt['n_findings']}
+carries signal — taste, smell, hair, eye color, chronotype. {pt['n_findings']}
 calls below. Deliberately <strong>no polygenic percentiles</strong>: no trait
 PGS scoring files are available locally, and inventing a percentile from a few
 SNPs would be dishonest.
@@ -2144,13 +2144,13 @@ def _render_wgs_decision(w: dict | None) -> str:
     # genome carrying two sequencing-only findings was shown a "1 in 56 chance"
     # of carrying one and nothing else: a forecast about a settled fact.
     realised_note = ""
-    if w.get("realised"):
+    if w.get("realized"):
         realised_note = f"""
   <div style="border:1.5px solid #177a54;background:#f2faf6;border-radius:8px;
               padding:11px 13px;margin:10px 0;font-size:.88em;color:#14533b">
     <strong>&#9873; Flagged in this genome &mdash;
     {w.get('n_wgs_only_findings', 0)} sequencing-only finding(s),
-    {money(w.get('retrospective_value'))} modelled net benefit.</strong><br>
+    {money(w.get('retrospective_value'))} modeled net benefit.</strong><br>
     {_esc(w.get('realised_headline', ''))}</div>"""
 
     zero_note = ""
@@ -2169,7 +2169,7 @@ def _render_wgs_decision(w: dict | None) -> str:
               gap:12px;flex-wrap:wrap">
     <div style="font-weight:700;color:{accent}">
       {"Sequencing already found what an array could not"
-        if w.get("realised") else "Is whole-genome sequencing worth buying?"}</div>
+        if w.get("realized") else "Is whole-genome sequencing worth buying?"}</div>
     <div style="font-size:.72em;color:#8a94a3;border:1px solid #dfe4ea;
                 border-radius:20px;padding:2px 9px;white-space:nowrap">
       prospective &middot; before testing</div>
@@ -2230,7 +2230,7 @@ def _render_plain_summary(pl: dict | None) -> str:
     actions = "".join(f"""
   <li style="margin-bottom:7px">
     <strong>{_esc(a.get('what',''))}</strong>
-    <span style="color:#8a94a3">&mdash; {_esc(a.get('value',''))} of modelled value</span>
+    <span style="color:#8a94a3">&mdash; {_esc(a.get('value',''))} of modeled value</span>
     <div style="color:#5b6673">{_esc(a.get('why',''))}</div>
     <div style="color:#8a94a3;font-size:.94em">{_esc(a.get('scale',''))}</div>
   </li>""" for a in (pl.get("actions") or []))
@@ -2426,7 +2426,7 @@ def _render_decision_layer(d: dict | None) -> str:
         if dist.get("available"):
             eq = (f" Equity: the Gini coefficient of remaining health moves "
                   f"from {dist.get('gini_before')} to {dist.get('gini_after')}, "
-                  f"so the programme "
+                  f"so the program "
                   f"<strong>{'narrows' if dist.get('reduces_inequality') else 'slightly widens'}"
                   f"</strong> the gap.")
         blocks += f"""
@@ -2526,7 +2526,7 @@ def _ceac_svg(curve: list, width: int = 460, height: int = 170) -> str:
 
 
 def _assumption_dominance_note(tornado: list[dict]) -> str:
-    """Say plainly when judgement calls, not evidence, drive the conclusion.
+    """Say plainly when judgment calls, not evidence, drive the conclusion.
 
     A reader can work this out from the tornado table, but only by noticing
     the tier tags and doing the arithmetic. If most of the swing comes from
@@ -2546,10 +2546,10 @@ def _assumption_dominance_note(tornado: list[dict]) -> str:
     return f"""
 <div style="border:1px solid #f0dcc0;background:#fffaf2;border-radius:8px;
             padding:10px 12px;margin-top:8px;font-size:.85em;color:#6b5330">
-  <strong>Judgement, not evidence, is driving this result.</strong>
+  <strong>Judgment, not evidence, is driving this result.</strong>
   {share:.0f}% of the total swing in net benefit comes from parameters with no
   published anchor{f" &mdash; chiefly {named}" if named else ""}. The
-  conclusion is therefore about as reliable as those judgements are, and a
+  conclusion is therefore about as reliable as those judgments are, and a
   reader who disagrees with them should expect a materially different number.
   They are stated in full under parameter provenance below.</div>"""
 
@@ -2561,7 +2561,7 @@ def _render_pooled_economics(p: dict | None) -> str:
     findings bearing on one condition were combined rather than summed, that
     costs and quality-adjusted life-years are different objects reported
     separately, that the perspective is a choice with itemised consequences,
-    and that a stated share of the model rests on judgement rather than
+    and that a stated share of the model rests on judgment rather than
     literature.
     """
     if not p or not p.get("available"):
@@ -2585,8 +2585,8 @@ def _render_pooled_economics(p: dict | None) -> str:
                     key=lambda r: r.get("inmb", 0), reverse=True):
         # Three tiers, in the order the corrections are applied: what naive
         # addition would have claimed, what the pooled trial evidence supports,
-        # and what this cohort would actually realise. Showing only the last
-        # would hide two judgement calls behind one number.
+        # and what this cohort would actually realize. Showing only the last
+        # would hide two judgment calls behind one number.
         naive = c.get("naive_additive_rrr", 0)
         eff = c.get("pooled_efficacy_rrr", c.get("combined_rrr", 0))
         pooled = c.get("combined_rrr", 0)
@@ -2639,7 +2639,7 @@ def _render_pooled_economics(p: dict | None) -> str:
             " That is why the cost per QALY worsens even though the "
             "intervention's own value for money barely moves."
             if (p.get("cea") or {}).get("icer") is not None else
-            " Because it is spread over fewer realised QALYs, it is the part "
+            " Because it is spread over fewer realized QALYs, it is the part "
             "of this analysis most sensitive to how many people follow through.")
         corr_html += f"""
 <div style="border:1px solid #d8e2ee;background:#f7fafd;border-radius:10px;
@@ -2648,7 +2648,7 @@ def _render_pooled_economics(p: dict | None) -> str:
     effectiveness</div>
   <div style="font-size:.87em;color:#425468;margin-top:5px">
     Every effect size above is measured in people who followed a protocol. Roughly half
-    of people stop long-term preventive medication, and sustained behaviour change fares
+    of people stop long-term preventive medication, and sustained behavior change fares
     worse than that. Charged against the benefit, that gap costs
     <strong>{adh.get('qaly_lost_to_non_adherence', 0):.3f} QALYs</strong> and
     <strong>{money(adh.get('value_lost_to_non_adherence'))}</strong> of avoided cost
@@ -2657,7 +2657,7 @@ def _render_pooled_economics(p: dict | None) -> str:
     because someone who stops taking a statin stops paying for it; the one-off
     {money(adh.get('fixed_test_cost'))} test cost is not.{_icer_clause}</div>
   <div style="font-size:.78em;color:#7b8794;margin-top:6px">
-    {_esc(adh.get('src', ''))}. Screening uptake and behavioural maintenance are
+    {_esc(adh.get('src', ''))}. Screening uptake and behavioral maintenance are
     declared assumptions, varied in the sensitivity analysis.</div>
 </div>"""
 
@@ -2681,7 +2681,7 @@ def _render_pooled_economics(p: dict | None) -> str:
                 letter-spacing:.04em">Incremental QALYs</div>
     <div style="font-size:1.3em;font-weight:700;color:#2b3440">
       {cea.get('incremental_qaly', 0):.3f}</div>
-    <div style="font-size:.76em;color:#8a94a3">health gain, not monetised here</div>
+    <div style="font-size:.76em;color:#8a94a3">health gain, not monetized here</div>
   </div>
   <div style="flex:1;min-width:160px;background:#f7f9fb;border:1px solid #e3e7ec;
               border-radius:10px;padding:11px 13px">
@@ -2787,7 +2787,7 @@ def _render_pooled_economics(p: dict | None) -> str:
   <tbody>{trows}</tbody></table>
 <div style="font-size:.8em;color:#8a94a3;margin-top:5px">
   A parameter high on this list is one the conclusion depends on. Anything
-  tagged <span style="color:#b06a00">[assumption]</span> is a judgement call
+  tagged <span style="color:#b06a00">[assumption]</span> is a judgment call
   carrying real weight &mdash; worth disagreeing with first.</div>
 {_assumption_dominance_note(p.get("tornado") or [])}</div></details>"""
 
@@ -2882,7 +2882,7 @@ def _render_pooled_economics(p: dict | None) -> str:
   <strong>{prov.get('n_published', 0)}</strong> are read directly from a cited
   source, <strong>{prov.get('n_derived', 0)}</strong> are derived from one by a
   stated arithmetic step, and <strong>{prov.get('n_assumption', 0)}</strong> are
-  judgement calls with no published anchor. The last group is listed in full
+  judgment calls with no published anchor. The last group is listed in full
   rather than blended in with the others &mdash; they are the parts of this model
   most worth arguing with.</div>
 <div style="border:1px solid #dfe7f0;background:#f7fafd;border-radius:8px;
@@ -2896,7 +2896,7 @@ def _render_pooled_economics(p: dict | None) -> str:
   follow directly (PMID or DOI) and
   <strong>{prov.get('model_pct_attributed_or_better', 0)}%</strong> carry at least a
   named literature attribution. Only
-  <strong>{prov.get('model_pct_unsourced', 0)}%</strong> rest on judgement alone,
+  <strong>{prov.get('model_pct_unsourced', 0)}%</strong> rest on judgment alone,
   and those are the declared assumptions listed below.
   <div style="margin-top:6px">The remaining gap is
   <strong>{prov.get('n_curated_attributed', 0)}</strong> figures whose source is
@@ -3101,7 +3101,7 @@ def build_voi_html(voi: dict | None) -> str:
 
     # ROH -> carrier-panel prior. Rendered as a recommendation card, deliberately
     # without a dollar figure and visually separated from the valued findings, so
-    # a qualitative judgement cannot be misread as a modelled amount.
+    # a qualitative judgment cannot be misread as a modeled amount.
     cp = voi.get("carrier_panel_prior") or {}
     panel_html = ""
     if cp.get("available"):
@@ -3113,7 +3113,7 @@ def build_voi_html(voi: dict | None) -> str:
   <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
     <div style="font-weight:700;color:{_accent}">Carrier-panel prior (from runs of homozygosity)</div>
     <div style="font-size:.72em;color:#8a94a3;border:1px solid #dfe4ea;border-radius:20px;
-                padding:2px 9px;white-space:nowrap">not monetised &middot; no dollar value</div>
+                padding:2px 9px;white-space:nowrap">not monetized &middot; no dollar value</div>
   </div>
   <div style="font-size:1.05em;font-weight:600;margin:7px 0 4px">{_esc(cp["recommendation"])}</div>
   <div style="font-size:.87em;color:#48545f">{_esc(cp["rationale"])}</div>
@@ -3123,7 +3123,7 @@ def build_voi_html(voi: dict | None) -> str:
     F<sub>ROH</sub> {cp["f_roh"]:.4f} &middot; long-ROH {cp["f_roh_long"]:.4f}
     ({cp["n_long_runs"]} long run{"" if cp["n_long_runs"] == 1 else "s"})</div>
   <div style="font-size:.75em;color:#9aa4b0;margin-top:8px;font-style:italic">
-    {_esc(cp["why_not_monetised"])}</div>
+    {_esc(cp["why_not_monetized"])}</div>
   <div style="font-size:.72em;color:#9aa4b0;margin-top:5px">{_esc(cp["src"])}</div>
 </div>"""
 
@@ -3150,7 +3150,7 @@ def build_voi_html(voi: dict | None) -> str:
     Information doesn't add health directly; it makes health <em>investment</em> more efficient, so its
     value compounds over the years you have left.</div>
   <div style="font-size:.86em;color:#177a54;margin-top:6px">
-    Modelled gain: <strong>{hc.get('pv_health_capital_gain')}</strong> discounted health-capital-years
+    Modeled gain: <strong>{hc.get('pv_health_capital_gain')}</strong> discounted health-capital-years
     {f"· morbidity threshold deferred ≈ <strong>{defer} yr</strong>" if defer else ""}</div>
 </div>"""
         if ro.get("available"):
@@ -3161,7 +3161,7 @@ def build_voi_html(voi: dict | None) -> str:
   <div style="font-size:.86em;color:#5b6673;margin-top:4px">
     Sequencing is irreversible, prices fall (~{ro.get('assumed_cost_decline',0):.0%}/yr) and interpretation
     improves (~{ro.get('assumed_knowledge_growth',0):.0%}/yr) — but the data is a permanent asset you can
-    re-analyse free, so waiting only forfeits protection.</div>
+    re-analyze free, so waiting only forfeits protection.</div>
   <div style="font-size:.86em;color:#177a54;margin-top:6px">
     Option value of waiting: <strong>{_m(ov)}</strong> → {_esc(ro.get('recommendation',''))}</div>
 </div>"""
@@ -3307,11 +3307,11 @@ def build_voi_html(voi: dict | None) -> str:
   <div style="font-size:.86em;color:#5b6673;margin-top:4px">{_esc(top_rows)}</div>
   <div style="font-size:.78em;color:#9aa4b0;margin-top:6px">{_esc(ep.get('interpretation',''))}</div>
 </div>"""
-        bh = voi.get("behavioural") or {}
+        bh = voi.get("behavioral") or {}
         if bh.get("available"):
             blocks += f"""
 <div style="flex:1;min-width:250px;background:#f7f9fb;border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px">
-  <div style="font-weight:700;color:#5b6673">Why people still don't test (behavioural)</div>
+  <div style="font-weight:700;color:#5b6673">Why people still don't test (behavioral)</div>
   <div style="font-size:.86em;color:#5b6673;margin-top:4px">
     Normative value (3% exponential): <strong>{_m(bh.get('pv_exponential',0))}</strong> ·
     with present bias (β={bh.get('present_bias_beta')}): <strong>{_m(bh.get('pv_hyperbolic',0))}</strong> ·
@@ -3332,7 +3332,7 @@ def build_voi_html(voi: dict | None) -> str:
   <table style="width:100%;border-collapse:collapse;font-size:.85em;margin-top:6px">
     <thead><tr style="text-align:left;color:#8a94a3"><th>Scenario</th>
       <th style="text-align:right">Life expectancy</th>
-      <th style="text-align:right">Realised risk</th>
+      <th style="text-align:right">Realized risk</th>
       <th style="text-align:right">vs today</th></tr></thead>
     <tbody>{lrows}</tbody></table>
   <div style="font-size:.78em;color:#9aa4b0;margin-top:6px">{_esc(lon.get('direction',''))}</div>
@@ -3720,7 +3720,7 @@ Anton 2008; Thorgeirsson 2008; Binder 2008).
 <div class="anc-caveat" style="margin-top:14px">
 Genetics contributes ~50% of the variance in substance-use-disorder risk in
 population studies, but that's variance across the population — not
-deterministic within an individual. Behaviour, environment, life circumstances,
+deterministic within an individual. Behavior, environment, life circumstances,
 and trauma history dominate individual outcomes. This section is educational.
 </div>
 </section>
@@ -3806,7 +3806,7 @@ def build_neurochemistry_html(nc: dict | None) -> str:
 <section class="neurochemistry-section" id="neurochemistry">
 <h2>Neurochemistry <span class="pro-pill">V6.12</span></h2>
 <p class="anc-intro">
-Your dopamine, serotonin, plasticity, stress, and reward-signalling profile — packaged
+Your dopamine, serotonin, plasticity, stress, and reward-signaling profile — packaged
 into a composite phenotype with concrete stimulant, SSRI, caffeine, meditation, and
 career recommendations. Grounded in the primary literature (COMT: Egan 2001 PNAS,
 Diamond 2007; BDNF: Egan 2003 Cell, Chen 2006 Science; MAOA: Caspi 2002 Science).
@@ -3814,7 +3814,7 @@ Diamond 2007; BDNF: Egan 2003 Cell, Chen 2006 Science; MAOA: Caspi 2002 Science)
 {hero}
 {domain_html}
 <div class="anc-caveat" style="margin-top:14px">
-Behavioural genetics of common variants operates at the level of <em>population
+Behavioral genetics of common variants operates at the level of <em>population
 tendencies</em>, not individual determinism. Effect sizes for most of these loci
 are modest (OR 1.1-1.5 per allele). Use as a decision-support layer for practices
 you'd already consider — not a verdict on who you are.
@@ -3917,7 +3917,7 @@ variants to the pandemics that shaped them. {ig['n_findings']} findings:
 {timeline_html}
 <div class="anc-caveat" style="margin-top:16px">
 Consumer-chip-based resistance / susceptibility estimates. Population-average
-effects; individual outcomes depend on exposure, vaccination, HLA, and behaviour.
+effects; individual outcomes depend on exposure, vaccination, HLA, and behavior.
 Vaccination and standard infection prevention still apply regardless of genotype.
 </div>
 </section>
@@ -3999,7 +3999,7 @@ def build_blood_type_html(bt: dict | None) -> str:
     d = bt["rhd"]
     s = bt["secretor"]
 
-    # Pick a colour by rarity
+    # Pick a color by rarity
     rarity = {"O+": "#3fb950", "A+": "#3fb950", "B+": "#d29922", "AB+": "#d29922",
               "O-": "#f85149", "A-": "#f85149", "B-": "#b3261e", "AB-": "#b3261e"}
     hero_color = rarity.get(combined, "#8b949e")
@@ -4495,7 +4495,7 @@ def build_detox_html(dx: dict | None) -> str:
             f'<h3 style="margin-top:18px">{_esc(cat)}</h3>{rows}'
         )
 
-    # Personalised protocol
+    # Personalized protocol
     proto = dx.get("protocol", {})
 
     def _proto_block(title, items, key_item="item", key_detail="detail"):
@@ -4516,8 +4516,8 @@ def build_detox_html(dx: dict | None) -> str:
                 f'<ul style="list-style:none;padding-left:0;margin:0">{lis}</ul>')
 
     protocol_html = (
-        _proto_block("Your personalised nutrition levers", proto.get("nutrition"))
-        + _proto_block("Behavioural protection during smoke events", proto.get("behavioural"))
+        _proto_block("Your personalized nutrition levers", proto.get("nutrition"))
+        + _proto_block("Behavioral protection during smoke events", proto.get("behavioral"))
         + _proto_block("Heavy-metal exposure & measurement", proto.get("metal"))
     )
 
@@ -4541,16 +4541,16 @@ genotype-tuned action plan.
 {score_card}
 <div class="detox-domains">{domains_html}</div>
 <div class="detox-protocol">
-  <h2 style="font-size:1.25em;margin-top:24px">Your Personalised Detox Protocol</h2>
+  <h2 style="font-size:1.25em;margin-top:24px">Your Personalized Detox Protocol</h2>
   {protocol_html}
 </div>
 <div class="anc-caveat" style="margin-top:16px">
 <strong>Informational, not diagnostic.</strong> These are consumer-chip
 genotype tendencies, not measurements of your toxicant burden or detox capacity.
 A true GSTM1/GSTT1-null status needs a PCR/CNV assay; blood-lead, urine
-heavy-metals and lung function are lab/clinical tests. The behavioural
+heavy-metals and lung function are lab/clinical tests. The behavioral
 protections during smoke events benefit everyone regardless of genotype — the
-genetics only personalise <em>emphasis</em>. Discuss supplements (especially NAC
+genetics only personalize <em>emphasis</em>. Discuss supplements (especially NAC
 and selenium) with a clinician before starting.
 </div>
 </section>
@@ -4922,7 +4922,7 @@ def build_phewas_html(p: dict | None) -> str:
             pct = res["percentile"]
             val = res.get("predicted_value")
 
-            # Evidence behind the estimate: GWAS reference, the standardised
+            # Evidence behind the estimate: GWAS reference, the standardized
             # Z-score against the reference distribution, and the specific
             # variants that drove the score (rsID, effect allele, your dose,
             # published per-allele effect). All produced by phewas._score_trait.
@@ -5033,7 +5033,7 @@ def build_phewas_html(p: dict | None) -> str:
 <p class="phewas-intro">
 Phenome-wide scoring across {p['n_traits']} traits using curated GWAS effect
 sizes — biomarkers (lipids, HbA1c, CRP, vitamin D, hormones), anthropometric,
-hematological, behavioural. {p['n_scored']}/{p['n_traits']} traits had sufficient
+hematological, behavioral. {p['n_scored']}/{p['n_traits']} traits had sufficient
 SNP coverage to score.
 </p>
 <div class="phewas-intro" style="background:#fff8e6;border:1px solid #f0e0a8;border-radius:8px;padding:10px 14px;font-size:.88em">
@@ -5278,8 +5278,8 @@ def build_reproductive_html(r: dict | None) -> str:
 <section class="rep-section" id="reproductive">
 <h2>Reproductive Genetics Simulator <span class="pro-pill">V5</span></h2>
 <p class="rep-intro">
-For each carrier finding, modelled probability of an affected child given
-different partner-ancestry carrier frequencies. Use this to prioritise
+For each carrier finding, modeled probability of an affected child given
+different partner-ancestry carrier frequencies. Use this to prioritize
 which conditions a prospective partner should be tested for.
 </p>
 {roh_context}
@@ -5339,7 +5339,7 @@ def build_medications_html(med: dict | None) -> str:
 <div class="med-card med-unknown">
   <div class="med-head">
     <span class="med-drug">{_esc(r["input"])}</span>
-    <span class="med-note">Not in PGx catalogue</span>
+    <span class="med-note">Not in PGx catalog</span>
   </div>
   <div class="med-msg">{_esc(r["message"])}</div>
 </div>
@@ -5430,7 +5430,7 @@ def build_economics_html(economics_result: dict | None) -> str:
         payback = f.get("payback_months")
         payback_txt = f"{payback} mo" if payback is not None else "—"
         # QALY gain + cost-per-QALY are computed per finding but were dropped in
-        # favour of the payer aggregate. Cost/QALY is the standard cost-
+        # favor of the payer aggregate. Cost/QALY is the standard cost-
         # effectiveness metric (≈ <$50k/QALY is conventionally "cost-effective").
         qaly = f.get("qaly_gain")
         qaly_txt = f"{qaly:.3f}".rstrip("0").rstrip(".") if isinstance(qaly, int | float) else "—"
@@ -5592,7 +5592,7 @@ def build_pharmgkb_html(pk: dict | None) -> str:
     """ClinPGx/PharmGKB clinical-annotation positions typed on this chip.
 
     High-evidence (Level 1A/1B/2A/2B) positions are shown open; the weak,
-    unreplicated Level 3/4 long tail is behind a collapsed, explicitly-labelled
+    unreplicated Level 3/4 long tail is behind a collapsed, explicitly-labeled
     disclosure. Every row is framed as an *annotated position* (with the user's
     genotype), NOT a direction-of-effect call — the source table has no risk
     allele. See module docstring for the accuracy contract.
@@ -5608,7 +5608,7 @@ def build_pharmgkb_html(pk: dict | None) -> str:
         out = ""
         for e in entries:
             pgx_note = (
-                ' <span class="pk-pgx" title="Also analysed at allele level in '
+                ' <span class="pk-pgx" title="Also analyzed at allele level in '
                 'the Pharmacogenomics section">↗ PGx</span>'
                 if e.get("pgx_gene")
                 else ""
@@ -6071,7 +6071,7 @@ def build_html_report(
                     '<div style="flex:1;min-width:180px;background:#f7f9fb;'
                     'border:1px solid #e3e7ec;border-radius:10px;padding:13px 15px">'
                     '<div style="font-size:.76em;color:#5b6673;text-transform:uppercase;'
-                    'letter-spacing:.04em">Modelled return</div>'
+                    'letter-spacing:.04em">Modeled return</div>'
                     f'<div style="font-size:1.25em;font-weight:700;color:#2b3440">'
                     f'{_roi_f:.1f}×</div>'
                     '<div style="font-size:.76em;color:#5b6673">'
@@ -7345,7 +7345,7 @@ a qualified physician, clinical pharmacist, or board-certified genetic
 counselor before acting on any finding in this report.
 <br><br>
 <strong>Reading the results:</strong> every score (polygenic, pharmacogenomic,
-ancestry, and haplogroup) is labelled with an explicit <em>confidence</em> level
+ancestry, and haplogroup) is labeled with an explicit <em>confidence</em> level
 and the number of SNPs actually typed versus expected. Results marked
 <em>low confidence</em> or <em>indeterminate</em> were computed on too few
 markers to be reliable and should not be interpreted; they are shown only for
@@ -7546,7 +7546,7 @@ sequencing for resolution.</p>
 No genetic data is transmitted to any external service. The only network call
 (if Tier 2 is enabled) is to <code>localhost:11434</code> (Ollama).</p>
 <p><strong>Polygenic Risk Scores:</strong> Each panel is a curated-variant
-weighted log-OR sum normalised to an expected Hardy-Weinberg distribution
+weighted log-OR sum normalized to an expected Hardy-Weinberg distribution
 (European reference allele frequencies), translated into a Z-score and
 percentile. Variants are drawn from CARDIoGRAMplusC4D, DIAGRAM, IGAP,
 BCAC, PRACTICAL, AFGen, GIANT and related GWAS consortia. These are
@@ -7581,7 +7581,7 @@ network call (if Tier 2 AI is enabled) is to <code>localhost:11434</code>
 <p><strong>Limitations:</strong> Findings depend on chip coverage — see the
 Quality Control section for callability per clinical domain. Many genetic
 influences require deeper testing: rare pathogenic variants (clinical
-sequencing); CYP2D6 CNVs (specialised PGx assays); full mitochondrial
+sequencing); CYP2D6 CNVs (specialized PGx assays); full mitochondrial
 sequencing (FTDNA mtFull); deep Y-DNA subclades (FTDNA Big Y-700);
 clinical-grade PGS (large biobank-derived scores); imprinting, epigenetics,
 and gene-environment interactions. Significance ratings reflect current

@@ -9,7 +9,7 @@ susceptibility profile, and produces practical clinical flags:
   • **Alcohol** — ADH1B rs1229984, ALDH2 rs671, ADH1C rs1693482, CYP2E1
     rs2031920, GABRA2 rs279858. Metabolism-side protection (East Asian
     flush) plus dependence-side risk (GABRA2 haplotype). Cross-refs OPRM1
-    for reward signalling.
+    for reward signaling.
   • **Opioid** — OPRM1 A118G rs1799971 (G-carriers: altered mu-opioid
     receptor kinetics, higher post-op morphine dose requirement, stronger
     naltrexone response — a *clinically useful* flag).
@@ -31,7 +31,7 @@ adjustment, never-smoke warning, stress-substance interaction alerts.
 
 Educational, not diagnostic. Genetics contributes ~50% of variance in
 substance-use-disorder risk in population studies, but that's variance
-across the population, not deterministic within an individual. Behaviour,
+across the population, not deterministic within an individual. Behavior,
 environment, and life circumstances dominate individual outcomes.
 
 References
@@ -107,7 +107,7 @@ def _adh1b(df):
               "No genetic protection from fast alcohol → acetaldehyde",
               "Standard ADH1B (Arg47/Arg47). Ethanol metabolism proceeds "
               "at typical European rate; no built-in flush deterrent.",
-              "Behavioural moderation is not offset by biology here.",
+              "Behavioral moderation is not offset by biology here.",
               "high", "Edenberg 2004")
 
 
@@ -196,10 +196,10 @@ def _oprm1(df):
                   "post-surgical analgesia; (2) naltrexone works BETTER in "
                   "G-carriers (Anton 2008 — one of the few positive pharmacogenetic "
                   "predictors in addiction medicine); (3) altered alcohol reward "
-                  "signalling — heterogeneous behavioural effect but real.",
+                  "signaling — heterogeneous behavioral effect but real.",
                   "**Flag this to any anesthesiologist before surgery** (may need "
                   "higher opioid dose). If alcohol-use ever becomes a concern, "
-                  "naltrexone is a genetically-favoured therapy.",
+                  "naltrexone is a genetically-favored therapy.",
                   "high", "Bond 1998; Way & Taylor 2010; Anton 2008")
     return _f(CAT_OPIOID, "OPRM1 wild-type (A/A)", "OPRM1", "rs1799971", gt,
               "neutral", "Standard mu-opioid receptor kinetics",
@@ -384,12 +384,12 @@ def build_composite(findings: list[dict]) -> dict:
     elif alc_susc >= 1 and alc_prot == 0:
         alcohol_tier = ("Modestly susceptible",
                         f"{alc_susc} dependence-risk variant(s), no metabolism protection. "
-                        "Genetics tilts modestly toward alcohol-use disorder — behaviour "
+                        "Genetics tilts modestly toward alcohol-use disorder — behavior "
                         "and context dominate.")
     elif alc_prot == 0 and alc_susc == 0:
         alcohol_tier = ("Baseline (typical European)",
                         "Neither strong protection nor strong risk. Standard European "
-                        "adult risk (~10-15% lifetime AUD). Behaviour dominates.")
+                        "adult risk (~10-15% lifetime AUD). Behavior dominates.")
     else:
         alcohol_tier = ("Mixed",
                         f"Both protective ({alc_prot}) and risk ({alc_susc}) variants — "
@@ -410,7 +410,7 @@ def build_composite(findings: list[dict]) -> dict:
             flags.append(("🚭 Never start smoking/vaping",
                           "CHRNA5 A-carrier + smoker = much higher lung-cancer and "
                           "COPD risk. If never a smoker, zero effect — currently your "
-                          "most-realised genetic prevention win."))
+                          "most-realized genetic prevention win."))
         if f["gene"] == "ALDH2" and f["impact"] == "protective":
             flags.append(("⚠️ Esophageal cancer",
                           "ALDH2*2 carriers who drink regularly have much higher "
@@ -428,7 +428,7 @@ def build_composite(findings: list[dict]) -> dict:
                    "genetic susceptibility to substance-use disorders.")
     elif susceptible >= 2 and protective == 0:
         overall = ("Elevated susceptibility",
-                   "Multiple substance-related risk variants. Behavioural moderation "
+                   "Multiple substance-related risk variants. Behavioral moderation "
                    "and mindful use patterns are especially important — genes tilt "
                    "the table.")
     elif protective >= 1 and susceptible >= 1:
@@ -438,7 +438,7 @@ def build_composite(findings: list[dict]) -> dict:
     else:
         overall = ("Baseline",
                    "No strong genetic tilts detected. Standard European adult risk. "
-                   "Behaviour dominates.")
+                   "Behavior dominates.")
 
     return {
         "alcohol_tier": alcohol_tier[0], "alcohol_narrative": alcohol_tier[1],

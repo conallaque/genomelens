@@ -4,5 +4,5 @@
     interactive     Menu-driven CLI
     compare         Predictions against measured blood work
     multi_person    Two-genome comparison (KING-robust relationship inference)
-    cohort_simulator  Population-scale value modelling behind the frontier
+    cohort_simulator  Population-scale value modeling behind the frontier
 """

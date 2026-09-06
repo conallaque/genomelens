@@ -51,7 +51,7 @@ SYSTEM_PROMPT = (
     "6. ## Ancestry & Heritage\n"
     "   What the DNA says about the user's heritage at a high level.\n\n"
     "7. ## Your Top 10 Action Items\n"
-    "   A prioritised, specific, numbered list. Concrete actions — not vague "
+    "   A prioritized, specific, numbered list. Concrete actions — not vague "
     "advice. e.g. 'Get one-time Lp(a) test', 'Methylfolate supplement instead "
     "of folic acid'. Aim for 10 items, ranked by life impact.\n\n"
     "Always include: 'This is educational information, not medical advice. "

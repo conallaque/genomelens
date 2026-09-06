@@ -18,7 +18,7 @@ Tree-walking algorithm:
                   genuinely-confirmed downstream marker (otherwise stop — never
                   guess a deeper subclade than the data supports).
   5. The reported terminal haplogroup is the DEEPEST CONFIRMED node. Inferred
-     (chip-gap) ancestors between two confirmed markers are kept but labelled.
+     (chip-gap) ancestors between two confirmed markers are kept but labeled.
 
 Strand safety: markers whose ancestral/derived alleles are a complementary pair
 (A/T or C/G) cannot be oriented from genotype alone and are skipped — clades are
@@ -516,7 +516,7 @@ def _empty(status: str, y_count: int, message: str, **extra) -> dict:
 
 def analyze_y_haplogroup(snps_df: pd.DataFrame) -> dict:
     """
-    Analyse Y-chromosome SNPs and return a result dict. The terminal haplogroup
+    Analyze Y-chromosome SNPs and return a result dict. The terminal haplogroup
     reported is always the DEEPEST CONFIRMED node — markers that are merely
     inferred across chip gaps never drive the call.
     """

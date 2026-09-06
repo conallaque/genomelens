@@ -115,7 +115,7 @@
         "rule": "Separate strength and endurance by \u22656 h on same day, or alternate days. Keep weekly endurance \u2264 90 min total when in a strength block."
       },
       "daily_readiness": {
-        "formula": "Daily readiness (0-100) = 0.30\u00b7HRV_norm + 0.25\u00b7Sleep_norm + 0.15\u00b7RestingHR_norm + 0.15\u00b7SubjectiveEnergy + 0.10\u00b7Soreness_inverse + 0.05\u00b7Mood. Each component normalised vs your 14-day rolling baseline.",
+        "formula": "Daily readiness (0-100) = 0.30\u00b7HRV_norm + 0.25\u00b7Sleep_norm + 0.15\u00b7RestingHR_norm + 0.15\u00b7SubjectiveEnergy + 0.10\u00b7Soreness_inverse + 0.05\u00b7Mood. Each component normalized vs your 14-day rolling baseline.",
         "personal_note": "Slow-recovery genotype \u2014 be MORE conservative with thresholds. Push red to 55, treat 50-64 as orange.",
         "thresholds": [
           {
@@ -143,7 +143,7 @@
           "Volume \u221250% (cut sets in half, keep load).",
           "Intensity \u221220% on top sets (RPE 6-7 instead of 8-9).",
           "Cut highest-impact work (sprints, plyo, max-effort lifts) first.",
-          "Sleep extension +30 min; emphasise pre-bed nutrition (40 g protein + carbs).",
+          "Sleep extension +30 min; emphasize pre-bed nutrition (40 g protein + carbs).",
           "Mobility/aerobic flush 2-3 sessions; full rest 1-2 days."
         ],
         "trigger_signals": "If you see: HRV \u2193 >7% for 3+ days, RPE drift (same load feels harder), sleep quality dropping, joint pain accumulating, plateau in PRs \u2265 2 weeks \u2192 deload immediately, don't wait for the scheduled one."
@@ -153,11 +153,11 @@
           "rs9939609 (FTO) AT"
         ],
         "fto_risk_allele": true,
-        "guidance": "FTO obesity-risk allele \u2014 GOOD NEWS: large studies show \u2265150 min/week of moderate aerobic exercise NEUTRALISES the FTO weight-gain effect. Aerobic exercise is non-negotiable. Strength training adds compounding benefit by raising RMR. Combine with high-protein/high-fibre eating for best fat-loss outcomes."
+        "guidance": "FTO obesity-risk allele \u2014 GOOD NEWS: large studies show \u2265150 min/week of moderate aerobic exercise NEUTRALISES the FTO weight-gain effect. Aerobic exercise is non-negotiable. Strength training adds compounding benefit by raising RMR. Combine with high-protein/high-fiber eating for best fat-loss outcomes."
       },
       "hr_zones": {
         "formula": "HRmax \u2248 208 \u2212 0.7 \u00d7 age (Tanaka). Zones as % HRmax:",
-        "polarised": "80/20 rule: 80% of weekly training in Z1\u2013Z2, 20% in Z3\u2013Z5. Avoid the 'grey zone' (Z3 every day) \u2014 neither builds base nor builds peak.",
+        "polarised": "80/20 rule: 80% of weekly training in Z1\u2013Z2, 20% in Z3\u2013Z5. Avoid the 'gray zone' (Z3 every day) \u2014 neither builds base nor builds peak.",
         "zones": [
           {
             "pct": "50\u201360%",
@@ -191,7 +191,7 @@
           {
             "level": "Protective",
             "marker": "rs12722 (COL5A1) TT",
-            "mitigation": "Favourable tendon-stiffness profile \u2014 running economy advantage.",
+            "mitigation": "Favorable tendon-stiffness profile \u2014 running economy advantage.",
             "tissue": "Achilles / patellar tendon"
           }
         ]
@@ -324,11 +324,11 @@
       "power_endurance": {
         "bias": "Power-dominant",
         "factors": [
-          "ACTN3 CT (R/X) \u2014 mixed fibre type, balanced"
+          "ACTN3 CT (R/X) \u2014 mixed fiber type, balanced"
         ],
         "ratio_pct_endurance": 0,
         "ratio_pct_power": 100,
-        "recommendation": "Prioritise heavy strength (3-6 reps) and explosive work (jumps, sprints, Olympic lifts). 2-3 short conditioning sessions/week is sufficient. Avoid chronic high-volume aerobic which blunts your strength response."
+        "recommendation": "Prioritize heavy strength (3-6 reps) and explosive work (jumps, sprints, Olympic lifts). 2-3 short conditioning sessions/week is sufficient. Avoid chronic high-volume aerobic which blunts your strength response."
       },
       "protocols": {
         "cycling_ftp_demo": {
@@ -595,7 +595,7 @@
           {
             "adjustments": [
               "Add 1 mandatory deload every 5-6 weeks",
-              "Prioritise sleep extension on hard days",
+              "Prioritize sleep extension on hard days",
               "Mobility 10 min/day non-negotiable"
             ],
             "decade": "30s",
@@ -895,7 +895,7 @@
             "90+ min endurance: 60-90 g carbs/h + 500-750 ml fluid + 300-500 mg Na",
             "Hot conditions: + 200-300 mg sodium per L fluid above standard"
           ],
-          "personalised_priority": "Strength-focused: creatine + caffeine + protein. Endurance-focused: beetroot + carbs + caffeine + sodium. Strength tier: Low hypertrophy / strength-leaning responder. VO2 tier: Unknown.",
+          "personalized_priority": "Strength-focused: creatine + caffeine + protein. Endurance-focused: beetroot + carbs + caffeine + sodium. Strength tier: Low hypertrophy / strength-leaning responder. VO2 tier: Unknown.",
           "post_workout": [
             "Protein 0.3 g/kg within 1-2 h (whey/leucine ideal for MPS spike)",
             "Carbs 0.5-1 g/kg if glycogen-depleted",
@@ -986,7 +986,7 @@
           "rs2228570 (VDR FokI) TT",
           "rs1800012 (COL1A1) GG"
         ],
-        "guidance": "Elevated stress-fracture risk markers \u2014 for runners/jumpers: ramp running mileage \u226410%/week, alternate impact days with cycling/swim, prioritise vitamin D \u226540 ng/mL, calcium 1000 mg/day, and bone-loading strength work (heavy squats, jumps) 2\u00d7/week \u2014 these strengthen bone more than running."
+        "guidance": "Elevated stress-fracture risk markers \u2014 for runners/jumpers: ramp running mileage \u226410%/week, alternate impact days with cycling/swim, prioritize vitamin D \u226540 ng/mL, calcium 1000 mg/day, and bone-loading strength work (heavy squats, jumps) 2\u00d7/week \u2014 these strengthen bone more than running."
       },
       "tapering": {
         "duration_days": 7,
@@ -1083,7 +1083,7 @@
         "factors": [
           "Antioxidant SNPs not typed"
         ],
-        "guidance": "Standard endogenous antioxidant capacity \u2014 a normal varied diet suffices. Aim for diverse plant colours weekly.",
+        "guidance": "Standard endogenous antioxidant capacity \u2014 a normal varied diet suffices. Aim for diverse plant colors weekly.",
         "reduced_capacity": false
       },
       "avoid": [
@@ -1101,7 +1101,7 @@
         "factors": [
           "rs1801198 (TCN2) GC"
         ],
-        "guidance": "Variants in B12 transport/secretor status \u2014 prioritise high-bioavailable B12 sources: clams, beef liver, sardines, eggs, dairy. Consider 500 \u00b5g methylcobalamin sublingual 2\u20133\u00d7/week if vegetarian/vegan.",
+        "guidance": "Variants in B12 transport/secretor status \u2014 prioritize high-bioavailable B12 sources: clams, beef liver, sardines, eggs, dairy. Consider 500 \u00b5g methylcobalamin sublingual 2\u20133\u00d7/week if vegetarian/vegan.",
         "lower_functional_b12": true
       },
       "caffeine": {
@@ -1201,7 +1201,7 @@
         ],
         "slow_phase2_clearance": false
       },
-      "emphasise": [
+      "emphasize": [
         "Non-starchy vegetables",
         "Berries",
         "Quinoa / oats (modest portions)",
@@ -1216,10 +1216,10 @@
       ],
       "fiber": {
         "factors": [
-          "Elevated appetite \u2014 fibre is the most powerful free satiety lever.",
-          "Salt-sensitive \u2014 potassium-rich high-fibre foods (legumes, potato) double-up benefit."
+          "Elevated appetite \u2014 fiber is the most powerful free satiety lever.",
+          "Salt-sensitive \u2014 potassium-rich high-fiber foods (legumes, potato) double-up benefit."
         ],
-        "guidance": "Target 40 g fibre/day \u2014 most adults eat 15. Practical: 1 cup oats (8 g), 1 cup berries (8 g), 1 cup beans/lentils (15 g), 2 cups veg (10 g), 1 oz chia/flax (10 g). Ramp up 5 g/week to avoid GI distress; pair with water increase.",
+        "guidance": "Target 40 g fiber/day \u2014 most adults eat 15. Practical: 1 cup oats (8 g), 1 cup berries (8 g), 1 cup beans/lentils (15 g), 2 cups veg (10 g), 1 oz chia/flax (10 g). Ramp up 5 g/week to avoid GI distress; pair with water increase.",
         "target_g": 40
       },
       "gluten": {
@@ -1228,13 +1228,13 @@
           "rs2187668 (HLA-DQ2 tag) CC",
           "rs7454108 (HLA-DQ8 tag) AA"
         ],
-        "guidance": "No DQ2/DQ8 risk haplotype typed/detected \u2014 coeliac disease is essentially ruled out. Gluten avoidance unnecessary for autoimmune reasons."
+        "guidance": "No DQ2/DQ8 risk haplotype typed/detected \u2014 celiac disease is essentially ruled out. Gluten avoidance unnecessary for autoimmune reasons."
       },
       "glycemic_threshold": {
         "factors": [
           "TCF7L2 CT"
         ],
-        "guidance": "Personal carb ceiling: ~65 g/meal at breakfast/lunch, ~50 g at dinner (circadian glucose tolerance drops PM). Reference portions: 1 cup cooked rice \u2248 45 g, 1 medium banana \u2248 27 g, 1 slice bread \u2248 15 g, 1 cup oats \u2248 27 g, 1 medium potato \u2248 37 g, 1 cup berries \u2248 14 g. Pairing with 25-30 g protein + 10 g fibre + healthy fat blunts glucose excursion 30-50%.",
+        "guidance": "Personal carb ceiling: ~65 g/meal at breakfast/lunch, ~50 g at dinner (circadian glucose tolerance drops PM). Reference portions: 1 cup cooked rice \u2248 45 g, 1 medium banana \u2248 27 g, 1 slice bread \u2248 15 g, 1 cup oats \u2248 27 g, 1 medium potato \u2248 37 g, 1 cup berries \u2248 14 g. Pairing with 25-30 g protein + 10 g fiber + healthy fat blunts glucose excursion 30-50%.",
         "max_carbs_dinner_g": 50,
         "max_carbs_per_meal_g": 65
       },
@@ -1250,14 +1250,14 @@
         "factors": [
           "Hydration SNPs not typed"
         ],
-        "guidance": "Baseline: 30\u201335 mL/kg body weight daily, +500\u2013750 mL per hour exercise. Salt-sensitive: pre-load 500 mL water on waking; emphasise potassium-rich fluids (coconut water, broth) over electrolyte powders.",
+        "guidance": "Baseline: 30\u201335 mL/kg body weight daily, +500\u2013750 mL per hour exercise. Salt-sensitive: pre-load 500 mL water on waking; emphasize potassium-rich fluids (coconut water, broth) over electrolyte powders.",
         "target_ml_per_kg": 33
       },
       "inflammation": {
         "factors": [
           "rs1800795 (IL6 -174) GG"
         ],
-        "guidance": "Mediterranean pattern with 2\u00d7 weekly fish, daily berries + nuts, 1 tsp turmeric, minimise processed foods.",
+        "guidance": "Mediterranean pattern with 2\u00d7 weekly fish, daily berries + nuts, 1 tsp turmeric, minimize processed foods.",
         "score": 2,
         "tier": "Mild inflammatory tendency"
       },
@@ -1280,7 +1280,7 @@
       "macro_periodisation": {
         "guidance": "Cycling carbs by training load improves body composition and insulin sensitivity vs flat macros. Elevated-appetite genotype: limit carb cycling depth \u2014 large --day swings can trigger evening cravings.",
         "rest_day": {
-          "carb_timing": "Lower-carb day \u2014 emphasise protein, vegetables, healthy fats. Useful for insulin sensitivity restoration.",
+          "carb_timing": "Lower-carb day \u2014 emphasize protein, vegetables, healthy fats. Useful for insulin sensitivity restoration.",
           "pct_carbs": 22,
           "pct_fat": 48,
           "pct_protein": 30
@@ -1295,9 +1295,9 @@
       "macros": {
         "factors": [
           "rs9939609 (FTO) AT \u2014 better response to lower-carb diet",
-          "rs7903146 (TCF7L2) CT \u2014 reduced glucose tolerance; minimise refined carbs",
+          "rs7903146 (TCF7L2) CT \u2014 reduced glucose tolerance; minimize refined carbs",
           "APOE \u03b54 carrier \u2014 lower saturated fat, prefer mono/poly",
-          "rs174547 (FADS1) TC \u2014 favour direct EPA/DHA from fish, not ALA"
+          "rs174547 (FADS1) TC \u2014 favor direct EPA/DHA from fish, not ALA"
         ],
         "pct_carbs": 32,
         "pct_fat": 33,
@@ -1316,7 +1316,7 @@
           "rs1801133 (MTHFR C677T) CT",
           "rs1801131 (MTHFR A1298C) AC"
         ],
-        "guidance": "Emphasise folate-rich foods: leafy greens (spinach, kale, romaine), liver, lentils, asparagus, broccoli. Avoid synthetic folic-acid fortified products (many cereals, breads) \u2014 they compete with active folate. Choose methylfolate-supplemented options if available.",
+        "guidance": "Emphasize folate-rich foods: leafy greens (spinach, kale, romaine), liver, lentils, asparagus, broccoli. Avoid synthetic folic-acid fortified products (many cereals, breads) \u2014 they compete with active folate. Choose methylfolate-supplemented options if available.",
         "needs_methylation_support": true
       },
       "omega3": {
@@ -1370,7 +1370,7 @@
           "typed": [],
           "z": null
         },
-        "Coeliac_risk": {
+        "Celiac_risk": {
           "coverage": 100.0,
           "max_possible": 2.8,
           "missing": [],
@@ -1504,7 +1504,7 @@
             "Pair high-AGE meals with high-polyphenol foods (berries, herbs, tea).",
             "Use a thermometer \u2014 most home ovens overshoot by 15-20 \u00b0C."
           ],
-          "rationale": "Advanced glycation end-products (AGEs) form when proteins/fats are exposed to dry, high heat. They accelerate vascular ageing and oxidative stress. Same food, different method, can differ 10-100\u00d7 in AGE load.",
+          "rationale": "Advanced glycation end-products (AGEs) form when proteins/fats are exposed to dry, high heat. They accelerate vascular aging and oxidative stress. Same food, different method, can differ 10-100\u00d7 in AGE load.",
           "rules": [
             {
               "AGE_load": "Lowest",
@@ -1554,14 +1554,14 @@
             "macro_emphasis": "Iron-rich foods + vitamin C cofactor",
             "training": "Reduce volume 20-30% if symptoms; gentle movement helps cramps"
           },
-          "note": "Activate by passing reproductive_state. Tailors macros, iron, and training-fuelling to follicular/ovulatory/luteal/menstrual phases.",
+          "note": "Activate by passing reproductive_state. Tailors macros, iron, and training-fueling to follicular/ovulatory/luteal/menstrual phases.",
           "ovulation_d14_16": {
             "macro_emphasis": "Antioxidants for ovulatory inflammation \u2014 berries, leafy greens",
             "training": "Peak power output \u2014 schedule key sessions"
           }
         },
         "fasting": {
-          "break_fast_meal": "Break-fast meal: 30-40 g protein + 8-10 g fibre + healthy fat + low-GI carbs \u226430 g. e.g. 3-egg omelette + spinach + avocado + \u00bd cup berries.",
+          "break_fast_meal": "Break-fast meal: 30-40 g protein + 8-10 g fiber + healthy fat + low-GI carbs \u226430 g. e.g. 3-egg omelette + spinach + avocado + \u00bd cup berries.",
           "cautions": [
             "Pregnant/breastfeeding \u2192 no fasting beyond \u226412 h overnight.",
             "History of eating disorder \u2192 no restrictive windows.",
@@ -1645,7 +1645,7 @@
             "modifiers_applied": [
               null,
               "vinegar 1 tbsp pre-meal",
-              "fibre 14 g",
+              "fiber 14 g",
               "fat 22 g slows absorption",
               null,
               null
@@ -1957,7 +1957,7 @@
             {
               "food": "Whole grains",
               "servings": "\u22653/day",
-              "why": "B vitamins, fibre"
+              "why": "B vitamins, fiber"
             },
             {
               "food": "Fish (esp oily)",
@@ -1967,7 +1967,7 @@
             {
               "food": "Beans/legumes",
               "servings": "\u22653/week",
-              "why": "Folate, fibre, B vitamins"
+              "why": "Folate, fiber, B vitamins"
             },
             {
               "food": "Poultry",
@@ -2122,7 +2122,7 @@
               "mg": 200
             }
           ],
-          "guidance": "Polyphenol target: 1500 mg/day. Mixing diverse sources beats single-source mega-dosing. Daily template: 1 cup berries (380), 8 oz coffee (350), 2 tbsp olive oil (180), 1 cup green tea (200), 1 apple (110), 1 oz dark chocolate (250). Total \u22481500 mg. Polyphenols cluster: anthocyanins (berries) + flavanols (cocoa, tea) + hydroxytyrosols (olive) + lignans (flax, sesame) + curcuminoids (turmeric) = broad signalling. Reduced antioxidant capacity flagged \u2014 double down on diversity.",
+          "guidance": "Polyphenol target: 1500 mg/day. Mixing diverse sources beats single-source mega-dosing. Daily template: 1 cup berries (380), 8 oz coffee (350), 2 tbsp olive oil (180), 1 cup green tea (200), 1 apple (110), 1 oz dark chocolate (250). Total \u22481500 mg. Polyphenols cluster: anthocyanins (berries) + flavanols (cocoa, tea) + hydroxytyrosols (olive) + lignans (flax, sesame) + curcuminoids (turmeric) = broad signaling. Reduced antioxidant capacity flagged \u2014 double down on diversity.",
           "target_mg_per_day": 1500
         },
         "pre_bed_mps": {
@@ -2268,7 +2268,7 @@
             "1 tbsp extra-virgin olive oil drizzle",
             "Pinch cinnamon + dash of vanilla"
           ],
-          "macros_est": "~35 g protein \u00b7 12 g carbs \u00b7 28 g fat \u00b7 8 g fibre",
+          "macros_est": "~35 g protein \u00b7 12 g carbs \u00b7 28 g fat \u00b7 8 g fiber",
           "method": "1) Cook oats with water + cinnamon. 2) Scramble eggs in olive oil. 3) Assemble bowl: oats base, top with yoghurt, eggs alongside, scatter berries, flax, chia, walnuts. 4) Drizzle olive oil. Eat within 30 min.",
           "name": "High-Protein Breakfast Bowl",
           "why_for_you": [
@@ -2288,12 +2288,12 @@
             "2 tbsp pumpkin seeds",
             "Dressing: 2 tbsp olive oil + 1 tbsp lemon juice + Dijon + garlic"
           ],
-          "macros_est": "~35 g protein \u00b7 30 g carbs \u00b7 22 g fat \u00b7 16 g fibre",
+          "macros_est": "~35 g protein \u00b7 30 g carbs \u00b7 22 g fat \u00b7 16 g fiber",
           "method": "1) Toss greens with dressing in large bowl. 2) Layer beans/chickpeas, cucumber, tomatoes, onion, avocado. 3) Top with protein + seeds. 4) Mix thoroughly so flavour reaches every bite (eating speed matters \u2014 aim 20 min).",
           "name": "Volume-Density Power Salad",
           "why_for_you": [
-            "FTO/MC4R appetite genotype \u2014 volume + fibre + protein density",
-            "Chickpeas: fibre + protein + folate",
+            "FTO/MC4R appetite genotype \u2014 volume + fiber + protein density",
+            "Chickpeas: fiber + protein + folate",
             "Avocado MUFA + olive oil for HDL maintenance"
           ]
         },
@@ -2307,7 +2307,7 @@
             "4 garlic cloves minced + 1 tsp turmeric + \u00bd tsp black pepper + 1 tsp oregano",
             "1 tbsp tahini + 2 tbsp lemon juice + water (drizzle sauce)"
           ],
-          "macros_est": "~45 g protein \u00b7 18 g carbs \u00b7 30 g fat \u00b7 11 g fibre",
+          "macros_est": "~45 g protein \u00b7 18 g carbs \u00b7 30 g fat \u00b7 11 g fiber",
           "method": "1) Preheat oven 425 \u00b0F. 2) Toss cruciferous + sweet potato + onion in olive oil + spices on sheet pan; roast 18 min. 3) Add protein + lemon slices; roast 12 more min (salmon) or 18 (chicken). 4) Whisk tahini + lemon + water. 5) Plate, drizzle tahini sauce, finish with fresh parsley.",
           "name": "Mediterranean Sheet-Pan Dinner",
           "why_for_you": [
@@ -2322,7 +2322,7 @@
         "factors": [
           "rs699 (AGT M235T) AG \u2014 salt-sensitive hypertension allele"
         ],
-        "guidance": "Reduce sodium to \u22642.3 g/day; emphasise potassium-rich foods (leafy greens, beans, potato). DASH-style pattern especially beneficial.",
+        "guidance": "Reduce sodium to \u22642.3 g/day; emphasize potassium-rich foods (leafy greens, beans, potato). DASH-style pattern especially beneficial.",
         "sensitive": true
       },
       "satiety": {
@@ -2330,7 +2330,7 @@
         "factors": [
           "rs9939609 (FTO) AT"
         ],
-        "guidance": "High-satiety eating pattern is critical. Anchor every meal with: (1) 30\u201340 g protein (eggs, Greek yoghurt, fish, lean meat, tofu), (2) 8\u201310 g fibre (legumes, berries, vegetables), (3) volume from non-starchy veg. Front-load calories to breakfast/lunch; keep dinner lighter. Avoid liquid calories (juice, smoothies as meals \u2014 they bypass satiety). Pre-meal water 500 mL + salad reduces total intake. 12-hour overnight fast helps; longer (16:8) only if it doesn't trigger evening binges.",
+        "guidance": "High-satiety eating pattern is critical. Anchor every meal with: (1) 30\u201340 g protein (eggs, Greek yoghurt, fish, lean meat, tofu), (2) 8\u201310 g fiber (legumes, berries, vegetables), (3) volume from non-starchy veg. Front-load calories to breakfast/lunch; keep dinner lighter. Avoid liquid calories (juice, smoothies as meals \u2014 they bypass satiety). Pre-meal water 500 mL + salad reduces total intake. 12-hour overnight fast helps; longer (16:8) only if it doesn't trigger evening binges.",
         "satiety_score": 1
       },
       "saturated_fat": {
@@ -2338,7 +2338,7 @@
         "factors": [
           "APOE: rs429358=TC, rs7412=CC (\u03b54 carrier)"
         ],
-        "guidance": "APOE \u03b54 carrier \u2014 markedly elevated LDL response to saturated fat. Cap saturated fat at \u226415 g/day (~7% of calories). Replace butter/coconut oil with extra-virgin olive oil and avocado; limit red meat to 1\u20132\u00d7/week, choose poultry/fish. Prioritise MUFA (olive, avocado, almonds) and PUFA (walnuts, fatty fish). Mediterranean pattern is best-evidence.",
+        "guidance": "APOE \u03b54 carrier \u2014 markedly elevated LDL response to saturated fat. Cap saturated fat at \u226415 g/day (~7% of calories). Replace butter/coconut oil with extra-virgin olive oil and avocado; limit red meat to 1\u20132\u00d7/week, choose poultry/fish. Prioritize MUFA (olive, avocado, almonds) and PUFA (walnuts, fatty fish). Mediterranean pattern is best-evidence.",
         "saturated_fat_cap_g": 15
       },
       "shopping_list": [
@@ -2414,7 +2414,7 @@
         "factors": [
           "BCO1 not typed"
         ],
-        "guidance": "Normal \u03b2-carotene conversion \u2014 colourful plant sources (sweet potato, carrot, kale, pumpkin) cover retinol needs."
+        "guidance": "Normal \u03b2-carotene conversion \u2014 colorful plant sources (sweet potato, carrot, kale, pumpkin) cover retinol needs."
       },
       "vitamin_c": {
         "factors": [
@@ -2430,7 +2430,7 @@
           "rs2282679 (GC/VDBP) CC",
           "rs2228570 (VDR FokI) TT"
         ],
-        "guidance": "Prioritise high-D foods: wild salmon, sardines, herring, egg yolks, UV-treated mushrooms, fortified dairy. Combine with daytime sun exposure where possible (10-30 min, depending on skin tone, latitude, season).",
+        "guidance": "Prioritize high-D foods: wild salmon, sardines, herring, egg yolks, UV-treated mushrooms, fortified dairy. Combine with daytime sun exposure where possible (10-30 min, depending on skin tone, latitude, season).",
         "needs_more_intake": true
       },
       "vitamin_e": {

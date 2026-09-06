@@ -2,14 +2,14 @@
 Golden-snapshot regression tests for the V6 modules.
 
 These lock the exact structured output of each module against a committed JSON
-snapshot. Any intentional behaviour change must be paired with a deliberate
+snapshot. Any intentional behavior change must be paired with a deliberate
 snapshot update:
 
     pytest --snapshot-update tests/golden/test_v6_golden.py
 
 …and the diff in `tests/snapshots/*.json` must be reviewed in the PR.
 
-The fixtures normalise out volatile fields (timestamps, UUIDs) so the
+The fixtures normalize out volatile fields (timestamps, UUIDs) so the
 comparisons are stable across runs.
 """
 

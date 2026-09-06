@@ -132,7 +132,7 @@ V(T)=\frac{\text{VOI}\cdot\left(1-\tfrac{T}{H}\right)-C\,(1-c)^{T}}{(1+r)^{T}}
 ```
 
 *In plain English:* sequencing gets cheaper every year, so why not wait? Because two things
-cut the other way. First, **you can re-analyse stored data for free forever** — so improving
+cut the other way. First, **you can re-analyze stored data for free forever** — so improving
 science reaches early testers too, and isn't a reason to delay. Second, **every year you
 wait is a year you can't act** on what you'd have found (the `1 − T/H` term). For a genome
 with real findings, waiting destroys more value than the price drop recovers → *test now*.
@@ -222,10 +222,10 @@ version: risk accumulated only over the years you're actually alive to accumulat
 **14 · Longer lifespans make this worth *more*, not less**
 
 Rising life expectancy pushes in the same direction twice: less competing mortality means
-more genetic risk is actually realised, **and** a longer horizon means prevention compounds
-for more years. Modelled explicitly:
+more genetic risk is actually realized, **and** a longer horizon means prevention compounds
+for more years. Modeled explicitly:
 
-| Scenario | Life expectancy | Realised risk | vs today |
+| Scenario | Life expectancy | Realized risk | vs today |
 |---|---|---|---|
 | 2025 baseline | ~79 | 73.2% | — |
 | 2050 projection | ~85 | 77.0% | +5.3% |
@@ -259,7 +259,7 @@ R^{2}_{\text{eff}}=R^{2}_{\text{EUR}}\times \rho_{\text{ancestry}},\qquad
 scores predict less well elsewhere — retaining roughly a quarter of their accuracy in
 African-ancestry individuals. Because risk runs through the liability model, **a less
 informative score automatically pulls your estimate back toward the population average**,
-which is the statistically correct behaviour. This is a data-equity problem in genomics,
+which is the statistically correct behavior. This is a data-equity problem in genomics,
 and the model surfaces it rather than burying it in a footnote.
 
 **17 · Which uncertainty is worth resolving (EVPPI), and why people still don't test**
@@ -273,7 +273,7 @@ and the model surfaces it rather than burying it in a footnote.
 would I actually decide differently?"* It tells you where a confirmatory test is worth
 buying — and where more precision would be wasted money.
 
-And a behavioural coda: under **prospect theory**, a certain up-front cost hurts about
+And a behavioral coda: under **prospect theory**, a certain up-front cost hurts about
 **2.25×** more than an equivalent uncertain future gain feels good, while **hyperbolic
 discounting** further shrinks benefits that arrive decades out. Together they explain the
 gap between a test that is clearly worth it on paper and one people actually buy — an
@@ -311,7 +311,7 @@ S_{\text{central}} = \underbrace{B_L(1+\pi)}_{\text{better analysis}} - C_{\text
 ```
 
 *In plain English:* going local costs you something real — a platform with more data may
-genuinely analyse it better. Local only wins if the expected privacy cost is **bigger than
+genuinely analyze it better. Local only wins if the expected privacy cost is **bigger than
 that sacrifice**. Note what cancels: `B_L` and the sequencing cost drop out of the
 comparison entirely, because you pay the test either way.
 
@@ -356,7 +356,7 @@ exploit state-level variation in US genetic-privacy law and find that regimes gr
 patients **control** over their genetic data raise testing incidence by **+83%**, while
 regimes that merely notify people of privacy risk and ask them to consent — *without*
 granting control — **lower testing by 69%**. That contrast maps almost directly onto the
-choice modelled here: local analysis is the maximal-control regime; uploading under a
+choice modeled here: local analysis is the maximal-control regime; uploading under a
 terms-of-service click is the notice-without-control regime. Survey evidence agrees on
 direction — NORC finds **~80%** of Americans hold privacy concerns about DNA testing, **~17%**
 of non-testers name privacy as their reason, and **four in five** non-testers say they would
@@ -371,7 +371,7 @@ So the dominant welfare loss from centralisation is **Akerlof-style unravelling 
 people who never test at all** — a deadweight loss concentrated in transactions that never
 happen, which is precisely why it is easy to miss: it is invisible in the data of people who
 did test. It also reframes what this tool is. GenomeLens is not mainly "the private option
-for people who would have tested anyway" — modelled this way it is an **access
+for people who would have tested anyway" — modeled this way it is an **access
 intervention**, and in welfare terms access effects typically dominate quality effects.
 
 *Why this matters methodologically:* the model converts a values argument ("privacy is
@@ -389,7 +389,7 @@ and worth stating plainly because an unexplained pair looks like duplication:
 
 | | `econ/markov.py` | `econ_engine.run_markov` |
 |---|---|---|
-| Question | *Would a payer fund genotype-guided care for a population?* | *What is this individual's own pooled finding set worth, once competing mortality is modelled?* |
+| Question | *Would a payer fund genotype-guided care for a population?* | *What is this individual's own pooled finding set worth, once competing mortality is modeled?* |
 | Cohort | Hypothetical, parameterised | Built from this person's pooled conditions |
 | Mortality | Gompertz | US life table (2015), sex-specific |
 | Within-cycle correction | Half-cycle (trapezoidal) | Simpson's 1/3 |
@@ -446,7 +446,7 @@ it is fixed capacity (buildings, salaried staff, overhead) that persists whether
 that case occurs. Treating an average as a marginal cost is one of the most common ways a
 health-economic model overstates savings — the "freeing a bed doesn't save its average
 cost" error. The averted-cost side is therefore scaled by an explicit, documented
-marginal-cost fraction, which only ever *reduces* the modelled saving:
+marginal-cost fraction, which only ever *reduces* the modeled saving:
 
 ```math
 \text{averted cost} = p \times \text{RRR} \times \text{COI}_{\text{avg}} \times m,\qquad 0 < m < 1
@@ -458,10 +458,10 @@ is genuinely freed.
 
 *Cost-saving is not the same as cost-effective.* Most prevention **adds** cost while
 buying health cheaply: it is cost-*effective* (good value per healthy year) without being
-cost-*saving* (money back). Net monetary benefit is dominated by monetised QALYs, so
+cost-*saving* (money back). Net monetary benefit is dominated by monetized QALYs, so
 dividing it by the test price and calling the result "ROI" implies a cash return that
 isn't there. The report therefore separates the **cash** side (averted cost − spend) from
-**monetised health**, and states which of three honest verdicts applies: cost-saving,
+**monetized health**, and states which of three honest verdicts applies: cost-saving,
 cost-effective but cost-adding, or not cost-effective at this threshold.
 Refs: Drummond et al. (2015); prevention economics — cost-effective ≠ cost-saving.
 
@@ -506,7 +506,7 @@ A second axis catches the same genotype surfacing in two panels — a COMT resul
 once by the neurochemistry module and again by pharmacogenomic prescribing guidance was
 valued twice. Matching is against an explicit gene vocabulary rather than a regex for
 gene-shaped words, which reads "MI", "MACE" and "B12" as genes.
-Refs: independence assumptions in combined-risk modelling; Drummond et al. (2015) on
+Refs: independence assumptions in combined-risk modeling; Drummond et al. (2015) on
 double counting.
 
 **22a · Adherence — from trial efficacy to real-world effectiveness**
@@ -537,8 +537,8 @@ acting requires of the person, not which organ is involved:
 | Archetype | Value | What it covers | Tier |
 |---|---|---|---|
 | Pharmacological | 0.50 | Chronic preventive medication — statins, metformin, SSRIs | published (WHO 2003) |
-| Screening | 0.65 | A programme you attend — colonoscopy, imaging surveillance, ferritin monitoring | assumption |
-| Lifestyle | 0.35 | Sustained behaviour change — diet, activity, abstinence | assumption |
+| Screening | 0.65 | A program you attend — colonoscopy, imaging surveillance, ferritin monitoring | assumption |
+| Lifestyle | 0.35 | Sustained behavior change — diet, activity, abstinence | assumption |
 
 An unmapped condition falls back to 0.50 rather than to 1.0. Defaulting a gap to perfect
 adherence would make the gap invisible by making it flattering. All four are sampled from
@@ -551,14 +551,14 @@ course while crediting only the adhered fraction of the benefit would be the mir
 of the double-count §22 was built to remove. What does **not** scale is the one-off test
 cost — you pay for the array whether or not you act on it. That asymmetry is the whole
 result: adherence leaves the intervention's own cost per QALY roughly alone, and moves
-cost-effectiveness by spreading a fixed cost over fewer realised QALYs.
+cost-effectiveness by spreading a fixed cost over fewer realized QALYs.
 
 *Reported as two corrections, not one.* Pooling is measured at full adherence and adherence
 is measured after pooling, so neither absorbs the other and the pair sums to the total
 shrinkage. The report shows all three tiers per condition — naive additive, pooled
-efficacy, realised effectiveness — because collapsing them would hide two separate
-judgement calls behind one smaller number. On the synthetic reference genome the efficacy-to-
-effectiveness gap costs **61.6% of the modelled health benefit**, and the individual's
+efficacy, realized effectiveness — because collapsing them would hide two separate
+judgment calls behind one smaller number. On the synthetic reference genome the efficacy-to-
+effectiveness gap costs **61.6% of the modeled health benefit**, and the individual's
 economic sheet is reported on the same basis rather than on the undiscounted one.
 
 Refs: WHO (2003), *Adherence to Long-Term Therapies: Evidence for Action*; Drummond et al.
@@ -578,7 +578,7 @@ range — and a **tier** stating honestly how much authority stands behind it:
 |---|---|
 | `published` | The value appears in the cited source; a reader can read it off the paper. |
 | `derived` | Computed from the source by a stated arithmetic step — inflated, converted, or taken as a midpoint. The step is recorded so it can be disputed separately from the source. |
-| `assumption` | A judgement call with no published anchor. Permitted, but enumerated individually in the report rather than blended in with sourced values. |
+| `assumption` | A judgment call with no published anchor. Permitted, but enumerated individually in the report rather than blended in with sourced values. |
 
 The registry is validated at import: a `published` or `derived` parameter without a
 citation is an error, and so is an `assumption` without a justification. An unregistered
@@ -590,7 +590,7 @@ tables hold several hundred more figures. Quoting registry coverage alone would 
 statement about a subset phrased as a statement about the whole, which is the same species
 of error the registry exists to prevent. So the report gives both: of roughly **350**
 parameters, **47%** resolve to a PMID or DOI, **99%** carry at least a named literature
-attribution, and under **1%** rest on judgement alone. The unresolved sources are listed
+attribution, and under **1%** rest on judgment alone. The unresolved sources are listed
 as a ranked work queue, largest first.
 
 *Making provenance load-bearing.* The distribution and range fields are not documentation.

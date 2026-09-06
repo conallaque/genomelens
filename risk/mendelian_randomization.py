@@ -3,7 +3,7 @@ Mendelian Randomization Inference
 =================================
 
 Uses pre-defined exposure → outcome MR effect estimates from large
-published studies, personalised by the user's own polygenic score for
+published studies, personalized by the user's own polygenic score for
 the exposure trait. The output is "if your genetics predict X is shifted
 by ΔSD, the literature-derived causal effect on outcome Y is approximately Z".
 
@@ -67,7 +67,7 @@ def _score_exposure(snps_df, exposure_snps):
     return z, n_used
 
 
-# ─── MR causal-effect catalogue ──────────────────────────────────────────────
+# ─── MR causal-effect catalog ──────────────────────────────────────────────
 # Each entry:
 #   exposure: name + SNPs for scoring the user's exposure PRS
 #   outcome: name + literature MR causal estimate (β_MR per SD increase in exposure)
@@ -219,7 +219,7 @@ MR_LIBRARY: list[dict] = [
         "explanation": (
             "Iron overload causally elevates cardiovascular mortality risk. "
             "Most relevant in HFE C282Y homozygotes; in the typical range "
-            "iron status is more important to optimise downward than upward."
+            "iron status is more important to optimize downward than upward."
         ),
         "exposure_snps": [
             ("rs1800562", "A", 0.30, 0.06),
@@ -235,7 +235,7 @@ MR_LIBRARY: list[dict] = [
         "explanation": (
             "MR supports a causal protective effect of higher SHBG on T2D, "
             "particularly in women. Mechanism involves altered free-hormone "
-            "balance and hepatic insulin signalling."
+            "balance and hepatic insulin signaling."
         ),
         "exposure_snps": [
             ("rs1799941", "A", 0.20, 0.27),
@@ -277,7 +277,7 @@ MR_LIBRARY: list[dict] = [
 
 
 def analyze_mr(snps_df: pd.DataFrame, sex: str | None = None) -> dict:
-    """Compute personalised MR projections for each exposure-outcome pair."""
+    """Compute personalized MR projections for each exposure-outcome pair."""
     findings: list[dict] = []
     for entry in MR_LIBRARY:
         if entry.get("applies_to") == "male" and sex == "female":

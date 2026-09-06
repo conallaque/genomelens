@@ -30,7 +30,7 @@ def test_death_state_is_absorbing():
 
 
 def test_transition_matrix_handles_competing_exits_over_one():
-    # Two large exit probabilities must be normalised, not left summing above 1.
+    # Two large exit probabilities must be normalized, not left summing above 1.
     P = mk.build_transition_matrix(0.8, 0.1, 0.7)
     for row in P:
         assert abs(sum(row) - 1.0) < 1e-12

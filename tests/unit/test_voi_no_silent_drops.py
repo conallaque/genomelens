@@ -1,7 +1,7 @@
 """Regression: a finding must never leave the economic model without a trace.
 
 ``_classify_category`` returns ('', '') for any category string it does not
-recognise, and ``_collect`` then skips that finding. Because health_economics.py
+recognize, and ``_collect`` then skips that finding. Because health_economics.py
 gains new ``source=`` labels regularly, an unmapped label silently removed
 findings from the model while the report still claimed a complete computation.
 
@@ -48,7 +48,7 @@ def test_oversight_makes_fully_computed_false():
 
 
 def test_documented_exclusion_does_not_count_as_incomplete():
-    # A category listed in NOT_VALUED is a modelling decision, not a gap.
+    # A category listed in NOT_VALUED is a modeling decision, not a gap.
     r = voi.analyze_value_of_information(
         _econ("Pharmacogenomics", "Family Planning"),
         None, None, n_mc=200, seed=1)
@@ -69,7 +69,7 @@ def test_every_module_source_reaches_the_model():
     assert len(valued) + len(excluded) == len(cats)
     # Exclusions come in two kinds and both must be documented.
     #
-    # ON PRINCIPLE — Family Planning, because monetising a reproductive outcome
+    # ON PRINCIPLE — Family Planning, because monetizing a reproductive outcome
     # prices a prospective child; Longevity, because the composite
     # re-aggregates variants already valued individually (double counting) at a
     # rate that had no published source.

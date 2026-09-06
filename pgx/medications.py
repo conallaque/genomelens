@@ -6,7 +6,7 @@ Cross-references a user-specified medication list against PGx phenotypes
 already calculated in pgx.py. Generates a focused "Medication Review"
 section in the report.
 
-Drug-name normalisation: brand → generic. The internal lookup table maps
+Drug-name normalization: brand → generic. The internal lookup table maps
 each drug to (metabolizing_gene, optional_pathway_note). When the
 phenotype is found in pgx_result, we surface the recommendation;
 otherwise we emit a "not flagged by PGx" note explaining why.
@@ -112,7 +112,7 @@ BRAND_TO_GENERIC: dict[str, str] = {
 
 
 # Generic → list of (gene, pathway_note). Multi-gene drugs list all relevant
-# metabolizers/transporters. Note: this table reflects CPIC-prioritised
+# metabolizers/transporters. Note: this table reflects CPIC-prioritized
 # gene-drug pairs, not every metabolic pathway.
 DRUG_GENES: dict[str, list[dict[str, str]]] = {
     # SSRIs / SNRIs
@@ -238,7 +238,7 @@ def lookup_medication(drug_input: str, pgx_result: dict) -> dict:
             "message": (
                 f"'{drug_input}' is not in the PGx lookup table. This does not "
                 "mean it has no genetic implications — just that this report "
-                "does not currently catalogue it."
+                "does not currently catalog it."
             ),
             "findings": [],
         }

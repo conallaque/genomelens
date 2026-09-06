@@ -118,7 +118,7 @@ def _reasons(f) -> list[str]:
     random person carries the variant — where the parametric path conditions it
     on the **event probability**, p_rx x p_adr x rrr. For CYP2C19 that is 0.30
     against 0.01, a factor of 30, and it accounts for essentially all of the
-    $4,452 vs $490 gap: the curated figure is 98% monetised QALY.
+    $4,452 vs $490 gap: the curated figure is 98% monetized QALY.
     """
     out = [
         "QALY conditioned on genotype prevalence (curated) rather than on "

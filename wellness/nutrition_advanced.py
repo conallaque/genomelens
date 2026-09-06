@@ -92,7 +92,7 @@ _PGS_DEFS = {
         ("rs1229984",  "A", 0.85, "ADH1B*2"),   # A = strongly protective
         ("rs671",      "A", 1.20, "ALDH2*2"),
     ],
-    "Coeliac_risk": [
+    "Celiac_risk": [
         ("rs2187668",  "T", 0.85, "HLA-DQ2.5"),
         ("rs7454108",  "C", 0.55, "HLA-DQ8"),
     ],
@@ -130,7 +130,7 @@ def _score_pgs(snps_df, defn: list[tuple]) -> dict:
             "z": None, "percentile": None,
             "typed": loci_typed, "missing": loci_missing,
         }
-    # Normalise: assume population mean ≈ max/2, SD ≈ max/6 (Gaussian approx)
+    # Normalize: assume population mean ≈ max/2, SD ≈ max/6 (Gaussian approx)
     pop_mean = max_possible / 2
     pop_sd = max_possible / 6 if max_possible > 0 else 1
     z = (raw - pop_mean) / pop_sd
@@ -199,10 +199,10 @@ def cardiometabolic_dashboard(pgs: dict) -> dict:
          "add 2 g plant sterols/day (fortified margarine), 25 g oats β-glucan."),
         ("Triglycerides", "Postprandial triglyceride response",
          "TG handling robust — moderate refined carbs tolerated.",
-         "TG spike postprandially — minimise added sugar (<25 g/day), alcohol "
+         "TG spike postprandially — minimize added sugar (<25 g/day), alcohol "
          "(major TG driver), refined grains. Push omega-3 to 2 g EPA+DHA/day."),
         ("HDL_cholesterol", "HDL maintenance",
-         "HDL maintenance favourable — standard exercise/diet sustains it.",
+         "HDL maintenance favorable — standard exercise/diet sustains it.",
          "Genetic tendency toward low HDL — high-intensity exercise (HIIT, lifting), "
          "MUFA emphasis (olive, almonds, avocado), moderate alcohol (if no ALDH2 issue)."),
         ("T2D", "Glycaemic vulnerability",
@@ -268,7 +268,7 @@ def inflammation_index(snps_df) -> dict:
         )
     elif score >= 1:
         tier = "Mild inflammatory tendency"
-        diet = "Mediterranean pattern with 2× weekly fish, daily berries + nuts, 1 tsp turmeric, minimise processed foods."
+        diet = "Mediterranean pattern with 2× weekly fish, daily berries + nuts, 1 tsp turmeric, minimize processed foods."
     else:
         tier = "Low baseline inflammation"
         diet = "Standard balanced diet; no special anti-inflammatory emphasis needed."
@@ -353,7 +353,7 @@ def detoxification_profile(snps_df) -> dict:
             "induces NQO1/GST), 2-3 alliums (garlic, onion — sulfur for sulfation), "
             "1 cup berries (anthocyanins), 1 tsp turmeric, glycine-rich foods (bone broth, "
             "gelatin) for glycine conjugation, NAC- or whey-derived cysteine for "
-            "glutathione synthesis. Minimise alcohol, char-grilled meats, smoking, and "
+            "glutathione synthesis. Minimize alcohol, char-grilled meats, smoking, and "
             "high-dose acetaminophen."
             if slow_phase2 else
             "Phase I/II balance acceptable. Support with cruciferous veg 3×/week + "
@@ -402,7 +402,7 @@ def glycemic_threshold(snps_df) -> dict:
             f"~{dinner_threshold} g at dinner (circadian glucose tolerance drops PM). "
             f"Reference portions: 1 cup cooked rice ≈ 45 g, 1 medium banana ≈ 27 g, "
             f"1 slice bread ≈ 15 g, 1 cup oats ≈ 27 g, 1 medium potato ≈ 37 g, "
-            f"1 cup berries ≈ 14 g. Pairing with 25-30 g protein + 10 g fibre + "
+            f"1 cup berries ≈ 14 g. Pairing with 25-30 g protein + 10 g fiber + "
             f"healthy fat blunts glucose excursion 30-50%."
         ),
     }
@@ -431,7 +431,7 @@ def macro_periodisation(macros: dict, glycemic: dict, satiety: dict) -> dict:
             "pct_carbs": rest_day_carb,
             "pct_fat": rest_fat,
             "pct_protein": 100 - rest_day_carb - rest_fat,
-            "carb_timing": "Lower-carb day — emphasise protein, vegetables, healthy fats. Useful for insulin sensitivity restoration.",
+            "carb_timing": "Lower-carb day — emphasize protein, vegetables, healthy fats. Useful for insulin sensitivity restoration.",
         },
         "guidance": (
             f"Cycling carbs by training load improves body composition and insulin "
@@ -593,8 +593,8 @@ def generate_recipes(result_partial: dict) -> list[dict]:
     # Recipe 1 — Breakfast bowl (adjusts for ApoE, lactose, gluten, choline)
     breakfast = {
         "name": "High-Protein Breakfast Bowl",
-        "macros_est": "~30 g protein · 35 g carbs · 18 g fat · 12 g fibre" if not low_carb
-                      else "~35 g protein · 12 g carbs · 28 g fat · 8 g fibre",
+        "macros_est": "~30 g protein · 35 g carbs · 18 g fat · 12 g fiber" if not low_carb
+                      else "~35 g protein · 12 g carbs · 28 g fat · 8 g fiber",
         "ingredients": [
             ("3 large eggs" if not e4 else "1 whole egg + 3 egg whites"),
             ("1 cup steel-cut oats (cooked)" if not low_carb and not gluten
@@ -608,7 +608,7 @@ def generate_recipes(result_partial: dict) -> list[dict]:
         ],
         "why_for_you": [
             "Eggs supply choline (PEMT)" if not e4 else "Reduced whole-egg dose limits saturated fat (APOE ε4)",
-            "Flax+chia give ALA for FADS poor converters" if high_omega3 else "Flax adds fibre + ALA",
+            "Flax+chia give ALA for FADS poor converters" if high_omega3 else "Flax adds fiber + ALA",
             "Greek yoghurt = aged-fermented, lower-lactose protein" if lactose else "Greek yoghurt = high-protein satiety anchor",
             "Berries deliver anthocyanins (Nrf2 antioxidant pathway)",
         ],
@@ -627,8 +627,8 @@ def generate_recipes(result_partial: dict) -> list[dict]:
                          "(super-taster bitter mitigation)" if bitter else "roasted at 400 °F with olive oil")
     dinner = {
         "name": "Mediterranean Sheet-Pan Dinner",
-        "macros_est": "~40 g protein · 40 g carbs · 22 g fat · 14 g fibre"
-                      if not low_carb else "~45 g protein · 18 g carbs · 30 g fat · 11 g fibre",
+        "macros_est": "~40 g protein · 40 g carbs · 22 g fat · 14 g fiber"
+                      if not low_carb else "~45 g protein · 18 g carbs · 30 g fat · 11 g fiber",
         "ingredients": [
             protein,
             "1 lb broccoli + Brussels sprouts (Phase II / cruciferous)",
@@ -655,7 +655,7 @@ def generate_recipes(result_partial: dict) -> list[dict]:
     # Recipe 3 — High-satiety lunch (appetite-elevated genotype)
     lunch = {
         "name": ("Volume-Density Power Salad" if appetite else "Mediterranean Bowl"),
-        "macros_est": "~35 g protein · 30 g carbs · 22 g fat · 16 g fibre",
+        "macros_est": "~35 g protein · 30 g carbs · 22 g fat · 16 g fiber",
         "ingredients": [
             "2 cups mixed greens (arugula + spinach + romaine)",
             ("1 cup chickpeas (rinsed)" if not iron_overload else "1 cup white beans"),
@@ -666,9 +666,9 @@ def generate_recipes(result_partial: dict) -> list[dict]:
             "Dressing: 2 tbsp olive oil + 1 tbsp lemon juice + Dijon + garlic",
         ],
         "why_for_you": [
-            ("FTO/MC4R appetite genotype — volume + fibre + protein density" if appetite
+            ("FTO/MC4R appetite genotype — volume + fiber + protein density" if appetite
              else "Balanced satiating lunch"),
-            ("Beans replace chickpeas to keep iron load down" if iron_overload else "Chickpeas: fibre + protein + folate"),
+            ("Beans replace chickpeas to keep iron load down" if iron_overload else "Chickpeas: fiber + protein + folate"),
             "Avocado MUFA + olive oil for HDL maintenance",
         ],
         "method": (

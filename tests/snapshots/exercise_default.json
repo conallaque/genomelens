@@ -95,7 +95,7 @@
     "rule": "Separate strength and endurance by \u22656 h on same day, or alternate days. Keep weekly endurance \u2264 90 min total when in a strength block."
   },
   "daily_readiness": {
-    "formula": "Daily readiness (0-100) = 0.30\u00b7HRV_norm + 0.25\u00b7Sleep_norm + 0.15\u00b7RestingHR_norm + 0.15\u00b7SubjectiveEnergy + 0.10\u00b7Soreness_inverse + 0.05\u00b7Mood. Each component normalised vs your 14-day rolling baseline.",
+    "formula": "Daily readiness (0-100) = 0.30\u00b7HRV_norm + 0.25\u00b7Sleep_norm + 0.15\u00b7RestingHR_norm + 0.15\u00b7SubjectiveEnergy + 0.10\u00b7Soreness_inverse + 0.05\u00b7Mood. Each component normalized vs your 14-day rolling baseline.",
     "personal_note": "Slow-recovery genotype \u2014 be MORE conservative with thresholds. Push red to 55, treat 50-64 as orange.",
     "thresholds": [
       {
@@ -123,7 +123,7 @@
       "Volume \u221250% (cut sets in half, keep load).",
       "Intensity \u221220% on top sets (RPE 6-7 instead of 8-9).",
       "Cut highest-impact work (sprints, plyo, max-effort lifts) first.",
-      "Sleep extension +30 min; emphasise pre-bed nutrition (40 g protein + carbs).",
+      "Sleep extension +30 min; emphasize pre-bed nutrition (40 g protein + carbs).",
       "Mobility/aerobic flush 2-3 sessions; full rest 1-2 days."
     ],
     "trigger_signals": "If you see: HRV \u2193 >7% for 3+ days, RPE drift (same load feels harder), sleep quality dropping, joint pain accumulating, plateau in PRs \u2265 2 weeks \u2192 deload immediately, don't wait for the scheduled one."
@@ -133,11 +133,11 @@
       "rs9939609 (FTO) AT"
     ],
     "fto_risk_allele": true,
-    "guidance": "FTO obesity-risk allele \u2014 GOOD NEWS: large studies show \u2265150 min/week of moderate aerobic exercise NEUTRALISES the FTO weight-gain effect. Aerobic exercise is non-negotiable. Strength training adds compounding benefit by raising RMR. Combine with high-protein/high-fibre eating for best fat-loss outcomes."
+    "guidance": "FTO obesity-risk allele \u2014 GOOD NEWS: large studies show \u2265150 min/week of moderate aerobic exercise NEUTRALISES the FTO weight-gain effect. Aerobic exercise is non-negotiable. Strength training adds compounding benefit by raising RMR. Combine with high-protein/high-fiber eating for best fat-loss outcomes."
   },
   "hr_zones": {
     "formula": "HRmax \u2248 208 \u2212 0.7 \u00d7 age (Tanaka). Zones as % HRmax:",
-    "polarised": "80/20 rule: 80% of weekly training in Z1\u2013Z2, 20% in Z3\u2013Z5. Avoid the 'grey zone' (Z3 every day) \u2014 neither builds base nor builds peak.",
+    "polarised": "80/20 rule: 80% of weekly training in Z1\u2013Z2, 20% in Z3\u2013Z5. Avoid the 'gray zone' (Z3 every day) \u2014 neither builds base nor builds peak.",
     "zones": [
       {
         "pct": "50\u201360%",
@@ -171,7 +171,7 @@
       {
         "level": "Protective",
         "marker": "rs12722 (COL5A1) TT",
-        "mitigation": "Favourable tendon-stiffness profile \u2014 running economy advantage.",
+        "mitigation": "Favorable tendon-stiffness profile \u2014 running economy advantage.",
         "tissue": "Achilles / patellar tendon"
       }
     ]
@@ -304,11 +304,11 @@
   "power_endurance": {
     "bias": "Power-dominant",
     "factors": [
-      "ACTN3 CT (R/X) \u2014 mixed fibre type, balanced"
+      "ACTN3 CT (R/X) \u2014 mixed fiber type, balanced"
     ],
     "ratio_pct_endurance": 0,
     "ratio_pct_power": 100,
-    "recommendation": "Prioritise heavy strength (3-6 reps) and explosive work (jumps, sprints, Olympic lifts). 2-3 short conditioning sessions/week is sufficient. Avoid chronic high-volume aerobic which blunts your strength response."
+    "recommendation": "Prioritize heavy strength (3-6 reps) and explosive work (jumps, sprints, Olympic lifts). 2-3 short conditioning sessions/week is sufficient. Avoid chronic high-volume aerobic which blunts your strength response."
   },
   "protocols": {
     "cycling_ftp_demo": {
@@ -575,7 +575,7 @@
       {
         "adjustments": [
           "Add 1 mandatory deload every 5-6 weeks",
-          "Prioritise sleep extension on hard days",
+          "Prioritize sleep extension on hard days",
           "Mobility 10 min/day non-negotiable"
         ],
         "decade": "30s",
@@ -875,7 +875,7 @@
         "90+ min endurance: 60-90 g carbs/h + 500-750 ml fluid + 300-500 mg Na",
         "Hot conditions: + 200-300 mg sodium per L fluid above standard"
       ],
-      "personalised_priority": "Strength-focused: creatine + caffeine + protein. Endurance-focused: beetroot + carbs + caffeine + sodium. Strength tier: Low hypertrophy / strength-leaning responder. VO2 tier: Unknown.",
+      "personalized_priority": "Strength-focused: creatine + caffeine + protein. Endurance-focused: beetroot + carbs + caffeine + sodium. Strength tier: Low hypertrophy / strength-leaning responder. VO2 tier: Unknown.",
       "post_workout": [
         "Protein 0.3 g/kg within 1-2 h (whey/leucine ideal for MPS spike)",
         "Carbs 0.5-1 g/kg if glycogen-depleted",
@@ -966,7 +966,7 @@
       "rs2228570 (VDR FokI) TT",
       "rs1800012 (COL1A1) GG"
     ],
-    "guidance": "Elevated stress-fracture risk markers \u2014 for runners/jumpers: ramp running mileage \u226410%/week, alternate impact days with cycling/swim, prioritise vitamin D \u226540 ng/mL, calcium 1000 mg/day, and bone-loading strength work (heavy squats, jumps) 2\u00d7/week \u2014 these strengthen bone more than running."
+    "guidance": "Elevated stress-fracture risk markers \u2014 for runners/jumpers: ramp running mileage \u226410%/week, alternate impact days with cycling/swim, prioritize vitamin D \u226540 ng/mL, calcium 1000 mg/day, and bone-loading strength work (heavy squats, jumps) 2\u00d7/week \u2014 these strengthen bone more than running."
   },
   "tapering": {
     "duration_days": 7,

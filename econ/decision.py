@@ -199,7 +199,7 @@ def breakeven(rebuild: Callable[[], dict], *, parameter: str,
               steps: int = 60) -> dict:
     """Value of one parameter at which net benefit crosses zero.
 
-    When a judgement call drives the conclusion, its point value is less
+    When a judgment call drives the conclusion, its point value is less
     interesting than its margin: how wrong could this assumption be before the
     recommendation changes? A breakeven comfortably outside the parameter's
     plausible range is reassuring; one inside it means the recommendation is
@@ -401,7 +401,7 @@ def subgroup_analysis(*, coi_key: str = "CAD", rrr: float | None = None,
         "annual_incidence": annual_incidence,
         "note": (f"Illustrative, at {annual_incidence:.1%} annual incidence — "
                  f"this shows how the value of prevention changes with age, "
-                 f"not a personalised risk estimate. Differences across age "
+                 f"not a personalized risk estimate. Differences across age "
                  f"come mostly from competing mortality: a prevented event is "
                  f"worth less to someone less likely to survive to "
                  f"experience it."),
@@ -414,7 +414,7 @@ def distributional_cea(baseline_qaly_by_group: dict[str, float],
     """Equity-weighted analysis using an Atkinson social welfare function.
 
     Standard cost-effectiveness is distribution-blind: a QALY counts the same
-    whoever gets it. Distributional CEA asks whether a programme widens or
+    whoever gets it. Distributional CEA asks whether a program widens or
     narrows health inequality, and prices that alongside total health.
 
     ``inequality_aversion`` is the Atkinson parameter. The value used in
@@ -473,7 +473,7 @@ def distributional_cea(baseline_qaly_by_group: dict[str, float],
         "note": ("The equally-distributed equivalent is the health level "
                  "which, if everyone had it, society would value as much as "
                  "the actual unequal distribution. A gain larger than the "
-                 "gain in the plain mean means the programme is "
+                 "gain in the plain mean means the program is "
                  "equity-improving as well as health-improving."),
     }
 
@@ -530,7 +530,7 @@ def analyze_decision_layer(rebuild: Callable[[], dict], *,
 
     # Distributional analysis across the age strata the subgroup model just
     # produced: younger groups start with more remaining health, so gains that
-    # favour them widen the gap.
+    # favor them widen the gap.
     sub = out["subgroups"]
     if sub.get("available"):
         by_age = {f"age {r['age']}": max(0.5, (100 - r["age"]) * 0.2)
@@ -555,7 +555,7 @@ def wgs_marginal_value(*, chip_findings_present: bool = True,
     """Expected value of sequencing over a genotyping array, before buying it.
 
     THE PROBLEM THIS SOLVES. The report's ``marginal_chip_to_wgs`` figure sums
-    the modelled value of findings tagged ``wgs_only``. Those findings come
+    the modeled value of findings tagged ``wgs_only``. Those findings come
     only from a VCF, so on chip input there are none and the figure is $0 —
     every time, for everybody. That is not the finding it looks like. It says
     "your array data contains no sequencing-only findings", which is true by
@@ -614,29 +614,29 @@ def wgs_marginal_value(*, chip_findings_present: bool = True,
     net = gross - incremental_cost
 
     nns = (1.0 / incremental_yield) if incremental_yield > 0 else None
-    # REALISED vs PROSPECTIVE. The prospective figure answers "should I buy
+    # REALIZED vs PROSPECTIVE. The prospective figure answers "should I buy
     # sequencing", which is the right question BEFORE testing. Once a VCF is in
     # hand the question has changed: sequencing already happened, and either it
     # found something an array could not or it did not. Reporting only the
     # population probability then buries the answer — a genome carrying two
     # sequencing-only findings was told it had a "1 in 56 chance" of carrying
     # one, which reads as a forecast about a fact already settled.
-    realised = int(n_wgs_only_findings) > 0
+    realized = int(n_wgs_only_findings) > 0
     return {
         "available": True,
-        "basis": "realised" if realised else "prospective",
-        "realised": realised,
+        "basis": "realized" if realized else "prospective",
+        "realized": realized,
         "realised_headline": (
             f"Sequencing has already found {int(n_wgs_only_findings)} finding"
             f"{'' if int(n_wgs_only_findings) == 1 else 's'} in this genome "
             f"that a genotyping array cannot produce, carrying "
-            f"${round(wgs_only_findings_value):,} of modelled net benefit "
+            f"${round(wgs_only_findings_value):,} of modeled net benefit "
             f"between them. The prospective figures below describe the "
             f"population this genome was drawn from"
             + (f" — roughly 1 person in {round(nns):,} carries such a finding"
                if nns else "")
             + ". For this input that question is already settled: this genome "
-              "is one of them." if realised else ""),
+              "is one of them." if realized else ""),
         "expected_incremental_yield": round(incremental_yield, 5),
         "number_needed_to_sequence": (round(nns) if nns else None),
         "value_per_finding": round(value_per_finding),

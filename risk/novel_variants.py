@@ -7,7 +7,7 @@ It says nothing about the millions of variants ClinVar has not classified. Phase
 fills that gap: for every protein-altering variant the sample carries that is **not**
 already a ClinVar P/LP hit, look it up in offline, tabix-indexed **computational
 pathogenicity predictors** and surface the *predicted-damaging, rare* ones — always
-labelled as **computational predictions, never clinical calls**.
+labeled as **computational predictions, never clinical calls**.
 
 Predictor registry (pluggable, each independently graceful):
   * **AlphaMissense** (CC BY 4.0 — commercial-OK) — primary missense predictor.
@@ -27,7 +27,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from pathlib import Path
 
-# Reuse the strand/indel-normalisation + zygosity helpers from Phase 2 so the two
+# Reuse the strand/indel-normalization + zygosity helpers from Phase 2 so the two
 # modules agree on what "the same variant" and "carries this allele" mean.
 from .clinical_variants import _norm_chrom, norm_key, zygosity_for_alt
 
@@ -137,7 +137,7 @@ def _load_uniprot_map() -> dict[str, str]:
 
     Absent is a real state, not an error: the map is a convenience file and the
     curated overrides still answer for the ACMG genes without it. It degrades to
-    the old behaviour rather than raising mid-scan.
+    the old behavior rather than raising mid-scan.
     """
     global _uniprot_map_cache
     if _uniprot_map_cache is not None:
@@ -251,8 +251,8 @@ class Predictor:
         ``build`` is the reference build of the *input genome*. A table keyed on
         a different build is not a degraded answer, it is an answer about other
         variants, so this refuses instead of scoring and records why in
-        ``reject_reason``. Passing no build keeps the old first-hit behaviour,
-        which only the licence manifest needs.
+        ``reject_reason``. Passing no build keeps the old first-hit behavior,
+        which only the license manifest needs.
         """
         self.reject_reason = ""
         if not _HAVE_PYSAM:
@@ -381,7 +381,7 @@ def _parse_alphamissense(rows, ref, alt):
 
 def _parse_revel(rows, ref, alt):
     """REVEL table (bgzipped CSV→TSV): ... ref alt ... REVEL ... Match ref/alt,
-    return MAX REVEL score. Column layout after setup normalisation:
+    return MAX REVEL score. Column layout after setup normalization:
     chr pos ref alt REVEL (5-col slim table produced by setup_revel)."""
     best = None
     for c in rows:

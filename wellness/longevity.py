@@ -66,7 +66,7 @@ def longevity_composite(nutrition: dict, exercise: dict) -> dict:
         apoe_score = 90
     else:
         apoe_score = 75
-    components.append({"component": "APOE / cognitive ageing", "score": apoe_score, "weight": 0.10})
+    components.append({"component": "APOE / cognitive aging", "score": apoe_score, "weight": 0.10})
 
     # Athletic capacity (predicts all-cause mortality strongly)
     athl = profile.get("overall_score", 50)
@@ -119,7 +119,7 @@ def longevity_composite(nutrition: dict, exercise: dict) -> dict:
             f"genetic cardiometabolic risk, inflammatory tone, APOE status, athletic "
             f"capacity, musculoskeletal resilience, recovery, and circadian alignment. "
             f"It is a snapshot of HEADWINDS and TAILWINDS — actual lifespan outcomes are "
-            f"~70% behavioural, so even a low genetic score can be substantially offset "
+            f"~70% behavioral, so even a low genetic score can be substantially offset "
             f"by lifestyle, and a high score can be squandered."
         ),
     }
@@ -133,7 +133,7 @@ def _longevity_tier(score: float) -> str:
     if score >= 50:
         return "Average — usual mix of strengths and risks"
     if score >= 35:
-        return "Headwind — multiple risk axes; behavioural levers matter more"
+        return "Headwind — multiple risk axes; behavioral levers matter more"
     return "Strong headwind — lifestyle interventions are mandatory, not optional"
 
 
@@ -245,7 +245,7 @@ def _quarterly_labs(q: int) -> list[str]:
             "hs-CRP", "Fasting glucose + HbA1c + insulin", "Vitamin D 25(OH)",
             "Ferritin + transferrin saturation", "CBC + comprehensive metabolic panel",
             "Magnesium, B12, folate, homocysteine"],
-        2: ["Skip — establish behavioural changes; no remeasure until 12 weeks in."],
+        2: ["Skip — establish behavioral changes; no remeasure until 12 weeks in."],
         3: ["hs-CRP (track inflammation response)", "HbA1c", "Vitamin D",
             "Lipid panel if making major dietary shifts"],
         4: ["Full panel repeat — track 12-month change vs Q1 baseline.",
@@ -364,7 +364,7 @@ def executive_summary(nutrition: dict, exercise: dict, longevity: dict) -> dict:
         ],
         "non_negotiable_daily": [
             f"≥{nutrition.get('caloric',{}).get('protein_g_per_kg',1.6)} g/kg protein",
-            f"≥{nutrition.get('fiber',{}).get('target_g',38)} g fibre",
+            f"≥{nutrition.get('fiber',{}).get('target_g',38)} g fiber",
             "Sleep 7.5-9 h",
             "8-10k steps minimum",
             "10 min mobility",

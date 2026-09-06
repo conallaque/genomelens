@@ -14,14 +14,14 @@ Examples of what it catches:
   • **Fasting-glucose ≥ 100 × HbA1c < 5.7** — the classic acute-stress /
     poor-sleep morning-of-draw pattern, not real dysglycemia.
   • **Favorable-genome leverage score** — a person with few genetic risk
-    anchors has more of their eventual healthspan defined by behaviour
+    anchors has more of their eventual healthspan defined by behavior
     than someone whose genome is already pushing them toward pathology.
     Their upside is bigger; so is their downside if they neglect lifestyle.
   • **Ancestral-diet fit** — Northern-European + LCT persistent + Yamnaya×EEF
     affinity → Mediterranean+dairy diet is *genetically appropriate*, not
     just generically healthy.
   • **APOE ε4 × elevated LDL** — LDL matters ~2× more with ε4.
-  • **CHRNA5 A-carrier who has never smoked** — an actively-realised
+  • **CHRNA5 A-carrier who has never smoked** — an actively-realized
     prevention success worth acknowledging.
   • **Warrior COMT + high MAOA + prediabetic glucose** — the stress-driven
     glucose spike pattern, not metabolic disease.
@@ -169,7 +169,7 @@ def _detect_apoe_lipid_amplification(tier1, bloodwork):
         f"average person.",
         "**Priority action:** aim for LDL <100 (ideally <70) and ApoB <90 "
         "(ideally <80). This may involve dietary saturated-fat reduction, "
-        "soluble fibre, exercise, and — if lifestyle alone doesn't move it "
+        "soluble fiber, exercise, and — if lifestyle alone doesn't move it "
         "— early statin discussion with a physician despite your young age. "
         "Also relevant for Alzheimer's-risk trajectory over the next 40 years.",
         [{"module": "apoe", "value": apoe},
@@ -179,7 +179,7 @@ def _detect_apoe_lipid_amplification(tier1, bloodwork):
 
 
 def _detect_chrna5_prevention_success(neurochem, meta):
-    """CHRNA5 A-carrier who has not started smoking — realised prevention."""
+    """CHRNA5 A-carrier who has not started smoking — realized prevention."""
     if not neurochem:
         return None
     chrna5 = None
@@ -195,13 +195,13 @@ def _detect_chrna5_prevention_success(neurochem, meta):
         return None
     return _insight(
         "chrna5_realised_prevention_success",
-        "CHRNA5 A-carrier — non-smoking is an actively-realised prevention success",
-        "Cross-panel: risk gene × behaviour", "informational",
+        "CHRNA5 A-carrier — non-smoking is an actively-realized prevention success",
+        "Cross-panel: risk gene × behavior", "informational",
         "You carry the CHRNA5 α5 nAChR risk allele. In people who never "
         "start smoking, this variant does nothing — it only matters if you "
         "smoke, in which case you would smoke harder and have markedly "
         "higher lung-cancer / COPD risk. Your non-smoker status is quietly "
-        "the single highest-value behavioural decision your genome cares "
+        "the single highest-value behavioral decision your genome cares "
         "about.",
         "Continue avoiding cigarettes, vapes, and cigar/cigarillos — "
         "**including social smoking** — indefinitely. If you're ever tempted, "
@@ -245,7 +245,7 @@ def _detect_ancestral_diet_fit(deep_ancestry, immuno):
         f"years adapting to Mediterranean-plus-dairy foodways: wheat, "
         f"barley, olives, wine, dairy fermentation (cheese/yogurt), grass-"
         f"fed meat. This isn't just 'a healthy diet' — it is **the diet "
-        f"your genome was actually optimised for**.",
+        f"your genome was actually optimized for**.",
         "Base your eating on: whole grains, legumes, olive oil, moderate "
         "fermented dairy, fish/red meat in moderation, vegetables, moderate "
         "red wine, minimal processed foods. Avoid the two categories your "
@@ -337,7 +337,7 @@ def _detect_favorable_genome_leverage(tier1, prs_result, immuno, neurochem,
             "Your genome sits in a rare cluster where the intervention math "
             "is genuinely favorable. Nearly every major fork in human "
             "evolutionary history has landed on the protective side for "
-            "your lineage. Practical translation: **behaviour is the "
+            "your lineage. Practical translation: **behavior is the "
             "trajectory** — you don't have anchors dragging you toward a "
             "specific pathology, which means the environment you build for "
             "yourself over the next 40 years will dominate the outcome. "
@@ -460,7 +460,7 @@ def _detect_coffee_synthesis(neurochem, pgx_result):
                 break
     return _insight(
         "coffee_protocol",
-        "Your personalised coffee protocol (COMT × CYP1A2 × MAOA)",
+        "Your personalized coffee protocol (COMT × CYP1A2 × MAOA)",
         "Cross-panel: neurochemistry × PGx", "actionable",
         f"COMT {c.get('comt_class','?')} + MAOA "
         f"{c.get('maoa_class','?')}"

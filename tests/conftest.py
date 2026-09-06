@@ -136,9 +136,9 @@ _FHIR_REF_RE = _re.compile(
 )
 
 
-def _normalise(obj):
+def _normalize(obj):
     """Make dict/list comparable across runs: drop volatile keys (timestamps,
-    UUIDs) and normalise FHIR resource references to their type only."""
+    UUIDs) and normalize FHIR resource references to their type only."""
     if isinstance(obj, dict):
         out = {}
         for k, v in obj.items():
@@ -150,10 +150,10 @@ def _normalise(obj):
             if k == "reference" and isinstance(v, str) and _FHIR_REF_RE.match(v):
                 out[k] = v.split("/")[0] + "/<id>"
                 continue
-            out[k] = _normalise(v)
+            out[k] = _normalize(v)
         return out
     if isinstance(obj, list):
-        return [_normalise(v) for v in obj]
+        return [_normalize(v) for v in obj]
     if isinstance(obj, str) and obj.startswith("urn:uuid:"):
         return "urn:uuid:<volatile>"
     return obj
@@ -176,7 +176,7 @@ def assert_snapshot(request):
     def _compare(name: str, actual: dict) -> None:
         SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
         path = SNAPSHOT_DIR / f"{name}.json"
-        actual_norm = _normalise(actual)
+        actual_norm = _normalize(actual)
         if update or not path.exists():
             path.write_text(json.dumps(actual_norm, indent=2, sort_keys=True,
                                        default=str))

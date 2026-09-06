@@ -31,7 +31,7 @@ FIELD CONTRACTS
     The condition anchor. Selects BOTH the cost of illness and the QALY
     decrement from the parameter registry via ``engine.COI_KEY_TO_PARAM``, so
     the decrement is registry-backed and tiered rather than a module literal.
-    ``None`` means the gene is deliberately not monetised — see NOT_VALUED_GENES.
+    ``None`` means the gene is deliberately not monetized — see NOT_VALUED_GENES.
 
 ``penetrance``
     Probability that a carrier of a pathogenic variant in this gene develops
@@ -108,7 +108,7 @@ GENE_ANCHORS: dict[str, dict] = {
         "src": "Ladabaum et al. (2011) Ann Intern Med",
         "finding": "MSH6 Lynch syndrome variant",
     },
-    # LOOKUP, not a judgement: PMS2 is a Lynch mismatch-repair gene managed by
+    # LOOKUP, not a judgment: PMS2 is a Lynch mismatch-repair gene managed by
     # the same colonoscopy surveillance as MLH1/MSH2/MSH6, so it takes the
     # anchor those three already use. Its penetrance is set below the other MMR
     # genes on ten Broeke et al. (2015) J Clin Oncol, which found PMS2 carrier
@@ -138,7 +138,7 @@ GENE_ANCHORS: dict[str, dict] = {
         "src": "Nherera et al. (2011) Heart — FH CEA",
         "finding": "APOB familial hypercholesterolemia",
     },
-    # LOOKUP, not a judgement: PCSK9 gain-of-function causes the same
+    # LOOKUP, not a judgment: PCSK9 gain-of-function causes the same
     # autosomal-dominant familial hypercholesterolaemia phenotype as LDLR and
     # APOB, treated on the same lipid-lowering pathway, so it takes the anchor
     # both already use.
@@ -157,7 +157,7 @@ GENE_ANCHORS: dict[str, dict] = {
 # Each of these has a real curated action and a real clinical meaning. What none
 # of them has is a registry-backed cost-of-illness anchor for its condition, and
 # the registry holds no entry for endocrine neoplasia, cardiac arrhythmia,
-# hypertrophic cardiomyopathy, paediatric retinoblastoma, or a multi-site
+# hypertrophic cardiomyopathy, pediatric retinoblastoma, or a multi-site
 # cancer syndrome.
 #
 # Assigning them an approximate anchor would have been easy and would have
@@ -214,9 +214,9 @@ NOT_VALUED_GENES: dict[str, dict] = {
     },
     "RB1": {
         "finding": "RB1 retinoblastoma variant",
-        "clinical_benefit": "Paediatric eye exams + family screening",
+        "clinical_benefit": "Pediatric eye exams + family screening",
         "reason": "`qaly_loss_cancer` is an adult, stage-weighted decrement. "
-                  "Applying it to a paediatric ocular cancer would borrow a "
+                  "Applying it to a pediatric ocular cancer would borrow a "
                   "figure derived from a different population.",
         "src": "Soliman et al. (2016) J AAPOS",
     },

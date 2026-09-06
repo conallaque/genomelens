@@ -226,7 +226,7 @@ def plain_verdict(cea: dict, *, wtp: float | None = None) -> dict:
                 "tone": "negative"}
     if cost < 0 and qaly > 0:
         return {"headline": "Worth doing — and it saves money",
-                "plain": (f"Acting on these findings is modelled to improve "
+                "plain": (f"Acting on these findings is modeled to improve "
                           f"health and reduce medical spending by about "
                           f"{plain_money(-cost)} over the period. That is "
                           f"unusual: most prevention improves health while "
@@ -310,7 +310,7 @@ def plain_actions(conditions: Sequence[dict], *, top: int = 5) -> list[dict]:
         out.append({
             "condition": c.get("condition", ""),
             "what": f"Reduce your risk of {_name(c.get('condition', ''))}",
-            "why": (f"{flagged} Acting on it is modelled to cut that risk by "
+            "why": (f"{flagged} Acting on it is modeled to cut that risk by "
                     f"about {rrr:.0%}."),
             "scale": (f"On the model's assumptions, that is roughly 1 person "
                       f"in {nns:,} avoiding the condition altogether."
@@ -360,7 +360,7 @@ def build_plain_summary(pooled: dict | None) -> dict:
                    "has measured directly for most of these findings. Treat "
                    "the figures as a considered estimate, not a forecast.")
     elif share >= 25:
-        weakest = ("A meaningful share of this answer rests on judgement "
+        weakest = ("A meaningful share of this answer rests on judgment "
                    "rather than published evidence. The direction is more "
                    "trustworthy than the exact numbers.")
     else:
@@ -377,7 +377,7 @@ def build_plain_summary(pooled: dict | None) -> dict:
             "net": plain_money(-float(cea.get("incremental_cost", 0) or 0)),
             "plain": (
                 f"Acting on these findings costs about {plain_money(upfront)} "
-                f"and is modelled to avoid about {plain_money(cost_averted)} "
+                f"and is modeled to avoid about {plain_money(cost_averted)} "
                 f"of medical spending over {horizon:.0f} years."),
         },
         "payback": payback,

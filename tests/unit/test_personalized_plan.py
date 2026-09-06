@@ -149,7 +149,7 @@ def test_render_html_smoke() -> None:
         phewas_result=_phewas_stub(),
     )
     html = pp.render_plan_html(plan)
-    assert "Personalised Plan" in html
+    assert "Personalized Plan" in html
     assert "Pillars at a glance" in html
     assert "supplements.html" in html
     # Reconciliation section appears only when there are diverged rows

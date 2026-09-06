@@ -79,7 +79,7 @@ def money(v, *, missing: str = MISSING) -> str:
     """``$1,234`` / ``-$1,234``. The sign leads; the currency symbol follows it.
 
     Whole dollars. Cents are noise at every magnitude this report deals in, and
-    showing them invites the reader to believe a modelled estimate is precise to
+    showing them invites the reader to believe a modeled estimate is precise to
     the penny.
     """
     d = _dec(v)
@@ -114,7 +114,7 @@ def qaly(v, *, missing: str = MISSING) -> str:
     a finding contributing 0.00065 QALYs displayed as ``0.00`` — indistinguishable
     from a finding contributing nothing at all, in a table whose whole purpose is
     to separate those two cases. A reader could not tell "too small to matter"
-    from "not modelled".
+    from "not modeled".
 
     So precision adapts: three decimals normally, more when three would round a
     genuinely non-zero quantity to zero, and an explicit ``<0.00001`` floor below
@@ -214,7 +214,7 @@ def one_in(v, *, missing: str = MISSING) -> str:
 def ratio(numerator, denominator, *, missing: str = MISSING) -> str:
     """``2.4x``. Never rendered as ``N:1`` and never called a return on investment.
 
-    The report's health-economic value already includes monetised health, so a
+    The report's health-economic value already includes monetized health, so a
     ratio built from it is not money coming back to anyone. Callers must label
     what is being divided.
     """

@@ -18,7 +18,7 @@ this module implements a simplified per-window approach:
   5. Flag windows whose call deviates strongly from the genome-wide
      ancestry estimate — these are the candidate ancestry-switch
      segments / admixture relics.
-  6. Render an SVG "chromosome painting" using superpopulation colours.
+  6. Render an SVG "chromosome painting" using superpopulation colors.
 
 Limitations (called out in the report):
   * The AIM panel is small (~14 markers); window calls in regions with
@@ -44,14 +44,14 @@ except Exception:
                       "SAS": "South Asian", "AMR": "Admixed American"}
 
 
-# Superpopulation colours for chromosome painting
+# Superpopulation colors for chromosome painting
 SUPERPOP_COLORS = {
     "EUR": "#3b82f6",   # blue
     "AFR": "#f59e0b",   # orange
     "EAS": "#10b981",   # green
     "SAS": "#a855f7",   # purple
     "AMR": "#ef4444",   # red
-    "UNK": "#cbd5e1",   # grey — unassigned (no AIM in window)
+    "UNK": "#cbd5e1",   # gray — unassigned (no AIM in window)
 }
 
 # Approximate chromosome lengths (Mb) for SVG sizing
@@ -71,7 +71,7 @@ GENE_ANNOTATIONS: list[tuple] = [
     ("7", 117, 118, "CFTR — cystic fibrosis"),
     ("9", 21, 23, "9p21 — CAD/T2D/cancer"),
     ("11", 5, 6, "HBB — sickle cell / β-thal"),
-    ("15", 28, 29, "OCA2 / HERC2 — eye colour"),
+    ("15", 28, 29, "OCA2 / HERC2 — eye color"),
     ("17", 41, 42, "BRCA1"),
     ("13", 32, 33, "BRCA2"),
     ("19", 45, 46, "APOE — Alzheimer's / lipids"),
@@ -231,7 +231,7 @@ def analyze_local_ancestry(snps_df: pd.DataFrame,
 # ─── SVG chromosome painting ─────────────────────────────────────────────────
 
 def render_chromosome_painting_svg(local_ancestry: dict, width: int = 760) -> str:
-    """Render a chromosome painting SVG with windows coloured by local ancestry call."""
+    """Render a chromosome painting SVG with windows colored by local ancestry call."""
     chroms = list(CHROM_LENGTHS_MB.keys())
     n = len(chroms)
     bar_h = 14

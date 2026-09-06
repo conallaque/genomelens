@@ -59,7 +59,7 @@ def test_module_ai_spec_keys_match_report_section_ids():
 def test_ai_grounding_guard_flags_fabricated_numbers():
     # Anti-hallucination guardrail: numbers absent from the source data are flagged.
     ctx = "CAD PRS high; value $57,000; WTP $100,000; 3% discount."
-    clean = "Your CAD risk is elevated; the modelled value is about $57,000 at 3%."
+    clean = "Your CAD risk is elevated; the modeled value is about $57,000 at 3%."
     dirty = "Risk is 87% and cost $1,234,567 per a 2019 study; MTHFR raises it 42%."
     assert analyze._ground_ai_output(clean, ctx) == []
     flagged = analyze._ground_ai_output(dirty, ctx)

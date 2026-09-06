@@ -196,7 +196,7 @@ def test_scale_to_payer_100k_members():
     assert payer["total_benefit"] > payer["total_cost"]
     assert payer["roi"] > 0
     # A ratio is only meaningful when cost and effect move the same way. This
-    # cohort is modelled as dominant, so the ICER is withheld and the fact is
+    # cohort is modeled as dominant, so the ICER is withheld and the fact is
     # stated as a flag — the same convention markov.py and CEAResult use. The
     # old assertion required a number here, which is what let a $616/QALY
     # figure sit beside a claim of $8bn in savings.
@@ -284,7 +284,7 @@ def _tier1_fixture() -> dict:
 
     Deliberately does NOT read the on-disk ``tier1_results.json``: that file is a
     gitignored runtime artifact whose contents depend on whichever genome was
-    analysed last, so a test bound to it skips on CI, skips on a fresh clone, and
+    analyzed last, so a test bound to it skips on CI, skips on a fresh clone, and
     skips silently the moment someone runs a different input. Building the input
     inline makes this test actually run everywhere.
     """
@@ -519,7 +519,7 @@ def test_econ_table_keys_resolve_against_the_strings_modules_emit():
 
 
 # ══════════════════════════════════════════════════════════════════════════
-# Wired-but-dead panels: revived, labelled, and worth nothing
+# Wired-but-dead panels: revived, labeled, and worth nothing
 # ══════════════════════════════════════════════════════════════════════════
 
 def test_verbose_category_labels_resolve_to_short_econ_keys():
@@ -534,7 +534,7 @@ def test_verbose_category_labels_resolve_to_short_econ_keys():
         assert he._match_econ_category(he.ADDICTION_ECONOMICS, verbose) is not None, (
             f"{verbose!r} does not resolve to an econ key")
     # An unrelated label must still miss rather than fuzzy-match something.
-    assert he._match_econ_category(he.ADDICTION_ECONOMICS, "Eye Colour") is None
+    assert he._match_econ_category(he.ADDICTION_ECONOMICS, "Eye Color") is None
 
 
 def test_the_addiction_panel_produces_records_again():
@@ -617,7 +617,7 @@ def test_no_priced_gene_bills_its_reference_genotype():
 
 def test_a_neutral_finding_still_reaches_the_narrative_report():
     # The guard must suppress the *valuation*, not the finding. COMT Val/Met is
-    # neutral for economics but is genuinely favourable news the report should
+    # neutral for economics but is genuinely favorable news the report should
     # still tell the reader, so it keeps its phenotype and its action.
     from wellness import neurochemistry as nc
     rec = nc._comt(_neuro("rs4680", "AG"))
@@ -636,7 +636,7 @@ def test_a_neutral_finding_still_reaches_the_narrative_report():
         "a neutral finding must still reach the narrative report -- `impact` "
         "gates the economics only"
     )
-    assert "Genuinely favourable" in html
+    assert "Genuinely favorable" in html
 
 
 def test_neurochemistry_evidence_is_not_silently_empty():
@@ -719,12 +719,12 @@ def _rec(**kw):
 def test_record_missing_prevalence_is_refused_not_defaulted():
     r = he.analyze_personal_economics({"findings_with_economics": [
         _rec(finding="no prevalence", prevalence=None)]})
-    labels = [n["finding"] for n in r["not_monetised"]]
-    assert "no prevalence" in labels, r["not_monetised"]
+    labels = [n["finding"] for n in r["not_monetized"]]
+    assert "no prevalence" in labels, r["not_monetized"]
     assert not any(i.get("finding") == "no prevalence"
                    for i in r["items"]), \
         "a record without prevalence must not be priced"
-    reason = next(n["reason"] for n in r["not_monetised"]
+    reason = next(n["reason"] for n in r["not_monetized"]
                   if n["finding"] == "no prevalence")
     assert "prevalence" in reason
 
@@ -732,9 +732,9 @@ def test_record_missing_prevalence_is_refused_not_defaulted():
 def test_record_missing_cost_is_refused_not_defaulted():
     r = he.analyze_personal_economics({"findings_with_economics": [
         _rec(finding="no cost", cost=None)]})
-    labels = [n["finding"] for n in r["not_monetised"]]
-    assert "no cost" in labels, r["not_monetised"]
-    reason = next(n["reason"] for n in r["not_monetised"]
+    labels = [n["finding"] for n in r["not_monetized"]]
+    assert "no cost" in labels, r["not_monetized"]
+    reason = next(n["reason"] for n in r["not_monetized"]
                   if n["finding"] == "no cost")
     assert "cost" in reason
 
@@ -750,7 +750,7 @@ def test_incomplete_records_do_not_collapse_onto_one_shared_figure():
     recs = [_rec(finding=f"gene{i} finding", prevalence=None, cost=None)
             for i in range(4)]
     r = he.analyze_personal_economics({"findings_with_economics": recs})
-    assert r["n_not_monetised"] >= 4
+    assert r["n_not_monetized"] >= 4
     valued = [i for i in r["items"]
               if str(i.get("finding", "")).endswith("finding")]
     assert valued == [], f"none should be priced; got {valued}"
@@ -762,7 +762,7 @@ def test_complete_records_are_still_valued():
     r = he.analyze_personal_economics({"findings_with_economics": [
         _rec(finding="complete finding")]})
     assert not any(n["finding"] == "complete finding"
-                   for n in r["not_monetised"])
+                   for n in r["not_monetized"])
     assert r["n_items"] == 1
     assert r["total_avoided"] > 0 and r["total_qaly"] > 0
 
@@ -790,7 +790,7 @@ def test_a_record_from_the_real_producer_is_not_called_incomplete():
     assert rec["intervention_cost"] == 2_000.0
 
     r = he.analyze_personal_economics({"findings_with_economics": [rec]})
-    rows = r.get("not_monetised") or []
+    rows = r.get("not_monetized") or []
     assert len(rows) == 1
     row = rows[0]
     assert row["finding"] == "BRCA1 pathogenic variant"

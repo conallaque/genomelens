@@ -52,8 +52,8 @@ def test_classify_thresholds(delta_sd: float, expected: str) -> None:
     ("a1c",                 "HbA1c (predicted)"),
 ])
 def test_lab_key_synonyms(key: str, trait: str) -> None:
-    normalised = bw._normalize_key(key)
-    assert bw._LAB_TO_PHEWAS.get(normalised) == trait
+    normalized = bw._normalize_key(key)
+    assert bw._LAB_TO_PHEWAS.get(normalized) == trait
 
 
 def test_normalize_key_handles_dashes_and_spaces() -> None:

@@ -156,7 +156,7 @@ def test_high_crp_bumps_curcumin_to_essential(synthetic_snps_df) -> None:
     assert "confirms" in curcumin[0]["reasoning"].lower()
 
 
-# ── Aggregator behaviour ─────────────────────────────────────────────────────
+# ── Aggregator behavior ─────────────────────────────────────────────────────
 
 def test_status_no_data_when_no_input() -> None:
     result = sup.build_supplement_stack(snps_df=None)

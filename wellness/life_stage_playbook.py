@@ -74,7 +74,7 @@ _DECADE_BASE = {
             "Begin colorectal cancer screening at 45 (earlier with family history).",
             "Baseline cognitive, hearing and vision checks; manage blood pressure "
             "tightly — midlife BP is a leading dementia risk factor.",
-            "Prioritise sleep quality and muscle mass; both protect late-life "
+            "Prioritize sleep quality and muscle mass; both protect late-life "
             "independence.",
         ],
     },
@@ -206,7 +206,7 @@ def analyze_life_stage_playbook(
         if chrna5_flag and key == "20s":
             add("Never start smoking or vaping — you carry the CHRNA5 risk allele "
                 "that makes smoking both more addictive and more dangerous. This "
-                "is your single highest-value behavioural decision.", "addiction_genetics")
+                "is your single highest-value behavioral decision.", "addiction_genetics")
 
         # Plasticity window
         if high_plasticity and key in ("20s", "30s"):

@@ -178,7 +178,7 @@ def _plan_marathon() -> dict:
         ],
         "race_day_fueling": (
             "Carb-load 8-10 g/kg in last 36 h. Race-morning breakfast 3 h pre: 1.5-2 g/kg "
-            "carbs (oats + banana + honey, low-fat). Race fuelling: 60-90 g carbs/h "
+            "carbs (oats + banana + honey, low-fat). Race fueling: 60-90 g carbs/h "
             "(gels every 30-35 min) + water + electrolytes 500 mg Na/L."
         ),
     }
@@ -390,7 +390,7 @@ def master_athlete_adjustments() -> list[dict]:
         {"decade": "30s",
          "key_changes": "Recovery slightly slower vs 20s. Mostly indistinguishable from younger.",
          "adjustments": ["Add 1 mandatory deload every 5-6 weeks",
-                         "Prioritise sleep extension on hard days",
+                         "Prioritize sleep extension on hard days",
                          "Mobility 10 min/day non-negotiable"]},
         {"decade": "40s",
          "key_changes": "Testosterone -1% per year. Mitochondrial decline begins. Connective tissue stiffens.",
@@ -450,7 +450,7 @@ def workout_supplement_stacks(caffeine_ergogenic: dict, strength_tier: str,
                                      "Most 'fat-burner' stacks", "Excess vitamin C/E (blunts adaptation)",
                                      "Testosterone-boosters (almost all useless)"],
         },
-        "personalised_priority": (
+        "personalized_priority": (
             "Strength-focused: creatine + caffeine + protein. "
             "Endurance-focused: beetroot + carbs + caffeine + sodium. "
             f"Strength tier: {strength_tier}. VO2 tier: {vo2_tier}."

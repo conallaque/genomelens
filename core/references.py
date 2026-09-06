@@ -303,9 +303,9 @@ REFERENCES: dict[str, dict] = {
 
 
 def get_reference(rsid: str) -> dict:
-    """Return the reference entry for an rsID, or a default 'not catalogued' record."""
+    """Return the reference entry for an rsID, or a default 'not cataloged' record."""
     return REFERENCES.get(rsid, {
-        "evidence_level": "Catalogued (GWAS/lit)",
+        "evidence_level": "Cataloged (GWAS/lit)",
         "evidence_summary": "Variant included from peer-reviewed GWAS or clinical literature.",
         "pmids": [],
         "guidelines": [],
@@ -313,7 +313,7 @@ def get_reference(rsid: str) -> dict:
 
 
 def collect_references_used(tier1_results: list[dict]) -> list[dict]:
-    """Return the catalogued references for variants that appeared in tier-1
+    """Return the cataloged references for variants that appeared in tier-1
     results, sorted by category and gene."""
     refs = []
     for r in tier1_results:
@@ -345,7 +345,7 @@ LEVEL_CLASSES = {
     "GWAS-A": "lvl-gwas-a",
     "Population-Validated": "lvl-pop",
     "GWAS / Functional": "lvl-gwas-a",
-    "Catalogued (GWAS/lit)": "lvl-other",
+    "Cataloged (GWAS/lit)": "lvl-other",
 }
 
 

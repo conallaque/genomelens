@@ -17,11 +17,11 @@ Four analyses live here:
   3. **Demand curve** — at each price, what share of the population is "in the
      money"? Produces the chip-vs-whole-genome crossover point.
   4. **Adoption (Bass diffusion)** — how uptake spreads over time, combined with
-     the behavioural adoption gap, to separate "no value" from "value not acted on".
+     the behavioral adoption gap, to separate "no value" from "value not acted on".
 
 **Where the heterogeneity comes from.** Each person is scored with point-estimate
 parameters rather than a full probabilistic sensitivity analysis. That is
-deliberate: here we are modelling *between-person* variation (do you carry an
+deliberate: here we are modeling *between-person* variation (do you carry an
 actionable variant? how old are you?), not *parameter* uncertainty, which the PSA
 in ``value_of_information`` already handles. Mixing the two would double-count.
 
@@ -71,7 +71,7 @@ PREVALENCE = {
     "acmg_secondary": {
         "p": 0.030,
         "src": "Miller et al. (2023) Genet Med (ACMG SF v3.2); population "
-               "sequencing programmes (e.g. Geisinger MyCode) report ~2-3.5% of "
+               "sequencing programs (e.g. Geisinger MyCode) report ~2-3.5% of "
                "unselected adults carrying a reportable pathogenic variant.",
         "plain": "About 3 in 100 people carry a serious but medically actionable "
                  "variant — the kind worth screening or preventing against.",
@@ -287,7 +287,7 @@ def simulate_cohort(n: int = 10_000, seed: int = 20260803,
         "personas_sample": personas[:25],
         "_totals": totals, "_wgs": wgs_parts, "_personas": personas,
         "plain_english": (
-            f"Across {n:,} simulated customers the average modelled value is "
+            f"Across {n:,} simulated customers the average modeled value is "
             f"${totals.mean():,.0f}, but the median is ${np.median(totals):,.0f} — "
             f"and the top 10% of customers account for "
             f"{concentration:.0%} of all the value. In other words, a small number "
@@ -386,9 +386,9 @@ def demand_curve(cohort: dict,
 
     *In plain English:* a customer should rationally buy when the expected value of
     the test exceeds its price. Sweep the price and you get a demand curve — the
-    share "in the money" at each point — plus modelled revenue per thousand
+    share "in the money" at each point — plus modeled revenue per thousand
     customers, which peaks somewhere in the middle. This is a willingness-to-pay
-    estimate grounded in modelled health value, not a survey.
+    estimate grounded in modeled health value, not a survey.
     """
     if not cohort.get("available"):
         return {"available": False}
@@ -417,7 +417,7 @@ def demand_curve(cohort: dict,
         "mean_sequencing_premium": round(mean_wgs_premium),
         "median_sequencing_premium": round(median_wgs_premium),
         "plain_english": (
-            f"Of the prices tested, ${best['price']:,} generates the most modelled "
+            f"Of the prices tested, ${best['price']:,} generates the most modeled "
             f"revenue per thousand customers (${best['revenue_per_1000']:,}), because "
             f"raising the price further loses more customers than it gains in margin. "
             f"Separately, the findings only sequencing can deliver are worth about "
@@ -426,7 +426,7 @@ def demand_curve(cohort: dict,
         "sources": {
             "in-the-money rule": "Standard consumer-surplus logic: a rational buyer "
                                  "purchases when expected value exceeds price.",
-            "caveat on behaviour": "Real buyers systematically under-buy relative to "
+            "caveat on behavior": "Real buyers systematically under-buy relative to "
                                    "this rule — see adoption_curve() and the "
                                    "prospect-theory adjustment in value_of_information.",
         },
@@ -440,7 +440,7 @@ def demand_curve(cohort: dict,
 
 def adoption_curve(periods: int = 10, p_innovate: float = 0.03,
                    q_imitate: float = 0.38, market_size: float = 1_000_000,
-                   behavioural_drag: float = 0.30) -> dict:
+                   behavioral_drag: float = 0.30) -> dict:
     """**Bass diffusion — how adoption spreads, and why it lags the value.**
 
     *In plain English:* new products spread in a predictable S-curve. A few
@@ -448,10 +448,10 @@ def adoption_curve(periods: int = 10, p_innovate: float = 0.03,
     it. The Bass model captures both forces with two numbers: ``p`` (innovation) and
     ``q`` (imitation, usually much larger — word of mouth dominates).
 
-    On top of that we apply a **behavioural drag**. The economics may say a test is
+    On top of that we apply a **behavioral drag**. The economics may say a test is
     clearly worth buying, yet people still don't — because a certain cost today
     feels heavier than an uncertain benefit years away (loss aversion and present
-    bias, quantified in ``value_of_information.analyze_behavioural``). The gap
+    bias, quantified in ``value_of_information.analyze_behavioral``). The gap
     between the two curves is not a value problem; it is a *marketing* problem.
     """
     cum, rows = 0.0, []
@@ -464,31 +464,31 @@ def adoption_curve(periods: int = 10, p_innovate: float = 0.03,
             "new_adopters": round(new),
             "cumulative_adopters": round(cum),
             "penetration": round(cum / market_size, 4),
-            "cumulative_with_behavioural_drag": round(cum * (1 - behavioural_drag)),
+            "cumulative_with_behavioral_drag": round(cum * (1 - behavioral_drag)),
         })
     peak = max(rows, key=lambda r: r["new_adopters"])
     return {
         "available": True,
         "p_innovation": p_innovate, "q_imitation": q_imitate,
-        "market_size": market_size, "behavioural_drag": behavioural_drag,
+        "market_size": market_size, "behavioral_drag": behavioral_drag,
         "curve": rows,
         "peak_period": peak["period"],
         "final_penetration": rows[-1]["penetration"],
-        "adopters_lost_to_behavioural_drag": round(rows[-1]["cumulative_adopters"]
-                                                   * behavioural_drag),
+        "adopters_lost_to_behavioral_drag": round(rows[-1]["cumulative_adopters"]
+                                                   * behavioral_drag),
         "plain_english": (
             f"Adoption peaks in period {peak['period']} and reaches "
             f"{rows[-1]['penetration']:.0%} of the market by period {periods}. "
             f"Word of mouth (q={q_imitate}) matters far more than advertising to "
             f"innovators (p={p_innovate}) — the single biggest lever is getting "
-            f"early customers to talk. Applying the behavioural drag, roughly "
-            f"{rows[-1]['cumulative_adopters'] * behavioural_drag:,.0f} people who "
+            f"early customers to talk. Applying the behavioral drag, roughly "
+            f"{rows[-1]['cumulative_adopters'] * behavioral_drag:,.0f} people who "
             f"would rationally benefit still never buy."),
         "sources": {
             "diffusion model": "Bass, F.M. (1969) 'A New Product Growth for Model "
                                "Consumer Durables,' Management Science 15(5):215-227. "
                                "Typical values p~0.03, q~0.38 across consumer durables.",
-            "behavioural drag": "Kahneman & Tversky (1979) prospect theory (loss "
+            "behavioral drag": "Kahneman & Tversky (1979) prospect theory (loss "
                                 "aversion ~2.25x); Laibson (1997) quasi-hyperbolic "
                                 "discounting.",
         },
@@ -506,7 +506,7 @@ def data_asset_ltv(initial_value: float = 4_463.0, years: int = 10,
     not depreciate — it *appreciates*. You buy the data once, but the science that
     interprets it keeps growing: ClinVar adds variant classifications every month,
     new pharmacogenomic guidelines are published, and new polygenic scores appear.
-    Because the file can be re-analysed locally for free, all of that future
+    Because the file can be re-analyzed locally for free, all of that future
     knowledge accrues to the person who already owns their genome. This models the
     genome as an appreciating data asset.
 
@@ -561,7 +561,7 @@ def data_asset_ltv(initial_value: float = 4_463.0, years: int = 10,
             f"a ${initial_value:,.0f} genome delivers value every year, so about "
             f"{durability_share:.0%} of its lifetime value arrives after the sale "
             f"simply because the data keeps working. Second, appreciation: because "
-            f"the file is re-analysed for free as knowledge grows, its lifetime value "
+            f"the file is re-analyzed for free as knowledge grows, its lifetime value "
             f"is about {appreciation_premium:.0%} higher than a genome frozen at "
             f"today's knowledge. Together they are the economic case for staying in "
             f"contact with a customer rather than treating the test as a one-time "
@@ -572,7 +572,7 @@ def data_asset_ltv(initial_value: float = 4_463.0, years: int = 10,
                               "variant records grow rapidly year on year.",
             "PGx guideline expansion": "CPIC (cpicpgx.org) — the set of "
                                        "gene-drug guidelines expands continuously.",
-            "PRS catalogue growth": "Lambert et al. (2021) Nat Genet — the PGS "
+            "PRS catalog growth": "Lambert et al. (2021) Nat Genet — the PGS "
                                     "Catalog has grown from a handful to thousands "
                                     "of published scores.",
             "free re-analysis / early ownership": "Mirrors the real-options result "
@@ -685,9 +685,9 @@ def personalize_for_report(voi_result: dict, age: float = 40.0,
         "plain_english": (
             f"For this genome specifically: the efficient testing choice is "
             f"{_rec}, optimal in {rec_prob:.0%} of simulations at ${lam:,.0f} per "
-            f"healthy year. The modelled value of ${total:,.0f} sits at about the "
+            f"healthy year. The modeled value of ${total:,.0f} sits at about the "
             f"{pct:.0f}th percentile of the population, and — because the data is "
-            f"re-analysed for free as science advances — over the next {yrs} years it "
+            f"re-analyzed for free as science advances — over the next {yrs} years it "
             f"is worth roughly {ltv.get('appreciation_premium', 0):.0%} more than a "
             f"genome frozen at today's knowledge."),
         "caveat": ("Personal decision-analytic estimate on illustrative parameters — "

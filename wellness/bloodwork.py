@@ -134,7 +134,7 @@ def _normalize_key(k: str) -> str:
 
 
 def load_bloodwork(path: str) -> dict[str, float]:
-    """Read and normalise a bloodwork JSON file. Drops null/non-numeric values."""
+    """Read and normalize a bloodwork JSON file. Drops null/non-numeric values."""
     p = Path(path).expanduser()
     if not p.exists():
         raise FileNotFoundError(f"Bloodwork file not found: {p}")
@@ -505,20 +505,20 @@ SYSTEM_ORDER = [
     "Electrolytes & Minerals", "Hormones", "Vitamins", "Blood Pressure",
 ]
 
-# ── Biomarker catalogue ───────────────────────────────────────────────────────
+# ── Biomarker catalog ───────────────────────────────────────────────────────
 _BIOMARKERS: list[dict] = [
     # ---- Lipids & cardiovascular ----
     _bm("total_cholesterol", "Total Cholesterol", "mg/dL", "Lipids & Cardiovascular",
         "high", (None, 200), (150, 199),
         "Sum of all cholesterol; a crude first-pass cardiovascular marker (ApoB/LDL are better).",
         aliases=("total_chol", "cholesterol", "tc"), critical=(None, 300),
-        high_action="Focus on LDL/ApoB and the TG:HDL ratio; diet, fibre, exercise.",
+        high_action="Focus on LDL/ApoB and the TG:HDL ratio; diet, fiber, exercise.",
         genes=("APOE",), rsids=(("rs429358", "APOE"),)),
     _bm("ldl", "LDL Cholesterol", "mg/dL", "Lipids & Cardiovascular",
         "high", (None, 100), (50, 99),
         "Primary atherogenic ('bad') cholesterol and the main lipid treatment target.",
         aliases=("ldl_c", "ldl_cholesterol"), critical=(None, 190),
-        high_action="Reduce saturated fat, add soluble fibre & plant sterols, exercise; discuss statin/ezetimibe if persistently high or with high Lp(a)/ApoB.",
+        high_action="Reduce saturated fat, add soluble fiber & plant sterols, exercise; discuss statin/ezetimibe if persistently high or with high Lp(a)/ApoB.",
         genes=("LDLR", "PCSK9", "APOB", "APOE"),
         rsids=(("rs429358", "APOE"), ("rs7412", "APOE"))),
     _bm("hdl", "HDL Cholesterol", "mg/dL", "Lipids & Cardiovascular",
@@ -598,7 +598,7 @@ _BIOMARKERS: list[dict] = [
         aliases=("sgpt",), critical=(None, 200),
         sex={"M": {"clinical": (7, 56), "optimal": (None, 30)},
              "F": {"clinical": (7, 45), "optimal": (None, 25)}},
-        high_action="Most common cause is metabolic (fatty liver) or alcohol; weight loss and reducing alcohol usually normalise it."),
+        high_action="Most common cause is metabolic (fatty liver) or alcohol; weight loss and reducing alcohol usually normalize it."),
     _bm("ast", "AST", "U/L", "Liver", "high", (10, 40), (None, 30),
         "Liver/muscle enzyme; interpreted alongside ALT.", aliases=("sgot",),
         critical=(None, 200)),
@@ -654,7 +654,7 @@ _BIOMARKERS: list[dict] = [
         "Total iron-binding capacity; rises in deficiency, falls in overload.",
         aliases=("total_iron_binding_capacity",)),
     _bm("hemoglobin", "Hemoglobin", "g/dL", "Iron Status", "low", (13.5, 17.5), (14, 16),
-        "Oxygen-carrying protein; low = anaemia.", aliases=("hgb", "hb"),
+        "Oxygen-carrying protein; low = anemia.", aliases=("hgb", "hb"),
         sex={"M": {"clinical": (13.5, 17.5), "optimal": (14, 16.5)},
              "F": {"clinical": (12.0, 15.5), "optimal": (12.5, 15)}}),
     _bm("hematocrit", "Hematocrit", "%", "Iron Status", "both", (38.8, 50), (40, 48),
@@ -667,7 +667,7 @@ _BIOMARKERS: list[dict] = [
         "Immune cell count; high with infection/inflammation, low with marrow/immune issues.",
         aliases=("white_blood_cells", "white_blood_cell_count", "leukocytes")),
     _bm("neutrophils", "Neutrophils", "K/µL", "Complete Blood Count", "both",
-        (1.5, 8.0), (2.0, 6.0), "First-line bacterial-defence white cells.", aliases=("neut", "anc")),
+        (1.5, 8.0), (2.0, 6.0), "First-line bacterial-defense white cells.", aliases=("neut", "anc")),
     _bm("lymphocytes", "Lymphocytes", "K/µL", "Complete Blood Count", "both",
         (1.0, 4.0), (1.3, 3.5), "Adaptive-immunity white cells.", aliases=("lymph",)),
     _bm("platelets", "Platelets", "K/µL", "Complete Blood Count", "both",
@@ -852,7 +852,7 @@ def compute_derived_markers(vals: dict[str, float], meta: dict) -> dict[str, flo
     tt, shbg = g("testosterone"), g("shbg")
     if tt is not None and shbg:
         # Free fraction ~1–3% of total, declining as SHBG rises. This keeps the
-        # estimate in the physiological ng/dL range (labelled 'est.').
+        # estimate in the physiological ng/dL range (labeled 'est.').
         ft_frac = 0.025 * (40.0 / (shbg + 40.0))
         d["free_testosterone"] = round(tt * ft_frac, 1)
 
@@ -951,7 +951,7 @@ def _genotype_note(bm_id: str, status: str, snps_df) -> str:
         if e and "C" in e:
             n = e.count("C")
             return (f"You carry {n} APOE ε4-tagging allele(s) — high LDL/ApoB matters more "
-                    "with ε4 (higher cardiovascular and Alzheimer's risk). Prioritise lowering ApoB.")
+                    "with ε4 (higher cardiovascular and Alzheimer's risk). Prioritize lowering ApoB.")
     if bm_id in ("fasting_glucose", "hba1c", "homa_ir") and flagged_high:
         t = _gt(snps_df, "rs7903146")   # T = TCF7L2 T2D risk
         if t and "T" in t:
@@ -1250,7 +1250,7 @@ def compute_advanced_indices(labs: dict[str, float], derived: dict[str, float],
         interp = (
             f"Your blood-derived biological age is <strong>{pa:.1f}</strong> vs a "
             f"chronological age of {age:.0f} — "
-            + ("<strong>younger</strong> than your years (favourable)."
+            + ("<strong>younger</strong> than your years (favorable)."
                if accel < 0 else
                "<strong>older</strong> than your years.")
             + " PhenoAge predicts all-cause mortality better than chronological age."
@@ -2152,7 +2152,7 @@ def _render_clinical_section(clinical: dict) -> str:
 
     unrec = ""
     if clinical.get("unrecognized"):
-        unrec = (f"<p class='bw-unmatched'>Supplied values not recognised as biomarkers: "
+        unrec = (f"<p class='bw-unmatched'>Supplied values not recognized as biomarkers: "
                  f"{', '.join(_esc(u) for u in clinical['unrecognized'])}.</p>")
 
     return (hero + flags_html + sys_html + unrec +

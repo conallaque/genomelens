@@ -68,7 +68,7 @@ def test_ceac_no_testing_wins_at_zero_wtp():
     assert at_zero["most_likely_optimal"] == "No testing"
 
 
-def test_ceac_higher_wtp_favours_more_effective():
+def test_ceac_higher_wtp_favors_more_effective():
     # As willingness-to-pay rises, the most effective strategy should gain share.
     p = hf.frontier_psa(n_mc=3000)
     wgs = "Whole-genome sequencing"

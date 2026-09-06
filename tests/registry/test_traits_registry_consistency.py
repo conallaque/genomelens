@@ -2,8 +2,8 @@
 
 V8 status: 16 / 48 traits.py rsIDs registered (via earlier modules that
 share their SNPs). The remaining 32 are documented in CHANGELOG.md under
-V8.1 follow-ups — each is a well-characterised phenotype SNP (eye/hair
-colour, taste, earwax) that needs literature-cited ancestral/derived +
+V8.1 follow-ups — each is a well-characterized phenotype SNP (eye/hair
+color, taste, earwax) that needs literature-cited ancestral/derived +
 GRCh37/38 coordinates before joining the registry.
 """
 

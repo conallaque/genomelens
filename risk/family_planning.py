@@ -10,7 +10,7 @@ to family planning. Wraps carrier.py output with:
   * Partner-testing guidance (which conditions to ask a prospective parent
     to test for)
   * Sensitivity-aware framing ('carrier status is information, not a
-    diagnosis; consider genetic counselling for personalised advice')
+    diagnosis; consider genetic counselling for personalized advice')
 
 Carrier frequency data drawn from ClinGen / OMIM / population genetics
 literature for common European, Ashkenazi Jewish, African American, and
@@ -308,7 +308,7 @@ def render_carrier_html(carrier_report: dict, file_label: str = "",
   </div>
   <div class="cr-finding-block">
     <strong>Carrier frequencies by population:</strong>
-    <ul class="cr-freq-list">{freq_lines or "<li>Not catalogued</li>"}</ul>
+    <ul class="cr-freq-list">{freq_lines or "<li>Not cataloged</li>"}</ul>
   </div>
 </div>
 """
@@ -511,8 +511,8 @@ _RECESSIVE_CARRIER_FREQ = {
                  "African American": 0.083, "South Asian": 0.040,
                  "East Asian": 0.033},
         "penetrance": (0.95, 1.0),
-        "partner_test": ("Haemoglobinopathy evaluation — CBC with MCV, "
-                         "haemoglobin electrophoresis, HBB sequencing"),
+        "partner_test": ("Hemoglobinopathy evaluation — CBC with MCV, "
+                         "hemoglobin electrophoresis, HBB sequencing"),
         "note": ("Two pathogenic HBB copies cause sickle-cell disease or "
                  "beta-thalassaemia depending on the variants. Carrier "
                  "(trait) status is largely benign. Newborn screening "

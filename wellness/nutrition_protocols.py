@@ -32,7 +32,7 @@ def simulate_postprandial_glucose(
     """
     meal: {
        'name': str, 'carbs_g': float, 'protein_g': float, 'fat_g': float,
-       'fibre_g': float, 'vinegar': bool, 'protein_first': bool,
+       'fiber_g': float, 'vinegar': bool, 'protein_first': bool,
        'walking_after_min': int, 'gi': int (0-100)
     }
     """
@@ -41,12 +41,12 @@ def simulate_postprandial_glucose(
         else glycemic.get("max_carbs_dinner_g", base_threshold - 15)
 
     carbs = max(0, meal.get("carbs_g", 0))
-    fibre = max(0, meal.get("fibre_g", 0))
+    fiber = max(0, meal.get("fiber_g", 0))
     protein = max(0, meal.get("protein_g", 0))
     fat = max(0, meal.get("fat_g", 0))
     gi = meal.get("gi", 55)  # default mixed meal
 
-    available_carbs = max(0, carbs - 0.5 * fibre)
+    available_carbs = max(0, carbs - 0.5 * fiber)
     gi_factor = gi / 55.0
 
     # Base iAUC (mg/dL·min) — simplified
@@ -59,7 +59,7 @@ def simulate_postprandial_glucose(
         iauc *= 0.75            # protein-first sequencing -25%
     if meal.get("vinegar"):
         iauc *= 0.80
-    if fibre >= 10:
+    if fiber >= 10:
         iauc *= 0.85
     if fat >= 15:
         iauc *= 0.92            # slows absorption
@@ -94,7 +94,7 @@ def simulate_postprandial_glucose(
         "modifiers_applied": [
             ("protein-first sequencing" if meal.get("protein_first") else None),
             ("vinegar 1 tbsp pre-meal" if meal.get("vinegar") else None),
-            (f"fibre {fibre} g" if fibre >= 10 else None),
+            (f"fiber {fiber} g" if fiber >= 10 else None),
             (f"fat {fat} g slows absorption" if fat >= 15 else None),
             (f"{walk} min post-meal walk" if walk >= 10 else None),
             ("evening circadian penalty" if time_of_day == "dinner" else None),
@@ -107,25 +107,25 @@ def simulate_common_meals(glycemic: dict) -> list[dict]:
     meals = [
         # Naïve carb-heavy
         {"name": "Bagel + orange juice (naïve)", "carbs_g": 75, "protein_g": 10,
-         "fat_g": 3, "fibre_g": 3, "gi": 75},
+         "fat_g": 3, "fiber_g": 3, "gi": 75},
         # Same carbs but engineered
         {"name": "Bagel + OJ — engineered (eggs first, vinegar, walk)",
-         "carbs_g": 75, "protein_g": 30, "fat_g": 12, "fibre_g": 5, "gi": 75,
+         "carbs_g": 75, "protein_g": 30, "fat_g": 12, "fiber_g": 5, "gi": 75,
          "protein_first": True, "vinegar": True, "walking_after_min": 15},
         # White rice + chicken
         {"name": "White rice + grilled chicken + broccoli",
-         "carbs_g": 55, "protein_g": 35, "fat_g": 10, "fibre_g": 6, "gi": 70,
+         "carbs_g": 55, "protein_g": 35, "fat_g": 10, "fiber_g": 6, "gi": 70,
          "protein_first": True},
         # Steel-cut oats
         {"name": "Steel-cut oats + berries + Greek yoghurt",
-         "carbs_g": 45, "protein_g": 25, "fat_g": 10, "fibre_g": 9, "gi": 42},
+         "carbs_g": 45, "protein_g": 25, "fat_g": 10, "fiber_g": 9, "gi": 42},
         # Power salad
         {"name": "Power salad (greens + chickpeas + chicken + olive oil)",
-         "carbs_g": 30, "protein_g": 35, "fat_g": 22, "fibre_g": 14, "gi": 35,
+         "carbs_g": 30, "protein_g": 35, "fat_g": 22, "fiber_g": 14, "gi": 35,
          "vinegar": True},
         # Pasta dinner
         {"name": "Spaghetti bolognese (dinner)",
-         "carbs_g": 85, "protein_g": 30, "fat_g": 18, "fibre_g": 6, "gi": 55},
+         "carbs_g": 85, "protein_g": 30, "fat_g": 18, "fiber_g": 6, "gi": 55},
     ]
     return [
         simulate_postprandial_glucose(m, glycemic,
@@ -248,7 +248,7 @@ def cooking_method_optimizer() -> dict:
     return {
         "rationale": (
             "Advanced glycation end-products (AGEs) form when proteins/fats are "
-            "exposed to dry, high heat. They accelerate vascular ageing and oxidative "
+            "exposed to dry, high heat. They accelerate vascular aging and oxidative "
             "stress. Same food, different method, can differ 10-100× in AGE load."
         ),
         "rules": [
@@ -411,7 +411,7 @@ def fasting_matchmaker(result: dict) -> dict:
         rationale = "Evening chronotype — 10:00-18:00 or 11:00-19:00 fits circadian cortisol/insulin profile."
     else:
         recommended = "14:10 baseline; optional 16:8 1-2×/week"
-        rationale = "Moderate TRF works without compromising training fuelling."
+        rationale = "Moderate TRF works without compromising training fueling."
 
     cautions = [
         "Pregnant/breastfeeding → no fasting beyond ≤12 h overnight.",
@@ -426,7 +426,7 @@ def fasting_matchmaker(result: dict) -> dict:
         "rationale": rationale,
         "cautions": cautions,
         "break_fast_meal": (
-            "Break-fast meal: 30-40 g protein + 8-10 g fibre + healthy fat + low-GI "
+            "Break-fast meal: 30-40 g protein + 8-10 g fiber + healthy fat + low-GI "
             "carbs ≤30 g. e.g. 3-egg omelette + spinach + avocado + ½ cup berries."
         ),
     }
@@ -460,7 +460,7 @@ def polyphenol_panel(antioxidants: dict, inflam: dict) -> dict:
             "(350), 2 tbsp olive oil (180), 1 cup green tea (200), 1 apple (110), 1 oz "
             "dark chocolate (250). Total ≈1500 mg. Polyphenols cluster: anthocyanins "
             "(berries) + flavanols (cocoa, tea) + hydroxytyrosols (olive) + lignans "
-            "(flax, sesame) + curcuminoids (turmeric) = broad signalling."
+            "(flax, sesame) + curcuminoids (turmeric) = broad signaling."
             + (" Reduced antioxidant capacity flagged — double down on diversity." if boost else "")
         ),
     }
@@ -531,10 +531,10 @@ def mind_diet_protocol(e4: bool) -> dict:
              "why": "α-linolenic acid, vitamin E, polyphenols"},
             {"food": "Olive oil", "servings": "Primary cooking fat",
              "why": "Oleocanthal — natural ibuprofen-like anti-inflammatory; MUFA"},
-            {"food": "Whole grains", "servings": "≥3/day", "why": "B vitamins, fibre"},
+            {"food": "Whole grains", "servings": "≥3/day", "why": "B vitamins, fiber"},
             {"food": "Fish (esp oily)", "servings": "≥1/week (aim 2-3)",
              "why": "DHA — neuronal membrane; ε4 carriers especially benefit"},
-            {"food": "Beans/legumes", "servings": "≥3/week", "why": "Folate, fibre, B vitamins"},
+            {"food": "Beans/legumes", "servings": "≥3/week", "why": "Folate, fiber, B vitamins"},
             {"food": "Poultry", "servings": "≥2/week", "why": "Lean protein"},
             {"food": "Wine (red, if no contraindication)", "servings": "≤1 glass/day",
              "why": "Resveratrol — discontinue if any ALDH2 variant"},
@@ -568,7 +568,7 @@ def mind_diet_protocol(e4: bool) -> dict:
 def cycle_phase_nutrition() -> dict:
     return {
         "note": "Activate by passing reproductive_state. Tailors macros, iron, and "
-                "training-fuelling to follicular/ovulatory/luteal/menstrual phases.",
+                "training-fueling to follicular/ovulatory/luteal/menstrual phases.",
         "follicular_d1_14": {
             "macro_emphasis": "Higher carb tolerance (insulin sensitivity peak)",
             "iron": "Replace menstrual losses — vitamin C with iron-rich meals",

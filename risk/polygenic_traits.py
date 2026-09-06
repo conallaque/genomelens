@@ -5,7 +5,7 @@ Trait Genetics — honest genotype-level trait reporting
 **A deliberate design decision, stated up front:** this module does NOT invent
 polygenic percentiles from a handful of hand-picked SNPs. A real polygenic
 score requires thousands of variants with per-variant GWAS effect weights,
-applied to a matched ancestry, standardised against a reference-population
+applied to a matched ancestry, standardized against a reference-population
 distribution. The project's `pgs_catalog.py` does exactly that — but only for
 the ~15 *disease* scores whose scoring files are downloaded locally. No
 published trait PGS scoring files (chronotype, sleep duration, personality,
@@ -14,7 +14,7 @@ be fabrication, and no caveat paragraph rescues a fabricated number.
 
 Instead this module reports **genotype-level trait calls** for traits where a
 *single variant* genuinely carries interpretable signal — taste, smell, hair,
-eye colour, chronotype, earwax, a few sleep loci — with the direction and the
+eye color, chronotype, earwax, a few sleep loci — with the direction and the
 primary citation, and nothing more precise than the evidence supports.
 
 For traits that are irreducibly **polygenic** (height) or **socially fraught
@@ -28,7 +28,7 @@ References
 ----------
 Kim 2003 (TAS2R38 PTC bitter); Eriksson 2012 23andMe (OR6A2 cilantro,
 asparagus anosmia); Yoshiura 2006 (ABCC11 earwax/body odour); Eriksson 2010
-(photic sneeze); Sturm 2008 (HERC2 eye colour); Han 2008 / Sulem 2007 (MC1R,
+(photic sneeze); Sturm 2008 (HERC2 eye color); Han 2008 / Sulem 2007 (MC1R,
 IRF4 pigmentation); Kimura 2009 (EDAR hair); Katzenberg 1998 & Garcia-Rios 2014
 (CLOCK chronotype); Allebrandt 2013 (ABCC9 sleep duration); Okbay 2016 &
 Lee 2018 (educational-attainment PGS — cited to explain the structural cap,
@@ -75,7 +75,7 @@ def _clock_chronotype(df):
         call = "Morning-leaning tendency (T/T)"
         detail = ("The CLOCK 3111 T/T genotype is associated on average with a "
                   "slightly earlier chronotype and morning preference. Effect is "
-                  "small — sleep timing is mostly behavioural and light-driven.")
+                  "small — sleep timing is mostly behavioral and light-driven.")
     elif n_c == 1:
         call = "Intermediate chronotype (T/C)"
         detail = "One CLOCK 3111-C allele; intermediate morning/evening tendency."
@@ -232,15 +232,15 @@ def _herc2_eye(df):
     if n_g == 2:
         call = "Blue / light eyes likely"
         detail = ("HERC2 rs12913832 G/G strongly predicts blue or light eye "
-                  "colour (down-regulates OCA2 → less iris melanin). ~99% of "
+                  "color (down-regulates OCA2 → less iris melanin). ~99% of "
                   "blue-eyed Europeans are G/G.")
     elif n_g == 1:
         call = "Green / hazel / intermediate likely"
-        detail = "One blue-eye allele — often green, hazel or intermediate iris colour."
+        detail = "One blue-eye allele — often green, hazel or intermediate iris color."
     else:
         call = "Brown eyes likely"
         detail = "HERC2 A/A predicts brown eyes (functional OCA2, more iris melanin)."
-    return _t(CAT_APPEAR, "Eye colour", "HERC2 / OCA2", "rs12913832", gt,
+    return _t(CAT_APPEAR, "Eye color", "HERC2 / OCA2", "rs12913832", gt,
               call, detail, "Sturm 2008", confidence="high")
 
 
@@ -263,7 +263,7 @@ def _mc1r_red_hair(df):
     else:
         call = "No MC1R red-hair alleles tested"
         detail = "No R151C/R160W red-hair variants detected."
-    return _t(CAT_APPEAR, "Hair colour / skin (MC1R)", "MC1R",
+    return _t(CAT_APPEAR, "Hair color / skin (MC1R)", "MC1R",
               "rs1805007+rs1805008", f"{g7 or '-'}/{g8 or '-'}", call, detail,
               "Sulem 2007; Han 2008", confidence="moderate")
 

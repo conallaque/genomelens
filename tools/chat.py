@@ -360,7 +360,7 @@ labeled sections (skip a section if it truly doesn't apply):
   4. **Personal fit** — reconcile the finding with the person's other results
      (e.g. an APOE ε4 carrier with high LDL vs an ε2 carrier; a slow metabolizer
      stacked with high-risk PRS; a MTHFR carrier with elevated homocysteine).
-  5. **Concrete action plan** — specific, prioritised steps (dose, food, test,
+  5. **Concrete action plan** — specific, prioritized steps (dose, food, test,
      habit) they can act on this month. Prefer specificity over "eat healthy".
   6. **Uncertainty & limits** — what the evidence base can and can't say,
      effect sizes (small/moderate/large), and where results are chip-inferred
@@ -418,7 +418,7 @@ SUGGESTED_QUESTIONS = [
     "How should I eat given my genome, blood work, and detox profile?",
     "What should I tell my primary care doctor at my next visit?",
     "How do my longevity variants (FOXO3, APOE, etc.) affect my long-term outlook?",
-    "What supplement stack would give me the biggest personalised return?",
+    "What supplement stack would give me the biggest personalized return?",
     "Explain my PREVENT cardiovascular risk and what to do about it.",
     "Should I see a genetic counselor? What would I bring?",
 ]

@@ -17,8 +17,8 @@ exactly, including the details that are easy to get wrong and that an HTA
 reviewer checks:
 
 * rate → probability via ``p = 1 - exp(-rate * cycle_length)``, not ``p = rate``
-* competing risks from Well, normalised so the two exits cannot exceed 1
-* ``p_dd`` built from the ORIGINAL background rate, not the normalised one
+* competing risks from Well, normalized so the two exits cannot exceed 1
+* ``p_dd`` built from the ORIGINAL background rate, not the normalized one
   (mirrors the local-rebinding subtlety in ``build_transition_matrix``)
 * half-cycle correction weighting cycle 0 and the final cycle at 0.5
 * age-dependent Gompertz background mortality
@@ -186,9 +186,9 @@ def _build_trace(ws, *, guided: bool, cycles: int) -> None:
         ws[_c("p_bg norm", r)] = (
             f"=IF({tot}>1,{_c('p_bg raw', r)}/{tot},{_c('p_bg raw', r)})")
 
-        # p_dd uses the ORIGINAL background probability, not the normalised one.
+        # p_dd uses the ORIGINAL background probability, not the normalized one.
         # build_transition_matrix rebinds its local p_bg before this line but
-        # reads the parameter, so the un-normalised value is what reaches here.
+        # reads the parameter, so the un-normalized value is what reaches here.
         ws[_c("p_dd", r)] = f"=MIN(1,{_c('p_bg raw', r)}+{_c('p_ex', r)})"
 
         # Cohort occupancy at the START of the cycle.
@@ -432,7 +432,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     # Default into build/, which .gitignore already covers. The repo's other
     # generated artefacts land in the root and are ignored BY NAME, because the
-    # pipeline has to write them beside the genome it analysed and cannot choose
+    # pipeline has to write them beside the genome it analyzed and cannot choose
     # a directory. This tool can choose. Defaulting to the root would add
     # another filename to that list -- and the list has already failed once
     # (see the economics.html note in .gitignore, committed by accident because

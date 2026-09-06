@@ -74,7 +74,7 @@ def _finding(category, trait, gene, rsid, genotype, result, action,
 
 def _adrb3_oab(snps):
     """ADRB3 Trp64Arg (rs4994) — the beta-3 adrenergic receptor is the target of
-    mirabegron (an OAB drug). Arg64 carriers have altered receptor signalling
+    mirabegron (an OAB drug). Arg64 carriers have altered receptor signaling
     associated with obesity and, in some cohorts, higher OAB symptom risk and
     modified response to beta-3 agonists."""
     d = _dose(snps, "rs4994", "G", "A")   # G = Arg64
@@ -84,7 +84,7 @@ def _adrb3_oab(snps):
     if d >= 1:
         result = ("Carries the ADRB3 Arg64 allele (rs4994 G). The beta-3 "
                   "adrenergic receptor is the drug target of mirabegron for "
-                  "overactive bladder; carriers show altered receptor signalling "
+                  "overactive bladder; carriers show altered receptor signaling "
                   "and, in some cohorts, higher susceptibility to OAB symptoms "
                   "and modified response to beta-3-agonist therapy.")
         impact = "reduced"

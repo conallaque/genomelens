@@ -28,7 +28,7 @@ GRCh38), a literature `source`, and `last_verified` for staleness audit.
 
 `supplements.py` was migrated first because it had the cleanest entry point
 (the strand-aware `_risk_dose` helper was the most isolated). The migration
-preserved byte-exact behaviour — verified by the V6 golden snapshots in
+preserved byte-exact behavior — verified by the V6 golden snapshots in
 `tests/snapshots/`. Total diff: one import, ~40 lines deleted from the
 strand-aware helper (now a thin shim delegating to the registry).
 
@@ -104,7 +104,7 @@ For each rsID the local module has that the registry doesn't:
 pytest tests/ -o addopts="" -v
 ```
 
-Golden snapshots are the safety net. If a behaviour change is intentional
+Golden snapshots are the safety net. If a behavior change is intentional
 (e.g. fixing a strand error), update the snapshot in a *separate* commit
 with a clear message: `fix(<module>): correct strand for rs… (regen snapshot)`.
 
@@ -149,7 +149,7 @@ The migration is complete when:
 ## Status (as of V7-α)
 
 - ✅ `snp_registry.py` created with 20 seed records covering 13 genes.
-- ✅ `supplements.py` migrated (PoC, behaviour-preserved).
+- ✅ `supplements.py` migrated (PoC, behavior-preserved).
 - ⬜ `carrier.py` — next.
 - ⬜ `wellness.py`, `traits.py` — queue.
 - ⬜ `phewas.py`, `prs.py`, `pgx.py`, `hla.py` — require small schema extension.

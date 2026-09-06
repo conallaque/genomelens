@@ -1,5 +1,5 @@
 """
-Personalised Exercise Programming
+Personalized Exercise Programming
 =================================
 
 Reads ACTN3, ACE, COL1A1, COL5A1, PPARGC1A, IL6, CRP, BDNF, and CLOCK
@@ -57,17 +57,17 @@ def _analyze_power_endurance(snps_df) -> dict:
     if actn3:
         if actn3.count("C") == 2:
             power_score += 2
-            factors.append("ACTN3 CC (R/R) — sprint/power dominant fast-twitch fibres")
+            factors.append("ACTN3 CC (R/R) — sprint/power dominant fast-twitch fibers")
         elif "C" in actn3 and "T" in actn3:
             power_score += 1
-            factors.append("ACTN3 CT (R/X) — mixed fibre type, balanced")
+            factors.append("ACTN3 CT (R/X) — mixed fiber type, balanced")
         elif actn3.count("T") == 2:
             endurance_score += 2
             factors.append("ACTN3 TT (X/X) — α-actinin-3 deficiency; endurance-biased")
 
     if ace and "G" in ace:                  # G ~ I allele on - strand reporting
         endurance_score += 1
-        factors.append("ACE I-allele present — endurance-favouring vascular response")
+        factors.append("ACE I-allele present — endurance-favoring vascular response")
     elif ace and "T" in ace:
         power_score += 1
         factors.append("ACE D-allele present — power/strength bias")
@@ -95,26 +95,26 @@ def _analyze_power_endurance(snps_df) -> dict:
     if ratio_power >= 70:
         bias = "Power-dominant"
         rec = (
-            "Prioritise heavy strength (3-6 reps) and explosive work (jumps, sprints, "
+            "Prioritize heavy strength (3-6 reps) and explosive work (jumps, sprints, "
             "Olympic lifts). 2-3 short conditioning sessions/week is sufficient. "
             "Avoid chronic high-volume aerobic which blunts your strength response."
         )
     elif ratio_power >= 55:
         bias = "Mixed, power-leaning"
         rec = (
-            "Balanced split favouring strength (~4 sessions) over endurance "
+            "Balanced split favoring strength (~4 sessions) over endurance "
             "(~2 sessions). Hybrid workouts (e.g. CrossFit, athletic prep) suit you."
         )
     elif ratio_power >= 45:
         bias = "Balanced"
         rec = (
             "Genuinely mixed phenotype — concurrent training works well. "
-            "Programme polarised: 80% easy aerobic + 20% intense, with 2-3 lifts/week."
+            "Program polarised: 80% easy aerobic + 20% intense, with 2-3 lifts/week."
         )
     elif ratio_power >= 30:
         bias = "Mixed, endurance-leaning"
         rec = (
-            "Favour aerobic base building (Zone 2 4-5×/week) with 2 strength sessions "
+            "Favor aerobic base building (Zone 2 4-5×/week) with 2 strength sessions "
             "as injury-prevention insurance. Tempo work and threshold intervals respond well."
         )
     else:
@@ -148,7 +148,7 @@ def _analyze_injury_risk(snps_df) -> dict:
             "level": "Elevated" if col1a1.count("T") == 2 else "Moderate",
             "marker": f"rs1800012 (COL1A1 Sp1) {col1a1}",
             "mitigation": (
-                "Prioritise neuromuscular knee-control drills (Nordics, single-leg "
+                "Prioritize neuromuscular knee-control drills (Nordics, single-leg "
                 "RDL, balance work). Collagen + vitamin C 1 hour pre-training "
                 "(15 g + 50 mg) improves tendon collagen synthesis."
             ),
@@ -170,7 +170,7 @@ def _analyze_injury_risk(snps_df) -> dict:
                 "tissue": "Achilles / patellar tendon",
                 "level": "Protective",
                 "marker": "rs12722 (COL5A1) TT",
-                "mitigation": "Favourable tendon-stiffness profile — running economy advantage.",
+                "mitigation": "Favorable tendon-stiffness profile — running economy advantage.",
             })
 
     if mmp3 and "A" in mmp3:
@@ -235,7 +235,7 @@ def _analyze_recovery(snps_df) -> dict:
         protocol = (
             "Below-average baseline inflammation — tolerate higher training "
             "frequency. Hard sessions back-to-back are feasible with adequate "
-            "fuelling and sleep."
+            "fueling and sleep."
         )
 
     return {
@@ -322,7 +322,7 @@ def _analyze_cognitive_exercise(snps_df) -> dict:
                 "aerobic training are real but slightly muted vs Val/Val."
             ),
             "training_note": (
-                "5+ aerobic sessions/week (Zone 2, 45+ min) maximise BDNF compensation. "
+                "5+ aerobic sessions/week (Zone 2, 45+ min) maximize BDNF compensation. "
                 "Skill-based / coordinative training (dance, martial arts, climbing) "
                 "produces additional BDNF response. Avoid prolonged inactivity."
             ),
@@ -518,7 +518,7 @@ def _analyze_fat_loss_response(snps_df) -> dict:
             "FTO obesity-risk allele — GOOD NEWS: large studies show ≥150 min/week of "
             "moderate aerobic exercise NEUTRALISES the FTO weight-gain effect. Aerobic "
             "exercise is non-negotiable. Strength training adds compounding benefit by "
-            "raising RMR. Combine with high-protein/high-fibre eating for best fat-loss "
+            "raising RMR. Combine with high-protein/high-fiber eating for best fat-loss "
             "outcomes."
         )
     else:
@@ -677,7 +677,7 @@ def _analyze_iron_endurance(snps_df) -> dict:
         )
     else:
         guidance = (
-            "Endurance athletes commonly run low ferritin (foot-strike haemolysis, "
+            "Endurance athletes commonly run low ferritin (foot-strike hemolysis, "
             "sweat losses). Check ferritin annually if you do >5 h/week endurance. "
             "Target ferritin >40 ng/mL for performance."
         )
@@ -703,7 +703,7 @@ def _analyze_stress_fracture(snps_df) -> dict:
     if risk:
         guidance = (
             "Elevated stress-fracture risk markers — for runners/jumpers: ramp running "
-            "mileage ≤10%/week, alternate impact days with cycling/swim, prioritise "
+            "mileage ≤10%/week, alternate impact days with cycling/swim, prioritize "
             "vitamin D ≥40 ng/mL, calcium 1000 mg/day, and bone-loading strength work "
             "(heavy squats, jumps) 2×/week — these strengthen bone more than running."
         )
@@ -725,7 +725,7 @@ def _hr_zones() -> dict:
             {"zone": "Z4 Threshold", "pct": "80–90%", "use": "Lactate threshold intervals (8–20 min)"},
             {"zone": "Z5 VO2max", "pct": "90–100%", "use": "3–5 min hard intervals — high-leverage capacity work"},
         ],
-        "polarised": "80/20 rule: 80% of weekly training in Z1–Z2, 20% in Z3–Z5. Avoid the 'grey zone' (Z3 every day) — neither builds base nor builds peak.",
+        "polarised": "80/20 rule: 80% of weekly training in Z1–Z2, 20% in Z3–Z5. Avoid the 'gray zone' (Z3 every day) — neither builds base nor builds peak.",
     }
 
 
@@ -1317,7 +1317,7 @@ def _render_exercise_protocols(result: dict) -> str:
   <strong>Tier A — proven</strong><ul>{a}</ul>
   <strong>Tier B — some evidence</strong><ul>{b}</ul>
   <strong>Tier C — avoid / unproven</strong><ul>{c}</ul>
-  <p><em>{_esc(ss['personalised_priority'])}</em></p>
+  <p><em>{_esc(ss['personalized_priority'])}</em></p>
 </div>
 """
 
@@ -1374,7 +1374,7 @@ def _render_exercise_protocols(result: dict) -> str:
 def render_exercise_html(result: dict, file_label: str = "") -> str:
     if not result or result.get("status") != "ok":
         return f"""<!DOCTYPE html><html><head><meta charset="utf-8"><title>Exercise</title>{_EX_CSS}</head><body>
-<div class="ex-wrap"><h1>Personalised Exercise Programming</h1>
+<div class="ex-wrap"><h1>Personalized Exercise Programming</h1>
 <p>Insufficient genetic data for exercise programming.</p></div></body></html>"""
 
     pe = result["power_endurance"]
@@ -1408,9 +1408,9 @@ def render_exercise_html(result: dict, file_label: str = "") -> str:
     cog = result["cognitive"]
 
     return f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
-<title>Personalised Exercise{(' — ' + _esc(file_label)) if file_label else ''}</title>
+<title>Personalized Exercise{(' — ' + _esc(file_label)) if file_label else ''}</title>
 {_EX_CSS}</head><body><div class="ex-wrap">
-<h1>Personalised Exercise Programming</h1>
+<h1>Personalized Exercise Programming</h1>
 
 <h2>Power vs Endurance Bias</h2>
 <div class="ex-card">
@@ -1556,7 +1556,7 @@ def render_exercise_html(result: dict, file_label: str = "") -> str:
 Not medical advice. Recommendations are starting points derived from published
 sport-genetics literature. Adjust based on training history, injury status,
 and lab-confirmed inflammation/recovery markers. Consult a physician before
-starting a new exercise programme if you have a cardiovascular or
+starting a new exercise program if you have a cardiovascular or
 musculoskeletal condition.
 </p>
 </div></body></html>"""

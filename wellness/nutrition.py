@@ -1,16 +1,16 @@
 """
-Personalised Nutrition Plan
+Personalized Nutrition Plan
 ===========================
 
 Genotype-driven dietary prescription:
 
   • macro ratios (carb / fat / protein) — FTO, TCF7L2, PPARG, APOE, FADS
-  • foods to emphasise / avoid
+  • foods to emphasize / avoid
   • caffeine guidance — CYP1A2, ADORA2A
   • alcohol guidance — ALDH2, ADH1B
   • salt sensitivity — ACE, AGT
   • lactose tolerance — LCT (rs4988235)
-  • gluten / coeliac risk — HLA-DQ2/8 tag SNPs
+  • gluten / celiac risk — HLA-DQ2/8 tag SNPs
   • methylation diet — MTHFR
   • vitamin D from food — VDR / CYP2R1
 
@@ -18,7 +18,7 @@ Output dict:
   {
     status,
     macros: {pct_carbs, pct_fat, pct_protein, rationale},
-    emphasise: [...], avoid: [...],
+    emphasize: [...], avoid: [...],
     caffeine: {...}, alcohol: {...}, salt: {...},
     lactose: {...}, gluten: {...},
     methylation: {...}, vitamin_d_food: {...},
@@ -71,11 +71,11 @@ def _analyze_macros(snps_df) -> dict:
             carb_pressure -= 1
             factors.append(f"rs9939609 (FTO) {fto} — better response to lower-carb diet")
         else:
-            factors.append(f"rs9939609 (FTO) {fto} — favourable FTO; carb-tolerant")
+            factors.append(f"rs9939609 (FTO) {fto} — favorable FTO; carb-tolerant")
 
     if tcf7l2 and "T" in tcf7l2:
         carb_pressure -= 2
-        factors.append(f"rs7903146 (TCF7L2) {tcf7l2} — reduced glucose tolerance; minimise refined carbs")
+        factors.append(f"rs7903146 (TCF7L2) {tcf7l2} — reduced glucose tolerance; minimize refined carbs")
 
     # rs429358 C + rs7412 C = ε4 carrier — saturated-fat sensitive
     if apoe1 and apoe2 and "C" in apoe1 and "C" in apoe2:
@@ -83,7 +83,7 @@ def _analyze_macros(snps_df) -> dict:
         factors.append("APOE ε4 carrier — lower saturated fat, prefer mono/poly")
 
     if fads and "T" in fads:
-        factors.append(f"rs174547 (FADS1) {fads} — favour direct EPA/DHA from fish, not ALA")
+        factors.append(f"rs174547 (FADS1) {fads} — favor direct EPA/DHA from fish, not ALA")
 
     if ppara and "G" in ppara:
         factors.append(f"rs1800206 (PPARA) {ppara} — wild-type fat metabolism")
@@ -232,7 +232,7 @@ def _analyze_salt(snps_df) -> dict:
         "sensitive": sensitive,
         "factors": factors or ["No salt-sensitivity SNPs typed"],
         "guidance": (
-            "Reduce sodium to ≤2.3 g/day; emphasise potassium-rich foods (leafy greens, "
+            "Reduce sodium to ≤2.3 g/day; emphasize potassium-rich foods (leafy greens, "
             "beans, potato). DASH-style pattern especially beneficial."
             if sensitive else
             "No genetic salt-sensitivity flagged — keep sodium within general "
@@ -283,11 +283,11 @@ def _analyze_gluten(snps_df) -> dict:
         "celiac_risk_haplotype": bool(carrier),
         "factors": factors or ["DQ2/DQ8 tag SNPs not typed"],
         "guidance": (
-            "DQ2/DQ8 carrier — ~3% lifetime risk of developing coeliac disease (vs <0.1% "
+            "DQ2/DQ8 carrier — ~3% lifetime risk of developing celiac disease (vs <0.1% "
             "without). If you have GI symptoms, fatigue, or family history, ask your "
             "physician for serology (tTG-IgA) before starting gluten-free diet."
             if carrier else
-            "No DQ2/DQ8 risk haplotype typed/detected — coeliac disease is essentially "
+            "No DQ2/DQ8 risk haplotype typed/detected — celiac disease is essentially "
             "ruled out. Gluten avoidance unnecessary for autoimmune reasons."
         ),
     }
@@ -312,7 +312,7 @@ def _analyze_methylation_diet(snps_df) -> dict:
         "needs_methylation_support": needs_extra,
         "factors": factors or ["MTHFR not typed"],
         "guidance": (
-            "Emphasise folate-rich foods: leafy greens (spinach, kale, romaine), liver, "
+            "Emphasize folate-rich foods: leafy greens (spinach, kale, romaine), liver, "
             "lentils, asparagus, broccoli. Avoid synthetic folic-acid fortified products "
             "(many cereals, breads) — they compete with active folate. Choose "
             "methylfolate-supplemented options if available."
@@ -343,7 +343,7 @@ def _analyze_vitamin_d_food(snps_df) -> dict:
         "needs_more_intake": needs_more,
         "factors": factors or ["Vitamin D SNPs not typed"],
         "guidance": (
-            "Prioritise high-D foods: wild salmon, sardines, herring, egg yolks, "
+            "Prioritize high-D foods: wild salmon, sardines, herring, egg yolks, "
             "UV-treated mushrooms, fortified dairy. Combine with daytime sun exposure "
             "where possible (10-30 min, depending on skin tone, latitude, season)."
             if needs_more else
@@ -352,19 +352,19 @@ def _analyze_vitamin_d_food(snps_df) -> dict:
     }
 
 
-# ── Foods to emphasise / avoid (synthesised) ───────────────────────────────
+# ── Foods to emphasize / avoid (synthesised) ───────────────────────────────
 
 def _build_food_lists(macros: dict, alcohol: dict, lactose: dict, salt: dict, gluten: dict) -> dict:
-    emphasise: list[str] = []
+    emphasize: list[str] = []
     avoid: list[str] = []
 
     if macros["pct_carbs"] <= 35:
         avoid.extend(["Sugary drinks", "White bread / pastries", "Sweetened breakfast cereals"])
-        emphasise.extend(["Non-starchy vegetables", "Berries", "Quinoa / oats (modest portions)"])
+        emphasize.extend(["Non-starchy vegetables", "Berries", "Quinoa / oats (modest portions)"])
     else:
-        emphasise.extend(["Whole grains (oats, brown rice, barley)", "Legumes", "Sweet potato"])
+        emphasize.extend(["Whole grains (oats, brown rice, barley)", "Legumes", "Sweet potato"])
 
-    emphasise.extend(["Fatty fish (salmon, sardines) 2-3×/week",
+    emphasize.extend(["Fatty fish (salmon, sardines) 2-3×/week",
                       "Olive oil (extra-virgin) — primary cooking fat",
                       "Leafy greens daily (folate + nitrates)",
                       "Nuts & seeds (small handful daily)",
@@ -376,11 +376,11 @@ def _build_food_lists(macros: dict, alcohol: dict, lactose: dict, salt: dict, gl
         avoid.extend(["Processed meats / deli", "Salted snacks", "High-sodium soups & sauces"])
     if lactose["tolerance"] == "Intolerant (non-persistent)":
         avoid.append("Fresh milk / ice cream (lactose intolerance)")
-        emphasise.append("Lactose-free dairy, aged cheeses, kefir/yoghurt")
+        emphasize.append("Lactose-free dairy, aged cheeses, kefir/yoghurt")
     if gluten["celiac_risk_haplotype"]:
         avoid.append("Standard gluten products if symptomatic (DQ2/DQ8 carrier)")
 
-    return {"emphasise": emphasise, "avoid": avoid}
+    return {"emphasize": emphasize, "avoid": avoid}
 
 
 # ── Daily template ──────────────────────────────────────────────────────────
@@ -557,7 +557,7 @@ def _analyze_b12(snps_df) -> dict:
         "lower_functional_b12": lower_status,
         "factors": factors or ["B12 transport SNPs not typed"],
         "guidance": (
-            "Variants in B12 transport/secretor status — prioritise high-bioavailable "
+            "Variants in B12 transport/secretor status — prioritize high-bioavailable "
             "B12 sources: clams, beef liver, sardines, eggs, dairy. Consider 500 µg "
             "methylcobalamin sublingual 2–3×/week if vegetarian/vegan."
             if lower_status else
@@ -591,7 +591,7 @@ def _analyze_vitamin_a(snps_df) -> dict:
             "egg yolks, dairy, liver (1 oz/week), oily fish. Cooking + fat with "
             "carotenoid veg improves absorption."
             if poor else
-            "Normal β-carotene conversion — colourful plant sources (sweet potato, "
+            "Normal β-carotene conversion — colorful plant sources (sweet potato, "
             "carrot, kale, pumpkin) cover retinol needs."
         ),
     }
@@ -718,7 +718,7 @@ def _analyze_satiety(snps_df) -> dict:
         appetite = "Mildly elevated hunger"
     strategies = (
         "High-satiety eating pattern is critical. Anchor every meal with: (1) 30–40 g "
-        "protein (eggs, Greek yoghurt, fish, lean meat, tofu), (2) 8–10 g fibre "
+        "protein (eggs, Greek yoghurt, fish, lean meat, tofu), (2) 8–10 g fiber "
         "(legumes, berries, vegetables), (3) volume from non-starchy veg. Front-load "
         "calories to breakfast/lunch; keep dinner lighter. Avoid liquid calories "
         "(juice, smoothies as meals — they bypass satiety). Pre-meal water 500 mL + "
@@ -764,13 +764,13 @@ def _analyze_saturated_fat(snps_df) -> dict:
             f"APOE ε4 carrier — markedly elevated LDL response to saturated fat. Cap "
             f"saturated fat at ≤{sat_cap_g} g/day (~7% of calories). Replace butter/"
             f"coconut oil with extra-virgin olive oil and avocado; limit red meat to "
-            f"1–2×/week, choose poultry/fish. Prioritise MUFA (olive, avocado, almonds) "
+            f"1–2×/week, choose poultry/fish. Prioritize MUFA (olive, avocado, almonds) "
             f"and PUFA (walnuts, fatty fish). Mediterranean pattern is best-evidence."
         )
     else:
         guidance = (
             f"Standard saturated-fat handling — keep ≤{sat_cap_g} g/day (~10% of "
-            f"calories). Full-fat dairy and moderate red meat acceptable; emphasise "
+            f"calories). Full-fat dairy and moderate red meat acceptable; emphasize "
             f"MUFA/PUFA still."
         )
     return {
@@ -844,7 +844,7 @@ def _analyze_antioxidants(snps_df) -> dict:
             "antioxidant megadose pills — paradoxically blunt training adaptations."
             if needs else
             "Standard endogenous antioxidant capacity — a normal varied diet suffices. "
-            "Aim for diverse plant colours weekly."
+            "Aim for diverse plant colors weekly."
         ),
     }
 
@@ -856,17 +856,17 @@ def _analyze_fiber(snps_df, macros: dict, satiety: dict, salt: dict) -> dict:
     extra: list[str] = []
     if macros["pct_carbs"] >= 50:
         base = 45
-        extra.append("Higher-carb prescription — push fibre to anchor glycemic response.")
+        extra.append("Higher-carb prescription — push fiber to anchor glycemic response.")
     if satiety["appetite_phenotype"] != "Standard":
         base = max(base, 40)
-        extra.append("Elevated appetite — fibre is the most powerful free satiety lever.")
+        extra.append("Elevated appetite — fiber is the most powerful free satiety lever.")
     if salt["sensitive"]:
-        extra.append("Salt-sensitive — potassium-rich high-fibre foods (legumes, potato) double-up benefit.")
+        extra.append("Salt-sensitive — potassium-rich high-fiber foods (legumes, potato) double-up benefit.")
     return {
         "target_g": base,
-        "factors": extra or ["Standard fibre target"],
+        "factors": extra or ["Standard fiber target"],
         "guidance": (
-            f"Target {base} g fibre/day — most adults eat 15. Practical: 1 cup oats "
+            f"Target {base} g fiber/day — most adults eat 15. Practical: 1 cup oats "
             "(8 g), 1 cup berries (8 g), 1 cup beans/lentils (15 g), 2 cups veg (10 g), "
             "1 oz chia/flax (10 g). Ramp up 5 g/week to avoid GI distress; pair with "
             "water increase."
@@ -880,7 +880,7 @@ def _analyze_hydration(snps_df, salt: dict) -> dict:
     avp = _gt(snps_df, "rs1042615")
     note = "Baseline: 30–35 mL/kg body weight daily, +500–750 mL per hour exercise."
     if salt["sensitive"]:
-        note += " Salt-sensitive: pre-load 500 mL water on waking; emphasise potassium-rich fluids (coconut water, broth) over electrolyte powders."
+        note += " Salt-sensitive: pre-load 500 mL water on waking; emphasize potassium-rich fluids (coconut water, broth) over electrolyte powders."
     return {
         "target_ml_per_kg": 33,
         "guidance": note,
@@ -940,16 +940,16 @@ def analyze_nutrition(snps_df: pd.DataFrame | None) -> dict:
         foods["avoid"].extend(["Iron-fortified cereals/breads", "Red meat >1×/week",
                                "Iron-containing multivitamins"])
     if omega3["ala_conversion"] == "Poor":
-        foods["emphasise"].append("Oily fish 3–4×/week (salmon, sardines, mackerel) — FADS poor converter")
+        foods["emphasize"].append("Oily fish 3–4×/week (salmon, sardines, mackerel) — FADS poor converter")
     if sat_fat["apoe_genotype"].startswith("ε4"):
         foods["avoid"].extend(["Butter/coconut oil as primary fats", "Processed red meat"])
-        foods["emphasise"].append("Extra-virgin olive oil (primary fat), Mediterranean pattern")
+        foods["emphasize"].append("Extra-virgin olive oil (primary fat), Mediterranean pattern")
     if choline["increased_need"]:
-        foods["emphasise"].append("Whole eggs 1–2/day, liver 1 oz weekly (PEMT choline need)")
+        foods["emphasize"].append("Whole eggs 1–2/day, liver 1 oz weekly (PEMT choline need)")
     if antiox["reduced_capacity"]:
-        foods["emphasise"].append("Cruciferous vegetables 3–4×/week (sulforaphane → Nrf2)")
+        foods["emphasize"].append("Cruciferous vegetables 3–4×/week (sulforaphane → Nrf2)")
     if taste["bitter"] == "Super-taster":
-        foods["emphasise"].append("Roasted/glazed cruciferous veg (super-taster mitigation)")
+        foods["emphasize"].append("Roasted/glazed cruciferous veg (super-taster mitigation)")
     template = _build_daily_template(macros, caffeine, alcohol)
 
     result = {
@@ -977,7 +977,7 @@ def analyze_nutrition(snps_df: pd.DataFrame | None) -> dict:
         "fiber": fiber,
         "hydration": hydration,
         "caloric": caloric,
-        "emphasise": foods["emphasise"],
+        "emphasize": foods["emphasize"],
         "avoid": foods["avoid"],
         "daily_template": template,
     }
@@ -1420,7 +1420,7 @@ Peak ≥140 mg/dL = caution; ≥180 = restructure.</p>
 def render_nutrition_html(result: dict, file_label: str = "") -> str:
     if not result or result.get("status") != "ok":
         return f"""<!DOCTYPE html><html><head><meta charset="utf-8"><title>Nutrition</title>{_NU_CSS}</head>
-<body><div class="nu-wrap"><h1>Personalised Nutrition Plan</h1>
+<body><div class="nu-wrap"><h1>Personalized Nutrition Plan</h1>
 <p>Insufficient genetic data for nutrition recommendations.</p></div></body></html>"""
 
     m = result["macros"]
@@ -1433,7 +1433,7 @@ def render_nutrition_html(result: dict, file_label: str = "") -> str:
     )
     macro_factors = "".join(f'<div class="nu-factors">{_esc(f)}</div>' for f in m["factors"])
 
-    em_html = "".join(f"<li>{_esc(x)}</li>" for x in result["emphasise"])
+    em_html = "".join(f"<li>{_esc(x)}</li>" for x in result["emphasize"])
     av_html = "".join(f"<li>{_esc(x)}</li>" for x in result["avoid"]) or "<li>—</li>"
 
     def section(title, d, key="guidance"):
@@ -1450,7 +1450,7 @@ def render_nutrition_html(result: dict, file_label: str = "") -> str:
         section("🍷 Alcohol", result["alcohol"]),
         section("🧂 Salt sensitivity", result["salt"]),
         section("🥛 Lactose", result["lactose"]),
-        section("🌾 Gluten / coeliac risk", result["gluten"]),
+        section("🌾 Gluten / celiac risk", result["gluten"]),
         section("🧬 Methylation (folate)", result["methylation"]),
         section("☀ Vitamin D from food", result["vitamin_d_food"]),
         section("🐟 Omega-3 (FADS conversion)", result.get("omega3", {})),
@@ -1523,7 +1523,7 @@ def render_nutrition_html(result: dict, file_label: str = "") -> str:
 <div class="nu-card">
   <strong>📏 Daily targets</strong>
   <ul class="nu-list">
-    <li>Fibre target: <strong>{fib.get('target_g','—')} g/day</strong> — {_esc(fib.get('guidance',''))}</li>
+    <li>Fiber target: <strong>{fib.get('target_g','—')} g/day</strong> — {_esc(fib.get('guidance',''))}</li>
     <li>Hydration: ~{hyd.get('target_ml_per_kg','—')} mL/kg/day — {_esc(hyd.get('guidance',''))}</li>
     <li>Protein floor: <strong>{cal.get('protein_g_per_kg','—')} g/kg body weight</strong></li>
     <li>Saturated fat cap: <strong>≤ {sat.get('saturated_fat_cap_g','—')} g/day</strong></li>
@@ -1538,9 +1538,9 @@ def render_nutrition_html(result: dict, file_label: str = "") -> str:
     )
 
     return f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
-<title>Personalised Nutrition Plan{(' — ' + _esc(file_label)) if file_label else ''}</title>
+<title>Personalized Nutrition Plan{(' — ' + _esc(file_label)) if file_label else ''}</title>
 {_NU_CSS}</head><body><div class="nu-wrap">
-<h1>Personalised Nutrition Plan</h1>
+<h1>Personalized Nutrition Plan</h1>
 
 <h2>Macronutrient Ratio</h2>
 <div class="nu-card">
@@ -1552,7 +1552,7 @@ def render_nutrition_html(result: dict, file_label: str = "") -> str:
 <h2>Foods</h2>
 <div class="nu-two">
   <div class="nu-card">
-    <div class="nu-em"><strong>Emphasise</strong></div>
+    <div class="nu-em"><strong>Emphasize</strong></div>
     <ul class="nu-list">{em_html}</ul>
   </div>
   <div class="nu-card">

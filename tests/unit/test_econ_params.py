@@ -3,7 +3,7 @@
 The registry exists because an internal audit found roughly two thirds of the
 economic parameters had no traceable source. These tests are what stop that
 state from returning: a new constant cannot enter the model without either a
-citation or an explicit statement that it is a judgement call.
+citation or an explicit statement that it is a judgment call.
 """
 
 import re
@@ -42,7 +42,7 @@ def test_assumptions_are_declared_and_uncited():
         assert p.note.strip(), f"{p.key}: assumption without a note"
         assert not p.citation.strip(), f"{p.key}: assumption must not cite"
         assert len(p.note) > 60, (
-            f"{p.key}: an assumption's note must explain the judgement, "
+            f"{p.key}: an assumption's note must explain the judgment, "
             f"not just label it")
 
 
@@ -118,14 +118,14 @@ def test_most_of_the_model_is_sourced():
     # registry starting to see it.
     # NOTE ON THE BOUND. This was 6 while the count was 3, then registering
     # the baseline-risk and effect-size literals out of _collect pushed it to
-    # 7. That is not a regression: those numbers were always judgement calls,
+    # 7. That is not a regression: those numbers were always judgment calls,
     # they were merely invisible ones. Counting a hidden assumption as an
     # assumption is the point. What must stay true is that each one is
     # individually justified and that they remain a small minority of the
     # model — both checked below and in test_whole_model_provenance.
     #
     # Then the adherence archetypes took it to 13. Only the pharmacological
-    # figure has a source worth naming; screening uptake and behavioural
+    # figure has a source worth naming; screening uptake and behavioral
     # maintenance are anchored on ranges rather than on a study, and inventing
     # a PMID to move them into the sourced column is exactly the failure this
     # registry exists to prevent. The proportional bound above is the one that
@@ -137,8 +137,8 @@ def test_most_of_the_model_is_sourced():
     # and often a penetrance — unless costing studies are in hand for it. So
     # broadening coverage and improving provenance pull against each other, and
     # the honest response is to let the count rise while the proportional gate
-    # above holds, rather than to retier judgement as evidence to keep a number
-    # flat. The coeliac anchors are the three in question and they are the
+    # above holds, rather than to retier judgment as evidence to keep a number
+    # flat. The celiac anchors are the three in question and they are the
     # first candidates for real sourcing.
     assert burden["n_assumption"] <= 17, (
         "declared assumptions are allowed but should stay few and "

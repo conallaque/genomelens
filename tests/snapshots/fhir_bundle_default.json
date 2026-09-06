@@ -101,7 +101,7 @@
         },
         "note": [
           {
-            "text": "APOE genotype is a clinically recognised risk modifier for late-onset Alzheimer's disease. \u03b54/\u03b54 carries highest lifetime risk; \u03b52/\u03b52 and \u03b52/\u03b53 may be protective."
+            "text": "APOE genotype is a clinically recognized risk modifier for late-onset Alzheimer's disease. \u03b54/\u03b54 carries highest lifetime risk; \u03b52/\u03b52 and \u03b52/\u03b53 may be protective."
           }
         ],
         "resourceType": "Observation",

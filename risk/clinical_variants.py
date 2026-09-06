@@ -9,12 +9,12 @@ possibly-affected), grade confidence by ClinVar review stars, and hand the
 result to the local AI layer.
 
 This module is deliberately conservative — a false "you're clear" is the worst
-possible output, so every design choice favours honesty over reassurance.
+possible output, so every design choice favors honesty over reassurance.
 
 Data
 ----
 ClinVar is distilled once (``setup.py --clinvar`` → ``distill_clinvar_vcf``) into
-a compact table keyed by a **normalised** ``chrom:pos:ref:alt`` so the same
+a compact table keyed by a **normalized** ``chrom:pos:ref:alt`` so the same
 variant represented differently in ClinVar vs the user VCF still matches. The
 engine loads that table (fast dict) and streams the user VCF against it. If the
 table isn't present, the module degrades gracefully.
@@ -22,13 +22,13 @@ table isn't present, the module degrades gracefully.
 Correctness decisions (each from review):
   * **inheritance-unknown is first-class.** We only assert carrier-vs-affected
     where a small, unambiguous curated ACMG-gene inheritance map applies;
-    otherwise the finding is labelled "inheritance not determined."
+    otherwise the finding is labeled "inheritance not determined."
   * **zygosity is resolved against the matched ALT index**, not generically —
     a ``1/2`` multi-allelic sample is heterozygous for whichever ALT matched.
   * **per-gene compound-het pass:** two distinct P/LP variants in one recessive
     gene → flagged *possible* compound heterozygote (phase unknown without
     parents) — the difference between "carrier" and "possibly affected".
-  * **indel normalisation:** both sides are trimmed to a canonical key so
+  * **indel normalization:** both sides are trimmed to a canonical key so
     anchor-base/left-alignment differences don't cause false negatives; indel
     sensitivity is still reduced and the report says so.
   * **negative result ≠ clear:** an empty findings list always carries an
@@ -114,7 +114,7 @@ _RECESSIVE_CARRIER_GENES = {
 }
 
 
-# ── key normalisation (SNV = identity; indels → canonical trimmed key) ────────
+# ── key normalization (SNV = identity; indels → canonical trimmed key) ────────
 
 def _norm_chrom(c: str) -> str:
     c = c.strip()
@@ -191,7 +191,7 @@ def distill_clinvar_vcf(in_path: str, out_path: str, log=print) -> int:
 
 # A two-record subset of the distilled ClinVar table, committed so that a clean
 # clone can reproduce the documented sample. ClinVar is an NCBI resource in the
-# public domain, so vendoring records is licence-clean.
+# public domain, so vendoring records is license-clean.
 #
 # WHY IT EXISTS. `reference/` is gitignored, so the full distilled table is not
 # in the repository. Without this, `scripts/make_econ_sample.py` on a fresh

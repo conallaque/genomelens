@@ -184,7 +184,7 @@ def cost_effectiveness_frontier(strategies: list[dict] | None = None,
             f"decision."),
         "src": ("Standard CEA frontier with dominance and extended dominance: "
                 "Drummond et al. (2015) Methods for the Economic Evaluation of "
-                "Health Care Programmes, 4th ed."),
+                "Health Care Programs, 4th ed."),
         "caveat": "Illustrative costs and QALYs; the method is the point, not the "
                   "specific numbers.",
     }
@@ -378,7 +378,7 @@ def distributional_cea(groups: list[dict] | None = None,
                     if benefit_gap_ratio else "nowhere near enough to close a gap that large")
 
     # ── Portability gap cost ─────────────────────────────────────────────────
-    # Monetise the gap between full-portability benefit and each group's actual
+    # Monetize the gap between full-portability benefit and each group's actual
     # benefit. This is NOT an equity weight — it is the dollar cost of doing
     # genomic research predominantly in European cohorts.
     _max_gain = max(gains) if gains else 0.0
@@ -455,7 +455,7 @@ def _pgx_icer(test_cost: float, p_event: float, rrr: float, event_cost: float,
     ``added_treatment_cost`` matters: a genotype-guided strategy often SWITCHES
     carriers to a costlier drug (e.g. ticagrelor over generic clopidogrel), which is
     why such strategies are usually cost-effective rather than outright cost-saving.
-    Omitting it — as a naive model does — makes the ICER look far too favourable.
+    Omitting it — as a naive model does — makes the ICER look far too favorable.
     A negative ICER means cost-saving (dominant). The formula is written out so the
     calculation is fully inspectable rather than buried."""
     averted = p_event * rrr * benefiting_fraction
@@ -472,7 +472,7 @@ def _lynch_icer() -> float | None:
         from . import markov as mk
     except Exception:
         return None
-    # Inputs approximated from Mvundura et al. (2010): universal tumour screening,
+    # Inputs approximated from Mvundura et al. (2010): universal tumor screening,
     # modest per-person screening cost, small incidence reduction via cascade
     # surveillance, chronic-disease cost and utilities from the Markov defaults.
     # Lynch screening catches few cases (Lynch is ~3% of colorectal cancer), so the
@@ -533,14 +533,14 @@ def validate_against_published(cases: list[dict] | None = None) -> dict:
             {"name": "CYP2C19-guided antiplatelet therapy",
              "published_icer": 6_500.0, "our_icer": cyp_icer, "tolerance_pct": 0.75,
              "source": "Kazi et al. (2014) Ann Intern Med — genotype-guided "
-                       "antiplatelet therapy was economically favourable (low ICER)."},
+                       "antiplatelet therapy was economically favorable (low ICER)."},
             {"name": "DPYD screening before fluoropyrimidine",
              "published_icer": -1_000.0, "our_icer": dpyd_icer, "tolerance_pct": 0.60,
              "source": "Deenen et al. (2016) J Clin Oncol — upfront DPYD testing "
                        "was cost-saving (dominant)."},
-            {"name": "Lynch-syndrome tumour screening",
+            {"name": "Lynch-syndrome tumor screening",
              "published_icer": 30_000.0, "our_icer": lynch_icer, "tolerance_pct": 0.60,
-             "source": "Mvundura et al. (2010) Genet Med — universal tumour "
+             "source": "Mvundura et al. (2010) Genet Med — universal tumor "
                        "screening ICER in the low tens of thousands per life-year.",
              "note": "Known structural mismatch, reported honestly rather than "
                      "tuned away: the published model screens a whole population to "

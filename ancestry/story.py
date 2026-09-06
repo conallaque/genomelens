@@ -59,7 +59,7 @@ _Y_STORIES = {
             "a genuine survivor lineage of the Neolithic revolution."
         ),
         "religions": (
-            "The Neolithic Near East is the world of the earliest organised "
+            "The Neolithic Near East is the world of the earliest organized "
             "religion humans have material evidence for: Göbekli Tepe (~11,500 "
             "ya) with its megalithic T-shaped pillars carved with animals; the "
             "Anatolian and Mesopotamian mother-goddess and bull cults; later "
@@ -388,7 +388,7 @@ def build_template_story(y_result: dict | None,
                 "and Neanderthals about 50,000 years ago, somewhere in the "
                 "Near East. Every non-African alive today carries this "
                 "inheritance. Your Neanderthal DNA sits at immune-system loci "
-                "and cellular-defence genes; some of it (like the OAS1 "
+                "and cellular-defense genes; some of it (like the OAS1 "
                 "haplotype) is actually adaptive and still helps you fight "
                 "viruses today."
             )

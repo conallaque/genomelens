@@ -15,15 +15,15 @@ disagree, because there is only one of them.
 
 TWO VISUAL RULES THE OLD OUTPUT BROKE.
 
-*Confidence and economic direction are different dimensions.* Colour on the
+*Confidence and economic direction are different dimensions.* Color on the
 evidence badge means evidence only, and nothing else on the page is tinted by
 it. A finding is not shaded green for being high-confidence, because "well
 established" and "good news" are not the same claim and a reader should never
-have to guess which one a colour means.
+have to guess which one a color means.
 
-*Cash and monetised health are never blended.* Expected net monetary benefit
+*Cash and monetized health are never blended.* Expected net monetary benefit
 includes health valued at a willingness-to-pay threshold and is not money
-returned to anyone. It is labelled as such wherever it appears, and the words
+returned to anyone. It is labeled as such wherever it appears, and the words
 "ROI", "return" and "savings" appear nowhere.
 """
 from __future__ import annotations
@@ -60,7 +60,7 @@ def _clip(s, n: int) -> str:
 # ── design system ─────────────────────────────────────────────────────────────
 #
 # Deep teal for structure and headings, one mint tint for grouped blocks, and
-# three badge colours that mean evidence and nothing else. Generous whitespace
+# three badge colors that mean evidence and nothing else. Generous whitespace
 # over density: an extra page costs less than an unreadable one.
 
 CSS = """
@@ -423,22 +423,22 @@ def _foot(p: EconomicsReportPayload, n: int,
 def _verdict(p: EconomicsReportPayload) -> str:
     """The headline, generated from the result rather than asserted.
 
-    Never "your genome is worth $X": that turns a modelled expectation into a
-    possession, and the quantity it names includes monetised health, which is
+    Never "your genome is worth $X": that turns a modeled expectation into a
+    possession, and the quantity it names includes monetized health, which is
     not money anyone receives.
     """
     r = p.reference_case
     cheaper, healthier = r.incremental_cost < 0, r.incremental_qalys > 0
     if cheaper and healthier:
-        return ("Acting on these findings is modelled to improve health and "
+        return ("Acting on these findings is modeled to improve health and "
                 "reduce healthcare spending.")
     if healthier:
-        return ("Acting on these findings is modelled to improve health at "
+        return ("Acting on these findings is modeled to improve health at "
                 "additional healthcare cost.")
     if cheaper:
-        return ("Acting on these findings is modelled to reduce healthcare "
+        return ("Acting on these findings is modeled to reduce healthcare "
                 "spending without a measurable health gain.")
-    return ("Acting on these findings is not modelled to improve health or "
+    return ("Acting on these findings is not modeled to improve health or "
             "reduce healthcare spending.")
 
 
@@ -530,7 +530,7 @@ def render_page_one(p: EconomicsReportPayload) -> str:
         # "of the same draws" and naming the overlap is the whole fix; the
         # numbers were never wrong.
         _cs_n = round(u.probability_cost_saving * u.psa_iterations)
-        unc_cap = (f"modelled simulations cost-effective "
+        unc_cap = (f"modeled simulations cost-effective "
                    f"({fmt.probability(u.probability_cost_effective)}); "
                    f"{fmt.count(_cs_n)} of the same draws are also cost-saving "
                    f"({fmt.probability(u.probability_cost_saving)}) "
@@ -563,9 +563,9 @@ def render_page_one(p: EconomicsReportPayload) -> str:
       <div class="val {'pos' if r.incremental_cost < 0 else 'neg'}"
         >{fmt.signed_money(r.incremental_cost)}</div>
       <div class="unit">healthcare-sector perspective</div>
-      <div class="cap">negative means the modelled programme spends less than
+      <div class="cap">negative means the modeled program spends less than
         usual care</div></div>
-    <div class="mcard"><div class="lbl">Modelled net benefit</div>
+    <div class="mcard"><div class="lbl">Modeled net benefit</div>
       <div class="val">{fmt.money(r.nmb)}</div>
       <div class="unit">reference-case NMB</div>
       <div class="cap">at {fmt.money(r.wtp)} per QALY. This values health at
@@ -578,7 +578,7 @@ def render_page_one(p: EconomicsReportPayload) -> str:
   <div class="banner">
     <div class="count">{n_priced}</div>
     <div class="btxt">
-      <div class="bh">findings carry a standardised economic estimate</div>
+      <div class="bh">findings carry a standardized economic estimate</div>
       <div class="bs">{_e(_confidence_mix(priced))}{_e(unstd_line)}</div>
       <div class="pills">{pills}</div>
     </div>
@@ -706,7 +706,7 @@ def _glance_row(f) -> str:
     if f.canonical_expected_nmb is None:
         cell = ('<div class="m na">Not routed to the engine</div>'
                 if not f.is_monetized
-                else '<div class="m na">Not yet standardised</div>')
+                else '<div class="m na">Not yet standardized</div>')
     else:
         v = f.canonical_expected_nmb
         cell = (f'<div class="m{" neg" if v < 0 else ""}">{fmt.money(v)}</div>')
@@ -726,7 +726,7 @@ def render_page_two(p: EconomicsReportPayload) -> str:
     holds. Every finding appears; none is dropped to make the page fit.
     """
     # Flatten to (group, finding) so a group can straddle a sheet boundary and
-    # be re-labelled "continued" rather than forcing an early break.
+    # be re-labeled "continued" rather than forcing an early break.
     flat: list[tuple[str, object]] = []
     for group, items in p.findings_page_groups():
         for f in items:
@@ -765,7 +765,7 @@ def render_page_two(p: EconomicsReportPayload) -> str:
     unstd = ""
     if n_unstd:
         word = "One finding is" if n_unstd == 1 else f"{n_unstd} findings are"
-        unstd = (f'<div class="info">{word} shown without a standardised '
+        unstd = (f'<div class="info">{word} shown without a standardized '
                  f'expected NMB rather than being assigned a value the model '
                  f'cannot support.</div>')
 
@@ -853,7 +853,7 @@ def render_page_two(p: EconomicsReportPayload) -> str:
 def _econ_box(f: FindingEconomics) -> str:
     if f.canonical_expected_nmb is None:
         head = ("Not routed to the economic engine" if not f.is_monetized
-                else "Economic pathway not yet standardised")
+                else "Economic pathway not yet standardized")
         why = _clip(f.reason_not_monetized, 62) or "no registry-backed pathway"
         return f"""<div class="econbox">
         <div class="eh">Expected NMB</div>
@@ -936,7 +936,7 @@ def render_page_three(p: EconomicsReportPayload) -> str:
                   "event, less the cost of acting. Provenance on the methods page.")
     if not cards:
         cards = ('<div class="info">This run produced no medication-genotype '
-                 'findings with a standardised economic pathway.</div>')
+                 'findings with a standardized economic pathway.</div>')
     return f"""
 <section class="sheet">
   {_mast(p, "Medication-genotype findings")}
@@ -957,7 +957,7 @@ def render_page_three(p: EconomicsReportPayload) -> str:
 def _estrip(f: FindingEconomics) -> str:
     if f.canonical_expected_nmb is None:
         label = ("Not routed to the economic engine" if not f.is_monetized
-                 else "Economic pathway not yet standardised")
+                 else "Economic pathway not yet standardized")
         why = _clip(f.reason_not_monetized, 70)
         return (f'<div class="estrip"><span class="el">Expected NMB</span>'
                 f'<span class="ev na">{_e(label)}</span>'
@@ -991,8 +991,8 @@ def _pgx_basis_note(f: FindingEconomics) -> str:
     """Mark a PGx figure that came from the generic flag, not a pair-specific CEA.
 
     Five findings on a real genome printed the same value because PGX_CEA holds
-    five gene-drug pairs and none of them was one of these. Unlabelled that is
-    indistinguishable from a bug; labelled it is a stated limit of the model.
+    five gene-drug pairs and none of them was one of these. Unlabeled that is
+    indistinguishable from a bug; labeled it is a stated limit of the model.
     """
     if f.pgx_basis == "generic_fallback":
         return ' <span class="dflt">generic PGx flag</span>'
@@ -1021,7 +1021,7 @@ def render_page_four(p: EconomicsReportPayload) -> str:
                  "Reported, not costed"):
         items.extend(groups.get(name, []))
     # Detail cards are for findings the model can actually explain. The ones
-    # with no standardised pathway have nothing to decompose, so a card would
+    # with no standardized pathway have nothing to decompose, so a card would
     # be four empty fields; they are named in a closing line instead and appear
     # in full on page 2.
     priced = [f for f in items if f.canonical_expected_nmb is not None]
@@ -1031,7 +1031,7 @@ def render_page_four(p: EconomicsReportPayload) -> str:
     generic = 0
     for f in priced[:5]:
         fields = [("Potential decision",
-                   f.action_summary or "No standardised action pathway "
+                   f.action_summary or "No standardized action pathway "
                                        "recorded.")]
         if f.action_caveat:
             fields.append(("Key assumption", f.action_caveat))
@@ -1060,7 +1060,7 @@ def render_page_four(p: EconomicsReportPayload) -> str:
         if more > 0:
             names += f", and {more} more"
         tail = (f'<div class="info" style="margin-top:11px"><b>Reported without '
-                f'a standardised value ({len(unpriced)}):</b> {_e(names)}. No '
+                f'a standardized value ({len(unpriced)}):</b> {_e(names)}. No '
                 f'registry-backed economic pathway exists for these yet, so '
                 f'none is invented. Each appears with its decision and evidence '
                 f'grade on the glance pages.</div>')
@@ -1073,7 +1073,7 @@ def render_page_four(p: EconomicsReportPayload) -> str:
   single standard of proof: this page runs from well-established variants to
   exploratory ones, and the badge on each card says which is which. Lower
   confidence changes how a finding should be read, not whether it is shown. A
-  negative expected NMB means the modelled cost of acting exceeds the modelled
+  negative expected NMB means the modeled cost of acting exceeds the modeled
   benefit &mdash; useful information, not an error. Evidence grade reflects the
   strength of the association, not the size of the value; provenance is on the
   methods page.</p>
@@ -1107,7 +1107,7 @@ def render_page_five(p: EconomicsReportPayload) -> str:
     # correction unevidenced. Naming it is what turns the number into an
     # argument for the pooling logic instead of against it.
     raw_note = ("<p class=\"note\"><strong>Raw is an uncorrected sum, not a "
-                "modelled result.</strong> It adds the risk reductions of "
+                "modeled result.</strong> It adds the risk reductions of "
                 "findings that share a condition, which is not how "
                 "probabilities combine. Any value above 100% is the artifact "
                 "this correction removes. The pooled figure beside it is the "
@@ -1116,11 +1116,11 @@ def render_page_five(p: EconomicsReportPayload) -> str:
     adher = c.efficacy_cost_averted - c.effectiveness_cost_averted
     pct = (overlap / c.naive_cost_averted) if c.naive_cost_averted else 0.0
     apct = (adher / c.efficacy_cost_averted) if c.efficacy_cost_averted else 0.0
-    # A second naive-to-realised walkthrough used to render here. It made the
+    # A second naive-to-realized walkthrough used to render here. It made the
     # same trip in one combined step; the "two
     # corrections" block below walks the same $60,291 to the same $28,824 and
     # additionally splits the reduction into its structural (pooling) and
-    # behavioural (adherence) halves. Showing both put 1,293px on a 1,240px
+    # behavioral (adherence) halves. Showing both put 1,293px on a 1,240px
     # sheet and printed the same journey twice, once less informatively.
     return f"""
 <section class="sheet">
@@ -1152,7 +1152,7 @@ def render_page_five(p: EconomicsReportPayload) -> str:
       <th style="text-align:right">Baseline</th>
       <th style="text-align:right">Raw<br><span class="thsub">uncorrected</span></th>
       <th style="text-align:right">Pooled</th><th style="text-align:right">Adherence</th>
-      <th style="text-align:right">Realised</th><th style="text-align:right">Cost averted</th>
+      <th style="text-align:right">Realized</th><th style="text-align:right">Cost averted</th>
       <th style="text-align:right">QALYs</th><th style="text-align:right">NMB</th>
     </tr></thead><tbody>{rows}</tbody></table>
   {raw_note}
@@ -1160,7 +1160,7 @@ def render_page_five(p: EconomicsReportPayload) -> str:
     <h3>Two corrections, applied in order</h3>
     <p class="sub">The engine reports these as one combined reduction. They rest
       on different evidence and are separated here: overlap is a structural
-      correction, adherence a behavioural one.</p>
+      correction, adherence a behavioral one.</p>
     <div class="steps">
       <div class="step"><div class="sl">Naive avoided cost</div>
         <div class="sv">{fmt.money(c.naive_cost_averted)}</div>
@@ -1173,7 +1173,7 @@ def render_page_five(p: EconomicsReportPayload) -> str:
           liability, one cost of illness</div></div>
       <div class="arrow"><div class="amt">&minus;{fmt.money(adher)}</div>
         <div class="gl">real-world<br>adherence</div><div class="bar"></div></div>
-      <div class="step"><div class="sl">Realised benefit</div>
+      <div class="step"><div class="sl">Realized benefit</div>
         <div class="sv">{fmt.money(c.effectiveness_cost_averted)}</div>
         <div class="sn">{fmt.percentage(apct, places=0)} further removed
           &mdash; efficacy is not effectiveness</div></div>
@@ -1282,8 +1282,8 @@ def render_page_six(p: EconomicsReportPayload) -> str:
     return f"""
 <section class="sheet">
   {_mast(p, "Uncertainty, evidence & model discipline")}
-  <h1 class="head">How sure is this, and what rests on judgement?</h1>
-  <p class="intro">Uncertainty has two layers: the spread of modelled outcomes,
+  <h1 class="head">How sure is this, and what rests on judgment?</h1>
+  <p class="intro">Uncertainty has two layers: the spread of modeled outcomes,
   and the provenance of the inputs producing that spread. A robust decision does
   not make its inputs precise, so both are shown.</p>
   <h2 class="sec">Net monetary benefit across
@@ -1307,7 +1307,7 @@ def render_page_six(p: EconomicsReportPayload) -> str:
     <div class="panel mint"><h4>Cost-saving</h4>
       <div class="ph">{_e(fmt.simulation_count(u.probability_cost_saving,
                                                u.psa_iterations))}</div>
-      <p>the modelled programme costs less than usual care
+      <p>the modeled program costs less than usual care
         ({fmt.probability(u.probability_cost_saving)}).
         {_e(_clip(u.note, 130))}</p>
       <p style="margin-top:6px">{_e(_ceac_at_zero_line(p))}</p></div>
@@ -1327,7 +1327,7 @@ def render_page_six(p: EconomicsReportPayload) -> str:
         <dd>{fmt.percentage(pr.model_pct_resolvable / 100, places=1)}</dd>
         <dt>Whole model &mdash; attributed</dt>
         <dd>{fmt.percentage(pr.model_pct_attributed_or_better / 100, places=1)}</dd>
-        <dt>Whole model &mdash; judgement only</dt>
+        <dt>Whole model &mdash; judgment only</dt>
         <dd>{fmt.percentage(pr.model_pct_unsourced / 100, places=1)}</dd>
       </dl>
       <p style="margin-top:7px">Two different denominators &mdash;
@@ -1430,8 +1430,8 @@ _LIMITATIONS = (
     "economic evaluation or a submission to any authority.",
     "Where a condition-specific baseline risk is unavailable a generic "
     "registered assumption is used; those assumptions dominate the sensitivity "
-    "analysis and are labelled as such.",
-    "Costs are not inflation-normalised to a single price year.",
+    "analysis and are labeled as such.",
+    "Costs are not inflation-normalized to a single price year.",
     "Findings without a registry-backed pathway are excluded from net monetary "
     "benefit rather than assigned an invented value.",
     "Clinically relevant findings require confirmation by an appropriate "
@@ -1486,7 +1486,7 @@ def render_page_eight(p: EconomicsReportPayload) -> str:
         <dt>Registry sourced</dt><dd>{fmt.percentage(pr.registry_pct_sourced / 100, places=1)}</dd>
         <dt>Model, resolvable</dt><dd>{fmt.percentage(pr.model_pct_resolvable / 100, places=1)}</dd>
         <dt>Model, attributed</dt><dd>{fmt.percentage(pr.model_pct_attributed_or_better / 100, places=1)}</dd>
-        <dt>Model, judgement only</dt><dd>{fmt.percentage(pr.model_pct_unsourced / 100, places=1)}</dd>
+        <dt>Model, judgment only</dt><dd>{fmt.percentage(pr.model_pct_unsourced / 100, places=1)}</dd>
       </dl>
       <p style="margin-top:8px">A parameter declared as an assumption may not
         cite a source &mdash; the registry refuses to load if one does.</p></div>

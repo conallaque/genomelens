@@ -16,17 +16,17 @@ associations to:
   * microbiome shaping      — FUT2 secretor status → mucosal fucosylation, a
                               well-replicated *host* determinant of
                               *Bifidobacterium* abundance
-  * gluten / coeliac risk   — HLA-DQ2.5 / DQ8 tag SNPs
+  * gluten / celiac risk   — HLA-DQ2.5 / DQ8 tag SNPs
   * food intolerance        — AOC1 (DAO) histamine-degradation capacity
   * inflammatory-bowel risk — NOD2 (risk) and IL23R (protective) modifiers
 
 These are **predispositions**, not diagnoses or measurements; each listed trait
 explains only a fraction of phenotype variance and is heavily modified by diet,
-fibre intake, antibiotics, and environment. Microbiome-shaping findings are
+fiber intake, antibiotics, and environment. Microbiome-shaping findings are
 tiered low-moderate confidence accordingly.
 
 Several SNPs are reused from existing registry records rather than re-declared:
-FUT2 (rs602662 — wellness.py reads it for B12) and the coeliac HLA-DQ tags
+FUT2 (rs602662 — wellness.py reads it for B12) and the celiac HLA-DQ tags
 (rs2187668 / rs7454108 — nutrition.py reads them for gluten). This panel reads
 them for the gut angle and **complements — does not replace** those sections.
 
@@ -73,7 +73,7 @@ def _dose(snps_df: pd.DataFrame, rsid: str) -> int | None:
 
 CAT_CARB = "Carbohydrate Digestion"
 CAT_MICRO = "Microbiome Shaping"
-CAT_GLUTEN = "Gluten & Coeliac Risk"
+CAT_GLUTEN = "Gluten & Celiac Risk"
 CAT_INTOL = "Food Intolerance"
 CAT_IBD = "Inflammatory-Bowel Predisposition"
 
@@ -106,12 +106,12 @@ def _lactase(snps):
                   "typically continues into adulthood, so fresh dairy is usually "
                   "well tolerated.")
         action = ("No restriction indicated on genetic grounds. Secondary "
-                  "intolerance can still occur (illness, ageing, gut injury).")
+                  "intolerance can still occur (illness, aging, gut injury).")
     else:
         result = ("Lactase non-persistence genotype (no persistence allele) — "
                   "lactase activity declines after weaning in most carriers, so "
-                  "fresh milk / ice-cream may cause bloating, gas, or diarrhoea.")
-        action = ("Favour lactose-free milk, hard aged cheeses (parmesan, "
+                  "fresh milk / ice-cream may cause bloating, gas, or diarrhea.")
+        action = ("Favor lactose-free milk, hard aged cheeses (parmesan, "
                   "cheddar) and fermented dairy (yoghurt, kefir); lactase enzyme "
                   "tablets help. Penetrance varies — many non-persisters tolerate "
                   "small amounts.")
@@ -136,7 +136,7 @@ def _fut2_secretor(snps):
                   "Non-secretors also resist most norovirus strains and may "
                   "absorb B12 less efficiently (see Wellness).")
         action = ("Consider Bifidobacterium-containing fermented foods / "
-                  "probiotics and prebiotic fibre to support bifidobacteria; "
+                  "probiotics and prebiotic fiber to support bifidobacteria; "
                   "monitor B12 status. This is a host-genetic tendency, not a "
                   "microbiome measurement.")
     else:
@@ -144,20 +144,20 @@ def _fut2_secretor(snps):
                   "mucus (the more common state), associated with typical "
                   "Bifidobacterium-bearing mucosal microbiota.")
         action = ("No specific action. Secretor status is one of many host "
-                  "factors shaping the microbiome; daily diet and fibre intake "
+                  "factors shaping the microbiome; daily diet and fiber intake "
                   "dominate.")
     return {"category": CAT_MICRO, "trait": "FUT2 Secretor Status",
             "result": result, "action": action,
             "evidence": f"{rsid} non-secretor-allele dose: {dose}", "confidence": "moderate"}
 
 
-# ─── Gluten / coeliac ──────────────────────────────────────────────────────
+# ─── Gluten / celiac ──────────────────────────────────────────────────────
 
-def _coeliac(snps):
+def _celiac(snps):
     have_25 = _gt(snps, "rs2187668") is not None
     have_8 = _gt(snps, "rs7454108") is not None
     if not have_25 and not have_8:
-        return _chip_gap(CAT_GLUTEN, "Coeliac HLA-DQ2.5 / DQ8 Risk",
+        return _chip_gap(CAT_GLUTEN, "Celiac HLA-DQ2.5 / DQ8 Risk",
                          "rs2187668 / rs7454108", "HLA-DQA1/DQB1")
     dq25 = _dose(snps, "rs2187668")  # derived T tags DQ2.5
     dq8 = _dose(snps, "rs7454108")   # derived C tags DQ8
@@ -168,23 +168,23 @@ def _coeliac(snps):
     if dq8 is not None:
         tags.append(f"DQ8(rs7454108) dose {dq8}")
     if carries:
-        result = ("Carries a coeliac-permissive HLA haplotype tag (DQ2.5 and/or "
+        result = ("Carries a celiac-permissive HLA haplotype tag (DQ2.5 and/or "
                   "DQ8). ~30-40% of the general population carry one and most "
-                  "never develop coeliac disease — the haplotype is necessary "
+                  "never develop celiac disease — the haplotype is necessary "
                   "but far from sufficient. Tag-SNP method, not full HLA typing.")
         action = ("If you have GI / iron-deficiency / skin symptoms, ask a "
                   "physician for tTG-IgA serology BEFORE removing gluten "
                   "(going gluten-free first invalidates the test). Do not "
                   "self-diagnose from this tag.")
     else:
-        result = ("Neither the DQ2.5 nor DQ8 tag SNP detected. >99% of coeliac "
-                  "patients carry one of these haplotypes, so classic coeliac "
+        result = ("Neither the DQ2.5 nor DQ8 tag SNP detected. >99% of celiac "
+                  "patients carry one of these haplotypes, so classic celiac "
                   "disease is genetically very unlikely.")
-        action = ("Coeliac disease essentially ruled out on genetic grounds; "
+        action = ("Celiac disease essentially ruled out on genetic grounds; "
                   "gluten avoidance is not warranted for autoimmune reasons. "
-                  "Non-coeliac gluten/wheat sensitivity is a separate, non-HLA "
+                  "Non-celiac gluten/wheat sensitivity is a separate, non-HLA "
                   "entity.")
-    return {"category": CAT_GLUTEN, "trait": "Coeliac HLA-DQ2.5 / DQ8 Risk",
+    return {"category": CAT_GLUTEN, "trait": "Celiac HLA-DQ2.5 / DQ8 Risk",
             "result": result, "action": action,
             "evidence": "; ".join(tags), "confidence": "moderate"}
 
@@ -236,7 +236,7 @@ def _nod2_crohn(snps):
                   "develop Crohn's.")
         action = ("Awareness only — no validated gene-based prevention. Not "
                   "smoking is the strongest modifiable Crohn's factor. Report "
-                  "persistent diarrhoea, abdominal pain, or rectal bleeding to a "
+                  "persistent diarrhea, abdominal pain, or rectal bleeding to a "
                   "physician. The other two NOD2 variants (G908R, 1007fs) are "
                   "not evaluated here.")
     else:
@@ -259,8 +259,8 @@ def _il23r_protective(snps):
         result = ("Carries IL23R R381Q (Gln381) — a well-replicated *protective* "
                   "variant that lowers risk of Crohn's disease, ulcerative "
                   "colitis, ankylosing spondylitis and psoriasis by dampening "
-                  "IL-23 signalling. Present in only ~5-7% of Europeans.")
-        action = ("Favourable finding; no action needed. Does not guarantee "
+                  "IL-23 signaling. Present in only ~5-7% of Europeans.")
+        action = ("Favorable finding; no action needed. Does not guarantee "
                   "protection — IBD is highly polygenic.")
     else:
         result = ("Does not carry the IL23R R381Q protective allele — the common "
@@ -280,8 +280,8 @@ def analyze_gut_health(snps_df: pd.DataFrame) -> dict:
         _lactase,
         # Microbiome shaping
         _fut2_secretor,
-        # Gluten / coeliac
-        _coeliac,
+        # Gluten / celiac
+        _celiac,
         # Food intolerance
         _histamine_dao,
         # Inflammatory-bowel predisposition

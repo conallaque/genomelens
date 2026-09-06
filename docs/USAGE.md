@@ -152,7 +152,7 @@ laptop, some patience, and disk space is enough — and nothing ever leaves the 
 ## Features
 
 ### Core analyses
-- **Curated SNP catalogue** — thousands of variants annotated for disease risk,
+- **Curated SNP catalog** — thousands of variants annotated for disease risk,
   drug response, traits, methylation, detox, hormones, and more.
 - **APOE genotype** — Alzheimer's risk and lipid metabolism inference.
 - **Y-DNA haplogroup** — recursive tree walker (Macro-K → N/O/Q/P/R) with full
@@ -187,11 +187,11 @@ laptop, some patience, and disk space is enough — and nothing ever leaves the 
   HbA1c, vitamin D, ferritin, testosterone, TSH, …).
 - **Mendelian randomization** — causal-direction projections.
 - **Genetic longevity** — biological-age proxy.
-- **Reproductive simulator** — partner-by-partner offspring risk modelling.
+- **Reproductive simulator** — partner-by-partner offspring risk modeling.
 - **Imputation** — Beagle 5.4 against 1000G Phase 3 (optional, ≈30-90 min).
 - **QC** — callability grading, sex inference, file hash, format detection.
 
-### V6 personalisation modules
+### V6 personalization modules
 - **Comprehensive blood-work analysis** (`--bloodwork labs.json`) — two layers:
   (1) a clinical engine classifying ≈50 biomarkers against standard *and*
   functional/optimal ranges across 12 body systems, with ≈12 calculated markers
@@ -200,13 +200,13 @@ laptop, some patience, and disk space is enough — and nothing ever leaves the 
   ABCG2, UGT1A1, LPA), and per-system + overall health scores; and (2) the
   original genetics-vs-labs comparison flagging confirmed/partial/diverged rows
   with SD-scaled deltas.
-- **Personalised supplement stack** — tiered (essential/recommended/optional)
+- **Personalized supplement stack** — tiered (essential/recommended/optional)
   recommendations driven by methylation, vitamin, hormone, inflammation, and
   detox SNPs. Includes dose, timing, form, monthly cost, and interactions.
-- **Personalised exercise programming** — ACTN3, ACE, COL1A1/5A1, PPARGC1A,
+- **Personalized exercise programming** — ACTN3, ACE, COL1A1/5A1, PPARGC1A,
   IL6, BDNF, CLOCK driven power/endurance bias, injury risk, recovery speed,
   chronotype window, and a 7-day template.
-- **Personalised nutrition plan** — FTO/TCF7L2/FADS/APOE-driven macro ratio,
+- **Personalized nutrition plan** — FTO/TCF7L2/FADS/APOE-driven macro ratio,
   food emphasis/avoid lists, caffeine + alcohol + salt + lactose + gluten +
   methylation guidance, daily meal pattern.
 
@@ -263,7 +263,7 @@ flowchart TB
     end
     tier1 --> Core
 
-    subgraph V6["V6 personalisation"]
+    subgraph V6["V6 personalization"]
         direction LR
         BW["bloodwork"]
         SU["supplements"]
@@ -308,7 +308,7 @@ flowchart TB
 
 The pipeline is **horizontally pluggable** — every module is imported in a
 `try / except ImportError` block, so deleting a single file degrades gracefully
-rather than breaking the run. The V6 personalisation layer reads only the
+rather than breaking the run. The V6 personalization layer reads only the
 structured dicts produced by the core modules; it never re-derives genotype
 calls. The `personalized_plan` dashboard is a pure synthesiser — it imports
 only its sibling V6 outputs and stitches them into a single executive-summary
@@ -495,7 +495,7 @@ pytest --snapshot-update tests/golden/  # regenerate golden snapshots (review th
 
 The suite ships **780 tests** across:
 
-- `tests/unit/` — per-module behavioural tests (strand-handling, threshold
+- `tests/unit/` — per-module behavioral tests (strand-handling, threshold
   boundaries, render smoke tests).
 - `tests/registry/` — invariants for the unified SNP registry (frozen
   records, allele validation, position lookup).
@@ -537,7 +537,7 @@ opinion about layout, and here the layout is load-bearing.
 
 ### Extending it
 
-*(The licence is All Rights Reserved, so this is a note on how the code is organised rather than an invitation for pull requests.)*
+*(The license is All Rights Reserved, so this is a note on how the code is organized rather than an invitation for pull requests.)*
 
 The project is structured so each analysis module is independent — the
 easiest way to extend it is to add a new module that takes `snps_df` and
@@ -560,7 +560,7 @@ returns a structured dict, then wire it into `analyze.py` behind a
   predictions typically explain 5–20% of trait variance; phrase tier labels
   and thresholds accordingly. "Diverged" in `wellness/bloodwork.py` means "non-genetic
   driver dominating," not "the genetic prediction is wrong."
-- **Add unit tests + a golden snapshot.** New behaviour must be locked
+- **Add unit tests + a golden snapshot.** New behavior must be locked
   against regression. See `tests/unit/test_supplements.py` as the template.
 
 For larger architectural changes (new pipeline stages, output formats, the

@@ -243,12 +243,12 @@ def _w_muscle_fiber(snps):
     if g == "TT":
         return {"category": CAT_FITNESS, "trait": "Muscle Fiber Composition",
                 "result": "Endurance-typical (ACTN3 null)",
-                "action": "Endurance training favoured. Power training still effective; just less elite-level advantage.",
+                "action": "Endurance training favored. Power training still effective; just less elite-level advantage.",
                 "evidence": "ACTN3: TT", "confidence": "high"}
     if g == "CC":
         return {"category": CAT_FITNESS, "trait": "Muscle Fiber Composition",
                 "result": "Power/sprint-typical (ACTN3 RR)",
-                "action": "Sprint/strength training favoured.",
+                "action": "Sprint/strength training favored.",
                 "evidence": "ACTN3: CC", "confidence": "high"}
     return {"category": CAT_FITNESS, "trait": "Muscle Fiber Composition",
             "result": "Mixed type",
@@ -346,7 +346,7 @@ def _w_telomere(snps):
     score = (tert or 0) + (obfc1 or 0)
     if score >= 2:
         return {"category": CAT_AGING, "trait": "Telomere Length Tendency",
-                "result": "Genetic profile favouring longer telomeres",
+                "result": "Genetic profile favoring longer telomeres",
                 "action": "Lifestyle dominates: Mediterranean diet, exercise, sleep, stress management.",
                 "evidence": f"TERT + OBFC1 dose: {score}", "confidence": "low"}
     return {"category": CAT_AGING, "trait": "Telomere Length Tendency",

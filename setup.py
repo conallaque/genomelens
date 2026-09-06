@@ -404,7 +404,7 @@ def setup_ancestry() -> None:
             ("rs3827760", "EDAR",     "EAS/AMR-informative"),
             ("rs1426654", "SLC24A5",  "EUR/SAS pigmentation"),
             ("rs16891982", "SLC45A2", "EUR pigmentation"),
-            ("rs12913832", "HERC2",   "EUR eye colour"),
+            ("rs12913832", "HERC2",   "EUR eye color"),
             ("rs1805007",  "MC1R",    "EUR red hair"),
             ("rs1042602",  "TYR",     "EUR pigmentation"),
             ("rs17822931", "ABCC11",  "EAS/AMR earwax"),

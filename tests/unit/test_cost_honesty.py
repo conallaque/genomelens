@@ -5,7 +5,7 @@ A) MARGINAL vs AVERAGE COST — averting one case frees the marginal cost of tha
    savings (the "freeing a bed doesn't save its average cost" error).
 
 B) COST-SAVING vs COST-EFFECTIVE — prevention is usually cost-effective (good value per
-   QALY) but not cost-saving (net cash out). Monetised QALYs must never be presented as
+   QALY) but not cost-saving (net cash out). Monetized QALYs must never be presented as
    money returned.
 
 Both assert THEORETICAL PROPERTIES (directions and invariants), not memorised outputs.
@@ -57,9 +57,9 @@ def _fake_econ(outcome, prevalence, qaly_gain, cost):
          "qaly_gain": qaly_gain, "cost": cost, "confidence": "high"}]}
 
 
-def test_net_cash_excludes_monetised_qalys():
+def test_net_cash_excludes_monetized_qalys():
     # net_cash is money only: averted cost minus spend. It must never include the
-    # monetised-QALY term that dominates total_net.
+    # monetized-QALY term that dominates total_net.
     pe = he.analyze_personal_economics(_fake_econ(100_000, 0.5, 2.0, 500))
     assert pe["available"]
     assert pe["net_cash"] == pe["total_avoided"] - pe["total_intervention"]
@@ -107,7 +107,7 @@ def test_cca_reports_no_summary_ratio():
 
 
 def test_cca_keeps_qalys_in_their_own_unit():
-    # QALYs must be reported as QALYs, not monetised into the same column as cash.
+    # QALYs must be reported as QALYs, not monetized into the same column as cash.
     cca = he.build_cost_consequence_analysis(
         he.analyze_personal_economics(_fake_econ(30_000, 0.3, 0.5, 250)))
     qrow = next(r for r in cca["rows"] if "life-years" in r["measure"])
@@ -131,8 +131,8 @@ def test_cca_degrades_when_no_items():
 
 # ── D) the stated horizon must actually enter the arithmetic ─────────────────
 
-def test_horizon_discount_is_applied_not_just_labelled():
-    # PERSONAL_HORIZON_YEARS labelled the output "Over 10 years" while the
+def test_horizon_discount_is_applied_not_just_labeled():
+    # PERSONAL_HORIZON_YEARS labeled the output "Over 10 years" while the
     # figures were undiscounted sums of future dollars. The discount factor must
     # be a real fraction that reduces the claim.
     assert 0.0 < he._MIDPOINT_DISCOUNT < 1.0

@@ -6,7 +6,7 @@ Parses PGS Catalog harmonised scoring files (Hmpos_GRCh37 format) and applies
 them to the user's genotype data (chip + imputed). For each condition:
 
   * Raw additive score: Σ effect_weight_i × dosage_i
-  * EUR-normalised Z-score and percentile (against expected Hardy-Weinberg
+  * EUR-normalized Z-score and percentile (against expected Hardy-Weinberg
     distribution using EUR allele frequencies if available, else the
     published reference distribution).
   * Tier classification: Low / Below Average / Average / Elevated / High

@@ -39,7 +39,7 @@ def test_homozygous_minor_is_neither():
     assert "Neither" in r["marker"]
 
 
-def test_opposite_strand_is_normalised():
+def test_opposite_strand_is_normalized():
     # CC == GG (wild type), CT == GA (het), on the complementary strand.
     gg = tm.analyze_tnrc18_marker(_rsid("CC"))
     assert gg["marker"] == "Target Trait Marker (Wild Type)"

@@ -87,7 +87,7 @@ def validate_payload(p: EconomicsReportPayload) -> list[dict[str, Any]]:
     out += _check_structural_crosscheck(p)
     out += _check_pricing_path_divergence(p)
     out += _check_provenance(p)
-    out += _check_monetised_flag_matches_the_value(p)
+    out += _check_monetized_flag_matches_the_value(p)
     out += _check_withheld_findings_carry_no_value(p)
     out += _check_path_reconciliation(p)
     out += _check_action_is_not_a_finding(p)
@@ -110,7 +110,7 @@ def pdf_is_blocked(findings: list[dict[str, Any]]) -> bool:
     The policy — any ERROR blocks, warnings never do — used to live as an
     inline comprehension inside the pipeline, which meant the README could
     claim "the renderer blocks on broken arithmetic identities" with nothing
-    asserting it. The behaviour was real; it was simply unreachable from a
+    asserting it. The behavior was real; it was simply unreachable from a
     test without running the whole pipeline. Naming it here gives the claim
     something to point at, and `test_pdf_blocked_on_arithmetic_violation`
     exercises the same predicate the pipeline branches on.
@@ -178,13 +178,13 @@ def _check_dominance(p: EconomicsReportPayload) -> list[Finding]:
         if bad:
             return [Finding(
                 Severity.ERROR, "Dominance classification",
-                f"reference case is labelled '{r.dominance_status}' but "
+                f"reference case is labeled '{r.dominance_status}' but "
                 + "; ".join(bad), "reference_case.dominance_status")]
     if ("dominated" in status and "not dominated" not in status
             and r.incremental_cost <= 0 and r.incremental_qalys >= 0):
         return [Finding(
             Severity.ERROR, "Dominance classification",
-            f"reference case is labelled '{r.dominance_status}' but costs "
+            f"reference case is labeled '{r.dominance_status}' but costs "
             f"less (${r.incremental_cost:,.0f}) and gains health "
             f"({r.incremental_qalys:.4f} QALYs)",
             "reference_case.dominance_status")]
@@ -370,7 +370,7 @@ def _check_budget_impact(p: EconomicsReportPayload) -> list[Finding]:
     # PEAK MEANS HIGHEST NET SPEND, not largest magnitude. A budget-impact
     # analysis answers "can the plan afford this?", so the peak is the worst
     # year for the payer — the maximum of the signed net figure. Once the
-    # programme turns cost-saving the later years are large *negative* numbers,
+    # program turns cost-saving the later years are large *negative* numbers,
     # and selecting on absolute value would report a year of maximum savings as
     # the peak budget impact. This check originally did exactly that and fired
     # against correct engine output; the engine selects with
@@ -395,19 +395,19 @@ def _check_budget_impact(p: EconomicsReportPayload) -> list[Finding]:
     return out
 
 
-def _check_monetised_flag_matches_the_value(
+def _check_monetized_flag_matches_the_value(
         p: EconomicsReportPayload) -> list[Finding]:
     """`is_monetized` must be false when there is no figure to show.
 
     The flag was set to a literal True at construction, so a finding whose value
-    had been withheld upstream still arrived claiming to be monetised. HFE
+    had been withheld upstream still arrived claiming to be monetized. HFE
     C282Y reported is_monetized=True with canonical_expected_nmb=None after
     NOT_VALUED correctly withheld its figure — the amount was gone and the flag
     still promised one.
 
     The general shape, which this file now has three instances of: a policy
-    enforced at a call site rather than at the point of monetisation is bypassed
-    by the next path that reaches monetisation. Duplicate valuation, NOT_VALUED,
+    enforced at a call site rather than at the point of monetization is bypassed
+    by the next path that reaches monetization. Duplicate valuation, NOT_VALUED,
     and the curated/parametric split were all the same defect wearing different
     labels. An invariant checked on the assembled payload is enforced once,
     wherever the value came from.
@@ -421,8 +421,8 @@ def _check_monetised_flag_matches_the_value(
                               f.health_economic_value, f.net_cash))
         if not has:
             out.append(Finding(
-                Severity.ERROR, "Monetised flag without a value",
-                f"{f.display_name or f.finding_id or '?'} is flagged monetised "
+                Severity.ERROR, "Monetized flag without a value",
+                f"{f.display_name or f.finding_id or '?'} is flagged monetized "
                 f"but carries no figure in any value field; the report would "
                 f"present it as priced and have nothing to print",
                 "findings.is_monetized"))
@@ -481,7 +481,7 @@ def _check_withheld_findings_carry_no_value(
     """A finding the model declined to price must not be priced anywhere.
 
     NOT_VALUED was enforced at each pricing path in turn, and each time the next
-    path reached monetisation without it. HFE C282Y was withheld by the carrier
+    path reached monetization without it. HFE C282Y was withheld by the carrier
     extractor — partner testing is a reproductive action, and pricing one
     prices a prospective child — and simultaneously valued at $5,576 by a second
     carrier block that passed no identity, so the two records could not even be
@@ -489,7 +489,7 @@ def _check_withheld_findings_carry_no_value(
 
     Checked here because the assembled payload is the one place every pricing
     path has already converged. Enforcement at a call site protects that call
-    site; enforcement at the point of monetisation protects the report.
+    site; enforcement at the point of monetization protects the report.
 
     Matching is on the pooling target and the display name as well as the gene,
     because a withheld record and its priced twin frequently carry neither the
@@ -526,7 +526,7 @@ def _check_withheld_findings_carry_no_value(
                 out.append(Finding(
                     Severity.ERROR, "Withheld finding carries a value",
                     f"{f.display_name or '?'} states a reason for not being "
-                    f"monetised but still reports {', '.join(live)}",
+                    f"monetized but still reports {', '.join(live)}",
                     "findings.reason_not_monetized"))
             continue
         shared = _keys(f) & withheld_keys
@@ -535,7 +535,7 @@ def _check_withheld_findings_carry_no_value(
             out.append(Finding(
                 Severity.ERROR, "Withheld finding priced by another path",
                 f"{f.display_name or '?'} is priced while a finding sharing "
-                f"{'/'.join(sorted(shared))} was withheld from monetisation; "
+                f"{'/'.join(sorted(shared))} was withheld from monetization; "
                 f"one path declined to value this and another valued it anyway",
                 "findings.health_economic_value"))
     return out
@@ -543,10 +543,10 @@ def _check_withheld_findings_carry_no_value(
 
 def _check_action_is_not_a_finding(
         p: EconomicsReportPayload) -> list[Finding]:
-    """No unvaluable finding may be named after a monetised finding's action.
+    """No unvaluable finding may be named after a monetized finding's action.
 
     THE CHECK THAT WOULD HAVE CAUGHT IT. `clinical_benefit` led the label
-    precedence on the not-monetised path, so a record that reached the curated
+    precedence on the not-monetized path, so a record that reached the curated
     valuation step without `prevalence`/`cost` was published under the name of
     its own action. The sample carried 23 of these against 8 genuinely
     unvaluable findings: BRCA1 was valued at $18,808 for "Enhanced screening +
@@ -619,7 +619,7 @@ def _gene_tokens(gene: str) -> set[str]:
 
 
 def _check_one_gene_one_finding(p: EconomicsReportPayload) -> list[Finding]:
-    """A gene must not resolve to more than one monetised finding.
+    """A gene must not resolve to more than one monetized finding.
 
     Two valuation paths used to price ACMG genes independently and disagree by
     200x on the same gene in the same run — one passed the curated QALY figure
@@ -686,7 +686,7 @@ def _check_one_gene_one_finding(p: EconomicsReportPayload) -> list[Finding]:
         if len(names) > 1:
             out.append(Finding(
                 Severity.ERROR, "Gene valued more than once",
-                f"{gene} resolves to {len(names)} monetised findings "
+                f"{gene} resolves to {len(names)} monetized findings "
                 f"({'; '.join(n[:44] for n in names)}). One variant cannot "
                 f"carry two dollar figures — one of the paths is "
                 f"double-counting it",
@@ -773,23 +773,23 @@ def _check_pricing_path_divergence(p: EconomicsReportPayload) -> list[Finding]:
     values any more, and the old "which of these two numbers is it" warning
     describes a world that no longer exists.
 
-    Three things are still worth saying: which findings have no standardised
+    Three things are still worth saying: which findings have no standardized
     value at all, which canonical records still hang off an identifier
     slugified from display text, and how far the retained curated figures sit
     from the canonical ones.
     """
     out: list[Finding] = []
 
-    unstandardised = [f for f in p.findings
+    unstandardized = [f for f in p.findings
                       if f.is_monetized and f.canonical_expected_nmb is None]
-    if unstandardised:
+    if unstandardized:
         out.append(Finding(
-            Severity.WARNING, "Findings without a standardised value",
-            f"{len(unstandardised)} monetised finding(s) have no registry-backed "
+            Severity.WARNING, "Findings without a standardized value",
+            f"{len(unstandardized)} monetized finding(s) have no registry-backed "
             f"parametric pathway and therefore no canonical expected NMB: "
-            + ", ".join(sorted(f.display_name for f in unstandardised)[:4])
+            + ", ".join(sorted(f.display_name for f in unstandardized)[:4])
             + '. They render with finding, action and evidence intact and '
-              '"not yet standardised" in place of a value; no figure is '
+              '"not yet standardized" in place of a value; no figure is '
               'invented for them', "findings.canonical_expected_nmb"))
 
     legacy_ids = [f for f in p.findings
@@ -852,7 +852,7 @@ def _check_provenance(p: EconomicsReportPayload) -> list[Finding]:
             f"{pr.registry_n_parameters} registered parameters; whole-model "
             f"coverage is {pr.model_pct_resolvable:.1f}% of "
             f"{pr.model_n_total_known} known parameters. These are different "
-            f"denominators and must each be labelled as such — collapsing them "
+            f"denominators and must each be labeled as such — collapsing them "
             f"into one figure would create an inconsistency, not remove one",
             "provenance"))
     if pr.weighted_provenance is None:
@@ -873,7 +873,7 @@ def _check_provenance(p: EconomicsReportPayload) -> list[Finding]:
             f"economics layer does not know. _CONFIDENCE_CONC in "
             f"value_of_information.py has keys high/moderate/low only, so "
             f"these silently take the moderate concentration in the "
-            f"probabilistic analysis. Display is normalised here; the PSA "
+            f"probabilistic analysis. Display is normalized here; the PSA "
             f"spread is not", "findings.raw_evidence_confidence"))
 
     low = [f for f in p.findings
@@ -881,7 +881,7 @@ def _check_provenance(p: EconomicsReportPayload) -> list[Finding]:
     if low:
         out.append(Finding(
             Severity.WARNING, "Low-confidence findings carry value",
-            f"{len(low)} monetised finding(s) rest on low-confidence evidence: "
+            f"{len(low)} monetized finding(s) rest on low-confidence evidence: "
             + ", ".join(sorted({f.display_name for f in low})[:5]),
             "findings"))
     return out
@@ -897,7 +897,7 @@ def _note_legitimate_differences(p: EconomicsReportPayload) -> list[Finding]:
             f"reference-case NMB is ${r.nmb:,.0f}; the mean across "
             f"{u.psa_iterations:,} probabilistic simulations is "
             f"${u.psa_mean_nmb:,.0f}. Both are correct. Neither may be "
-            f"labelled 'Net monetary benefit' without a qualifier",
+            f"labeled 'Net monetary benefit' without a qualifier",
             "reference_case.nmb vs uncertainty.psa_mean_nmb"))
 
     pooled_total = sum(c.nmb for c in p.condition_results)

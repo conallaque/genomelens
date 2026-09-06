@@ -4,7 +4,7 @@ Genomic Statistics — quantitative-genetics rigor beneath the economics
 
 Every dollar figure GenomeLens reports is only as good as the genetic risk
 estimate underneath it. This module implements the corrections and models a
-statistical geneticist would insist on before any risk number is monetised:
+statistical geneticist would insist on before any risk number is monetized:
 
   * **Liability-threshold model** (Falconer 1965) — the principled mapping from a
     polygenic score to *absolute* risk, instead of hand-waving a percentile into
@@ -78,7 +78,7 @@ def liability_threshold_risk(prs_percentile: float, prevalence: float,
                              prs_r2: float | None = None) -> dict:
     """**Falconer liability-threshold model** — PRS percentile → absolute risk.
 
-    The disease is modelled as a latent continuous *liability* L ~ N(0,1); you are
+    The disease is modeled as a latent continuous *liability* L ~ N(0,1); you are
     affected if L exceeds a threshold T set by the population prevalence K:
 
         T = Φ⁻¹(1 − K)
@@ -153,7 +153,7 @@ def age_dependent_penetrance(lifetime_penetrance: float, current_age: float = 35
     What matters is *when* risk accrues, and the fact that you can be removed from
     risk by dying of something else first. Two refinements:
 
-      1. **Age-dependent onset.** Cause-specific incidence is modelled with a Weibull
+      1. **Age-dependent onset.** Cause-specific incidence is modeled with a Weibull
          hazard, scaled so that lifetime cumulative incidence matches the (already
          ascertainment-corrected) penetrance.
       2. **Competing risks.** The *cause-specific* hazard is converted to a
@@ -176,7 +176,7 @@ def age_dependent_penetrance(lifetime_penetrance: float, current_age: float = 35
     genomic information**, through two reinforcing channels:
 
       1. **Less competing mortality.** Fewer people are removed from risk by dying of
-         something else, so late-onset genetic risk is *realised* more often.
+         something else, so late-onset genetic risk is *realized* more often.
       2. **A longer benefit horizon.** Prevention started early compounds over more
          remaining years (the Grossman channel in ``value_of_information``).
 
@@ -314,7 +314,7 @@ def prs_portability(prs_percentile: float, prevalence: float,
     Because absolute risk is computed through the liability-threshold model, a lower R²
     mechanically **pulls the estimate back toward the population base rate**: the score
     is less informative, so it should move you less. That is the statistically honest
-    behaviour, and it is *why* the caveat is implemented rather than merely stated.
+    behavior, and it is *why* the caveat is implemented rather than merely stated.
     """
     key = (ancestry or "european").strip().lower().replace("-", "_").replace(" ", "_")
     retained = PORTABILITY.get(key, 0.5)
@@ -338,7 +338,7 @@ def prs_portability(prs_percentile: float, prevalence: float,
     }
 
 
-# Named longevity scenarios: (label, period life expectancy, modelling max age, note).
+# Named longevity scenarios: (label, period life expectancy, modeling max age, note).
 # The 2025 baseline uses current US period life expectancy (~79); the 2020 figure is
 # deliberately avoided because the pandemic depressed it by ~1.8 years and it is not a
 # representative anchor. Max age is the horizon by which essentially all of a cohort has
@@ -363,11 +363,11 @@ def longevity_sensitivity(lifetime_penetrance: float = 0.55,
 
     Two levers move together under a longevity-advance scenario:
 
-      * ``max_age`` rises (a longer horizon over which late-onset risk can be realised);
+      * ``max_age`` rises (a longer horizon over which late-onset risk can be realized);
       * background all-cause mortality falls (``mortality_improvement``), so *fewer*
         people are censored out of their genetic risk by dying of something else.
 
-    Both push realised risk **up**, which means the *value of knowing and acting* also
+    Both push realized risk **up**, which means the *value of knowing and acting* also
     goes up. This is the honest direction of the uncertainty: the conservative default
     understates the value of the information in a longer-lived world.
     """
@@ -407,11 +407,11 @@ def longevity_sensitivity(lifetime_penetrance: float = 0.55,
         "current_age": current_age,
         "mortality_improvement_assumed": mortality_improvement,
         "scenarios": rows,
-        "direction": ("Longer lifespans raise realised late-onset risk (less competing "
+        "direction": ("Longer lifespans raise realized late-onset risk (less competing "
                       "mortality) AND lengthen the horizon over which prevention pays "
                       "off. Both increase the value of genomic information, so the "
                       "default 95-year assumption is conservative."),
-        "src": "Vaupel (2010) Nature — biodemography of human ageing",
+        "src": "Vaupel (2010) Nature — biodemography of human aging",
     }
 
 
@@ -439,5 +439,5 @@ def summarise_genomic_corrections(prs_percentile: float = 0.95,
              "value": age["remaining_lifetime_risk"]},
         ],
         "direction": ("Every correction in this chain is conservative — each one "
-                      "reduces the headline risk, and therefore the modelled value."),
+                      "reduces the headline risk, and therefore the modeled value."),
     }

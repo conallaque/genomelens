@@ -177,7 +177,7 @@ def analyze_neanderthal(snps_df: pd.DataFrame) -> dict:
 # 2. ANCIENT-POPULATION AFFINITY (Yamnaya / EEF / WHG)
 # ══════════════════════════════════════════════════════════════════════════
 #
-# Well-characterised trait alleles that entered Europe in specific ancient-
+# Well-characterized trait alleles that entered Europe in specific ancient-
 # DNA waves (Mathieson 2015; Wilde 2014; Allentoft 2015):
 #   • Western Hunter-Gatherer (WHG, ~Mesolithic Europeans): DARK skin + BLUE
 #     eyes (HERC2 rs12913832 G — the earliest known blue-eye allele in ancient
@@ -189,7 +189,7 @@ def analyze_neanderthal(snps_df: pd.DataFrame) -> dict:
 #     light-skin allele.
 #
 # We score the user against each ancient-population "fingerprint" by counting
-# characteristic derived alleles, then normalise.
+# characteristic derived alleles, then normalize.
 
 _ANCIENT_FINGERPRINTS: list[dict] = [
     {"name": "Yamnaya / Steppe (Bronze Age, ~5-4 kya)",

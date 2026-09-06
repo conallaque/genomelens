@@ -1,4 +1,4 @@
-"""Regression tests for three scientifically-wrong ROH detection behaviours.
+"""Regression tests for three scientifically-wrong ROH detection behaviors.
 
 1) HET BUDGET IS PER SLIDING WINDOW, NOT PER RUN — a whole-run counter ends a
    segment at the first het overrun, fragmenting genuine IBD tracts into several

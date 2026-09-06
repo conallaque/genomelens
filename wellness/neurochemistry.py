@@ -24,7 +24,7 @@ Coverage
     recovery, worse working-memory training gains.
   • **Reward / dopamine-receptor density** — DRD2/ANKK1 Taq1A (rs1800497),
     DRD4 -521 (rs1800955), OPRM1 A118G (rs1799971).
-  • **Serotonin signalling** — 5-HTTLPR (proxy rs25531), HTR2A T102C (rs6313),
+  • **Serotonin signaling** — 5-HTTLPR (proxy rs25531), HTR2A T102C (rs6313),
     TPH2 rs4570625.
   • **Mood stability / calcium channels** — CACNA1C rs1006737 (the strongest
     common bipolar / SCZ / MDD locus).
@@ -33,7 +33,7 @@ Coverage
 
 Composite output
 ----------------
-Categorised findings + a `composite` block with predicted:
+Categorized findings + a `composite` block with predicted:
   • Stress-response profile ("warrior", "worrier", "adaptive middle").
   • Learning / plasticity tier.
   • Stimulant response prediction (Val/Met + Val/Val → higher expected effect).
@@ -150,7 +150,7 @@ def _comt(df):
                 "(documented heterozygote advantage; Diamond 2007). You retain "
                 "some Warrior stress-resilience AND some Worrier working-memory "
                 "sustainment.")
-        action = ("Genuinely favourable for high-performance / high-pressure "
+        action = ("Genuinely favorable for high-performance / high-pressure "
                   "cognitive work. Handles acute stress well without paying the "
                   "sustained-cognition tax of Val/Val.")
         # NOTE: COMT's reference genotype is the HETEROZYGOTE, not a homozygote.
@@ -192,7 +192,7 @@ def _maoa(df):
                 "impulsive-aggression risk. In the absence of severe adversity, "
                 "MAOA-L is largely neutral or mildly enhances emotional depth.")
         action = ("Awareness only; the Caspi × environment interaction requires "
-                  "severe childhood adversity to become behaviourally relevant. "
+                  "severe childhood adversity to become behaviorally relevant. "
                   "Meditation and emotion-regulation practices are especially "
                   "valuable.")
         conf = "moderate"
@@ -222,7 +222,7 @@ def _bdnf(df):
                 "activity. Better motor learning, better working-memory "
                 "training gains, better recovery from stroke, better long-term "
                 "expertise accrual through deliberate practice.")
-        action = ("Genuinely favourable for skill acquisition. Time invested in "
+        action = ("Genuinely favorable for skill acquisition. Time invested in "
                   "deliberate practice pays off more than average — spend the "
                   "reps in the domains you care about.")
         # Full activity-dependent secretion is the reference: the econ entry
@@ -236,7 +236,7 @@ def _bdnf(df):
                 "activity-dependent BDNF secretion is reduced ~30% per Met "
                 "allele. Modestly slower complex-motor and working-memory "
                 "training gains than Val/Val.")
-        action = ("Emphasise consistent practice over intense bursts; aerobic "
+        action = ("Emphasize consistent practice over intense bursts; aerobic "
                   "exercise materially raises baseline BDNF and partly "
                   "compensates.")
         conf = "high"
@@ -247,7 +247,7 @@ def _bdnf(df):
                 "motor-learning speed, and recovery from stroke.")
         action = ("Aerobic exercise (running, cycling, swimming) is the single "
                   "most effective non-pharmacological BDNF booster and largely "
-                  "closes the gap. Prioritise consistent moderate-intensity "
+                  "closes the gap. Prioritize consistent moderate-intensity "
                   "cardio over occasional intense sessions.")
         conf = "high"
     return _find(CAT_PLASTICITY, "BDNF Val66Met", "BDNF", "rs6265", gt,
@@ -269,11 +269,11 @@ def _drd2(df):
         ph = f"DRD2/ANKK1 Taq1A A1 carrier ({n_T}× T) — reduced striatal D2 density"
         mech = ("The Taq1A A1 allele associates with ~30% lower striatal D2 "
                 "receptor density. Reduced reward-sensitivity feedback: more "
-                "prone to reward-deficiency behaviours (higher addiction-"
+                "prone to reward-deficiency behaviors (higher addiction-"
                 "susceptibility signal), and modestly attenuated aversive-"
                 "learning from punishment.")
         action = ("Awareness. Reward-deficiency susceptibility is real but not "
-                  "deterministic — behaviours matter more. Regular reward from "
+                  "deterministic — behaviors matter more. Regular reward from "
                   "physical activity and creative work partly compensates.")
         conf = "moderate"
     else:
@@ -308,7 +308,7 @@ def _drd4(df):
         mech = "Lower DRD4 expression."
         conf = "moderate"
     return _find(CAT_REWARD, "DRD4 -521 promoter", "DRD4", "rs1800955", gt,
-                 ph, mech, "Novelty-seeking is behavioural, not fixed by this variant.",
+                 ph, mech, "Novelty-seeking is behavioral, not fixed by this variant.",
                  conf, "Okuyama 2000")
 
 
@@ -327,7 +327,7 @@ def _oprm1(df):
                 "response to social bonding cues (Way & Taylor 2010), altered "
                 "opioid analgesic dose requirements (G-carriers often need "
                 "higher morphine doses post-op), and different alcohol-reward "
-                "signalling. Naltrexone response is stronger in G-carriers "
+                "signaling. Naltrexone response is stronger in G-carriers "
                 "(a key predictor for alcohol-use-disorder treatment).")
         action = ("Flag OPRM1 status if being prescribed post-surgical opioids "
                   "(may need dose adjustment) or if ever discussing naltrexone "
@@ -444,7 +444,7 @@ def _chrna5(df):
                 "to smoke MORE per day (need more nicotine for the same "
                 "receptor stimulation) and have materially higher lung-cancer "
                 "and COPD risk if they do. Zero risk if never a smoker.")
-        action = ("**The clearest gene-behaviour prevention lever in your "
+        action = ("**The clearest gene-behavior prevention lever in your "
                   "genome:** never start smoking or vaping. If you already "
                   "smoke, this variant makes quitting harder AND makes "
                   "continued smoking more dangerous — varenicline/bupropion + "
@@ -524,7 +524,7 @@ def build_composite(df: pd.DataFrame, findings: list[dict]) -> dict:
 
     # ── Plasticity tier ────
     plasticity_tier = {
-        "Val/Val (full)": "High — full activity-dependent BDNF; skill-acquisition-favourable.",
+        "Val/Val (full)": "High — full activity-dependent BDNF; skill-acquisition-favorable.",
         "Val/Met (reduced)": "Intermediate — ~30% reduced activity-dependent BDNF.",
         "Met/Met (low)": "Lower — aerobic exercise partly compensates.",
         "unknown": "Not typed.",
@@ -553,7 +553,7 @@ def build_composite(df: pd.DataFrame, findings: list[dict]) -> dict:
                 "Standard SSRIs still work but effect size may be smaller — "
                 "SNRIs sometimes outperform in high-MAOA individuals.")
     elif maoa == "MAOA-L":
-        ssri = ("Standard-to-favourable SSRI response — low-activity MAOA "
+        ssri = ("Standard-to-favorable SSRI response — low-activity MAOA "
                 "leaves more serotonin in the synapse for SSRIs to build on.")
     else:
         ssri = "Standard SSRI response."
@@ -612,7 +612,7 @@ def build_composite(df: pd.DataFrame, findings: list[dict]) -> dict:
                   "(you can, but pay a cognitive tax).")
     else:
         career = ("See individual variant recommendations."
-                  " Neurotype signature is genuinely favourable for "
+                  " Neurotype signature is genuinely favorable for "
                   "high-performance cognitive work.")
 
     # ── Addiction / substance risk flags ────
@@ -624,7 +624,7 @@ def build_composite(df: pd.DataFrame, findings: list[dict]) -> dict:
     if oprm1 and "G" in oprm1:
         substance_flags.append(
             "🍷 **OPRM1 G-carrier:** post-surgical opioid dosing may need "
-            "adjustment; naltrexone is genetically favoured if ever considering "
+            "adjustment; naltrexone is genetically favored if ever considering "
             "medication-assisted alcohol reduction.")
     if comt == "warrior":
         substance_flags.append(

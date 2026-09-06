@@ -20,7 +20,7 @@ def _roh(f_roh=0.0, f_long=0.0, n_long=0, tier="no_recent_relatedness"):
             "context_tier": tier}
 
 
-# ── the non-monetisation contract ────────────────────────────────────────────
+# ── the non-monetization contract ────────────────────────────────────────────
 
 def test_result_never_contains_a_monetary_field():
     for r in (_roh(), _roh(0.02), _roh(0.06, 0.05, 4, "first_cousin_or_closer")):
@@ -39,19 +39,19 @@ def test_no_numeric_field_could_be_read_as_currency():
             assert v <= 100, f"{k}={v} is large enough to be mistaken for money"
 
 
-def test_monetised_flag_is_false_and_explained():
+def test_monetized_flag_is_false_and_explained():
     out = voi.assess_carrier_panel_prior(_roh(0.03))
-    assert out["monetised"] is False
-    assert len(out["why_not_monetised"]) > 80
+    assert out["monetized"] is False
+    assert len(out["why_not_monetized"]) > 80
 
 
 def test_no_risk_score_is_emitted():
     # Consanguinity must never be scored — the framing is informational.
     out = voi.assess_carrier_panel_prior(_roh(0.06, 0.05, 4))
-    assert not [k for k in out if "risk" in k.lower() and k != "why_not_monetised"]
+    assert not [k for k in out if "risk" in k.lower() and k != "why_not_monetized"]
 
 
-# ── tiering behaviour ────────────────────────────────────────────────────────
+# ── tiering behavior ────────────────────────────────────────────────────────
 
 def test_outbred_profile_recommends_no_change():
     out = voi.assess_carrier_panel_prior(_roh(0.002))
@@ -108,7 +108,7 @@ def test_missing_or_unavailable_roh_degrades_cleanly():
     for r in (None, {}, {"context_tier": "unavailable"}):
         out = voi.assess_carrier_panel_prior(r)
         assert out["available"] is False
-        assert out["monetised"] is False
+        assert out["monetized"] is False
 
 
 # ── integration with the economic model ──────────────────────────────────────

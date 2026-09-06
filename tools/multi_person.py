@@ -57,7 +57,7 @@ _VALID = set("ACGT")
 
 
 def _norm_gt(g) -> str | None:
-    """Return a normalised 2-allele biallelic genotype as a sorted string, or
+    """Return a normalized 2-allele biallelic genotype as a sorted string, or
     None for no-calls / indels / non-ACGT."""
     if g is None:
         return None
@@ -125,7 +125,7 @@ def king_kinship(df_a: pd.DataFrame, df_b: pd.DataFrame) -> dict:
     # opposite homozygotes → IBS0 (both homozygous, different allele)
     n_ibs0 = int((hom_a & hom_b & (a0 != b0)).sum())
 
-    # concordance on strand-normalised genotypes ("AG" == "GA")
+    # concordance on strand-normalized genotypes ("AG" == "GA")
     norm_a = np.where(a0 <= a1, np.char.add(a0.astype(str), a1.astype(str)),
                       np.char.add(a1.astype(str), a0.astype(str)))
     norm_b = np.where(b0 <= b1, np.char.add(b0.astype(str), b1.astype(str)),

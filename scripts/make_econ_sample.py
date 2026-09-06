@@ -33,7 +33,7 @@ WHY IT IS BUILT THIS WAY
 The previous version of this script built the VCF *from* that GRCh37 chip export
 and then wrote ``##reference=GRCh38`` on top of it, injecting its rare variants
 at GRCh38 coordinates. The file was therefore ~200,000 GRCh37 records plus eight
-GRCh38 records, labelled GRCh38. Build detection read the bulk and correctly
+GRCh38 records, labeled GRCh38. Build detection read the bulk and correctly
 resolved GRCh37, loaded the GRCh37 ClinVar table, and matched none of the
 injected variants — so the feature this script exists to exercise had never
 worked. Nothing complained, because nothing compared the declared build against
@@ -86,7 +86,7 @@ PGX_VARIANTS = [
 # across distinct organ systems rather than stacked within one, so the pooling
 # correction has genuinely separate liabilities to work on.
 #
-# NOT fabricated: each is a catalogued human variant. The genome carrying all of
+# NOT fabricated: each is a cataloged human variant. The genome carrying all of
 # them is synthetic, and its joint prevalence is reported by the profile that
 # uses it rather than left implied.
 # Approximate pathogenic-variant HETEROZYGOTE prevalence, order of magnitude,
@@ -101,7 +101,7 @@ PGX_VARIANTS = [
 # biases toward people with family history. The exclusion argument for
 # multi-gene stacks survives that — a product of 1 in 10^9 is not rescued by a
 # correction of this size — but the printed figure is an estimate, and it is
-# labelled as one wherever it appears.
+# labeled as one wherever it appears.
 HET_PREVALENCE = {
     "LDLR":  1/300,      # FH overall ~1/250; LDLR the commonest cause
     "APOB":  1/1_000,
