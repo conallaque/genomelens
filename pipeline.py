@@ -609,8 +609,22 @@ def run_pipeline(args: argparse.Namespace) -> int:
     if analyze_expanded_pgs is not None:
         try:
             log("Running expanded PGS Catalog panels ...")
+            # COORDINATE JOIN FOR WHOLE GENOMES. Pass the callset and its
+            # build so PGS can match on position instead of rsID. On a gVCF the
+            # rsID join silently selects for non-reference sites — hom-ref
+            # calls carry no rsID — which biased every score upward. A chip
+            # export has no VCF path here and keeps the rsID path, which is
+            # correct for it.
+            _is_vcf = False
+            try:
+                from core import genome_input as _gi_pgs
+                _is_vcf = _gi_pgs.looks_like_vcf(args.dna_file)
+            except Exception:
+                _is_vcf = False
             expanded_pgs_result = analyze_expanded_pgs(
                 snps_df, sex=(qc_result or {}).get("inferred_sex"),
+                vcf_path=(args.dna_file if _is_vcf else None),
+                build=(detected_build if _is_vcf else None),
             )
             if expanded_pgs_result.get("available"):
                 hf = expanded_pgs_result.get("headline_findings", [])
@@ -620,6 +634,28 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 log(f"  Expanded PGS not available: {expanded_pgs_result.get('reason','')}")
         except Exception as e:
             log(f"  WARNING: Expanded PGS failed: {e}")
+
+    # CROSS-MODULE RECONCILIATION. Both scoring modules answer for the same
+    # seven conditions and their answers were printed side by side with nothing
+    # marking a disagreement. Run it where both results exist, and log the
+    # divergences — a check that is computed and never surfaced is the same
+    # defect as no check at all.
+    prs_pgs_reconciliation: list[dict] = []
+    if prs_result and expanded_pgs_result:
+        try:
+            from risk.pgs_catalog import reconcile_prs_pgs
+            prs_pgs_reconciliation = reconcile_prs_pgs(
+                prs_result, expanded_pgs_result)
+            _div = [r for r in prs_pgs_reconciliation if r["divergent"]]
+            log(f"  PRS/PGS reconciliation: {len(prs_pgs_reconciliation)} "
+                f"condition(s) scored by both, {len(_div)} divergent")
+            for r in _div:
+                log(f"    DIVERGENT {r['condition']}: curated "
+                    f"{r['curated_percentile']}th ({r['curated_tier']}) vs "
+                    f"catalog {r['catalog_percentile']}th "
+                    f"({r['catalog_tier']}) — gap {r['percentile_gap']}")
+        except Exception as e:
+            log(f"  WARNING: PRS/PGS reconciliation failed: {e}")
 
     if analyze_ancestry is not None:
         try:
