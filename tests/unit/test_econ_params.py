@@ -378,3 +378,60 @@ def test_different_seeds_give_different_results():
     e = voi.analyze_value_of_information(econ, input_type="chip", n_mc=1500,
                                          seed=ep.DEFAULT_SEED)
     assert d["voi_expost_mean"] == e["voi_expost_mean"]
+
+
+def test_only_one_table_maps_a_gene_to_its_economics():
+    """No second per-gene QALY anchor may reappear anywhere in the econ layer.
+
+    `ACMG_GENE_ECONOMICS` and `_gene_to_econ` each held per-gene QALY figures
+    and disagreed on every shared gene — LDLR was 3.5 in one and 1.5 in the
+    other — so a finding's worth depended on which code path reached it. The
+    provenance registry cannot see this class of defect: each table was
+    internally consistent and individually well-sourced, and the registry
+    audits parameters rather than the relationships between tables.
+
+    So it is asserted structurally instead. There is one gene->economics table,
+    it carries no QALY field, and the decrement is read from the registry via
+    the condition anchor — which is what puts it in the tornado and the
+    provenance count.
+    """
+    import econ.engine as ee
+    import econ.gene_anchors as ga
+    import econ.health_economics as he
+    import econ.value_of_information as voi
+
+    assert not hasattr(he, "ACMG_GENE_ECONOMICS"), (
+        "the superseded second anchor table is back; econ.gene_anchors is the "
+        "single gene->economics source")
+
+    # No anchor may carry a QALY of its own.
+    for gene, a in ga.GENE_ANCHORS.items():
+        assert not any("qaly" in k.lower() for k in a), (
+            f"{gene} anchor carries a QALY field; the decrement belongs to the "
+            f"condition in the registry, not to the gene")
+
+    # And no other gene-keyed table in the econ layer may grow one either.
+    genes = set(ga.GENE_ANCHORS)
+    offenders = []
+    for mod in (he, voi, ga, ee):
+        for name, v in vars(mod).items():
+            if not isinstance(v, dict) or not v:
+                continue
+            if not (genes & {str(k) for k in v}):
+                continue
+            sample = next(iter(v.values()))
+            if isinstance(sample, dict) and any(
+                    "qaly" in str(f).lower() for f in sample):
+                offenders.append(f"{mod.__name__}.{name}")
+    assert not offenders, (
+        f"a second per-gene QALY anchor exists: {offenders}. Two tables "
+        f"holding one quantity will disagree eventually, and the registry "
+        f"cannot detect it")
+
+    # The decrement resolves through the registry, not a literal.
+    coi_key, _pen, _rrr, qaly = voi._gene_to_econ("LDLR")
+    assert coi_key == "CAD"
+    param = ee.COI_KEY_TO_PARAM[coi_key][1]
+    assert qaly == ep.value(param), (
+        f"LDLR's QALY decrement ({qaly}) does not come from the registry "
+        f"parameter {param}")

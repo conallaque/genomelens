@@ -1,7 +1,5 @@
 # GenomeLens
 
-![GenomeLens — findings-first genomics health-economics engine](docs/assets/genomelens-hero-v2.png)
-
 **A privacy-preserving genomic decision engine that connects genetic evidence to
 actionable decisions, uncertainty, and health-economic consequences.** Cost-utility
 analysis, value of information and budget impact — computed on real genomic data,
