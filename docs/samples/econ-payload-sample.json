@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "build_id": "GENOMELENS-BUILD: c21b6f6 2026-09-06T13:15:17-04:00",
-    "generated_at": "2026-09-06T13:15:17-04:00",
+    "build_id": "GENOMELENS-BUILD: b8d90af 2026-09-06T13:27:07-04:00",
+    "generated_at": "2026-09-06T13:27:07-04:00",
     "input_type": "wgs",
     "input_label": "synthetic_wgs.vcf",
     "is_synthetic": true,
@@ -1595,8 +1595,8 @@
       },
       {
         "parameter": "adherence_screening",
-        "units": "proportion",
-        "tier": "assumption",
+        "units": "fraction",
+        "tier": "derived",
         "low_value": 0.45,
         "high_value": 0.85,
         "inmb_at_low": 25917,
@@ -1715,13 +1715,13 @@
   "provenance": {
     "registry_n_parameters": 72,
     "registry_n_published": 10,
-    "registry_n_derived": 45,
-    "registry_n_assumption": 17,
-    "registry_pct_sourced": 76.4,
+    "registry_n_derived": 48,
+    "registry_n_assumption": 14,
+    "registry_pct_sourced": 80.6,
     "model_n_total_known": 378,
-    "model_pct_resolvable": 50.0,
-    "model_pct_attributed_or_better": 95.5,
-    "model_pct_unsourced": 4.5,
+    "model_pct_resolvable": 50.8,
+    "model_pct_attributed_or_better": 96.3,
+    "model_pct_unsourced": 3.7,
     "unresolved_sources": [
       {
         "source": "Manchanda et al. (2015) J Clin Oncol",
@@ -1838,24 +1838,6 @@
         "value": 10.0,
         "units": "years",
         "note": "Reporting horizon for the personal economic summary. Chosen for interpretability rather than derived: long enough for prevention to accrue, short enough that the projection is not fantasy. The state-transition model runs to age 100 internally and is truncated to this window for display."
-      },
-      {
-        "key": "adherence_screening",
-        "value": 0.65,
-        "units": "proportion",
-        "note": "Uptake of a recommended screening or surveillance programme (colonoscopy, mammography, ferritin monitoring). Higher than chronic drug therapy because the ask is episodic rather than daily, but well short of complete: US population screening uptake sits in the 60-70% band. Anchored on that band rather than on a single study, so it is declared as judgement."
-      },
-      {
-        "key": "adherence_lifestyle",
-        "value": 0.35,
-        "units": "proportion",
-        "note": "Sustained behaviour change \u2014 diet, exercise, alcohol reduction \u2014 maintained over the horizon. The lowest of the three archetypes because maintenance, not initiation, is what the model needs, and maintenance attrition in behavioural trials is severe. Judgement; varied 0.20-0.55."
-      },
-      {
-        "key": "adherence_default",
-        "value": 0.5,
-        "units": "proportion",
-        "note": "Fallback for a condition with no archetype assigned. Set equal to the pharmacological figure so an unmapped condition is treated no more optimistically than a mapped one. A condition reaching this parameter is a gap in the mapping, not a finding."
       },
       {
         "key": "coi_coeliac",
@@ -3151,7 +3133,7 @@
       }
     ],
     "what_would_change_it": "A meaningful share of this answer rests on judgement rather than published evidence. The direction is more trustworthy than the exact numbers.",
-    "assumption_share": 45.0,
+    "assumption_share": 36.1,
     "bottom_line": "Worth doing \u2014 and it saves money. About 21 extra days of healthy life, on average. In about 100 of every 100 runs of the model, acting was worth it.",
     "disclaimer": "These are model estimates for someone with your genetic results, using population-average figures. They are not medical advice, not a prediction about you specifically, and not a substitute for talking to a clinician."
   },
@@ -3203,7 +3185,7 @@
     {
       "check": "Most parameters carry a citation",
       "pass": true,
-      "detail": "76.4% sourced, 17 declared assumptions"
+      "detail": "80.6% sourced, 14 declared assumptions"
     }
   ],
   "report_validation": [
@@ -3228,7 +3210,7 @@
     {
       "severity": "INFO",
       "check": "Two provenance denominators",
-      "detail": "registry coverage is 76.4% of 72 registered parameters; whole-model coverage is 50.0% of 378 known parameters. These are different denominators and must each be labelled as such \u2014 collapsing them into one figure would create an inconsistency, not remove one",
+      "detail": "registry coverage is 80.6% of 72 registered parameters; whole-model coverage is 50.8% of 378 known parameters. These are different denominators and must each be labelled as such \u2014 collapsing them into one figure would create an inconsistency, not remove one",
       "field": "provenance"
     },
     {
