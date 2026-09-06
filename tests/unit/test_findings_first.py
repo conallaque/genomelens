@@ -328,7 +328,7 @@ def test_the_glance_pages_never_drop_or_duplicate_a_finding():
     from report.findings_first import render_page_two
     from report.payload import EconomicsReportPayload, FindingEconomics
 
-    for n in list(range(0, 40)) + [47, 48, 49, 60, 97]:
+    for n in [*range(0, 40), 47, 48, 49, 60, 97]:
         p = EconomicsReportPayload()
         p.findings = [FindingEconomics(display_name=f"F{i}",
                                        canonical_expected_nmb=1.0,

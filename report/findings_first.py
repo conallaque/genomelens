@@ -782,6 +782,21 @@ def render_page_two(p: EconomicsReportPayload) -> str:
                 else:
                     label = (f'{n_in_group} finding'
                              f'{"" if n_in_group == 1 else "s"}')
+                # WHY THESE FIGURES ARE IDENTICAL. On a real genome five
+                # medication findings came back at exactly $210 each, because
+                # PGX_CEA holds five gene-drug pairs and none of these was one
+                # of them, so all five fell through to the generic
+                # actionable-PGx flag. The figures were right; five identical
+                # numbers in a column with nothing to explain them read as a
+                # collapse bug. Said once per group rather than as a badge on
+                # every row — the rows share one cause, not five.
+                _gf = sum(1 for g, x in chunk if g == group
+                          and getattr(x, "pgx_basis", "") == "generic_fallback")
+                if _gf:
+                    label += ('&nbsp;&middot; all priced off the generic PGx flag'
+                              if _gf == n_here else
+                              f'&nbsp;&middot; {_gf} priced off the generic '
+                              f'PGx flag')
                 rows += (f'<div class="grouplabel">{_e(group)}{cont}'
                          f'<span>{label}</span></div>'
                          f'<div class="glance">')
@@ -836,7 +851,8 @@ def _econ_box(f: FindingEconomics) -> str:
     v = f.canonical_expected_nmb
     return f"""<div class="econbox">
         <div class="eh">Expected NMB</div>
-        <div class="ev{' neg' if v < 0 else ''}">{fmt.money(v)}</div>
+        <div class="ev{' neg' if v < 0 else ''}">{fmt.money(v)}\
+{_pgx_basis_note(f)}</div>
         <dl>
           <dt>Medical cost averted</dt><dd>{fmt.money(f.medical_cost_averted)}</dd>
           <dt>Health gain</dt><dd>{fmt.qaly(f.expected_qaly_gain)} QALY</dd>
@@ -957,6 +973,18 @@ def _cost_basis_note(f: FindingEconomics) -> str:
     """
     if f.intervention_cost_basis and f.intervention_cost_basis != "gene_specific":
         return ' <span class="dflt">registry default</span>'
+    return ""
+
+
+def _pgx_basis_note(f: FindingEconomics) -> str:
+    """Mark a PGx figure that came from the generic flag, not a pair-specific CEA.
+
+    Five findings on a real genome printed the same value because PGX_CEA holds
+    five gene-drug pairs and none of them was one of these. Unlabelled that is
+    indistinguishable from a bug; labelled it is a stated limit of the model.
+    """
+    if f.pgx_basis == "generic_fallback":
+        return ' <span class="dflt">generic PGx flag</span>'
     return ""
 
 

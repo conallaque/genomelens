@@ -226,8 +226,24 @@ def _collect(economics_result: dict | None,
                                        "category — likely an oversight."})
         _hc = _evidence_haircut(f.get("category"))
         if kind == "pgx":
+            # WHICH CEA ANSWERED. PGX_CEA carries five gene-drug pairs; anything
+            # else falls through to the generic actionable-PGx flag, which is a
+            # defensible published construct but is NOT pair-specific evidence.
+            # Unlabelled, the fallback is invisible: a real whole genome
+            # surfaced five distinct findings whose pairs the table lacks
+            # (HLA-A*31:01/carbamazepine, CYP2D6/codeine,
+            # CYP2C9/warfarin, CYP3A5/tacrolimus, UGT1A1/irinotecan), none of
+            # them in the table, and all five priced at an identical $210 —
+            # which reads as a constant-collapse bug rather than as the stated
+            # model limitation it actually is. The pairs are not added here
+            # because five pairs is twenty-five parameters and this repository
+            # requires a PMID or DOI for each; guessing them would be worse
+            # than naming the gap.
+            _pgx_key = _match_pgx(label)
             out.append({"label": label, "economic_pathway_id": pid, "kind": "pgx",
-                        "pgx_key": _match_pgx(label),
+                        "pgx_key": _pgx_key,
+                        "pgx_basis": ("pair_specific" if "/" in _pgx_key
+                                      else "generic_fallback"),
                         "intervention": _econ_params.value(
                             "intervention_cost_pgx"),
                         "intervention_basis": _DEFAULT_COST_BASIS,
@@ -1229,6 +1245,12 @@ def analyze_value_of_information(economics_result: dict | None = None,
                          # and eleven findings sharing $500 looks like eleven
                          # estimates rather than one declared parameter.
                          "intervention_basis": f.get("intervention_basis", ""),
+                         # Same reasoning one field up, for the benefit side.
+                         # This row is rebuilt from an explicit key list, so a
+                         # field added at the producer is silently dropped here
+                         # unless it is named — which is exactly what happened
+                         # to pgx_basis on its first outing.
+                         "pgx_basis": f.get("pgx_basis", ""),
                          "wgs_only": f["wgs_only"], "nmb": round(nmb),
                          "dcost_averted": round(dcost), "dqaly": round(dqaly, 3)})
     nmb_rows.sort(key=lambda r: -r["nmb"])

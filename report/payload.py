@@ -216,6 +216,16 @@ class FindingEconomics:
     expected_qaly_gain: float = 0.0
     medical_cost_averted: float = 0.0
     intervention_cost: float = 0.0
+    pgx_basis: str = ""
+    """'pair_specific' when PGX_CEA holds this gene-drug pair, else 'generic_fallback'.
+
+    A real whole genome surfaced five PGx findings — carbamazepine, codeine,
+    warfarin, tacrolimus, irinotecan — none of which PGX_CEA covers, so all
+    five were priced off the generic actionable-PGx flag and printed an
+    identical figure.
+    Identical numbers on five distinct findings read as a collapse bug. They are
+    one construct applied five times, and the page has to say so.
+    """
     intervention_cost_basis: str = ""
     """'gene_specific', or the marker for the registered fallback.
 
@@ -771,6 +781,7 @@ def build_report_payload(
             # arithmetic off the page.
             intervention_cost=_iv_charged(r, c_iv),
             intervention_cost_basis=_s(r.get("intervention_basis")),
+            pgx_basis=_s(r.get("pgx_basis")),
             net_cash=_f(r.get("dcost_averted")) - _iv_charged(r, c_iv),
             canonical_expected_nmb=nmb,
             economic_value_basis="parametric_expected_nmb",
@@ -921,7 +932,11 @@ def build_report_payload(
     # it is the failure mode this report exists to avoid.
     _seen_names = {(f.display_name or "").strip().lower() for f in findings}
     for uv in (voi_result.get("unvalued_findings") or []):
-        _label = _s(uv.get("label"))
+        # BOTH KEYS. Three of the five append sites in value_of_information
+        # write "finding" and two write "label"; reading only one silently
+        # dropped every Path C record — 180 predicted-pathogenic variants from
+        # the first real genome reached this loop and none of them survived it.
+        _label = _s(uv.get("label") or uv.get("finding"))
         if not _label or _label.strip().lower() in _seen_names:
             continue
         _seen_names.add(_label.strip().lower())
