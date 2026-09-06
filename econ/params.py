@@ -646,6 +646,25 @@ _REGISTRY: list[Param] = [
     # and each of these carries the trial's own confidence interval as its
     # sensitivity range rather than an invented one.
 
+    _p("baseline_event_probability_parkinsons", 0.10, "probability",
+       "derived",
+       note="Ten-year probability of Parkinson's disease for an LRRK2 G2019S "
+            "carrier. DERIVED from cumulative penetrance, and the choice of "
+            "source is the whole point: clinic-ascertained families give 91% "
+            "by age 80, while this UNSELECTED cohort gives 26% — the same "
+            "variant, a threefold difference, and the higher figure is an "
+            "artifact of how carriers were found. The cumulative 26% is "
+            "apportioned across the roughly twenty-five years over which "
+            "onset is concentrated, giving about a tenth per decade against "
+            "the model's ten-year horizon. Replaces an uncited generic 0.20, "
+            "which overstated it twofold. Range spans the 25-42.5% "
+            "cross-population span of the cumulative estimate.",
+       source="Marder K, Wang Y, Alcalay RN, et al. Age-specific penetrance "
+              "of LRRK2 G2019S in the Michael J. Fox Ashkenazi Jewish LRRK2 "
+              "Consortium. Neurology 2015;85:89-95",
+       citation="PMID:26062626 doi:10.1212/WNL.0000000000001708", year=2015,
+       dist="beta", low=0.04, high=0.20),
+
     _p("coi_parkinsons", 150_000.0, "$ per case", "derived",
        note="Multi-year direct medical cost of Parkinson's disease. The source "
             "reports $25.4bn of direct medical cost across roughly one million "

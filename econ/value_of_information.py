@@ -254,11 +254,16 @@ def _collect(economics_result: dict | None,
                         # prev_affected) and no P(condition | carrier), so for
                         # most sources there is genuinely nothing to substitute
                         # — see `penetrance_basis` on the pathway.
-                        "p_event": _gene_penetrance(f.get("gene", "")) or
-                        _econ_params.value(
-                            "baseline_event_probability_dementia"
-                            if coi_key == "Alzheimer"
-                            else "baseline_event_probability"),
+                        # Gene penetrance first, then the condition's own
+                        # measured baseline, then the generic assumption. The
+                        # Alzheimer special-case that used to sit here is now
+                        # one entry in `_BASELINE_PARAM_FOR_COI` rather than a
+                        # conditional expression only that condition benefits
+                        # from.
+                        "p_event": (_gene_penetrance(f.get("gene", ""))
+                                    or _baseline_for_condition(coi_key)
+                                    or _econ_params.value(
+                                        "baseline_event_probability")),
                         # Gene anchor first, then the condition's own measured
                         # effect, then the generic assumption. Each step down
                         # is recorded in `rrr_basis` below.
@@ -946,6 +951,20 @@ def _gene_to_econ(gene: str) -> tuple[str, float, float, float]:
 # Condition anchors whose effect of acting has been measured for the action
 # this model prices. Anything absent falls back to the generic `actionable_rrr`,
 # which is an uncited assumption and the second-largest driver in the tornado.
+# Condition anchors with a measured baseline risk over the model's horizon.
+# Anything absent falls back to `baseline_event_probability`, an uncited 0.20.
+_BASELINE_PARAM_FOR_COI = {
+    "Parkinsons": "baseline_event_probability_parkinsons",
+    "Alzheimer": "baseline_event_probability_dementia",
+}
+
+
+def _baseline_for_condition(coi_key: str) -> float:
+    """Measured baseline risk for a condition, or 0.0 when none is known."""
+    key = _BASELINE_PARAM_FOR_COI.get(coi_key)
+    return float(_econ_params.value(key)) if key else 0.0
+
+
 _RRR_PARAM_FOR_COI = {
     "T2D": "actionable_rrr_t2d",
     "Alzheimer": "actionable_rrr_alzheimer",
