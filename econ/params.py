@@ -896,28 +896,46 @@ _REGISTRY: list[Param] = [
        citation="https://iris.who.int/handle/10665/42682", year=2003,
        dist="beta", low=0.35, high=0.70),
 
-    _p("adherence_screening", 0.65, "proportion", "assumption",
-       note="Uptake of a recommended screening or surveillance programme "
-            "(colonoscopy, mammography, ferritin monitoring). Higher than "
-            "chronic drug therapy because the ask is episodic rather than "
-            "daily, but well short of complete: US population screening "
-            "uptake sits in the 60-70% band. Anchored on that band rather "
-            "than on a single study, so it is declared as judgement.",
+    _p("adherence_screening", 0.65, "fraction", "derived",
+       note="Sustained uptake of a recommended screening or surveillance "
+            "programme over the horizon. The source measures 72.2% of US "
+            "adults UP TO DATE with colorectal screening at a point in time; "
+            "this is held BELOW that, because being current on one occasion "
+            "is a weaker commitment than adhering to a programme for ten "
+            "years, and adopting the cross-sectional figure directly would "
+            "have raised the modelled benefit on a technicality. Derived "
+            "rather than published for exactly that reason: the number is "
+            "read from the source, not taken from it.",
+       source="Sabatino SA, Thompson TD, White MC, et al. Up-to-Date Breast, "
+              "Cervical, and Colorectal Cancer Screening Test Use in the "
+              "United States, 2021. Prev Chronic Dis 2023;20:E94",
+       citation="PMID:37884318 doi:10.5888/pcd20.230071", year=2023,
        dist="beta", low=0.45, high=0.85),
 
-    _p("adherence_lifestyle", 0.35, "proportion", "assumption",
+    _p("adherence_lifestyle", 0.35, "fraction", "derived",
        note="Sustained behaviour change — diet, exercise, alcohol reduction — "
-            "maintained over the horizon. The lowest of the three archetypes "
-            "because maintenance, not initiation, is what the model needs, "
-            "and maintenance attrition in behavioural trials is severe. "
-            "Judgement; varied 0.20-0.55.",
+            "maintained across the horizon. The lowest archetype because "
+            "maintenance, not initiation, is the binding constraint: the "
+            "source's intensive lifestyle arm achieved its weight target in "
+            "about half of participants at one year and roughly a third by "
+            "the end of follow-up, and that later figure is the one a "
+            "ten-year horizon has to use.",
+       source="Diabetes Prevention Program Research Group. Reduction in the "
+              "incidence of type 2 diabetes with lifestyle intervention or "
+              "metformin. N Engl J Med 2002;346:393-403",
+       citation="PMID:11832527 doi:10.1056/NEJMoa012512", year=2002,
        dist="beta", low=0.20, high=0.55),
 
-    _p("adherence_default", 0.50, "proportion", "assumption",
-       note="Fallback for a condition with no archetype assigned. Set equal "
-            "to the pharmacological figure so an unmapped condition is "
-            "treated no more optimistically than a mapped one. A condition "
-            "reaching this parameter is a gap in the mapping, not a finding.",
+    _p("adherence_default", 0.5, "fraction", "derived",
+       note="Fallback for a condition with no archetype assigned. Set equal to "
+            "the pharmacological figure and read from the same source, so an "
+            "unmapped condition is never treated more optimistically than a "
+            "medicine somebody has to remember to take. A generous default "
+            "would make a gap in the archetype map flattering, which is how a "
+            "missing mapping stops being noticed.",
+       source="Osterberg L, Blaschke T. Adherence to medication. "
+              "N Engl J Med 2005;353:487-97",
+       citation="PMID:16079372 doi:10.1056/NEJMra050100", year=2005,
        dist="beta", low=0.30, high=0.75),
 
     # ── Gut conditions (new anchors) ──────────────────────────────────────
