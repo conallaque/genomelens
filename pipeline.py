@@ -1666,6 +1666,40 @@ def run_pipeline(args: argparse.Namespace) -> int:
         except Exception as e:
             log(f"  WARNING: Bloodwork HTML failed: {e}")
 
+    # ── Canonical payload, findings-first report, reconciliation ──────────
+    #
+    # NOT GATED ON `personal_econ.available`. These are built from the
+    # parametric path and the pooled reference case; `available` is a property
+    # of the LEGACY curated sheet — literally `bool(items)` on that one list.
+    # Coupling them meant a genome whose curated sheet happened to be empty
+    # produced no payload, no findings-first report and no PDF, silently, while
+    # the parametric path had twenty priced findings sitting right there. The
+    # first real genome run hit exactly that: one HLA record was the only thing
+    # left feeding the curated sheet, and removing it took the whole economics
+    # artefact set with it.
+    if econ_payload is not None:
+        try:
+            from report.findings_first import render_findings_first
+            from report.payload import payload_to_json
+            from report.reconcile import format_reconciliation, reconcile_paths
+
+            _pj = output_path.parent / "economics-payload.json"
+            _pj.write_text(payload_to_json(econ_payload), encoding="utf-8")
+
+            _ff = output_path.parent / "economics-findings-first.html"
+            _ff.write_text(_stamp_html(render_findings_first(econ_payload)),
+                           encoding="utf-8")
+            log(f"  Findings-first economics: {_ff}")
+
+            _rec = reconcile_paths(econ_payload)
+            (output_path.parent / "economics-reconciliation.txt").write_text(
+                format_reconciliation(_rec) + "\n", encoding="utf-8")
+            log(f"  Economics payload saved: {_pj} "
+                f"({len(econ_payload.findings)} findings · "
+                f"{len(_rec)} reconciled pathway(s))")
+        except Exception as _pe:
+            log(f"  WARNING: economics payload failed: {_pe}")
+
     # Personal economic-impact sheet — standalone economic_analysis.html
     if personal_econ is not None and render_economic_analysis_html is not None:
         try:
@@ -1689,41 +1723,6 @@ def run_pipeline(args: argparse.Namespace) -> int:
                 except Exception as _ce:
                     log(f"  WARNING: consolidated economics page failed: {_ce}")
 
-                # The canonical report payload, serialised beside the HTML.
-                # Built and validated above, before any PDF was written, so what
-                # is written here is exactly what the gate ran against.
-                try:
-                    if econ_payload is not None:
-                        from report.payload import payload_to_json
-                        from report.reconcile import (
-                            format_reconciliation,
-                            reconcile_paths,
-                        )
-                        _pj = output_path.parent / "economics-payload.json"
-                        _pj.write_text(payload_to_json(econ_payload),
-                                       encoding="utf-8")
-                        # The findings-first pages, rendered from the same
-                        # payload the gate ran against. Written beside the
-                        # legacy economics page rather than replacing it while
-                        # the remaining pages are still being built.
-                        from report.findings_first import (
-                            render_findings_first,
-                        )
-                        _ff = output_path.parent / "economics-findings-first.html"
-                        _ff.write_text(_stamp_html(
-                            render_findings_first(econ_payload)),
-                            encoding="utf-8")
-                        log(f"  Findings-first economics: {_ff}")
-
-                        _rec = reconcile_paths(econ_payload)
-                        (output_path.parent / "economics-reconciliation.txt"
-                         ).write_text(format_reconciliation(_rec) + "\n",
-                                      encoding="utf-8")
-                        log(f"  Economics payload saved: {_pj} "
-                            f"({len(econ_payload.findings)} findings · "
-                            f"{len(_rec)} reconciled pathway(s))")
-                except Exception as _pe:
-                    log(f"  WARNING: economics payload failed: {_pe}")
 
                 log(f"  Economic-impact analysis saved: {econ_path} "
                     f"(modeled net benefit {personal_econ['total_net']:,} "
