@@ -627,6 +627,46 @@ def _iv_charged(row: dict, curated_fallback: float) -> float:
     return float(v) if v is not None else float(curated_fallback)
 
 
+# Engine condition keys are identifiers, not prose. Some read acceptably
+# ("Type 2 Diabetes"), some are slugs ("opioid_toxicity", "graft_rejection"),
+# and one is a deliberate placeholder ("Pathogenic") standing for "a pathogenic
+# variant with no condition-specific anchor registered". `condition_id` keeps
+# the raw key because joins depend on it; `condition` is what a reader sees,
+# and it was declared and then never assigned at any of the three construction
+# sites below — so every finding in every report carried condition="".
+_CONDITION_LABELS: dict[str, str] = {
+    "CAD": "Coronary artery disease",
+    "T2D": "Type 2 diabetes",
+    "Alzheimer": "Alzheimer's disease",
+    "Depression": "Major depression",
+    "SubstanceUse": "Substance use disorder",
+    "Autoimmune": "Autoimmune disease",
+    "Urologic": "Urologic disease",
+    "IronOverload": "Hereditary hemochromatosis",
+    "Parkinsons": "Parkinson's disease",
+    "Colorectal": "Colorectal cancer",
+    "BreastOvarian": "Breast / ovarian cancer",
+    "Celiac": "Celiac disease",
+    # NAMED AS A FALLBACK, NOT AS A DISEASE. Rendering this as the bare word
+    # "Pathogenic" made a real finding look as though its condition had been
+    # replaced by a placeholder. It had not — no anchor exists, and saying so
+    # is more honest than borrowing a neighbouring condition's economics.
+    "Pathogenic": "Pathogenic variant \u2014 no condition-specific anchor",
+}
+
+
+def _condition_label(key: str) -> str:
+    """Human-readable condition for display. Empty in, empty out."""
+    k = (key or "").strip()
+    if not k:
+        return ""
+    if k in _CONDITION_LABELS:
+        return _CONDITION_LABELS[k]
+    if "_" in k:                       # slug from a pgx pathway
+        return k.replace("_", " ").capitalize()
+    return k                           # already prose
+
+
 def build_report_payload(
     economics_result: dict | None = None,
     voi_result: dict | None = None,
@@ -771,6 +811,13 @@ def build_report_payload(
             pricing_path=PricingPath.VOI_PARAMETRIC,
             gene=_s(r.get("gene")),
             condition_id=_s(r.get("condition")),
+            condition=_condition_label(_s(r.get("condition"))),
+            # Declared since this dataclass existed and never once assigned, so
+            # every published finding reported its net benefit while withholding
+            # the baseline risk and effect size that produced it.
+            event_probability=(None if r.get("p_event") is None
+                               else _f(r.get("p_event"))),
+            effect_size=(None if r.get("rrr") is None else _f(r.get("rrr"))),
             expected_qaly_gain=_f(r.get("dqaly")),
             medical_cost_averted=_f(r.get("dcost_averted")),
             # Cost to act comes from the pathway that was actually priced. It
@@ -855,6 +902,7 @@ def build_report_payload(
             # gene were indistinguishable from two findings.
             gene=_s(it.get("gene")),
             condition_id=_s(it.get("condition")),
+            condition=_condition_label(_s(it.get("condition"))),
             variant=_s(it.get("variant")),
             # The DECISION, not the method. `basis` describes how the figure
             # was computed ("avoided adverse event x probability of relevant
@@ -910,6 +958,7 @@ def build_report_payload(
             category=_s(nm.get("category")),
             gene=_s(nm.get("gene")),
             condition_id=_s(nm.get("condition")),
+            condition=_condition_label(_s(nm.get("condition"))),
             action_summary=_s(nm.get("action")) or _s(nm.get("decision")),
             evidence_confidence=_s(nm.get("confidence")),
             pricing_path=PricingPath.CURATED_TABLE,

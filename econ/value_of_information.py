@@ -1251,8 +1251,22 @@ def analyze_value_of_information(economics_result: dict | None = None,
                          # unless it is named — which is exactly what happened
                          # to pgx_basis on its first outing.
                          "pgx_basis": f.get("pgx_basis", ""),
+                         # THE TWO INPUTS THAT PRODUCE THE FIGURE. Every NMB on
+                         # the page is baseline risk x effect size x value, and
+                         # neither multiplicand was carried past this rebuild —
+                         # so `event_probability` and `effect_size` arrived at
+                         # the report as None on every finding of every report
+                         # ever produced. The dollar figure was auditable only
+                         # by rerunning the model, which is not an audit.
+                         "p_event": f.get("p_event"),
+                         "rrr": f.get("rrr"),
                          "wgs_only": f["wgs_only"], "nmb": round(nmb),
-                         "dcost_averted": round(dcost), "dqaly": round(dqaly, 3)})
+                         # 5 dp, not 3. At a $100,000 threshold a QALY rounded
+                         # to 0.001 carries +/- $50 of slack, and these findings
+                         # gain ~0.001 QALYs each — so a reader recomputing NMB
+                         # from the published payload could be 24% out on a
+                         # $210 finding purely from serialisation.
+                         "dcost_averted": round(dcost), "dqaly": round(dqaly, 5)})
     nmb_rows.sort(key=lambda r: -r["nmb"])
 
     total_expost = sum(r["nmb"] for r in nmb_rows) - test_cost
