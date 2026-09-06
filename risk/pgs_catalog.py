@@ -175,7 +175,26 @@ def parse_pgs_scoring_file(path: Path) -> list[dict]:
             ea = row.get("effect_allele") or ""
             oa = row.get("other_allele") or row.get("hm_inferOtherAllele") or ""
             weight_str = row.get("effect_weight") or row.get("OR") or ""
+            # EUR-SPECIFIC FREQUENCY COLUMNS COUNT TOO. This read only the
+            # plain `allelefrequency_effect`, so a file publishing
+            # `allelefrequency_effect_European` — which PGS000662 does for all
+            # 269 of its variants — parsed as "no frequency available" and every
+            # variant fell back to the 0.30 default. Correcting only the
+            # frequency source on that panel moves it from z +5.37 (100.0th) to
+            # z -1.20 (11.6th). The module docstring already promises EUR
+            # frequencies "if available"; they were available and unread.
             af_str = row.get("allelefrequency_effect") or ""
+            if not af_str:
+                for _k, _v in row.items():
+                    if (_k.startswith("allelefrequency_effect")
+                            and "european" in _k.lower() and _v):
+                        af_str = _v
+                        break
+            if not af_str:
+                for _k, _v in row.items():
+                    if _k.startswith("allelefrequency_effect") and _v:
+                        af_str = _v
+                        break
             try:
                 weight = float(weight_str)
             except ValueError:
@@ -217,6 +236,10 @@ PGS_HIGH_COVERAGE_PCT = 80
 PGS_MODERATE_COVERAGE_PCT = 40
 PGS_MIN_COVERAGE_PCT = 10   # below this the percentile is not interpretable
 
+# Ratio of carried dose to frequency-predicted dose above which the callable
+# set is judged non-random. See the gate in calculate_pgs.
+PGS_INFORMATIVE_MISSINGNESS_RATIO = 1.5
+
 
 def _pgs_confidence(n_used: int, total: int, n_low_r2: int) -> tuple:
     """Map PGS coverage (and imputation quality) to an explicit confidence."""
@@ -253,6 +276,11 @@ def calculate_pgs(snps_df: pd.DataFrame, variants: list[dict],
     raw_score = 0.0
     expected_mean = 0.0
     expected_var = 0.0
+    # Dose actually carried vs dose the frequencies predict — see the
+    # informative-missingness gate below.
+    observed_dose_sum = 0.0
+    expected_dose_sum = 0.0
+    n_no_rsid = 0
     n_chip = n_imputed = n_low_r2 = 0
     n_missing = 0
     used: list[dict] = []
@@ -261,6 +289,7 @@ def calculate_pgs(snps_df: pd.DataFrame, variants: list[dict],
         rsid = v["rsid"]
         if not rsid or rsid == ".":
             n_missing += 1
+            n_no_rsid += 1
             continue
         if rsid not in snps_df.index:
             n_missing += 1
@@ -283,6 +312,8 @@ def calculate_pgs(snps_df: pd.DataFrame, variants: list[dict],
         beta = v["weight"]
         af = v["af"] if v["af"] is not None else default_af
         raw_score += beta * dose
+        observed_dose_sum += dose
+        expected_dose_sum += 2.0 * af
         expected_mean += beta * 2.0 * af
         expected_var += (beta ** 2) * 2.0 * af * (1.0 - af)
         if source == "imputed":
@@ -296,7 +327,21 @@ def calculate_pgs(snps_df: pd.DataFrame, variants: list[dict],
     if n_used == 0 or expected_var <= 0:
         return {
             "status": "insufficient_data",
-            "reason": f"None of the {total} scoring-file variants found on chip or in imputed data.",
+            # BLAME THE RIGHT THING. A scoring file with no rsID column — PGS000004
+            # publishes coordinates and frequencies for all 313 of its variants and
+            # no rsIDs — yields an empty rsid for every row, and lookup here is
+            # rsID-only, so all 313 counted as "missing" and the message told the
+            # reader their genome lacked the variants. It did not; this module
+            # never looked them up. Coordinate matching would need a GRCh37->38
+            # liftover the scoring files do not carry, so this states the real
+            # cause rather than inventing a join.
+            "reason": (
+                f"None of the {total} scoring-file variants could be looked up."
+                + ("  This scoring file publishes no rsIDs, and matching here is "
+                   "rsID-only — the variants were not searched for, rather than "
+                   "searched for and absent." if n_no_rsid == total and total
+                   else "  Not found on chip or in imputed data.")
+            ),
             "confidence": "none",
             "coverage": {
                 "total": total, "chip": 0, "imputed": 0,
@@ -306,6 +351,86 @@ def calculate_pgs(snps_df: pd.DataFrame, variants: list[dict],
         }
 
     confidence, confidence_note = _pgs_confidence(n_used, total, n_low_r2)
+
+    # SUPPRESSION WAS GATED ON ZERO, NOT ON ENOUGH. The only path to
+    # "insufficient_data" above is `n_used == 0` — literally none of the
+    # scoring-file variants found. One variant out of 1.7 million fell through
+    # and rendered a full percentile and a tier. PGS_MIN_COVERAGE_PCT existed
+    # and said "below this the percentile is not interpretable", but nothing
+    # ever read it except the confidence label, so the module printed a
+    # percentile alongside its own text calling that percentile unreliable.
+    # On a real genome that produced "High, 100th percentile" for coronary
+    # artery disease off 28% coverage, beside a curated panel calling the same
+    # person Average.
+    #
+    # The rule now matches the wording: if coverage is low enough that this
+    # module would label the score low-confidence, it does not report a
+    # percentile at all. JUDGMENT CALL — no enforced threshold existed in
+    # either scoring module (the curated PRS gate is an absolute floor of
+    # PRS_MIN_USED variants, not a percentage), so this reuses the declared
+    # PGS_MODERATE_COVERAGE_PCT boundary rather than inventing a new number.
+    # INFORMATIVE MISSINGNESS. Dropping absent variants is correct only when
+    # absence is random, which holds for a genotyping chip. It does NOT hold for
+    # a whole-genome gVCF, where rsIDs are attached only to non-reference sites:
+    # absence there means homozygous reference, not "not measured". The callable
+    # set is then conditioned on carrying an alt allele, every retained variant
+    # scores high, and the score is compared against a null built for a random
+    # sample. Measured on a real 30x genome: of 502,690 callable scoring
+    # variants, ZERO were 0/0, and mean carried dose ran 1.00-1.14 against the
+    # 0.60 the frequencies predict. That is the whole reason five unrelated
+    # traits pinned at exactly the 100th percentile.
+    #
+    # This is NOT correctable from the callable set. The right value for an
+    # absent variant is 2 if the effect allele is the reference allele and 0
+    # otherwise; the gVCF's hom-ref records carry no rsID to look up, and the
+    # scoring files are GRCh37 against a GRCh38 callset, so coordinates do not
+    # join either. Scoring absent variants as 0 just produces the mirror
+    # artifact — the same panels pinned at the 0th percentile instead. So the
+    # percentile is withheld rather than corrected.
+    #
+    # JUDGMENT CALL, flagged like the coverage threshold: 1.5x. Random
+    # missingness puts this ratio at ~1.0 (a chip export does not trip it);
+    # the affected panels here sit at 1.7-2.3.
+    dose_ratio = (observed_dose_sum / expected_dose_sum
+                  if expected_dose_sum > 0 else 0.0)
+    if dose_ratio > PGS_INFORMATIVE_MISSINGNESS_RATIO:
+        return {
+            "status": "insufficient_data",
+            "reason": (
+                f"Carried dose is {dose_ratio:.2f}x what the allele "
+                "frequencies predict, so the variants that were callable are "
+                "not a random sample of the panel — on a whole-genome callset "
+                "an absent variant means homozygous reference, not unmeasured. "
+                "A percentile computed here would be biased upward and cannot "
+                "be corrected from the callable variants alone."
+            ),
+            "confidence": "none",
+            "informative_missingness": True,
+            "dose_ratio": round(dose_ratio, 3),
+            "coverage": {
+                "total": total, "chip": n_chip, "imputed": n_imputed,
+                "missing": n_missing, "low_r2": n_low_r2,
+                "pct_callable": round(100.0 * n_used / max(total, 1), 1),
+            },
+        }
+
+    pct_callable = 100.0 * n_used / max(total, 1)
+    if pct_callable < PGS_MODERATE_COVERAGE_PCT:
+        return {
+            "status": "insufficient_data",
+            "reason": (
+                f"Only {n_used:,} of {total:,} scoring-file variants were "
+                f"callable ({pct_callable:.1f}%, minimum "
+                f"{PGS_MODERATE_COVERAGE_PCT}%) — not enough for an "
+                "interpretable percentile."
+            ),
+            "confidence": "none",
+            "coverage": {
+                "total": total, "chip": n_chip, "imputed": n_imputed,
+                "missing": n_missing, "low_r2": n_low_r2,
+                "pct_callable": round(pct_callable, 1),
+            },
+        }
 
     z = (raw_score - expected_mean) / sqrt(expected_var)
     pct = _norm_cdf(z) * 100.0
@@ -330,6 +455,11 @@ def calculate_pgs(snps_df: pd.DataFrame, variants: list[dict],
         "tier_class": cls,
         "confidence": confidence,
         "confidence_note": confidence_note,
+        # Recorded on scores that PASS the gate as well, so a reader can see how
+        # close a surviving score sat to it. Inflammatory bowel disease clears
+        # the bar and still reports the 98th percentile; without this number
+        # there is no way to judge that from the outside.
+        "dose_ratio": round(dose_ratio, 3),
         "coverage": {
             "total": total,
             "chip": n_chip,
@@ -351,11 +481,17 @@ def calculate_pgs(snps_df: pd.DataFrame, variants: list[dict],
 
 
 # ── Top-level analyzer ────────────────────────────────────────────────────────
-def analyze_expanded_pgs(snps_df: pd.DataFrame, sex: str | None = None) -> dict:
+def analyze_expanded_pgs(snps_df: pd.DataFrame, sex: str | None = None,
+                         vcf_path: str | None = None,
+                         build: str | None = None) -> dict:
     """Run all available PGS Catalog panels.
 
-    Returns a dict with per-condition results. If scoring files are not
-    downloaded, returns a status indicating setup is needed.
+    When `vcf_path` and `build` are supplied and scoring files exist for that
+    build, panels are scored by COORDINATE against the callset. That is the
+    correct join for a whole genome: an absent rsID there means the site is
+    homozygous reference, not unmeasured, and dropping those sites conditions
+    the score on carrying an alt allele. Chip exports keep the rsID path, where
+    missingness genuinely is close to random.
     """
     if not PGS_DIR.exists():
         return {
@@ -363,6 +499,41 @@ def analyze_expanded_pgs(snps_df: pd.DataFrame, sex: str | None = None) -> dict:
             "reason": "PGS scoring files not downloaded. Run `python setup.py --pgs`.",
             "panels": {},
         }
+
+    # ── coordinate pre-pass ──────────────────────────────────────────────
+    # One read of the callset for every panel at once. Positions are collected
+    # across all panels first so the file is streamed a single time rather than
+    # fifteen; the per-panel arrays then index into the shared result.
+    coord_ok = False
+    needed = a1 = a2 = None
+    panel_variants: dict[str, list] = {}
+    if vcf_path and build:
+        try:
+            import numpy as np
+            want = (build or "").lower()
+            keys: set = set()
+            for slug, info in CONDITIONS.items():
+                f = PGS_DIR / f"{info['pgs_id']}_hmPOS_{'GRCh38' if want == 'grch38' else 'GRCh37'}.txt.gz"
+                if not f.exists() or pgs_file_build(f) != want:
+                    continue
+                vs = parse_pgs_scoring_file(f)
+                panel_variants[slug] = vs
+                for v in vs:
+                    k = _pack(v["chrom"], v["pos"]) if v.get("pos") else -1
+                    if k > 0:
+                        keys.add(k)
+            if keys:
+                _log(f"Coordinate join: {len(keys):,} positions across "
+                     f"{len(panel_variants)} panel(s), build {want}")
+                needed = np.array(sorted(keys), dtype=np.int64)
+                a1, a2 = build_coordinate_genotypes(vcf_path, needed)
+                seen = int((a1 > 0).sum())
+                _log(f"  {seen:,} of {len(needed):,} positions present in the "
+                     f"callset ({100.0 * seen / max(len(needed), 1):.1f}%)")
+                coord_ok = True
+        except Exception as e:  # fall back to the rsID path
+            _log(f"  WARNING: coordinate join unavailable ({e}); using rsIDs")
+            coord_ok = False
 
     panels: dict[str, dict] = {}
     for slug, info in CONDITIONS.items():
@@ -396,7 +567,11 @@ def analyze_expanded_pgs(snps_df: pd.DataFrame, sex: str | None = None) -> dict:
             _log(f"Loading {pgs_id} ({info['label']}) ...")
             variants = parse_pgs_scoring_file(score_file)
             _log(f"  {len(variants):,} weighted variants parsed")
-            result = calculate_pgs(snps_df, variants)
+            if coord_ok and slug in panel_variants:
+                result = calculate_pgs_by_coordinate(
+                    panel_variants[slug], needed, a1, a2)
+            else:
+                result = calculate_pgs(snps_df, variants)
             panels[slug] = {**info, "result": result}
         except Exception as e:
             panels[slug] = {**info, "result": {"status": "error", "reason": str(e)}}
@@ -411,4 +586,270 @@ def analyze_expanded_pgs(snps_df: pd.DataFrame, sex: str | None = None) -> dict:
         "panels": panels,
         "headline_findings": headline,
         "n_panels": len(panels),
+    }
+
+
+# ── cross-module reconciliation: curated PRS vs PGS Catalog ──────────────────
+# Two independent modules score the same seven conditions from the same genome
+# and their answers were rendered side by side with nothing saying they
+# disagreed. On a real whole genome the curated panel put this person at the
+# 96th percentile for Alzheimer's (High) while the PGS Catalog panel put them
+# at the 13th (Below Average) — the same trait, the same DNA, opposite ends of
+# the distribution. Neither is necessarily wrong: they are different variant
+# sets, different training cohorts and different coverage. But a reader given
+# both numbers and no flag will assume they corroborate each other.
+#
+# Same posture as the economics reconciliation gate: FLAG, do not suppress and
+# do not silently pick a winner. Deciding which score is right is a modeling
+# question this function is not entitled to answer.
+_PRS_TO_PGS: dict[str, str] = {
+    "Coronary Artery Disease": "coronary_artery_disease",
+    "Type 2 Diabetes": "type_2_diabetes",
+    "Breast Cancer": "breast_cancer",
+    "Prostate Cancer": "prostate_cancer",
+    "Alzheimer's Disease (Late-onset)": "alzheimers_disease",
+    "Atrial Fibrillation": "atrial_fibrillation",
+    "BMI / Obesity Tendency": "bmi",
+}
+
+# A percentile gap this wide means the two scores disagree about which side of
+# the distribution the person sits on, not merely by how much.
+PRS_PGS_DIVERGENCE_PCT = 40.0
+
+
+def reconcile_prs_pgs(prs_result: dict, pgs_result: dict) -> list[dict]:
+    """Compare curated-PRS and PGS-Catalog scores for conditions scored by both.
+
+    Returns one record per condition where both modules produced a percentile,
+    with `divergent` set when they disagree sharply. Conditions where either
+    side was suppressed for coverage are skipped rather than compared: a
+    withheld score is not a disagreement.
+    """
+    prs_panels = (prs_result or {}).get("panels") or {}
+    pgs_panels = (pgs_result or {}).get("panels") or {}
+    out: list[dict] = []
+    for prs_name, pgs_slug in _PRS_TO_PGS.items():
+        a = (prs_panels.get(prs_name) or {}).get("result") or {}
+        b = (pgs_panels.get(pgs_slug) or {}).get("result") or {}
+        if a.get("status") != "computed" or b.get("status") != "computed":
+            continue
+        pa, pb = a.get("percentile"), b.get("percentile")
+        if pa is None or pb is None:
+            continue
+        gap = abs(float(pa) - float(pb))
+        out.append({
+            "condition": prs_name,
+            "pgs_id": (pgs_panels.get(pgs_slug) or {}).get("pgs_id", ""),
+            "curated_percentile": pa, "curated_tier": a.get("tier"),
+            "curated_confidence": a.get("confidence"),
+            "catalog_percentile": pb, "catalog_tier": b.get("tier"),
+            "catalog_confidence": b.get("confidence"),
+            "percentile_gap": round(gap, 1),
+            "tiers_agree": a.get("tier") == b.get("tier"),
+            "divergent": gap >= PRS_PGS_DIVERGENCE_PCT,
+        })
+    out.sort(key=lambda r: -r["percentile_gap"])
+    return out
+
+
+def format_prs_pgs_reconciliation(rows: list[dict]) -> str:
+    """One line per compared condition; divergent ones marked."""
+    if not rows:
+        return "No condition is scored by both the curated PRS and PGS Catalog modules."
+    lines = []
+    for r in rows:
+        mark = "  <-- DIVERGENT" if r["divergent"] else ""
+        lines.append(
+            f"{r['condition']:34} curated {r['curated_percentile']:>5}th "
+            f"({r['curated_tier']}) vs catalog {r['catalog_percentile']:>5}th "
+            f"({r['catalog_tier']})  gap {r['percentile_gap']:>5}{mark}"
+        )
+    n = sum(1 for r in rows if r["divergent"])
+    lines.append(f"{n} of {len(rows)} compared conditions diverge by "
+                 f"{PRS_PGS_DIVERGENCE_PCT:.0f} percentile points or more.")
+    return "\n".join(lines)
+
+
+# ── coordinate-joined scoring (whole-genome callsets) ────────────────────────
+# WHY THIS EXISTS. Lookup here was rsID-only. On a gVCF that is not a coverage
+# limitation, it is a selection effect: annotators attach rsIDs only to
+# non-reference sites, so every hom-reference call — 65% of records in the
+# genome this was built against, and 0 of 261,114 of them carrying an rsID —
+# was invisible. The scored set was therefore conditioned on carrying an alt
+# allele, which is what pinned five unrelated traits at the 100th percentile.
+#
+# The information was never missing. It was unjoinable: hom-ref records have no
+# rsID, and the shipped scoring files are GRCh37 against a GRCh38 callset, so
+# coordinates did not line up either. Joining on coordinates in the SAME build
+# fixes both at once — absence stops meaning "unmeasured" and starts meaning
+# "homozygous reference", which is a dose, not a gap.
+_ALLELE_CODE = {"A": 1, "C": 2, "G": 3, "T": 4}
+_CODE_ALLELE = {1: "A", 2: "C", 3: "G", 4: "T"}
+
+
+def _chrom_num(c: str) -> int:
+    c = str(c).strip()
+    if c.lower().startswith("chr"):
+        c = c[3:]
+    if c.isdigit():
+        return int(c)
+    return {"X": 23, "Y": 24, "M": 25, "MT": 25}.get(c.upper(), 0)
+
+
+def _pack(chrom: str, pos: int) -> int:
+    n = _chrom_num(chrom)
+    return n * 1_000_000_000 + int(pos) if n else -1
+
+
+def build_coordinate_genotypes(vcf_path, needed_packed):
+    """Read a VCF once and return allele codes at exactly the positions wanted.
+
+    `needed_packed` is a sorted numpy int64 array of packed chrom/pos keys.
+    Returns (a1, a2) uint8 arrays parallel to it; 0 means the position was not
+    seen. Hom-reference records are kept — they are the whole point.
+    """
+    import gzip as _gz
+
+    import numpy as np
+
+    n = len(needed_packed)
+    a1 = np.zeros(n, dtype=np.uint8)
+    a2 = np.zeros(n, dtype=np.uint8)
+    opener = _gz.open if str(vcf_path).endswith(".gz") else open
+    with opener(vcf_path, "rt") as fh:
+        for line in fh:
+            if line[0] == "#":
+                continue
+            f = line.split("\t", 10)
+            if len(f) < 10:
+                continue
+            ref, alt = f[3], f[4]
+            if len(ref) != 1 or ref not in _ALLELE_CODE:
+                continue
+            key = _pack(f[0], f[1]) if f[1].isdigit() else -1
+            if key < 0:
+                continue
+            i = np.searchsorted(needed_packed, key)
+            if i >= n or needed_packed[i] != key:
+                continue
+            gt = f[9].split(":", 1)[0].replace("|", "/")
+            parts = gt.split("/")
+            if len(parts) == 1:
+                parts = [parts[0], parts[0]]
+            if len(parts) != 2 or "." in parts:
+                continue
+            alts = [x for x in alt.split(",")] if alt not in (".", "") else []
+            codes = []
+            ok = True
+            for p in parts:
+                try:
+                    idx = int(p)
+                except ValueError:
+                    ok = False
+                    break
+                if idx == 0:
+                    seq = ref
+                elif 1 <= idx <= len(alts):
+                    seq = alts[idx - 1]
+                else:
+                    ok = False
+                    break
+                if len(seq) != 1 or seq.upper() not in _ALLELE_CODE:
+                    ok = False
+                    break
+                codes.append(_ALLELE_CODE[seq.upper()])
+            if ok and len(codes) == 2:
+                a1[i], a2[i] = codes[0], codes[1]
+    return a1, a2
+
+
+def pgs_file_build(path) -> str | None:
+    """Which reference build a scoring filename declares, or None."""
+    low = str(path).lower()
+    if "grch38" in low or "hg38" in low:
+        return "grch38"
+    if "grch37" in low or "hg19" in low:
+        return "grch37"
+    return None
+
+
+def calculate_pgs_by_coordinate(variants: list[dict], needed_packed,
+                                a1, a2, default_af: float = 0.30) -> dict:
+    """Score one panel from coordinate-joined genotypes.
+
+    Absence now means "position not present in the callset" rather than
+    "person carries no alt allele", so the informative-missingness gate that
+    guards the rsID path is not needed here — hom-reference sites contribute
+    their real dose (2 when the effect allele IS the reference allele, 0
+    otherwise) instead of being dropped.
+    """
+    from math import sqrt
+
+    import numpy as np
+
+    raw = mean = var = 0.0
+    n_used = n_missing = n_homref = 0
+    obs = exp = 0.0
+    for v in variants:
+        key = _pack(v["chrom"], v["pos"]) if v.get("pos") else -1
+        if key < 0:
+            n_missing += 1
+            continue
+        i = np.searchsorted(needed_packed, key)
+        if i >= len(needed_packed) or needed_packed[i] != key or not a1[i]:
+            n_missing += 1
+            continue
+        g = _CODE_ALLELE.get(int(a1[i]), "") + _CODE_ALLELE.get(int(a2[i]), "")
+        dose = _dosage(g, v["effect_allele"])
+        if dose is None:
+            n_missing += 1
+            continue
+        af = v["af"] if v["af"] is not None else default_af
+        beta = v["weight"]
+        raw += beta * dose
+        mean += beta * 2.0 * af
+        var += (beta ** 2) * 2.0 * af * (1.0 - af)
+        obs += dose
+        exp += 2.0 * af
+        if dose == 0:
+            n_homref += 1
+        n_used += 1
+
+    total = len(variants)
+    if n_used == 0 or var <= 0:
+        return {"status": "insufficient_data", "confidence": "none",
+                "reason": f"None of the {total} scoring-file variants were "
+                          "present in the callset at matching coordinates.",
+                "coverage": {"total": total, "chip": 0, "imputed": 0,
+                             "missing": n_missing, "low_r2": 0,
+                             "pct_callable": 0.0}}
+
+    z = (raw - mean) / sqrt(var)
+    pct = _norm_cdf(z) * 100.0
+    if pct >= 95:
+        tier, cls = "High", "tier-high"
+    elif pct >= 80:
+        tier, cls = "Elevated", "tier-elevated"
+    elif pct >= 20:
+        tier, cls = "Average", "tier-average"
+    elif pct >= 5:
+        tier, cls = "Below Average", "tier-below"
+    else:
+        tier, cls = "Low", "tier-low"
+    pct_callable = 100.0 * n_used / max(total, 1)
+    confidence, note = _pgs_confidence(n_used, total, 0)
+    return {
+        "status": "computed", "raw_score": round(raw, 4),
+        "expected_mean": round(mean, 4), "z_score": round(z, 3),
+        "percentile": round(pct, 1), "tier": tier, "tier_class": cls,
+        "confidence": confidence, "confidence_note": note,
+        "match_basis": "coordinate",
+        # Proof the selection effect is gone: on the rsID path this was
+        # structurally zero, because a hom-reference call carries no rsID.
+        "n_hom_reference": n_homref,
+        "dose_ratio": round(obs / exp, 3) if exp > 0 else None,
+        "coverage": {"total": total, "chip": n_used, "imputed": 0,
+                     "missing": n_missing, "low_r2": 0,
+                     "pct_callable": round(pct_callable, 1)},
+        "n_variants_used": n_used,
     }
