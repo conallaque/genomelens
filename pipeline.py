@@ -1397,6 +1397,12 @@ def run_pipeline(args: argparse.Namespace) -> int:
         module_ai=module_ai,
     )
 
+    # A --output path in a directory that does not exist used to surface as a
+    # bare FileNotFoundError traceback from open(), after the whole analysis had
+    # already run — on a whole genome that is minutes of work discarded at the
+    # last write. Create the parent instead; the user named the path, so the
+    # intent is unambiguous.
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html)
 
