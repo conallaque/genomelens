@@ -402,15 +402,37 @@ def _collect(economics_result: dict | None,
         # BRCA1 variant and a predicted variant in an uncosted gene were worth
         # the same. The gene was known and discarded.
         _ppv = float(_econ_params.value("predictor_ppv_no_clinvar"))
-        for f in (nvr.get("buckets", {}).get("predicted_pathogenic_rare") or [])[:8]:
+        # BOTH DAMAGING BUCKETS. This read only `predicted_pathogenic_rare`,
+        # so every splice-disrupting prediction was invisible to the economics
+        # — and the two are summed into the single "n predicted damaging"
+        # figure the log reports, which made the omission impossible to see
+        # from the outside.
+        _pred = list(nvr.get("buckets", {}).get("predicted_pathogenic_rare") or [])
+        _pred += list(nvr.get("buckets", {}).get(
+            "predicted_splice_disrupting") or [])
+        _n_pred_total = len(_pred)
+        _n_unanchored = 0
+        for f in _pred[:_PREDICTED_VARIANT_CAP]:
             gene = f.get("gene", "") or ""
             coi_key, p_lit, rrr, qaly = _gene_to_econ(gene)
+            # LOCUS IN THE LABEL, ALWAYS. Two things go wrong without it. A
+            # missing gene rendered as "?", which is not a finding a reader can
+            # do anything with; and `build_report_payload` deduplicates the
+            # unvalued list on display name, so every identically-named row
+            # after the first was dropped on the floor. On a real whole genome
+            # both showed up as one "predicted-pathogenic ?" row standing in
+            # for 40 distinct variants. The coordinate makes each row unique
+            # and lets a reader look the variant up.
+            _loc = f"{f.get('chrom', '?')}:{f.get('pos', '?')}"
+            _name = (f"predicted-pathogenic {gene} ({_loc})" if gene
+                     else f"predicted-pathogenic variant at {_loc}")
             if not coi_key:
                 # Path C. No defensible anchor: report the finding, withhold
                 # the figure, rather than pricing it off a generic bucket.
-                if unvalued is not None:
+                _n_unanchored += 1
+                if unvalued is not None and _n_unanchored <= _PREDICTED_REPORT_CAP:
                     unvalued.append({
-                        "finding": f"predicted-pathogenic {gene or '?'}",
+                        "label": _name,
                         "category": "Predicted variant",
                         "reason": (
                             "Predicted pathogenic by a sequence model in a gene "
@@ -431,8 +453,7 @@ def _collect(economics_result: dict | None,
                 prior_penetrance=p_lit, gene=gene, family_history=False
             ).get("posterior_penetrance", p_lit))
 
-            _loc = f"{f.get('chrom','?')}:{f.get('pos','?')}"
-            out.append({"label": f"predicted-pathogenic {gene or _loc}",
+            out.append({"label": _name,
                         "kind": "coi", "gene": gene, "condition": coi_key,
                         "coi_key": coi_key, "p_event": p_corr, "rrr": rrr,
                         "qaly": qaly, "qaly_explicit": True,
@@ -475,6 +496,31 @@ def _collect(economics_result: dict | None,
                         "action_caveat": ("Predicted by sequence model, not "
                                           "observed in ClinVar — confirmation "
                                           "is the action, not treatment")})
+
+        # WHAT DID NOT FIT. A cap that silently discards is indistinguishable
+        # from a bug: the first real genome carried 180 damaging predictions
+        # against a cap of 8, and the 172 that did not fit left no trace
+        # anywhere in the output. The count is reported even when nothing else
+        # about them is.
+        if unvalued is not None and _n_pred_total:
+            _extra = max(0, _n_pred_total - _PREDICTED_VARIANT_CAP)
+            _summarised = max(0, _n_unanchored - _PREDICTED_REPORT_CAP)
+            if _extra or _summarised:
+                unvalued.append({
+                    "label": (f"{_extra + _summarised} further "
+                              f"predicted-damaging variant(s), not listed "
+                              f"individually"),
+                    "category": "Predicted variant",
+                    "intentional": True,
+                    "reason": (
+                        f"This genome carries {_n_pred_total} "
+                        f"predicted-damaging variants. The economics examines "
+                        f"the first {_PREDICTED_VARIANT_CAP} and names up to "
+                        f"{_PREDICTED_REPORT_CAP} unanchored ones; the rest are "
+                        f"counted here rather than dropped. None is priced — a "
+                        f"sequence model's call in a gene with no condition "
+                        f"anchor is a finding, not a valuation."),
+                })
     return out
 
 
@@ -923,6 +969,19 @@ def _match_pgx(label: str) -> str:
         if (gene_token and gene_token in low) or (drug and drug.lower() in low):
             return key
     return "PGx-generic"
+
+
+_PREDICTED_VARIANT_CAP = 40
+"""How many predicted variants the economics will look at.
+
+Was 8, applied to one of the two damaging buckets, with the remainder dropped
+without trace. A cap is right — a genome can carry hundreds of predictions and
+the report cannot be a list of them — but the count that did not fit has to be
+stated, which is what `_n_pred_total` carries to the aggregate row below.
+"""
+
+_PREDICTED_REPORT_CAP = 8
+"""How many unanchored predictions get their own row before they are summarised."""
 
 
 def _gene_to_econ(gene: str) -> tuple[str, float, float, float]:
