@@ -996,6 +996,12 @@ def _prs_findings(prs_summary: dict) -> list[dict]:
         ev = f"{panel} polygenic tier: {tier}"
         if pct is not None:
             ev += f" ({pct:g}th percentile)"
+        # SEMANTIC IDENTITY, NOT DISPLAY TEXT. Without these the pathway id was
+        # derived from `finding`, so rewording "Elevated type-2-diabetes
+        # polygenic risk" would silently move the id and break every join that
+        # points at it. `panel` is the key `prs_summary` is already keyed on, so
+        # it is stable by construction — the same argument that moved the
+        # pharmacogenomics extractor off display text.
         out.append(_econ_record(
             finding=econ["finding"],
             clinical_benefit=f"{econ['clinical_benefit']} — {econ['intervention']}",
@@ -1003,6 +1009,7 @@ def _prs_findings(prs_summary: dict) -> list[dict]:
             confidence="moderate", source="Polygenic Risk", recurring=econ["recurring"],
             prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
             evidence=ev,
+            kind="prs", condition=panel, phenotype=panel,
         ))
     return out
 
@@ -1144,6 +1151,13 @@ def _hla_findings(hla_result: dict | None) -> list[dict]:
             confidence="high", source="HLA Pharmacogenomics",
             prevalence=econ["prevalence"], qaly_gain=econ["qaly_gain"],
             evidence=f"{allele} carrier — avoid {econ['drug']}",
+            # Identity, so this stops keying on its own display text. It
+            # arrived as `legacy:hla_a_31_01:hla_a_31_01_carrier_carbamaze...`
+            # with gene and condition both empty — the same defect fixed on
+            # APOE, the coeliac haplotype, the wellness traits and the carrier
+            # panel, found here only because no synthetic sample carries an
+            # HLA risk allele.
+            kind="pgx", gene=allele, drug=econ.get("drug", ""),
         ))
     return out
 
@@ -2937,18 +2951,22 @@ def analyze_personal_economics(economics_result: dict | None = None,
             f"~{_PREDIAB_PROGRESSION_10YR:.0%} 10-yr progression risk × ${_T2D_COST:,} lifetime "
             f"T2D cost × {_DPP_RRR:.0%} reduction from a diabetes-prevention program.")
 
-    # ── HLA drug-hypersensitivity (personal) ──
-    if hla_result:
-        for allele in (hla_result.get("carrier_alleles") or []):
-            econ = HLA_ECONOMICS.get(allele)
-            if econ is None:
-                continue
-            avoided = econ["outcome_value"] * 0.15
-            qaly = econ["qaly_gain"]
-            add("HLA Pharmacogenomics", econ["finding"],
-                avoided, qaly, econ["cost"], "high",
-                f"{allele} carrier — published cost-effectiveness for pre-prescription testing "
-                f"({econ.get('src', 'CPIC')}).")
+    # ── HLA drug-hypersensitivity — VALUED UPSTREAM, NOT HERE ──
+    #
+    # SECOND HLA PATH COLLAPSED, for the same reason the carrier path below it
+    # was. `_hla_findings` already emits every carried allele into
+    # findings_with_economics, where the parametric path prices it. This block
+    # priced each one AGAIN off `outcome_value * 0.15` — a bare multiplier with
+    # no stated meaning — and passed the full `qaly_gain` through without
+    # conditioning on whether the drug is ever prescribed.
+    #
+    # It surfaced on the first real genome the engine has run. HLA-A*31:01
+    # carbamazepine hypersensitivity came out at $16,379 here against $210 from
+    # the parametric path — 78x apart, which tripped the reconciliation gate and
+    # blocked the PDF. The parametric figure is the defensible one: it
+    # multiplies by the probability the drug is actually prescribed, and most
+    # people never take carbamazepine. Valuing avoided harm from a drug nobody
+    # is taking is the same error as pricing a finding nobody can act on.
 
     # ── Carrier screening (personal) — VALUED UPSTREAM, NOT HERE ──
     #
