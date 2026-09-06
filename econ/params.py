@@ -636,6 +636,87 @@ _REGISTRY: list[Param] = [
             "statin.",
        dist="beta", low=0.05, high=0.55),
 
+    # ── Condition-specific effect of acting ──────────────────────────────
+    #
+    # `actionable_rrr` below is one generic number applied to every condition
+    # with no gene anchor, and it is the second-largest driver in the tornado
+    # with no citation at all. Where a trial has measured the effect of the
+    # action this model actually prices, that measurement is registered here
+    # and used instead. The generic figure survives only as the last resort,
+    # and each of these carries the trial's own confidence interval as its
+    # sensitivity range rather than an invented one.
+
+    _p("coi_parkinsons", 150_000.0, "$ per case", "derived",
+       note="Multi-year direct medical cost of Parkinson's disease. The source "
+            "reports $25.4bn of direct medical cost across roughly one million "
+            "prevalent US cases — about $25,000 per patient-year — and this "
+            "anchors that over a multi-year course. Excludes the indirect and "
+            "non-medical burden the same source puts at $26.5bn, which does "
+            "not belong in a healthcare-sector perspective. Range is wide "
+            "because the course length, not the annual cost, is the "
+            "uncertainty.",
+       source="Yang W, Hamilton JL, Kopil C, et al. Current and projected "
+              "future economic burden of Parkinson's disease in the U.S. "
+              "npj Parkinsons Dis 2020;6:15",
+       citation="PMID:32665974 doi:10.1038/s41531-020-0117-1", year=2020,
+       dist="gamma", low=75_000.0, high=300_000.0),
+
+    _p("qaly_loss_parkinsons", 3.0, "QALYs per case", "derived",
+       note="Parkinson's disease carries a large utility decrement over a long "
+            "motor and non-motor course. Derived the same way as the other "
+            "decrements here: the published EQ-5D decrement applied across the "
+            "expected years lived with the condition, rather than a single-"
+            "year utility passed off as a lifetime loss.",
+       source="Sullivan PW, Ghushchyan V. Preference-Based EQ-5D Index Scores "
+              "for Chronic Conditions in the United States. Med Decis Making "
+              "2006;26:410-20",
+       citation="PMID:16855125 doi:10.1177/0272989X06290495", year=2006,
+       dist="gamma", low=1.5, high=5.0),
+
+    _p("actionable_rrr_t2d", 0.58, "relative risk reduction", "published",
+       note="Structured lifestyle programme (7% weight loss, 150 min/week "
+            "activity) versus placebo, in adults with impaired glucose "
+            "tolerance. This is the action the model prices for a T2D "
+            "finding, so the trial's own effect is used rather than a "
+            "generic one. Range is the published 95% CI.",
+       source="Diabetes Prevention Program Research Group. Reduction in the "
+              "incidence of type 2 diabetes with lifestyle intervention or "
+              "metformin. N Engl J Med 2002;346:393-403",
+       citation="PMID:11832527 doi:10.1056/NEJMoa012512", year=2002,
+       dist="beta", low=0.48, high=0.66),
+
+    _p("actionable_rrr_alzheimer", 0.11, "relative risk reduction",
+       "published",
+       note="Intensive systolic blood-pressure control (<120 mmHg) versus "
+            "standard (<140), composite of mild cognitive impairment or "
+            "probable dementia: HR 0.89 (95% CI 0.79-0.99). MUCH SMALLER "
+            "than the generic 0.30 this replaces. Probable dementia alone "
+            "did not reach significance, so the composite is used and the "
+            "range is the published interval, which nearly touches no "
+            "effect. Vascular risk management is the action an APOE finding "
+            "leads to, and the honest effect size for it is modest.",
+       source="SPRINT MIND Investigators. Effect of intensive vs standard "
+              "blood pressure control on probable dementia: a randomized "
+              "clinical trial. JAMA 2019;321:553-561",
+       citation="PMID:30688979 doi:10.1001/jama.2018.21442", year=2019,
+       dist="beta", low=0.01, high=0.21),
+
+    _p("actionable_rrr_iron_overload", 0.70, "relative risk reduction",
+       "derived",
+       note="Phlebotomy begun before cirrhosis or diabetes develops. Survival "
+            "in non-cirrhotic, non-diabetic patients was indistinguishable "
+            "from the expected rate, so the effect of acting pre-symptomatically "
+            "is large. DERIVED, not published: the source reports survival "
+            "normalisation in a cohort, not a randomised risk reduction for a "
+            "named event, so the point estimate is a reading of that finding "
+            "and the range is deliberately wide.",
+       source="Niederau C, Fischer R, Purschel A, et al. Long-term survival "
+              "in patients with hereditary hemochromatosis. "
+              "Gastroenterology 1996;110:1107-19",
+       citation="PMID:8613000 doi:10.1053/gast.1996.v110.pm8613000",
+       year=1996,
+       dist="beta", low=0.40, high=0.90),
+
     _p("intervention_cost_standard", 500.0, "$", "derived",
        note="Cost of acting on a typical risk finding: additional clinical "
             "visits and monitoring over the horizon, at US self-pay office-"

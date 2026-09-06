@@ -106,6 +106,10 @@ COI_KEY_TO_PARAM: dict[str, tuple[str, str]] = {
     "Autoimmune":        ("coi_autoimmune",         "qaly_loss_autoimmune"),
     "Urologic":          ("coi_urologic",           "qaly_loss_urologic"),
     "IronOverload":      ("coi_iron_overload",      "qaly_loss_iron_overload"),
+    # Parkinson's, added when the metal/oxidative panel was un-merged. LRRK2
+    # used to route to IronOverload, a bucket named for a condition it has
+    # nothing to do with.
+    "Parkinsons":        ("coi_parkinsons",         "qaly_loss_parkinsons"),
     "Colorectal":        ("coi_colorectal",         "qaly_loss_cancer"),
     "BreastOvarian":     ("coi_breast_ovarian",     "qaly_loss_cancer"),
     "Pathogenic":        ("coi_pathogenic_generic", "qaly_loss_pathogenic_generic"),
@@ -139,6 +143,7 @@ ADHERENCE_BY_COI_KEY: dict[str, str] = {
     "Autoimmune":        "adherence_screening",         # periodic monitoring
     "Urologic":          "adherence_lifestyle",         # hydration, diet
     "IronOverload":      "adherence_screening",         # ferritin surveillance
+    "Parkinsons":        "adherence_screening",         # neurology follow-up
     "Colorectal":        "adherence_screening",         # colonoscopy programme
     "BreastOvarian":     "adherence_screening",         # imaging surveillance
     "Pathogenic":        "adherence_screening",         # specialist follow-up
@@ -1078,7 +1083,7 @@ def validate_model(pools: dict[str, ConditionPool], evaluated: dict) -> list[dic
     # flattering. Penalising the surfacing of a hidden assumption more heavily
     # than leaving it hidden would make the registry worse at its job; the
     # breach is recorded as a known limitation rather than absorbed silently.
-    add("Most parameters carry a citation", burden["pct_sourced"] >= 74.0,
+    add("Most parameters carry a citation", burden["pct_sourced"] >= 75.0,
         f"{burden['pct_sourced']}% sourced, {burden['n_assumption']} declared "
         f"assumptions")
 

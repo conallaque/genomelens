@@ -259,8 +259,17 @@ def _collect(economics_result: dict | None,
                             "baseline_event_probability_dementia"
                             if coi_key == "Alzheimer"
                             else "baseline_event_probability"),
-                        "rrr": _gene_rrr(f.get("gene", "")) or
-                        _econ_params.value("actionable_rrr"),
+                        # Gene anchor first, then the condition's own measured
+                        # effect, then the generic assumption. Each step down
+                        # is recorded in `rrr_basis` below.
+                        "rrr": (_gene_rrr(f.get("gene", ""))
+                                or _rrr_for_condition(coi_key)
+                                or _econ_params.value("actionable_rrr")),
+                        "rrr_basis": (
+                            "gene_specific" if _gene_rrr(f.get("gene", ""))
+                            else "condition_trial"
+                            if _rrr_for_condition(coi_key)
+                            else "model_default_no_measured_effect"),
                         "penetrance_basis": (
                             "gene_specific"
                             if _gene_penetrance(f.get("gene", ""))
@@ -640,7 +649,26 @@ def _classify_category(category: str | None, label: str = "",
     if "urolog" in cat or "renal" in cat or "kidney" in cat:
         return ("coi", "Urologic")
     if "metal" in cat or "oxidative" in cat:
-        return ("coi", "IronOverload")
+        # ROUTED BY GENE, NOT BY PANEL. This returned "IronOverload" for the
+        # whole metal/oxidative panel, so LRRK2 (Parkinson's), G6PD deficiency
+        # and ATP7B (Wilson's disease) were pooled as one liability and priced
+        # against haemochromatosis. Three unrelated conditions in a bucket
+        # named after none of them.
+        g = (gene or "").strip().upper()
+        if g == "LRRK2":
+            return ("coi", "Parkinsons")
+        if g == "G6PD":
+            # The decision is which drugs to avoid — primaquine, dapsone,
+            # rasburicase. That is a prescribing decision, not a cost-of-illness
+            # condition, and the pgx path is where prescribing decisions are
+            # priced.
+            return ("pgx", "")
+        if g == "HFE":
+            return ("coi", "IronOverload")
+        # ATP7B and anything else on this panel: no condition-specific anchor
+        # exists, so the generic bucket rather than a borrowed one. Wilson's
+        # disease is not iron overload and must not be priced as though it were.
+        return ("coi", "Pathogenic")
     # Gut health reaches the model through its one costable trait: the
     # coeliac-permissive HLA haplotype, which drives a serology decision. The
     # module's other five traits are reported as signals and emit nothing, so
@@ -913,6 +941,37 @@ def _gene_to_econ(gene: str) -> tuple[str, float, float, float]:
         return ("", 0.0, 0.0, 0.0)
     return (a["coi_key"], a["penetrance"], a["rrr"],
             float(_qaly_decrement_for(a["coi_key"])))
+
+
+# Condition anchors whose effect of acting has been measured for the action
+# this model prices. Anything absent falls back to the generic `actionable_rrr`,
+# which is an uncited assumption and the second-largest driver in the tornado.
+_RRR_PARAM_FOR_COI = {
+    "T2D": "actionable_rrr_t2d",
+    "Alzheimer": "actionable_rrr_alzheimer",
+    # "IronOverload" IS NOT MAPPED, DELIBERATELY. `actionable_rrr_iron_overload`
+    # is registered and cited, but the bucket carrying that name holds no
+    # iron-overload condition: on the current sample it contains LRRK2
+    # (Parkinson's), G6PD deficiency and ATP7B (Wilson's disease). It is a
+    # metal/oxidative-stress catch-all that was named for one of its members.
+    # Wiring the haemochromatosis phlebotomy effect to it priced Parkinson's
+    # risk off a 1996 haemochromatosis survival cohort and moved LRRK2 from
+    # $613 to $2,098. A condition-specific effect applied to the wrong
+    # condition is worse than the generic fallback, which at least does not
+    # claim to be measured. Map it once the bucket holds hereditary
+    # haemochromatosis and nothing else.
+}
+
+
+def _rrr_for_condition(coi_key: str) -> float:
+    """Measured effect of acting on this condition, or 0.0 when none is known.
+
+    0.0 is falsy so the caller falls through to `actionable_rrr` with an `or`,
+    and the fall-through is recorded on the pathway as `rrr_basis` rather than
+    left invisible — the same contract `_gene_penetrance` uses.
+    """
+    key = _RRR_PARAM_FOR_COI.get(coi_key)
+    return float(_econ_params.value(key)) if key else 0.0
 
 
 def _qaly_decrement_for(coi_key: str) -> float:

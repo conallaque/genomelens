@@ -519,11 +519,22 @@ def test_provenance_floor_breach_is_an_error():
     assert any(e["check"] == "Registry provenance floor" for e in errs)
 
     # And the live value must NOT breach, or the sample cannot be published.
+    # READ FROM THE REGISTRY, not copied. This held a hardcoded 74.2% / 66
+    # parameters — the live values at the time — so when sourcing work moved
+    # the registry to 76.1% / 71 and the floor was restored to 75%, the stale
+    # copy became a breach and failed a test that was meant to assert the
+    # opposite. A fixture that mirrors a live value goes stale the moment the
+    # value it mirrors improves.
+    from econ import params as _ep
+    live = [x for x in _ep._REGISTRY]
+    n_sourced = sum(1 for x in live if x.tier != "assumption")
     ok = _coherent()
-    ok.provenance.registry_n_parameters = 66
-    ok.provenance.registry_pct_sourced = 74.2
+    ok.provenance.registry_n_parameters = len(live)
+    ok.provenance.registry_pct_sourced = round(100.0 * n_sourced / len(live), 1)
     assert not [e for e in errors_in(validate_payload(ok))
-                if e["check"] == "Registry provenance floor"]
+                if e["check"] == "Registry provenance floor"], (
+        f"the live registry ({ok.provenance.registry_pct_sourced}% sourced) "
+        f"breaches its own floor; the sample cannot be published")
 
 
 def test_two_provenance_denominators_are_reported_not_merged():

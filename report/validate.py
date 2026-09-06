@@ -834,11 +834,11 @@ def _check_provenance(p: EconomicsReportPayload) -> list[Finding]:
     # will disagree with itself eventually, which is the same class of defect as
     # the two gene-anchor tables. Moved together here; worth registering once
     # rather than thrice.
-    if pr.registry_pct_sourced and pr.registry_pct_sourced < 74.0:
+    if pr.registry_pct_sourced and pr.registry_pct_sourced < 75.0:
         out.append(Finding(
             Severity.ERROR, "Registry provenance floor",
             f"registry is {pr.registry_pct_sourced:.1f}% sourced, below the "
-            f"74% floor asserted in tests/unit/test_econ_params.py",
+            f"75% floor asserted in tests/unit/test_econ_params.py",
             "provenance.registry_pct_sourced"))
     if pr.model_pct_unsourced and pr.model_pct_unsourced > 10.0:
         out.append(Finding(

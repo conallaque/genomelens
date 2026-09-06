@@ -109,7 +109,7 @@ def test_most_of_the_model_is_sourced():
     # breach is recorded as a known limitation in the README rather than
     # absorbed silently.
     burden = ep.assumption_burden()
-    assert burden["pct_sourced"] >= 74.0, (
+    assert burden["pct_sourced"] >= 75.0, (
         f"only {burden['pct_sourced']}% of registered parameters carry a "
         f"citation; the registry exists to keep this high")
     # 16 -> 17: predictor_ppv_no_clinvar, which replaced the unregistered
