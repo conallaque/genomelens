@@ -519,11 +519,22 @@ def render_page_one(p: EconomicsReportPayload) -> str:
             _ci = (f" \u00b7 95% interval {fmt.money(u.nmb_ci_low)} to "
                    f"{fmt.money(u.nmb_ci_high)} across "
                    f"{fmt.count(u.n_parameters_varied)} varied parameters")
+        # TWO SHARES OF ONE SET OF DRAWS, NOT A PARTITION. This used to read
+        # "1,287 of 1,500 ... (86%); cost-saving in 1,241 of 1,500 (83%)" —
+        # two same-denominator fractions separated by a semicolon, which a
+        # reader naturally adds to 169% and treats as broken. They are the
+        # same 1,500 simulations measured against two different bars:
+        # cost-effective is INMB > 0 at the threshold, cost-saving is a
+        # negative incremental cost, and the cost-saving draws sit inside the
+        # cost-effective ones wherever the QALY gain is non-negative. Saying
+        # "of the same draws" and naming the overlap is the whole fix; the
+        # numbers were never wrong.
+        _cs_n = round(u.probability_cost_saving * u.psa_iterations)
         unc_cap = (f"modelled simulations cost-effective "
                    f"({fmt.probability(u.probability_cost_effective)}); "
-                   f"cost-saving in "
-                   f"{fmt.simulation_count(u.probability_cost_saving, u.psa_iterations)}"
-                   f" ({fmt.probability(u.probability_cost_saving)})"
+                   f"{fmt.count(_cs_n)} of the same draws are also cost-saving "
+                   f"({fmt.probability(u.probability_cost_saving)}) "
+                   f"\u2014 overlapping shares, not a split"
                    f"{_ci}")
     else:
         unc_val, unc_cap = fmt.MISSING, "no probabilistic analysis available"
