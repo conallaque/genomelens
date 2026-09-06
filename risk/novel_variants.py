@@ -113,9 +113,64 @@ UNIPROT_TO_GENE: dict[str, str] = {
 }
 
 
+# The 18 entries above stay as an override, but they cover the ACMG-actionable
+# genes and nothing else. That is adequate for a targeted chip export and badly
+# insufficient for a whole genome, where predicted-damaging variants turn up
+# right across the exome. With only those accessions plus a 2.0 Mb coordinate
+# index — 0.065% of the genome — essentially nothing gets a gene name. Measured
+# on a real 30x whole genome: 40 of 40 examined predictions came back
+# unassigned and collapsed into a single indistinguishable
+# "predicted-pathogenic" row, because the report deduplicates on display
+# name and every one of them rendered alike.
+#
+# So the accession map is backed by UniProt's reviewed (Swiss-Prot) human
+# proteome, shipped as data/uniprot_gene_map.tsv.gz: accession -> primary gene
+# symbol, 20,283 entries, 126 KB. It covers 99.5% of the accessions
+# AlphaMissense actually emits (measured over 826 distinct accessions). UniProt
+# is CC BY 4.0; provenance is recorded in data/PROVENANCE.md.
+_UNIPROT_MAP_PATH = SCRIPT_DIR / "data" / "uniprot_gene_map.tsv.gz"
+_uniprot_map_cache: dict[str, str] | None = None
+
+
+def _load_uniprot_map() -> dict[str, str]:
+    """Accession -> primary gene symbol, read once. Empty dict if the file is absent.
+
+    Absent is a real state, not an error: the map is a convenience file and the
+    curated overrides still answer for the ACMG genes without it. It degrades to
+    the old behaviour rather than raising mid-scan.
+    """
+    global _uniprot_map_cache
+    if _uniprot_map_cache is not None:
+        return _uniprot_map_cache
+    import gzip as _gz
+    out: dict[str, str] = {}
+    try:
+        with _gz.open(_UNIPROT_MAP_PATH, "rt") as fh:
+            for line in fh:
+                acc, _, sym = line.partition("\t")
+                acc, sym = acc.strip().upper(), sym.strip()
+                if acc and sym:
+                    out[acc] = sym
+    except OSError:
+        out = {}
+    _uniprot_map_cache = out
+    return out
+
+
 def gene_for_uniprot(uniprot: str) -> str:
-    """Gene symbol for a UniProt accession, or "" if it is not one we anchor."""
-    return UNIPROT_TO_GENE.get((uniprot or "").strip().upper(), "")
+    """Gene symbol for a UniProt accession, or "" if nothing maps it.
+
+    The curated map wins wherever it has an entry: it was resolved against this
+    repository's own tables and picks canonical isoforms deliberately (P40692
+    for MLH1, not the non-canonical isoform a first-hit join returns). UniProt's
+    reviewed proteome answers everything else. Isoform suffixes ("P38398-2") are
+    stripped first, since every isoform of an accession belongs to one gene.
+    """
+    acc = (uniprot or "").strip().upper()
+    if not acc:
+        return ""
+    acc = acc.split("-", 1)[0]
+    return UNIPROT_TO_GENE.get(acc) or _load_uniprot_map().get(acc, "")
 
 
 def _window_gene(build: str, chrom: str, pos: int) -> str:

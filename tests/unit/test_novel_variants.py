@@ -215,10 +215,23 @@ def test_uniprot_accession_resolves_to_a_gene():
     # Canonical, not an isoform. First-hit derivation picked Q7L775 for MLH1;
     # majority vote over ~60 supporting coordinates gives the canonical entry.
     assert nv.gene_for_uniprot("P40692") == "MLH1"
-    # A real protein with no economic anchor resolves to nothing, rather than
-    # to a plausible-looking neighbour.
-    assert nv.gene_for_uniprot("P05091") == ""            # ALDH2
+    # NAMING IS NOT ANCHORING. This used to assert P05091 -> "", on the
+    # reasoning that a gene with no economic anchor should resolve to nothing.
+    # That conflated two jobs. ALDH2 is simply the correct name for P05091, and
+    # withholding it does not protect anything — it just produced unnamed rows.
+    # On a whole genome that was the whole story: 40 of 40 predictions came back
+    # unnamed and collapsed into one "predicted-pathogenic ?" row. The property
+    # that actually matters is that an unanchored gene is not PRICED, and that
+    # is enforced downstream by _gene_to_econ, asserted just below.
+    assert nv.gene_for_uniprot("P05091") == "ALDH2"
+    assert nv.gene_for_uniprot("P38398-2") == "BRCA1"     # isoform suffix
     assert nv.gene_for_uniprot("") == ""
+    # Nonsense accessions still resolve to nothing rather than a near neighbour.
+    assert nv.gene_for_uniprot("NOT_AN_ACCESSION") == ""
+
+    from econ.value_of_information import _gene_to_econ
+    assert _gene_to_econ("ALDH2")[0] is None or not _gene_to_econ("ALDH2")[0]
+    assert _gene_to_econ("BRCA1")[0]                      # anchored, still priced
 
 
 def test_every_anchor_gene_has_an_accession():
