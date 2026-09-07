@@ -302,6 +302,18 @@ future pharmacogenomic guidelines. A one-time test with recurring returns.
 
 This model reports its own gaps rather than hiding them.
 
+- **Polygenic percentiles on a whole genome need the reference sequence.** An rsID join
+  looks like a coverage question and is actually a selection effect: annotators attach
+  rsIDs only to non-reference sites, so every homozygous-reference call is invisible and
+  the scored set is conditioned on carrying an alt allele. Measured on a public 30x
+  genome, **0 of 502,690** callable scoring variants were `0/0`, and five unrelated traits
+  pinned at exactly the 100th percentile. Coordinates alone do not fix it either — 99.8%
+  of called positions live inside compressed reference blocks with no row to match. With
+  `reference/genome/GRCh38.fa` in place the blocks are expanded and coverage goes from
+  **36.9% to 99.9%**, recovering 4.8M positions; without it, affected scores are
+  **withheld rather than printed**, because scoring an absent variant as zero just
+  produces the mirror artifact. Chip exports are unaffected and keep the rsID path, where
+  missingness genuinely is close to random.
 - **Parameter provenance is incomplete.** The registry enforces tiers (published / derived
   / assumption) and blocks assumption-laundering. Coverage differs by population and the
   two are not interchangeable: **58 of 72 (80.6%)** registry parameters are sourced, but
@@ -427,4 +439,6 @@ distribution without the author's written permission is prohibited. No warranty.
 
 Built on top of the work of countless GWAS consortia (PGC, UK Biobank, GIANT,
 GLGC, MAGIC, Astle 2016, …), CPIC, ClinVar, PharmGKB, ISOGG, YFull, and the
-PGS Catalog. Reference genome positions are GRCh37/hg19 unless noted.
+PGS Catalog. Curated tables are GRCh37/hg19 unless noted; polygenic scoring files
+are read in whichever build matches the input, since a scoring file for the wrong
+build does not degrade gracefully — it answers a different question.
