@@ -526,7 +526,21 @@ def analyze_expanded_pgs(snps_df: pd.DataFrame, sex: str | None = None,
                 _log(f"Coordinate join: {len(keys):,} positions across "
                      f"{len(panel_variants)} panel(s), build {want}")
                 needed = np.array(sorted(keys), dtype=np.int64)
-                a1, a2 = build_coordinate_genotypes(vcf_path, needed)
+                # Reference sequence, when present, is what makes a compressed
+                # hom-reference block usable: without it a block-covered
+                # position cannot be scored, because "homozygous reference"
+                # is only a dose once you know which base the reference is.
+                _fa = REFERENCE_FASTA if REFERENCE_FASTA.exists() else None
+                _ref = None
+                if _fa is not None:
+                    _log(f"  reading reference bases from {_fa.name}")
+                    _ref = reference_bases(_fa, needed)
+                    _log(f"  {int((_ref > 0).sum()):,} of {len(needed):,} "
+                         "positions have a reference base")
+                else:
+                    _log("  no reference FASTA; hom-reference blocks cannot be "
+                         "expanded and low-coverage panels stay withheld")
+                a1, a2 = build_coordinate_genotypes(vcf_path, needed, _ref)
                 seen = int((a1 > 0).sum())
                 _log(f"  {seen:,} of {len(needed):,} positions present in the "
                      f"callset ({100.0 * seen / max(len(needed), 1):.1f}%)")
@@ -683,6 +697,9 @@ def format_prs_pgs_reconciliation(rows: list[dict]) -> str:
 # coordinates did not line up either. Joining on coordinates in the SAME build
 # fixes both at once — absence stops meaning "unmeasured" and starts meaning
 # "homozygous reference", which is a dose, not a gap.
+REFERENCE_FASTA = SCRIPT_DIR / "reference" / "genome" / "GRCh38.fa" \
+    if (SCRIPT_DIR / "reference" / "genome" / "GRCh38.fa").exists() \
+    else SCRIPT_DIR / "reference" / "genome" / "GRCh38.fa.gz"
 _ALLELE_CODE = {"A": 1, "C": 2, "G": 3, "T": 4}
 _CODE_ALLELE = {1: "A", 2: "C", 3: "G", 4: "T"}
 
@@ -701,7 +718,40 @@ def _pack(chrom: str, pos: int) -> int:
     return n * 1_000_000_000 + int(pos) if n else -1
 
 
-def build_coordinate_genotypes(vcf_path, needed_packed):
+def reference_bases(fasta_path, needed_packed):
+    """Reference base at each needed position, as allele codes.
+
+    Read one chromosome at a time and index into the sequence rather than
+    issuing one fetch per position: 7.6M individual pysam calls is minutes,
+    a per-chromosome slice is seconds.
+    """
+    import numpy as np
+    import pysam
+
+    out = np.zeros(len(needed_packed), dtype=np.uint8)
+    fa = pysam.FastaFile(str(fasta_path))
+    names = {n.replace("chr", ""): n for n in fa.references}
+    chrom_of = needed_packed // 1_000_000_000
+    pos_of = needed_packed % 1_000_000_000
+    for cnum in sorted(set(int(c) for c in chrom_of.tolist())):
+        label = {23: "X", 24: "Y", 25: "MT"}.get(cnum, str(cnum))
+        ref_name = names.get(label) or names.get(label.replace("MT", "M"))
+        if not ref_name:
+            continue
+        try:
+            seq = fa.fetch(ref_name).upper()
+        except Exception:
+            continue
+        sel = np.where(chrom_of == cnum)[0]
+        for i in sel.tolist():
+            p0 = int(pos_of[i]) - 1          # VCF is 1-based, string is 0-based
+            if 0 <= p0 < len(seq):
+                out[i] = _ALLELE_CODE.get(seq[p0], 0)
+    fa.close()
+    return out
+
+
+def build_coordinate_genotypes(vcf_path, needed_packed, ref_codes=None):
     """Read a VCF once and return allele codes at exactly the positions wanted.
 
     `needed_packed` is a sorted numpy int64 array of packed chrom/pos keys.
@@ -715,6 +765,7 @@ def build_coordinate_genotypes(vcf_path, needed_packed):
     n = len(needed_packed)
     a1 = np.zeros(n, dtype=np.uint8)
     a2 = np.zeros(n, dtype=np.uint8)
+    n_block_filled = 0
     opener = _gz.open if str(vcf_path).endswith(".gz") else open
     with opener(vcf_path, "rt") as fh:
         for line in fh:
@@ -724,6 +775,32 @@ def build_coordinate_genotypes(vcf_path, needed_packed):
             if len(f) < 10:
                 continue
             ref, alt = f[3], f[4]
+            # REFERENCE BLOCKS. A gVCF compresses hom-reference stretches into
+            # one row spanning POS..END, so 99.8% of called positions have no
+            # row of their own and a per-position match never sees them. Those
+            # rows carry real information — 244,555 of 247,247 blocks in the
+            # callset this was built against are confident 0/0 — so expand them
+            # across the needed positions they cover. The person is homozygous
+            # for whatever the reference says at each of those positions, which
+            # is why this needs the reference sequence and cannot be inferred
+            # from the block row (it names REF only at its start).
+            if ref_codes is not None and "END=" in f[7]:
+                gt0 = f[9].split(":", 1)[0].replace("|", "/")
+                if gt0 in ("0/0", "0"):
+                    try:
+                        end = int(f[7].split("END=", 1)[1].split(";", 1)[0])
+                    except (ValueError, IndexError):
+                        end = 0
+                    start_key = _pack(f[0], f[1]) if f[1].isdigit() else -1
+                    if start_key > 0 and end >= int(f[1]):
+                        end_key = start_key + (end - int(f[1]))
+                        lo = np.searchsorted(needed_packed, start_key, "left")
+                        hi = np.searchsorted(needed_packed, end_key, "right")
+                        for j in range(lo, hi):
+                            if a1[j] == 0 and ref_codes[j]:
+                                a1[j] = a2[j] = ref_codes[j]
+                                n_block_filled += 1
+                continue
             if len(ref) != 1 or ref not in _ALLELE_CODE:
                 continue
             key = _pack(f[0], f[1]) if f[1].isdigit() else -1
@@ -760,6 +837,8 @@ def build_coordinate_genotypes(vcf_path, needed_packed):
                 codes.append(_ALLELE_CODE[seq.upper()])
             if ok and len(codes) == 2:
                 a1[i], a2[i] = codes[0], codes[1]
+    if ref_codes is not None:
+        _log(f"  {n_block_filled:,} position(s) resolved from reference blocks")
     return a1, a2
 
 
@@ -777,11 +856,23 @@ def calculate_pgs_by_coordinate(variants: list[dict], needed_packed,
                                 a1, a2, default_af: float = 0.30) -> dict:
     """Score one panel from coordinate-joined genotypes.
 
-    Absence now means "position not present in the callset" rather than
-    "person carries no alt allele", so the informative-missingness gate that
-    guards the rsID path is not needed here — hom-reference sites contribute
-    their real dose (2 when the effect allele IS the reference allele, 0
-    otherwise) instead of being dropped.
+    Absence here means "position not present in the callset" rather than
+    "person carries no alt allele", so hom-reference sites contribute their real
+    dose instead of being dropped.
+
+    THE GATE STILL APPLIES. It was first written without one, on the reasoning
+    that a coordinate join removes the selection effect by construction. That is
+    true only if hom-reference positions actually appear as records. In a gVCF
+    they often do not: reference stretches are compressed into blocks carrying
+    an END= span, so a position inside a block is never its own row and cannot
+    be matched by coordinate. Measured on a real 30x callset, only 2,802,753 of
+    7,600,597 panel positions matched, and those matches were still
+    overwhelmingly variant sites — coronary artery disease and BMI came back at
+    exactly the 100th percentile, the same artifact the join was meant to
+    remove. Resolving block-covered positions needs the reference base at each
+    one, which neither the block record nor the scoring file supplies. So the
+    same dose-ratio guard runs here, and scores stay withheld until the join can
+    actually see hom-reference calls.
     """
     from math import sqrt
 
@@ -824,6 +915,27 @@ def calculate_pgs_by_coordinate(variants: list[dict], needed_packed,
                              "missing": n_missing, "low_r2": 0,
                              "pct_callable": 0.0}}
 
+    dose_ratio = (obs / exp) if exp > 0 else 0.0
+    if dose_ratio > PGS_INFORMATIVE_MISSINGNESS_RATIO:
+        return {
+            "status": "insufficient_data", "confidence": "none",
+            "informative_missingness": True,
+            "dose_ratio": round(dose_ratio, 3),
+            "n_hom_reference": n_homref,
+            "reason": (
+                f"Carried dose is {dose_ratio:.2f}x what the allele frequencies "
+                f"predict. Only {n_used:,} of {total:,} panel positions matched "
+                "the callset and just "
+                f"{n_homref:,} of those are homozygous reference, so the matched "
+                "set is still selected for variant sites — reference stretches "
+                "in this callset are stored as spans rather than per-position "
+                "records, and cannot be joined by coordinate."
+            ),
+            "coverage": {"total": total, "chip": n_used, "imputed": 0,
+                         "missing": n_missing, "low_r2": 0,
+                         "pct_callable": round(100.0 * n_used / max(total, 1), 1)},
+        }
+
     z = (raw - mean) / sqrt(var)
     pct = _norm_cdf(z) * 100.0
     if pct >= 95:
@@ -844,10 +956,10 @@ def calculate_pgs_by_coordinate(variants: list[dict], needed_packed,
         "percentile": round(pct, 1), "tier": tier, "tier_class": cls,
         "confidence": confidence, "confidence_note": note,
         "match_basis": "coordinate",
+        "dose_ratio": round(dose_ratio, 3),
         # Proof the selection effect is gone: on the rsID path this was
         # structurally zero, because a hom-reference call carries no rsID.
         "n_hom_reference": n_homref,
-        "dose_ratio": round(obs / exp, 3) if exp > 0 else None,
         "coverage": {"total": total, "chip": n_used, "imputed": 0,
                      "missing": n_missing, "low_r2": 0,
                      "pct_callable": round(pct_callable, 1)},

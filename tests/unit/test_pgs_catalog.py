@@ -88,3 +88,50 @@ def test_a_suppressed_score_is_not_reported_as_a_disagreement():
     pgs = {"panels": {"type_2_diabetes": {"result": {
         "status": "insufficient_data", "reason": "coverage"}}}}
     assert reconcile_prs_pgs(prs, pgs) == []
+
+
+def test_hom_reference_blocks_are_expanded_using_the_reference(tmp_path):
+    """A gVCF stores hom-ref stretches as spans, not per-position rows.
+
+    99.8% of called positions in a real 30x callset sit inside such blocks, so a
+    per-position coordinate match sees almost none of them and the scored set
+    stays selected for variant sites. Expanding a block needs the reference
+    base at each covered position: "homozygous reference" is only a dose once
+    you know which base the reference is.
+    """
+    import numpy as np
+
+    from risk.pgs_catalog import (
+        _CODE_ALLELE,
+        _pack,
+        build_coordinate_genotypes,
+        reference_bases,
+    )
+
+    fa = tmp_path / "tiny.fa"
+    fa.write_text(">1\nACGTACGTACGTACGTACGT\n")
+    vcf = tmp_path / "tiny.vcf"
+    vcf.write_text(
+        "##fileformat=VCFv4.2\n"
+        '##INFO=<ID=END,Number=1,Type=Integer,Description="End">\n'
+        "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tS1\n"
+        "1\t2\t.\tC\t.\t50\tPASS\tEND=9\tGT:DP\t0/0:30\n"
+        "1\t12\t.\tG\tA\t50\tPASS\t.\tGT:DP\t0/1:30\n"
+    )
+    # 3 and 5 are inside the hom-ref block; 12 has its own variant row.
+    needed = np.array(sorted([_pack("1", 3), _pack("1", 5), _pack("1", 12)]),
+                      dtype=np.int64)
+
+    ref = reference_bases(fa, needed)
+    assert [_CODE_ALLELE.get(int(c)) for c in ref] == ["G", "A", "T"]
+
+    a1, a2 = build_coordinate_genotypes(vcf, needed, ref)
+    got = ["".join((_CODE_ALLELE.get(int(x), "-"), _CODE_ALLELE.get(int(y), "-")))
+           for x, y in zip(a1, a2, strict=False)]
+    assert got == ["GG", "AA", "GA"], got
+
+    # Without the reference the block-covered positions are invisible, which is
+    # precisely the defect: they look unmeasured when they were measured.
+    b1, b2 = build_coordinate_genotypes(vcf, needed, None)
+    assert int(b1[0]) == 0 and int(b1[1]) == 0
+    assert int(b1[2]) != 0
