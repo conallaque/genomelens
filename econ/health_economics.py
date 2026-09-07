@@ -509,13 +509,27 @@ METAL_OXIDATIVE_ECONOMICS: dict[str, dict] = {
         "prevalence": 0.01, "qaly_gain": 2.00,
         "src": "Healy et al. (2008) Lancet Neurol — LRRK2 penetrance + PD trials",
     },
-    "ATP7B": {
-        "finding": "ATP7B variant — Wilson's disease copper monitoring",
-        "clinical_benefit": "Serum copper/ceruloplasmin monitoring + early chelation",
-        "cost": 200, "outcome_value": 50_000,
-        "prevalence": 0.003, "qaly_gain": 1.50,
-        "src": "EASL CPG Wilson's disease (2012); Roberts & Schilsky (2023)",
-    },
+    # ATP7B DELIBERATELY ABSENT. The metal panel's ATP7B signal is rs1061472
+    # (K832R), and the module that emits it says so in as many words: "It is
+    # NOT the Wilson's disease diagnostic variant (H1069Q) — this SNP only
+    # flags minor variation in copper handling", with the action "No action
+    # from this SNP alone."
+    #
+    # This table used to price exactly that signal as "Wilson's disease copper
+    # monitoring", with serum ceruloplasmin plus early chelation as the
+    # benefit, a $50,000 averted outcome, 1.50 QALYs and a 0.003 prevalence —
+    # Wilson's disease epidemiology and a Wilson's disease intervention,
+    # attached to a common polymorphism the same repository describes as
+    # research-grade and not actionable. On a real genome that produced a
+    # $532 expected net benefit for a finding whose own module recommends
+    # doing nothing.
+    #
+    # An economic value is the value of ACTING. Where there is no action there
+    # is no value, so this gene is left out of the table rather than given a
+    # smaller number. A genuinely pathogenic ATP7B genotype (H1069Q homozygous
+    # or compound heterozygous) is a ClinVar-asserted finding and reaches the
+    # economics through the clinical-variant path, which is where a real
+    # Wilson's disease intervention belongs.
 }
 
 # ─── Mendelian randomization outcome costs (maps MR outcome → healthcare cost) ─

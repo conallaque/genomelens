@@ -317,7 +317,7 @@ This model reports its own gaps rather than hiding them.
 - **Parameter provenance is incomplete.** The registry enforces tiers (published / derived
   / assumption) and blocks assumption-laundering. Coverage differs by population and the
   two are not interchangeable: **58 of 72 (80.6%)** registry parameters are sourced, but
-  only **134 of 306 (43.8%)** figures in the curated clinical tables resolve to a PMID or
+  only **134 of 302 (44.4%)** figures in the curated clinical tables resolve to a PMID or
   DOI. The rest are stated assumptions. The report prints its own coverage rather than
   claiming "fully sourced."
 - **The most influential parameter is still an assumption.** `actionable_rrr` — the
