@@ -1,0 +1,153 @@
+{
+  "schema": "genomelens-hg002-validation-1.0",
+  "generated_utc": "2026-09-12T23:15:35+00:00",
+  "benchmark": {
+    "project": "Genome in a Bottle (GIAB) / NIST",
+    "version": "NISTv4.2.1",
+    "assembly": "GRCh38 (no-alt analysis set)",
+    "subject": {
+      "giab_id": "HG002",
+      "coriell_id": "NA24385",
+      "pgp_id": "huAA53E0"
+    },
+    "consent": "PGP-Harvard open consent; public release of genome sequence data",
+    "artifact_type": "high-confidence benchmark truth set",
+    "artifact_note": "Not a complete whole-genome variant representation. Never described as 'full WGS'.",
+    "chromosome_scope": "chr1-22 only; no chrX, chrY or chrM",
+    "confident_regions": 481622,
+    "selection_rationale": "A public reference genome with benchmarking infrastructure: a published truth set, an explicit high-confidence region definition, and a second independent assay of the same individual. Ancestry is incidental provenance and was not a selection criterion."
+  },
+  "technical_validation": {
+    "requested_loci": 490,
+    "scoreable_denominator": 408,
+    "concordance_pct": 100.0,
+    "explicit_variant_matches": 169,
+    "confident_reference_matches": 239,
+    "confident_reference_by_class": {
+      "snv": 229,
+      "deletion": 4,
+      "insertion": 4,
+      "multiallelic": 2
+    },
+    "mismatches": 0,
+    "normalization_failures": 0,
+    "no_call_record_present_unreconcilable": 1,
+    "outside_truth_scope": 9,
+    "not_assayed_outside_benchmark_chromosomes": 72,
+    "denominator_policy": "Rates are reported over the scoreable denominator, with the requested total always shown beside it. A rate over loci-found and a rate over loci-requested differ by exactly the failure mode being measured."
+  },
+  "callability": {
+    "states": {
+      "in_callset": "explicit genotype evidence",
+      "absent_inside_confident_region": "confidently homozygous reference",
+      "absent_outside_confident_region": "outside truth scope - not reference, not absent, not a negative finding",
+      "outside_benchmark_chromosomes": "not assayed",
+      "record_present_unreconcilable": "no call"
+    },
+    "effect_of_region_definition": {
+      "scoreable_before": 169,
+      "scoreable_after": 408,
+      "concordance_before_pct": 100.0,
+      "concordance_after_pct": 100.0
+    },
+    "note": "A variant-only callset carries zero reference blocks, so absence is not evidence on its own. This is the opposite of the gVCF rule, where an absent row is silent because reference blocks carry the homozygous-reference evidence. The two cases look identical at row level and mean opposite things."
+  },
+  "second_assay_comparison": {
+    "assay": "independent consumer genotyping array of the same individual",
+    "join_key": "rsID (the array is GRCh37 and the benchmark GRCh38, so position is not a valid join key)",
+    "genuine_discordances": 1,
+    "discordance_note": "Retained as discordant. It falls in a gene with well-documented pseudogene homology that makes short-read genotyping difficult; that explanation is recorded but is not used to excuse the disagreement.",
+    "representation_artefacts_correctly_classified": 2,
+    "representation_artefact_kinds": [
+      "strand orientation",
+      "indel placeholder encoding"
+    ]
+  },
+  "pipeline_summary": {
+    "runtime_seconds": 190,
+    "runtime_scope": "benchmark truth set (variant-only input); not comparable to a full whole-genome callset",
+    "variants_matched": 123,
+    "risk_alleles": 77,
+    "clinically_classified_pathogenic_or_likely_pathogenic": 1,
+    "actionable": 0,
+    "carrier": 0,
+    "findings_reaching_economic_engine": 21,
+    "report_consistency": {
+      "errors": 0,
+      "warnings": 4
+    },
+    "y_dna": "not assayed - outside benchmark chromosome scope",
+    "mt_dna": "not assayed - outside benchmark chromosome scope",
+    "wgs_specific_paths_exercised": 0,
+    "wgs_specific_note": "0 of 21 findings required whole-genome-only evidence. Running a WGS benchmark end to end is supportable; exercising the WGS-specific value path is not."
+  },
+  "qualification_distribution": {
+    "source": "read directly from the engine's own output; not inferred afterwards",
+    "n_results": 36,
+    "UNRESOLVED": 33,
+    "REFUSED": 3,
+    "EVIDENCE_QUALIFIED": 0,
+    "PARTIALLY_SUPPORTED": 0,
+    "ASSUMPTION_DRIVEN": 0,
+    "SYNTHETIC": 0,
+    "bookable": 0,
+    "headline_eligible": 0,
+    "interpretation": "36 results, zero valuations published. Every result failed at least one evidence gate. This is the economic governance layer behaving as designed, not a gap in it."
+  },
+  "fail_closed_examples": [
+    {
+      "situation": "missing usual-care comparator",
+      "detail": "A pharmacogenomic entry prices an averted event rather than the difference against realistic usual care. With no usual-care arm there is no incremental quantity to report.",
+      "result": "genomic economic value unresolved",
+      "qualification": "UNRESOLVED"
+    },
+    {
+      "situation": "missing survival evidence",
+      "detail": "No pathway carries registered survival evidence, so life-years gained is unavailable rather than assumed.",
+      "result": "life-years gained unavailable",
+      "qualification": "UNRESOLVED"
+    },
+    {
+      "situation": "verified equation, unverified economic linkage",
+      "detail": "A cardiovascular risk equation is verified but its economic linkage is not: the risk-reclassification analysis is absent, the treatment threshold is unregistered, and relative-to-absolute composition is assumed.",
+      "result": "calculation refused rather than completed",
+      "qualification": "REFUSED"
+    }
+  ],
+  "engineering": {
+    "tests_passing": 3430,
+    "tests_held_red": 10,
+    "held_red_note": "Each red test encodes a known defect in curated data. Turning them green without fixing the cause would delete the only record that the defect exists."
+  },
+  "model_defaults_not_subject_attributes": {
+    "note": "These appear in internal output as engine fallbacks. HG002 supplied none of them and they must never be read as attributes of this genome. No clinical history, laboratory results, medications, family history or reproductive context was supplied.",
+    "fields": [
+      {
+        "field": "age",
+        "value": 35,
+        "status": "MODEL_DEFAULT"
+      },
+      {
+        "field": "wealth_base",
+        "value": 60000,
+        "status": "MODEL_DEFAULT"
+      },
+      {
+        "field": "ancestry_used",
+        "value": "European",
+        "status": "MODEL_DEFAULT"
+      }
+    ]
+  },
+  "limitations": [
+    "Truth validation covers benchmark-defined regions only; 9 requested loci fall outside truth scope and are excluded from every rate.",
+    "Technical validation is not clinical validation. Nothing here establishes clinical efficacy, causal benefit, survival benefit or economic effect.",
+    "No WGS-specific analysis path was exercised.",
+    "Model coverage is incomplete; not every pathway has registered survival evidence.",
+    "Unresolved results are retained as unresolved by design.",
+    "The upstream release publishes no checksums, so upstream file authenticity is unverified.",
+    "Figures produced by the legacy value-of-information path are not evidence-qualified and are excluded from this summary.",
+    "This summary intentionally omits proprietary implementation detail."
+  ],
+  "not_included": "No raw genomic data, genotype lines, variant lists, per-finding clinical interpretation, participant name, internal parameter tables, coefficients, pathway identifiers or module structure."
+}

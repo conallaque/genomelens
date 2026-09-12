@@ -8,6 +8,106 @@
 
 ---
 
+## Results on a real benchmark genome
+
+GenomeLens turns a variant callset into decision and economic intelligence, and
+refuses to produce a number when the evidence behind it does not hold. It was
+run end to end against a public, open-consent reference genome with a published
+truth set. The technical layer agreed with the truth set on every scoreable
+locus. The economic layer then published **nothing** — every result failed at
+least one evidence gate. Both of those are the intended outcome.
+
+| | |
+|---|---|
+| **Benchmark** | GIAB / NIST v4.2.1, GRCh38 |
+| **Subject** | HG002 / NA24385 / huAA53E0 (public, open consent) |
+| **Scope** | chr1–22, 481,622 high-confidence regions |
+| **Runtime** | 190 s over the benchmark truth set |
+
+### Genotype concordance: 100.00%
+
+```
+490 requested loci
+  → 408 scoreable           concordance 100.00%
+      169 explicit variant matches
+      239 confident-reference matches
+            229 SNV · 4 deletion · 4 insertion · 2 multiallelic
+      0 mismatches
+      0 normalization failures
+```
+
+The remaining 82 loci are accounted for rather than dropped: **1** no-call
+(a record present but unreconcilable), **9** outside truth scope, and **72**
+not assayed because they sit on chrX, chrY or chrM, which this benchmark does
+not cover. 169 + 239 + 1 + 9 + 72 = 490.
+
+**Callability is the difference between 169 and 408.** Supplying the
+confident-region definition raised the scoreable denominator from 169 to 408
+with concordance unchanged — the same claim the *WGS-native by design* section
+below makes structurally, measured here on real data. An absent explicit row
+was not a missing genotype; 239 times it was evidence.
+
+A second, independent genotyping assay of the same individual was compared at
+mutually testable loci. One genuine discordance remains, in a gene whose known
+pseudogene homology makes short-read genotyping difficult. It is disclosed
+rather than excluded.
+
+### Pipeline output for the run
+
+| | |
+|---|---|
+| Variants matched | 123 |
+| Risk alleles | 77 |
+| Clinically classified pathogenic / likely pathogenic | 1 |
+| Actionable | 0 |
+| Carrier | 0 |
+| Findings reaching the economic engine | 21 |
+| Report consistency | 0 errors · 4 warnings |
+
+These are engine counts for this run, not a clinical reading of a person.
+
+### Economic qualification: 0 of 36
+
+Of the 36 results the qualification layer evaluated, none cleared the bar to
+be valued:
+
+| State | Count |
+|---|---|
+| UNRESOLVED | 33 (91.7%) |
+| REFUSED | 3 (8.3%) |
+| EVIDENCE_QUALIFIED | 0 |
+| PARTIALLY_SUPPORTED | 0 |
+| ASSUMPTION_DRIVEN | 0 |
+| **Bookable** | **0** |
+| **Headline-eligible** | **0** |
+
+A platform that wanted a number here could have produced one. The gates are
+what stopped it:
+
+```
+finding present
+  → no usual-care comparator registered
+      → attributable value UNRESOLVED   (not $0)
+
+finding present
+  → no registered survival evidence
+      → life-years gained UNAVAILABLE   (not 0 years)
+```
+
+Unresolved is not zero. Zero would assert that acting here is worth nothing;
+unresolved says the evidence does not yet support a number, and names what
+would unlock it. A run that publishes no valuations is the governance layer
+holding, not the pipeline failing.
+
+The dollar figures shown under *A worked example* below come from a synthetic
+profile and are illustrative. No economic result from this benchmark run is
+published, because none qualified.
+
+**Technical validation is not clinical validation.** Concordance with a truth
+set says the genotypes are right; it says nothing about clinical utility.
+
+Full detail: [benchmark results](docs/RESULTS.md).
+
 ## What it does
 
 A variant callset is evidence. It is not yet a decision, and a decision is not
@@ -81,9 +181,10 @@ usual-care comparator, beneficiary separation, and explicitly unresolved
 pathways. Parameterization, eligibility gates and attribution formulas are not
 published.
 
-## A worked example
+## A worked example (synthetic)
 
-**DPYD / fluoropyrimidines**, from a synthetic genome:
+**DPYD / fluoropyrimidines**, from a synthetic genome — illustrating the
+distinctions above. This is not a benchmark result:
 
 | | |
 |---|---|
@@ -105,8 +206,8 @@ than direct typing — and an example you have to caveat is not an example.)*
 
 | | |
 |---|---|
-| Automated tests | **3,297 passing**, 16 skipped |
-| Known-failing | 10, held red deliberately — each pins an unresolved data defect rather than being silenced |
+| Automated tests | **3,430 passing** |
+| Known-failing | 10, held red deliberately — each encodes a known curated-data defect. Turning them green without fixing the cause would delete the only record that the defect exists. |
 | Representation equivalence | array vs block-compressed vs all-sites callsets asserted to agree |
 | Fail-closed | unsupported inputs refuse rather than coerce |
 | Mutation testing | guards are re-verified by planting the defect they exist to catch and confirming they fail |
@@ -158,7 +259,12 @@ No current partner deployment is claimed.
   phenotype depends on copy number — CYP2D6 is the clearest case — this
   analysis does not measure it and does not claim a resolved diplotype however
   completely the gene's SNP loci are called.
-- All figures and artifacts here are generated from synthetic data.
+- Two sources are mixed here and are labeled as such. The worked example,
+  partner overview and example payload are generated from **synthetic data**.
+  The benchmark section at the top is measured on a **public, open-consent
+  reference genome** against its published truth set.
+- Benchmark concordance is technical validation only. It is not clinical
+  validation and does not establish clinical utility.
 
 ## What is public and what is not
 
@@ -172,6 +278,7 @@ is sound, not enough to reconstruct it.
 
 ## Documentation
 
+[Benchmark results](docs/RESULTS.md) ·
 [Architecture](docs/ARCHITECTURE.md) · [Methods](docs/METHODS.md) ·
 [Validation](docs/VALIDATION.md) · [Partner pilot](docs/PARTNER-PILOT.md)
 

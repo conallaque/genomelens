@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif">
+  <defs>
+    <linearGradient id="hdr" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1f3a5f"/><stop offset="100%" stop-color="#2d5d8a"/>
+    </linearGradient>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a9bb0"/>
+    </marker>
+  </defs>
+
+  <rect width="900" height="560" fill="#ffffff"/>
+
+  <!-- header -->
+  <rect x="0" y="0" width="900" height="64" fill="url(#hdr)"/>
+  <text x="28" y="30" fill="#ffffff" font-size="19" font-weight="600">GenomeLens — real-genome benchmark</text>
+  <text x="28" y="50" fill="#c3d4e6" font-size="12.5">HG002 / NA24385 · GIAB NIST v4.2.1 · GRCh38 · public open-consent reference genome</text>
+
+  <!-- stage boxes -->
+  <g font-size="12.5">
+    <rect x="28" y="92" width="182" height="72" rx="6" fill="#eef3f8" stroke="#b9c9da"/>
+    <text x="119" y="117" text-anchor="middle" font-weight="600" fill="#1f3a5f">Real benchmark genome</text>
+    <text x="119" y="136" text-anchor="middle" fill="#4a5c6e">490 curated loci requested</text>
+    <text x="119" y="153" text-anchor="middle" fill="#4a5c6e">481,622 confident regions</text>
+
+    <rect x="240" y="92" width="182" height="72" rx="6" fill="#eef3f8" stroke="#b9c9da"/>
+    <text x="331" y="117" text-anchor="middle" font-weight="600" fill="#1f3a5f">Technical validation</text>
+    <text x="331" y="136" text-anchor="middle" fill="#1a7f4b" font-weight="600" font-size="15">100.00% concordance</text>
+    <text x="331" y="153" text-anchor="middle" fill="#4a5c6e">408 scoreable · 0 mismatches</text>
+
+    <rect x="452" y="92" width="182" height="72" rx="6" fill="#eef3f8" stroke="#b9c9da"/>
+    <text x="543" y="117" text-anchor="middle" font-weight="600" fill="#1f3a5f">Pipeline integration</text>
+    <text x="543" y="136" text-anchor="middle" fill="#4a5c6e">123 variants matched</text>
+    <text x="543" y="153" text-anchor="middle" fill="#4a5c6e">21 findings reached economics</text>
+
+    <rect x="664" y="92" width="208" height="72" rx="6" fill="#fdf3ef" stroke="#e3b9a8"/>
+    <text x="768" y="117" text-anchor="middle" font-weight="600" fill="#8a3d1c">Qualification</text>
+    <text x="768" y="136" text-anchor="middle" fill="#8a3d1c" font-weight="600" font-size="15">0 valuations published</text>
+    <text x="768" y="153" text-anchor="middle" fill="#7a5a4c">33 unresolved · 3 refused</text>
+
+    <line x1="212" y1="128" x2="236" y2="128" stroke="#8a9bb0" stroke-width="1.6" marker-end="url(#ar)"/>
+    <line x1="424" y1="128" x2="448" y2="128" stroke="#8a9bb0" stroke-width="1.6" marker-end="url(#ar)"/>
+    <line x1="636" y1="128" x2="660" y2="128" stroke="#8a9bb0" stroke-width="1.6" marker-end="url(#ar)"/>
+  </g>
+
+  <!-- callability -->
+  <text x="28" y="204" font-size="14" font-weight="600" fill="#1f3a5f">Callability states are kept distinct, never collapsed into &#8220;missing&#8221;</text>
+  <g font-size="12" >
+    <rect x="28" y="216" width="844" height="108" rx="6" fill="#fafbfc" stroke="#dfe5ec"/>
+    <text x="46" y="240" fill="#26323d">in callset</text>
+    <text x="300" y="240" fill="#4a5c6e">&#8594; explicit genotype evidence</text>
+    <text x="46" y="262" fill="#26323d">absent, inside confident region</text>
+    <text x="300" y="262" fill="#1a7f4b">&#8594; confidently homozygous reference</text>
+    <text x="46" y="284" fill="#26323d">absent, outside confident region</text>
+    <text x="300" y="284" fill="#8a3d1c">&#8594; outside truth scope — not reference, not absent</text>
+    <text x="46" y="306" fill="#26323d">record present, unreconcilable</text>
+    <text x="300" y="306" fill="#8a3d1c">&#8594; no call</text>
+    <text x="600" y="262" fill="#6b7a8a" font-size="11">Supplying the region definition</text>
+    <text x="600" y="278" fill="#6b7a8a" font-size="11">raised scoreable loci 169 &#8594; 408</text>
+    <text x="600" y="294" fill="#6b7a8a" font-size="11">with concordance unchanged.</text>
+  </g>
+
+  <!-- metrics strip -->
+  <g>
+    <rect x="28" y="344" width="196" height="70" rx="6" fill="#f4f8f5" stroke="#c2ddcc"/>
+    <text x="126" y="371" text-anchor="middle" font-size="22" font-weight="700" fill="#1a7f4b">169</text>
+    <text x="126" y="392" text-anchor="middle" font-size="11.5" fill="#4a5c6e">explicit variant matches</text>
+
+    <rect x="240" y="344" width="196" height="70" rx="6" fill="#f4f8f5" stroke="#c2ddcc"/>
+    <text x="338" y="371" text-anchor="middle" font-size="22" font-weight="700" fill="#1a7f4b">239</text>
+    <text x="338" y="392" text-anchor="middle" font-size="11.5" fill="#4a5c6e">confident-reference matches</text>
+
+    <rect x="452" y="344" width="196" height="70" rx="6" fill="#f4f8f5" stroke="#c2ddcc"/>
+    <text x="550" y="371" text-anchor="middle" font-size="22" font-weight="700" fill="#1a7f4b">0</text>
+    <text x="550" y="392" text-anchor="middle" font-size="11.5" fill="#4a5c6e">mismatches</text>
+
+    <rect x="664" y="344" width="208" height="70" rx="6" fill="#fafbfc" stroke="#dfe5ec"/>
+    <text x="768" y="371" text-anchor="middle" font-size="22" font-weight="700" fill="#1f3a5f">72</text>
+    <text x="768" y="392" text-anchor="middle" font-size="11.5" fill="#4a5c6e">not assayed (chrX/Y/M)</text>
+  </g>
+
+  <!-- fail closed -->
+  <text x="28" y="446" font-size="14" font-weight="600" fill="#1f3a5f">Where it refused to guess</text>
+  <g font-size="12">
+    <rect x="28" y="458" width="844" height="70" rx="6" fill="#fdf9f7" stroke="#e8d5cc"/>
+    <text x="46" y="481" fill="#26323d">no usual-care comparator modelled</text>
+    <text x="420" y="481" fill="#8a3d1c">&#8594; genomic economic value UNRESOLVED</text>
+    <text x="46" y="503" fill="#26323d">no registered survival evidence</text>
+    <text x="420" y="503" fill="#8a3d1c">&#8594; life-years gained unavailable</text>
+    <text x="46" y="519" fill="#6b7a8a" font-size="10.5">Technical validation is not clinical validation. It establishes genotype and callability correctness, not clinical or economic effect.</text>
+  </g>
+
+  <text x="872" y="548" text-anchor="end" font-size="10" fill="#95a3b3">All figures measured from a single reproducible run.</text>
+</svg>
