@@ -1,0 +1,477 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GenomeLens &mdash; Economic intelligence for genome sequencing</title><style>
+:root{
+  /* PREMIUM RESEARCH PALETTE, not a clinical one.
+     The previous tokens were hospital teal (#12626f) on mint (#f2f8f8) with
+     grey hairlines -- the exact combination that reads as pathology report
+     or patient portal. These are the colours of an institutional research
+     note: warm paper rather than screen white, charcoal rather than blue-
+     black, a muted navy that carries authority without looking like an EHR
+     header, and a desaturated green and gold that signal category rather
+     than shouting pass/fail. Nothing here changes a number; it changes what
+     the reader thinks they are holding. */
+  --ink:#22262b;        /* charcoal, not blue-black */
+  --ink2:#4c545d;       /* secondary prose */
+  --mute:#8a9099;       /* labels, annotations */
+  --line:#e3ded6;       /* warm hairline, never cool grey */
+  --line2:#cfc8bd;      /* emphasis rule */
+  --teal:#2b4a6f;       /* muted navy — the single accent */
+  --teal-d:#1e3550;     /* deeper navy for headings */
+  --mint:#f6f3ec;       /* warm off-white panel */
+  --paper:#fffdf9;      /* warm paper */
+  --warm:#f3efe7;       /* subtle fill */
+  --amber:#8a6a1f; --amber-bg:#f7f1e1;   /* muted gold */
+  --cond:#5d5470; --cond-bg:#f2f0f4;     /* restrained violet-grey */
+  --ok:#3f6b52; --ok-bg:#eef3ee;         /* desaturated green */
+}
+/* NO margin declaration here, and that is the whole fix for a defect that
+   looked like a dozen unrelated layout bugs.
+
+   `margin:0` overrode the PDF engine's own page margins FOR LAYOUT while
+   the engine still applied them physically. Chrome therefore paginated to
+   the full 297mm page, filled it to the bottom edge, and the engine then
+   shifted that content down into the band reserved for the running footer.
+   Content printed up to 35pt below the printable bottom and overprinted the
+   disclaimer, and because the cause was global it reproduced with a bare
+   <p> and no wrapper at all -- which is why chasing it through table rows,
+   grids, floats, inline-blocks and margin widths never fixed it.
+
+   Omitting the declaration lets the engine's margins (PRINT_MARGINS) drive
+   pagination, so the content box and the physical margins agree. Measured
+   at exactly 0.00pt overflow for narrative values of 1, 5, 15, 30 and 90
+   lines at every offset down the page. */
+@page{size:A4}
+*{box-sizing:border-box}
+/* 13.3px, not 14px. Three sheets overflowed a page by under 30px, which
+   produces a near-blank stub page far uglier than slightly smaller type.
+   Scaling the base size scales every derived measurement with it. */
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:13.3px/1.52 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,
+  "Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+/* NO max-height and NO overflow:hidden. An earlier revision had both, and
+   they silently clipped the mechanism map and the entire "What rises to the
+   top" block off page one -- the single most-read element in the report --
+   while the page count still looked correct. Content now flows, so a sheet
+   that does not fit becomes a VISIBLE extra page and
+   `test_the_pdf_paginates_one_sheet_per_page` fails loudly. */
+/* Sheets FLOW. A section longer than one page becomes two, with cards kept
+   whole by break-inside:avoid, rather than being clipped or crammed. Page
+   numbers come from the PDF engine's running footer, not from a block
+   positioned inside the section -- an absolutely positioned footer inside a
+   two-page section lands only on its final page. */
+.sheet{max-width:186mm;margin:0 auto;padding:2mm 0 2mm;
+  page-break-after:always;position:relative}
+.sheet:last-child{page-break-after:auto}
+.mast{display:flex;justify-content:space-between;align-items:baseline;
+  border-bottom:2px solid var(--teal);padding-bottom:8px;margin-bottom:26px}
+.mast .brand{font-weight:700;letter-spacing:.14em;font-size:11px;
+  text-transform:uppercase;color:var(--teal)}
+.mast .sec{font-size:11px;color:var(--mute);letter-spacing:.06em;
+  text-transform:uppercase}
+h1.head{font-size:24px;line-height:1.2;margin:0 0 5px;letter-spacing:-.3px}
+h2.sec{font-size:15.5px;margin:18px 0 3px;letter-spacing:-.15px;
+  color:var(--teal-d);break-after:avoid}
+h3.sub{font-size:12.5px;margin:16px 0 6px;text-transform:uppercase;
+  letter-spacing:.09em;color:var(--mute);font-weight:700;break-after:avoid}
+p.intro{color:var(--ink2);margin:0 0 14px;max-width:70ch;font-size:13px}
+p.note{color:var(--mute);font-size:11.5px;margin:5px 0 0;max-width:78ch}
+.rule{height:1px;background:var(--line);margin:22px 0}
+
+/* hero */
+.hero{background:var(--mint);border:1px solid var(--line);
+  border-radius:10px;padding:15px 26px 12px;text-align:center;
+  margin-bottom:10px}
+.hero .lbl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--teal);font-weight:700}
+.hero .amt{font-size:47px;line-height:1.02;font-weight:700;
+  letter-spacing:-1.8px;margin:5px 0 4px;font-variant-numeric:tabular-nums}
+.hero .qual{color:var(--ink2);font-size:12px;max-width:66ch;
+  margin:0 auto;line-height:1.42}
+.hero .meta{margin-top:6px;font-size:10.5px;color:var(--mute)}
+
+/* quantity table */
+.qtab{width:100%;border-collapse:collapse;margin-top:6px}
+.qtab td{padding:5.5px 9px;border-bottom:1px solid var(--line);
+  vertical-align:top;font-size:12.5px}
+.qtab tr.hero-row td{background:var(--mint)}
+.qtab .ql{font-weight:600}
+/* GLOBAL, not scoped to .qtab. It was `.qtab .qt`, so the same class used
+   in table cells and in the section headers had no display:block and ran
+   straight on into the text before it -- "UNRESOLVEDcurrent economic
+   estimate", "Scenario range if parameterizeda range on an unresolved
+   quantity". A sub-label that concatenates with its own label reads as a
+   rendering fault, which is exactly what it was. */
+.qt{font-size:11px;color:var(--mute);display:block;margin-top:2px;
+  font-weight:400;letter-spacing:0;text-transform:none;line-height:1.35}
+.qtab .qv{text-align:right;font-weight:700;white-space:nowrap;
+  font-variant-numeric:tabular-nums}
+.qtab tr.pri .qv{font-size:17px}
+.qtab tr.sec .ql,.qtab tr.sec .qv{color:var(--ink2)}
+.qtab tr.sec .qv{font-weight:600}
+.qtab .qn{font-size:11px;color:var(--mute);max-width:34ch}
+
+/* chips */
+.chip{display:inline-block;font-size:10px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;
+  border-radius:3px;border:1px solid}
+.chip-ok{color:var(--ok);background:var(--ok-bg);border-color:#cfe6da}
+.chip-cond{color:var(--cond);background:var(--cond-bg);border-color:#ddd8ee}
+.chip-warn{color:var(--amber);background:var(--amber-bg);border-color:#eedcb4}
+.chip-neutral{color:var(--ink2);background:var(--warm);
+  border-color:var(--line)}
+
+/* mechanism map */
+.map{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.map .row{display:flex;align-items:center;gap:12px;padding:4px 13px;
+  border-bottom:1px solid var(--line)}
+.map .row:last-child{border-bottom:0}
+.map .row .nm{flex:0 0 200px;font-weight:600;font-size:13px}
+.map .row .bn{flex:0 0 130px;font-size:11px;color:var(--mute)}
+.map .row .bar{flex:1;height:7px;background:var(--warm);border-radius:4px;
+  overflow:hidden}
+.map .row .bar i{display:block;height:100%;background:var(--teal);
+  border-radius:4px}
+.map .row .vl{flex:0 0 150px;text-align:right;font-size:12.5px;
+  font-variant-numeric:tabular-nums}
+.map .row .vl b{font-size:14px}
+
+/* finding cards */
+.tops{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.tcard{border:1px solid var(--line);border-radius:9px;padding:12px 14px;
+  background:var(--paper);break-inside:avoid}
+.tcard .gene{font-size:15px;font-weight:700;letter-spacing-.1px}
+.tcard .cond{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--mute);margin-top:1px}
+.tcard .amt{font-size:26px;font-weight:700;letter-spacing:-1px;
+  margin:7px 0 1px;font-variant-numeric:tabular-nums}
+.tcard .amtl{font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--teal);font-weight:700}
+.tcard .txt{font-size:11.5px;color:var(--ink2);margin:7px 0 0;
+  line-height:1.45}
+.tcard .kv{margin-top:6px;font-size:11.5px}
+.tcard .kv b{font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--mute);display:block}
+.tcard .bwrap{margin-top:8px;display:flex;gap:5px;flex-wrap:wrap}
+
+/* dollar provenance block */
+.prov{margin-top:12px;border-top:1px solid var(--line);padding-top:9px;
+  display:grid;grid-template-columns:1fr 1fr;gap:5px 14px;font-size:11.5px}
+.prov div span{color:var(--mute);display:block;font-size:10px;
+  letter-spacing:.06em;text-transform:uppercase}
+
+/* tables */
+table.dt{width:100%;border-collapse:collapse;font-size:12.5px;
+  margin-top:10px}
+table.dt th{text-align:left;font-size:10px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--mute);border-bottom:1.5px solid
+  var(--line);padding:7px 8px;font-weight:700}
+table.dt td{padding:6.5px 8px;border-bottom:1px solid var(--line);
+  vertical-align:top}
+/* A row label that wrapped to two lines was split across the page
+   boundary, printing its second line on top of the running footer.
+   Rows avoid breaking, and the label column no longer packs two
+   quantities into one cell. */
+table.dt tr{break-inside:avoid;page-break-inside:avoid}
+/* The frontier is one thirteen-row table and nothing else, so it can
+   carry a denser row than a table sitting among prose. Scoped, so no
+   other section shifts. Density only: no clipping, no smaller type. */
+table.dt.tight td{padding:4px 8px}
+/* The appendix uses DIV rows, not table rows. Chrome does not reliably
+   honor break-inside:avoid on a <tr>, and three rows were split across the
+   page boundary -- one printed its second line on top of the running
+   footer. It honors it on a block element, so the audit trail is built from
+   blocks that move whole. */
+.dl{margin:0}
+/* Rows are a grid and are allowed to fragment.
+   Four arrangements were measured. Table rows, a grid and a float all let a
+   row cut at the page boundary, and the float additionally let labels
+   escape their rows and stack six-deep on the next page. Making each
+   BENEFIT unbreakable fixed the cut but cost four pages of whitespace and
+   still collided, because one benefit block is taller than a page.
+   What actually fixes it is reserving a footer band wide enough that a
+   fragmented row cannot reach the footer -- see PRINT_MARGINS. */
+/* The appendix has two kinds of record and forcing one shape on both is
+   what broke pagination.
+
+   A SHORT key/value pair ("Realization state | currently_actionable")
+   stays two-column and unbreakable: it is at most two lines, so Chrome can
+   always move it to the next page whole.
+
+   A LONG narrative field -- counterfactual, sources, overlap exclusions,
+   blockers -- is now label-above-prose and FULLY FRAGMENTABLE. It carries
+   no atomic wrapper of any kind: no inline-block, no grid or flex child, no
+   overflow container. Those wrappers are unsplittable boxes, and an
+   unsplittable box that does not fit prints below the printable bottom
+   rather than moving. Measured: content reached 24.2pt past the printable
+   bottom and overlapped the running footer by 10.9pt. Prose that may
+   fragment simply breaks between lines and never overflows. */
+.dr{display:block;padding:6.5px 8px;border-bottom:1px solid var(--line);
+  font-size:12.5px;break-inside:avoid;page-break-inside:avoid}
+/* A PLAIN BLOCK, not a grid. Chrome does not honor break-inside:avoid on a
+   grid container: a 33px two-line row printed 20.5pt past the printable
+   bottom and 5.2pt over the running footer instead of moving to the next
+   page. Being atomic is correct HERE and only here -- a short record should
+   move whole -- so the columns are inline-blocks. Long narrative fields
+   must never use this shape; they use `.dn`. */
+.dr .dk{display:inline-block;width:29%;vertical-align:top;
+  padding-right:14px;color:var(--ink2)}
+.dr .dv{display:inline-block;width:66%;vertical-align:top}
+.dr .dv.n{text-align:right;font-variant-numeric:tabular-nums}
+.dn{padding:6.5px 8px;border-bottom:1px solid var(--line);
+  font-size:12.5px;break-inside:auto}
+.dn .dk{display:block;color:var(--mute);font-size:9.5px;
+  letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px;
+  break-after:avoid;page-break-after:avoid}
+.dn p{margin:0;break-inside:auto}
+.dn p.q{color:var(--ink2)}
+.dr.hd{display:block;padding-top:13px;border-bottom:1px solid var(--line);
+  break-after:avoid;page-break-after:avoid}
+table.dt thead{display:table-header-group}
+table.dt td.n{text-align:right;font-variant-numeric:tabular-nums;
+  white-space:nowrap}
+table.dt tr.sub td{font-weight:700;border-top:1.5px solid var(--ink);
+  border-bottom:0;background:var(--warm)}
+table.dt tr.tot td{font-weight:700;border-top:2.5px double var(--ink);
+  font-size:13.5px}
+table.dt tr.excl td{color:var(--mute)}
+table.dt caption{caption-side:top;text-align:left;font-size:11px;
+  color:var(--mute);padding-bottom:6px}
+
+/* arm block */
+.arm{border:1px solid var(--line);border-radius:8px;padding:13px 15px;
+  margin-top:12px;break-inside:avoid}
+.arm .ah{display:flex;justify-content:space-between;align-items:baseline;
+  border-bottom:1px solid var(--line);padding-bottom:7px;margin-bottom:8px}
+.arm .ah .who{font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:700;color:var(--teal)}
+.arm .ah .st{font-size:16px;font-weight:700;
+  font-variant-numeric:tabular-nums;text-align:right}
+
+/* ladder */
+.ladder{display:grid;gap:7px;margin-top:10px}
+.rung{display:grid;grid-template-columns:180px 1fr;gap:14px;
+  border:1px solid var(--line);border-left:3px solid var(--teal);
+  border-radius:7px;padding:8px 15px;break-inside:avoid}
+.rung .in{font-size:12px;color:var(--ink2)}
+.rung .in b{display:block;font-size:10px;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--mute);margin-bottom:3px}
+.rung .out .pl{font-weight:700;font-size:13.5px}
+.rung .out .mn{font-size:12px;color:var(--ink2);margin-top:4px}
+
+/* flow */
+/* nowrap, and boxes that may shrink. Wrapping put MANAGEMENT on a second
+   row and left the connector before it pointing into empty space. */
+.flow{display:flex;align-items:center;justify-content:center;gap:8px;
+  flex-wrap:nowrap;margin:16px 0 6px}
+/* nowrap is right for a short connected flow and wrong for a long list.
+   The eleven-gate chain overflowed the page and printed clipped chips
+   ("capabil", "identit", "comput"), so a list that is meant to wrap says
+   so. */
+.flow.wrap{flex-wrap:wrap;row-gap:6px}
+.flow .fb{border:1px solid var(--line);border-radius:7px;padding:10px 12px;
+  text-align:center;background:var(--warm);min-width:0;flex:0 1 auto}
+.flow .fb b{display:block;font-size:11px;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--teal)}
+.flow .fb span{font-size:11.5px;color:var(--ink2)}
+.flow .ar{color:var(--mute);font-size:17px}
+
+/* callout */
+.call{border-left:3px solid var(--teal);background:var(--mint);
+  padding:11px 15px;border-radius:0 7px 7px 0;margin:14px 0;font-size:12.5px;
+  color:var(--ink2);break-inside:avoid}
+.call b{color:var(--ink)}
+.warnbox{border-left:3px solid var(--amber);background:var(--amber-bg);
+  padding:11px 15px;border-radius:0 7px 7px 0;margin:14px 0;
+  font-size:12.5px;break-inside:avoid}
+.foot{border-top:1px solid var(--line);margin-top:16px;padding-top:6px;
+  display:flex;justify-content:space-between;font-size:10px;
+  color:var(--mute);break-inside:avoid}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+
+/* ── PREMIUM EDITORIAL LAYER ──────────────────────────────────────────────
+   Everything above is the working report. This layer changes only how it
+   LOOKS: no rule here reads a number, and none is keyed to a value, so a
+   figure cannot be styled into looking more or less certain than it is.
+
+   The brief: institutional investment research, not an EHR. That means
+   hierarchy carried by type and whitespace instead of by borders; one
+   accent instead of traffic lights; and numbers set in a face that makes a
+   column of dollars scan. The previous design put every element in a
+   rounded bordered card, which flattens importance -- when everything is a
+   card, nothing is a headline. */
+
+/* Editorial display face for headings; the UI stack stays for body copy so
+   dense tables keep their measured line length. */
+h1.head,h2.sec,.hero .amt,.tcard .amt,.qtab .qv,.exec .amt{
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,
+  "Times New Roman",serif}
+h1.head{font-size:27px;letter-spacing:-.4px;font-weight:600;
+  color:var(--ink);margin:0 0 7px;max-width:24ch;line-height:1.16}
+h2.sec{font-size:17px;font-weight:600;color:var(--ink);letter-spacing:-.2px;
+  margin:26px 0 4px}
+h3.sub{font-size:10.5px;letter-spacing:.14em;color:var(--mute);
+  font-weight:700;margin:18px 0 7px}
+p.intro{font-size:13px;color:var(--ink2);max-width:66ch;line-height:1.58}
+
+.mast{border-bottom:1px solid var(--line2);padding-bottom:7px;
+  margin-bottom:28px}
+.mast .brand{letter-spacing:.2em;font-size:9.5px;color:var(--teal);
+  font-weight:700}
+.mast .sec{letter-spacing:.13em;font-size:9.5px;color:var(--mute)}
+
+/* THE HEADLINE IS TYPE, NOT A BOX. A bordered mint panel around the hero
+   number made the most important figure on the page look like a form
+   field. */
+.hero{background:transparent;border:0;border-radius:0;text-align:left;
+  padding:4px 0 0;margin:0 0 6px;
+  border-top:2px solid var(--ink);border-bottom:1px solid var(--line)}
+.hero .lbl{font-size:9.5px;letter-spacing:.2em;color:var(--mute);
+  font-weight:700}
+.hero .amt{font-size:54px;font-weight:600;letter-spacing:-2.2px;
+  margin:2px 0 6px;color:var(--ink)}
+.hero .qual{font-size:11.5px;color:var(--ink2);max-width:70ch;margin:0;
+  line-height:1.5}
+.hero .meta{font-size:10px;color:var(--mute);margin:6px 0 9px}
+
+/* Tables: hairlines and air, no zebra fills or heavy rules. */
+.qtab td{border-bottom:1px solid var(--line);padding:7px 10px 7px 0}
+.qtab tr.hero-row td{background:transparent;border-bottom:1px solid var(--line2)}
+.qtab .qv{font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.qtab tr.pri .qv{font-size:18px;font-weight:600}
+
+/* Chips carry a category, not an alarm. Border removed, weight reduced. */
+.chip{border:0;border-radius:2px;font-size:9.5px;letter-spacing:.09em;
+  font-weight:700;padding:2.5px 7px}
+.chip-ok{color:var(--ok);background:var(--ok-bg)}
+.chip-cond{color:var(--cond);background:var(--cond-bg)}
+.chip-warn{color:var(--amber);background:var(--amber-bg)}
+.chip-neutral{color:var(--ink2);background:var(--warm)}
+
+/* Contribution bars, understated. */
+.map{border:0;border-top:1px solid var(--line2);border-radius:0}
+.map .row{padding:7px 0;border-bottom:1px solid var(--line)}
+.map .row .bar{height:5px;background:var(--warm);border-radius:0}
+.map .row .bar i{background:var(--teal);border-radius:0}
+.map .row .vl b{font-weight:600;letter-spacing:-.2px}
+
+/* Finding entries: a rule above, not a box around. */
+.tops{gap:0 26px}
+.tcard{border:0;border-top:1px solid var(--line);border-radius:0;
+  padding:13px 0 15px;background:transparent}
+.tcard .gene{font-size:14px;font-weight:700;letter-spacing:.01em}
+.tcard .cond{font-size:9.5px;letter-spacing:.13em;color:var(--mute)}
+.tcard .amt{font-size:29px;font-weight:600;letter-spacing:-1.2px;
+  margin:8px 0 0;color:var(--ink)}
+.tcard .amtl{font-size:9.5px;letter-spacing:.13em;color:var(--mute)}
+.tcard .txt{font-size:11.5px;line-height:1.5;color:var(--ink2)}
+.tcard .kv b{font-size:9.5px;letter-spacing:.11em}
+
+/* §49 executive headline: one narrative block, four supporting figures. */
+.exec{margin:0 0 4px}
+.exec .amt{font-size:54px;font-weight:600;letter-spacing:-2.2px;
+  line-height:1;margin:3px 0 10px;color:var(--ink)}
+.exec .lbl{font-size:9.5px;letter-spacing:.2em;color:var(--mute);
+  font-weight:700}
+.exec-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  border-top:1px solid var(--line2);border-bottom:1px solid var(--line);
+  margin:12px 0 0}
+.exec-grid div{padding:11px 16px 11px 0}
+.exec-grid .k{font-size:9.5px;letter-spacing:.12em;color:var(--mute);
+  font-weight:700;display:block;margin-bottom:4px}
+.exec-grid .v{font-size:19px;font-weight:600;letter-spacing:-.5px;
+  font-variant-numeric:tabular-nums;color:var(--ink)}
+.exec-grid .s{font-size:10.5px;color:var(--mute);display:block;margin-top:3px}
+
+/* §52 health value and cash impact are different things and must look it. */
+.hvc{display:grid;grid-template-columns:1fr 1fr;gap:0 34px;margin-top:8px}
+.hvc section{border-top:2px solid var(--ink)}
+.hvc section.cash{border-top-color:var(--line2)}
+.hvc h4{font-size:9.5px;letter-spacing:.2em;color:var(--mute);font-weight:700;
+  margin:9px 0 8px}
+.hvc .ln{display:flex;justify-content:space-between;gap:14px;
+  padding:5px 0;border-bottom:1px solid var(--line);font-size:12px}
+.hvc .ln b{font-variant-numeric:tabular-nums;font-weight:600}
+.hvc .tot{border-bottom:0;padding-top:8px;font-weight:600}
+
+/* Validation rows: a status word, not a green tick farm. */
+.vck{width:100%;border-collapse:collapse;font-size:12px}
+.vck td{padding:5px 0;border-bottom:1px solid var(--line)}
+.vck td.s{text-align:right;font-size:9.5px;letter-spacing:.12em;
+  font-weight:700;color:var(--ok)}
+.vck td.s.fail{color:var(--amber)}
+
+/* ── Layer A: partner executive overview ─────────────────────────────────
+   A different rhythm from the detailed report: fewer objects per page,
+   larger type, and one idea per band. The colour tokens are inherited
+   unchanged so the two layers read as one product. */
+.p-hero{padding:0 0 4mm;border-bottom:1.5pt solid var(--line2);margin-bottom:5mm}
+.p-kicker{font:600 8pt/1.3 ui-sans-serif,system-ui;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--teal);margin-bottom:3mm}
+.p-hero h1{font:600 19pt/1.2 ui-serif,Georgia,serif;color:var(--ink);
+  margin:0 0 2.5mm;letter-spacing:-.01em;max-width:150mm}
+.p-lede{font:400 10pt/1.5 ui-serif,Georgia,serif;color:var(--ink2);
+  max-width:150mm;margin:0}
+.p-band{margin:0 0 5mm}
+.p-band > h2{font:600 8pt/1.3 ui-sans-serif,system-ui;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--mute);margin:0 0 3mm;
+  padding-bottom:1.5mm;border-bottom:.6pt solid var(--line)}
+.p-counts{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm}
+.p-count{padding:3.5mm 0 0;border-top:1.5pt solid var(--teal)}
+.p-count .v{font:600 19pt/1 ui-serif,Georgia,serif;color:var(--ink);
+  display:block;margin-bottom:1.5mm}
+.p-count .l{font:400 7.6pt/1.35 ui-sans-serif,system-ui;color:var(--ink2);
+  display:block}
+.p-money{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4mm}
+.p-m{padding:3mm 3.5mm;border-radius:1.2mm;border:.6pt solid var(--line)}
+.p-m .v{font:600 15pt/1.1 ui-serif,Georgia,serif;display:block;margin-bottom:1mm}
+.p-m .l{font:600 7.6pt/1.3 ui-sans-serif,system-ui;color:var(--ink);display:block;
+  margin-bottom:1.5mm}
+.p-m .who{font:600 6.8pt/1.3 ui-sans-serif,system-ui;letter-spacing:.05em;
+  text-transform:uppercase;display:block;margin-bottom:1.5mm}
+.p-m .q{font:400 6.8pt/1.38 ui-sans-serif,system-ui;color:var(--ink2);display:block}
+/* Presentation class is a pure function of realization_state. Never of size. */
+.m-conditional{background:var(--cond-bg);border-color:var(--cond)}
+.m-conditional .v,.m-conditional .who{color:var(--cond)}
+.m-expected{background:var(--ok-bg);border-color:var(--ok)}
+.m-expected .v,.m-expected .who{color:var(--ok)}
+.m-realized{background:var(--warm);border-color:var(--line2)}
+.m-realized .v,.m-realized .who{color:var(--ink2)}
+.m-count{background:var(--mint);border-color:var(--line)}
+.m-count .v,.m-count .who{color:var(--ink)}
+.p-flag{border:.8pt solid var(--line2);border-radius:1.2mm;overflow:hidden}
+.p-flag .hd{background:var(--mint);padding:2.5mm 4mm;border-bottom:.6pt solid var(--line);
+  font:600 8.4pt/1.3 ui-sans-serif,system-ui;color:var(--ink)}
+.p-flag .bd{padding:4mm}
+.p-chain{display:grid;grid-template-columns:repeat(7,auto);gap:0 3mm;
+  align-items:center;justify-content:center;margin-bottom:4mm}
+.p-chain .step{text-align:center}
+.p-chain .step .n{font:600 13pt/1.1 ui-serif,Georgia,serif;color:var(--ink);display:block}
+.p-chain .step .c{font:400 6.8pt/1.3 ui-sans-serif,system-ui;color:var(--mute);display:block;
+  margin-top:1mm;max-width:30mm}
+.p-chain .arw{font:400 11pt/1 ui-sans-serif,system-ui;color:var(--line2);
+  text-align:center;padding-bottom:3mm}
+.p-tbl{width:100%;border-collapse:collapse;font:400 7.8pt/1.4 ui-sans-serif,system-ui}
+.p-tbl th{text-align:left;font:600 6.8pt/1.3 ui-sans-serif,system-ui;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--mute);padding:0 3mm 1.8mm 0;
+  border-bottom:.6pt solid var(--line2)}
+.p-tbl td{padding:1.7mm 3mm 1.7mm 0;border-bottom:.5pt solid var(--line);
+  vertical-align:top;color:var(--ink2)}
+.p-tbl td.g{color:var(--ink);font-weight:600;white-space:nowrap}
+.p-tbl td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.p-refuse{font:400 7.4pt/1.42 ui-sans-serif,system-ui;color:var(--ink2)}
+.p-refuse li{margin-bottom:1.5mm}
+.p-refuse b{color:var(--ink);font-weight:600}
+.p-two{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+.p-note{font:400 7.2pt/1.42 ui-sans-serif,system-ui;color:var(--ink2);
+  padding:3mm 3.5mm;background:var(--mint);border-radius:1.2mm;
+  border-left:1.5pt solid var(--teal)}
+.p-demo{background:var(--amber-bg);border:.8pt solid var(--amber);color:var(--amber);
+  font:600 7.2pt/1.3 ui-sans-serif,system-ui;padding:2mm 3.5mm;border-radius:1.2mm;
+  margin-bottom:4mm;letter-spacing:.03em}
+@media screen and (max-width:900px){
+  .p-counts{grid-template-columns:repeat(2,1fr)}
+  .p-money,.p-two{grid-template-columns:1fr}
+  .p-chain{grid-template-columns:1fr;gap:2mm 0}
+  .p-chain .arw{display:none}
+  .p-chain .step .c{max-width:none}
+}
+</style></head><body><section class="sheet"><div class="p-demo">SYNTHETIC DEMONSTRATION — every figure on these pages was produced from a synthetic genome. No personal genomic, clinical, or laboratory data is present.</div><div class="p-hero"><div class="p-kicker">Economic intelligence for genome sequencing</div><h1>A sequenced genome is evidence. GenomeLens turns it into a decision, and prices the decision.</h1><p class="p-lede">GenomeLens is an economic intelligence layer for genome sequencing. It turns sequence data into measurable decision and economic value. It reads a variant callset and returns the clinical decisions that callset can change, who benefits from each one, what each is worth, and — explicitly — which ones it refuses to price.</p></div><div class="p-band"><h2>What the model recovered from one genome</h2><div class="p-counts"><div class="p-count"><span class="v">12</span><span class="l">Clinical pathways carried through the economic model</span></div><div class="p-count"><span class="v">7</span><span class="l">Distinct economic mechanisms evaluated</span></div><div class="p-count"><span class="v">4</span><span class="l">Distinct beneficiaries the value is separated across</span></div><div class="p-count"><span class="v">9</span><span class="l">Pathways blocked on a named evidence gap</span></div></div></div><div class="p-band"><h2>The value, separated by kind and by who receives it</h2><div class="p-money"><div class="p-m m-conditional"><span class="l">Modeled payoff if the triggering circumstances occur</span><span class="v">$110,766</span><span class="who">spans multiple beneficiaries — not one person&#x27;s gain</span><span class="q">Modeled potential economic benefit across supported findings if the relevant medication, reproductive, or clinical circumstances occur. Not all identified value is expected to be realized, and it does not all accrue to the same person.</span></div><div class="p-m m-expected"><span class="l">Expected present value, sequenced individual</span><span class="v">$112.28</span><span class="who">accrues to the sequenced individual</span><span class="q">Probability-weighted and discounted. Lower-bound scenario: pathways blocked on an unsourced parameter contribute nothing.</span></div><div class="p-m m-expected"><span class="l">Expected present value, payer</span><span class="v">$4.55</span><span class="who">accrues to the payer</span><span class="q">Testing the payer may not need to repeat. Claimed only where the existing result is an adequate substitute for the test it would replace.</span></div></div><p class="p-note">These three numbers are not comparable and are not additive. The first is a payoff conditional on an event that has not happened, pooled across people who are not the same person. The second and third are probability-weighted present values, each scoped to a single beneficiary. Color encodes which kind a number is, never how large it is. For scale, $183.16 of management value is modeled in total &mdash; the worth of the correct treatment however it is reached &mdash; of which $112.28 is attributed to the genome. GenomeLens books the attributable share, never the whole.</p></div><div class="p-band"><h2>How a payoff becomes a value</h2><div class="p-flag"><div class="hd">Worked example &mdash; DPYD / fluoropyrimidines</div><div class="bd"><div class="p-chain"><div class="step"><span class="n">DPYD</span><span class="c">identity verified</span></div><div class="arw">&rarr;</div><div class="step"><span class="n">$11,600</span><span class="c">payoff if the drug decision arises</span></div><div class="arw">&times;</div><div class="step"><span class="n">1.05%</span><span class="c">probability that decision arises</span></div><div class="arw">=</div><div class="step"><span class="n">$38.91</span><span class="c">expected present value</span></div></div><p class="p-refuse">Reduced DPD activity can substantially increase fluoropyrimidine toxicity risk. Genotype-guided dose reduction or alternative therapy.</p><p class="p-refuse">Both numbers are true and they are not interchangeable. A platform that reports the first as value delivered is overstating its product by roughly two orders of magnitude. GenomeLens reports both, labeled, and lets the buyer choose the one their question needs.</p></div></div></div></section><section class="sheet"><div class="p-hero"><div class="p-kicker">Method and discipline</div><h1>What GenomeLens refuses to price is the reason to trust what it does price.</h1><p class="p-lede">Across 7 economic mechanisms evaluated on this genome, 3 resolved to a defensible number and 9 pathways are blocked on a named evidence gap. 6 of those still carry a conditional payoff that is reported in the headline; what is blocked is the step that would turn it into a bookable expected present value. Each names the parameter, identity, or attribution problem responsible.</p></div><div class="p-band"><h2>Value separated by mechanism and beneficiary</h2><table class="p-tbl"><thead><tr><th>Mechanism</th><th>Beneficiary</th><th style="text-align:right">Pathways</th><th style="text-align:right">Conditional payoff</th><th>State</th></tr></thead><tbody><tr><td class="g">individual health</td><td>accrues to the sequenced individual</td><td class="n">1</td><td class="n">&mdash;</td><td>Attribution unresolved</td></tr><tr><td class="g">pharmacogenomic</td><td>accrues to the sequenced individual</td><td class="n">4</td><td class="n">$52,150</td><td>Conditional</td></tr><tr><td class="g">diagnostic odyssey</td><td>accrues to the sequenced individual</td><td class="n">1</td><td class="n">&mdash;</td><td>Attribution unresolved</td></tr><tr><td class="g">replacement testing</td><td>accrues to the payer</td><td class="n">4</td><td class="n">$519.52</td><td>Conditional</td></tr><tr><td class="g">reproductive</td><td>accrues to a prospective child</td><td class="n">1</td><td class="n">$58,097</td><td>Conditional</td></tr><tr><td class="g">family cascade</td><td>accrues to a relative</td><td class="n">1</td><td class="n">&mdash;</td><td>Attribution unresolved</td></tr><tr><td class="g">future option</td><td>accrues to the sequenced individual</td><td class="n">0</td><td class="n">&mdash;</td><td>Not currently modeled</td></tr></tbody></table><p class="p-note">Beneficiary separation is structural, not editorial. A payer does not receive reproductive value and an individual does not receive cascade value, so the model never pools them into a single figure attributed to one party.</p></div><div class="p-band"><h2>Pathways blocked on a named evidence gap</h2><ul class="p-refuse"><li><b>reproductive &mdash; Attribution unresolved.</b> P(planning a pregnancy) is not sourced <i>$58,097 conditional payoff reported; the expected present value is what is blocked.</i></li><li><b>pharmacogenomic &mdash; Parameter blocked.</b> P(abacavir consideration | HIV diagnosis) [unsourced] <i>$36,425 conditional payoff reported; the expected present value is what is blocked.</i></li><li><b>pharmacogenomic &mdash; Parameter blocked.</b> P(an indication for thiopurine therapy (IBD, autoimmune disease, or ALL maintenance)) [unsourced]; P(thiopurine prescription | an… <i>$15,725 conditional payoff reported; the expected present value is what is blocked.</i></li><li><b>replacement testing &mdash; Identity blocked.</b> NOT a valid substitute. Three of the four CPIC-tested DPYD alleles are identity-verified here (a tested allele, a tested allele… <i>$174.81 conditional payoff reported; the expected present value is what is blocked.</i></li><li><b>replacement testing &mdash; Parameter blocked.</b> P(an indication for thiopurine therapy (IBD, autoimmune disease, or ALL maintenance)) [unsourced]; P(thiopurine prescription | an… <i>$174.81 conditional payoff reported; the expected present value is what is blocked.</i></li><li><b>replacement testing &mdash; Identity blocked.</b> NOT a valid substitute. This pipeline reaches HLA-B*57:01 by TAG PROXY rather than direct typing, and an internal consistency… <i>$169.90 conditional payoff reported; the expected present value is what is blocked.</i></li></ul><p class="p-refuse" style="margin-top:2mm;color:var(--mute)">3 further blocked pathways are itemized in the detailed economic report. These are the least material blockers, not the least defensible ones.</p></div><div class="p-band"><h2>What a partner should take from this</h2><div class="p-two"><div class="p-note"><b>Realized value is reported honestly.</b> Value realized to date on this genome is $0, because nothing has triggered yet. A platform that cannot show a zero is not measuring realization.</div><div class="p-note"><b>The arithmetic reconciles.</b> Every figure traces to a named parameter with a source, and cross-arm totals are checked against the headline at build time. The detailed economic report carries the full ledger, the model framework, the validation checks, and the declared limitations.</div></div></div></section></body></html>

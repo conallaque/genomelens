@@ -1,0 +1,93 @@
+{
+  "analysis": {
+    "genome_build": "GRCh38",
+    "source_type": "array",
+    "status": "success",
+    "status_reason": null,
+    "study_id": "SYN-004"
+  },
+  "callability": {
+    "basis": "fraction of each panel's declared loci that produced a call",
+    "by_module": {
+      "CYP2C19": {
+        "snp_callable_fraction": 1.0,
+        "structurally_resolved": true
+      },
+      "CYP2C9": {
+        "snp_callable_fraction": 1.0,
+        "structurally_resolved": true
+      },
+      "CYP2D6": {
+        "snp_callable_fraction": 1.0,
+        "structural_limitation": "phenotype depends on gene copy number, which this analysis does not measure; a full-locus call is not claimed",
+        "structurally_resolved": false,
+        "untested_alleles": [
+          "*5 (whole-gene deletion)",
+          "*1xN/*2xN (duplication)",
+          "*13/*36/*68 (hybrid structures)",
+          "*3",
+          "*6",
+          "*9",
+          "*17",
+          "*29"
+        ]
+      },
+      "CYP3A5": {
+        "snp_callable_fraction": 1.0,
+        "structurally_resolved": true
+      },
+      "HLA-B*57:01": {
+        "snp_callable_fraction": 1.0,
+        "structurally_resolved": true
+      },
+      "NUDT15": {
+        "snp_callable_fraction": 1.0,
+        "structurally_resolved": true
+      },
+      "SLCO1B1": {
+        "snp_callable_fraction": 1.0,
+        "structurally_resolved": true
+      },
+      "TPMT": {
+        "snp_callable_fraction": 1.0,
+        "structurally_resolved": true
+      },
+      "UGT1A1": {
+        "snp_callable_fraction": 1.0,
+        "structurally_resolved": true
+      },
+      "VKORC1": {
+        "snp_callable_fraction": 1.0,
+        "structurally_resolved": true
+      }
+    },
+    "snp_callability_is_not_diplotype_resolution": true
+  },
+  "pathways": [
+    {
+      "beneficiary": "individual",
+      "blocked_by": "No sourced trigger probability",
+      "conditional_payoff": 6250.0,
+      "decision": "CYP2C19 / clopidogrel",
+      "economic_state": "conditional",
+      "expected_present_value": null,
+      "genomic_attribution_resolved": false,
+      "identity_status": "identity_verified",
+      "mechanism": "pharmacogenomic",
+      "unlocked_by": "an incidence or prescribing rate for the clinical event that puts the decision in play"
+    },
+    {
+      "beneficiary": "individual",
+      "blocked_by": "No sourced trigger probability",
+      "conditional_payoff": 15724.999999999998,
+      "decision": "TPMT / thiopurines azathioprine 6 mercaptopurine",
+      "economic_state": "conditional",
+      "expected_present_value": null,
+      "genomic_attribution_resolved": false,
+      "identity_status": "identity_verified",
+      "mechanism": "pharmacogenomic",
+      "unlocked_by": "an incidence or prescribing rate for the clinical event that puts the decision in play"
+    }
+  ],
+  "schema_version": "partner-1.0"
+}
