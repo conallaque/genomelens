@@ -36,37 +36,68 @@ is not offered as evidence of generalisation across populations.
 **What this input is, and what it is not.** A high-confidence benchmark truth
 set is a curated set of variant calls within regions the producer is willing to
 stand behind. It is **not** a complete whole-genome variant representation.
-Regions the producer excluded are not represented at all — not as
-reference, not as absent. For that reason this input is never called "full WGS" here or in
+Regions the producer excluded are not represented at all — not as reference and
+not as absent. For that reason this input is never called "full WGS" here or in
 the outputs it summarises, and any rate computed from it is a rate over
 benchmark-defined regions.
 
 ## Technical validation
 
-**490** loci were requested against the benchmark. **408** were scoreable.
-Concordance on the scoreable denominator was **100.00%**, with **0** mismatches
-and **0** normalization failures.
+**490** loci were requested against the benchmark. Results are reported as two
+separate measurements, because they are not equally strong evidence and a single
+blended rate would overstate the weaker one.
+
+**Genotype concordance against explicit records.** Every locus where the truth
+set carries a variant call, compared against what the engine independently
+parsed from the same file.
 
 | | |
 |---|---|
-| Loci requested | **490** |
-| Scoreable denominator | **408** |
+| Explicit-record loci compared | **169** |
+| Agreements | **169** |
 | Concordance | **100.00%** |
 | Mismatches | **0** |
 | Normalization failures | **0** |
 
-The scoreable 408 decompose into explicit variant evidence and confident
-reference evidence.
+This is the measurement that exercises coordinate handling, allele orientation,
+ploidy and indel representation.
+
+**Confident-reference resolution — a callability result, not a concordance.**
+A further **239** loci resolved as confidently homozygous reference rather than
+unresolved once the producer's confident-region definition was supplied.
 
 | Evidence type | Count |
 |---|---|
-| Explicit variant matches | **169** |
-| Confident-reference matches | **239** |
 | — single-nucleotide | 229 |
 | — deletion | 4 |
 | — insertion | 4 |
 | — multiallelic | 2 |
-| **Scoreable total** | **408** |
+| **Confident-reference total** | **239** |
+
+These 239 are deliberately **not** folded into a concordance rate. The engine
+emits *confidently homozygous reference* when there is no record at a position
+inside the confident region; the truth definition asserts *homozygous
+reference* from the same two facts. Their agreement therefore confirms that the
+region logic fires where it should — it does not independently verify a
+genotype, and counting it as concordance would inflate the figure.
+
+**Independent cross-assay concordance.** The external check is a second,
+independent measurement of the same individual by a different technology: a
+consumer genotyping array, joined by rsID.
+
+| | |
+|---|---|
+| Mutually scoreable loci | **316** |
+| Agreements | **315** |
+| Concordance | **99.68%** |
+| Genuine discordances | **1** |
+| Representation artefacts (not counted as mismatches) | **3** |
+| Concordance if artefacts counted as mismatches | **98.75%** |
+
+The scoreable loci here are exclusively single-nucleotide: every insertion,
+deletion and multiallelic row resolved to no-probe, off-chromosome, or an
+indel placeholder encoding the array could not express as sequence. **99.68% is
+an SNV figure, not a whole-callset one.**
 
 **Callability semantics.** A locus absent from a variant-only callset has not
 thereby been shown to be reference. A variant-only callset carries **zero
@@ -97,11 +128,11 @@ be reconciled to the curated representation. It is reported as a no-call rather
 than resolved by preference.
 
 **Effect of supplying the region definition.** Without the confident-region
-input, only explicit records are scoreable and the denominator is **169**.
-Supplying the definition raises the scoreable denominator to **408** with
-concordance unchanged at **100.00%**. The additional 239 are not new agreements
-found by relaxing anything; they are agreements that were previously
-unevaluable for want of the evidence that licenses them.
+input, only explicit records can be evaluated at all, and **239** curated loci
+resolve as unresolved. Supplying the definition resolves them as confidently
+homozygous reference. Nothing was relaxed to achieve this: the evidence that
+licenses the call arrived in a separate file, and the engine refuses the call
+without it.
 
 **The rule inverts by file type, and the two look identical.** In an all-sites
 callset, reference blocks carry the homozygous-reference evidence directly, so
@@ -160,9 +191,8 @@ from reporting them as negative.
 **What the run does and does not support.** No whole-genome-specific analysis
 path was exercised: **0 of 21** findings required evidence available only from
 whole-genome data. Two statements follow, and only the first is supportable.
-
-- Supportable: a whole-genome benchmark was run end to end.
-- **Not** supportable: the whole-genome-specific value path was exercised.
+**Supportable:** a whole-genome benchmark was run end to end. **Not
+supportable:** the whole-genome-specific value path was exercised.
 
 The counts in this section are from the end-to-end run and are not commensurable
 with the technical-validation counts above; the two runs differ in scope and

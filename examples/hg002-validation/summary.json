@@ -19,22 +19,45 @@
   },
   "technical_validation": {
     "requested_loci": 490,
-    "scoreable_denominator": 408,
-    "concordance_pct": 100.0,
-    "explicit_variant_matches": 169,
-    "confident_reference_matches": 239,
-    "confident_reference_by_class": {
-      "snv": 229,
-      "deletion": 4,
-      "insertion": 4,
-      "multiallelic": 2
+    "explicit_record_concordance": {
+      "loci_compared": 169,
+      "agreements": 169,
+      "concordance_pct": 100.0,
+      "mismatches": 0,
+      "normalization_failures": 0,
+      "what_it_tests": "Coordinate handling, allele orientation, ploidy and indel representation, by comparing the engine's parse of each explicit record against an independent parse of the same record."
     },
-    "mismatches": 0,
-    "normalization_failures": 0,
-    "no_call_record_present_unreconcilable": 1,
-    "outside_truth_scope": 9,
-    "not_assayed_outside_benchmark_chromosomes": 72,
-    "denominator_policy": "Rates are reported over the scoreable denominator, with the requested total always shown beside it. A rate over loci-found and a rate over loci-requested differ by exactly the failure mode being measured."
+    "confident_reference_resolution": {
+      "loci_resolved": 239,
+      "by_class": {
+        "snv": 229,
+        "deletion": 4,
+        "insertion": 4,
+        "multiallelic": 2
+      },
+      "reported_as": "callability result, NOT concordance",
+      "why_not_concordance": "The engine emits confidently-homozygous-reference when there is no record at a position inside the confident region; the truth definition asserts homozygous reference from the same two facts. Their agreement confirms the region logic fires where it should. It does not independently verify a genotype, and folding it into a concordance rate would inflate that rate."
+    },
+    "independent_cross_assay_concordance": {
+      "comparator": "second independent assay of the same individual (consumer genotyping array), joined by rsID",
+      "mutually_scoreable_loci": 316,
+      "agreements": 315,
+      "concordance_pct": 99.68,
+      "genuine_discordances": 1,
+      "representation_artefacts": 3,
+      "concordance_pct_if_artefacts_counted_as_mismatches": 98.75,
+      "scoreable_classes": "exclusively single-nucleotide; every insertion, deletion and multiallelic row resolved to no-probe, off-chromosome, or an indel placeholder the array could not express as sequence",
+      "caveat": "99.68% is an SNV figure, not a whole-callset figure."
+    },
+    "locus_accounting": {
+      "explicit_records": 169,
+      "confident_reference": 239,
+      "no_call_record_present_unreconcilable": 1,
+      "outside_truth_scope": 9,
+      "not_assayed_outside_benchmark_chromosomes": 72,
+      "total": 490
+    },
+    "denominator_policy": "Each rate names its own denominator. A rate over loci-found and a rate over loci-requested differ by exactly the failure mode being measured, and a blended rate across independent and non-independent comparisons would overstate the weaker one."
   },
   "callability": {
     "states": {
@@ -45,10 +68,8 @@
       "record_present_unreconcilable": "no call"
     },
     "effect_of_region_definition": {
-      "scoreable_before": 169,
-      "scoreable_after": 408,
-      "concordance_before_pct": 100.0,
-      "concordance_after_pct": 100.0
+      "loci_resolved_from_unresolved": 239,
+      "note": "Nothing was relaxed. The evidence that licenses a confident-reference call arrives in a separate file, and the engine refuses the call without it."
     },
     "note": "A variant-only callset carries zero reference blocks, so absence is not evidence on its own. This is the opposite of the gVCF rule, where an absent row is silent because reference blocks carry the homozygous-reference evidence. The two cases look identical at row level and mean opposite things."
   },
@@ -61,7 +82,8 @@
     "representation_artefact_kinds": [
       "strand orientation",
       "indel placeholder encoding"
-    ]
+    ],
+    "genuine_discordance_resolution": "Resolved against the array. A second GIAB benchmark built from a diploid assembly - not from short-read mapping, and so not subject to the same failure mode - makes the same call as the truth set. The array probe sits in a region of high pseudogene similarity where cross-hybridization is documented to produce spurious heterozygous calls. Retained as a discordance and disclosed rather than dropped."
   },
   "pipeline_summary": {
     "runtime_seconds": 190,

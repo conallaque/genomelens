@@ -13,9 +13,9 @@
 GenomeLens turns a variant callset into decision and economic intelligence, and
 refuses to produce a number when the evidence behind it does not hold. It was
 run end to end against a public, open-consent reference genome with a published
-truth set. The technical layer agreed with the truth set on every scoreable
-locus. The economic layer then published **nothing** — every result failed at
-least one evidence gate. Both of those are the intended outcome.
+truth set, and cross-checked against a second, independent assay of the same
+individual. The economic layer then published **nothing** — every result failed
+at least one evidence gate. Both of those are the intended outcome.
 
 | | |
 |---|---|
@@ -24,33 +24,62 @@ least one evidence gate. Both of those are the intended outcome.
 | **Scope** | chr1–22, 481,622 high-confidence regions |
 | **Runtime** | 190 s over the benchmark truth set |
 
-### Genotype concordance: 100.00%
+### Genotype concordance
+
+Two comparisons, reported separately because they are not equally strong
+evidence and merging them would overstate the result.
+
+**1 — Against the benchmark's explicit records.** Every locus where the truth
+set carries a variant call, compared against what the engine independently
+parsed from the same file:
 
 ```
-490 requested loci
-  → 408 scoreable           concordance 100.00%
-      169 explicit variant matches
-      239 confident-reference matches
-            229 SNV · 4 deletion · 4 insertion · 2 multiallelic
-      0 mismatches
-      0 normalization failures
+169 explicit-record loci compared
+  → 169 agree          100.00%
+  → 0 mismatches · 0 normalization failures
 ```
 
-The remaining 82 loci are accounted for rather than dropped: **1** no-call
-(a record present but unreconcilable), **9** outside truth scope, and **72**
-not assayed because they sit on chrX, chrY or chrM, which this benchmark does
-not cover. 169 + 239 + 1 + 9 + 72 = 490.
+This exercises coordinate handling, allele orientation, ploidy and indel
+representation — where a resolver actually goes wrong.
 
-**Callability is the difference between 169 and 408.** Supplying the
-confident-region definition raised the scoreable denominator from 169 to 408
-with concordance unchanged — the same claim the *WGS-native by design* section
-below makes structurally, measured here on real data. An absent explicit row
-was not a missing genotype; 239 times it was evidence.
+**2 — Against a second, independent assay.** A consumer genotyping array of the
+same individual, joined by rsID (the array is GRCh37 and the benchmark GRCh38,
+so position is not a valid join key). This is the genuinely external check,
+because the two measurements come from different technologies:
 
-A second, independent genotyping assay of the same individual was compared at
-mutually testable loci. One genuine discordance remains, in a gene whose known
-pseudogene homology makes short-read genotyping difficult. It is disclosed
-rather than excluded.
+```
+316 mutually scoreable loci
+  → 315 agree          99.68%
+  → 1 genuine discordance
+  → 3 representation artefacts, classified as such rather than as mismatches
+      (98.75% if all three were counted as mismatches instead)
+```
+
+The single discordance was **resolved against the array**. A second GIAB
+benchmark built from a diploid assembly — not from short-read mapping, so not
+subject to the same failure mode — makes the same call as the truth set. The
+array probe sits in a region of high pseudogene similarity where
+cross-hybridization is documented to produce spurious heterozygous calls. It is
+disclosed rather than dropped.
+
+### What the callability layer recovered
+
+A variant-only callset carries no reference blocks, so an absent row is not
+evidence of anything. Supplying the producer's confident-region definition let
+**239** further loci resolve as confidently homozygous reference instead of
+unresolved — the same claim the *WGS-native by design* section below makes
+structurally, now measured on real data.
+
+These 239 are reported as a **callability result, not as concordance.** Both the
+engine and the truth definition decide "homozygous reference" from the same two
+facts — no record, inside the confident region — so their agreement confirms the
+region logic fires correctly; it does not independently verify a genotype.
+Counting them toward a concordance rate would inflate it.
+
+The 490 requested loci are fully accounted for: 169 explicit records, 239
+confident-reference, 1 no-call (a record present but unreconcilable), 9 outside
+truth scope, and 72 not assayed because they sit on chrX, chrY or chrM, which
+this benchmark does not cover. 169 + 239 + 1 + 9 + 72 = 490.
 
 ### Pipeline output for the run
 
@@ -263,13 +292,11 @@ No current partner deployment is claimed.
   partner overview and example payload are generated from **synthetic data**.
   The benchmark section at the top is measured on a **public, open-consent
   reference genome** against its published truth set.
-- Benchmark concordance is technical validation only. It is not clinical
-  validation and does not establish clinical utility.
 
 ## What is public and what is not
 
-This repository is **documentation and synthetic artifacts**. It does not
-contain the production engine.
+This repository is **documentation, benchmark results and synthetic
+artifacts**. It does not contain the production engine.
 
 Selected production methods, reference assets, routing logic and economic
 parameterization are intentionally withheld from the public repository. The

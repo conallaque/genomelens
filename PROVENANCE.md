@@ -1,6 +1,9 @@
 # Provenance
 
-Everything in this repository is documentation or a synthetic artifact.
+Most of this repository is documentation or a synthetic artifact. The one
+exception is the HG002 benchmark result, which is derived from a **public,
+open-consent reference genome** (GIAB / NIST). It contains no raw genomic data,
+no genotype lines and no participant name — only aggregate measurements.
 
 | Asset | Origin |
 |---|---|
@@ -9,7 +12,9 @@ Everything in this repository is documentation or a synthetic artifact.
 | `examples/genomelens_partner_v1.example.json` | Generated from a synthetic genome fixture. |
 | Documentation | Written for this repository. |
 
-No figure in any artifact here is derived from a real person's genome, and no
+Apart from the HG002 benchmark measurements described above — which come from a
+genome its participant consented to publish — no figure in any artifact here is
+derived from a real person's genome, and no
 prevalence shown is an epidemiological estimate.
 
 The production implementation, reference data assets and economic
