@@ -120,7 +120,7 @@ GenomeLens keeps five distinct states and never collapses them into a single
 | Absent, inside confident region | Confidently homozygous reference | **239** |
 | Absent, outside confident region | **Outside truth scope** — not reference, not absent, not a negative finding | **9** |
 | Outside benchmark chromosomes | **Not assayed** | **72** |
-| Record present, unreconcilable | **No call** | **1** |
+| Indel resolved as dosage-only | **No allele string** | **1** |
 | **Requested total** | | **490** |
 
 The no-call is a single locus where a record exists in the source but could not

@@ -52,12 +52,13 @@
     "locus_accounting": {
       "explicit_records": 169,
       "confident_reference": 239,
-      "no_call_record_present_unreconcilable": 1,
       "outside_truth_scope": 9,
       "not_assayed_outside_benchmark_chromosomes": 72,
-      "total": 490
+      "total": 490,
+      "indel_resolved_dosage_only": 1
     },
-    "denominator_policy": "Each rate names its own denominator. A rate over loci-found and a rate over loci-requested differ by exactly the failure mode being measured, and a blended rate across independent and non-independent comparisons would overstate the weaker one."
+    "denominator_policy": "Each rate names its own denominator. A rate over loci-found and a rate over loci-requested differ by exactly the failure mode being measured, and a blended rate across independent and non-independent comparisons would overstate the weaker one.",
+    "correction_2026_09_12": "An earlier version described this locus as 'a record present but unreconcilable'. After five curated coordinates were corrected against GRCh38 and canonical left-alignment was applied to registry back-fill, the record reconciles to the curated variant. It carries a copy count rather than an allele string, because a length change cannot be spelled in two characters."
   },
   "callability": {
     "states": {
@@ -65,7 +66,7 @@
       "absent_inside_confident_region": "confidently homozygous reference",
       "absent_outside_confident_region": "outside truth scope - not reference, not absent, not a negative finding",
       "outside_benchmark_chromosomes": "not assayed",
-      "record_present_unreconcilable": "no call"
+      "indel_reconciled_without_an_allele_string": "resolved as a copy count; no allele string is emitted, because fabricating one is how a deletion gets rendered as a pair of bases"
     },
     "effect_of_region_definition": {
       "loci_resolved_from_unresolved": 239,

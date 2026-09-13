@@ -77,7 +77,8 @@ region logic fires correctly; it does not independently verify a genotype.
 Counting them toward a concordance rate would inflate it.
 
 The 490 requested loci are fully accounted for: 169 explicit records, 239
-confident-reference, 1 no-call (a record present but unreconcilable), 9 outside
+confident-reference, 1 resolved as dosage-only (an indel carried as a copy
+count rather than an allele string), 9 outside
 truth scope, and 72 not assayed because they sit on chrX, chrY or chrM, which
 this benchmark does not cover. 169 + 239 + 1 + 9 + 72 = 490.
 
