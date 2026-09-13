@@ -12,6 +12,11 @@ no genotype lines and no participant name — only aggregate measurements.
 | `examples/genomelens_partner_v1.example.json` | Generated from a synthetic genome fixture. |
 | Documentation | Written for this repository. |
 
+**The synthetic fixtures are synthetic.** Where a fixture is written in a
+consumer-array export format, it is a **synthetic 23andMe-format test fixture**
+constructed for testing. It is not a real person's consumer DNA export, and no
+artifact in this repository is derived from one.
+
 Apart from the HG002 benchmark measurements described above — which come from a
 genome its participant consented to publish — no figure in any artifact here is
 derived from a real person's genome, and no

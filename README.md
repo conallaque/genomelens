@@ -236,7 +236,7 @@ than direct typing — and an example you have to caveat is not an example.)*
 
 | | |
 |---|---|
-| Automated tests | **3,430 passing** |
+| Automated tests | **3,620 passing** |
 | Known-failing | 10, held red deliberately — each encodes a known curated-data defect. Turning them green without fixing the cause would delete the only record that the defect exists. |
 | Representation equivalence | array vs block-compressed vs all-sites callsets asserted to agree |
 | Fail-closed | unsupported inputs refuse rather than coerce |

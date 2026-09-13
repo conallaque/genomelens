@@ -57,6 +57,21 @@ beneficiaries is labeled as spanning them.
 A clinical decision reachable through two genomic routes is one decision. It is
 counted once, and its value is claimed once.
 
+## Observed, unobserved, and absent
+
+A locus that was examined and matched the reference is not the same as a locus
+that was never examined, and neither is the same as a locus the assay could not
+resolve. Different input representations express these states differently: a
+block-compressed callset records a reference-matching locus as silence inside a
+reference block, while a variant-only callset records the same silence for a
+locus it says nothing about at all.
+
+Reading absence literally collapses these states into one, and the collapse is
+not neutral — it converts an unexamined locus into a negative result. The
+resolution layer therefore carries the state explicitly rather than inferring it
+from whether a row exists, and what licenses a confident-reference reading is a
+producer-supplied region definition, not the shape of the file.
+
 ## Representation invariance
 
 The same biology encoded differently must be read the same way. This is
