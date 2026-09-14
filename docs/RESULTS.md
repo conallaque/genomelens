@@ -357,6 +357,81 @@ carries no management evidence at all. Both were corrected and the affected
 figures are now marked unsourced.
 
 
+## Row-level validation — all 36
+
+Every finding carries its own terminal validation decision. No aggregate
+substitutes for a row, because an aggregate can show that *some* findings were
+checked and never that a *particular* one was.
+
+| Terminal status | Rows |
+|---|---|
+| Validated refusal — the reason for refusing is scientifically established | **14** |
+| Validated conditional — a real model awaiting a trigger that has not occurred | **12** |
+| Validated scenario — credible comparators answering different questions | **7** |
+| Validated not economically applicable | 2 |
+| Validated reproductive cost-consequence | 1 |
+
+Nothing remains partial, unresolved, unknown or pending. **A validated refusal is
+a finished result, not a deferral** — the question is whether the reason survives
+contact with the source, not whether the answer is favourable.
+
+**Two counts that a summary would hide.** Fourteen refusals is the largest single
+category, and that is the honest shape of this evidence base rather than a
+shortfall. And the model-gap count reached zero **without reclassification**: the
+ten affected rows resolved on established reasons — six because the treatment is
+indicated on the phenotype without a risk calculation at all, so the genomic
+finding crosses no threshold the phenotype has not; four because published
+management arms exist and are not transferable across jurisdiction, price year
+and discount rates.
+
+### A required invariant this build does not meet
+
+An internal standard required zero unsourced material parameters. **Twenty-three
+of thirty-six rows still contain at least one model default**, and that is
+asserted as a failing count rather than resolved by relabelling. A regression
+test pins the number so it cannot quietly be claimed as zero.
+
+The parameter driving most of it is lifetime drug-exposure probability, and the
+work done on it illustrates why the count is hard to move.
+
+### Lifetime exposure: reconstructed, and still an interval
+
+No lifetime exposure probability is published for any drug modelled here. Rather
+than reuse a round default, five of eight pathways now carry a bracketed
+derivation from sourced annual utilization. The reconstruction brackets rather
+than chooses, because the literature does not resolve the distinction it turns
+on:
+
+> Annual **use prevalence** counts everyone taking a drug this year, including
+> people who started years ago. Ever-exposure accumulates **initiations**.
+> Treating one as the other compounds continuing users year after year.
+
+| Pathway | Annual | Reconstructed lifetime bracket | Width |
+|---|---|---|---|
+| Antiplatelet | 1.37% | 1.4% – 42.4% | 31× |
+| Anticoagulant | 0.53% | 0.5% – 19.0% | 36× |
+| Statin | 2.14% | 2.1% – 57.9% | 27× |
+| Antidepressant | 13.2% | 13.2% – 99.7% | 7.5× |
+| Immunosuppressant | 0.28% | 0.3% – 10.5% | 38× |
+
+**The width is the finding.** A bracket spanning thirtyfold constrains without
+determining, which is why no ex-ante expected value appears anywhere in this
+engine: weighting a conditional value by a probability known only to within
+thirtyfold produces precision that is entirely fictional.
+
+What it does establish is narrower and still worth having — every registered
+default falls *inside* its own bracket. That does not validate the defaults, since
+an interval that wide contains almost any plausible value. It rules out the
+specific failure of a default sitting outside the range its own evidence permits,
+which was not previously known.
+
+**Three pathways returned a displayed zero and are recorded as not found.** The
+source shows `0` alongside "no data available", meaning the survey could not
+estimate that drug — not that nobody receives it. Reading those as zero exposure
+would convert an unmeasured quantity into a measured absence, which is the same
+error, in a different register, as reading a missing genotype as a reference
+call.
+
 ## Where GenomeLens declined to add value
 
 Two controls exist specifically to stop the total rising for reasons that are

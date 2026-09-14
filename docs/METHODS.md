@@ -137,3 +137,65 @@ instead of reading as unfinished work. One family-cascade input is of that kind:
 how many relatives a particular person can reach is a fact about one family, not
 a population rate, and substituting a national average would be wrong in a
 specific direction for every person it was applied to.
+
+
+## Validation, and what it is not
+
+**Executed, classified and validated are three different claims.** A model that
+runs is not a model that is right, and a model that is right about its structure
+is not one whose parameters are sourced. GenomeLens reports the three separately
+because collapsing them is how a coverage figure starts standing in for evidence.
+
+A finding is treated as validated only when every required dimension resolves:
+genomic evidence, clinical interpretation, clinical action, comparator,
+intervention effect, economic parameters, time horizon, perspective, uncertainty,
+pathway identity and double-counting status. A model that executes but rests on
+an unsourced exposure probability is **executable and not validated**, and is
+labelled that way.
+
+**Certification is not agreement.** A row certified as a refusal is as validated
+as one certified as a value. What certification asserts is that the reason was
+checked against a primary source rather than inherited from the system's own
+tables — a distinction that is invisible without it, and one that mattered here:
+a disposition that had been verified and one that had merely been assigned looked
+identical until they were separated.
+
+### What disqualifies a parameter
+
+An intervention effect must be the relative reduction in the **modelled clinical
+event**, caused by genotype-guided management **against realistic usual care**.
+Several quantities are routinely substituted for it and none of them is it:
+
+- a genotype relative risk, which describes who is at risk rather than what
+  acting changes;
+- a drug-versus-placebo efficacy, which prices the treatment rather than the
+  information;
+- a surrogate endpoint, which measures something correlated with the outcome
+  rather than the outcome;
+- a prescribing-behaviour change, which shows that a result was acted on rather
+  than that acting helped.
+
+A parameter substituted from the wrong genre is not weaker evidence for the
+quantity. It is evidence for a different quantity, and the distinction is
+enforced rather than noted.
+
+### Effects that were sought and not found
+
+Some pathways fail for a stronger reason than missing evidence: randomised trials
+looked for the effect and did not find it. That is not a gap research will close
+by looking harder, and it is recorded as a distinct state from an unsourced
+parameter. Monetising such a pathway would assert what those trials refuted.
+
+### Denominators travel with numbers
+
+Per patient tested, per patient randomised and per identified carrier differ by
+roughly the reciprocal of carrier frequency — an order of magnitude for a rare
+phenotype. Every figure carries the population it describes, and figures with
+different denominators are never summed.
+
+### Two tiers of monetary output
+
+A published cost-effectiveness ratio cannot yield a per-patient net benefit, but
+it can yield a signed, scale-free one. The two are reported in separate tiers and
+cannot be added, because a scale-free verdict is not a per-person figure and
+letting one absorb the other repeats the denominator error above.
