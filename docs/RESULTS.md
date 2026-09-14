@@ -386,10 +386,36 @@ and discount rates.
 
 ### A required invariant this build does not meet
 
-An internal standard required zero unsourced material parameters. **Twenty-three
-of thirty-six rows still contain at least one model default**, and that is
-asserted as a failing count rather than resolved by relabelling. A regression
-test pins the number so it cannot quietly be claimed as zero.
+An internal standard required zero unsourced material parameters. **Twelve of
+thirty-six rows still contain at least one model default**, down from thirty-one,
+and that is asserted as a failing count rather than resolved by relabelling. A
+regression test pins the number so it cannot quietly be claimed as zero.
+
+The twelve are specific rather than diffuse, which matters because it says what
+would close them:
+
+| Pathway | What is missing |
+|---|---|
+| Anticoagulant dosing | economic components — no post-trial evaluation supplies them |
+| Antiplatelet scenarios, hypersensitivity screening, thiopurine dosing | exposure probability |
+| Topoisomerase-inhibitor dosing | all four — effect, cost, utility, exposure |
+| Carrier partner screening | resource costs |
+
+**Mortality and utilities closed most of the rest.** Background all-cause
+transitions are registered with the unit stated, and the unit is the part most
+often got wrong: a complete period life table's second column is *already* an
+annual probability of death between exact ages, so it enters a yearly transition
+with no rate conversion. Applying one anyway is a common and silent error.
+
+Only *background* mortality is registered. Disease-specific excess and post-event
+mortality are different quantities and remain unregistered rather than implied by
+the one that is.
+
+Two surgical-management utilities were added and both are labelled for what they
+are rather than absorbed into the main set: one is US-elicited but not EQ-5D, so
+it is not on the same scale as the condition weights; the other is **mapped
+rather than elicited**, its own authors stating that no directly elicited value
+exists after that procedure.
 
 The parameter driving most of it is lifetime drug-exposure probability, and the
 work done on it illustrates why the count is hard to move.

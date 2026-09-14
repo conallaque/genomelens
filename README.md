@@ -148,7 +148,7 @@ pathways**.
 | Placeholder `$0` values used to represent missing economics | **0** |
 | **Pathways carrying a defensible monetary output** | **4 of 8 with published economics** |
 | **Rows with a terminal validation decision** | **36 / 36** |
-| Rows still containing an unsourced model default | **23 / 36** — reported, not resolved |
+| Rows still containing an unsourced model default | **12 / 36** — reported, not resolved |
 
 | Disposition | Rows |
 |---|---|
