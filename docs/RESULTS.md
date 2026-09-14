@@ -257,7 +257,7 @@ not represented as a zero-dollar benefit.**
 | Function errors | **0** |
 | Rows dropped without accounting | **0** |
 | Placeholder `$0` values used to represent missing economics | **0** |
-| **Validated monetary outputs** | **0 — under active evidence validation** |
+| **Pathways carrying a defensible monetary output** | **4 of 8 with published economics** |
 
 **Rows are not pathways.** Each pathway emits one row per economic quantity, so
 a pathway generally appears twice. Counting rows as independent models would
@@ -266,16 +266,58 @@ are therefore carried separately throughout.
 
 ### Disposition breakdown
 
-| Disposition | Rows | Pathways |
+| Disposition | Rows |
+|---|---|
+| Conditional — pharmacogenomic, contingent on an exposure that has not occurred | **12** |
+| Awaiting comparator-model completion — monogenic | **10** |
+| Evidence gap — a named parameter is unsourced, or an effect was sought and not found | **5** |
+| Scenario-modelled — two credible comparators answering different questions | 3 |
+| Explicitly refused under an evidence gate | 3 |
+| Not economically applicable | 2 |
+| Reproductive arm — value accrues to a separate beneficiary | 1 |
+
+Two of these counts moved for reasons worth stating, because both moved
+in the direction of a *worse-looking* number that is a truer one.
+
+*Conditional fell and evidence gap rose.* Two pharmacogenomic pathways were
+reclassified out of "conditional" after their intervention effects were checked
+against primary sources. Conditional asserts that real value awaits a trigger.
+For these two, randomised trials had looked for the effect and not found it — so
+they are waiting on evidence, not on a prescription, and saying otherwise would
+promise a payoff those trials refuted.
+
+*A mechanism-routing defect was corrected.* Ten rows had been classified under a
+category that did not describe them. The correction moved them into a category
+that names a missing comparator, which is the honest state and a less flattering
+one.
+
+### Monetized outputs
+
+Monetary outputs are now reported in two tiers, which cannot be added together
+and are kept apart for that reason.
+
+| Tier | Pathways | Quantity |
 |---|---|---|
-| Conditional — pharmacogenomic, contingent on an exposure that has not occurred | **16** | **8** |
-| Awaiting comparator-model completion — monogenic | **10** | **5** |
-| Scenario-modelled — two credible comparators answering different questions | 3 | — |
-| Explicitly refused under an evidence gate | 3 | — |
-| Not economically applicable | 2 | — |
-| Reproductive arm — value accrues to a separate beneficiary | 1 | — |
-| Evidence gap — a named parameter is unsourced | 1 | — |
-| **Defensibly monetized** | **0** | **0** |
+| Per-patient conditional net benefit | **2** | **$987 total**, per patient tested |
+| Signed verdict from a published ratio alone | **2** | one clears its threshold, one misses it |
+
+The per-patient tier requires six conditions, all disqualifying: both cost and
+health components present, a result whose interval excludes zero, an
+intervention effect that was measured rather than refuted, a realistic
+usual-care comparator, a stated denominator, and no double-counting against
+another pathway. Four of eight candidate pathways fail at least one.
+
+The second tier exists because a published cost-effectiveness ratio cannot yield
+a per-patient net benefit, but it can yield a signed, scale-free one. **One of
+the two verdicts is negative** — a pathway that misses its threshold by a wide
+margin — and it is retained. A portfolio that reports only its positive results
+is not reporting its evidence.
+
+**Value is conditional, not realised.** Nobody in this configuration is taking
+any of these drugs, so realised value is zero, and that zero is a modelled
+result rather than an unknown. Converting conditional value into an expected
+value would require a lifetime exposure probability, and no such figure was
+found published for any of these drugs.
 
 **Two honest qualifications on the coverage figure.**
 
@@ -292,14 +334,56 @@ here and the 36 results in the benchmark snapshot above are different units of
 account over different inputs; the equal totals are coincidental. No ratio
 between them is meaningful and none is computed.
 
-**A functioning economic model is not a validated dollar estimate.** The current
-hardening pass is validating pathway-specific usual-care comparators, treatment
-effects, costs, utilities and uncertainty before any monetary estimate is
-promoted to a validated output. GenomeLens separates model execution, evidence
-qualification and monetization rather than publishing unsupported values merely
-to increase coverage. Coverage above means 36 of 36 rows are economically
-**classified** — it does not mean 36 of 36 are economically **validated**.
+**A functioning economic model is not a validated dollar estimate.** GenomeLens
+separates model execution, evidence qualification and monetization rather than
+publishing unsupported values to increase coverage. Coverage above means 36 of
+36 rows are economically **classified**. It does not mean 36 of 36 are
+economically **validated**, and it never will: most of these pathways should
+not carry a dollar figure on the evidence that exists.
 
+**What the validation pass changed, and in which direction.** Registered
+intervention effects were checked against primary sources rather than against
+the engine's own tables. Three of five were not what the field requires — a
+relative reduction in the modelled event from genotype-guided management against
+usual care — and two of those asserted effects that randomised trials had looked
+for and failed to find. An independent systematic review of 47 published
+economic evaluations reaches the same verdicts on the same pathways, which is
+the closest thing to an external check available here.
+
+Two citations were also found not to support the values attached to them: one
+named a paper that does not exist as an economic evaluation, and one named a
+screening analysis that holds treatment constant across its arms and therefore
+carries no management evidence at all. Both were corrected and the affected
+figures are now marked unsourced.
+
+
+## Where GenomeLens declined to add value
+
+Two controls exist specifically to stop the total rising for reasons that are
+not evidence. Both are reported because a system that only ever counts upward
+should not be trusted with the count.
+
+**One clinical outcome receives one economic credit.** Several findings in a
+single genome can resolve to the same intervention preventing the same class of
+event — a polygenic score, several single-gene variants and a second score can
+all reduce to lowering one person's cholesterol to prevent one atherosclerotic
+event. Booked independently they summed to more than **$1.1 million** of
+prevented disease for someone with one cardiovascular system. Credited once per
+distinct intervention-and-outcome pair, the figure is **$260,000**, so roughly
+**$930,000 was double counting**. The discriminator is the pair, not the gene:
+two findings can share a gene and be economically distinct, and two unrelated
+genes can collide completely.
+
+The suppressed findings are still reported. A score that confirms what a
+single-gene variant already indicated raises confidence and may change intensity
+or timing. What it is not is a second prevented event.
+
+**Sequencing is bought once.** Each pharmacogenomic pathway carried its own test
+cost, and across the registered genes those summed to **$2,100** charged to one
+person for information that arrived in a single sequencing run. Each pathway's
+arithmetic was locally correct and the portfolio total was wrong, which is why no
+single model caught it. Acquisition is now allocated once at portfolio level,
+and only confirmatory testing — the rarest case — is charged per finding.
 
 ## Where GenomeLens refused to guess
 

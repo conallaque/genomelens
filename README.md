@@ -146,13 +146,14 @@ pathways**.
 | Function errors | **0** |
 | Rows dropped without accounting | **0** |
 | Placeholder `$0` values used to represent missing economics | **0** |
-| **Validated monetary outputs** | **0 — under active evidence validation** |
+| **Pathways carrying a defensible monetary output** | **4 of 8 with published economics** |
 
-| Disposition | Rows | Pathways |
-|---|---|---|
-| Conditional — contingent on an exposure that has not occurred | 16 | 8 |
-| Awaiting comparator-model completion | 10 | 5 |
-| Scenario-modelled, refused, not applicable, reproductive, evidence gap | 10 | — |
+| Disposition | Rows |
+|---|---|
+| Conditional — contingent on an exposure that has not occurred | 12 |
+| Awaiting comparator-model completion | 10 |
+| Evidence gap — a parameter unsourced, or an effect sought and not found | 5 |
+| Scenario-modelled, refused, not applicable, reproductive | 9 |
 
 **These two 36s are not the same 36.** The snapshot above counts results from the
 benchmark genome; this counts rows from a development reference configuration.
