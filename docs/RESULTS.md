@@ -4,7 +4,12 @@ Measured output on a public, open-consent reference genome. No raw genotype
 content is reproduced here. No clinical, payer or regulatory validation is
 claimed.
 
-## Real-genome benchmark
+## Real-genome benchmark — snapshot, 12 September 2026
+
+The figures in this section and in *Result qualification* below are a dated
+benchmark snapshot, not a description of the engine's current state. They are
+retained unchanged as a historical result. For current development status see
+*Health-economic model status* below.
 
 The benchmark input is the Genome in a Bottle / NIST **v4.2.1** high-confidence
 truth set for **HG002 / NA24385 / huAA53E0**, on GRCh38 (no-alt analysis set).
@@ -198,7 +203,7 @@ The counts in this section are from the end-to-end run and are not commensurable
 with the technical-validation counts above; the two runs differ in scope and
 their totals are not subsets of one another.
 
-## Result qualification
+## Result qualification — benchmark snapshot, 12 September 2026
 
 The qualification states below are read directly from the engine's own output.
 They are not a retrospective assessment of the results, and they were not
@@ -234,6 +239,67 @@ A number would have been easy to produce. Weakening any one gate would have
 yielded a publishable figure, and would have destroyed the only thing this run
 demonstrates: that the gates hold against a real genome, not only against
 fixtures built to test them.
+
+## Health-economic model status — development status, 14 September 2026
+
+GenomeLens executes an economic evaluation pathway for **36 of 36** evaluated
+result rows (100%).
+
+The economic layer distinguishes between findings that support a numerical
+decision model and findings whose correct output is conditional, reproductive,
+non-applicable, evidence-limited, or explicitly refused. **Missing evidence is
+not represented as a zero-dollar benefit.**
+
+| | |
+|---|---|
+| Economic function coverage | **36 / 36 result rows** |
+| Distinct economic pathways behind those rows | **17** |
+| Function errors | **0** |
+| Rows dropped without accounting | **0** |
+| Placeholder `$0` values used to represent missing economics | **0** |
+| **Validated monetary outputs** | **0 — under active evidence validation** |
+
+**Rows are not pathways.** Each pathway emits one row per economic quantity, so
+a pathway generally appears twice. Counting rows as independent models would
+overstate the size of the economics by roughly a factor of two, and both units
+are therefore carried separately throughout.
+
+### Disposition breakdown
+
+| Disposition | Rows | Pathways |
+|---|---|---|
+| Conditional — pharmacogenomic, contingent on an exposure that has not occurred | **16** | **8** |
+| Awaiting comparator-model completion — monogenic | **10** | **5** |
+| Scenario-modelled — two credible comparators answering different questions | 3 | — |
+| Explicitly refused under an evidence gate | 3 | — |
+| Not economically applicable | 2 | — |
+| Reproductive arm — value accrues to a separate beneficiary | 1 | — |
+| Evidence gap — a named parameter is unsourced | 1 | — |
+| **Defensibly monetized** | **0** | **0** |
+
+**Two honest qualifications on the coverage figure.**
+
+*Exhaustiveness is a design property, not a measurement.* A row that cannot be
+classified is routed to an explicit refusal category rather than to an
+unclassified bucket, because a result nobody can classify is itself an error and
+naming it one is more useful than leaving a hole in the accounting. "Zero
+unclassified" therefore follows from the design and is reported as such. What is
+measured, and what is worth reporting, is that the refusal category stays small
+and holds only genuine refusals.
+
+*This is a development configuration, not the benchmark genome run.* The 36 rows
+here and the 36 results in the benchmark snapshot above are different units of
+account over different inputs; the equal totals are coincidental. No ratio
+between them is meaningful and none is computed.
+
+**A functioning economic model is not a validated dollar estimate.** The current
+hardening pass is validating pathway-specific usual-care comparators, treatment
+effects, costs, utilities and uncertainty before any monetary estimate is
+promoted to a validated output. GenomeLens separates model execution, evidence
+qualification and monetization rather than publishing unsupported values merely
+to increase coverage. Coverage above means 36 of 36 rows are economically
+**classified** — it does not mean 36 of 36 are economically **validated**.
+
 
 ## Where GenomeLens refused to guess
 
