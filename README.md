@@ -8,7 +8,7 @@
 
 ---
 
-## Results on a real benchmark genome
+## Results on a real benchmark genome — snapshot, 12 September 2026
 
 GenomeLens turns a variant callset into decision and economic intelligence, and
 refuses to produce a number when the evidence behind it does not hold. It was
@@ -96,10 +96,10 @@ this benchmark does not cover. 169 + 239 + 1 + 9 + 72 = 490.
 
 These are engine counts for this run, not a clinical reading of a person.
 
-### Economic qualification: 0 of 36
+### Economic qualification for this run
 
-Of the 36 results the qualification layer evaluated, none cleared the bar to
-be valued:
+Of the 36 results the qualification layer evaluated in this benchmark run,
+none cleared the bar to be valued:
 
 | State | Count |
 |---|---|
@@ -132,6 +132,36 @@ holding, not the pipeline failing.
 The dollar figures shown under *A worked example* below come from a synthetic
 profile and are illustrative. No economic result from this benchmark run is
 published, because none qualified.
+
+### Current economic model status — 14 September 2026
+
+The benchmark figures above are a dated snapshot. The economic layer has since
+moved on, and its current development status is reported in a different unit of
+account: **result rows**, of which there are 36, behind **17 distinct economic
+pathways**.
+
+| | |
+|---|---|
+| Economic function coverage | **36 / 36 result rows** |
+| Function errors | **0** |
+| Rows dropped without accounting | **0** |
+| Placeholder `$0` values used to represent missing economics | **0** |
+| **Validated monetary outputs** | **0 — under active evidence validation** |
+
+| Disposition | Rows | Pathways |
+|---|---|---|
+| Conditional — contingent on an exposure that has not occurred | 16 | 8 |
+| Awaiting comparator-model completion | 10 | 5 |
+| Scenario-modelled, refused, not applicable, reproductive, evidence gap | 10 | — |
+
+**These two 36s are not the same 36.** The snapshot above counts results from the
+benchmark genome; this counts rows from a development reference configuration.
+The equal totals are coincidental and no ratio between them is meaningful.
+
+**Executing is not validating.** 36 of 36 rows are economically *classified*.
+None is economically *validated*, and coverage is not offered as a substitute.
+
+Full detail: [benchmark results](docs/RESULTS.md).
 
 **Technical validation is not clinical validation.** Concordance with a truth
 set says the genotypes are right; it says nothing about clinical utility.
