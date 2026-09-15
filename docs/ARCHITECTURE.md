@@ -63,3 +63,49 @@ One genome may arrive as an array export, a block-compressed callset, or an
 all-sites callset. These are three spellings of one biology and are required to
 produce one answer. The resolution layer is canonical and shared; modules do
 not implement their own.
+
+
+## Boundaries
+
+Four boundaries exist in the pipeline. Each is a place where something
+is allowed to refuse, and nothing downstream may re-decide what an
+upstream boundary settled.
+
+```
+Genome
+  |
+  |   canonical observation boundary
+  |   one biological fact becomes one observation, whatever assay saw it
+  v
+Clinical interpretation
+  |
+  |   validation boundary
+  |   nothing numeric passes unvalidated; a failing gate yields a
+  |   refusal token, never a number
+  v
+Economic model
+  |
+  |   aggregation boundary
+  |   one consequence is credited once; totals are produced here and
+  |   nowhere else
+  v
+Payload
+  |
+  |   privacy boundary
+  |   personal artifacts are not emitted unless the gate passes;
+  |   an unknown privacy state refuses
+  v
+Renderer
+```
+
+**The renderer renders.** It formats precomputed values and performs no
+arithmetic on an economic quantity. Two output paths that each computed
+their own total would diverge silently, and agreement between them is
+not evidence either is right.
+
+**Legacy boundary.** Where an older computation is retained for output
+stability it is labelled as such and structurally barred from
+contributing to any total. A quarantine enforced only by a comment is
+not enforced; reachability is established by import-graph trace.
+
+Stage internals, registries and gate logic are not published.

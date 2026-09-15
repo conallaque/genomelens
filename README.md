@@ -1,10 +1,104 @@
-# GenomeLens
+# GenomeLens — Genomic Decision & Health-Economic Engine
 
-### Economic Intelligence for Genome Sequencing
+**Turning sequence data into measurable decision and economic value —
+and refusing to produce a number when the evidence behind it does not
+hold.**
 
-**Turning sequence data into measurable decision and economic value.**
+---
 
-*Not just what your genome says — what it could change.*
+## Scorecard — 15 September 2026
+
+```
+36 / 36   economic pathway rows terminally adjudicated
+0         unresolved rows
+0         duplicate economic credit
+0         fake-zero economic outputs
+0         fabricated health outcomes in a published quantity
+15        distinct economic decision pathways behind those 36 rows
+
+Canonical economic-credit aggregation          VALIDATED
+Remaining release-hardening items               IN PROGRESS
+
+4,864     passing at the September 15, 2026 validation snapshot
+10        held deliberately red (each encodes a known curated-data defect)
+0         unexpected failures
+
+Synthetic and public-reference validation only
+Local-first / offline-capable architecture
+```
+
+Every figure above is produced by the engine's own audit tooling, not
+transcribed by hand. Two of them deserve reading twice: **0 duplicate
+economic credit** and **0 fake-zero outputs** are guarantees about
+arithmetic, and the section below explains why they are the hard part.
+
+**Release hardening is in progress and is reported as such.** Canonical
+economic-credit aggregation is validated. Remaining release-hardening
+items are open work, tracked internally against a frozen acceptance
+specification. Readiness is not claimed beyond what is stated here.
+
+---
+
+## The chain
+
+```
+Genome
+  ↓
+Canonical genomic observations
+  ↓
+Clinical interpretation
+  ↓
+Actionable decision pathways
+  ↓
+Health outcomes
+  ↓
+Costs / QALYs / life-years
+  ↓
+Economic result
+  ↓
+Evidence + uncertainty + provenance
+```
+
+Each arrow is a gate that can refuse, and the monetary result is the
+**end** of that chain rather than the beginning. A finding with no
+intervention behind it does not become a decision. A decision usual care
+would have reached anyway does not become *genomic* value. A pathway with
+no sourced probability for its triggering event does not become an
+expected value.
+
+---
+
+## What GenomeLens refuses to do
+
+These are enforced by tests, not by policy documents. Each refusal exists
+because the opposite behaviour is the easy, plausible-looking default —
+and each one makes the headline number smaller.
+
+- **It does not monetize unsupported pathways.** A pathway whose causal
+  chain has not been established carries no monetary value, however
+  complete its parameters are.
+- **It does not treat missing evidence as zero.** `0` means *measured,
+  and found to be nothing*. Absent means absent. Collapsing the second
+  into the first invents precision that was never measured.
+- **It does not double-count two genes informing one decision.** Two
+  pharmacogenes governing a single drug dose are two genomic findings and
+  **one** economic consequence. Three genes converging on one
+  lipid-lowering decision are one decision, not three.
+- **It does not merge conditional results into unconditional headline
+  values.** "Worth $X *if* this drug decision arises" and "worth $Y
+  today" are the same pathway answering different questions. They are
+  reported separately and never silently interchanged.
+- **It does not convert reproductive outcomes into personal net monetary
+  benefit.** Value accruing to a prospective child is not the sequenced
+  person's gain, and the two are never pooled into one figure attributed
+  to one party.
+- **It does not emit unsupported economic values.** Where a required
+  input is absent the result is *unavailable*, with the specific missing
+  evidence named — not rounded to zero, and not filled with a default.
+
+The engine currently publishes **no** headline monetary total, because no
+pathway has cleared the bar. That is the governance layer holding, not
+the pipeline failing.
 
 ---
 
@@ -133,38 +227,84 @@ The dollar figures shown under *A worked example* below come from a synthetic
 profile and are illustrative. No economic result from this benchmark run is
 published, because none qualified.
 
-### Current economic model status — 14 September 2026
+### Current economic model status — 15 September 2026
 
-The benchmark figures above are a dated snapshot. The economic layer has since
-moved on, and its current development status is reported in a different unit of
-account: **result rows**, of which there are 36, behind **17 distinct economic
-pathways**.
+The benchmark figures above are a dated snapshot. The economic layer has
+since moved on, and its current status is reported in a different unit of
+account: **result rows**, of which there are 36, behind **15 distinct
+economic pathways**.
 
 | | |
 |---|---|
-| Economic function coverage | **36 / 36 result rows** |
-| Function errors | **0** |
+| Rows with a terminal adjudication | **36 / 36** |
+| Unresolved rows | **0** |
 | Rows dropped without accounting | **0** |
-| Placeholder `$0` values used to represent missing economics | **0** |
-| **Pathways carrying a defensible monetary output** | **4 of 8 with published economics** |
-| **Rows with a terminal validation decision** | **36 / 36** |
-| Rows still containing an unsourced model default | **12 / 36** — reported, not resolved |
+| Placeholder `$0` used to represent missing economics | **0** |
+| Duplicate economic credit | **0** |
+| Rows numeric within their own validated frame | **8** |
+| Distinct pathways carrying a defensible numeric output | **4** |
+| **Headline-eligible pathways** | **0** |
 
-| Disposition | Rows |
-|---|---|
-| Conditional — contingent on an exposure that has not occurred | 12 |
-| Awaiting comparator-model completion | 10 |
-| Evidence gap — a parameter unsourced, or an effect sought and not found | 5 |
-| Scenario-modelled, refused, not applicable, reproductive | 9 |
+Stated precisely, because the distinction is the whole point:
 
-**These two 36s are not the same 36.** The snapshot above counts results from the
-benchmark genome; this counts rows from a development reference configuration.
-The equal totals are coincidental and no ratio between them is meaningful.
+> **4 distinct economic pathways currently have defensible numeric
+> estimates within conditional/scenario frames; 0 are currently eligible
+> for a portfolio headline total.**
 
-**Executing is not validating.** 36 of 36 rows are economically *classified*.
-None is economically *validated*, and coverage is not offered as a substitute.
+A conditional estimate is real inside the frame that conditions it. A
+headline is exactly where that condition would be dropped, which is why
+the second number is zero and not a rounding of the first.
 
-Full detail: [benchmark results](docs/RESULTS.md).
+**A published count was wrong and is corrected here.** An earlier
+revision of this page reported *17* distinct economic pathways and
+"4 of 8 with published economics". Both figures came from counting
+**rows** where the unit is **pathways** — several rows can share one
+economic pathway, and one pathway appeared five times. The corrected
+figures are **15** distinct pathways, of which **4** carry a defensible
+numeric output and **8 rows** are numeric within a validated frame. The
+audit that certified pathway coverage was itself miscounting, in the
+reassuring direction, which is the direction worth being suspicious of.
+
+**These two 36s are not the same 36.** The benchmark snapshot above counts
+results from a public reference genome; this counts rows from a
+development reference configuration. The equal totals are coincidental
+and no ratio between them is meaningful.
+
+**Adjudicated is not validated, and neither is monetized.** All 36 rows
+carry a terminal decision. Zero are headline-eligible. Coverage is not
+offered as a substitute for either.
+
+Full detail: [benchmark results](docs/RESULTS.md) ·
+[capability matrix](docs/CAPABILITY-MATRIX.md).
+
+### One decision, one credit
+
+The hardest problem in this layer is not computing a value. It is making
+sure one health consequence is credited exactly **once**, however many
+genomic routes reach it.
+
+A coronary polygenic score, three familial-hypercholesterolaemia genes
+and an ischaemic-stroke score are five different **findings**. They are
+substantially **one** intervention — lower this person's LDL cholesterol
+— preventing **one** class of event in a person who has one
+cardiovascular system. Booking them independently sums to a large,
+individually defensible, entirely fictitious number.
+
+The engine now resolves this with a single credit-attribution authority:
+
+- economic identity is authored where the **decision model** is created,
+  never derived downstream from a gene symbol, a display label or a
+  condition name
+- one aggregation path produces every total; no renderer or serializer
+  recomputes one
+- a result that cannot be shown *not* to double count is **excluded and
+  reported**, never admitted with a synthesised identity
+- quantities of different economic constructs are never added, so there
+  is deliberately **no single scalar "genome value"**
+- absent totals serialize as absent, never as `$0`
+
+Deduplication semantics, identity registries and aggregation internals
+are not published.
 
 **Technical validation is not clinical validation.** Concordance with a truth
 set says the genotypes are right; it says nothing about clinical utility.
@@ -269,11 +409,13 @@ than direct typing — and an example you have to caveat is not an example.)*
 
 | | |
 |---|---|
-| Automated tests | **3,620 passing** |
+| Automated tests | **4,864 passing at the September 15, 2026 validation snapshot** |
 | Known-failing | 10, held red deliberately — each encodes a known curated-data defect. Turning them green without fixing the cause would delete the only record that the defect exists. |
 | Representation equivalence | array vs block-compressed vs all-sites callsets asserted to agree |
 | Fail-closed | unsupported inputs refuse rather than coerce |
-| Mutation testing | guards are re-verified by planting the defect they exist to catch and confirming they fail |
+| Mutation testing | guards are re-verified by planting the defect they exist to catch and confirming they fail. Guards that survived their own mutation — and therefore proved nothing — have been found this way and given real tests |
+| Adversarial review | finished work is re-audited by independent reviewers told to assume it is wrong and to find the defect. Most of the serious findings in the latest round were in code written during that same round |
+| Aggregation invariants | permutation invariance, idempotence and byte-identical determinism are asserted on economic totals |
 | Report reconciliation | rendered figures must trace to the computed payload; renderers may not compute |
 | Shareability scanning | artifacts scanned for personal data, private paths and unsupported claims, with positive controls |
 
@@ -340,8 +482,10 @@ is sound, not enough to reconstruct it.
 ## Documentation
 
 [Benchmark results](docs/RESULTS.md) ·
+[Capability matrix](docs/CAPABILITY-MATRIX.md) ·
 [Architecture](docs/ARCHITECTURE.md) · [Methods](docs/METHODS.md) ·
-[Validation](docs/VALIDATION.md) · [Partner pilot](docs/PARTNER-PILOT.md)
+[Validation](docs/VALIDATION.md) · [Partner pilot](docs/PARTNER-PILOT.md) ·
+[Changelog](CHANGELOG.md)
 
 ## License
 

@@ -6,7 +6,7 @@ Factual status. No clinical, payer or regulatory validation is claimed.
 
 | | |
 |---|---|
-| Passing | **3,620** |
+| Passing | **4,864** at the September 15, 2026 validation snapshot |
 | Skipped | 16 (optional public benchmark fixtures not installed) |
 | Known-failing | **10** |
 
@@ -143,3 +143,55 @@ this page describes software behaviour verified against tests and a public
 benchmark. It is not a clinical validation study, not an analytical validation
 under a laboratory standard, and not a regulatory clearance of any kind.
 GenomeLens is not a medical device and no diagnostic claim is made for it.
+
+
+## Canonical economic-credit aggregation
+
+A dedicated workstream established that one health consequence is
+credited exactly once, however many genomic routes reach it. It is
+recorded here because the guarantee is arithmetic, and arithmetic
+guarantees are testable.
+
+| Property | Status |
+|---|---|
+| One credit-attribution authority, proven reachable from the entry point | asserted |
+| Economic identity authored at the producer, never derived downstream | asserted |
+| Duplicate credit refused rather than silently resolved | asserted |
+| Results that cannot be shown not to double count are excluded and reported | asserted |
+| Quantities of different economic constructs never summed | asserted |
+| Absent totals represented as absent, not as zero | asserted |
+| Permutation invariance of every total | asserted |
+| Idempotence of aggregation | asserted |
+| Byte-identical determinism of serialized totals | asserted |
+| Historical illustrative values structurally barred from any total | asserted |
+
+### What the adversarial round changed
+
+Four independent reviewers were given the finished implementation and
+told to assume it was wrong. The yield is the point: **most of the
+serious findings were in code written during that same round.**
+
+Three findings are worth publishing because they generalise:
+
+1. **A safety check that inspected source text.** An architecture check
+   tested whether a function name appeared in a file's source. A comment
+   mentioning that name satisfied it. A check that can pass for the
+   wrong reason is worse than no check, because it converts an open
+   question into a recorded answer. It was replaced with a behavioural
+   probe that substitutes the component and observes the result.
+
+2. **Three guards that survived their own mutation tests.** Deliberately
+   removing them caused zero test failures — the tests asserted on a
+   path where a different guard already caught the problem, so they
+   never exercised the code they claimed to cover. Each now has a test
+   that fails when the guard is removed.
+
+3. **A fail-open default in a fail-closed design.** A missing identity
+   correctly refused; a missing *provenance for a present identity* was
+   silently upgraded to trustworthy. An omitted field must never read as
+   a satisfied one.
+
+Findings outside the workstream's boundary were recorded and ranked
+rather than absorbed or dropped, and are tracked internally as named
+release-hardening items so that not fixing one is a decision on the
+record rather than an oversight.

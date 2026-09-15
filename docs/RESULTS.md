@@ -240,7 +240,7 @@ yielded a publishable figure, and would have destroyed the only thing this run
 demonstrates: that the gates hold against a real genome, not only against
 fixtures built to test them.
 
-## Health-economic model status — development status, 14 September 2026
+## Health-economic model status — development status, 15 September 2026
 
 GenomeLens executes an economic evaluation pathway for **36 of 36** evaluated
 result rows (100%).
@@ -253,16 +253,33 @@ not represented as a zero-dollar benefit.**
 | | |
 |---|---|
 | Economic function coverage | **36 / 36 result rows** |
-| Distinct economic pathways behind those rows | **17** |
+| Distinct economic pathways behind those rows | **15** |
+| Rows with a terminal adjudication | **36 / 36** |
+| Unresolved rows | **0** |
 | Function errors | **0** |
 | Rows dropped without accounting | **0** |
 | Placeholder `$0` values used to represent missing economics | **0** |
-| **Pathways carrying a defensible monetary output** | **4 of 8 with published economics** |
+| Duplicate economic credit | **0** |
+| Rows numeric within their own validated frame | **8** |
+| **Distinct pathways carrying a defensible numeric output** | **4** |
+| **Headline-eligible pathways** | **0** |
 
-**Rows are not pathways.** Each pathway emits one row per economic quantity, so
-a pathway generally appears twice. Counting rows as independent models would
-overstate the size of the economics by roughly a factor of two, and both units
-are therefore carried separately throughout.
+> **4 distinct economic pathways currently have defensible numeric
+> estimates within conditional/scenario frames; 0 are currently eligible
+> for a portfolio headline total.**
+
+**Rows are not pathways, and a published count got this wrong.** Each pathway
+emits one row per economic quantity, so a pathway generally appears at least
+twice — and one appears five times. An earlier revision reported **17** distinct
+pathways and "4 of 8 with published economics"; both came from counting rows
+where the unit is pathways. The corrected figures are **15** distinct pathways,
+**4** of which carry a defensible numeric output, with **8 rows** numeric inside
+a validated frame.
+
+The correction is recorded rather than quietly applied because of where it was
+found: the audit that *certified* pathway coverage was itself counting rows, and
+it therefore overstated coverage by roughly 2.4x in the reassuring direction.
+An audit that flatters its own subject is the kind worth re-deriving.
 
 ### Disposition breakdown
 
