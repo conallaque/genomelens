@@ -66,10 +66,10 @@ verification suite** ships here instead, written from the published artifacts
 outward rather than by exporting private tests. It is purpose-built
 around the public claims — not a sample drawn from the private suite — and lets
 what this repository publishes be inspected independently. **Public validation:
-137 checks.**
+138 checks — 137 passed, 1 skipped.**
 
 ```bash
-pytest tests/public                     # 137 checks over the published artifacts
+pytest tests/public                     # 138 checks: 137 passed, 1 skipped
 python tools/verify_public_release.py   # one-command release verification
 ```
 
