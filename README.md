@@ -15,9 +15,9 @@ GenomeLens was run end to end on three publicly released Genome in a Bottle whol
 
 | Sample | GIAB concordance | Reference-case NMB | Canonical expected NMB | Report |
 |---|---|---|---|---|
-| **HG002** | **169 / 169** · 0 mismatches · 0 normalization failures | **$957** | **$1,239** | [View report](artifacts/public-benchmarks/HG002/report-public.html) · [summary](artifacts/public-benchmarks/HG002/summary.json) |
-| **HG003** | **187 / 187** · 0 mismatches · 0 normalization failures | **$2,295** | **$4,127** | [View report](artifacts/public-benchmarks/HG003/report-public.html) · [summary](artifacts/public-benchmarks/HG003/summary.json) |
-| **HG004** | **170 / 170** · 0 mismatches · 0 normalization failures | **$937** | **$1,304** | [View report](artifacts/public-benchmarks/HG004/report-public.html) · [summary](artifacts/public-benchmarks/HG004/summary.json) |
+| **HG002** | **169 / 169** · 0 mismatches · 0 normalization failures | **$957** | **$1,239** | [Report (PDF)](artifacts/public-benchmarks/HG002/report-public.pdf) · [Web report](https://conallaque.github.io/genomelens/artifacts/public-benchmarks/HG002/report-public.html) · [JSON](artifacts/public-benchmarks/HG002/summary.json) |
+| **HG003** | **187 / 187** · 0 mismatches · 0 normalization failures | **$2,295** | **$4,127** | [Report (PDF)](artifacts/public-benchmarks/HG003/report-public.pdf) · [Web report](https://conallaque.github.io/genomelens/artifacts/public-benchmarks/HG003/report-public.html) · [JSON](artifacts/public-benchmarks/HG003/summary.json) |
+| **HG004** | **170 / 170** · 0 mismatches · 0 normalization failures | **$937** | **$1,304** | [Report (PDF)](artifacts/public-benchmarks/HG004/report-public.pdf) · [Web report](https://conallaque.github.io/genomelens/artifacts/public-benchmarks/HG004/report-public.html) · [JSON](artifacts/public-benchmarks/HG004/summary.json) |
 
 ```
 526 / 526  scoped explicit GIAB truth calls concordant
@@ -28,12 +28,15 @@ GenomeLens was run end to end on three publicly released Genome in a Bottle whol
 Scope: GIAB **v4.2.1** · **GRCh38** · **chr1–22** · a fixed curated validation panel. This is agreement on the explicitly benchmarked calls inside that scope — not whole-genome accuracy, not clinical validation, and not an endorsement by NIST or GIAB. The denominator is published in [`docs/VALIDATION.md`](docs/VALIDATION.md#per-sample).
 
 <p align="center">
-  <a href="artifacts/public-benchmarks/HG002/report-public.html"><img src="artifacts/public-benchmarks/HG002/preview.png" alt="GenomeLens public report, HG002" width="32%"></a>
-  <a href="artifacts/public-benchmarks/HG003/report-public.html"><img src="artifacts/public-benchmarks/HG003/preview.png" alt="GenomeLens public report, HG003" width="32%"></a>
-  <a href="artifacts/public-benchmarks/HG004/report-public.html"><img src="artifacts/public-benchmarks/HG004/preview.png" alt="GenomeLens public report, HG004" width="32%"></a>
+  <a href="https://conallaque.github.io/genomelens/artifacts/public-benchmarks/HG002/report-public.html"><img src="artifacts/public-benchmarks/HG002/preview.png" alt="GenomeLens public report, HG002" width="32%"></a>
+  <a href="https://conallaque.github.io/genomelens/artifacts/public-benchmarks/HG003/report-public.html"><img src="artifacts/public-benchmarks/HG003/preview.png" alt="GenomeLens public report, HG003" width="32%"></a>
+  <a href="https://conallaque.github.io/genomelens/artifacts/public-benchmarks/HG004/report-public.html"><img src="artifacts/public-benchmarks/HG004/preview.png" alt="GenomeLens public report, HG004" width="32%"></a>
 </p>
 
-These public reports are built from an explicit allowlist, not by redacting a production report. The production GenomeLens report is a separate internal artifact and is not published.
+Click any preview for the rendered report. **Report (PDF)** opens in GitHub's
+own viewer; **Web report** is the same report rendered via GitHub Pages; **JSON**
+is the machine-readable public summary. These reports are built from an explicit
+allowlist, not by redacting a production report. The production GenomeLens report is a separate internal artifact and is not published.
 
 ## It runs, on real public genomes
 
@@ -66,10 +69,10 @@ verification suite** ships here instead, written from the published artifacts
 outward rather than by exporting private tests. It is purpose-built
 around the public claims — not a sample drawn from the private suite — and lets
 what this repository publishes be inspected independently. **Public validation:
-138 checks — 137 passed, 1 skipped.**
+155 checks — 154 passed, 1 skipped.**
 
 ```bash
-pytest tests/public                     # 138 checks: 137 passed, 1 skipped
+pytest tests/public                     # 155 checks: 154 passed, 1 skipped
 python tools/verify_public_release.py   # one-command release verification
 ```
 

@@ -23,11 +23,11 @@ private tests with assertions removed.
 
 | | Private production suite | Public verification suite |
 |---|---|---|
-| Scale | **5,397 passing · 2 known residual failures · 24 skipped** | **55 test functions · 138 collected checks: 137 passed, 1 skipped** |
+| Scale | **5,397 passing · 2 known residual failures · 24 skipped** | **62 test functions · 155 collected checks: 154 passed, 1 skipped** |
 | Tests | implementation behavior under given inputs | the claims and artifacts this repository publishes |
 | Published | no | yes — [`tests/public/`](../tests/public) |
 
-**The 138 public checks are not a sample of the 5,397.** They were written from
+**The 155 public checks are not a sample of the 5,397.** They were written from
 the published artifacts outward and verify different things. A private test
 asserting what the engine does under a given input is a specification of that
 engine; enough of them describe the mechanism this repository withholds. A
@@ -81,6 +81,7 @@ High-level categories only:
 | **Claim discipline** | No unscoped accuracy, certification or clinical-validation claims; the scope qualifier must sit adjacent to the headline figure |
 | **Missingness semantics** | An unresolved or not-assessed disposition is never rendered as benign, normal or absent; no non-computed value is published as zero |
 | **Links and assets** | Every published link, report, summary and preview resolves |
+| **Presentation** | Previews are embedded rather than linked, the primary report link is the PDF GitHub renders, no README link sends a reader to HTML source, and sample links never cross-reference another genome |
 
 Run them with:
 
@@ -88,7 +89,7 @@ Run them with:
 pytest tests/public
 ```
 
-The current result is `137 passed, 1 skipped` out of 138 collected. The skip is
+The current result is `154 passed, 1 skipped` out of 155 collected. The skip is
 the cost-effectiveness ratio check on the one published case that is dominant —
 a dominant strategy has no interpretable ratio, so there is nothing to compare.
 The verifier prints the skip reason rather than hiding it: a skip whose reason
