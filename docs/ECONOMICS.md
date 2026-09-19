@@ -28,7 +28,7 @@ Standard health-economic definitions, stated so published results are interpreta
 
 The relations `0 ≤ EVSI ≤ EVPI` and `net = EVSI − cost` are enforced, not assumed.
 
-`METHODS HOLD` — numerical value-of-information examples are withheld pending review of one treatment-effect parameter. `[REGENERATE AFTER METHODS REVIEW]`
+[`METHODS HOLD`](RELEASE-STATUS.md#methods-hold) — numerical value-of-information examples are withheld pending review of one treatment-effect parameter. `[REGENERATE AFTER METHODS REVIEW]`
 
 ## Estimands kept apart
 

@@ -19,7 +19,7 @@ health economics · uncertainty · auditable report
 a decision/economic layer on top of data you already produce
 ```
 
-The proof points are deliberately external where possible: a public GIAB trio, an external truth set, a published benchmark denominator, real generated reports, and explicit refusal behavior.
+The proof points are deliberately external where possible: a public GIAB trio, an external truth set, a published benchmark denominator, and explicit refusal behavior. Sanitized real reports are [not published in this release](../docs/RELEASE-STATUS.md#trio-reports).
 
 ## For a payer or HTA reader
 

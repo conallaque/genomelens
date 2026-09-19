@@ -19,7 +19,7 @@ GenomeLens is exercised end-to-end against the Genome in a Bottle Ashkenazim tri
   0        normalization failures
 ```
 
-Per sample: HG002 169, HG003 187, HG004 170.
+Per sample: [HG002](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/HG002_NA24385_son/) [169](docs/VALIDATION.md#hg002), [HG003](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/HG003_NA24149_father/) [187](docs/VALIDATION.md#hg003), [HG004](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/HG004_NA24143_mother/) [170](docs/VALIDATION.md#hg004).
 
 **What that is not.** Not 100% whole-genome accuracy. Not clinical validation. Not an endorsement by NIST or GIAB. It is agreement on the explicitly benchmarked calls inside the defined truth and callability scope — a denominator we publish rather than hide.
 
@@ -27,7 +27,7 @@ Per sample: HG002 169, HG003 187, HG004 170.
 
 Each run produces a genomic and health-economic report. This repository is intended to carry sanitized versions of real generated reports, not illustrative mock-ups: supported findings, carrier status, pharmacogenomics, callability and source state; evidence provenance per finding; reference-case and standardized pathway economics; incremental cost, incremental QALYs, ICER or dominance; probabilistic sensitivity analysis; explicit refusals and limitations.
 
-`OWNER REVIEW` — sanitized trio reports must be regenerated through the public export profile before publication.
+[`OWNER REVIEW`](docs/RELEASE-STATUS.md#trio-reports) — sanitized trio reports must be regenerated through the public export profile before publication.
 
 ## It does not price a genome
 
@@ -37,7 +37,7 @@ Seven estimands are kept distinct — reference-case · canonical standardized p
 
 Action value and information value can represent closely related economic consequences viewed from different decision perspectives, so GenomeLens does not automatically add them.
 
-`OWNER REVIEW — VERIFY AGAINST FINAL SANITIZED ENGINE BUILD` — previously published trio headline economics predate the current engine state and must be regenerated before republication.
+[`OWNER REVIEW — VERIFY AGAINST FINAL SANITIZED ENGINE BUILD`](docs/RELEASE-STATUS.md#trio-economics) — previously published trio headline economics predate the current engine state and must be regenerated before republication.
 
 ## Evidence, assumption, and refusal are different states
 
@@ -52,7 +52,7 @@ A refusal is not a negative biological result. Declining to monetize a finding s
 
 An explicit economic-validation matrix requires every tracked pathway to terminate in a defined disposition rather than falling silently through the model. The claim is "every tracked row reaches an explicit terminal disposition" — coverage and accountability, not a claim that every row is empirically validated.
 
-`OWNER REVIEW` — verify current matrix counts against the final sanitized engine build before publishing them.
+[`OWNER REVIEW`](docs/RELEASE-STATUS.md#matrix-counts) — verify current matrix counts against the final sanitized engine build before publishing them.
 
 ## Uncertainty and value of information
 
@@ -60,7 +60,7 @@ GenomeLens carries probabilistic sensitivity analysis, decision-uncertainty summ
 
 The current lipid value-of-information pathway is driven by clinical decision state, not genomic variation. Holding clinical state fixed and changing the genome does not change it. This is a property of the current model, not a claim that genomes are irrelevant to lipid decisions.
 
-`METHODS HOLD` — numerical value-of-information examples are withheld pending review of one treatment-effect parameter. `[REGENERATE AFTER METHODS REVIEW]`
+[`METHODS HOLD`](docs/RELEASE-STATUS.md#methods-hold) — numerical value-of-information examples are withheld pending review of one treatment-effect parameter. `[REGENERATE AFTER METHODS REVIEW]`
 
 ## Where GenomeLens stops
 
