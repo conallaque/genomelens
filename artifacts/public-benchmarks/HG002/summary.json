@@ -1,0 +1,48 @@
+{
+  "sample": "HG002",
+  "dataset": {
+    "source": "Genome in a Bottle",
+    "reference_build": "GRCh38",
+    "benchmark_release": "v4.2.1",
+    "benchmark_scope": "chr1-22"
+  },
+  "validation": {
+    "explicit_truth_calls": 169,
+    "concordant": 169,
+    "mismatches": 0,
+    "normalization_failures": 0
+  },
+  "findings": [
+    {
+      "name": "PTPN22 R620W carrier \u2014 autoimmune screening awareness",
+      "category": "carrier",
+      "disposition": "unresolved",
+      "evidence_basis": "curated clinical evidence"
+    },
+    {
+      "name": "CYP2D6 Intermediate Metabolizer (IM) (codeine / antidepressants)",
+      "category": "pharmacogenomics",
+      "disposition": "conditional",
+      "evidence_basis": "published pharmacogenomic guideline evidence"
+    },
+    {
+      "name": "Elevated type-2-diabetes polygenic risk",
+      "category": "polygenic risk",
+      "disposition": "conditional",
+      "evidence_basis": "published association evidence"
+    }
+  ],
+  "economics": {
+    "reference_case_nmb_usd": 957,
+    "canonical_expected_nmb_usd": 1239,
+    "incremental_cost_usd": 367,
+    "incremental_qaly": 0.0132,
+    "icer": 27734
+  },
+  "limitations": [
+    "Public demonstration output; not clinical validation.",
+    "Benchmark scope is limited to the stated GIAB panel and chr1-22.",
+    "Modeled economics are not realized savings.",
+    "Representative findings only; the full sanitized report is the complete output."
+  ]
+}

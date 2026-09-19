@@ -9,6 +9,32 @@ WHOLE-GENOME INTERPRETATION → CLINICAL ACTIONABILITY → EVIDENCE PROVENANCE
 → HEALTH ECONOMICS → UNCERTAINTY / VALUE OF INFORMATION → AUDITABLE REPORTING
 ```
 
+## Real whole-genome demonstrations
+
+GenomeLens was run end to end on three publicly released Genome in a Bottle whole-genome callsets. The reports below are sanitized public outputs from those runs — real results, not mock-ups.
+
+| Sample | GIAB concordance | Reference-case NMB | Canonical expected NMB | Report |
+|---|---|---|---|---|
+| **HG002** | **169 / 169** · 0 mismatches · 0 normalization failures | **$957** | **$1,239** | [View report](artifacts/public-benchmarks/HG002/report-public.html) · [summary](artifacts/public-benchmarks/HG002/summary.json) |
+| **HG003** | **187 / 187** · 0 mismatches · 0 normalization failures | **$2,295** | **$4,127** | [View report](artifacts/public-benchmarks/HG003/report-public.html) · [summary](artifacts/public-benchmarks/HG003/summary.json) |
+| **HG004** | **170 / 170** · 0 mismatches · 0 normalization failures | **$937** | **$1,304** | [View report](artifacts/public-benchmarks/HG004/report-public.html) · [summary](artifacts/public-benchmarks/HG004/summary.json) |
+
+```
+526 / 526  scoped explicit GIAB truth calls concordant
+  0        mismatches
+  0        normalization failures
+```
+
+Scope: GIAB **v4.2.1** · **GRCh38** · **chr1–22** · a fixed curated validation panel. This is agreement on the explicitly benchmarked calls inside that scope — not whole-genome accuracy, not clinical validation, and not an endorsement by NIST or GIAB. The denominator is published in [`docs/VALIDATION.md`](docs/VALIDATION.md#per-sample).
+
+<p align="center">
+  <a href="artifacts/public-benchmarks/HG002/report-public.html"><img src="artifacts/public-benchmarks/HG002/preview.png" alt="GenomeLens public report, HG002" width="32%"></a>
+  <a href="artifacts/public-benchmarks/HG003/report-public.html"><img src="artifacts/public-benchmarks/HG003/preview.png" alt="GenomeLens public report, HG003" width="32%"></a>
+  <a href="artifacts/public-benchmarks/HG004/report-public.html"><img src="artifacts/public-benchmarks/HG004/preview.png" alt="GenomeLens public report, HG004" width="32%"></a>
+</p>
+
+These public reports are built from an explicit allowlist, not by redacting a production report. The production GenomeLens report is a separate internal artifact and is not published.
+
 ## It runs, on real public genomes
 
 GenomeLens is exercised end-to-end against the [Genome in a Bottle](https://www.nist.gov/programs-projects/genome-bottle) Ashkenazim trio — HG002, HG003, HG004 — using the publicly released GIAB GRCh38 benchmark callsets and defined confident regions. These are real public reference genomes with an external truth set, not mockups or simulations.
