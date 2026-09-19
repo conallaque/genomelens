@@ -1,0 +1,76 @@
+{
+  "schema": "GenomeLens Public Example",
+  "schema_version": "public-example-1",
+  "synthetic": true,
+  "production_payload": false,
+  "notice": "PUBLIC SCHEMA EXAMPLE — SYNTHETIC — NON-PRODUCTION. Illustrative values only; not a benchmark result and not derived from any real genome.",
+
+  "sample": {
+    "id": "SYNTHETIC-DEMO-001",
+    "source_type": "whole-genome variant callset",
+    "reference_build": "GRCh38"
+  },
+
+  "findings": [
+    {
+      "category": "pharmacogenomics",
+      "finding": "Example reduced-function metabolizer phenotype",
+      "disposition": "conditional",
+      "interpretation": "Guideline-actionable for a specific drug class. Economics withheld because no relevant prescription or indication is known for this sample.",
+      "evidence": "Public pharmacogenomic guideline (citation accompanies each real finding)"
+    },
+    {
+      "category": "carrier",
+      "finding": "Example autosomal-recessive carrier result",
+      "disposition": "supported",
+      "interpretation": "Carrier status. Reproductive relevance is reported in a separate economic arm and is not attributed to this individual's own health value.",
+      "evidence": "Public variant classification source"
+    },
+    {
+      "category": "structural",
+      "finding": "Example copy-number-dependent locus",
+      "disposition": "refused",
+      "interpretation": "Phenotype depends on copy number, which a variant callset does not measure. No diplotype is claimed. A refusal here is not a negative result.",
+      "evidence": "Not assessable in this modality"
+    }
+  ],
+
+  "economics": {
+    "perspective": "healthcare sector",
+    "time_horizon_years": 10,
+    "discount_rate": 0.03,
+    "willingness_to_pay_per_qaly": 100000,
+
+    "reference_case": {
+      "incremental_cost": 250.0,
+      "incremental_qaly": 0.01,
+      "nmb": 750.0,
+      "icer": 25000.0,
+      "status": "modeled",
+      "evidence_basis": "scenario/example"
+    },
+
+    "dispositions": {
+      "modeled": 1,
+      "conditional": 1,
+      "refused": 1,
+      "unresolved": 0,
+      "not_economically_applicable": 0
+    },
+
+    "not_summed": [
+      "reference-case and canonical pathway results answer different questions",
+      "reproductive and family arms accrue to different beneficiaries",
+      "action value and information value are not automatically additive"
+    ],
+
+    "absent_is_not_zero": "A pathway that could not be evaluated is reported as unresolved or refused. It is never rendered as 0."
+  },
+
+  "limitations": [
+    "Synthetic illustrative values; not a benchmark result.",
+    "Research software. Not a diagnostic device. Not medical advice.",
+    "Modeled economics are not realized savings.",
+    "Capabilities requiring read-level evidence are not exercised by a variant callset."
+  ]
+}
