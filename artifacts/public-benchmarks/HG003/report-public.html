@@ -1,0 +1,99 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<title>GenomeLens — public demonstration — HG003</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:44px 52px;font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",
+ Inter,Helvetica,Arial,sans-serif;color:#10151c;background:#fff;-webkit-font-smoothing:antialiased}
+.wrap{max-width:860px;margin:0 auto}
+header{border-bottom:2px solid #10151c;padding-bottom:18px;margin-bottom:26px}
+.brand{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#5b6472;font-weight:600}
+h1{font-size:30px;margin:8px 0 4px;letter-spacing:-.02em;font-weight:680}
+.sample{font-size:19px;color:#2b3442;font-weight:600}
+.note{font-size:12.5px;color:#5b6472;margin-top:14px;line-height:1.5;max-width:70ch}
+h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#5b6472;
+ margin:34px 0 12px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{border:1px solid #dfe3e8;border-radius:8px;padding:13px 15px;background:#fbfcfd}
+.card .k{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:#6b7482}
+.card .v{font-size:23px;font-weight:660;margin-top:5px;letter-spacing:-.02em}
+.card .v.sm{font-size:15px;font-weight:600}
+.big{border-color:#c8d2de;background:#f2f6fb}
+.big .v{color:#11305c}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px}
+th{text-align:left;font-size:11px;letter-spacing:.07em;text-transform:uppercase;
+ color:#6b7482;font-weight:700;border-bottom:1px solid #dfe3e8;padding:0 10px 7px 0}
+td{padding:11px 10px 11px 0;border-bottom:1px solid #eef1f4;vertical-align:top}
+.pill{display:inline-block;font-size:11px;font-weight:650;padding:3px 9px;border-radius:99px;
+ border:1px solid;letter-spacing:.02em;white-space:nowrap}
+.supported{color:#0d5a2b;border-color:#a8d8b9;background:#eefaf1}
+.conditional{color:#7a4b06;border-color:#e6cf9a;background:#fdf6e7}
+.unresolved{color:#3b4551;border-color:#cfd6de;background:#f4f6f8}
+.notassessed{color:#3b4551;border-color:#cfd6de;background:#f4f6f8}
+.muted{color:#6b7482;font-size:13px}
+ul.lim{margin:6px 0 0;padding-left:19px;color:#3b4551;font-size:13.5px}
+ul.lim li{margin:5px 0}
+footer{margin-top:34px;padding-top:16px;border-top:1px solid #dfe3e8;
+ font-size:12px;color:#6b7482;display:flex;justify-content:space-between;gap:20px}
+a{color:#11305c}
+@media print{body{padding:26px 30px}}
+</style></head><body><div class="wrap">
+<header>
+  <div class="brand">GenomeLens</div>
+  <h1>Public whole-genome demonstration</h1>
+  <div class="sample">HG003 &middot; Genome in a Bottle</div>
+  <p class="note">Sanitized public demonstration generated from an end-to-end GenomeLens analysis of publicly released Genome in a Bottle data.<br>This public report contains a selected allowlist of results from the analysis. It is not the production GenomeLens report and does not expose the private analysis engine.</p>
+</header>
+
+<h2>Dataset provenance</h2>
+<div class="grid">
+  <div class="card"><div class="k">Source</div><div class="v sm">Genome in a Bottle</div></div>
+  <div class="card"><div class="k">Reference build</div><div class="v sm">GRCh38</div></div>
+  <div class="card"><div class="k">Benchmark release</div><div class="v sm">v4.2.1</div></div>
+  <div class="card"><div class="k">Benchmark scope</div><div class="v sm">chr1-22</div></div>
+</div>
+
+<h2>External benchmark</h2>
+<div class="grid">
+  <div class="card big"><div class="k">Concordant</div>
+    <div class="v">187/187</div></div>
+  <div class="card"><div class="k">Explicit truth calls</div><div class="v">187</div></div>
+  <div class="card"><div class="k">Mismatches</div><div class="v">0</div></div>
+  <div class="card"><div class="k">Normalization failures</div><div class="v">0</div></div>
+</div>
+<p class="note">Concordance is measured on positions where the truth set states a
+genotype, inside the defined confident regions. It is not whole-genome accuracy,
+not clinical validation, and not an endorsement by NIST or GIAB.</p>
+
+<h2>Selected genomic results</h2>
+<table><thead><tr><th>Finding</th><th>Category</th><th>Disposition</th><th>Evidence basis</th></tr></thead>
+<tbody><tr><td><strong>PTPN22 R620W carrier — autoimmune screening awareness</strong></td><td class='muted'>carrier</td><td><span class='pill unresolved'>unresolved</span></td><td class='muted'>curated clinical evidence</td></tr><tr><td><strong>Below-median longevity composite (improvement headroom)</strong></td><td class='muted'>longevity</td><td><span class='pill conditional'>conditional</span></td><td class='muted'>published association evidence</td></tr><tr><td><strong>CYP2C19 Rapid Metabolizer (RM) (clopidogrel)</strong></td><td class='muted'>pharmacogenomics</td><td><span class='pill conditional'>conditional</span></td><td class='muted'>published pharmacogenomic guideline evidence</td></tr></tbody></table>
+<p class="note">A representative selection, one per category. The full sanitized
+analysis contains more results than are shown here.</p>
+
+<h2>Health-economic results</h2>
+<div class="grid">
+  <div class="card big"><div class="k">Reference-case NMB</div>
+    <div class="v">$2,295</div></div>
+  <div class="card big"><div class="k">Canonical expected NMB</div>
+    <div class="v">$4,127</div></div>
+  <div class="card"><div class="k">Incremental cost</div>
+    <div class="v sm">-$115</div></div>
+  <div class="card"><div class="k">Incremental QALYs</div>
+    <div class="v sm">0.0218</div></div>
+</div>
+<div class="grid" style="margin-top:12px;grid-template-columns:1fr 3fr">
+  <div class="card"><div class="k">ICER</div><div class="v sm">dominant</div></div>
+  <div class="card"><div class="k">Note</div><div class="v sm" style="font-weight:500;font-size:13px">
+    Reference-case and canonical pathway results answer different questions and are never summed.</div></div>
+</div>
+
+<h2>Scope and limitations</h2>
+<ul class="lim"><li>Public demonstration output; not clinical validation.</li><li>Benchmark scope is limited to the stated GIAB panel and chr1-22.</li><li>Modeled economics are not realized savings.</li><li>Representative findings only; the full sanitized report is the complete output.</li></ul>
+
+<footer>
+  <span>Methods and validation: <a href="../../../docs/VALIDATION.md">VALIDATION.md</a>
+  &middot; <a href="../../../docs/ECONOMICS.md">ECONOMICS.md</a>
+  &middot; <a href="../../../docs/LIMITATIONS.md">LIMITATIONS.md</a></span>
+  <span>Research software. Not a diagnostic device. Not medical advice.</span>
+</footer>
+</div></body></html>

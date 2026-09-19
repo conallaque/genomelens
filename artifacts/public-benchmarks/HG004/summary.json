@@ -1,0 +1,48 @@
+{
+  "sample": "HG004",
+  "dataset": {
+    "source": "Genome in a Bottle",
+    "reference_build": "GRCh38",
+    "benchmark_release": "v4.2.1",
+    "benchmark_scope": "chr1-22"
+  },
+  "validation": {
+    "explicit_truth_calls": 170,
+    "concordant": 170,
+    "mismatches": 0,
+    "normalization_failures": 0
+  },
+  "findings": [
+    {
+      "name": "Below-median longevity composite (improvement headroom)",
+      "category": "longevity",
+      "disposition": "conditional",
+      "evidence_basis": "published association evidence"
+    },
+    {
+      "name": "CYP2C9 Intermediate Metabolizer (IM) (warfarin)",
+      "category": "pharmacogenomics",
+      "disposition": "conditional",
+      "evidence_basis": "published pharmacogenomic guideline evidence"
+    },
+    {
+      "name": "Elevated coronary-artery-disease polygenic risk",
+      "category": "polygenic risk",
+      "disposition": "conditional",
+      "evidence_basis": "published association evidence"
+    }
+  ],
+  "economics": {
+    "reference_case_nmb_usd": 937,
+    "canonical_expected_nmb_usd": 1304,
+    "incremental_cost_usd": 85,
+    "incremental_qaly": 0.0102,
+    "icer": 8286
+  },
+  "limitations": [
+    "Public demonstration output; not clinical validation.",
+    "Benchmark scope is limited to the stated GIAB panel and chr1-22.",
+    "Modeled economics are not realized savings.",
+    "Representative findings only; the full sanitized report is the complete output."
+  ]
+}

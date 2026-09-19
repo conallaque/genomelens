@@ -1,0 +1,48 @@
+{
+  "sample": "HG003",
+  "dataset": {
+    "source": "Genome in a Bottle",
+    "reference_build": "GRCh38",
+    "benchmark_release": "v4.2.1",
+    "benchmark_scope": "chr1-22"
+  },
+  "validation": {
+    "explicit_truth_calls": 187,
+    "concordant": 187,
+    "mismatches": 0,
+    "normalization_failures": 0
+  },
+  "findings": [
+    {
+      "name": "PTPN22 R620W carrier \u2014 autoimmune screening awareness",
+      "category": "carrier",
+      "disposition": "unresolved",
+      "evidence_basis": "curated clinical evidence"
+    },
+    {
+      "name": "Below-median longevity composite (improvement headroom)",
+      "category": "longevity",
+      "disposition": "conditional",
+      "evidence_basis": "published association evidence"
+    },
+    {
+      "name": "CYP2C19 Rapid Metabolizer (RM) (clopidogrel)",
+      "category": "pharmacogenomics",
+      "disposition": "conditional",
+      "evidence_basis": "published pharmacogenomic guideline evidence"
+    }
+  ],
+  "economics": {
+    "reference_case_nmb_usd": 2295,
+    "canonical_expected_nmb_usd": 4127,
+    "incremental_cost_usd": -115,
+    "incremental_qaly": 0.0218,
+    "icer": "dominant"
+  },
+  "limitations": [
+    "Public demonstration output; not clinical validation.",
+    "Benchmark scope is limited to the stated GIAB panel and chr1-22.",
+    "Modeled economics are not realized savings.",
+    "Representative findings only; the full sanitized report is the complete output."
+  ]
+}
