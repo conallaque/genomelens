@@ -28,7 +28,7 @@ REPORT + PROVENANCE
 
 **Economically evidenced.** Each input to a monetary result carries a provenance tier: published, derived by a stated step, or declared assumption. The composition of those tiers is reported alongside the result.
 
-**Terminal disposition.** Every tracked pathway ends in a defined state — modeled, conditional, unresolved, refused, or not economically applicable. Nothing falls through silently, and a value that could not be computed is never rendered as `$0`.
+**Terminal disposition.** Every tracked pathway ends in a defined state (see [`GLOSSARY.md`](GLOSSARY.md)) — modeled, conditional, unresolved, refused, or not economically applicable. Nothing falls through silently, and a value that could not be computed is never rendered as `$0`.
 
 **Report and provenance.** Outputs carry the inputs, versions and scope that produced them.
 

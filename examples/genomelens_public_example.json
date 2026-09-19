@@ -4,13 +4,11 @@
   "synthetic": true,
   "production_payload": false,
   "notice": "PUBLIC SCHEMA EXAMPLE — SYNTHETIC — NON-PRODUCTION. Illustrative values only; not a benchmark result and not derived from any real genome.",
-
   "sample": {
     "id": "SYNTHETIC-DEMO-001",
     "source_type": "whole-genome variant callset",
     "reference_build": "GRCh38"
   },
-
   "findings": [
     {
       "category": "pharmacogenomics",
@@ -34,39 +32,70 @@
       "evidence": "Not assessable in this modality"
     }
   ],
-
   "economics": {
     "perspective": "healthcare sector",
     "time_horizon_years": 10,
     "discount_rate": 0.03,
     "willingness_to_pay_per_qaly": 100000,
-
-    "reference_case": {
-      "incremental_cost": 250.0,
-      "incremental_qaly": 0.01,
-      "nmb": 750.0,
-      "icer": 25000.0,
-      "status": "modeled",
-      "evidence_basis": "scenario/example"
-    },
-
-    "dispositions": {
+    "arms": [
+      {
+        "estimand": "reference_case",
+        "beneficiary": "sequenced individual",
+        "status": "modeled",
+        "evidence_basis": "model/scenario assumption",
+        "incremental_cost": 250.0,
+        "incremental_qaly": 0.01,
+        "nmb": 750.0,
+        "icer": 25000.0,
+        "icer_delta_cost_sign": "positive",
+        "icer_delta_qaly_sign": "positive"
+      },
+      {
+        "estimand": "reproductive",
+        "beneficiary": "prospective child",
+        "status": "conditional",
+        "evidence_basis": "conditional",
+        "incremental_cost": null,
+        "incremental_qaly": null,
+        "nmb": null,
+        "icer": null,
+        "withheld_because": "The condition that would make this arm live is not known for this sample.",
+        "never_summed_with": [
+          "reference_case"
+        ]
+      },
+      {
+        "estimand": "testing_replacement",
+        "beneficiary": "payer",
+        "status": "not_economically_applicable",
+        "evidence_basis": "not economically applicable",
+        "incremental_cost": null,
+        "incremental_qaly": null,
+        "nmb": null,
+        "icer": null,
+        "withheld_because": "No assay is substituted for in this example."
+      }
+    ],
+    "arm_dispositions": {
       "modeled": 1,
       "conditional": 1,
-      "refused": 1,
+      "refused": 0,
       "unresolved": 0,
-      "not_economically_applicable": 0
+      "not_economically_applicable": 1
     },
-
+    "finding_dispositions": {
+      "supported": 1,
+      "conditional": 1,
+      "refused": 1
+    },
+    "disposition_axes": "Findings and economic arms are counted on two different axes and are not the same list. See docs/GLOSSARY.md.",
     "not_summed": [
       "reference-case and canonical pathway results answer different questions",
       "reproductive and family arms accrue to different beneficiaries",
       "action value and information value are not automatically additive"
     ],
-
     "absent_is_not_zero": "A pathway that could not be evaluated is reported as unresolved or refused. It is never rendered as 0."
   },
-
   "limitations": [
     "Synthetic illustrative values; not a benchmark result.",
     "Research software. Not a diagnostic device. Not medical advice.",

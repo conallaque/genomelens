@@ -1,7 +1,7 @@
 # Release status
 
-What this release publishes, what it withholds, and why. Each item elsewhere in
-the repository that is marked `OWNER REVIEW` or `METHODS HOLD` links here.
+What this release publishes, what it withholds, and why. Items elsewhere in the repository
+that are withheld from this release link here.
 
 Publishing this list is deliberate. A result that is not yet attributable to a
 specific engine build is not published as evidence — that rule is stated in
@@ -36,7 +36,7 @@ per build and are not published in this release.
 <a id="methods-hold"></a>
 ## Numerical value-of-information examples — withheld
 
-`METHODS HOLD`. Numerical value-of-information examples are withheld pending
+Numerical value-of-information examples are withheld pending
 review of one treatment-effect parameter. The methods are published in
 [`ECONOMICS.md`](ECONOMICS.md#uncertainty); the numbers are not.
 
@@ -45,6 +45,11 @@ inversely proportional, so figures derived from it are not reported in either
 direction until the review concludes. Publishing a number whose sign is not
 established would contradict the evidence discipline the rest of this
 repository describes.
+
+<a id="benchmark-manifest"></a>
+## Benchmark manifest — not in this release
+
+The benchmark figure is published without its truth-set release version, confident-region file identity, engine build identifier, retrieval date, or the rule by which benchmarked positions were selected. [`VALIDATION.md`](VALIDATION.md#provenance) sets the standard that a result must be attributable to a specific build to count as evidence; this release does not yet meet it for that figure. Publishing the manifest is the next planned addition.
 
 <a id="synthetic-cohort"></a>
 ## Synthetic stress cohort — designed, not yet run
@@ -57,8 +62,8 @@ prevalence or clinical validity.
 <a id="ai-assistance"></a>
 ## Creator role and AI-assisted development
 
-The disclosure in [`PROJECT-SCOPE.md`](PROJECT-SCOPE.md#creator-role) describes
-how the project was directed and implemented. Its wording is under owner review.
+How the project was directed and implemented is described in
+[`PROJECT-SCOPE.md`](PROJECT-SCOPE.md#creator-role).
 
 ---
 
