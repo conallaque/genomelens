@@ -49,6 +49,35 @@ Per sample: [HG002](https://www.nist.gov/programs-projects/genome-bottle) [169](
 
 **What that is not.** Not 100% whole-genome accuracy. Not clinical validation. Not an endorsement by NIST or GIAB. It is agreement on the explicitly benchmarked calls inside the defined truth and callability scope — a denominator we publish rather than hide.
 
+## Validation and QA
+
+[![Public validation](https://github.com/conallaque/genomelens/actions/workflows/public-validation.yml/badge.svg)](https://github.com/conallaque/genomelens/actions/workflows/public-validation.yml)
+
+GenomeLens is developed against a private automated regression suite covering
+genomic interpretation, evidence handling, health economics, uncertainty,
+reproducibility and reporting. Current private-engine release run:
+**5,397 passing · 2 known residual failures · 24 skipped**, with both residual
+failures tracked outside the three published demonstration paths. Exact status
+in [`docs/TESTING.md`](docs/TESTING.md).
+
+That suite stays private, because a test asserting what the engine does under a
+given input is a specification of the engine. So a **representative public
+verification suite** ships here instead, written from the published artifacts
+outward rather than by exporting private tests. It is purpose-built
+around the public claims — not a sample drawn from the private suite — and lets
+what this repository publishes be inspected independently. **Public validation:
+137 checks.**
+
+```bash
+pytest tests/public                     # 137 checks over the published artifacts
+python tools/verify_public_release.py   # one-command release verification
+```
+
+Both read only files committed to this repository — no network, no credentials,
+no engine dependency, so a fresh clone can run them.
+
+[Public validation suite](tests/public) · [Testing methodology](docs/TESTING.md)
+
 ## What a report contains
 
 Each run produces a genomic and health-economic report containing: supported findings, carrier status, pharmacogenomics, callability and source state; evidence provenance per finding; reference-case and standardized pathway economics; incremental cost, incremental QALYs, ICER or dominance; probabilistic sensitivity analysis; explicit refusals and limitations.
