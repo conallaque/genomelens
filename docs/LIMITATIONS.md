@@ -12,7 +12,7 @@ The reported concordance covers positions where the truth set states a genotype,
 
 ## Modality
 
-A SNV/indel variant callset cannot resolve every genomic event. Copy number, structural variants, repeat expansions, some star-allele architectures and mitochondrial heteroplasmy are **not claimed as production-supported**. Capabilities requiring read-level evidence are not exercised by a variant callset alone, and results are labeled accordingly rather than presented at uniform confidence.
+A SNV/indel variant callset cannot resolve every genomic event. Copy number, structural variants, repeat expansions, some star-allele architectures, HLA typing and mitochondrial heteroplasmy are **not claimed as production-supported**. Capabilities requiring read-level evidence are not exercised by a variant callset alone, and results are labeled accordingly rather than presented at uniform confidence.
 
 ## Difficult regions
 
@@ -24,13 +24,15 @@ A locus never interrogated is not a locus that came back normal. GenomeLens dist
 
 ## Pharmacogenomic conditionality
 
-Guideline actionability is not the same as a decision in play. Where the relevant medication or indication is unknown, the finding is reported and the economics are withheld. Published economics therefore understate what would be realized if prescribing context were known — deliberately.
+Guideline actionability is not the same as a decision in play. Where the relevant medication or indication is unknown, the finding is reported and the economics are withheld. Published economics therefore **may** understate what would be realized if prescribing context were known. The direction is not signed by the model: a withheld pathway with negative net monetary benefit at the stated threshold would move the total the other way.
 
 ## Model dependence
 
 Results depend on assumed treatment effects, event costs, utility decrements, discount rate, time horizon and willingness-to-pay threshold. Where an assumption's plausible range changes the *sign* of a result, that is disclosed rather than resolved by choosing a convenient value.
 
 ## Ancestry and population
+
+The benchmark itself is one nuclear family of a single ancestry. It establishes nothing about callability in populations with a different variant spectrum or divergent haplotype structure.
 
 Effect estimates and allele frequencies are not uniformly transportable across populations. Where an estimate is transferred from a source population to a different target, that transfer is an assumption.
 

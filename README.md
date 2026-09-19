@@ -11,7 +11,7 @@ WHOLE-GENOME INTERPRETATION → CLINICAL ACTIONABILITY → EVIDENCE PROVENANCE
 
 ## It runs, on real public genomes
 
-GenomeLens is exercised end-to-end against the Genome in a Bottle Ashkenazim trio — HG002, HG003, HG004 — using the publicly released GIAB GRCh38 benchmark callsets and defined confident regions. These are real public reference genomes with an external truth set, not mockups or simulations.
+GenomeLens is exercised end-to-end against the [Genome in a Bottle](https://www.nist.gov/programs-projects/genome-bottle) Ashkenazim trio — HG002, HG003, HG004 — using the publicly released GIAB GRCh38 benchmark callsets and defined confident regions. These are real public reference genomes with an external truth set, not mockups or simulations.
 
 ```
 526 / 526  explicit benchmarked calls concordant
@@ -19,15 +19,15 @@ GenomeLens is exercised end-to-end against the Genome in a Bottle Ashkenazim tri
   0        normalization failures
 ```
 
-Per sample: [HG002](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/HG002_NA24385_son/) [169](docs/VALIDATION.md#hg002), [HG003](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/HG003_NA24149_father/) [187](docs/VALIDATION.md#hg003), [HG004](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/HG004_NA24143_mother/) [170](docs/VALIDATION.md#hg004).
+Per sample: [HG002](https://www.nist.gov/programs-projects/genome-bottle) [169](docs/VALIDATION.md#hg002), [HG003](https://www.nist.gov/programs-projects/genome-bottle) [187](docs/VALIDATION.md#hg003), [HG004](https://www.nist.gov/programs-projects/genome-bottle) [170](docs/VALIDATION.md#hg004). The three are a father–mother–son trio, so the calls are not statistically independent.
 
 **What that is not.** Not 100% whole-genome accuracy. Not clinical validation. Not an endorsement by NIST or GIAB. It is agreement on the explicitly benchmarked calls inside the defined truth and callability scope — a denominator we publish rather than hide.
 
-## The output is real, and inspectable
+## What a report contains
 
-Each run produces a genomic and health-economic report. This repository is intended to carry sanitized versions of real generated reports, not illustrative mock-ups: supported findings, carrier status, pharmacogenomics, callability and source state; evidence provenance per finding; reference-case and standardized pathway economics; incremental cost, incremental QALYs, ICER or dominance; probabilistic sensitivity analysis; explicit refusals and limitations.
+Each run produces a genomic and health-economic report containing: supported findings, carrier status, pharmacogenomics, callability and source state; evidence provenance per finding; reference-case and standardized pathway economics; incremental cost, incremental QALYs, ICER or dominance; probabilistic sensitivity analysis; explicit refusals and limitations.
 
-[`OWNER REVIEW`](docs/RELEASE-STATUS.md#trio-reports) — sanitized trio reports must be regenerated through the public export profile before publication.
+Reports are published only through the allowlist export profile in [`PUBLIC-REPORT-SPEC.md`](docs/PUBLIC-REPORT-SPEC.md). A sanitized trio report is [not published in this release](docs/RELEASE-STATUS.md#trio-reports).
 
 ## It does not price a genome
 
@@ -37,7 +37,7 @@ Seven estimands are kept distinct — reference-case · canonical standardized p
 
 Action value and information value can represent closely related economic consequences viewed from different decision perspectives, so GenomeLens does not automatically add them.
 
-[`OWNER REVIEW — VERIFY AGAINST FINAL SANITIZED ENGINE BUILD`](docs/RELEASE-STATUS.md#trio-economics) — previously published trio headline economics predate the current engine state and must be regenerated before republication.
+Headline trio economics are regenerated against each engine build and published only with the build identifier that produced them. None is [published in this release](docs/RELEASE-STATUS.md#trio-economics).
 
 ## Evidence, assumption, and refusal are different states
 
@@ -46,21 +46,23 @@ EVIDENCE-DERIVED · MODEL / SCENARIO ASSUMPTION · CONDITIONAL
 UNRESOLVED · REFUSED · NOT ECONOMICALLY APPLICABLE
 ```
 
+Findings and economic arms are classified on two separate axes; both vocabularies are defined in [`GLOSSARY.md`](docs/GLOSSARY.md).
+
 A missing value is never silently converted to $0. A pathway that could not be evaluated and one evaluated at zero are different facts.
 
 A refusal is not a negative biological result. Declining to monetize a finding says nothing about whether the finding is real.
 
 An explicit economic-validation matrix requires every tracked pathway to terminate in a defined disposition rather than falling silently through the model. The claim is "every tracked row reaches an explicit terminal disposition" — coverage and accountability, not a claim that every row is empirically validated.
 
-[`OWNER REVIEW`](docs/RELEASE-STATUS.md#matrix-counts) — verify current matrix counts against the final sanitized engine build before publishing them.
+The matrix counts themselves are regenerated per build and are [not published in this release](docs/RELEASE-STATUS.md#matrix-counts).
 
 ## Uncertainty and value of information
 
 GenomeLens carries probabilistic sensitivity analysis, decision-uncertainty summaries, and value-of-information methods for asking whether resolving additional clinical uncertainty could change a modeled decision — and whether that information is worth its acquisition cost.
 
-The current lipid value-of-information pathway is driven by clinical decision state, not genomic variation. Holding clinical state fixed and changing the genome does not change it. This is a property of the current model, not a claim that genomes are irrelevant to lipid decisions.
+In the current lipid value-of-information pathway, holding clinical state fixed and changing the genome does not change the result. This is a property of the current model, not a claim that genomes are irrelevant to lipid decisions — and because it derives from the same model as the withheld figures below, it is reported as a current model property rather than as an established finding.
 
-[`METHODS HOLD`](docs/RELEASE-STATUS.md#methods-hold) — numerical value-of-information examples are withheld pending review of one treatment-effect parameter. `[REGENERATE AFTER METHODS REVIEW]`
+Numerical value-of-information examples are [not published in this release](docs/RELEASE-STATUS.md#methods-hold), pending review of one treatment-effect parameter.
 
 ## Where GenomeLens stops
 

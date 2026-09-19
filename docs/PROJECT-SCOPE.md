@@ -143,9 +143,6 @@ engineering. The design decisions, evidence standards, validation requirements
 and methodological corrections above are the project's own work, and are what
 the public material is intended to evidence.
 
-[`OWNER REVIEW`](RELEASE-STATUS.md#ai-assistance) — the wording of the AI-assisted development disclosure in the
-preceding paragraph is pending owner approval before publication.
-
 ## What is public, and what is not
 
 Public: methodology, validation design and results, architecture at the level
