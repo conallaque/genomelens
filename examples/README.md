@@ -1,6 +1,6 @@
 # Examples
 
-## `genomelens_public_example.json`
+## [`genomelens_public_example.json`](genomelens_public_example.json)
 
 A **public schema example**. It shows the shape of an integration payload — findings with dispositions, economic results with their evidence basis, and explicit limitations — using synthetic values.
 

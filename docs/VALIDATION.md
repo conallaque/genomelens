@@ -12,6 +12,48 @@ GenomeLens is run end-to-end against the Genome in a Bottle Ashkenazim trio — 
 
 Per sample: HG002 169, HG003 187, HG004 170.
 
+## Per sample
+
+<a id="hg002"></a>
+
+### HG002
+
+**Sample ID** — HG002 / NA24385 (son), [GIAB Ashkenazim trio](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/HG002_NA24385_son/).
+
+**Benchmarked calls** — 169, all concordant. Zero mismatches, zero normalization failures.
+
+**Truth and callability scope** — the GIAB GRCh38 benchmark callset for this sample, restricted to its defined confident regions.
+
+The 169 counts **explicit calls compared within the GIAB benchmark scope** — positions where the truth set states a genotype. Positions the truth set declines to state are reported as callability, not as agreement.
+
+<a id="hg003"></a>
+
+### HG003
+
+**Sample ID** — HG003 / NA24149 (father), [GIAB Ashkenazim trio](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/HG003_NA24149_father/).
+
+**Benchmarked calls** — 187, all concordant. Zero mismatches, zero normalization failures.
+
+**Truth and callability scope** — the GIAB GRCh38 benchmark callset for this sample, restricted to its defined confident regions.
+
+The 187 counts **explicit calls compared within the GIAB benchmark scope** — positions where the truth set states a genotype. Positions the truth set declines to state are reported as callability, not as agreement.
+
+<a id="hg004"></a>
+
+### HG004
+
+**Sample ID** — HG004 / NA24143 (mother), [GIAB Ashkenazim trio](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/HG004_NA24143_mother/).
+
+**Benchmarked calls** — 170, all concordant. Zero mismatches, zero normalization failures.
+
+**Truth and callability scope** — the GIAB GRCh38 benchmark callset for this sample, restricted to its defined confident regions.
+
+The 170 counts **explicit calls compared within the GIAB benchmark scope** — positions where the truth set states a genotype. Positions the truth set declines to state are reported as callability, not as agreement.
+
+Per-sample counts sum to the 526 reported above (169 + 187 + 170).
+
+---
+
 ## The denominator, stated
 
 The figure counts positions where the truth set **states a genotype**. Positions the truth set declines to state are not counted as agreement — they are reported separately as a callability result. Counting them toward concordance would inflate it.
@@ -34,4 +76,4 @@ A synthetic whole-genome **variant-call** cohort is designed to test behavior at
 
 It is explicitly **planned and not yet executed**, and when it runs it will answer a different question from the GIAB benchmark. Synthetic inputs test stability and coherence at scale; they are not evidence of real-world accuracy, disease prevalence, or clinical validity, and they do not substitute for real-genome validation.
 
-`OWNER REVIEW` — do not describe this cohort as existing until it has run.
+[`OWNER REVIEW`](RELEASE-STATUS.md#synthetic-cohort) — do not describe this cohort as existing until it has run.

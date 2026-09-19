@@ -64,7 +64,7 @@ and value-of-information. Where a benefit is estimable but its real-world cost
 is not adequately sourced, the model can report a maximum model-consistent cost
 bound instead of inventing a price or treating the unknown as zero.
 
-See `ECONOMICS.md`.
+See [`ECONOMICS.md`](ECONOMICS.md).
 
 ## Genomic and bioinformatic work
 
@@ -81,7 +81,7 @@ states, and collapsing them into "negative" is how false reassurance gets
 manufactured. Variant normalization and truth-scope handling are part of the
 benchmark rather than a preprocessing detail.
 
-See `ARCHITECTURE.md` and `LIMITATIONS.md`.
+See [`ARCHITECTURE.md`](ARCHITECTURE.md) and [`LIMITATIONS.md`](LIMITATIONS.md).
 
 ## Validation and QA
 
@@ -103,7 +103,7 @@ economic identities, fail-closed behavior on unknown inputs, and explicit
 refusal states. A synthetic stress cohort is designed but **not yet run**, and
 is described as planned rather than existing.
 
-See `VALIDATION.md`.
+See [`VALIDATION.md`](VALIDATION.md).
 
 ## Product and system design
 
@@ -119,7 +119,7 @@ reporting afterthought: the report shows not only the result but what the
 result depends on, and which parts of it rest on published evidence, a derived
 step, or a declared assumption.
 
-See `PUBLIC-REPORT-SPEC.md` and `../partner/OVERVIEW.md`.
+See [`PUBLIC-REPORT-SPEC.md`](PUBLIC-REPORT-SPEC.md) and [`OVERVIEW.md`](../partner/OVERVIEW.md).
 
 ## Research communication
 
@@ -143,7 +143,7 @@ engineering. The design decisions, evidence standards, validation requirements
 and methodological corrections above are the project's own work, and are what
 the public material is intended to evidence.
 
-`OWNER REVIEW` — the wording of the AI-assisted development disclosure in the
+[`OWNER REVIEW`](RELEASE-STATUS.md#ai-assistance) — the wording of the AI-assisted development disclosure in the
 preceding paragraph is pending owner approval before publication.
 
 ## What is public, and what is not
