@@ -33,12 +33,14 @@
     }
   ],
   "economics": {
-    "reference_case_nmb_usd": 937,
-    "canonical_expected_nmb_usd": 1304,
-    "incremental_cost_usd": 85,
-    "incremental_qaly": 0.0102,
-    "icer": 8286
+    "reference_case_nmb_usd": 138.56,
+    "canonical_expected_nmb_usd": 765.0,
+    "incremental_cost_usd": 588.49,
+    "incremental_qaly": 0.0073,
+    "icer": 80943,
+    "probability_cost_effective_pct": 49.4
   },
+  "evidence_basis": "Genomic findings rest on published association evidence; published pharmacogenomic guideline evidence. The economic figures are modeled estimates built on published evidence and stated assumptions, not realized savings.",
   "limitations": [
     "Public demonstration output; not clinical validation.",
     "Benchmark scope is limited to the stated GIAB panel and chr1-22.",

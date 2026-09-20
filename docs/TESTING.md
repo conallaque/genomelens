@@ -23,11 +23,11 @@ private tests with assertions removed.
 
 | | Private production suite | Public verification suite |
 |---|---|---|
-| Scale | **5,397 passing · 2 known residual failures · 24 skipped** | **62 test functions · 155 collected checks: 154 passed, 1 skipped** |
+| Scale | **5,446 passing · 2 known residual failures · 24 skipped** | **155 collected checks: 155 passed** |
 | Tests | implementation behavior under given inputs | the claims and artifacts this repository publishes |
 | Published | no | yes — [`tests/public/`](../tests/public) |
 
-**The 155 public checks are not a sample of the 5,397.** They were written from
+**The 155 public checks are not a sample of the 5,446.** They were written from
 the published artifacts outward and verify different things. A private test
 asserting what the engine does under a given input is a specification of that
 engine; enough of them describe the mechanism this repository withholds. A
@@ -40,7 +40,7 @@ figure was produced.
 Release build of the private engine:
 
 ```
-5,397 passed
+5,446 passed
     2 failed   (known, tracked)
    24 skipped
 ```
@@ -89,10 +89,14 @@ Run them with:
 pytest tests/public
 ```
 
-The current result is `154 passed, 1 skipped` out of 155 collected. The skip is
-the cost-effectiveness ratio check on the one published case that is dominant —
-a dominant strategy has no interpretable ratio, so there is nothing to compare.
-The verifier prints the skip reason rather than hiding it: a skip whose reason
+The current result is `155 passed` out of 155 collected, with no skip.
+
+That skip used to exist and its disappearance is a result, not a cleanup: it
+was the cost-effectiveness ratio check on the one published case that was
+dominant, and a dominant strategy has no interpretable ratio to compare. No
+published case is dominant any more — whole-genome sequencing is now priced at
+its list price rather than a promotional one — so the check runs. The verifier
+still prints any skip reason rather than hiding it, because a skip whose reason
 is unstated is indistinguishable from a check that was quietly dropped.
 
 Or verify the whole release in one command:

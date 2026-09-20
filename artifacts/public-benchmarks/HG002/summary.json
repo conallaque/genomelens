@@ -14,7 +14,7 @@
   },
   "findings": [
     {
-      "name": "PTPN22 R620W carrier \u2014 autoimmune screening awareness",
+      "name": "Celiac Disease Susceptibility (second-most-common allele) carrier -- susceptibility_allele",
       "category": "carrier",
       "disposition": "unresolved",
       "evidence_basis": "curated clinical evidence"
@@ -33,12 +33,14 @@
     }
   ],
   "economics": {
-    "reference_case_nmb_usd": 957,
-    "canonical_expected_nmb_usd": 1239,
-    "incremental_cost_usd": 367,
-    "incremental_qaly": 0.0132,
-    "icer": 27734
+    "reference_case_nmb_usd": 158.72,
+    "canonical_expected_nmb_usd": 700.0,
+    "incremental_cost_usd": 871.1,
+    "incremental_qaly": 0.0103,
+    "icer": 84588,
+    "probability_cost_effective_pct": 51.9
   },
+  "evidence_basis": "Genomic findings rest on curated clinical evidence; published association evidence; published pharmacogenomic guideline evidence. The economic figures are modeled estimates built on published evidence and stated assumptions, not realized savings.",
   "limitations": [
     "Public demonstration output; not clinical validation.",
     "Benchmark scope is limited to the stated GIAB panel and chr1-22.",

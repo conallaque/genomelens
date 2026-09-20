@@ -13,11 +13,16 @@ WHOLE-GENOME INTERPRETATION → CLINICAL ACTIONABILITY → EVIDENCE PROVENANCE
 
 GenomeLens was run end to end on three publicly released Genome in a Bottle whole-genome callsets. The reports below are sanitized public outputs from those runs — real results, not mock-ups.
 
-| Sample | GIAB concordance | Reference-case NMB | Canonical expected NMB | Report |
-|---|---|---|---|---|
-| **HG002** | **169 / 169** · 0 mismatches · 0 normalization failures | **$957** | **$1,239** | [Report (PDF)](artifacts/public-benchmarks/HG002/report-public.pdf) · [Web report](https://conallaque.github.io/genomelens/artifacts/public-benchmarks/HG002/report-public.html) · [JSON](artifacts/public-benchmarks/HG002/summary.json) |
-| **HG003** | **187 / 187** · 0 mismatches · 0 normalization failures | **$2,295** | **$4,127** | [Report (PDF)](artifacts/public-benchmarks/HG003/report-public.pdf) · [Web report](https://conallaque.github.io/genomelens/artifacts/public-benchmarks/HG003/report-public.html) · [JSON](artifacts/public-benchmarks/HG003/summary.json) |
-| **HG004** | **170 / 170** · 0 mismatches · 0 normalization failures | **$937** | **$1,304** | [Report (PDF)](artifacts/public-benchmarks/HG004/report-public.pdf) · [Web report](https://conallaque.github.io/genomelens/artifacts/public-benchmarks/HG004/report-public.html) · [JSON](artifacts/public-benchmarks/HG004/summary.json) |
+| Sample | Explicit truth calls | Concordance | Reference-case NMB | Canonical expected NMB | Incremental cost | Incremental QALY | ICER / status\* | Evidence basis | Report |
+|---|---|---|---|---|---|---|---|---|---|
+| **HG002** | 169 | **100.0%** (169/169, 0 mismatches) | **$158.72** | **$700.00** | $871.10 | 0.0103 | $84,588 | curated clinical, published association, published guideline + modeled economics | [Report (PDF)](artifacts/public-benchmarks/HG002/report-public.pdf) · [Web report](https://conallaque.github.io/genomelens/artifacts/public-benchmarks/HG002/report-public.html) · [JSON](artifacts/public-benchmarks/HG002/summary.json) |
+| **HG003** | 187 | **100.0%** (187/187, 0 mismatches) | **$1,497.24** | **$3,588.00** | $388.53 | 0.0189 | $20,603 | curated clinical, published association, published guideline + modeled economics | [Report (PDF)](artifacts/public-benchmarks/HG003/report-public.pdf) · [Web report](https://conallaque.github.io/genomelens/artifacts/public-benchmarks/HG003/report-public.html) · [JSON](artifacts/public-benchmarks/HG003/summary.json) |
+| **HG004** | 170 | **100.0%** (170/170, 0 mismatches) | **$138.56** | **$765.00** | $588.49 | 0.0073 | $80,943 | published association, published guideline + modeled economics | [Report (PDF)](artifacts/public-benchmarks/HG004/report-public.pdf) · [Web report](https://conallaque.github.io/genomelens/artifacts/public-benchmarks/HG004/report-public.html) · [JSON](artifacts/public-benchmarks/HG004/summary.json) |
+
+> **\*** ICER shows the additional cost required to gain one additional
+> quality-adjusted life year (QALY). Lower positive ICERs generally indicate better
+> value at a given willingness-to-pay threshold. **Dominant** means better modeled
+> outcomes at lower cost.
 
 ```
 526 / 526  scoped explicit GIAB truth calls concordant
@@ -26,6 +31,35 @@ GenomeLens was run end to end on three publicly released Genome in a Bottle whol
 ```
 
 Scope: GIAB **v4.2.1** · **GRCh38** · **chr1–22** · a fixed curated validation panel. This is agreement on the explicitly benchmarked calls inside that scope — not whole-genome accuracy, not clinical validation, and not an endorsement by NIST or GIAB. The denominator is published in [`docs/VALIDATION.md`](docs/VALIDATION.md#per-sample).
+
+**What the columns mean**
+
+- **Sample** — The public Genome in a Bottle (GIAB) genome analyzed by GenomeLens.
+- **GIAB concordance** — Of the benchmark positions where the GIAB truth set states a
+  definitive genotype (the *explicit truth calls*, the denominator shown), how many
+  GenomeLens matched. A scoped validation measure over a fixed panel, not a claim of
+  whole-genome accuracy.
+- **Reference-case NMB** — *Net monetary benefit*: the modeled monetary value of
+  expected health gains, minus the additional costs, under the reference-case
+  assumptions. Higher positive values mean greater modeled net benefit at the stated
+  willingness-to-pay threshold.
+- **Canonical expected NMB** — A separate, standardized estimate of expected net benefit
+  across the modeled pathways. It answers a different question from reference-case NMB,
+  so it is not a component of that figure and the two are never added together.
+- **Report** — The sanitized public output for that genome, as a rendered PDF, a web
+  page, and the underlying JSON.
+
+Reference-case and canonical expected NMB answer different modeling questions. They are
+reported side by side rather than combined, because no single number is "the value of
+this genome."
+
+> **For nontechnical readers:** These results are a research demonstration of
+> what GenomeLens can produce from real whole-genome data. The benchmark
+> measures agreement only at the specific GIAB locations tested and is not a
+> claim of whole-genome or clinical accuracy. The health-economic figures are
+> modeled estimates based on published evidence and assumptions; they are not a
+> diagnosis, medical advice, or a statement that a genome is literally “worth” a
+> particular dollar amount.
 
 <p align="center">
   <a href="https://conallaque.github.io/genomelens/artifacts/public-benchmarks/HG002/report-public.html"><img src="artifacts/public-benchmarks/HG002/preview.png" alt="GenomeLens public report, HG002" width="32%"></a>
@@ -59,7 +93,7 @@ Per sample: [HG002](https://www.nist.gov/programs-projects/genome-bottle) [169](
 GenomeLens is developed against a private automated regression suite covering
 genomic interpretation, evidence handling, health economics, uncertainty,
 reproducibility and reporting. Current private-engine release run:
-**5,397 passing · 2 known residual failures · 24 skipped**, with both residual
+**5,446 passing · 2 known residual failures · 24 skipped**, with both residual
 failures tracked outside the three published demonstration paths. Exact status
 in [`docs/TESTING.md`](docs/TESTING.md).
 
@@ -69,10 +103,10 @@ verification suite** ships here instead, written from the published artifacts
 outward rather than by exporting private tests. It is purpose-built
 around the public claims — not a sample drawn from the private suite — and lets
 what this repository publishes be inspected independently. **Public validation:
-155 checks — 154 passed, 1 skipped.**
+155 checks — 155 passed.**
 
 ```bash
-pytest tests/public                     # 155 checks: 154 passed, 1 skipped
+pytest tests/public                     # 155 checks: 155 passed
 python tools/verify_public_release.py   # one-command release verification
 ```
 

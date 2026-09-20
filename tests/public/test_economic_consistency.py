@@ -36,14 +36,25 @@ def test_a_published_icer_is_consistent_with_its_own_components(s):
     assert abs(e["icer"] - expected) <= abs(expected) * 0.01
 
 
-def test_hg003_is_the_dominant_case():
-    """The one published case where the strategy is both cheaper and more
-    effective. Named explicitly because it is the figure most likely to be
-    quoted, and the one where a silent sign flip would be least visible."""
+def test_no_published_case_claims_dominance():
+    """HG003 WAS the dominant case. It is not any more, and that is correct.
+
+    Dominance means cheaper AND more effective. HG003's incremental cost was
+    -$115 when whole-genome sequencing was priced at the vendor's promotional
+    $300. At the $599 list price the same strategy costs $388.53 more than
+    the comparator, so it buys health at a price rather than for free.
+
+    The test is inverted rather than deleted. A dominance claim is the single
+    most quotable thing this repository publishes and the one where a silent
+    sign flip would be least visible, so the guard is kept pointing the other
+    way: no sample may claim dominance while costing more.
+    """
     e = summary("HG003")["economics"]
-    assert e["incremental_cost_usd"] == -115
-    assert e["incremental_qaly"] == 0.0218
-    assert e["icer"] == "dominant"
+    assert e["incremental_cost_usd"] > 0, "HG003 no longer costs less"
+    assert e["icer"] != "dominant"
+    for x in SAMPLES:
+        assert summary(x)["economics"]["icer"] != "dominant", (
+            f"{x} claims dominance; no current published case is dominant")
 
 
 def test_positive_incremental_cost_never_claims_dominance():

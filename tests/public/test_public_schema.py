@@ -14,12 +14,21 @@ would have to be added here deliberately.
 import json
 from conftest import BENCH, SAMPLES, summary
 
-TOP = {"sample", "dataset", "validation", "findings", "economics", "limitations"}
+# WIDENED DELIBERATELY, 2026-09-20. `evidence_basis` is a sample-level
+# roll-up of the per-finding bases already published below it. It names
+# evidence CLASSES only -- never a registry row, tier, routing rule or
+# source map. The allowlist stays closed; it is one key wider.
+TOP = {"sample", "dataset", "validation", "findings", "economics",
+       "evidence_basis", "limitations"}
 DATASET = {"source", "reference_build", "benchmark_release", "benchmark_scope"}
 VALIDATION = {"explicit_truth_calls", "concordant", "mismatches", "normalization_failures"}
 FINDING = {"name", "category", "disposition", "evidence_basis"}
+# `probability_cost_effective_pct` is a single interpretable uncertainty
+# summary. No draw-level detail, no per-pathway decomposition, nothing
+# from which the PSA could be reconstructed.
 ECONOMICS = {"reference_case_nmb_usd", "canonical_expected_nmb_usd",
-             "incremental_cost_usd", "incremental_qaly", "icer"}
+             "incremental_cost_usd", "incremental_qaly", "icer",
+             "probability_cost_effective_pct"}
 
 CATEGORIES = {"carrier", "pharmacogenomics", "polygenic risk", "longevity",
               "wellness", "hereditary condition", "other"}

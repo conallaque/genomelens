@@ -19,9 +19,9 @@ SAMPLES = ("HG002", "HG003", "HG004")
 # in each summary.json and in each report-public.html; the cross-artifact tests
 # exist to prove those three never drift apart.
 PUBLISHED = {
-    "HG002": {"truth_calls": 169, "nmb": 957, "canonical": 1239},
-    "HG003": {"truth_calls": 187, "nmb": 2295, "canonical": 4127},
-    "HG004": {"truth_calls": 170, "nmb": 937, "canonical": 1304},
+    "HG002": {"truth_calls": 169, "nmb": 158.72, "canonical": 700.00},
+    "HG003": {"truth_calls": 187, "nmb": 1497.24, "canonical": 3588.00},
+    "HG004": {"truth_calls": 170, "nmb": 138.56, "canonical": 765.00},
 }
 AGGREGATE = 526
 

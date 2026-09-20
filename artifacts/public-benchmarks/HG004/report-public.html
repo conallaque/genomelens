@@ -35,6 +35,10 @@ ul.lim li{margin:5px 0}
 footer{margin-top:34px;padding-top:16px;border-top:1px solid #dfe3e8;
  font-size:12px;color:#6b7482;display:flex;justify-content:space-between;gap:20px}
 a{color:#11305c}
+.plain{border:1px solid #c8d2de;border-left:4px solid #11305c;background:#f6f9fc;
+ border-radius:6px;padding:13px 16px;margin:20px 0 4px;font-size:13.5px;
+ line-height:1.55;color:#2b3442}
+.plain b{color:#10151c}
 @media print{body{padding:26px 30px}}
 </style></head><body><div class="wrap">
 <header>
@@ -73,27 +77,32 @@ analysis contains more results than are shown here.</p>
 <h2>Health-economic results</h2>
 <div class="grid">
   <div class="card big"><div class="k">Reference-case NMB</div>
-    <div class="v">$937</div></div>
+    <div class="v">$138.56</div></div>
   <div class="card big"><div class="k">Canonical expected NMB</div>
-    <div class="v">$1,304</div></div>
+    <div class="v">$765.00</div></div>
   <div class="card"><div class="k">Incremental cost</div>
-    <div class="v sm">$85</div></div>
+    <div class="v sm">$588.49</div></div>
   <div class="card"><div class="k">Incremental QALYs</div>
-    <div class="v sm">0.0102</div></div>
+    <div class="v sm">0.0073</div></div>
 </div>
-<div class="grid" style="margin-top:12px;grid-template-columns:1fr 3fr">
-  <div class="card"><div class="k">ICER</div><div class="v sm">8,286</div></div>
+<div class="grid" style="margin-top:12px;grid-template-columns:1fr 1fr 2fr">
+  <div class="card"><div class="k">ICER</div><div class="v sm">80,943</div></div>
+  <div class="card"><div class="k">Probability cost-effective</div>
+    <div class="v sm">49.4%</div></div>
   <div class="card"><div class="k">Note</div><div class="v sm" style="font-weight:500;font-size:13px">
     Reference-case and canonical pathway results answer different questions and are never summed.</div></div>
 </div>
+<p class="note"><strong>Evidence basis.</strong> Genomic findings rest on published association evidence; published pharmacogenomic guideline evidence. The economic figures are modeled estimates built on published evidence and stated assumptions, not realized savings.</p>
+
+<div class="plain"><b>For nontechnical readers.</b> These results are a research demonstration of what GenomeLens can produce from real whole-genome data. The benchmark measures agreement only at the specific GIAB locations tested and is not a claim of whole-genome or clinical accuracy. The health-economic figures are modeled estimates based on published evidence and assumptions; they are not a diagnosis, medical advice, or a statement that a genome is literally “worth” a particular dollar amount.</div>
 
 <h2>Scope and limitations</h2>
 <ul class="lim"><li>Public demonstration output; not clinical validation.</li><li>Benchmark scope is limited to the stated GIAB panel and chr1-22.</li><li>Modeled economics are not realized savings.</li><li>Representative findings only; the full sanitized report is the complete output.</li></ul>
 
 <footer>
-  <span>Methods and validation: <a href="../../../docs/VALIDATION.md">VALIDATION.md</a>
-  &middot; <a href="../../../docs/ECONOMICS.md">ECONOMICS.md</a>
-  &middot; <a href="../../../docs/LIMITATIONS.md">LIMITATIONS.md</a></span>
+  <span>Methods and validation: <a href="https://github.com/conallaque/genomelens/blob/main/docs/VALIDATION.md">VALIDATION.md</a>
+  &middot; <a href="https://github.com/conallaque/genomelens/blob/main/docs/ECONOMICS.md">ECONOMICS.md</a>
+  &middot; <a href="https://github.com/conallaque/genomelens/blob/main/docs/LIMITATIONS.md">LIMITATIONS.md</a></span>
   <span>Research software. Not a diagnostic device. Not medical advice.</span>
 </footer>
 </div></body></html>
