@@ -23,11 +23,11 @@ private tests with assertions removed.
 
 | | Private production suite | Public verification suite |
 |---|---|---|
-| Scale | **5,446 passing · 2 known residual failures · 24 skipped** | **155 collected checks: 155 passed** |
+| Scale | **5,446 passing · 2 known residual failures · 24 skipped** | **161 collected checks: 161 passed** |
 | Tests | implementation behavior under given inputs | the claims and artifacts this repository publishes |
 | Published | no | yes — [`tests/public/`](../tests/public) |
 
-**The 155 public checks are not a sample of the 5,446.** They were written from
+**The 161 public checks are not a sample of the 5,446.** They were written from
 the published artifacts outward and verify different things. A private test
 asserting what the engine does under a given input is a specification of that
 engine; enough of them describe the mechanism this repository withholds. A
@@ -89,7 +89,7 @@ Run them with:
 pytest tests/public
 ```
 
-The current result is `155 passed` out of 155 collected, with no skip.
+The current result is `161 passed` out of 161 collected, with no skip.
 
 That skip used to exist and its disappearance is a result, not a cleanup: it
 was the cost-effectiveness ratio check on the one published case that was

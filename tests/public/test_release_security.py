@@ -15,7 +15,26 @@ from conftest import BENCH, ROOT, SAMPLES
 
 TEXT_SUFFIXES = {".md", ".json", ".html", ".yml", ".yaml", ".py", ".txt", ".svg"}
 
-PRIVATE_LOCATIONS = [r"/Users/", r"/home/", r"[A-Za-z]:\\Users\\"]
+# WIDENED AFTER A REAL LEAK GOT PAST THE ORIGINAL THREE PATTERNS.
+#
+# The published PDFs carried
+#   file:///private/tmp/claude-501/-Users-conallaque-Desktop-Claude/<id>/...
+# and every pattern below missed it, for a reason worth stating: the build
+# tool's working directory encodes the home path with HYPHENS, so `-Users-`
+# never matches `/Users/`. A scan tuned to one spelling of a path is a scan
+# that reports clean on the spelling it has not seen.
+#
+# `file://` is listed on its own because the scheme is the real tell: a
+# published artifact should never contain a local-file URI regardless of what
+# follows it.
+PRIVATE_LOCATIONS = [
+    r"/Users/", r"/home/", r"[A-Za-z]:\\Users\\",
+    r"file://",            # any local-file URI, whatever the path
+    r"/private/(?:tmp|var)/",
+    r"/var/folders/",      # macOS per-user temp
+    r"-Users-",            # hyphen-encoded home path in a directory name
+    r"\bscratchpad\b",
+]
 CREDENTIALS = [r"AKIA[0-9A-Z]{16}", r"gh[pousr]_[A-Za-z0-9]{20,}",
                r"-----BEGIN [A-Z ]*PRIVATE KEY", r"[Bb]earer\s+[A-Za-z0-9._\-]{24,}"]
 COMMERCIAL = [r"gross\s+margin", r"per[- ]patient[ /]per[- ]month", r"\bPPPM\b",
@@ -160,3 +179,53 @@ def test_pdf_text_is_scanned_not_just_its_bytes():
         assert len(text) > 500, f"{sample} PDF yielded no extractable text to scan"
         for pattern in PRIVATE_LOCATIONS + COMMERCIAL + WITHHELD_FIGURES:
             assert not re.search(pattern, text, re.I), f"{pattern} in {sample} PDF"
+
+
+def test_pdf_link_annotations_are_scanned_too():
+    """Extracted text does not include a link's TARGET, only its label.
+
+    The published PDFs carried three annotations pointing at
+    `file:///private/tmp/.../docs/VALIDATION.md` -- the build machine's
+    directory layout, embedded as clickable targets. `page.get_text()`
+    returns none of that, so the text scan above reported clean while the
+    leak sat in the annotation dictionaries.
+
+    READ EVERY VALUE IN THE LINK DICT, NOT JUST `uri`. The first version of
+    this test did exactly that and would have passed on the leaky file:
+    PyMuPDF classifies a `file://` target as kind 3 (LAUNCH) and reports the
+    path under `file`, leaving `uri` empty. A scanner that reads one key
+    cannot see a leak the library filed under another.
+
+    Cause of the original leak: relative hrefs in the report footer, which a
+    browser resolves against the file path when printing.
+    """
+    fitz = pytest.importorskip("fitz", reason="PyMuPDF not installed")
+    checked = 0
+    for sample in SAMPLES:
+        doc = fitz.open(BENCH / sample / "report-public.pdf")
+        try:
+            for page in doc:
+                for link in page.get_links():
+                    # Kind 2 is LINK_URI. Anything else in a published report
+                    # -- LAUNCH, GOTOR, an embedded file -- points outside the
+                    # document at something local by construction.
+                    kind = int(link.get("kind", -1))
+                    targets = {k: str(v) for k, v in link.items()
+                               if k in ("uri", "file", "name") and v}
+                    if not targets:
+                        continue
+                    checked += 1
+                    assert kind == getattr(fitz, "LINK_URI", 2), (
+                        f"{sample} PDF has a non-URI link (kind={kind}): {targets}")
+                    for key, val in targets.items():
+                        for pattern in PRIVATE_LOCATIONS:
+                            assert not re.search(pattern, val, re.I), (
+                                f"{sample} PDF link[{key}] leaks a local path: "
+                                f"{val[:90]}")
+                        assert val.startswith(("https://", "mailto:")), (
+                            f"{sample} PDF link[{key}] is not absolute https: "
+                            f"{val[:90]}")
+        finally:
+            doc.close()
+    # A test that found no links to check has proven nothing.
+    assert checked >= 3, f"expected published PDFs to carry links; found {checked}"
