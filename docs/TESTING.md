@@ -37,6 +37,8 @@ figure was produced.
 
 ## Current production-suite status
 
+> **Superseded for the frozen benchmark.** The Deterministic Benchmark v1 engine build (`4eaf729`) passed its full private suite: **7,723 passed, 26 skipped, 0 failed**. The status below describes the earlier release build that accompanied the trio reference demonstrations and is retained for the record.
+
 Release build of the private engine:
 
 ```

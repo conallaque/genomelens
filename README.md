@@ -1,15 +1,108 @@
 # GenomeLens
 
-**From whole-genome evidence to decision-relevant health economics.**
+## Health-economic decision analysis for genomic medicine
 
-GenomeLens is an experimental genomics and decision-analysis platform. It asks not only what a genome contains, but what supported findings could change, what evidence stands behind that change, what the modeled health and economic consequences are, how uncertain those consequences remain — and when the system should refuse to make a claim at all.
+GenomeLens connects genomic evidence to the decisions it may change, and evaluates the potential health and economic consequences of those decisions while preserving uncertainty, missingness, and explicit refusal states.
 
 ```
-WHOLE-GENOME INTERPRETATION → CLINICAL ACTIONABILITY → EVIDENCE PROVENANCE
-→ HEALTH ECONOMICS → UNCERTAINTY / VALUE OF INFORMATION → AUDITABLE REPORTING
+GENOMIC EVIDENCE  →  DECISION / COMPARATOR  →  HEALTH CONSEQUENCE
+                  →  ΔCOST + ΔQALY  →  ICER / NMB (where supported)  →  UNCERTAINTY / APPLICABILITY
 ```
 
-## Real whole-genome demonstrations
+**[View Benchmark v1](benchmark/v1/) · [Read the Public Evidence Brief](benchmark/v1/GenomeLens_Deterministic_Benchmark_v1_Public_Evidence_Brief.pdf) · [View the frozen results](benchmark/v1/GenomeLens_Deterministic_Benchmark_v1_Public_Results.pdf)**
+
+<a href="benchmark/v1/GenomeLens_Deterministic_Benchmark_v1_Public_Evidence_Brief.pdf">
+  <img src="benchmark/v1/GenomeLens_Deterministic_Benchmark_v1_Cover.png" alt="GenomeLens Deterministic Benchmark v1 — Economic decision analysis for genomic medicine" width="520">
+</a>
+
+---
+
+## Deterministic Benchmark v1
+
+A frozen, public-data technical proof of concept: 30 primary public genomes and 6 reference/parent genomes, 36 in total, run end to end as a deterministic control (no AI interpretation) on pinned engine and tooling builds.
+
+| | | | |
+|---|---|---|---|
+| **36 / 36**<br>public genomes completed | **7,723**<br>tests passed (26 skipped, 0 failed) | **9 / 9**<br>release gates | **0**<br>parity failures |
+| **0**<br>arithmetic discrepancies | **301 / 301**<br>real-row assertions | **0 / 1,399**<br>zero-audit defects | **0 / 144**<br>forbidden-string hits across 144 rendered PDFs checked |
+
+These figures matter for specific reasons. *Parity* means every dollar and percentage printed in a report traces to a structured result, so a report cannot say something the analysis did not. The *zero audit* examines every displayed zero and requires it to be a supported null or no-change state, never a missing value rendered as zero. *Arithmetic* recomputes each net-monetary-benefit value from its recorded components wherever those components are separable. *Real-row assertions* are checked against rows the pipeline actually produced, not fixtures.
+
+Full record: [Public Evidence Brief](benchmark/v1/GenomeLens_Deterministic_Benchmark_v1_Public_Evidence_Brief.pdf) (narrative, 6 pages) and [Public Results](benchmark/v1/GenomeLens_Deterministic_Benchmark_v1_Public_Results.pdf) (compact technical record, 4 pages).
+
+---
+
+## Two analysis modes
+
+| Individual genomic economics | Reproductive & carrier economics |
+|---|---|
+| **Unit of analysis:** one genome | **Unit of analysis:** a biologically paired parent pair |
+| Genomic finding → evidence qualification → decision / comparator → health consequence → incremental cost and QALYs → ICER / NMB where supportable → uncertainty, conditionality or refusal | Parent A + Parent B → relevant findings → inheritance compatibility → offspring genotype / phenotype probability → reproductive decision → expected health and economic consequence |
+| Decision contexts: screening, surveillance, treatment selection, pharmacogenomics, prevention, context-dependent future decisions | Decision pathways: resolving technical uncertainty, targeted testing, prenatal testing, PGT-M, or no change where evidence does not support intervention |
+
+Pair-level reproductive value is a **different estimand**. It is not two individual reports added together and is never silently added to either parent's personal-health value.
+
+---
+
+## Decision economics, not genome monetization
+
+- **Genotype alone is not economic value.** Value attaches to a decision, so a finding with no decision it could change has nothing to monetize.
+- **Actionability needs a decision context**, and an economic estimate needs a defensible evidence chain from finding to outcome.
+- **Unsupported pathways can be refused.** A refusal is a reported result with its reason, not a silent omission.
+- **Missing is not zero.** Absent donor context, unresolved technical calls, missing intervention evidence, or economic terms that cannot be separated do not become "$0".
+- **Distinct estimands stay distinct.** Present expected value, value if and when a decision arises, reproductive value, family or cascade value, conditional scenarios, alternative models and sensitivity analyses are reported separately and never silently combined.
+- **Uncertainty stays visible** rather than being collapsed into a point estimate.
+
+---
+
+## What v1 establishes
+
+- Reproducible execution across the intended public cohort, from pinned engine and tooling builds.
+- Evidence and economic routing consistency, with no finding dropped from the economics without a recorded reason.
+- Arithmetic integrity wherever economic terms are recomputable.
+- Explicit missingness and zero semantics.
+- Parity between structured results and rendered reports.
+- Separate parent-pair reproductive economics.
+- Resistance to unsupported external analyst suggestions entering the deterministic economic layer: 278 of 278 challenge items answered, none accepted into an authoritative result.
+
+## What v1 does not establish
+
+- Diagnostic sensitivity or specificity of whole-genome sequencing.
+- Population prevalence or representativeness.
+- Clinical efficacy for an individual patient.
+- A universal cash value of a genome.
+- Individualized medical or reproductive advice.
+- Regulatory clearance or medical-device validation.
+
+### Disclosed limitations of the release
+
+- **Visual review: ACCEPTED P2 VISUAL EXCEPTION.** 49 of 9,482 rendered pages were flagged, all in the full-genome `report.pdf`; the economics PDFs were clean. The flags were a bounding-box false positive and minor ancestry-label overlap and clipping. This is not an unconditional pass.
+- Mutation harnesses were not rerun because their source anchors were stale.
+- No separate full manual adversarial-review pass was completed across every final artifact; one Lynch report was read end to end.
+- 20 economic rows are explicitly classified as not independently recomputable from separable ΔQALY / ΔCost source terms, rather than being filled with invented components.
+
+---
+
+## Reproducibility record
+
+| | |
+|---|---|
+| Benchmark | GenomeLens Deterministic Benchmark v1 (frozen) |
+| Engine | `4eaf729` |
+| Tooling | `a9b3d3a` |
+| Cohort | 30 primary public genomes + 6 reference/parent genomes |
+| Data | Public, open-consent research genomes only. No personal genome, private genomic data or bloodwork. |
+| Archive | Frozen benchmark artifacts were archived and integrity-checked locally. Internal benchmark packages and raw run outputs are not publicly distributed. |
+
+The production implementation, reference data assets and economic parameterization are maintained privately. This repository publishes what GenomeLens evaluates, what it outputs, the evidence that it behaves as described, the principles that govern its output, and where its evidence stops.
+
+---
+
+---
+
+## Earlier reference demonstrations (superseded by Benchmark v1)
+
+> **These are dated snapshots from an earlier engine build**, kept for the record. They are not the current benchmark: the figures below do not describe Deterministic Benchmark v1. Use [Benchmark v1](benchmark/v1/) for current results.
 
 GenomeLens was run end to end on three publicly released Genome in a Bottle whole-genome callsets. The reports below are sanitized public outputs from those runs — real results, not mock-ups.
 
@@ -72,7 +165,7 @@ own viewer; **Web report** is the same report rendered via GitHub Pages; **JSON*
 is the machine-readable public summary. These reports are built from an explicit
 allowlist, not by redacting a production report. The production GenomeLens report is a separate internal artifact and is not published.
 
-## It runs, on real public genomes
+### Genome in a Bottle trio concordance
 
 GenomeLens is exercised end-to-end against the [Genome in a Bottle](https://www.nist.gov/programs-projects/genome-bottle) Ashkenazim trio — HG002, HG003, HG004 — using the publicly released GIAB GRCh38 benchmark callsets and defined confident regions. These are real public reference genomes with an external truth set, not mockups or simulations.
 
@@ -86,6 +179,8 @@ Per sample: [HG002](https://www.nist.gov/programs-projects/genome-bottle) [169](
 
 **What that is not.** Not 100% whole-genome accuracy. Not clinical validation. Not an endorsement by NIST or GIAB. It is agreement on the explicitly benchmarked calls inside the defined truth and callability scope — a denominator we publish rather than hide.
 
+---
+
 ## Validation and QA
 
 [![Public validation](https://github.com/conallaque/genomelens/actions/workflows/public-validation.yml/badge.svg)](https://github.com/conallaque/genomelens/actions/workflows/public-validation.yml)
@@ -93,9 +188,7 @@ Per sample: [HG002](https://www.nist.gov/programs-projects/genome-bottle) [169](
 GenomeLens is developed against a private automated regression suite covering
 genomic interpretation, evidence handling, health economics, uncertainty,
 reproducibility and reporting. Current private-engine release run:
-**5,446 passing · 2 known residual failures · 24 skipped**, with both residual
-failures tracked outside the three published demonstration paths. Exact status
-in [`docs/TESTING.md`](docs/TESTING.md).
+**7,723 passing · 26 skipped · 0 failed** for the frozen Deterministic Benchmark v1 build (engine `4eaf729`). The earlier release-build status that accompanied the trio demonstrations is recorded in [`docs/TESTING.md`](docs/TESTING.md).
 
 That suite stays private, because a test asserting what the engine does under a
 given input is a specification of the engine. So a **representative public
@@ -177,3 +270,15 @@ This repository contains selected methodology, validation evidence, curated repo
 Public artifacts are generated through a deliberately constrained export layer so that validation evidence and interpretable results can be inspected without exposing the production engine.
 
 **Research software. Not a diagnostic device. Not medical advice.**
+
+---
+
+## Repository guide
+
+| | |
+|---|---|
+| [`benchmark/v1/`](benchmark/v1/) | Deterministic Benchmark v1: evidence brief, results record, cover |
+| [`docs/`](docs/) | Architecture, economics, glossary, limitations, scope, report spec, release status, testing, validation |
+| [`tests/public/`](tests/public) · [`tools/verify_public_release.py`](tools/verify_public_release.py) | Public verification suite and one-command release check |
+| [`artifacts/public-benchmarks/`](artifacts/public-benchmarks/) | Earlier trio reference reports (superseded by v1) |
+| [`partner/OVERVIEW.md`](partner/OVERVIEW.md) · [`examples/`](examples/) | Partner overview and integration example |
