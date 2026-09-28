@@ -1,5 +1,10 @@
 # Release status
 
+## Deterministic Benchmark v1
+
+Published: the [Public Evidence Brief](../benchmark/v1/GenomeLens_Deterministic_Benchmark_v1_Public_Evidence_Brief.pdf), the [Public Results](../benchmark/v1/GenomeLens_Deterministic_Benchmark_v1_Public_Results.pdf) record and a cover image, for the frozen public-genome benchmark (engine `4eaf729`, tooling `a9b3d3a`). Not published: internal benchmark packages, raw run outputs, the production engine, routing logic and parameter registries. The earlier trio sections below describe dated snapshots that v1 supersedes.
+
+
 What this release publishes, what it withholds, and why. Items elsewhere in the repository
 that are withheld from this release link here.
 
