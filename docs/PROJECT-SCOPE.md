@@ -89,7 +89,8 @@ External benchmarking uses the Genome in a Bottle Ashkenazim trio — HG002,
 HG003, HG004 — against the publicly released GIAB GRCh38 callsets and their
 defined confident regions: **526 / 526** explicit benchmarked calls concordant,
 zero mismatches, zero normalization failures, across 169 / 187 / 170 calls per
-sample.
+sample. This is a historical result from an earlier engine build and is not
+representative of v1.11 validation.
 
 The denominator is published deliberately. The figure counts positions where
 the truth set *states a genotype*; positions it declines to state are reported
@@ -105,12 +106,11 @@ is described as planned rather than existing.
 
 See [`VALIDATION.md`](VALIDATION.md).
 
-## Product and system design
+## System design
 
-GenomeLens is positioned downstream of sequencing rather than in competition
-with it: a decision and economic layer over variant output that a sequencing
-provider already produces. Public and production outputs are deliberately
-different artifacts — the public report is built from an explicit allowlist, so
+GenomeLens sits downstream of variant calling: it takes a variant callset as
+input and performs neither sequencing nor variant calling. Public and production
+outputs are deliberately different artifacts — the public report is built from an explicit allowlist, so
 that a field added to production tomorrow cannot become public by default. A
 blacklist fails open; an allowlist fails closed.
 
@@ -119,7 +119,7 @@ reporting afterthought: the report shows not only the result but what the
 result depends on, and which parts of it rest on published evidence, a derived
 step, or a declared assumption.
 
-See [`PUBLIC-REPORT-SPEC.md`](PUBLIC-REPORT-SPEC.md) and [`OVERVIEW.md`](../partner/OVERVIEW.md).
+See [`PUBLIC-REPORT-SPEC.md`](PUBLIC-REPORT-SPEC.md) and the [technical overview](../partner/OVERVIEW.md).
 
 ## Research communication
 
@@ -138,10 +138,15 @@ estimand separation, the validation strategy and benchmark design, the
 failure-and-refusal semantics, the public/private export boundary, testing and
 audit requirements, iterative methodological correction, and product direction.
 
-Implementation was carried out with substantial AI-assisted software
-engineering. The design decisions, evidence standards, validation requirements
-and methodological corrections above are the project's own work, and are what
-the public material is intended to evidence.
+Software engineering and document preparation were carried out with
+substantial AI assistance, including the code and the research PDFs in
+[`research/`](../research/), which carry signed Content Credentials recording
+that they were produced with an AI tool. The author set the requirements,
+reviewed the output and made the methodological corrections; neither the code
+nor the documents are presented as written by hand. The direction above is what
+the public material is intended to evidence. It is oversight by the author, not
+independent scientific validation; what has been checked externally, and within
+what scope, is stated in [`VALIDATION.md`](VALIDATION.md).
 
 ## What is public, and what is not
 

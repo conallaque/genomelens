@@ -23,11 +23,11 @@ private tests with assertions removed.
 
 | | Private production suite | Public verification suite |
 |---|---|---|
-| Scale | **5,446 passing · 2 known residual failures · 24 skipped** | **161 collected checks: 161 passed** |
+| Scale | Frozen v1 build (engine `4eaf729`): **7,723 passed · 26 skipped · 0 failed**. Earlier release build: 5,446 passed · 2 known residual failures · 24 skipped (historical). No figure is published for later versions. | **175 collected checks: 175 passed** |
 | Tests | implementation behavior under given inputs | the claims and artifacts this repository publishes |
 | Published | no | yes — [`tests/public/`](../tests/public) |
 
-**The 161 public checks are not a sample of the 5,446.** They were written from
+**The 175 public checks are not a sample of the private suite.** They were written from
 the published artifacts outward and verify different things. A private test
 asserting what the engine does under a given input is a specification of that
 engine; enough of them describe the mechanism this repository withholds. A
@@ -35,9 +35,9 @@ public test asserting that the benchmark figure in `summary.json` matches the
 one in the report and the README verifies a claim without revealing how the
 figure was produced.
 
-## Current production-suite status
+## Private production-suite status (historical)
 
-> **Superseded for the frozen benchmark.** The Deterministic Benchmark v1 engine build (`4eaf729`) passed its full private suite: **7,723 passed, 26 skipped, 0 failed**. The status below describes the earlier release build that accompanied the trio reference demonstrations and is retained for the record.
+> **Superseded for the frozen benchmark.** The Deterministic Benchmark v1 engine build (`4eaf729`) passed its full private suite: **7,723 passed, 26 skipped, 0 failed**. The status below describes the earlier release build that accompanied the trio reference demonstrations and is retained for the record. Neither figure describes later versions, including the current private development version; no test figure is published for them.
 
 Release build of the private engine:
 
@@ -79,7 +79,7 @@ High-level categories only:
 | **Economic consistency** | Published NMB and canonical figures, ICER consistent with its own components, and dominance reported as a status rather than a ratio |
 | **Estimand separation** | Reference-case and canonical results remain distinct fields, differ in value, are stated as never summed, and no collapsed "value of this genome" field exists |
 | **Public schema** | A **closed** allowlist — every key at every level must be expected, so an unanticipated field cannot appear by being unanticipated |
-| **Release security** | Private paths, credential shapes, commercial language and withheld figures, with positive and negative scanner controls, and extracted PDF text rather than raw bytes |
+| **Release security** | Private paths, credential shapes and commercial language, with positive and negative scanner controls and extracted PDF text rather than raw bytes; a value-free scan for numeric value-of-information examples across text files and every PDF surface (text, link targets, properties, attachment names); synthetic-canary controls proving the scanner reports locations and counts but never matched text. It does **not** screen for exact withheld values: a list of those in public code would publish them, so that check belongs to a private release gate before publication |
 | **Claim discipline** | No unscoped accuracy, certification or clinical-validation claims; the scope qualifier must sit adjacent to the headline figure |
 | **Missingness semantics** | An unresolved or not-assessed disposition is never rendered as benign, normal or absent; no non-computed value is published as zero |
 | **Links and assets** | Every published link, report, summary and preview resolves |
@@ -91,7 +91,7 @@ Run them with:
 pytest tests/public
 ```
 
-The current result is `161 passed` out of 161 collected, with no skip.
+The current result is `175 passed` out of 175 collected, with no skip.
 
 That skip used to exist and its disappearance is a result, not a cleanup: it
 was the cost-effectiveness ratio check on the one published case that was

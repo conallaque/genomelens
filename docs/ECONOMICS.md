@@ -44,6 +44,10 @@ Action value and information value can represent closely related economic conseq
 
 Every monetary contribution is classified — evidence-derived, model/scenario assumption, conditional, unresolved, refused, or not economically applicable — and the classification is reported with the number. Parameter provenance distinguishes published values, values derived by a stated step, and declared assumptions, and the model reports how much of its output rests on each.
 
+## Illustration
+
+A short, fully synthetic worked example of these quantities, combining published clinical evidence with independently constructed economic inputs, is given in the [illustrative case study](../research/GenomeLens_TSC_Illustrative_HEOR_Case_Study.pdf). It is an educational calculation and not an output of the GenomeLens engine.
+
 ## Bounds instead of invented prices
 
 Where an intervention's benefit is estimable but its real-world cost is not adequately sourced, GenomeLens can report the **maximum model-consistent cost** at which the modeled decision would still hold. This is a bound, not an estimate of actual cost, not a recommended or fair price, and it is never added to any total. The alternative — treating an unknown cost as zero, or inventing a market price — would be worse than the bound.

@@ -6,6 +6,14 @@ Published in detail because a system that states its boundaries is easier to eva
 
 Research software under active development. **Not a diagnostic device. Not medical advice. Not clinically validated. Not payer-approved.** No regulatory clearance is held or claimed.
 
+## Version scope
+
+Published results describe specific historical builds: the frozen Deterministic Benchmark v1 build (engine `4eaf729`) and the earlier build behind the trio snapshots. They do not describe later versions, including the current private development version, and they do not validate it.
+
+## Validation scope
+
+The external benchmark checks genotype concordance against a public truth set within a stated scope. The public evidence does not include an independent validation of the health-economic model, its parameters or its conclusions. Technical reproducibility is not clinical effectiveness, payer approval or external health-economic validation.
+
 ## Benchmark scope
 
 The reported concordance covers positions where the truth set states a genotype, within defined confident regions. It is not whole-genome accuracy, and it is not an endorsement by NIST or GIAB. Technical concordance is not clinical validity.

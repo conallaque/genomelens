@@ -15,7 +15,10 @@ one that rots.
 What this does NOT do: reproduce the analysis. Regenerating these results
 requires the production engine, which is not published. This verifies that what
 is published here is internally consistent, correctly scoped, and free of the
-disclosure classes the release excludes.
+generic disclosure classes it screens for (local paths, credentials, commercial
+language, numeric value-of-information examples). It does not screen for exact
+withheld values: a list of those in public code would publish them, so that
+check belongs to a private release gate this repository does not contain.
 """
 from __future__ import annotations
 
@@ -94,6 +97,7 @@ def main() -> int:
         return 1
 
     print(dots("result", summary_line))
+    print(dots("exact withheld-value screening", "NOT PERFORMED HERE"))
     if " skipped" in summary_line:
         # Report WHY, rather than implying a missing dependency. A skip whose
         # reason is unstated is indistinguishable from a check that was quietly
@@ -116,8 +120,10 @@ def main() -> int:
 
     print("\nRESULT: PASS")
     print("\nThis verifies the published artifacts. It does not re-run the analysis —\n"
-          "that requires the production engine, which is not published. See\n"
-          "docs/TESTING.md for what the public and private suites each cover.")
+          "that requires the production engine, which is not published — and it\n"
+          "does not check for exact withheld values, which a private release gate\n"
+          "screens before publication. See docs/TESTING.md for what the public and\n"
+          "private suites each cover.")
     return 0
 
 

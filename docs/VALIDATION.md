@@ -1,8 +1,10 @@
 # Validation
 
+> The concordance results on this page are historical: they come from an earlier engine build and are published as a dated snapshot. They are not representative of v1.11 validation, and they do not describe Deterministic Benchmark v1 (see [`benchmark/v1/`](../benchmark/v1/)) or any later version, including the current private development version.
+
 ## Real-data benchmark
 
-GenomeLens is run end-to-end against the Genome in a Bottle Ashkenazim trio — HG002, HG003, HG004 — using the publicly released GIAB GRCh38 benchmark callsets and their defined confident regions.
+GenomeLens was run end-to-end, in an earlier engine build, against the Genome in a Bottle Ashkenazim trio — HG002, HG003, HG004 — using the publicly released GIAB GRCh38 benchmark callsets and their defined confident regions.
 
 ```
 526 / 526  explicit benchmarked calls concordant
@@ -78,7 +80,7 @@ Regions outside the confident-region definition; variant classes the truth set d
 
 Published artifacts carry the engine build that produced them, the input callset and truth-set version, and the region definitions applied. A result that cannot be attributed to a specific build is not publishable as evidence.
 
-**This release does not yet meet that standard for the benchmark figure.** The truth-set release version, confident-region file identity, engine build identifier and retrieval date are not published alongside the 526 figure, and the rule by which the benchmarked positions were selected is not stated. Until they are, the figure should be read as a reported result rather than as an independently re-derivable one. See [`RELEASE-STATUS.md`](RELEASE-STATUS.md#benchmark-manifest).
+**The trio figure does not yet meet that standard.** The truth-set release (GIAB v4.2.1), reference build and chromosome scope are published with it. The confident-region file identity, the engine build identifier, the retrieval date and the rule by which the benchmarked positions were selected are not. Until they are, the figure should be read as a reported result rather than as an independently re-derivable one. See [`RELEASE-STATUS.md`](RELEASE-STATUS.md#benchmark-manifest).
 
 ## Synthetic stress testing — PLANNED, NOT YET RUN
 

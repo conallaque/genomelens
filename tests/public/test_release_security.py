@@ -39,7 +39,13 @@ CREDENTIALS = [r"AKIA[0-9A-Z]{16}", r"gh[pousr]_[A-Za-z0-9]{20,}",
                r"-----BEGIN [A-Z ]*PRIVATE KEY", r"[Bb]earer\s+[A-Za-z0-9._\-]{24,}"]
 COMMERCIAL = [r"gross\s+margin", r"per[- ]patient[ /]per[- ]month", r"\bPPPM\b",
               r"\bLTV\b", r"\b(TAM|SAM|SOM)\b", r"customer acquisition cost"]
-WITHHELD_FIGURES = [r"\$36\.42", r"\b39\.8\s?%", r"\$56\.81", r"\b0\.774\s?%"]
+# Withheld values are deliberately NOT listed in this repository. A deny-list of
+# the numbers publishes the numbers, and a failing assertion that echoes its
+# pattern publishes them again. Exact withheld-value screening is done by a
+# private release gate that this repository does not contain and this suite
+# cannot run. What the public suite checks instead is generic and value-free
+# (scan_engine.py, test_scan_engine_controls.py). A passing run here says nothing
+# about whether any particular withheld value is absent.
 
 
 # This module necessarily contains every pattern it searches for, so scanning
@@ -125,15 +131,6 @@ def test_no_commercial_terms(pattern):
     assert not hits, f"commercial language {pattern} in {hits}"
 
 
-@pytest.mark.parametrize("pattern", WITHHELD_FIGURES)
-def test_withheld_figures_are_absent(pattern):
-    """Numerical value-of-information examples are withheld from this release
-    pending review of a treatment-effect parameter."""
-    hits = [str(p.relative_to(ROOT)) for p in public_text_files()
-            if re.search(pattern, p.read_text(errors="replace"))]
-    assert not hits, f"withheld figure {pattern} published in {hits}"
-
-
 # CAC is coronary artery calcium in clinical text and customer acquisition cost
 # in commercial text. Banning the token would strip legitimate prevention advice,
 # so each occurrence is adjudicated by context instead. These are the contexts
@@ -177,7 +174,7 @@ def test_pdf_text_is_scanned_not_just_its_bytes():
         text = "\n".join(page.get_text() for page in doc)
         doc.close()
         assert len(text) > 500, f"{sample} PDF yielded no extractable text to scan"
-        for pattern in PRIVATE_LOCATIONS + COMMERCIAL + WITHHELD_FIGURES:
+        for pattern in PRIVATE_LOCATIONS + COMMERCIAL:
             assert not re.search(pattern, text, re.I), f"{pattern} in {sample} PDF"
 
 
