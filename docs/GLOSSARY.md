@@ -18,6 +18,8 @@ several arms with different beneficiaries.
 | `unresolved` | Could not be evaluated. Not a negative result. |
 | `refused` | The model declines to make a claim. Not a negative biological result. |
 
+In a report's page footer, **UNRESOLVED** is the label on a computed figure whose applicability to this donor is not established (the donor's age is stated, not observed). It is a statement about the donor, not about the model: the figure was evaluated.
+
 ### Economic disposition — what the model did with a pathway
 
 | Term | Meaning |
@@ -50,3 +52,13 @@ Every monetary contribution carries exactly one of these, reported with the numb
 | **EVSI** | What one specific additional measurement is expected to be worth. |
 | **Estimand** | The precise quantity a number is an estimate of — including whose it is and against what comparator. Two numbers with different estimands are not addable. |
 | **Callability** | Whether a position could be interrogated at all — distinct from what was found there. |
+| **Model basis** | What kind of model stands behind a value: a published model's printed result (restated by stated arithmetic where the source prints another unit), or a hypothetical, assumption-based construction built here from published components or assumptions where the best-ranked model of the decision for the person is not a published one. |
+| **Primary decision-relevant comparison** | The decision's own value: acting on a returned finding against not having it, as the best-ranked model of that decision gives it. |
+| **Secondary published-strategy comparison** | A published result of a different question (for example, which surveillance schedule is best among carriers who are already known), shown beside a decision with each comparator named; never the decision's value and never added to a total. |
+| **Evidence-qualified** | A value for which every model input is sourced and the value does not rest on an age that is stated rather than observed. |
+| **Assumption-driven scenario** | A value that rests on at least one assumption, commonly the stated age; shown as a scenario. |
+| **Supported calculation at the assumed age** | The decisions whose every input except the stated age is sourced; a stricter test than the modeled headline, never a total. A value above zero stays a scenario at the stated age; a supported zero made only of measured nulls is the same true zero as those findings, because a measured null does not depend on the age. |
+| **Hypothetical** | A value whose best-ranked model is one built here, from components and assumptions, shown as a scenario. It is labeled, never counted as a supported estimate. |
+| **Stated age** | The standardized age used for the public demonstrations, because public genomes carry no age: 45 for every genome, except one demonstration of a published-model decision, which uses the age its source reports (30). It is an assumption, labeled on every page. |
+| **Callset** | The file of calls a genome's analysis starts from. A variants-only callset records only where a person differs from the reference, so silence in it is not evidence of a reference sequence. |
+| **Validation (three kinds)** | *Reproduction*: a model rebuilt from a source reproduces that source's printed outputs. *Cross-check*: results set beside a model developed by others. *External validation*: results compared with observed outcomes in a population. No GenomeLens model has had the third. |

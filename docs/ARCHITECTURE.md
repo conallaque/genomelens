@@ -11,7 +11,7 @@ GENOMIC EVENT
    ↓  individually applicable to this person, now?
    ↓  economically evidenced?
    ↓
-MODELLED · CONDITIONAL · REFUSED
+MODELED · CONDITIONAL · REFUSED
    ↓
 REPORT + PROVENANCE
 ```

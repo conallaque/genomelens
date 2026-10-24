@@ -1,0 +1,46 @@
+1. Classification of every printed strategy
+  MLH1 Q5Y, Start age 40: dominated (printed Dominated)
+  MLH1 Q3Y, Start age 35: dominated (printed Dominated)
+  MLH1 Q3Y, Start age 25: dominated (printed Dominated)
+  MLH1 Q2Y, Start age 25: frontier (printed --)
+  MLH1 Q1Y, Start age 25: frontier (printed $44,790.96)
+  MSH2 Q5Y, Start age 40: dominated (printed Dominated)
+  MSH2 Q3Y, Start age 35: dominated (printed Dominated)
+  MSH2 Q3Y, Start age 25: frontier (printed --)
+  MSH2 Q2Y, Start age 25: frontier (printed $29,298.71)
+  MSH2 Q1Y, Start age 25: frontier (printed $2,009,850.42)
+  MSH6 Q5Y, Start age 40: dominated (printed Dominated)
+  MSH6 Q3Y, Start age 40: dominated (printed Dominated)
+  MSH6 Q3Y, Start age 35: frontier (printed --)
+  MSH6 Q3Y, Start age 25: frontier (printed $246,980.73)
+  MSH6 Q1Y, Start age 25: dominated (printed Dominated)
+  PMS2 Q5Y, Start age 40: dominated (printed Dominated)
+  PMS2 Q4Y, Start age 40: dominated (printed Dominated)
+  PMS2 Q3Y, Start age 40: frontier (printed --)
+  PMS2 Q3Y, Start age 35: dominated (printed Dominated)
+  PMS2 Q1Y, Start age 25: dominated (printed Dominated)
+2. Printed ICERs against the previous strategy on the frontier, recomputed from the printed totals
+  MLH1 Q1Y, Start age 25 vs Q2Y, Start age 25: printed 44,790.96, recomputed 44,790.96, reproduces
+  MSH2 Q2Y, Start age 25 vs Q3Y, Start age 25: printed 29,298.71, recomputed 32,437.86, does not reproduce (QALYs rounded to three decimals allow 31,319.31 to 33,639.26; the printed ratio implies an increment of 0.0310 QALYs, the printed totals give 0.0280)
+  MSH2 Q1Y, Start age 25 vs Q2Y, Start age 25: printed 2,009,850.42, recomputed 2,009,850.00, reproduces
+  MSH6 Q3Y, Start age 25 vs Q3Y, Start age 35: printed 246,980.73, recomputed 246,980.00, reproduces
+3. The optimal strategy at 100,000 USD per QALY, and its net monetary benefit against two comparators
+  MLH1 optimal: Q1Y, Start age 25
+    against the next efficient strategy (Q2Y, Start age 25): QALYs +0.073, cost +3,269.74, NMB 4,030.26
+    against the least intensive strategy listed (Q5Y, Start age 40): QALYs +1.639, cost -61,291.09, NMB 225,191.09
+  MSH2 optimal: Q2Y, Start age 25
+    against the next efficient strategy (Q3Y, Start age 25): QALYs +0.028, cost +908.26, NMB 1,891.74
+    against the least intensive strategy listed (Q5Y, Start age 40): QALYs +0.664, cost -25,130.91, NMB 91,530.91
+  MSH6 optimal: Q3Y, Start age 35
+    against the next efficient strategy: none (the optimal strategy is the reference of the frontier)
+    against the least intensive strategy listed (Q5Y, Start age 40): QALYs +0.107, cost -4,092.36, NMB 14,792.36
+  PMS2 optimal: Q3Y, Start age 40
+    against the next efficient strategy: none (the optimal strategy is the reference of the frontier)
+    against the least intensive strategy listed (Q5Y, Start age 40): QALYs +0.054, cost -1,858.65, NMB 7,258.65
+4. A check of the stated discounting (the source states 3% a year, ages 25 to 75)
+  The most 3% discounting can give over 50 annual cycles, at full health with no deaths, is 26.50 QALYs (25.73 if the first cycle is also discounted)
+  MLH1: printed QALYs 27.867 to 29.506, all above 26.50
+  MSH2: printed QALYs 29.032 to 29.699, all above 26.50
+  MSH6: printed QALYs 29.785 to 29.895, all above 26.50
+  PMS2: printed QALYs 29.853 to 29.941, all above 26.50
+  The printed QALYs therefore cannot be 3% discounted over that horizon: the discounting convention behind the printed totals is unresolved, and every figure above is arithmetic on the totals as printed.

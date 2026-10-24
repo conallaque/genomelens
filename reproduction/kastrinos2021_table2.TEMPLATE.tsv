@@ -1,0 +1,3 @@
+# Template for kastrinos2021_table2.tsv (see README.md in this folder). Fill one row per printed strategy (20 rows: four genes) from Table 2 of the source,
+# save the result as kastrinos2021_table2.tsv in this folder, and run either script. Lines starting with # are ignored.
+gene	strategy_as_printed	QALYs	Cost	ICER

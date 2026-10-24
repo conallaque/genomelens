@@ -11,14 +11,14 @@ import re
 from pathlib import Path
 
 import pytest
-from conftest import BENCH, ROOT, SAMPLES
+from conftest import ROOT
 
-TEXT_SUFFIXES = {".md", ".json", ".html", ".yml", ".yaml", ".py", ".txt", ".svg"}
+TEXT_SUFFIXES = {".md", ".json", ".html", ".yml", ".yaml", ".py", ".txt", ".svg", ".R", ".tsv", ".csv", ".sh"}
 
 # WIDENED AFTER A REAL LEAK GOT PAST THE ORIGINAL THREE PATTERNS.
 #
 # The published PDFs carried
-#   file:///private/tmp/claude-501/-Users-conallaque-Desktop-Claude/<id>/...
+#   a file:// URI naming the build machine's temporary directory, with the user's home path encoded with hyphens
 # and every pattern below missed it, for a reason worth stating: the build
 # tool's working directory encodes the home path with HYPHENS, so `-Users-`
 # never matches `/Users/`. A scan tuned to one spelling of a path is a scan
@@ -164,65 +164,57 @@ def test_payback_occurrences_are_health_economic_or_declarative():
                 f"unadjudicated payback usage in {p.relative_to(ROOT)}")
 
 
+def _published_pdfs():
+    return sorted(p for p in ROOT.rglob("*.pdf") if ".git" not in p.parts)
+
+
 def test_pdf_text_is_scanned_not_just_its_bytes():
     """Raw-byte grep on a compressed PDF stream proves nothing. Text is
     extracted and scanned, or this test fails loudly rather than silently
-    passing."""
+    passing. Every committed PDF is scanned, not a chosen few."""
     fitz = pytest.importorskip("fitz", reason="PyMuPDF not installed")
-    for sample in SAMPLES:
-        doc = fitz.open(BENCH / sample / "report-public.pdf")
+    pdfs = _published_pdfs()
+    assert len(pdfs) >= 19, f"expected the published PDFs; found {len(pdfs)}"
+    for pdf in pdfs:
+        doc = fitz.open(pdf)
         text = "\n".join(page.get_text() for page in doc)
         doc.close()
-        assert len(text) > 500, f"{sample} PDF yielded no extractable text to scan"
+        assert len(text) > 500, f"{pdf.name} yielded no extractable text to scan"
         for pattern in PRIVATE_LOCATIONS + COMMERCIAL:
-            assert not re.search(pattern, text, re.I), f"{pattern} in {sample} PDF"
+            assert not re.search(pattern, text, re.I), f"{pattern} in {pdf.name}"
 
 
 def test_pdf_link_annotations_are_scanned_too():
     """Extracted text does not include a link's TARGET, only its label.
 
-    The published PDFs carried three annotations pointing at
-    `file:///private/tmp/.../docs/VALIDATION.md` -- the build machine's
-    directory layout, embedded as clickable targets. `page.get_text()`
-    returns none of that, so the text scan above reported clean while the
-    leak sat in the annotation dictionaries.
+    An earlier set of published PDFs carried annotations pointing at a
+    file:// path of the build machine's directory layout, embedded as
+    clickable targets. `page.get_text()` returns none of that, so a text scan
+    reported clean while the leak sat in the annotation dictionaries.
 
-    READ EVERY VALUE IN THE LINK DICT, NOT JUST `uri`. The first version of
-    this test did exactly that and would have passed on the leaky file:
-    PyMuPDF classifies a `file://` target as kind 3 (LAUNCH) and reports the
-    path under `file`, leaving `uri` empty. A scanner that reads one key
-    cannot see a leak the library filed under another.
-
-    Cause of the original leak: relative hrefs in the report footer, which a
-    browser resolves against the file path when printing.
+    READ EVERY VALUE IN THE LINK DICT, NOT JUST `uri`. PyMuPDF classifies a
+    `file://` target as kind 3 (LAUNCH) and reports the path under `file`,
+    leaving `uri` empty. A scanner that reads one key cannot see a leak the
+    library filed under another.
     """
     fitz = pytest.importorskip("fitz", reason="PyMuPDF not installed")
-    checked = 0
-    for sample in SAMPLES:
-        doc = fitz.open(BENCH / sample / "report-public.pdf")
+    pdfs = _published_pdfs()
+    assert len(pdfs) >= 19, f"expected the published PDFs; found {len(pdfs)}"
+    for pdf in pdfs:
+        doc = fitz.open(pdf)
         try:
             for page in doc:
                 for link in page.get_links():
-                    # Kind 2 is LINK_URI. Anything else in a published report
-                    # -- LAUNCH, GOTOR, an embedded file -- points outside the
-                    # document at something local by construction.
                     kind = int(link.get("kind", -1))
-                    targets = {k: str(v) for k, v in link.items()
-                               if k in ("uri", "file", "name") and v}
+                    targets = {k: str(v) for k, v in link.items() if k in ("uri", "file", "name") and v}
                     if not targets:
                         continue
-                    checked += 1
-                    assert kind == getattr(fitz, "LINK_URI", 2), (
-                        f"{sample} PDF has a non-URI link (kind={kind}): {targets}")
+                    # Kind 2 is LINK_URI. Anything else in a published report -- LAUNCH, GOTOR, an embedded file -- points
+                    # outside the document at something local by construction.
+                    assert kind == getattr(fitz, "LINK_URI", 2), f"{pdf.name} has a non-URI link (kind={kind}): {targets}"
                     for key, val in targets.items():
                         for pattern in PRIVATE_LOCATIONS:
-                            assert not re.search(pattern, val, re.I), (
-                                f"{sample} PDF link[{key}] leaks a local path: "
-                                f"{val[:90]}")
-                        assert val.startswith(("https://", "mailto:")), (
-                            f"{sample} PDF link[{key}] is not absolute https: "
-                            f"{val[:90]}")
+                            assert not re.search(pattern, val, re.I), f"{pdf.name} link[{key}] leaks a local path: {val[:90]}"
+                        assert val.startswith(("https://", "mailto:")), f"{pdf.name} link[{key}] is not absolute https: {val[:90]}"
         finally:
             doc.close()
-    # A test that found no links to check has proven nothing.
-    assert checked >= 3, f"expected published PDFs to carry links; found {checked}"

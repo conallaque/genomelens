@@ -6,43 +6,20 @@ A fresh clone can run the whole suite.
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
-import pytest
-
 ROOT = Path(__file__).resolve().parents[2]
-BENCH = ROOT / "artifacts" / "public-benchmarks"
-SAMPLES = ("HG002", "HG003", "HG004")
 
-# The published headline claims. Every number here also appears in README.md,
-# in each summary.json and in each report-public.html; the cross-artifact tests
-# exist to prove those three never drift apart.
-PUBLISHED = {
-    "HG002": {"truth_calls": 169, "nmb": 158.72, "canonical": 700.00},
-    "HG003": {"truth_calls": 187, "nmb": 1497.24, "canonical": 3588.00},
-    "HG004": {"truth_calls": 170, "nmb": 138.56, "canonical": 765.00},
-}
+# The historical GIAB concordance record (an earlier engine build): explicit truth calls per sample and their aggregate. Every number here also
+# appears in README.md and in docs/VALIDATION.md; the tests in test_historical_concordance.py exist to keep those places from drifting apart.
+PUBLISHED = {"HG002": {"truth_calls": 169}, "HG003": {"truth_calls": 187}, "HG004": {"truth_calls": 170}}
 AGGREGATE = 526
-
-
-def summary(sample: str) -> dict:
-    return json.loads((BENCH / sample / "summary.json").read_text())
-
-
-def report_html(sample: str) -> str:
-    return (BENCH / sample / "report-public.html").read_text()
+SAMPLES = tuple(PUBLISHED)
 
 
 def readme() -> str:
-    return (ROOT / "README.md").read_text()
+    return (ROOT / "README.md").read_text(encoding="utf-8")
 
 
-@pytest.fixture(params=SAMPLES)
-def sample(request) -> str:
-    return request.param
-
-
-@pytest.fixture
-def s(sample) -> dict:
-    return summary(sample)
+def validation() -> str:
+    return (ROOT / "docs" / "VALIDATION.md").read_text(encoding="utf-8")

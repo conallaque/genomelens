@@ -4,7 +4,9 @@ The scoped concordance claim is defensible. The unscoped version of the same
 sentence is not, and the distance between them is one word.
 """
 import re
-from conftest import ROOT, SAMPLES, report_html, summary
+
+import fitz
+from conftest import ROOT
 
 TEXT = {".md", ".html", ".json"}
 
@@ -50,15 +52,10 @@ def test_the_scope_qualifier_travels_with_the_headline():
         assert token in window, f"scope qualifier {token!r} not adjacent to the aggregate"
 
 
-def test_every_public_report_disclaims_clinical_status(sample):
-    html = report_html(sample).lower()
-    assert "not a diagnostic device" in html
-    assert "not medical advice" in html
-    assert "not clinical validation" in html
-
-
-def test_reports_state_they_are_not_the_production_artifact(sample):
-    html = report_html(sample).lower()
-    assert "not the production" in html, (
-        "the public/private boundary must be stated in the artifact itself, "
-        "not only in the repository documentation")
+def test_every_published_report_states_its_research_status_and_that_it_is_proprietary():
+    pdfs = sorted((ROOT / "demonstrations" / "v1.11").rglob("*.pdf"))
+    assert len(pdfs) >= 17, f"expected the demonstration reports, the dossier and the featured report; found {len(pdfs)}"
+    for p in pdfs:
+        text = " ".join(" ".join(pg.get_text() for pg in fitz.open(p)).split())
+        assert re.search(r"not (medical|clinical) or financial advice", text), f"{p.name} does not state its research status"
+        assert "not open-source software" in text, f"{p.name} does not state that it is proprietary"

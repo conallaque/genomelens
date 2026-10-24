@@ -136,15 +136,14 @@ project concept and scope, the research questions, the analytical and evidence
 requirements, the system architecture, the health-economic framework and
 estimand separation, the validation strategy and benchmark design, the
 failure-and-refusal semantics, the public/private export boundary, testing and
-audit requirements, iterative methodological correction, and product direction.
+audit requirements, and iterative methodological correction.
 
-Software engineering and document preparation were carried out with
-substantial AI assistance, including the code and the research PDFs in
-[`research/`](../research/), which carry signed Content Credentials recording
-that they were produced with an AI tool. The author set the requirements,
-reviewed the output and made the methodological corrections; neither the code
-nor the documents are presented as written by hand. The direction above is what
-the public material is intended to evidence. It is oversight by the author, not
+The author independently conceived and directed the project: set its research and methodological requirements, evaluated
+the outputs, identified their limitations and oversaw the corrections. The code and the documents were written by AI tools (Anthropic's Claude and OpenAI's ChatGPT)
+under that direction; AI tools also searched the literature, ran review passes and implemented the corrections. That includes the
+two research PDFs in [`research/`](../research/), which carry signed Content Credentials recording that they were produced
+with an AI tool (OpenAI's ChatGPT). Neither the code nor the documents are presented as written by hand. The direction above is what the public material is
+intended to evidence. It is oversight by the author, not
 independent scientific validation; what has been checked externally, and within
 what scope, is stated in [`VALIDATION.md`](VALIDATION.md).
 

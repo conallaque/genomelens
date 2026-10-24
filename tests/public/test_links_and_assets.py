@@ -3,16 +3,8 @@
 Unglamorous, and the first thing a reader hits if it is wrong.
 """
 import re
-from conftest import BENCH, ROOT, SAMPLES
 
-REQUIRED = ("summary.json", "report-public.html", "report-public.pdf", "preview.png")
-
-
-def test_every_sample_ships_the_full_artifact_set(sample):
-    for name in REQUIRED:
-        p = BENCH / sample / name
-        assert p.is_file(), f"missing {sample}/{name}"
-        assert p.stat().st_size > 0, f"empty {sample}/{name}"
+from conftest import ROOT
 
 
 def test_readme_links_and_images_resolve():
@@ -43,7 +35,10 @@ def test_all_markdown_cross_references_resolve():
     assert not broken, f"broken cross-references: {broken}"
 
 
-def test_preview_images_are_real_images(sample):
-    data = (BENCH / sample / "preview.png").read_bytes()
-    assert data[:8] == b"\x89PNG\r\n\x1a\n", "preview is not a PNG"
-    assert len(data) > 20_000, "preview is too small to be readable"
+def test_committed_pngs_are_real_images():
+    pngs = sorted(p for p in ROOT.rglob("*.png") if ".git" not in p.parts)
+    assert pngs, "no PNG found to check"
+    for p in pngs:
+        data = p.read_bytes()
+        assert data[:8] == b"\x89PNG\r\n\x1a\n", f"{p.relative_to(ROOT)} is not a PNG"
+        assert len(data) > 10_000, f"{p.relative_to(ROOT)} is too small to be readable"

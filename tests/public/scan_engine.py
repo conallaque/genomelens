@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Iterator, Union
 
-TEXT_SUFFIXES = frozenset({".md", ".json", ".html", ".yml", ".yaml", ".py", ".txt", ".svg"})
+TEXT_SUFFIXES = frozenset({".md", ".json", ".html", ".yml", ".yaml", ".py", ".txt", ".svg", ".R", ".tsv", ".csv", ".sh"})
 
 
 class EmptyRuleSet(ValueError):
@@ -85,7 +85,7 @@ def scan_text(text: str, rules: Iterable[AnyRule], where: str) -> list[Finding]:
 
 
 def pdf_surfaces(path: Path) -> Iterator[tuple[str, str]]:
-    """Every string a reader or a crawler can extract from a PDF, labelled by where it lives.
+    """Every string a reader or a crawler can extract from a PDF, labeled by where it lives.
 
     Extracted text does not include a link's target, and neither includes the
     document properties or attachment names; each is its own surface."""

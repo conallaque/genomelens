@@ -6,11 +6,11 @@ GenomeLens separates **public verification** from **private production
 testing**, because the two answer different questions.
 
 The public suite in [`tests/public/`](../tests/public) verifies the claims this
-repository makes: that the published benchmark numbers are what they say they
-are, that the economic figures satisfy the identities defined in
-[`ECONOMICS.md`](ECONOMICS.md), that the same number means the same thing in the
-JSON, the report and the README, and that the release contains none of the
-disclosure classes it is supposed to exclude.
+repository makes: that the historical benchmark record is stated consistently and labeled as
+historical, that every published report states its research and proprietary
+status, that the dossier prints only numbers the public reports and documents
+already print, and that the release contains none of the disclosure classes it
+is supposed to exclude.
 
 The complete production suite stays private. Parts of it encode proprietary
 implementation behavior — a test that asserts what the engine does under a given
@@ -23,40 +23,21 @@ private tests with assertions removed.
 
 | | Private production suite | Public verification suite |
 |---|---|---|
-| Scale | Frozen v1 build (engine `4eaf729`): **7,723 passed · 26 skipped · 0 failed**. Earlier release build: 5,446 passed · 2 known residual failures · 24 skipped (historical). No figure is published for later versions. | **175 collected checks: 175 passed** |
+| Scale | v1.11 release candidate (engine `e89f545c`): **11,165 passed, 68 skipped, 1 failed (an environmental disk-space failure in a test that starts a pipeline from sequencing reads), full private suite on a clean snapshot of the final tree**. Earlier builds were tested against their own private suites; those results are in the private release log and are not restated here. | **107 collected checks: 107 passed** |
 | Tests | implementation behavior under given inputs | the claims and artifacts this repository publishes |
 | Published | no | yes — [`tests/public/`](../tests/public) |
 
-**The 175 public checks are not a sample of the private suite.** They were written from
+**The 107 public checks are not a sample of the private suite.** They were written from
 the published artifacts outward and verify different things. A private test
 asserting what the engine does under a given input is a specification of that
 engine; enough of them describe the mechanism this repository withholds. A
-public test asserting that the benchmark figure in `summary.json` matches the
-one in the report and the README verifies a claim without revealing how the
+public test asserting that the historical concordance figure in the README
+matches the one in `VALIDATION.md` verifies a claim without revealing how the
 figure was produced.
 
-## Private production-suite status (historical)
+## Earlier builds
 
-> **Superseded for the frozen benchmark.** The Deterministic Benchmark v1 engine build (`4eaf729`) passed its full private suite: **7,723 passed, 26 skipped, 0 failed**. The status below describes the earlier release build that accompanied the trio reference demonstrations and is retained for the record. Neither figure describes later versions, including the current private development version; no test figure is published for them.
-
-Release build of the private engine:
-
-```
-5,446 passed
-    2 failed   (known, tracked)
-   24 skipped
-```
-
-**This is not a fully passing suite, and it is not described as one.** Two
-residual failures are carried deliberately:
-
-- one concerns an architectural coverage question that predates this release and
-  is tracked separately;
-- one concerns an insertion-class variant that is **not present in any of the
-  three published demonstrations** — verified directly rather than assumed.
-
-Both are outside the HG002 / HG003 / HG004 paths published here. Neither is
-described further, because the description would be the implementation detail.
+Earlier release builds were tested against their own private suites. Those results are recorded in the private release log and are not restated here, and no test figure describes any build other than the one named above.
 
 ## What the private suite covers
 
@@ -74,16 +55,16 @@ High-level categories only:
 
 | Area | What it checks |
 |---|---|
-| **Benchmark integrity** | Per-sample and aggregate concordance, zero mismatches, pinned GIAB release, reference build and `chr1-22` scope, distinct sample identifiers, and that the trio's pedigree relationship stays visible next to the aggregate |
-| **Cross-artifact consistency** | The same headline figure in `summary.json`, `report-public.html`, the rendered PDF and the README card — a report that silently disagrees with its own JSON is worse than one that publishes less |
-| **Economic consistency** | Published NMB and canonical figures, ICER consistent with its own components, and dominance reported as a status rather than a ratio |
-| **Estimand separation** | Reference-case and canonical results remain distinct fields, differ in value, are stated as never summed, and no collapsed "value of this genome" field exists |
-| **Public schema** | A **closed** allowlist — every key at every level must be expected, so an unanticipated field cannot appear by being unanticipated |
+| **Historical concordance record** | Per-sample and aggregate concordance as stated in the README and in `VALIDATION.md`, zero mismatches, pinned GIAB release, reference build and `chr1-22` scope, the trio's pedigree relationship stated next to the aggregate, the record labeled historical and not v1.11 validation, and no per-genome report of the earlier build left in the tree |
 | **Release security** | Private paths, credential shapes and commercial language, with positive and negative scanner controls and extracted PDF text rather than raw bytes; a value-free scan for numeric value-of-information examples across text files and every PDF surface (text, link targets, properties, attachment names); synthetic-canary controls proving the scanner reports locations and counts but never matched text. It does **not** screen for exact withheld values: a list of those in public code would publish them, so that check belongs to a private release gate before publication |
-| **Claim discipline** | No unscoped accuracy, certification or clinical-validation claims; the scope qualifier must sit adjacent to the headline figure |
-| **Missingness semantics** | An unresolved or not-assessed disposition is never rendered as benign, normal or absent; no non-computed value is published as zero |
-| **Links and assets** | Every published link, report, summary and preview resolves |
-| **Presentation** | Previews are embedded rather than linked, the primary report link is the PDF GitHub renders, no README link sends a reader to HTML source, and sample links never cross-reference another genome |
+| **Claim discipline** | No unscoped accuracy, certification or clinical-validation claims; the scope qualifier must sit adjacent to the headline figure; every demonstration PDF states its research status and that it is proprietary |
+| **Links and assets** | Every published link and image resolves, and every PNG is a real image |
+| **Presentation** | The repository serves its files verbatim and the README links nothing removed |
+| **HEOR dossiers (public edition)** | The dossier PDF exists, is linked from the README, carries only its title as metadata and no link or annotation, says it is proprietary, and prints only decimals and whole numbers of 100 or more (apart from years and axis marks) that already appear in that genome's public reports, the public documents or the reproduction kit's recorded output |
+| **Featured six-page report (public edition)** | The PDF exists, has exactly six pages, is linked and previewed in the README, carries only its title as metadata and no link but the PubMed citation links, states that it is hypothetical, proprietary and not externally validated, discloses that its comparator is an assumption that overstates the increment, and prints only numbers that already appear in the public reports and documents or are calculated from printed terms |
+| **v1.11 demonstrations and reproduction** | The 16 demonstration PDFs carry only their title as metadata and contain no local path or draft text; the README's example table matches the published files and uses only the allowed model-basis labels; the README keeps published results apart from hypothetical scenarios; the published colorectal-surveillance recomputation prints exactly its recorded output in both Python and R when the published table is supplied (the table is not shipped, so those two checks skip, with that reason, until it is), and without it each script says how to supply it and computes nothing; the preview image carries no metadata |
+
+Checks written for the earlier trio per-genome reports (their JSON schema, economic identities, estimand separation, missingness semantics and cross-artifact consistency) were retired on 2026-10-24 together with those reports. For the v1.11 reports the equivalent guarantees are the allowlist export that builds them, the v1.11 checks above and the dossier's number rule.
 
 Run them with:
 
@@ -91,15 +72,10 @@ Run them with:
 pytest tests/public
 ```
 
-The current result is `175 passed` out of 175 collected, with no skip.
+The current result is `105 passed, 2 skipped` out of 107 collected. The skips are the two reproduction checks that need the published table, which is not shipped (publisher terms); each reports that reason.
 
-That skip used to exist and its disappearance is a result, not a cleanup: it
-was the cost-effectiveness ratio check on the one published case that was
-dominant, and a dominant strategy has no interpretable ratio to compare. No
-published case is dominant any more — whole-genome sequencing is now priced at
-its list price rather than a promotional one — so the check runs. The verifier
-still prints any skip reason rather than hiding it, because a skip whose reason
-is unstated is indistinguishable from a check that was quietly dropped.
+The verifier prints any skip reason rather than hiding it, because a skip whose
+reason is unstated is indistinguishable from a check that was quietly dropped.
 
 Or verify the whole release in one command:
 
@@ -144,21 +120,9 @@ construction.
 
 ## Reproducibility
 
-Deterministic reruns were tested: the same engine, inputs, configuration and
-seed reproduce the structured output exactly, with the sole difference being a
-build identifier that embeds a timestamp.
+Deterministic reruns were tested: the same engine, inputs, configuration and seed reproduce the structured output exactly, apart from the generation timestamp printed on each document.
 
-Stochastic re-seeding was verified separately and is a different question.
-Re-seeding moves the probabilistic sensitivity analysis — mean net monetary
-benefit, cost-effectiveness probability, interval bounds and expected value of
-perfect information all shift — while every deterministic reference-case figure
-stays fixed. That is the expected signature, and observing it is what
-establishes the published interpretation does not depend on a single Monte Carlo
-realization. The observed shift in expected value of perfect information was a
-small fraction of that quantity's own reported Monte Carlo standard error.
-
-The default seed is not published: it is an implementation detail, and fixing a
-public number to it would invite the figure to be read as more exact than it is.
+Stochastic re-seeding was verified separately and is a different question: reference-case figures are invariant to the random seed, and the probabilistic summaries move within their stated Monte Carlo error. The default seed is not published: fixing a public number to it would invite the figure to be read as more exact than it is.
 
 ## Scope and limitations
 

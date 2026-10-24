@@ -17,7 +17,7 @@ interpretation · actionability · evidence provenance
 health economics · uncertainty · auditable report
 ```
 
-The proof points are deliberately external where possible: a public GIAB trio (a historical result from an earlier engine build, not representative of v1.11 validation), an external truth set, a published benchmark denominator, and explicit refusal behavior. Sanitized reports for the current engine build are [not published](../docs/RELEASE-STATUS.md#trio-reports).
+The proof points are deliberately external where possible: a public GIAB trio (a historical concordance result from an earlier engine build, not representative of v1.11 validation), an external truth set, a published benchmark denominator, and explicit refusal behavior. Sanitized reports for the v1.11 release candidate are in [`demonstrations/v1.11/`](../demonstrations/v1.11/).
 
 ## For a health-economic reader
 

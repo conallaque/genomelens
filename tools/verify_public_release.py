@@ -7,8 +7,8 @@ No network, no credentials, no GenomeLens engine, no private paths. A fresh
 clone can run it.
 
 SINGLE SOURCE OF TRUTH. The checks themselves live in `tests/public/`. This
-script reads the published artifacts to print the headline figures, then runs
-that suite and reports its result. It deliberately does not reimplement the
+script reads the published files to print what they contain, then runs that
+suite and reports its result. It deliberately does not reimplement the
 assertions: two copies of the same logic drift, and the copy nobody runs is the
 one that rots.
 
@@ -22,13 +22,12 @@ check belongs to a private release gate this repository does not contain.
 """
 from __future__ import annotations
 
-import json
+import re
 import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-BENCH = ROOT / "artifacts" / "public-benchmarks"
 SAMPLES = ("HG002", "HG003", "HG004")
 WIDTH = 52
 
@@ -41,46 +40,37 @@ def dots(label: str, value: str) -> str:
 def main() -> int:
     print("GenomeLens public release verification\n")
 
-    # ── artifacts present ────────────────────────────────────────────────
-    required = ("summary.json", "report-public.html", "report-public.pdf", "preview.png")
-    print("Artifacts")
-    missing: list[str] = []
-    for s in SAMPLES:
-        absent = [n for n in required if not (BENCH / s / n).is_file()]
-        missing += [f"{s}/{n}" for n in absent]
-        print(dots(s, "PASS" if not absent else "FAIL"))
-    if missing:
-        print(f"\nRESULT: FAIL — missing artifacts: {', '.join(missing)}")
+    # -- published reports present ---------------------------------------
+    print("Published reports")
+    demo = ROOT / "demonstrations" / "v1.11"
+    reports = sorted(demo.glob("GenomeLens_public_demonstration_*.pdf"))
+    dossiers = sorted((demo / "dossiers").glob("*.pdf")) if (demo / "dossiers").is_dir() else []
+    featured = sorted((demo / "featured").glob("*.pdf")) if (demo / "featured").is_dir() else []
+    bench = sorted((ROOT / "benchmark" / "v1").glob("*.pdf"))
+    print(dots("v1.11 demonstration reports", str(len(reports))))
+    print(dots("featured six-page report", str(len(featured))))
+    print(dots("HEOR technical dossier", str(len(dossiers))))
+    print(dots("Benchmark v1 documents", str(len(bench))))
+    if not (reports and bench):
+        print("\nRESULT: FAIL - the published reports or the benchmark documents are missing")
         return 1
 
-    summaries = {s: json.loads((BENCH / s / "summary.json").read_text()) for s in SAMPLES}
-
-    # ── benchmark ────────────────────────────────────────────────────────
-    print("\nGIAB benchmark")
-    total = mism = norm = 0
-    for s, d in summaries.items():
-        v = d["validation"]
-        total += v["explicit_truth_calls"]
-        mism += v["mismatches"]
-        norm += v["normalization_failures"]
-        print(dots(s, f"{v['concordant']}/{v['explicit_truth_calls']}"))
+    # -- historical GIAB concordance, as the README states it ------------
+    print("\nHistorical GIAB concordance (an earlier engine build; not v1.11)")
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    total = 0
+    for s in SAMPLES:
+        row = re.search(rf"\|\s*{s}\s*\|[^\n]*", text[text.index("## Earlier GIAB trio concordance"):])
+        m = re.search(r"\b(\d+)/(\d+)\b", row.group(0)) if row else None
+        if not m:
+            print(dots(s, "FAIL"))
+            print(f"\nRESULT: FAIL - the README no longer states {s}'s concordance")
+            return 1
+        total += int(m.group(2))
+        print(dots(s, f"{m.group(1)}/{m.group(2)}"))
     print(dots("Aggregate", f"{total}/526"))
-    print(dots("Mismatches", str(mism)))
-    print(dots("Normalization failures", str(norm)))
-    scope = {(d["dataset"]["benchmark_release"], d["dataset"]["reference_build"],
-              d["dataset"]["benchmark_scope"]) for d in summaries.values()}
-    print(dots("Scope", " · ".join(sorted(scope)[0])))
 
-    # ── economics ────────────────────────────────────────────────────────
-    print("\nEconomics")
-    for s, d in summaries.items():
-        e = d["economics"]
-        icer = e["icer"] if isinstance(e["icer"], str) else f"{e['icer']:,}"
-        print(dots(f"{s}  reference-case / canonical / ICER",
-                   f"${e['reference_case_nmb_usd']:,} / "
-                   f"${e['canonical_expected_nmb_usd']:,} / {icer}"))
-
-    # ── the suite ────────────────────────────────────────────────────────
+    # -- the suite -------------------------------------------------------
     print("\nPublic validation suite")
     proc = subprocess.run(
         [sys.executable, "-m", "pytest", "tests/public", "-q", "--no-header",
@@ -91,7 +81,7 @@ def main() -> int:
 
     if "no tests ran" in summary_line or not tail:
         print(dots("suite executed", "FAIL"))
-        print("\nRESULT: FAIL — the suite did not run. An exit code from a suite\n"
+        print("\nRESULT: FAIL - the suite did not run. An exit code from a suite\n"
               "that never executed is not evidence of anything.")
         print(proc.stdout[-1500:] or proc.stderr[-1500:])
         return 1
@@ -119,8 +109,8 @@ def main() -> int:
         return proc.returncode
 
     print("\nRESULT: PASS")
-    print("\nThis verifies the published artifacts. It does not re-run the analysis —\n"
-          "that requires the production engine, which is not published — and it\n"
+    print("\nThis verifies the published files. It does not re-run the analysis -\n"
+          "that requires the production engine, which is not published - and it\n"
           "does not check for exact withheld values, which a private release gate\n"
           "screens before publication. See docs/TESTING.md for what the public and\n"
           "private suites each cover.")
