@@ -4,12 +4,12 @@ A GenomeLens economic report answers one question for one genome: **for each cli
 
 ## The set of documents
 
-Each genome produces a six-page economic report, a complete model record, and three short documents written for different readers.
+Each genome produces a six-page economic report, the detailed results behind it, and three short documents written for different readers.
 
 | Document | Reader | What it holds | Published here |
 |---|---|---|---|
-| Economic report (six pages) | Anyone | The headline result and what it means; every finding by class; the calculation behind the headline; sensitivity and uncertainty; assumptions and limitations; evidence provenance | A public edition for demonstration 2 (`demonstrations/v1.11/featured/`; its input table and model record are not in it); the full report is private |
-| Complete model record | A reviewer | Every result by category, with its inputs, conditions and sources | No (private) |
+| Economic report (six pages) | Anyone | The headline result and what it means; every finding by class; the calculation behind the headline; sensitivity and uncertainty; assumptions and limitations; evidence provenance | A public edition for demonstration 2 (`demonstrations/v1.11/featured/`; its input table and the detailed results are not in it); the full report is private |
+| Detailed results | A reviewer | Every result by category, with its sources | No (private) |
 | Payer brief | A health plan | The lead result, who it accrues to, a scale illustration per 1,000 members, what a plan should not read into it | No (private) |
 | HEOR technical dossier | A health-economics analyst | A model card for every modeled value; the reporting checklist (CHEERS 2022); the validation record | A public edition for demonstration 1 (`demonstrations/v1.11/dossiers/`, without the input tables); the full edition is private |
 | Genomics summary | A sequencing or genomics organization | What the genome yielded, from finding to value; carrier, cascade and population information; what the callset does and does not settle gene by gene | No (private) |
